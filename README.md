@@ -1,2 +1,2 @@
 # ChatterUI
-Simple frontend for LLM backend built in react-native.
+Simple frontend for LLMs built in react-native.
