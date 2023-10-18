@@ -1,0 +1,216 @@
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { Stack, useRouter} from 'expo-router'
+import { TouchableOpacity, View, StyleSheet} from 'react-native'
+import { useEffect } from 'react'
+import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
+import { Global, generateDefaultDirectories, createNewDefaultChat  } from '@globals'
+import * as FS from 'expo-file-system'
+import {Asset} from 'expo-asset'
+// init values should be here
+require('fastestsmallesttextencoderdecoder')
+const Layout = () => {
+    const router = useRouter()
+    
+	const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
+    const [currentPreset, setCurrentPreset] = useMMKVObject(Global.CurrentPreset)
+	const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
+    const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
+    const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
+
+    // reset defaults
+    useEffect(() => {
+        
+		setCurrentChat('')
+        setUserName('User')
+        setCurrentCard(null)
+		setCharName('Welcome')
+		setNowGenerating(false)
+		console.log("Reset values")
+
+		FS.readDirectoryAsync(`${FS.documentDirectory}/characters`).catch(() => generateDefaultDirectories().catch(
+            () => console.log(`Could not generate default folders`)
+        ))
+
+        if(currentInstruct?.system_prompt === undefined)
+            setCurrentInstruct(defaultInstruct())
+
+        if(currentPreset?.temp === undefined)
+            setCurrentPreset(defaultPreset())
+
+	}, []) 
+
+    return (
+    <Stack>
+       <Stack.Screen name='index' options={{
+					title: charName,
+                    headerRight : () => 
+                         (<View style={styles.headerButtonContainer}>
+                            {charName !== 'Welcome' && 
+                            <View style={styles.headerButtonContainer}>
+                                <TouchableOpacity style={styles.headerButtonRight} onPress={() => {router.push('ChatSelector')}}>
+                                    <Ionicons name='chatbox' size={28} />
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.headerButtonRight} onPress={() => router.push(`CharInfo`)}>
+                                    <FontAwesome name='cog' size={28} />
+                                </TouchableOpacity>
+                            </View>
+                        }
+                            <TouchableOpacity style={styles.headerButtonRight} onPress={() => {router.push('CharMenu')}}>
+                            <Ionicons name='person' size={28} />
+                            
+                            </TouchableOpacity>
+                            {false &&
+                            <TouchableOpacity style={styles.headerButtonRight} onPress={() => generateDefaults()}>
+                            <Ionicons name='reload' size={28} />
+                            </TouchableOpacity>}
+                        </View>)
+                    ,
+                    headerLeft :() =>  (
+                        <TouchableOpacity style={styles.headerButtonLeft} onPress={() => router.push('Settings')}>
+                            <Ionicons name='menu' size={28} />
+                        </TouchableOpacity>
+                    ),
+                   
+                   paddingRight:20,
+        }}/> 
+                
+       <Stack.Screen name='CharMenu' options={{
+                        animation:'slide_from_right',
+                         title: "Characters",
+        }}/> 
+
+        <Stack.Screen name='CharInfo' options={{
+                animation:'slide_from_right',
+                title: "Edit",
+            
+        }}/> 
+
+        <Stack.Screen name='ChatSelector' options={{
+                        animation:'slide_from_right',
+                         title: "History", 
+                         headerRight : () => 
+                         (<View style={styles.headerButtonContainer}>
+                            <TouchableOpacity style={styles.headerButtonRight} onPress={() => {
+                                // create new default chat from globals
+                                createNewDefaultChat(charName).then( response =>
+                                    setCurrentChat(response)
+                                )
+                                router.back()
+                            }}>
+                                <FontAwesome name='plus' size={28} />
+                            </TouchableOpacity>
+                        </View>),
+                         
+        }}/> 
+        
+        <Stack.Screen   name='Settings' options={{
+                        animation:'slide_from_left',
+                        headerShown: 'false'
+        }} />
+        </Stack> 
+    );
+    
+}
+
+export default Layout;
+
+const styles = StyleSheet.create({
+    navbar : {
+        alignItems:'center',
+        paddingRight:100,
+    },
+
+    headerButtonRight : {
+        marginLeft:20,
+        marginRight:4,
+    },
+
+    headerButtonLeft : {
+        marginRight:20,
+
+    },
+
+    headerButtonContainer : {
+        flexDirection: 'row',
+    },
+})
+
+
+const devReset = async () => {
+
+	await FS.deleteAsync(FS.documentDirectory + 'characters').catch(error => console.log("Couldnt delete?" + error))
+
+
+	const dirinfo = await FS.getInfoAsync(FS.documentDirectory + 'characters/Flux').then( async (dirinfo) => {
+		if(dirinfo.exists){
+			await FS.readDirectoryAsync(FS.documentDirectory + 'characters/Flux').then(response => console.log(response))
+			return
+		}
+		chardata = require('@public/characters/Flux_the_Cat/default_FluxTheCat.json')
+		const charImage =  require('@public/characters/Flux_the_Cat/default_FluxTheCat.png')
+		
+		await FS.makeDirectoryAsync(FS.documentDirectory + 'characters/')
+		
+		await FS.makeDirectoryAsync(FS.documentDirectory + 'characters/Flux The Cat')
+		await FS.makeDirectoryAsync(FS.documentDirectory + 'characters/Flux The Cat/chats')
+		await FS.makeDirectoryAsync(FS.documentDirectory + 'characters/Flux2')
+		await FS.makeDirectoryAsync(FS.documentDirectory + 'characters/Flux2/chats')
+
+		await FS.writeAsStringAsync(FS.documentDirectory + 'characters/Flux The Cat/Flux The Cat.json', JSON.stringify(chardata), {encoding:FS.EncodingType.UTF8})
+		await FS.writeAsStringAsync(FS.documentDirectory + 'characters/Flux2/Flux2.json', JSON.stringify(chardata), {encoding:FS.EncodingType.UTF8})
+		//await FS.writeAsStringAsync(FS.documentDirectory + 'characters/Flux/FluxTheCat.png', charImage, {encoding:FS.EncodingType.Base64})
+		await FS.downloadAsync(
+			Asset.fromModule(require('@public/characters/Flux_the_Cat/default_FluxTheCat.png')).uri ,
+			FS.documentDirectory + 'characters/Flux The Cat/Flux The Cat.png')
+		
+			await FS.downloadAsync(
+				Asset.fromModule(require('@public/characters/Flux_the_Cat/default_FluxTheCat.png')).uri ,
+				FS.documentDirectory + 'characters/Flux2/Flux2.png')
+
+		console.log("Default Files Successfully Generated")
+	}
+		
+	).catch((error) => console.log("Something went wrong!\n" + error))
+}
+
+const defaultPreset = () => {
+    return {
+        "temp": 1,
+        "rep_pen": 1,
+        "rep_pen_range": 1,
+        "top_p": 0.9,
+        "top_a": 0.9,
+        "top_k": 20,
+        "typical": 1,
+        "tfs": 1,
+        "rep_pen_slope": 0.9,
+        "single_line": false,
+        "sampler_order": [
+            6,
+            0,
+            1,
+            3,
+            4,
+            2,
+            5
+        ],
+        "mirostat": 0,
+        "mirostat_tau": 5,
+        "mirostat_eta": 0.1,
+        "use_default_badwordsids": true,
+        "grammar": "",
+        "genamt": 220,
+        "max_length": 4096
+    }
+
+}
+
+const defaultInstruct = () => {
+    return {
+        "system_prompt": "",
+        "input_sequence": "",
+        "output_sequence": "",
+    }
+}
