@@ -78,8 +78,6 @@ const Home = () => {
 		}
 	}
 
-
-
 	useEffect(() => {
 		if(nowGenerating)
 			generateResponse()

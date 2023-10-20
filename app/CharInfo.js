@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity, Alert, ToastAndroid  } from 'react-native'
+import { View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity, Alert, ToastAndroid } from 'react-native'
 import { useState } from 'react'
 
 import { Global, copyCharImage, deleteCharacter, getCharacterCard, getCharacterImageDirectory, saveCharacterCard } from '@globals'
