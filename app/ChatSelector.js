@@ -1,7 +1,7 @@
 import { ScrollView, View, Text, StyleSheet, Image ,Alert } from 'react-native'
 import { useEffect, useState } from 'react'
 import { useMMKVString } from 'react-native-mmkv'
-import { Global, getCharacterImageDirectory, getChatFilenames, deleteChatFile, getNewestChatFilename, createNewDefaultChat }  from '@globals'
+import { Global, getCharacterImageDirectory, getChatFilenames, deleteChatFile, getNewestChatFilename}  from '@globals'
 import { useRouter } from 'expo-router'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { FontAwesome } from '@expo/vector-icons'

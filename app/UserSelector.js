@@ -18,20 +18,22 @@ const UserSelector = () => {
     const [newUserName, setNewUserName] = useState('')
 
     const loadUserList = () => {
+
         getUserFilenames().then((response)=> {
             if(response.length === 0) {
-                createNewUser('User').then(() => {
+                const defaultName = 'User'
+                createNewUser(defaultName).then(() => {
                     setUserList(response)
-                    setUserName('User')
-                    loadUserCard('User').then(card => setUserCard(card))
+                    setUserName(defaultName)
+                    loadUserCard(defaultName).then(card => setUserCard(card))
                     loadUserList()
                 })
             }
             else setUserList(response)
-        })
+        }).catch(() => setUserList([]))
     }
 
-    useEffect(() => {loadUserList()}, [])
+    useEffect(() => {if (userName !== undefined) loadUserList()}, [])
 
     return (
     <SafeAreaView style={styles.mainContainer}>
@@ -110,7 +112,7 @@ const UserSelector = () => {
                             }}
                         >
 
-                            <Image source={{uri:getUserImageDirectory()}} style={styles.avatar}/>
+                            <Image source={{uri:getUserImageDirectory(name)}} loadingIndicatorSource={require('@assets/user.png')} style={styles.avatar}/>
                         
                             <Text style={{flex:1}}>{name}</Text>
                         

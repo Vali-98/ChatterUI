@@ -4,9 +4,9 @@ import {
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler'
 import { useRef, useEffect, useState, useContext} from 'react'
 import { MaterialIcons} from '@expo/vector-icons'
-import { MessageContext, saveChatFile, Global, getCharacterImageDirectory } from '@globals'
+import { MessageContext, saveChatFile, Global, getCharacterImageDirectory, getUserImageDirectory } from '@globals'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
-import Markdown from 'react-native-easy-markdown'
+import Markdown from 'react-native-markdown-package'
 import * as FS from 'expo-file-system'
 // global chat property for editing
 
@@ -21,15 +21,16 @@ const ChatItem = ({ message, id}) => {
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     // figure this shit out
     const [imageExists, setImageExists] = useState(true)
-
+    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
 
     useEffect(() => {
-        FS.readAsStringAsync(getCharacterImageDirectory()).then(
+        FS.readAsStringAsync((message.name === charName) ? getCharacterImageDirectory(charName) : getUserImageDirectory(userName)).then(
             () => setImageExists(true)
         ).catch(
             () => setImageExists(false)
         )
-    })
+    }, [message.mes])
+ 
 
     useEffect(() => {
         Animated.parallel([
@@ -64,9 +65,9 @@ const ChatItem = ({ message, id}) => {
             
                 <Image style={styles.avatar} source={
                     (message.name === charName)?
-                    ((imageExists)? {uri:getCharacterImageDirectory(message.name)} : require('@assets/user.png'))
+                    ((imageExists)? {uri:getCharacterImageDirectory(charName)} : require('@assets/user.png'))
                     :
-                    require('@assets/user.png')
+                    ((imageExists)? {uri:getUserImageDirectory(userName)} : require('@assets/user.png'))
                     } />
             
             
@@ -131,9 +132,9 @@ const ChatItem = ({ message, id}) => {
 
             {!editMode?
                 <View style={styles.messageTextContainer}>
-                    <Markdown 
+                    <Markdown
                         style={styles.messageText}
-                        markdownStyles={{
+                        styles={{
                             em:{
                                 color: `#606060`,
                                 fontStyle:'italic',
@@ -144,7 +145,7 @@ const ChatItem = ({ message, id}) => {
                     </Markdown>
                 </View>
                 :
-                <View style={styles.messageInput}  >
+                <View style={styles.messageInput} >
                 <TextInput
                     value={placeholderText.trim('\n')} 
                     onChangeText={setPlaceholderText}        
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
 
     messageTextContainer : {
         backgroundColor: '#e1e1e1',
-        padding: 8,
+        paddingHorizontal: 8,
         borderRadius: 8,
         flex: 1,
         textAlignVertical:'center',
