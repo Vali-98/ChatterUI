@@ -22,6 +22,7 @@ import  extractChunks  from 'png-chunks-extract'
 import { decode } from 'png-chunk-text'
 import { Buffer } from '@craftzdog/react-native-buffer'
 import * as Base64 from 'base-64'
+import axios from 'axios'
 
 const CharMenu = () => {
     const router = useRouter()
@@ -29,6 +30,8 @@ const CharMenu = () => {
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [showNewChar, setShowNewChar] = useState(false)
     const [newCharName, setNewCharName] = useState('')
+    const [showDownload, setShowDownload] = useState(false)
+    const [downloadName, setDownloadName] = useState('')
 
     const getCharacterList = async () => {
         await FS.readDirectoryAsync(FS.documentDirectory + 'characters/').then((response) => {
@@ -42,7 +45,6 @@ const CharMenu = () => {
 
     const createCharacter = (uri) => {
         FS.readAsStringAsync(uri, {encoding: FS.EncodingType.Base64}).then((file)=>{
-                            
             const chunks = extractChunks(Buffer.from(file, 'base64'))
             const textChunks = chunks.filter(function (chunk) {
                 return chunk.name === 'tEXt'
@@ -50,8 +52,11 @@ const CharMenu = () => {
                 return decode(chunk.data)
                 })
             const charactercard = JSON.parse(Base64.decode(textChunks[0].text))
-            const newname = charactercard.data.name ?? charactercard.name
-            
+            const newname = charactercard?.data?.name ?? charactercard.name
+            if(newname === 'Detailed Example Character'){
+                ToastAndroid.show('Invalid Character ID', 2000)
+                return
+            }
             createNewCharacter(newname).then(() => {
                 return saveCharacterCard(newname, JSON.stringify(charactercard))
             }).then(() => {
@@ -64,8 +69,10 @@ const CharMenu = () => {
             }).catch(() => {
                 ToastAndroid.show(`Failed to create card - Character might already exist.`, 2000)
             })
-
-        }).catch(error => console.log(error))
+        }).catch(error => {
+            ToastAndroid.show(`Failed to create card - Character might already exist?`, 2000)
+            console.log(error)
+        })
 
     }
 
@@ -77,7 +84,7 @@ const CharMenu = () => {
             (<View style={styles.headerButtonContainer}>
                 
                 <TouchableOpacity style={styles.headerButtonRight} onPress={async () => {
-                    
+                    setShowDownload(true)
                 }}>
                 <FontAwesome name='cloud-download' size={28} />
                 </TouchableOpacity>
@@ -141,7 +148,65 @@ const CharMenu = () => {
                 </View>
             </Modal>
             
+            <Modal
+                visible={showDownload}
+                transparent
+                animationType='fade'
+                onDismiss={() => {setShowDownload(false)}}
+            >   
+                <View style={{backgroundColor: 'rgba(0, 0, 0, 0.5)', flex:1, justifyContent: 'center'}}>
+                <View style={styles.modalview}>
+                    <Text>Enter ID or Hyperlink</Text>
+                    <TextInput 
+                        style={styles.input} 
+                        value={downloadName}
+                        onChangeText={setDownloadName}
+                    />
 
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity 
+                            style={styles.modalButton}
+                            onPress={() => setShowDownload(false)
+                        }>
+                            <MaterialIcons name='close' size={28} color="#707070" />
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={styles.modalButton}
+                            onPress={async () => {
+                            axios.post(
+                                'https://api.chub.ai/api/characters/download', 
+                                JSON.stringify({
+                                    "format" : "tavern",
+                                    "fullPath" : downloadName
+                                }),
+                                {
+                                    responseType: 'arraybuffer'
+                                }
+                                ).then(async (res) => {
+                                    console.log(res.data)
+                                    if(res.status !== 200){
+                                        ToastAndroid.show(`Invalid URL`, ToastAndroid.SHORT)
+                                        return
+                                    }
+                                    const response = Buffer.from(res.data, 'base64').toString('base64')
+                                    
+                                    FS.writeAsStringAsync(
+                                        `${FS.cacheDirectory}image.png`, 
+                                        response, 
+                                        {encoding:FS.EncodingType.Base64}).then( async () => {
+                                            createCharacter(`${FS.cacheDirectory}image.png`)
+                                    })
+                                    
+                                })
+                            setShowDownload(false)
+                        }}>
+                           <MaterialIcons name='check' size={28} color="#707070" />
+                        </TouchableOpacity>
+                    </View>    
+                    
+                </View>
+                </View>
+            </Modal>
             
             <ScrollView style={styles.characterContainer}>         
                 {characterList.map((character,index) => (                
@@ -155,8 +220,7 @@ const CharMenu = () => {
                         <Image
                             source={{ uri: `${FS.documentDirectory}characters/${character}/${character}.png` }} 
                             style={styles.avatar}
-                            defaultSource=  {require('@assets/user.png')}
-                        />    
+                        />     
                         <Text style={styles.nametag}>{character}</Text>
                     </TouchableOpacity>
                 ))}
