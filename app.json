@@ -8,7 +8,7 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -20,15 +20,20 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#000"
       },
-      "package": "com.Vali98.ChatterUI"
+      "package": "com.Vali98.ChatterUI",
+      "splash": {
+        "image": "./assets/images/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      }
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/adaptive-icon.png"
     },
     "plugins": [
       "expo-router",
