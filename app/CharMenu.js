@@ -23,13 +23,13 @@ import { decode } from 'png-chunk-text'
 import { Buffer } from '@craftzdog/react-native-buffer'
 import * as Base64 from 'base-64'
 import axios from 'axios'
+import TextBoxModal from '@components/TextBoxModal'
 
 const CharMenu = () => {
     const router = useRouter()
     const [characterList, setCharacterList] = useState([])
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [showNewChar, setShowNewChar] = useState(false)
-    const [newCharName, setNewCharName] = useState('')
     const [showDownload, setShowDownload] = useState(false)
     const [downloadName, setDownloadName] = useState('')
 
@@ -62,8 +62,6 @@ const CharMenu = () => {
                 return saveCharacterCard(newname, JSON.stringify(charactercard))
             }).then(() => {
                 return copyCharImage(uri, newname)
-            }).then(() => {
-                return 
             }).then(() => {
                 ToastAndroid.show(`Successfully Imported Character`, ToastAndroid.SHORT)
                 getCharacterList()
@@ -107,104 +105,44 @@ const CharMenu = () => {
 
 
            </View>),}} />
-           
-            <Modal
-                visible={showNewChar}
-                transparent
-                animationType='fade'
-                onDismiss={() => {setShowNewChar(false)}}
-            >   
-                <View style={{backgroundColor: 'rgba(0, 0, 0, 0.5)', flex:1, justifyContent: 'center'}}>
-                <View style={styles.modalview}>
-                    <Text>Enter Name</Text>
-                    <TextInput 
-                        style={styles.input} 
-                        value={newCharName}
-                        onChangeText={setNewCharName}
-                    />
+               
+            <TextBoxModal 
+                booleans={[showNewChar, setShowNewChar]}
+                onConfirm={(text)=> {
+                    createNewCharacter(text).then(() => {
+                        setCharName(text)
+                        router.push('CharInfo')
+                        getCharacterList()
+                    })
+                }}
+            />
 
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity 
-                            style={styles.modalButton}
-                            onPress={() => setShowNewChar(false)
-                        }>
-                            <MaterialIcons name='close' size={28} color="#707070" />
-                        </TouchableOpacity>
-                        <TouchableOpacity 
-                            style={styles.modalButton}
-                            onPress={() => {
-                            createNewCharacter(newCharName).then(() => {
-                                setCharName(newCharName)
-                                router.push('CharInfo')
-                                getCharacterList()
+            <TextBoxModal 
+                booleans={[showDownload, setShowDownload]}
+                onConfirm={(text)=> {
+                    axios.post(
+                        'https://api.chub.ai/api/characters/download', 
+                        {
+                            "format" : "tavern",
+                            "fullPath" : text.replace('https://chub.ai/characters/', '')
+                        },
+                        {responseType: 'arraybuffer'}
+                        ).then((res) => {
+                            const response = Buffer.from(res.data, 'base64').toString('base64')
+                            FS.writeAsStringAsync(
+                                `${FS.cacheDirectory}image.png`, 
+                                response, 
+                                {encoding:FS.EncodingType.Base64}).then( async () => {
+                                    createCharacter(`${FS.cacheDirectory}image.png`)
                             })
-
-                            setShowNewChar(false)
-                        }}>
-                           <MaterialIcons name='check' size={28} color="#707070" />
-                        </TouchableOpacity>
-                    </View>    
-                    
-                </View>
-                </View>
-            </Modal>
+                            
+                        }).catch((error) => {
+                            console.log(`Could not retrieve card. ${error}`)
+                            ToastAndroid.show(`Invalid ID or URL`, ToastAndroid.SHORT)
+                        })
+                }}
+            />
             
-            <Modal
-                visible={showDownload}
-                transparent
-                animationType='fade'
-                onDismiss={() => {setShowDownload(false)}}
-            >   
-                <View style={{backgroundColor: 'rgba(0, 0, 0, 0.5)', flex:1, justifyContent: 'center'}}>
-                <View style={styles.modalview}>
-                    <Text>Enter Card ID or URL</Text>
-                    <TextInput 
-                        style={{...styles.input, width: '100%'}} 
-                        value={downloadName}
-                        onChangeText={setDownloadName}
-                    />
-
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity 
-                            style={styles.modalButton}
-                            onPress={() => setShowDownload(false)
-                        }>
-                            <MaterialIcons name='close' size={28} color="#707070" />
-                        </TouchableOpacity>
-                        <TouchableOpacity 
-                            style={styles.modalButton}
-                            onPress={async () => {
-                                console.log(downloadName)
-                            axios.post(
-                                'https://api.chub.ai/api/characters/download', 
-                                {
-                                    "format" : "tavern",
-                                    "fullPath" : downloadName.trim('https://chub.ai/characters/')
-                                },
-                                {
-                                    responseType: 'arraybuffer'
-                                }
-                                ).then(async (res) => {
-                                    FS.writeAsStringAsync(
-                                        `${FS.cacheDirectory}image.png`, 
-                                        response, 
-                                        {encoding:FS.EncodingType.Base64}).then( async () => {
-                                            createCharacter(`${FS.cacheDirectory}image.png`)
-                                    })
-                                    
-                                }).catch((error) => {
-                                    console.log(`Could not retrieve card. ${error}`)
-                                    ToastAndroid.show(`Invalid ID or URL`, ToastAndroid.SHORT)
-                                })
-                            setShowDownload(false)
-                        }}>
-                           <MaterialIcons name='check' size={28} color="#707070" />
-                        </TouchableOpacity>
-                    </View>    
-                    
-                </View>
-                </View>
-            </Modal>
             
             <ScrollView style={styles.characterContainer}>         
                 {characterList.map((character,index) => (                
