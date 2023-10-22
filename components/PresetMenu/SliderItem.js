@@ -1,11 +1,15 @@
 import { View, Text, StyleSheet, TextInput } from 'react-native'
 import Slider from '@react-native-community/slider'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const SliderItem = ({name, preset, varname, fn , min=0, max=1, step=0, precision=0}) => {
 
     const clamp = (val) => Math.min(Math.max(parseFloat(val?.toFixed(2) ?? 0), min), max)
     const [textValue, setTextValue] = useState(preset[varname].toFixed(precision))
+
+    useEffect(() => {
+        setTextValue(preset[varname].toFixed(precision))
+    }, [preset])
 
 
     return (

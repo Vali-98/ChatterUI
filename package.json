@@ -42,6 +42,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.72.5",
+    "react-native-element-dropdown": "^2.10.0",
     "react-native-gesture-handler": "~2.12.0",
     "react-native-markdown-package": "^1.8.2",
     "react-native-mmkv": "^2.10.2",

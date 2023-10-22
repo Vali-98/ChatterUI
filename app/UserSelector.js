@@ -51,7 +51,47 @@ const UserSelector = () => {
                 }
             }}
         />
-         <Modal
+       
+        
+        <ScrollView>
+            {
+                userList.map((name, index) => 
+                    (<View key={index} style={styles.useritem}>
+                        <TouchableOpacity 
+                            style={styles.useritembutton}
+                            onPress={() => {
+                                loadUserCard(name).then((file) => {
+                                    setUserCard(file)
+                                    setUserName(name)
+                                    router.back()
+                                })
+                            }}
+                        >
+
+                            <Image source={{uri:getUserImageDirectory(name)}} loadingIndicatorSource={require('@assets/user.png')} style={styles.avatar}/>
+                        
+                            <Text style={{flex:1}}>{name}</Text>
+                        
+                            <TouchableOpacity onPress={()=>{
+                                Alert.alert(`Delete Persona`, `Are you sure you want to delete \'${name}\'?`, 
+                                [
+                                    {text:`Cancel`, style: `cancel`},
+                                    {
+                                        text:`Confirm`, 
+                                        style: `destructive`, 
+                                        onPress: () =>  deleteUser(name).then(() => { loadUserList()})
+                                    }
+                                ])
+                                
+                            }}>
+                                <FontAwesome size={28} name='trash'/>
+                            </TouchableOpacity>
+                        </TouchableOpacity>
+                    </View>))
+            }
+        </ScrollView>
+
+        <Modal
                 visible={showNewUser}
                 transparent
                 animationType='fade'
@@ -96,44 +136,6 @@ const UserSelector = () => {
                 </View>
                 </View>
         </Modal>
-        
-        <ScrollView>
-            {
-                userList.map((name, index) => 
-                    (<View key={index} style={styles.useritem}>
-                        <TouchableOpacity 
-                            style={styles.useritembutton}
-                            onPress={() => {
-                                loadUserCard(name).then((file) => {
-                                    setUserCard(file)
-                                    setUserName(name)
-                                    router.back()
-                                })
-                            }}
-                        >
-
-                            <Image source={{uri:getUserImageDirectory(name)}} loadingIndicatorSource={require('@assets/user.png')} style={styles.avatar}/>
-                        
-                            <Text style={{flex:1}}>{name}</Text>
-                        
-                            <TouchableOpacity onPress={()=>{
-                                Alert.alert(`Delete Persona`, `Are you sure you want to delete \'${name}\'?`, 
-                                [
-                                    {text:`Cancel`, style: `cancel`},
-                                    {
-                                        text:`Confirm`, 
-                                        style: `destructive`, 
-                                        onPress: () =>  deleteUser(name).then(() => { loadUserList()})
-                                    }
-                                ])
-                                
-                            }}>
-                                <FontAwesome size={28} name='trash'/>
-                            </TouchableOpacity>
-                        </TouchableOpacity>
-                    </View>))
-            }
-        </ScrollView>
     </SafeAreaView>
     )
 }
