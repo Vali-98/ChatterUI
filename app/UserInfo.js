@@ -57,7 +57,7 @@ const UserInfo = () => {
             style={styles.input}
             multiline
             numberOfLines={3}
-            value={userCard.description}
+            value={userCard?.description ?? ''}
             onChangeText={text => {setUserCard({...userCard, description: text})}}
         />
         </View>

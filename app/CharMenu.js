@@ -31,7 +31,6 @@ const CharMenu = () => {
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [showNewChar, setShowNewChar] = useState(false)
     const [showDownload, setShowDownload] = useState(false)
-    const [downloadName, setDownloadName] = useState('')
 
     const getCharacterList = async () => {
         await FS.readDirectoryAsync(FS.documentDirectory + 'characters/').then((response) => {
