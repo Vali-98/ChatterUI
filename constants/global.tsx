@@ -8,6 +8,20 @@ const mmkv = new MMKV()
 
 export const MessageContext = createContext([])
 
+
+export const enum Color {
+    Background = '#222',
+    Container = '#333',
+    BorderColor = '#252525',
+    White = '#fff',
+    Black = '#000',
+    DarkContainer= '#111',
+    Offwhite= '#aaa',
+    Button = '#ddd',
+    TextWhite = '#fff',
+    TextBlack = '#000',
+}
+
 export const enum Global {
     CurrentCharacter='currentchar',     // current char filename, locates dir
     CurrentChat='currentchat',          // current chat filename, locates dir
@@ -24,18 +38,6 @@ export const enum Global {
 }
 
 
-export const enum Color {
-    Background = '#222',
-    Container = '#333',
-    BorderColor = '#252525',
-    White = '#fff',
-    Black = '#000',
-    DarkContainer= '#111',
-    Offwhite= '#aaa',
-    Button = '#ddd',
-    TextWhite = '#fff',
-    TextBlack = '#000',
-}
 
 export const GlobalStyle = StyleSheet.create({
     
