@@ -4,7 +4,7 @@ import {
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler'
 import { useRef, useEffect, useState, useContext} from 'react'
 import { MaterialIcons} from '@expo/vector-icons'
-import { MessageContext, saveChatFile, Global, getCharacterImageDirectory, getUserImageDirectory } from '@globals'
+import {  Global, Color, MessageContext, saveChatFile, getCharacterImageDirectory, getUserImageDirectory } from '@globals'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 import Markdown from 'react-native-markdown-package'
 import * as FS from 'expo-file-system'
@@ -74,8 +74,8 @@ const ChatItem = ({ message, id}) => {
             <View style={{flex:1}}>
 
                 <View style={{flexDirection:'row', alignItems:'flex-end', marginBottom: 8}}>
-                <Text style={{fontSize: 16,}}>{message.name}   </Text>
-                <Text style={{fontSize: 10, flex: 1}}>{message.send_date}</Text>
+                <Text style={{fontSize: 16, color: Color.White}}>{message.name}   </Text>
+                <Text style={{fontSize: 10, color: Color.White, flex: 1}}>{message.send_date}</Text>
 
                 { 
                 (!nowGenerating) &&
@@ -90,7 +90,7 @@ const ChatItem = ({ message, id}) => {
                             })
                             setEditMode(editMode => false)
                         }}>
-                            <MaterialIcons name='delete' size={28} color="#707070" />
+                            <MaterialIcons name='delete' size={28} color={Color.Button} />
                         </TouchableOpacity>}
 
                         <TouchableOpacity style={styles.editButton} onPress={() => {
@@ -105,7 +105,7 @@ const ChatItem = ({ message, id}) => {
                                 })
                             setEditMode(editMode => false)
                             }}>
-                            <MaterialIcons name='check' size={28} color="#707070" />
+                            <MaterialIcons name='check' size={28} color={Color.Button} />
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.editButton} onPress={() => {
@@ -114,7 +114,7 @@ const ChatItem = ({ message, id}) => {
                             setPlaceholderText(message.mes)
                             setEditMode(editMode => false)
                             }}>
-                            <MaterialIcons name='close' size={28} color="#707070" />
+                            <MaterialIcons name='close' size={28} color={Color.Button} />
                         </TouchableOpacity>
                     </View>)
                     : 
@@ -123,7 +123,7 @@ const ChatItem = ({ message, id}) => {
                             setEditMode(true)
                             setPlaceholderText(message.mes)
                             }}>
-                            <MaterialIcons name='edit' size={28} color="#707070" />
+                            <MaterialIcons name='edit' size={28} color={Color.Button} />
                         </TouchableOpacity>
                     </View>)
                 }
@@ -136,9 +136,12 @@ const ChatItem = ({ message, id}) => {
                         style={styles.messageText}
                         styles={{
                             em:{
-                                color: `#606060`,
+                                color: Color.Offwhite,
                                 fontStyle:'italic',
-                            }
+                            },
+                            text: {
+                                color: Color.White
+                            },
                         }}
                     >
                     {message.mes.trim(`\n`)}
@@ -191,7 +194,7 @@ const styles = StyleSheet.create({
     },
 
     messageTextContainer : {
-        backgroundColor: '#e1e1e1',
+        backgroundColor: Color.Container,
         paddingHorizontal: 8,
         borderRadius: 8,
         flex: 1,

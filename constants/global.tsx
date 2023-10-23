@@ -2,7 +2,7 @@ import * as FS from 'expo-file-system'
 import {MMKV} from 'react-native-mmkv'
 import { createContext } from 'react'
 import * as DocumentPicker from 'expo-document-picker'
-import { ToastAndroid } from 'react-native'
+import { ToastAndroid, StyleSheet } from 'react-native'
 const mmkv = new MMKV()
 
 
@@ -22,6 +22,26 @@ export const enum Global {
     PresetName='presetname',            // name of current preset
     InstructName='instructname',
 }
+
+
+export const enum Color {
+    Background = '#222',
+    Container = '#333',
+    BorderColor = '#252525',
+    White = '#fff',
+    Black = '#000',
+    DarkContainer= '#111',
+    Offwhite= '#aaa',
+    Button = '#ddd',
+    TextWhite = '#fff',
+    TextBlack = '#000',
+}
+
+export const GlobalStyle = StyleSheet.create({
+    
+
+})
+
 
 
 // generate default directories

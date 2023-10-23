@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TextInput } from 'react-native'
 import Slider from '@react-native-community/slider'
 import { useState, useEffect } from 'react'
-
+import { Color } from '@globals'
 const SliderItem = ({name, preset, varname, fn , min=0, max=1, step=0, precision=0}) => {
 
     const clamp = (val) => Math.min(Math.max(parseFloat(val?.toFixed(2) ?? 0), min), max)
@@ -15,7 +15,7 @@ const SliderItem = ({name, preset, varname, fn , min=0, max=1, step=0, precision
     return (
 
         <View style={{alignItems: `center`}}>
-        <Text>{name}</Text>
+        <Text style={styles.itemName}>{name}</Text>
         <View style={styles.sliderContainer}>
             <Slider
                 style={styles.slider}
@@ -27,9 +27,9 @@ const SliderItem = ({name, preset, varname, fn , min=0, max=1, step=0, precision
                     fn(varname, clamp(value))
                     setTextValue(clamp(value).toFixed(precision))
                 }}
-                minimumTrackTintColor="#000"
-                maximumTrackTintColor="#fff"
-                thumbTintColor='#000'
+                minimumTrackTintColor={Color.White}
+                maximumTrackTintColor={Color.Offwhite}
+                thumbTintColor={Color.White}
             />
 
             <TextInput 
@@ -57,7 +57,7 @@ export default SliderItem
 const styles = StyleSheet.create({
 
     itemName : {
-        
+        color: Color.White
     },
 
     sliderContainer: {
@@ -70,6 +70,8 @@ const styles = StyleSheet.create({
     },
 
     textBox: {
+        backgroundColor: Color.DarkContainer,
+        color: Color.White,
         borderWidth: 1,
         borderRadius: 12,
         flex:1.5,
