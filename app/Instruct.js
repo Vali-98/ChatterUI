@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, ToastAndroid, Alert} from 'react-native'
 import { Stack } from 'expo-router'
-import { Global, getInstructList, writeInstruct, loadInstruct, deleteInstruct, uploadInstruct} from '@globals'
+import { Global, Color, getInstructList, writeInstruct, loadInstruct, deleteInstruct, uploadInstruct} from '@globals'
 import { useMMKVObject } from 'react-native-mmkv'
 import { ScrollView } from 'react-native-gesture-handler'
 import TextBox from '@components/InstructMenu/TextBox'
@@ -40,7 +40,7 @@ const Instruct = () => {
     },[])
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={styles.mainContainer}>
             <Stack.Screen 
                 options={{
                 title:`Instruct`,
@@ -69,6 +69,7 @@ const Instruct = () => {
                 value={selectedItem}
                 style={styles.dropdownbox}
                 data={instructList}
+                selectedTextStyle={styles.selected}
                 labelField={"label"}
                 valueField={"value"}
                 onChange={(item)=>{
@@ -86,7 +87,7 @@ const Instruct = () => {
                     writeInstruct(instructName, currentInstruct).then(ToastAndroid.show(`Preset Updated!`, 2000))
                 }}
                 >
-                <FontAwesome  size={24} name='save'/>
+                <FontAwesome  size={24} name='save' color={Color.Button}/>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.button} 
@@ -109,7 +110,7 @@ const Instruct = () => {
                             }
                     ])
                 }}> 
-                <FontAwesome  size={24} name='trash' />
+                <FontAwesome  size={24} name='trash' color={Color.Button}/>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.button} onPress={() => {
@@ -124,7 +125,7 @@ const Instruct = () => {
                     })
                 })
             }}> 
-                <FontAwesome  size={24} name='upload' />
+                <FontAwesome  size={24} name='upload' color={Color.Button}/>
             </TouchableOpacity>
      
             <TouchableOpacity style={styles.button} onPress={async () => {
@@ -139,11 +140,11 @@ const Instruct = () => {
                     })
                 } 
             }}>
-                <FontAwesome  size={24} name='download' />
+                <FontAwesome  size={24} name='download' color={Color.Button}/>
             </TouchableOpacity>
      
-            <TouchableOpacity style={styles.button}>
-                <FontAwesome  size={24} name='plus' onPress={() => {setShowNewInstruct(true)}} />
+            <TouchableOpacity style={styles.button} onPress={() => {setShowNewInstruct(true)}}>
+                <FontAwesome  size={24} name='plus' color={Color.Button}  />
             </TouchableOpacity>
         </View>
             
@@ -223,34 +224,46 @@ const Instruct = () => {
 
             <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
             <CheckBox 
+                tintColors={{false:Color.White, true:Color.White}}
+                onFillColor={Color.White}
+                onCheckColor={Color.White}
                 value={currentInstruct.wrap}
                 onValueChange={value => setCurrentInstruct({...currentInstruct, "wrap" : value})}
             />
-            <Text style={{paddingLeft: 8}}>Wrap Sequence with Newline</Text>
+            <Text style={{paddingLeft: 8, color:Color.White}}>Wrap Sequence with Newline</Text>
         </View>
 
         <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
-            <CheckBox 
+            <CheckBox
+                tintColors={{false:Color.White, true:Color.White}}
+                onFillColor={Color.White}
+                onCheckColor={Color.White} 
                 value={currentInstruct.macro}
                 onValueChange={value => setCurrentInstruct({...currentInstruct, ["macro"] : value})}
             />
-            <Text style={{paddingLeft: 8}}>Replace Macro In Sequences</Text>
+            <Text style={{paddingLeft: 8, color:Color.White}}>Replace Macro In Sequences</Text>
         </View>
 
         <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
             <CheckBox 
+                tintColors={{false:Color.White, true:Color.White}}
+                onFillColor={Color.White}
+                onCheckColor={Color.White}
                 value={currentInstruct.names}
                 onValueChange={value => setCurrentInstruct({...currentInstruct, names : value})}
             />
-            <Text style={{paddingLeft: 8}}>Include Names</Text>
+            <Text style={{paddingLeft: 8, color:Color.White}}>Include Names</Text>
         </View>
 
         <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
             <CheckBox 
+                tintColors={{false:Color.White, true:Color.White}}
+                onFillColor={Color.White}
+                onCheckColor={Color.White}
                 value={currentInstruct.names_force_groups}
                 onValueChange={value => setCurrentInstruct({...currentInstruct, names_force_groups : value})}
             />
-            <Text style={{paddingLeft: 8}}>Force for Groups and Personas</Text>
+            <Text style={{paddingLeft: 8, color:Color.White}}>Force for Groups and Personas</Text>
         </View>
 
             <TextBox 
@@ -273,7 +286,11 @@ export default Instruct
 
 
 const styles = StyleSheet.create({
-   
+    mainContainer: {
+        flex: 1,
+        backgroundColor: Color.Background
+    },
+
     dropdownContainer: {
         marginHorizontal: 16,
         marginTop: 16,
@@ -285,13 +302,18 @@ const styles = StyleSheet.create({
     dropdownbox : {
         flex:1,
         paddingHorizontal: 8,
-        borderWidth: 1,
+        backgroundColor: Color.DarkContainer,
         borderRadius: 8,
     },
 
+    selected : {
+        color: Color.White,
+    },
+
+
     button : {
-        padding:4,
-        borderWidth: 1,
+        padding:5,
+        backgroundColor: Color.DarkContainer,
         borderRadius: 4,
         marginLeft: 8,
     },

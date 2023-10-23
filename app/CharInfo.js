@@ -172,9 +172,8 @@ const styles = StyleSheet.create({
   },
 
   foregroundButton: {
+    backgroundColor: Color.DarkContainer,
     padding:8, 
-    borderColor: Color.White,
-    borderWidth: 1,
     borderRadius: 4,
   },
 
@@ -188,8 +187,7 @@ const styles = StyleSheet.create({
   },
 
   inputContainer: {
-		borderWidth: 1,
-		borderColor: Color.White,
+    backgroundColor: Color.DarkContainer,
 		borderRadius: 8, 
 		paddingHorizontal: 8,
     maxHeight: 160,
@@ -197,7 +195,8 @@ const styles = StyleSheet.create({
 
   boxText:{
     color:Color.White, 
-    paddingVertical: 8
+    paddingTop:16,
+    paddingBottom: 8,
   },
 
   input: {

@@ -2,7 +2,7 @@ import { SafeAreaView, Text, TextInput, StyleSheet } from 'react-native'
 import React from 'react'
 import { Stack } from 'expo-router'
 import { useMMKVString } from 'react-native-mmkv'
-import { Global } from '@globals'
+import { Global, Color } from '@globals'
 import { useEffect } from 'react'
 
 const Endpoint = () => {
@@ -20,7 +20,7 @@ const Endpoint = () => {
                 animation: `fade`,
             }}/>
 
-            <Text>Endpoint</Text>
+            <Text style={styles.title}>Endpoint</Text>
 
             <TextInput 
                 style={styles.input}
@@ -36,14 +36,21 @@ const Endpoint = () => {
 export default Endpoint
 
 const styles = StyleSheet.create({
+
+    title : {
+        color: Color.White
+    },
+
     mainContainer: {
-        marginVertical:16, 
-        marginHorizontal:20
+        paddingVertical:16, 
+        paddingHorizontal:20,
+        backgroundColor: Color.Background,
+        flex: 1,
     },
 
     input: {
-        borderWidth: 1,
-        borderRadius: 8,
+        color: Color.White,
+        backgroundColor: Color.DarkContainer,
         paddingVertical: 4,
         paddingHorizontal: 8,
         marginVertical:8,

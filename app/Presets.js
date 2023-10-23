@@ -301,7 +301,7 @@ const Presets = () => {
 
         <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
             <CheckBox 
-                tintColors={{false:Color.DarkContainer, true:Color.White}}
+                tintColors={{false:Color.White, true:Color.White}}
                 onFillColor={Color.White}
                 onCheckColor={Color.White}
                 value={currentPreset.use_default_badwordsids}
@@ -359,7 +359,6 @@ const styles = StyleSheet.create({
 
     selected : {
         color: Color.White,
-
     },
 
     button : {
