@@ -65,7 +65,6 @@ const Layout = () => {
     return (
     <Stack screenOptions={{
         headerStyle: {backgroundColor: Color.Background},
-        navigationBarColor: Color.Background,
         headerTitleStyle: {color: Color.White},
         headerTintColor: Color.White,
     }}>
