@@ -94,6 +94,9 @@ const Home = () => {
 			"frmttriminc": true,
 			"frmtrmblln": true,
 			"stop_sequence": ["\n\n\n\n\n", currentInstruct.input_sequence],
+			"mirostat": currentPreset.mirostat,
+			"mirostat_tau": currentPreset.mirostat_tau,
+			"mirostat_eta": currentPreset.mirostat_eta,
 		}
 	}
 
