@@ -42,6 +42,7 @@ const UserSelector = () => {
         <Stack.Screen
             options={{
                 title:'Personas',
+                animation: 'slide_from_left',
                 headerRight: () => {
                     return (<View>
                         <TouchableOpacity onPress={() => {

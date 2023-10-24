@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
         margin: 4,
         borderWidth: 2,
         borderColor: Color.White,
+        backgroundColor: Color.DarkContainer,
     },
 
     userImage : {

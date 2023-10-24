@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius:8,
         alignItems: 'center',
-        marginBottom: 8,
+        marginVertical: 4,
     },
 
     avatar : {
@@ -193,31 +193,6 @@ const styles = StyleSheet.create({
         fontSize:16,
         marginLeft: 20,
         color: Color.Text,
-    },
-    
-    modalview: {
-        margin: 20,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 35,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-        width: 0,
-        height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-
-    buttonContainer : {
-        flexDirection: 'row',
-        alignContent: 'space-around',
-    },
-    
-    modalButton : {
-        marginHorizontal: 30,
     },
 
     headerButtonRight : {

@@ -17,7 +17,7 @@ const Endpoint = () => {
         <SafeAreaView style={styles.mainContainer}>
             <Stack.Screen options={{
                 title: `Endpoint`,
-                animation: `fade`,
+                animation: 'slide_from_left',
             }}/>
 
             <Text style={styles.title}>Endpoint</Text>
