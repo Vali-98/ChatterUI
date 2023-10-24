@@ -57,7 +57,6 @@ const ChatItem = ({ message, id}) => {
             style={{
                 opacity: fadeAnim,
                 transform: [{ translateY: dyAnim }],
-                ...styles.otherMessage,
             }}
         >
             <View style={styles.chatItem}>
@@ -136,7 +135,7 @@ const ChatItem = ({ message, id}) => {
                         style={styles.messageText}
                         styles={{
                             em:{
-                                color: Color.Offwhite,
+                                color: Color.TextItalic,
                                 fontStyle:'italic',
                             },
                             text: {
@@ -174,20 +173,10 @@ const styles = StyleSheet.create({
     chatItem: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        paddingBottom: 8,
-        marginTop:6,
-        marginRight: 8,
-        borderColor: '#ddd',
+        paddingVertical: 12,
+        paddingHorizontal: 8,
+        borderColor: Color.Offwhite,
         borderBottomWidth: 1,
-    },
-
-    userMessage: {
-        justifyContent: 'flex-end',
-    },
- 
-    otherMessage: {
-        justifyContent: 'flex-start',
-        
     },
 
     messageText: {
@@ -198,7 +187,6 @@ const styles = StyleSheet.create({
         backgroundColor: Color.Container,
         paddingHorizontal: 8,
         borderRadius: 8,
-        flex: 1,
         textAlignVertical:'center',
     },
 

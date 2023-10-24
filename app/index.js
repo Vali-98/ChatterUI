@@ -5,12 +5,12 @@ import {
 } from 'react-native'
 import { useState, useEffect} from 'react'
 import axios  from 'axios'
-import ChatMenu from '@components/ChatMenu/ChatMenu' 
+import {ChatWindow }from '@components/ChatMenu/ChatWindow/ChatWindow' 
 import { useMMKVString,  useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 import { Global, Color, getChatFile,getNewestChatFilename , MessageContext, saveChatFile, getCharacterCard} from '@globals'
 import llamaTokenizer from '@constants/tokenizer'
-import { MaterialIcons } from '@expo/vector-icons'
-
+import { FontAwesome, Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu'
 
 const Home = () => {
 
@@ -23,11 +23,11 @@ const Home = () => {
 	const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
 	const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
 	const [currentPreset, setCurrentPreset] = useMMKVObject(Global.CurrentPreset)
-
 	// rework later
 	const [messages, setMessages] = useState([]);
 	const [newMessage, setNewMessage] = useState('');
-
+	const [targetLength, setTargetLength] = useState(0)
+	const [chatCache, setChatCache] = useState('')
 	// load character chat upon character change
 	useEffect(() => {
 		if (charName === 'Welcome' || charName === undefined) return
@@ -52,9 +52,9 @@ const Home = () => {
 			}
 			message_acc += message_shard
 		}
-		payload += message_acc	
+		payload += message_acc + ((chatCache === '')? currentInstruct.output_sequence : '')
 		return {
-			"prompt": payload.replace(`{{char}}`, charName).replace(`{{user}}`,userName) + currentInstruct.output_sequence,
+			"prompt": payload.replace(`{{char}}`, charName).replace(`{{user}}`,userName),
 			"use_story": false,
 			"use_memory": false,
 			"use_authors_note": false,
@@ -81,9 +81,8 @@ const Home = () => {
 	}
 
 	useEffect(() => {
-		if(nowGenerating)
-			generateResponse()
-	}, [nowGenerating])
+		nowGenerating && generateResponse()
+	}, [nowGenerating]) 
 
 	// load character upon currentChat changing 
 	useEffect(() => {	
@@ -100,18 +99,18 @@ const Home = () => {
 		if (newMessage.trim() !== ''){	
 			const newMessageItem = createChatEntry(userName, true, newMessage)		
 			setMessages(messages => [...messages, newMessageItem])
-		}
+			setTargetLength(messages.length + 2)
+		} else 
+			setTargetLength(messages.length + 1)
+		setChatCache('')
 		setNowGenerating(true)
 	};
-
-
 
 	const generateResponse = () => {
 		console.log(`Obtaining response from endpoint: ${endpoint}`)
 		setNewMessage(n => '');
 		console.log("Getting Response")
 		// handle swipe logic
-		const target_length = messages.length + 1
 		const getresponse = (api, write = false, body = "") => {
 			return axios.create({timeout:200}).post(api, body)
 			.then(response => {
@@ -124,8 +123,8 @@ const Home = () => {
 				}
 				setMessages(messages => {
 					try {
-						const createnew = (messages.length < target_length)	
-						const mescontent = data
+						const createnew = (messages.length < targetLength)	
+						const mescontent = chatCache + data
 						.replace(currentInstruct.input_sequence, ``)
 						.replace(currentInstruct.output_sequence, ``)
 						.trim()
@@ -198,8 +197,52 @@ const Home = () => {
 			:
 			<MessageContext.Provider value={ [messages, setMessages]}>
 			<View style={styles.container}>
-				<ChatMenu messages={messages} />
+				
+				<ChatWindow messages={messages} />
 				<View style={styles.inputContainer}>
+				<Menu >
+					<MenuTrigger >
+							<MaterialIcons 
+								name='menu' 
+								style={styles.optionsButton} 
+								size={36} 
+								color={Color.Button}
+								/>
+					</MenuTrigger>
+					<MenuOptions customStyles={styles.optionMenu}>
+						<MenuOption onSelect={() => {
+							console.log(`Continuing Reponse`)
+							setTargetLength(messages.length + (messages.at(-1).name === charName)? 0 : 1)
+							if(messages.at(-1).name === charName) {
+								setChatCache(messages.at(-1).mes)
+								setTargetLength(messages.length)
+							} else setTargetLength(messages.length + 1)
+
+							setNowGenerating(true)
+						}}>
+						<View style={styles.optionItem}>
+							<Ionicons name='arrow-forward' color={Color.Button} size={24}/>
+							<Text style={styles.optionText} >Continue</Text>
+						</View>
+						</MenuOption>
+						<MenuOption onSelect={() => {
+							console.log('Regenerate Response')
+							const len = messages.length
+							if(messages.at(-1)?.name === charName){
+								setMessages(messages.slice(0,-1))
+								setTargetLength(len)
+							} else setTargetLength(len+ 1)
+							setChatCache('')
+							setNowGenerating(true)
+						}}>
+						<View style={styles.optionItemLast}>
+							<Ionicons name='reload' color={Color.Button} size={24}/>
+							<Text style={styles.optionText} >Regenerate</Text>
+						</View>
+						</MenuOption>
+					</MenuOptions>
+				</Menu>
+
 					<TextInput
 						style={styles.input}
 						placeholder="Message..."
@@ -216,7 +259,7 @@ const Home = () => {
 							setNowGenerating(false)
 						})	
 					}}>
-					<Text>Stop</Text>
+						<MaterialIcons name='stop' color={Color.Button} size={30}/>
 					</TouchableOpacity>
 						:
 					
@@ -271,6 +314,36 @@ const styles = StyleSheet.create({
 		padding: 8,
 	},
 	
+	optionsButton: {
+		marginRight: 4,
+	},
+
+	optionMenu : {
+		optionsContainer: {
+			backgroundColor: Color.DarkContainer,
+			padding: 4,
+			borderRadius: 8,
+			borderColor: Color.Offwhite,
+			borderWidth: 1,
+		},
+	},
+
+	optionItem: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingBottom: 8,
+		borderBottomColor: Color.Offwhite,
+		borderBottomWidth: 1,
+	},
+	optionItemLast: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+
+	optionText : {
+		color: Color.Text,
+		marginLeft: 16,	
+	},
 });
 
 export default Home;

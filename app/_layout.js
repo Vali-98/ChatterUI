@@ -6,6 +6,7 @@ import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 import { Global, generateDefaultDirectories, createNewDefaultChat, 
     loadUserCard, createNewUser, writePreset,  writeInstruct, Color
 } from '@globals'
+import { MenuProvider } from 'react-native-popup-menu';
 
 import * as FS from 'expo-file-system'
 // init values should be here
@@ -61,6 +62,7 @@ const Layout = () => {
 	}, []) 
 
     return (
+        <MenuProvider>
     <Stack screenOptions={{
         headerStyle: {backgroundColor: Color.Header},
         headerTitleStyle: {color: Color.Text},
@@ -133,6 +135,7 @@ const Layout = () => {
                         headerShown: 'false'
         }} />
     </Stack> 
+    </MenuProvider>
     );
     
 }

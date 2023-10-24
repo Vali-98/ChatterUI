@@ -22,7 +22,7 @@ const ChatWindow = ({messages}) => {
                 <ScrollView         
                     ref={scrollViewRef} 
                     onContentSizeChange={() => {if(nowGenerating)scrollViewRef.current?.scrollToEnd()}} 
-                    style={{margin:8}}
+                    style={{flex: 1,padding:4}}
                 >  
                 {messages.slice(1).map((message, index) => (
                     <ChatItem key={index} id={index} message={message} />
@@ -38,7 +38,6 @@ export {ChatWindow}
 const styles = StyleSheet.create({
     chatHistory: {
         flex: 1,
-        
       },
 
 })
