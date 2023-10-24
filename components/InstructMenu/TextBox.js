@@ -16,7 +16,7 @@ const TextBox = ({text, instruct, varname, setvalue, lines = 1}) => {
                     setvalue({...instruct, [varname]:value})
                 }}
                 placeholder='----'
-                placeholderTextColor={Color.White}
+                placeholderTextColor={Color.TextItalic}
             />
         </View>
     )
@@ -31,11 +31,11 @@ const styles = StyleSheet.create({
     },
 
     title : {
-        color: Color.White
+        color: Color.Text
     },
 
     input: {
-        color: Color.White,
+        color: Color.Text,
         backgroundColor: Color.DarkContainer,
         paddingVertical: 4,
         paddingHorizontal: 8,

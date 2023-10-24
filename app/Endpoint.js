@@ -38,7 +38,7 @@ export default Endpoint
 const styles = StyleSheet.create({
 
     title : {
-        color: Color.White
+        color: Color.Text
     },
 
     mainContainer: {
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     },
 
     input: {
-        color: Color.White,
+        color: Color.Text,
         backgroundColor: Color.DarkContainer,
         paddingVertical: 4,
         paddingHorizontal: 8,

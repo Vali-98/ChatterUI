@@ -1,5 +1,5 @@
 import { SafeAreaView, View, Text, Image, StyleSheet } from 'react-native'
-import { Global, getUserImageDirectory } from '@globals'
+import { Global, Color, getUserImageDirectory } from '@globals'
 import React from 'react'
 import { useMMKVString } from 'react-native-mmkv'
 import { TouchableOpacity } from 'react-native-gesture-handler'
@@ -12,9 +12,7 @@ const Settings = () => {
 
     return (
         <SafeAreaView style={styles.mainContainer}>
-
         <View style={styles.userContainer}> 
-            
             <View style={styles.imageContainer}>    
                 <Image style={styles.userImage} source={{uri:getUserImageDirectory(userName)}} />
             </View> 
@@ -22,10 +20,10 @@ const Settings = () => {
                 <Text style={styles.userName}>{userName}</Text>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.button} onPress={() => {router.push('UserInfo')}}>
-                        <FontAwesome size={20} name='edit'/>
+                        <FontAwesome size={20} name='edit'color={Color.Button} />
                     </TouchableOpacity>
                     <TouchableOpacity  style={styles.button} onPress={() => {router.push('UserSelector')}}>
-                        <FontAwesome size={20} name='th-list' />
+                        <FontAwesome size={20} name='th-list' color={Color.Button} />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -56,6 +54,7 @@ export default Settings
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
+        backgroundColor: Color.Background,
     },
     
     userContainer: {
@@ -70,8 +69,8 @@ const styles = StyleSheet.create({
     },
 
     button: {
+        backgroundColor: Color.DarkContainer,
         marginRight: 10,
-        borderWidth: 1,
         borderRadius: 4,
         padding: 8,
     },
@@ -81,6 +80,7 @@ const styles = StyleSheet.create({
         marginTop: 16,
         marginBottom: 8,
         marginLeft: 12,
+        color: Color.Text,
     },
 
     imageContainer : {
@@ -88,7 +88,8 @@ const styles = StyleSheet.create({
         height: 108,
         borderRadius: 54,
         margin: 4,
-        borderWidth: 1,
+        borderWidth: 2,
+        borderColor: Color.White,
     },
 
     userImage : {
@@ -99,19 +100,20 @@ const styles = StyleSheet.create({
 
     largeButtonContainer : {
         borderTopWidth:1,
-        borderColor: '#888',
+        borderColor: Color.Offwhite,
     },
 
     largeButtonText : {
         fontSize: 20,
         paddingVertical: 12,
-        paddingLeft: 30
+        paddingLeft: 30,
+        color:Color.Text,
     },
 
     largeButton : {
         borderBottomWidth:1,
         fontSize: 20,
-        borderColor: '#888',
+        borderColor: Color.Offwhite,
     },
 
 })

@@ -307,10 +307,10 @@ const Presets = () => {
                 value={currentPreset.use_default_badwordsids}
                 onValueChange={value => setPresetValue("use_default_badwordsids", value)}
             />
-            <Text style={{paddingLeft: 8, color:Color.White }}>Ban EOS Tokens</Text>
+            <Text style={{paddingLeft: 8, color:Color.Text }}>Ban EOS Tokens</Text>
         </View>
 
-        <Text style={{alignSelf:'center', color:Color.White }}>Grammar</Text>
+        <Text style={{alignSelf:'center', color:Color.Text }}>Grammar</Text>
         <TextInput
             style={styles.grammarbox}
             value={currentPreset.grammar}
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     },
 
     selected : {
-        color: Color.White,
+        color: Color.Text,
     },
 
     button : {

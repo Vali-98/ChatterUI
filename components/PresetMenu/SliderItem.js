@@ -57,7 +57,7 @@ export default SliderItem
 const styles = StyleSheet.create({
 
     itemName : {
-        color: Color.White
+        color: Color.Text
     },
 
     sliderContainer: {

@@ -81,7 +81,7 @@ const CharInfo = () => {
 
         <View style={styles.characterHeaderInfo}>
           
-        <Text style={{fontSize:20, marginBottom: 12, color:Color.White}}>{charName}</Text>
+        <Text style={{fontSize:20, marginBottom: 12, color:Color.Text}}>{charName}</Text>
           <View style={styles.buttonContainer}> 
             <TouchableOpacity 
               style={styles.foregroundButton}
@@ -194,13 +194,13 @@ const styles = StyleSheet.create({
 	},
 
   boxText:{
-    color:Color.White, 
+    color:Color.Text, 
     paddingTop:16,
     paddingBottom: 8,
   },
 
   input: {
-    color: Color.White,
+    color: Color.Text,
     textAlignVertical: 'top',
     paddingVertical:8,
   },

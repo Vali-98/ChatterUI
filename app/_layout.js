@@ -41,8 +41,6 @@ const Layout = () => {
                     setUserName('User')
                     setUserCard(card)
                 })
-
-                
             })
             
             writePreset(`Default`, defaultPreset()).then(() => {
@@ -64,8 +62,8 @@ const Layout = () => {
 
     return (
     <Stack screenOptions={{
-        headerStyle: {backgroundColor: Color.Background},
-        headerTitleStyle: {color: Color.White},
+        headerStyle: {backgroundColor: Color.Header},
+        headerTitleStyle: {color: Color.Text},
         headerTintColor: Color.White,
     }}>
        <Stack.Screen 
@@ -96,7 +94,7 @@ const Layout = () => {
             ,
             headerLeft :() =>  (
                 <TouchableOpacity style={styles.headerButtonLeft} onPress={() => router.push('Settings')}>
-                    <Ionicons name='menu' size={28} color={ Color.White}/>
+                    <Ionicons name='menu' size={28} color={ Color.Button}/>
                 </TouchableOpacity>
             ),
         }}/> 
