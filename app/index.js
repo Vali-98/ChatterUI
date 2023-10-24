@@ -167,7 +167,7 @@ const Home = () => {
 			let response = null
 			const interval = () => setTimeout(async () => {
 				if(response === null) {
-					await getresponse(`http://${endpoint}/api/extra/generate/check`).catch((error) => {
+					await getresponse(`${endpoint}/api/extra/generate/check`).catch((error) => {
 						handleError(error, false)
 						response = ""
 					})
@@ -175,7 +175,7 @@ const Home = () => {
 				} 
 			}, 300);
 			interval()
-			getresponse(`http://${endpoint}/api/api/v1/generate`, true,  
+			getresponse(`${endpoint}/api/api/v1/generate`, true,  
 			JSON.stringify(constructPayload()))
 			.catch((error) => {
 				handleError(error)
@@ -220,7 +220,7 @@ const Home = () => {
 						
 						<MenuOption onSelect={() => {
 							console.log(`Aborting Generation`)
-							axios.post(`http://${endpoint}/api/extra/abort`).then(() => {	
+							axios.post(`${endpoint}/api/extra/abort`).then(() => {	
 							setNowGenerating(false)
 						})	
 						}}>
@@ -276,7 +276,7 @@ const Home = () => {
 
 					{ nowGenerating ?
 					<TouchableOpacity style={styles.sendButton} onPress={()=> {
-						axios.post(`http://${endpoint}/api/extra/abort`).then(() => {	
+						axios.post(`${endpoint}/api/extra/abort`).then(() => {	
 							setNowGenerating(false)
 						})	
 					}}>
