@@ -149,13 +149,18 @@ const Home = () => {
 		console.log(`Obtaining response.`)
 		setNewMessage(n => '')
 
-		fetchWithTimeout(`${endpoint}/api/extra/generate/stream`, {
+		const controller = new AbortController();
+		const timeout = setTimeout(() => controller.abort(), 5000);
+
+
+		fetch(`${endpoint}/api/extra/generate/stream`, {
 			reactNative: {textStreaming: true},
 			method: `POST`,
 			body: JSON.stringify(constructPayload()),
-			timeout: 1000,
+			signal: controller.signal,
 		}, {})
 		.then((response) => {
+			clearTimeout(timeout)
 			const reader = response.body.getReader()
 			return reader.read().then(function processText ({done, value}) {
 				if(done) {
@@ -402,17 +407,3 @@ const  humanizedISO8601DateTime = (date) => {
 };
 
 
-const fetchWithTimeout = async (resource, options = {}) => {
-	const { timeout = 200 } = options;
-	
-	const controller = new AbortController();
-	const id = setTimeout(() => controller.abort(), timeout);
-  
-	const response = await fetch(resource, {
-	  ...options,
-	  signal: controller.signal  
-	});
-	clearTimeout(id);
-  
-	return response;
-  }
