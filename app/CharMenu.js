@@ -118,7 +118,7 @@ const CharMenu = () => {
             <TextBoxModal 
                 booleans={[showDownload, setShowDownload]}
                 onConfirm={(text)=> {
-                    axios.post(
+                    axios.create({timeout: 1000}).post(
                         'https://api.chub.ai/api/characters/download', 
                         {
                             "format" : "tavern",
