@@ -11,8 +11,11 @@
  * 
  */
 
-import { decode as atob } from 'base-64'
-import 'fastestsmallesttextencoderdecoder'
+import { polyfill as polyfillBase64 } from 'react-native-polyfill-globals/src/base64'
+polyfillBase64()
+
+import { polyfill as polyfillTextEncoding } from 'react-native-polyfill-globals/src/encoding'
+polyfillTextEncoding()
 
 const llamaTokenizer = {}
 

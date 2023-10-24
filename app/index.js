@@ -9,8 +9,17 @@ import {ChatWindow }from '@components/ChatMenu/ChatWindow/ChatWindow'
 import { useMMKVString,  useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 import { Global, Color, getChatFile,getNewestChatFilename , MessageContext, saveChatFile, getCharacterCard} from '@globals'
 import llamaTokenizer from '@constants/tokenizer'
-import { FontAwesome, Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu'
+
+import { polyfill as polyfillReadableStream } from 'react-native-polyfill-globals/src/readable-stream'
+polyfillReadableStream()
+
+import { polyfill as polyfillFetch } from 'react-native-polyfill-globals/src/fetch'
+polyfillFetch()
+
+import { polyfill as polyfillTextEncoding } from 'react-native-polyfill-globals/src/encoding'
+polyfillTextEncoding()
 
 const Home = () => {
 
@@ -28,6 +37,7 @@ const Home = () => {
 	const [newMessage, setNewMessage] = useState('');
 	const [targetLength, setTargetLength] = useState(0)
 	const [chatCache, setChatCache] = useState('')
+
 	// load character chat upon character change
 	useEffect(() => {
 		if (charName === 'Welcome' || charName === undefined) return
@@ -58,9 +68,10 @@ const Home = () => {
 		else {
 			payload += message_acc.trim('\n')
 		}
-
+		payload = payload.replaceAll('{{char}}', charName).replaceAll('{{user}}',userName)
+		console.log(`Payload size: ${llamaTokenizer.encode(payload).length}`)
 		return {
-			"prompt": payload.replace(`{{char}}`, charName).replace(`{{user}}`,userName),
+			"prompt": payload,
 			"use_story": false,
 			"use_memory": false,
 			"use_authors_note": false,
@@ -110,85 +121,69 @@ const Home = () => {
 			setTargetLength(messages.length + 1)
 		setChatCache('')
 		setNowGenerating(true)
-	};
+	}
 
+	const insertGeneratedMessage = (data, fn = () => {}) => {
+		setMessages(messages => {
+			try {
+				const createnew = (messages.length < targetLength)
+				const mescontent = ((createnew )  ? chatCache + data : messages.at(-1).mes + data)
+				.replaceAll(currentInstruct.input_sequence, ``)
+				.replaceAll(currentInstruct.output_sequence, ``)
+				const newmessage = (createnew) ? createChatEntry(charName, false, "") : messages.at(-1)
+				newmessage.mes = mescontent
+				newmessage.swipes[newmessage.swipe_id] = mescontent
+				newmessage.gen_finished = humanizedISO8601DateTime()
+				newmessage.swipe_info[newmessage.swipe_id].gen_finished = humanizedISO8601DateTime()
+			return createnew ?	[...messages , newmessage] : [...messages.slice(0,-1), newmessage]
+			} catch (error) {
+				console.log("Couldnt write due to:" + error)
+				return messages 
+			} finally {
+				fn()
+			}
+		})		
+	}
+	
 	const generateResponse = () => {
-		console.log(`Obtaining response from endpoint: ${endpoint}`)
-		setNewMessage(n => '');
-		console.log("Getting Response")
-		// handle swipe logic
-		const getresponse = (api, write = false, body = "") => {
-			return axios.create({timeout:200}).post(api, body)
-			.then(response => {
-				// hacky solution, API returns json missing `}` occasionally
-				let data = {}
-				try{
-					data = response.data.results[0].text
-				} catch {
-					data = JSON.parse(`${response.data}}`).results[0].text
+		console.log(`Obtaining response.`)
+		setNewMessage(n => '')
+
+		fetch(`${endpoint}/api/extra/generate/stream`, {
+			reactNative: {textStreaming: true},
+			method: `POST`,
+			body: JSON.stringify(constructPayload()),
+		}, {})
+		.then((response) => {
+			const reader = response.body.getReader()
+			return reader.read().then(function processText ({done, value}) {
+				if(done) {
+					setNowGenerating(false)
+					insertGeneratedMessage('', () => {
+						console.log(`Saving chat`)
+						saveChatFile(messages, charName, currentChat)
+					})					
+					console.log('Done')
+					return
 				}
-				if(data === '') return
-
-				setMessages(messages => {
-					try {
-						const createnew = (messages.length < targetLength)	
-						const mescontent = chatCache + data
-						.replace(currentInstruct.input_sequence, ``)
-						.replace(currentInstruct.output_sequence, ``)
-						const newmessage = (createnew) ? createChatEntry(charName, false, "") : messages.at(-1)
-						newmessage.mes = mescontent
-						newmessage.swipes[newmessage.swipe_id] = mescontent
-						if (write) {  // if this is the initial request, this only triggers upon completion
-							newmessage.gen_finished = new Date()
-							newmessage.swipe_info[newmessage.swipe_id].gen_finished = new Date()
-						}
-					return createnew ?	[...messages , newmessage] : [...messages.slice(0,-1), newmessage]
-					} catch (error) {
-						console.log("Couldnt write due to:" + error + (write? "( This is a /generate response)" : "  (This is a /check response)"))
-						return messages 
-					} finally {
-						if (write) {
-							saveChatFile(messages, charName, currentChat)
-						}
-					}
-				})		
+				const text = new TextDecoder().decode(value)
+				let events = text.split('\n')
+				if(events.length !== 2) {	
+					const data = 
+					((events.length === 4)? 
+						JSON.parse(events.at(1).substring(5)) : 
+						JSON.parse(events.at(0).substring(5))
+					).token
+					insertGeneratedMessage(data)	
+				}
+				return reader.read().then(processText)
 			})
-		}
-		
-		const handleError = (error, main = true) => {
-			console.log("Response Fetch Failed: " + error)
-			setNowGenerating(nowGenerating => false)
-			if(main)
+
+		}).catch((error) => {
+			setNowGenerating(false)
 			ToastAndroid.show('Connection Lost...', ToastAndroid.SHORT)
-		
-		}
-		
-		const getgenerationstream = async () => {
-			let response = null
-			const interval = () => setTimeout(async () => {
-				if(response === null) {
-					await getresponse(`${endpoint}/api/extra/generate/check`).catch((error) => {
-						handleError(error, false)
-						response = ""
-					})
-					interval()
-				} 
-			}, 300);
-			interval()
-			getresponse(`${endpoint}/api/api/v1/generate`, true,  
-			JSON.stringify(constructPayload()))
-			.catch((error) => {
-				handleError(error)
-			}).finally(() => {
-				setNowGenerating(false)
-				response = ""
-			})
-		
-		}
-
-		getgenerationstream()
-
-		return 
+			console.log('Something went wrong.' + error)
+		})
 	}
 
 	return (
@@ -377,7 +372,7 @@ const createChatEntry = (name, is_user, message) => {
 		"mes":message,
 		
 		// metadata
-		"send_date":humanizedISO8601DateTime(),
+		"send_date": Date(),
 		// gen_started
 		// gen_finished
 		"extra":{"api":"kobold","model":"concedo/koboldcpp"},
@@ -386,7 +381,7 @@ const createChatEntry = (name, is_user, message) => {
 		"swipe_info":[
 			// metadata
 			{	
-				"send_date":humanizedISO8601DateTime(),
+				"send_date": Date(),
 				"extra":{"api":"kobold","model":"concedo/koboldcpp"},
 			},
 		],
