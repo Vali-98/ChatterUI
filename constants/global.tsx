@@ -277,7 +277,7 @@ const TavernCardV2 = (name : string) => {
     }
 }
 
-function humanizedISO8601DateTime(date: string = '') {
+export const humanizedISO8601DateTime = (date: string = '') => {
     let baseDate = typeof date === 'number' ? new Date(date) : new Date();
     let humanYear = baseDate.getFullYear();
     let humanMonth = (baseDate.getMonth() + 1);

@@ -1,7 +1,7 @@
 import {
     ScrollView, StyleSheet, KeyboardAvoidingView 
 } from 'react-native'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import {ChatItem} from './ChatItem'
 import { Global } from '../../../constants/global'
 import { useMMKVBoolean, useMMKVListener } from 'react-native-mmkv'
@@ -15,7 +15,9 @@ const ChatWindow = ({messages}) => {
         if(key === Global.CurrentCharacter || key === Global.CurrentChat)
         scrollViewRef.current?.scrollToEnd()
     })
-
+    useEffect(() => {
+        if (!nowGenerating) scrollViewRef.current?.scrollToEnd()
+    },[nowGenerating])
     
     return (
             <KeyboardAvoidingView style ={styles.chatHistory} >
@@ -25,7 +27,7 @@ const ChatWindow = ({messages}) => {
                     style={{flex: 1,padding:4}}
                 >  
                 {messages.slice(1).map((message, index) => (
-                    <ChatItem key={index} id={index} message={message} />
+                    <ChatItem key={index} id={index} message={message} scroll={scrollViewRef}/>
                 ))}
 
                 </ScrollView>
