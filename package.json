@@ -24,6 +24,7 @@
     "base-64": "^1.0.0",
     "eas-cli": "^5.4.0",
     "expo": "~49.0.11",
+    "expo-application": "~5.3.0",
     "expo-asset": "~8.10.1",
     "expo-build-properties": "~0.8.3",
     "expo-crypto": "~12.4.1",
@@ -53,9 +54,7 @@
     "react-native-safe-area-context": "4.6.3",
     "react-native-screens": "~3.22.0",
     "react-native-web": "~0.19.6",
-    "text-encoding": "^0.7.0",
-    "undefined": "web-streams-polyfill/ponyfill/es6",
-    "expo-application": "~5.3.0"
+    "undefined": "web-streams-polyfill/ponyfill/es6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
