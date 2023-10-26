@@ -37,8 +37,8 @@ const Settings = () => {
             <TouchableOpacity style={styles.largeButton} onPress={() => router.push("Instruct")}>
                 <Text style={styles.largeButtonText}>Instruct</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.largeButton} onPress={() => router.push("Endpoint")}>
-                <Text style={styles.largeButtonText}>Endpoint</Text>
+            <TouchableOpacity style={styles.largeButton} onPress={() => router.push("APIMenu")}>
+                <Text style={styles.largeButtonText}>API</Text>
             </TouchableOpacity>
         </View>
 

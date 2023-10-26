@@ -122,7 +122,7 @@ const ChatItem = ({ message, id, scroll}) => {
                             setPlaceholderText(message.mes)
                             setEditMode(editMode => false)
                             }}>
-                            <MaterialIcons name='close' size={28} color={Color.Button} />
+                            <MaterialIcons name='close' size={28} color={Color.Button} /> 
                         </TouchableOpacity>
                     </View>)
                     : 

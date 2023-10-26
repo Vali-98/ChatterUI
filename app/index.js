@@ -7,7 +7,8 @@ import { useState, useEffect} from 'react'
 import axios  from 'axios'
 import {ChatWindow }from '@components/ChatMenu/ChatWindow/ChatWindow' 
 import { useMMKVString,  useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import { Global, Color, getChatFile,getNewestChatFilename , MessageContext, saveChatFile, getCharacterCard} from '@globals'
+import { Global, Color, API, hordeHeader, 
+	getChatFile,getNewestChatFilename , MessageContext, saveChatFile, getCharacterCard} from '@globals'
 import llamaTokenizer from '@constants/tokenizer'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu'
@@ -25,18 +26,24 @@ const Home = () => {
 
 	const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
 	const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-	const [endpoint, setEndpoint] = useMMKVString(Global.Endpoint)
+	const [kaiendpoint, setKAIEndpoint] = useMMKVString(Global.KAIEndpoint)
 	const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
 	const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
 	const [userCard, setUserCard] = useMMKVObject(Global.CurrentUserCard)
 	const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
 	const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
 	const [currentPreset, setCurrentPreset] = useMMKVObject(Global.CurrentPreset)
-	// rework later
+	const [APIType, setAPIType] = useMMKVString(Global.APIType)
+	
+    const [hordeKey, setHordeKey] = useMMKVString(Global.HordeKey)
+    const [hordeModels, setHordeModels] = useMMKVObject(Global.HordeModels)
+    const [hordeWorkers, setHordeWorkers] = useMMKVObject(Global.HordeWorkers)
+
 	const [messages, setMessages] = useState([]);
 	const [newMessage, setNewMessage] = useState('');
 	const [targetLength, setTargetLength] = useState(0)
 	const [chatCache, setChatCache] = useState('')
+	const [hordeID, setHordeID] = useState('')
 
 	// load character chat upon character change
 	useEffect(() => {
@@ -50,13 +57,13 @@ const Home = () => {
 		})
 		
 	}, [charName])
-			
-	const constructPayload = () => {
+	
+	const buildContext = (usedContext = currentPreset.max_context_length) => {
 		let payload = `${currentInstruct.input_sequence}\n${userCard.description}\n${currentInstruct.system_prompt}\n${currentCard.description}\n`
 		let message_acc = ``
 		for(const message of messages.slice(1)) {
 			let message_shard = `${message.name === charName ? currentInstruct.output_sequence : currentInstruct.input_sequence} ${message.mes}\n`
-			if (llamaTokenizer.encode(payload + message_acc).length > currentInstruct.max_length){
+			if (llamaTokenizer.encode(payload + message_acc).length > usedContext){
 				//console.log(llamaTokenizer.encode(payload + message_acc).length > currentInstruct.max_length)
 				break
 			}
@@ -70,8 +77,12 @@ const Home = () => {
 		}
 		payload = payload.replaceAll('{{char}}', charName).replaceAll('{{user}}',userName)
 		console.log(`Payload size: ${llamaTokenizer.encode(payload).length}`)
+		return payload
+	}
+
+	const constructKAIPayload = () => {
 		return {
-			"prompt": payload,
+			"prompt": buildContext(),
 			"use_story": false,
 			"use_memory": false,
 			"use_authors_note": false,
@@ -100,6 +111,51 @@ const Home = () => {
 		}
 	}
 
+	const constructHordePayload = (dry = false) => {
+		const usedModels = hordeModels.map(item => {return item.name})
+		const usedWorkers = hordeWorkers.filter(item => item.models.some(model => usedModels.includes(model)))
+		const usedContext = Math.min.apply(null, 
+			usedWorkers.map(item => {return item.max_context_length})
+			)
+		const usedResponseLength = Math.min.apply(null,
+			usedWorkers.map(item => {return item.max_length})
+			) 
+		console.log('Max worker context length: ' + usedContext)
+		console.log('Max worker response length: ' + usedResponseLength)
+		console.log('Models used: ' + usedModels)
+		return {
+			"prompt": buildContext(usedContext),
+			"params": {
+				"n": 1,
+				"frmtadsnsp": false,
+				"frmtrmblln": false,
+				"frmtrmspch": false,
+				"frmttriminc": true,
+				"max_context_length": Math.min(parseInt(currentPreset.max_length), usedContext),
+				"max_length": Math.min(parseInt(currentPreset.genamt), usedResponseLength ),
+				"rep_pen": currentPreset.rep_pen,
+				"rep_pen_range": parseInt(currentPreset.rep_pen_range),
+				"rep_pen_slope": currentPreset.rep_pen_slope,
+				"temperature": currentPreset.temp,
+				"tfs": currentPreset.tfs,
+				"top_a": currentPreset.top_a,
+				"top_k": parseInt(currentPreset.top_k),
+				"top_p": currentPreset.top_p,
+				"typical": currentPreset.typical,
+				"singleline": false,
+				"use_default_badwordsids": true,
+				"stop_sequence": ["\n\n\n\n\n", currentInstruct.input_sequence],
+			},
+			"trusted_workers": false,
+			"slow_workers": true,
+			"workers": [
+			],
+			"worker_blacklist": false,
+			"models": usedModels,
+			"dry_run" : dry
+		  }
+	}
+
 	useEffect(() => {
 		nowGenerating && generateResponse()
 	}, [nowGenerating]) 
@@ -126,14 +182,16 @@ const Home = () => {
 		setNowGenerating(true)
 	}
 
-	const insertGeneratedMessage = (data, fn = () => {}) => {
+	const insertGeneratedMessage = (data, save=false) => {
 		setMessages(messages => {
 			try {
 				const createnew = (messages.length < targetLength)
 				const mescontent = ((createnew )  ? chatCache + data : messages.at(-1).mes + data)
 				.replaceAll(currentInstruct.input_sequence, ``)
 				.replaceAll(currentInstruct.output_sequence, ``)
-				const newmessage = (createnew) ? createChatEntry(charName, false, "") : messages.at(-1)
+				const newmessage = (createnew) ? createChatEntry(charName, false, "", APIType, 
+					(APIType === API.KAI) ? 'concedo/koboldcpp' : JSON.stringify(hordeModels)
+				) : messages.at(-1)
 				newmessage.mes = mescontent
 				newmessage.swipes[newmessage.swipe_id] = mescontent
 				newmessage.gen_finished = humanizedISO8601DateTime()
@@ -143,7 +201,9 @@ const Home = () => {
 				console.log("Couldnt write due to:" + error)
 				return messages 
 			} finally {
-				fn()
+				if(!save) return
+				console.log(`Saving chat`)
+				saveChatFile(messages, charName, currentChat)
 			}
 		})		
 	}
@@ -151,15 +211,24 @@ const Home = () => {
 	const generateResponse = () => {
 		console.log(`Obtaining response.`)
 		setNewMessage(n => '')
+		switch(APIType) {
+			case API.KAI:
+				KAIresponse()
+				break
+			case API.HORDE:
+				hordeResponse()
+				break
+		}
+	}
 
+	const KAIresponse = () => {
+		console.log(`Using KAI`)
 		const controller = new AbortController();
 		const timeout = setTimeout(() => controller.abort(), 5000);
-
-
-		fetch(`${endpoint}/api/extra/generate/stream`, {
+		fetch(`${kaiendpoint}/api/extra/generate/stream`, {
 			reactNative: {textStreaming: true},
 			method: `POST`,
-			body: JSON.stringify(constructPayload()),
+			body: JSON.stringify(constructKAIPayload()),
 			signal: controller.signal,
 		}, {})
 		.then((response) => {
@@ -168,15 +237,13 @@ const Home = () => {
 			return reader.read().then(function processText ({done, value}) {
 				if(done) {
 					setNowGenerating(false)
-					insertGeneratedMessage('', () => {
-						console.log(`Saving chat`)
-						saveChatFile(messages, charName, currentChat)
-					})					
+					insertGeneratedMessage('', true)					
 					console.log('Done')
 					return
 				}
 				const text = new TextDecoder().decode(value)
 				let events = text.split('\n')
+				console.log(events)
 				if(events.length !== 2) {	
 					const data = 
 					((events.length === 4)? 
@@ -193,7 +260,13 @@ const Home = () => {
 			ToastAndroid.show('Connection Lost...', ToastAndroid.SHORT)
 			console.log('Something went wrong.' + error)
 		})
+
 	}
+
+	const hordeResponse = async () => {
+	}
+
+
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
@@ -224,9 +297,14 @@ const Home = () => {
 						
 						<MenuOption onSelect={() => {
 							console.log(`Aborting Generation`)
-							axios.create({timeout: 1000}).post(`${endpoint}/api/extra/abort`).then(() => {	
-							setNowGenerating(false)
-						})	
+							if(APIType === API.KAI)
+								axios
+									.create({timeout: 1000})
+									.post(`${kaiendpoint}/api/extra/abort`)
+									.then(() => {setNowGenerating(false)})	
+
+							if(APIType === API.HORDE)
+									setNowGenerating(false)
 						}}>
 						<View style={styles.optionItem}>
 							<Ionicons name='stop' color={Color.Button} size={24}/>
@@ -280,9 +358,21 @@ const Home = () => {
 
 					{ nowGenerating ?
 					<TouchableOpacity style={styles.sendButton} onPress={()=> {
-						axios.create({timeout: 1000}).post(`${endpoint}/api/extra/abort`).then(() => {	
-							setNowGenerating(false)
-						})	
+						if(APIType === API.KAI)
+								axios
+									.create({timeout: 1000})
+									.post(`${kaiendpoint}/api/extra/abort`)
+									.then(() => {setNowGenerating(false)})	
+
+						if(APIType === API.HORDE)
+								fetch(`https://stablehorde.net/api/v2/generate/text/status/${hordeID}`,{
+									method: 'DELETE',
+									headers:{
+										...hordeHeader(),							
+										'accept':'application/json',
+										'Content-Type':'application/json'
+									},
+								}).then((response) => {setNowGenerating(false)})	
 					}}>
 						<MaterialIcons name='stop' color={Color.Button} size={30}/>
 					</TouchableOpacity>
@@ -373,7 +463,7 @@ const styles = StyleSheet.create({
 
 export default Home;
 
-const createChatEntry = (name, is_user, message) => {
+const createChatEntry = (name, is_user, message, api, model) => {
 	return {
 		// important stuff
 		"name":name,
@@ -391,7 +481,7 @@ const createChatEntry = (name, is_user, message) => {
 			// metadata
 			{	
 				"send_date": Date(),
-				"extra":{"api":"kobold","model":"concedo/koboldcpp"},
+				"extra":{"api":api,"model":model},
 			},
 		],
 	}

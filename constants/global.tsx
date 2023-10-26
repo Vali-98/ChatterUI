@@ -3,11 +3,16 @@ import {MMKV} from 'react-native-mmkv'
 import { createContext } from 'react'
 import * as DocumentPicker from 'expo-document-picker'
 import { ToastAndroid, StyleSheet } from 'react-native'
+import * as Crypto from 'expo-crypto';
+import * as Application from 'expo-application'
 const mmkv = new MMKV()
 
 
 export const MessageContext = createContext([])
 
+export const resetEncryption = (value = 0) => {
+    mmkv.recrypt(Crypto.getRandomBytes(16).toString())
+}
 
 export const enum Color {
     Header= '#1e1e1e',
@@ -33,20 +38,31 @@ export const enum Global {
     CurrentCharacterCard='charcard',    // note: use Object ? - stores charactercard
     CurrentUser='currentuser',          // current username, locates dir
     CurrentUserCard='usercard',         // note: use Object ? - stores usercard
-    Endpoint='endpoint',                // api endpoint 
     NowGenerating='nowgenerating',      // generation signal
     EditedWindow='editedwindow',        // exit editing window confirmation
     PresetName='presetname',            // name of current preset
-    InstructName='instructname',
+    InstructName='instructname',        // name of current instruct preset
+    APIType='endpointtype',             // name of current api mode
+    KAIEndpoint='kaiendpoint',          // kai api endpoint
+    HordeKey='hordekey',                // api key for horde 
+    HordeModels='hordemodel',             // name of horde model
+    HordeWorkers = 'hordeworker',
 }
 
-
+export const enum API {
+    KAI = 'kai',
+    HORDE = 'horde',
+}
 
 export const GlobalStyle = StyleSheet.create({
     
-
 })
 
+// horde
+
+export const hordeHeader = () => {
+    return { "Client-Agent":`ChatterUI:${Application.nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`} 
+}
 
 
 // generate default directories
