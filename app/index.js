@@ -216,7 +216,7 @@ const Home = () => {
             no_repeat_ngram_size: parseInt(presetTGWUI.no_repeat_ngram_size),
             num_beams: parseInt(presetTGWUI.num_beams),
 			penalty_alpha: parseFloat(presetTGWUI.penalty_alpha),
-            length_penalty: parseFloat(presetTGWUI.length_penalt),
+            length_penalty: parseFloat(presetTGWUI.length_penalty),
             early_stopping: presetTGWUI.early_stopping,
 			mirostat_mode: parseInt(presetTGWUI.mirostat_mode),
 			mirostat_eta: parseFloat(presetTGWUI.mirostat_eta),
@@ -379,14 +379,16 @@ const Home = () => {
 	}
 
 	const TGWUIReponseStream = async () => {
-		const check = await fetch(`https://neuro.mancer.tech/webui/${mancerModel.id}/api/v1/model`, {
+		if(APIType === API.MANCER) {
+			const check = await fetch(`https://neuro.mancer.tech/webui/${mancerModel?.id}/api/v1/model`, {
 			method: 'GET',
 			headers: {'X-API-KEY': mancerKey}
-		})
-		if(check.status !== 200) {
-			setNowGenerating(false)
-			ToastAndroid.show(`Invalid Model or API key!`, 3000)
-			return
+			})
+			if(check.status !== 200) {
+				setNowGenerating(false)
+				ToastAndroid.show(`Invalid Model or API key!`, 3000)
+				return
+			}
 		}
 		//return
 		try {
