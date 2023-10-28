@@ -2,15 +2,14 @@ import { View, Text, StyleSheet, TextInput } from 'react-native'
 import Slider from '@react-native-community/slider'
 import { useState, useEffect } from 'react'
 import { Color } from '@globals'
-const SliderItem = ({name, preset, varname, fn , min=0, max=1, step=0, precision=0}) => {
+const SliderItem = ({name, body, varname, setValue, min=0, max=1, step=0, precision=0}) => {
 
     const clamp = (val) => Math.min(Math.max(parseFloat(val?.toFixed(2) ?? 0), min), max)
-    const [textValue, setTextValue] = useState(preset[varname].toFixed(precision))
+    const [textValue, setTextValue] = useState(body[varname].toFixed(precision))
 
     useEffect(() => {
-        setTextValue(preset[varname].toFixed(precision))
-    }, [preset])
-
+        setTextValue(body[varname].toFixed(precision))
+    }, [body])
 
     return (
 
@@ -22,9 +21,9 @@ const SliderItem = ({name, preset, varname, fn , min=0, max=1, step=0, precision
                 step = {step}
                 minimumValue={min}
                 maximumValue={max}
-                value={preset[varname]}
+                value={body[varname]}
                 onValueChange={value => {
-                    fn(varname, clamp(value))
+                    setValue({...body, [varname]:clamp(value)})
                     setTextValue(clamp(value).toFixed(precision))
                 }}
                 minimumTrackTintColor={Color.White}
@@ -39,9 +38,9 @@ const SliderItem = ({name, preset, varname, fn , min=0, max=1, step=0, precision
                 onEndEditing={() => {   
                 
                     if(isNaN(clamp(parseFloat(textValue))))
-                        setTextValue(preset[varname].toFixed(precision))
+                        setTextValue(body[varname].toFixed(precision))
                     else {
-                        fn(varname, clamp(parseFloat(textValue)))
+                        setValue({...body, [varname]:clamp(parseFloat(textValue))})
                         setTextValue(clamp(textValue !== null ? parseFloat(textValue) : 0).toFixed(precision) ?? min)
                     }
                 }}      

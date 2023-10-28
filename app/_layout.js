@@ -3,8 +3,9 @@ import { Stack, useRouter} from 'expo-router'
 import { TouchableOpacity, View, StyleSheet} from 'react-native'
 import { useEffect } from 'react'
 import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import { Global, generateDefaultDirectories, createNewDefaultChat, 
-    loadUserCard, createNewUser, writePreset,  writeInstruct, Color, resetEncryption
+import { Global, generateDefaultDirectories, createNewDefaultChat, createDefaultPresets,
+    loadUserCard, createNewUser,  writeInstruct, Color, 
+    defaultInstruct, defaultPresetKAI, defaultPresetTGWUI, defaultPresetNovelAI,
 } from '@globals'
 import { MenuProvider } from 'react-native-popup-menu';
 import * as SystemUI from 'expo-system-ui'
@@ -20,14 +21,21 @@ const Layout = () => {
 	const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
-    const [currentPreset, setCurrentPreset] = useMMKVObject(Global.CurrentPreset)
 	const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
-    const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
     const [userCard, setUserCard] = useMMKVObject(Global.CurrentUserCard)
 
     const [instructName, setInstructName] = useMMKVObject(Global.InstructName)
-    const [presetName, setPresetName] = useMMKVString(Global.PresetName)
+    const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
+    
+    const [presetKAI, setPresetKAI] = useMMKVObject(Global.PresetKAI)
+    const [presetNameKAI, setPresetNameKAI] = useMMKVString(Global.PresetNameKAI)
+
+    const [presetTGWUI, setPresetTGWUI] = useMMKVObject(Global.PresetTGWUI)
+    const [presetNameTGWUI, setPresetNameTGWUI] = useMMKVString(Global.PresetNameTGWUI)
+
+    const [presetNovelAI, setPresetNovelAI] = useMMKVObject(Global.PresetNovelAI)
+    const [presetNameNovelAI, setPresetNameNovelAI] = useMMKVObject(Global.PresetNameNovelAI)
 
     const [hordeModels, setHordeModels] = useMMKVObject(Global.HordeModels)
     const [hordeWorkers, setHordeWorkers] = useMMKVObject(Global.HordeWorkers)
@@ -45,6 +53,8 @@ const Layout = () => {
         console.log("Reset values")
         SystemUI.setBackgroundColorAsync(Color.Background)
 
+        // replace this entire call with specific to each field
+        
 		FS.readDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => generateDefaultDirectories().then(() => {
             
             createNewUser('User').then(() => {
@@ -55,12 +65,14 @@ const Layout = () => {
                 })
             })
             
-            writePreset(`Default`, defaultPreset()).then(() => {
-                console.log(`Creating Default Presets`)
-                setCurrentPreset(defaultPreset())
-                setPresetName(`Default`)
-            })
-            
+            createDefaultPresets()
+            setPresetKAI(defaultPresetKAI())
+            setPresetNameKAI(`Default`)
+            setPresetTGWUI(defaultPresetTGWUI())
+            setPresetNameTGWUI(`Default`)
+            setPresetNovelAI(defaultPresetNovelAI())
+            setPresetNameNovelAI(`Default`)
+
             writeInstruct('Default', defaultInstruct()).then(() => {
                 console.log(`Creating Default Instruct`)
                 setCurrentInstruct(defaultInstruct())
@@ -175,56 +187,3 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
 })
-
-const defaultPreset = () => {
-    return {
-        "temp": 1,
-        "rep_pen": 1,
-        "rep_pen_range": 1,
-        "top_p": 0.9,
-        "top_a": 0.9,
-        "top_k": 20,
-        "typical": 1,
-        "tfs": 1,
-        "rep_pen_slope": 0.9,
-        "single_line": false,
-        "sampler_order": [
-            6,
-            0,
-            1,
-            3,
-            4,
-            2,
-            5
-        ],
-        "mirostat": 0,
-        "mirostat_tau": 5,
-        "mirostat_eta": 0.1,
-        "use_default_badwordsids": true,
-        "grammar": "",
-        "genamt": 220,
-        "max_length": 4096
-    }
-
-}
-
-const defaultInstruct = () => {
-    return {
-        "system_prompt": "Write {{char}}'s next reply in a roleplay chat between {{char}} and {{user}}.",
-        "input_sequence": "### Instruction: ",
-        "output_sequence": "### Response: ",
-        "first_output_sequence": "",
-        "last_output_sequence": "",
-        "system_sequence_prefix": "",
-        "system_sequence_suffix": "",
-        "stop_sequence": "",
-        "separator_sequence": "",
-        "wrap": false,
-        "macro": false,
-        "names": false,
-        "names_force_groups": false,
-        "activation_regex": "",
-        "name": "Default"
-    }
-}
-

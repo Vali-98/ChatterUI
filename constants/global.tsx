@@ -6,8 +6,6 @@ import { ToastAndroid, StyleSheet } from 'react-native'
 import * as Crypto from 'expo-crypto';
 import * as Application from 'expo-application'
 const mmkv = new MMKV()
-
-
 export const MessageContext = createContext([])
 
 export const resetEncryption = (value = 0) => {
@@ -22,6 +20,7 @@ export const enum Color {
     White = '#fff',
     Text = '#fff',
     TextItalic = '#aaa',
+    TextQuote = '#e69d17',
     Black = '#000',
     DarkContainer= '#111',
     Offwhite= '#888',
@@ -31,32 +30,99 @@ export const enum Color {
 }
 
 export const enum Global {
-    CurrentCharacter='currentchar',     // current char filename, locates dir
-    CurrentChat='currentchat',          // current chat filename, locates dir
-    CurrentPreset='currentpreset',      // note: use Object ? - stores preset 
-    CurrentInstruct='currentinstruct',  // note: use Object ? - stores instruct
-    CurrentCharacterCard='charcard',    // note: use Object ? - stores charactercard
-    CurrentUser='currentuser',          // current username, locates dir
-    CurrentUserCard='usercard',         // note: use Object ? - stores usercard
+
+    // Processing
+    
     NowGenerating='nowgenerating',      // generation signal
     EditedWindow='editedwindow',        // exit editing window confirmation
-    PresetName='presetname',            // name of current preset
+
+    // Character
+
+    CurrentCharacter='currentchar',     // current char filename, locates dir
+    CurrentCharacterCard='charcard',    // note: use Object ? - stores charactercard
+
+    // User
+
+    CurrentUser='currentuser',          // current username, locates dir
+    CurrentUserCard='usercard',         // note: use Object ? - stores usercard
+    
+    // Chat
+
+    CurrentChat='currentchat',          // current chat filename, locates dir
+    
+    // Instruct
+
     InstructName='instructname',        // name of current instruct preset
+    CurrentInstruct='currentinstruct',  // note: use Object ? - stores instruct
+
+    // Presets
+
+    //CurrentPreset='currentpreset',      // note: use Object ? - stores preset 
+    //PresetName='presetname',            // name of current preset
+
+    PresetKAI='currentpresetkai',
+    PresetNameKAI='presetnamekai',
+
+    PresetTGWUI='currentpresettgwui',
+    PresetNameTGWUI='presetnametgwui',
+
+    PresetNovelAI='currentpresetnovelai',
+    PresetNameNovelAI='presetnamenovelai',
+
+    // APIs
+
     APIType='endpointtype',             // name of current api mode
+    
     KAIEndpoint='kaiendpoint',          // kai api endpoint
+    
+    TGWUIBlockingEndpoint='tgwuiblockingendpoint',   // tgwui endpoint
+    TGWUIStreamingEndpoint='tgwuistreamingendpoint', // tgwui streaming web socket
+
     HordeKey='hordekey',                // api key for horde 
-    HordeModels='hordemodel',             // name of horde model
-    HordeWorkers = 'hordeworker',
+    HordeModels='hordemodel',           // names of horde models to be used
+    HordeWorkers = 'hordeworker',       // List of available horde workers
+
+    MancerKey='mancerkey',              // api key for mancer
+    MancerModel='mancermodel',          // selected mancer model
+
+    NovelKey='novelkey',                // novelai key
+    NovelModel='novelmodel',            // novelai model
+
+    AphroditeKey = 'aphroditekey',      // api key for aphrodite, default is `EMPTY`
 }
 
 export const enum API {
     KAI = 'kai',
     HORDE = 'horde',
+    TGWUI = 'textgenwebui',
+    MANCER = 'mancer',
+    NOVELAI = 'novel',
+    APHRODITE = 'aphrodite',
 }
 
 export const GlobalStyle = StyleSheet.create({
     
 })
+
+// general downloader
+
+export const saveStringExternal = async (
+    filename : string,
+    filedata : string,
+) => {
+    const permissions = await FS.StorageAccessFramework.requestDirectoryPermissionsAsync();
+    if (permissions.granted) {
+        let directoryUri = permissions.directoryUri
+        await FS.StorageAccessFramework.createFileAsync(directoryUri, filename, "application/json")
+        .then(async(fileUri) => {
+            await FS.writeAsStringAsync(fileUri, filedata, { encoding: FS.EncodingType.UTF8 })
+            ToastAndroid.show(`File saved sucessfully`, 2000)
+        })
+        .catch((e) => {
+            console.log(e)
+        })
+    }
+} 
 
 // horde
 
@@ -64,12 +130,17 @@ export const hordeHeader = () => {
     return { "Client-Agent":`ChatterUI:${Application.nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`} 
 }
 
-
 // generate default directories
 
 export const generateDefaultDirectories = async () => {
     return FS.makeDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => console.log(`Could not create characters folder.`)).then(
-        () => { return FS.makeDirectoryAsync(`${FS.documentDirectory}preset`).catch(() => console.log(`Could not create presets folder.`))}
+        () => { return FS.makeDirectoryAsync(`${FS.documentDirectory}presets`).catch(() => console.log(`Could not create presets folder.`))}
+    ).then(
+        () => { return FS.makeDirectoryAsync(`${FS.documentDirectory}presets/kai`).catch(() => console.log(`Could not create instruct folder.`))}
+    ).then(
+        () => { return FS.makeDirectoryAsync(`${FS.documentDirectory}presets/tgwui`).catch(() => console.log(`Could not create instruct folder.`))}
+    ).then(
+        () => { return FS.makeDirectoryAsync(`${FS.documentDirectory}presets/novelai`).catch(() => console.log(`Could not create instruct folder.`))}
     ).then(
         () => { return FS.makeDirectoryAsync(`${FS.documentDirectory}instruct`).catch(() => console.log(`Could not create instruct folder.`))}
     ).then(
@@ -77,39 +148,66 @@ export const generateDefaultDirectories = async () => {
     )
 }
 
+// default presets
+
+export const createDefaultPresets = async () => {
+    console.log('Creating Default Presets')
+    await writePreset(`Default`, defaultPresetKAI(), 'kai')
+    await writePreset(`Default`, defaultPresetTGWUI(), 'tgwui')
+    await writePreset(`Default`, defaultPresetNovelAI(), 'novelai')
+}
+
+
 // presets
 
-export const loadPreset = async (name : string) => {
-    return FS.readAsStringAsync(`${FS.documentDirectory}preset/${name}.json`, {encoding: FS.EncodingType.UTF8})
+const apiType = () => {
+    let type : string = 'kai'
+    const api = mmkv.getString(Global.APIType)
+    if(api === API.MANCER || api === API.TGWUI || api === API.APHRODITE)
+        type = 'tgwui'
+    if(api === API.NOVELAI)
+        type = 'novelai'
+    return type
 }
 
-export const writePreset = async (name : string, preset : Object) => {
-    return FS.writeAsStringAsync(`${FS.documentDirectory}preset/${name}.json`, JSON.stringify(preset), {encoding:FS.EncodingType.UTF8})
+export const loadPreset = async (name : string, api = apiType()) => {    
+    return FS.readAsStringAsync(`${FS.documentDirectory}presets/${api}/${name}.json`, {encoding: FS.EncodingType.UTF8})
 }
 
-export const deletePreset = async (name : string ) => {
-    return FS.deleteAsync(`${FS.documentDirectory}preset/${name}.json`)
+export const writePreset = async (name : string, preset : Object, api = apiType()) => {
+    return FS.writeAsStringAsync(`${FS.documentDirectory}presets/${api}/${name}.json`, JSON.stringify(preset), {encoding:FS.EncodingType.UTF8})
 }
 
-export const getPresetList = async () => {
-    return FS.readDirectoryAsync(`${FS.documentDirectory}preset`)
+export const deletePreset = async (name : string ,api = apiType() ) => {
+    return FS.deleteAsync(`${FS.documentDirectory}presets/${api}/${name}.json`)
 }
 
-export const uploadPreset = async () => {
+export const getPresetList = async (api = apiType()) => {
+    return FS.readDirectoryAsync(`${FS.documentDirectory}presets/${api}`)
+}
+
+export const uploadPreset = async (api = apiType()) => {
     return DocumentPicker.getDocumentAsync({type:'application/json'}).then((result) => {
         if(result.canceled) return
         let name = result.assets[0].name.replace(`.json`, '')
         return FS.copyAsync({
             from: result.assets[0].uri, 
-            to: `${FS.documentDirectory}/preset/${name}.json`
+            to: `${FS.documentDirectory}/presets/${api}/${name}.json`
         }).then(() => {
-            return FS.readAsStringAsync(`${FS.documentDirectory}/preset/${name}.json`, {encoding: FS.EncodingType.UTF8})
+            return FS.readAsStringAsync(`${FS.documentDirectory}/preset/${api}/${name}.json`, {encoding: FS.EncodingType.UTF8})
         }).then((file) => {
+            console.log(JSON.parse(file))
             let filekeys =Object.keys(JSON.parse(file))
-            let correctkeys = Object.keys(defaultPreset())
+            let preset = defaultKAIPreset()
+            if(api === 'tgwui')
+                preset = defaultTGWUIPreset()
+            if(api === 'novelai')
+                preset = defaultNovelAIPreset()
+
+            let correctkeys = Object.keys(preset)
             let samekeys =  filekeys.every((element, index) => {return element === correctkeys[index]})
             if (!samekeys) {
-                return FS.deleteAsync(`${FS.documentDirectory}/preset/${name}.json`).then(() => {
+                return FS.deleteAsync(`${FS.documentDirectory}/preset/${api}/${name}.json`).then(() => {
                     throw new TypeError(`JSON file has invalid format`)
                 })
             }
@@ -258,53 +356,7 @@ const createNewChat = (userName : any, characterName : any, initmessage : any) =
 	]
 }
 
-const TavernCardV2 = (name : string) => { 
-    return {
-        name: name,
-        description: '',
-        personality: '',
-        scenario: '',
-        first_mes: '',
-        mes_example: '',
 
-      spec: 'chara_card_v2',
-      spec_version: '2.0',
-      data: {
-        name: name,
-        description: '',
-        personality: '',
-        scenario: '',
-        first_mes: '',
-        mes_example: '',
-  
-        // New fields start here
-        creator_notes: '',
-        system_prompt: '',
-        post_history_instructions: '',
-        alternate_greetings: [],
-        character_book: '',
-  
-        // May 8th additions
-        tags: [],
-        creator: '',
-        character_version: '',
-        extensions: {},
-      }
-    }
-}
-
-export const humanizedISO8601DateTime = (date: string = '') => {
-    let baseDate = typeof date === 'number' ? new Date(date) : new Date();
-    let humanYear = baseDate.getFullYear();
-    let humanMonth = (baseDate.getMonth() + 1);
-    let humanDate = baseDate.getDate();
-    let humanHour = (baseDate.getHours() < 10 ? '0' : '') + baseDate.getHours();
-    let humanMinute = (baseDate.getMinutes() < 10 ? '0' : '') + baseDate.getMinutes();
-    let humanSecond = (baseDate.getSeconds() < 10 ? '0' : '') + baseDate.getSeconds();
-    let humanMillisecond = (baseDate.getMilliseconds() < 10 ? '0' : '') + baseDate.getMilliseconds();
-    let HumanizedDateTime = (humanYear + "-" + humanMonth + "-" + humanDate + " @" + humanHour + "h " + humanMinute + "m " + humanSecond + "s " + humanMillisecond + "ms");
-    return HumanizedDateTime;
-}
 
 // dirs
 
@@ -447,19 +499,56 @@ export const copyCharImage = async (
 }
 
 
+const TavernCardV2 = (name : string) => { 
+    return {
+        name: name,
+        description: '',
+        personality: '',
+        scenario: '',
+        first_mes: '',
+        mes_example: '',
+
+      spec: 'chara_card_v2',
+      spec_version: '2.0',
+      data: {
+        name: name,
+        description: '',
+        personality: '',
+        scenario: '',
+        first_mes: '',
+        mes_example: '',
+  
+        // New fields start here
+        creator_notes: '',
+        system_prompt: '',
+        post_history_instructions: '',
+        alternate_greetings: [],
+        character_book: '',
+  
+        // May 8th additions
+        tags: [],
+        creator: '',
+        character_version: '',
+        extensions: {},
+      }
+    }
+}
+
+export const humanizedISO8601DateTime = (date: string = '') => {
+    let baseDate = typeof date === 'number' ? new Date(date) : new Date();
+    let humanYear = baseDate.getFullYear();
+    let humanMonth = (baseDate.getMonth() + 1);
+    let humanDate = baseDate.getDate();
+    let humanHour = (baseDate.getHours() < 10 ? '0' : '') + baseDate.getHours();
+    let humanMinute = (baseDate.getMinutes() < 10 ? '0' : '') + baseDate.getMinutes();
+    let humanSecond = (baseDate.getSeconds() < 10 ? '0' : '') + baseDate.getSeconds();
+    let humanMillisecond = (baseDate.getMilliseconds() < 10 ? '0' : '') + baseDate.getMilliseconds();
+    let HumanizedDateTime = (humanYear + "-" + humanMonth + "-" + humanDate + " @" + humanHour + "h " + humanMinute + "m " + humanSecond + "s " + humanMillisecond + "ms");
+    return HumanizedDateTime;
+}
 
 
-
-
-
-
-
-
-
-
-
-
-const defaultPreset = () => {
+export const defaultPresetKAI = () => {
     return {
         "temp": 1,
         "rep_pen": 1,
@@ -486,12 +575,85 @@ const defaultPreset = () => {
         "use_default_badwordsids": true,
         "grammar": "",
         "genamt": 220,
-        "max_length": 4096
+        "max_length": 4096,
+        "seed": -1,
     }
 
 }
 
-const defaultInstruct = () => {
+export const defaultPresetTGWUI = () => {
+    return {
+        "temp": 0.5,
+        "top_p": 0.9,
+        "top_k": 0,
+        "top_a": 0,
+        "tfs": 1,
+        "epsilon_cutoff": 0,
+        "eta_cutoff": 0,
+        "typical_p": 1,
+        "rep_pen": 1.1,
+        "rep_pen_range": 0,
+        "no_repeat_ngram_size": 20,
+        "penalty_alpha": 0,
+        "num_beams": 1,
+        "length_penalty": 1,
+        "min_length": 0,
+        "encoder_rep_pen": 1,
+        "freq_pen": 0,
+        "presence_pen": 0,
+        "do_sample": true,
+        "early_stopping": false,
+        "add_bos_token": true,
+        "truncation_length": 2048,
+        "ban_eos_token": false,
+        "skip_special_tokens": true,
+        "streaming": true,
+        "mirostat_mode": 0,
+        "mirostat_tau": 5,
+        "mirostat_eta": 0.1,
+        "guidance_scale": 1,
+        "negative_prompt": "",
+        "grammar_string": "",
+        "banned_tokens": "",
+        "type": "ooba",
+        "rep_pen_size": 0,
+        "genamt": 256,
+        "max_length": 4096
+    }
+}
+
+export const defaultPresetNovelAI = () => {
+    return {
+        "temperature": 1.5,
+        "repetition_penalty": 2.25,
+        "repetition_penalty_range": 2048,
+        "repetition_penalty_slope": 0.09,
+        "repetition_penalty_frequency": 0,
+        "repetition_penalty_presence": 0.005,
+        "tail_free_sampling": 0.975,
+        "top_k": 10,
+        "top_p": 0.75,
+        "top_a": 0.08,
+        "typical_p": 0.975,
+        "min_length": 1,
+        "preamble": "[ Style: chat, complex, sensory, visceral ]",
+        "cfg_uc": "",
+        "banned_tokens": "",
+        "order": [
+            1,
+            5,
+            0,
+            2,
+            3,
+            4
+        ],
+        "logit_bias": [],
+        "genamt": 256,
+        "max_length": 2560
+    }
+}
+
+export const defaultInstruct = () => {
     return {
         "system_prompt": "Write {{char}}'s next reply in a roleplay chat between {{char}} and {{user}}.",
         "input_sequence": "### Instruction: ",
