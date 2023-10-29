@@ -198,7 +198,7 @@ export const getPresetList = async (api = apiType()) => {
 
 export const uploadPreset = async (api = apiType()) => {
     return DocumentPicker.getDocumentAsync({type:['application/*']}).then((result) => {
-        if(result.canceled || !result.assets[0].name.endsWith('json') || !result.assets[0].name.endsWith('settings')) {
+        if(result.canceled || !result.assets[0].name.endsWith('json') && !result.assets[0].name.endsWith('settings')) {
             ToastAndroid.show(`Invalid File Type!`, 3000)    
             return
         }
