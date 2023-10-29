@@ -198,11 +198,11 @@ export const uploadPreset = async (api = apiType()) => {
         }).then((file) => {
             console.log(JSON.parse(file))
             let filekeys =Object.keys(JSON.parse(file))
-            let preset = defaultKAIPreset()
+            let preset : any = defaultPresetKAI()
             if(api === 'tgwui')
-                preset = defaultTGWUIPreset()
+                preset = defaultPresetTGWUI()
             if(api === 'novelai')
-                preset = defaultNovelAIPreset()
+                preset = defaultPresetNovelAI()
 
             let correctkeys = Object.keys(preset)
             let samekeys =  filekeys.every((element, index) => {return element === correctkeys[index]})
