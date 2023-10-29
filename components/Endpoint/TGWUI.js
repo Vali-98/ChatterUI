@@ -29,7 +29,7 @@ const TGWUI = () => {
                 onChangeText={(value) => {
                     setStreamEnd(value)
                 }}
-                placeholder='eg. http://127.0.0.1:5005/api/v1/stream'
+                placeholder='eg. ws://127.0.0.1:5005/api/v1/stream'
                 placeholderTextColor={Color.Offwhite}
             />
 
