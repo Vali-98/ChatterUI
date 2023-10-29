@@ -14,8 +14,7 @@ const KAI = () => {
 
     return (
         <View style={styles.mainContainer}>
-            <Text style={styles.title}>Endpoint</Text>
-
+            <Text style={styles.title}>URL</Text>
             <TextInput 
                 style={styles.input}
                 value={kaiendpoint}

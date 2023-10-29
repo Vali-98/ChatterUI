@@ -12,63 +12,63 @@ const ChatSelector = () => {
     const [chats, setChats] = useState([])
     const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
-
-
-    const refreshfilenames = () => {
-        getChatFilenames().then(
-            chatdirs => {
-                setChats(chatdirs)
-            }
-        )
-    }
-
-
+    
     useEffect(() => {
         refreshfilenames()
     },[])
 
+    const refreshfilenames = () => {
+        getChatFilenames().then(setChats)
+    }
+
+    const deleteChat = (chatname) => {
+        Alert.alert(`Delete Chat`, `Are you sure you want to delete this chat file?`, [
+            {
+                text:'Cancel',
+                onPress:()=> {},
+                style:'cancel' 
+            },
+            {
+                text:'Confirm',
+                onPress: () => {
+                    deleteChatFile(charName, chatname).then(() =>
+                        getNewestChatFilename(charName).then(filename => {
+                            setCurrentChat(filename)    
+                            refreshfilenames()
+                }))},
+                style:'destructive'
+            }])
+
+    }
+
+    const exportChat = (chatname) => {
+        
+    }
 
     return (
         <ScrollView style={styles.mainContainer}>
-            {
-                chats.reverse().map((chat,index) => (
-                    
-                        <TouchableOpacity
-                            key={index}
-                            onPress={() => {
-                                setCurrentChat(chat)
-                                router.back()
-                            }}
-                            style = {chat === currentChat ? styles.selectedchatlogitem : styles.chatlogitem}
-                        >   
-                        <View style = {styles.chatinfo}>
-                            
-                            <Image source={{uri:getCharacterImageDirectory()}} style={styles.avatar}/>
-                            <Text style={styles.chatname}>{chat.replace('.jsonl', '')}</Text>
-
-                        </View>
-                        
-                            <TouchableOpacity style={styles.deleteIcon} onPress={() => {
-                                Alert.alert(`Delete Chat`, `Are you sure you want to delete this chat file?`, [
-                                    {
-                                        text:'Cancel',
-                                        onPress:()=> {},
-                                        style:'cancel' 
-                                    },
-                                    {
-                                        text:'Confirm',
-                                        onPress: () => {
-                                            deleteChatFile(charName, chat).then(() =>
-                                                getNewestChatFilename(charName).then(filename => {
-                                                    setCurrentChat(filename)    
-                                                    refreshfilenames()
-                                        }))},
-                                        style:'destructive'
-                                    }])}}>
-                                <FontAwesome name='trash' size={32} color={Color.Button} />
-                            </TouchableOpacity>
-                        </TouchableOpacity>
-            ))}
+        {
+            chats.reverse().map((chat,index) => (
+            <TouchableOpacity
+                key={index}
+                onPress={() => {
+                    setCurrentChat(chat)
+                    router.back()
+                }}
+                style = {chat === currentChat ? styles.selectedchatlogitem : styles.chatlogitem}
+            >   
+            
+                <Image source={{uri:getCharacterImageDirectory()}} style={styles.avatar}/>
+                <Text style={styles.chatname}>{chat.replace('.jsonl', '')}</Text>
+           
+                <TouchableOpacity style={styles.button} onPress={() => deleteChat(chat)}>
+                    <FontAwesome name='download' size={32} color={Color.Button} />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => deleteChat(chat)}>
+                    <FontAwesome name='trash' size={32} color={Color.Button} />
+                </TouchableOpacity>
+            </TouchableOpacity>
+        ))}
         </ScrollView>
     )
 }
@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
 
     chatname : {
         color: Color.Text,
+        flex: 1,
     },
 
     chatlogitem: {
@@ -105,13 +106,6 @@ const styles = StyleSheet.create({
         backgroundColor: Color.Container,
     },
 
-
-    chatinfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex:1,
-    },
-
     avatar: {
         width: 48,
         height: 48,
@@ -119,7 +113,8 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
 
-    deleteIcon : { 
+    button : { 
         marginRight: 8,
+        marginLeft: 16,
     }
 })

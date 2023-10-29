@@ -15,24 +15,18 @@ const PresetsKAI = () => {
     const [presetName, setPresetName] = useMMKVString(Global.PresetNameKAI)
     const [currentPreset, setCurrentPreset] = useMMKVObject(Global.PresetKAI)
     const [presetList, setPresetList] = useState([])
-    const [selectedItem, setSelectedItem] = useState(null)
     const [showNewPreset, setShowNewPreset] = useState(false)
 
-    const loadPresetList = (name = presetName) => {
+    const loadPresetList = (name) => {
         getPresetList().then((list) => {
-            const mainlist = list.map((item, index) => {return {label: item.replace(`.json`, ''), value:index}})
+            const cleanlist = list.map(item => {return item.replace(`.json`, '')})
+            const mainlist = cleanlist.map((item) => {return {label: item}})
             setPresetList(mainlist)
-            for (const item of mainlist){
-                if (item.label.replace(`.json`, '') === name){
-                    setSelectedItem(item.value)
-                    return
-                }
-            }
-            setSelectedItem(0)
-            loadPreset(list[0].replace(`.json`, '')).then((preset)=>{
-                setCurrentPreset(JSON.parse(preset))
-            })
-        })
+            // after deletion, preset may not exist and needs to be changed
+            if(cleanlist.includes(name)) return
+            setPresetName(cleanlist[0])
+            loadPreset(cleanlist[0]).then(text => setCurrentPreset(JSON.parse(text)))
+        })  
     }
 
     useEffect(() => {
@@ -53,8 +47,8 @@ const PresetsKAI = () => {
 
                 writePreset(text, currentPreset).then(() => {
                     ToastAndroid.show(`Preset created.`, 2000)
-                    setPresetName(text)
-                    loadPresetList()
+                    loadPresetList(text)
+                    setPresetName(currentPreset => text)
                 })
             }}
         />
@@ -66,20 +60,20 @@ const PresetsKAI = () => {
         
         <View style={styles.dropdownContainer}>
             <Dropdown 
-                value={selectedItem}
-                style={styles.dropdownbox}
-                selectedTextStyle={styles.selected}
+                value={presetName}
                 data={presetList}
+                valueField={"label"}
                 labelField={"label"}
-                valueField={"value"}
                 onChange={(item)=>{
                     if(item.label === presetName) return
-
                     setPresetName(item.label)
                     loadPreset(item.label).then((preset) => {
                         setCurrentPreset(JSON.parse(preset))
                     })
                 }}
+                
+                style={styles.dropdownbox}
+                selectedTextStyle={styles.selected}
                 
             />
             <TouchableOpacity style={styles.button} 

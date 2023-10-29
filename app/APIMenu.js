@@ -25,7 +25,7 @@ const APIMenu = () => {
     return (
         <SafeAreaView style={styles.mainContainer}>
             <Stack.Screen options={{
-                title: `Endpoint`,
+                title: `API`,
                 animation: 'slide_from_left',
             }}/>
         <ScrollView>
