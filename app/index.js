@@ -679,7 +679,7 @@ const createChatEntry = (name, is_user, message, api, model) => {
 		"mes":message,
 		
 		// metadata
-		"send_date": Date(),
+		"send_date": humanizedISO8601DateTime(),
 		// gen_started
 		// gen_finished
 		"extra":{"api":"kobold","model":"concedo/koboldcpp"},
@@ -688,7 +688,7 @@ const createChatEntry = (name, is_user, message, api, model) => {
 		"swipe_info":[
 			// metadata
 			{	
-				"send_date": Date(),
+				"send_date": humanizedISO8601DateTime(),
 				"extra":{"api":api,"model":model},
 			},
 		],
