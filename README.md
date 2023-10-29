@@ -25,4 +25,6 @@ eas build --platform android --local
 
 ### Roadmap
 
+- NovelAI support
 - Lorebooks 
+- Chat Management (export, import from compatible files)

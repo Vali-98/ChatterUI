@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
 
 const speechStyle = {color: Color.TextQuote}
 const speech = {
-      order: SimpleMarkdown.defaultRules.em.order - 0.6,
+      order: SimpleMarkdown.defaultRules.em.order + 0.6,
       match: function(source, state, lookbehind) {
           return /^"([\s\S]+?)"(?!")/.exec(source);
       },
