@@ -30,7 +30,7 @@ const PresetsKAI = () => {
     }
 
     useEffect(() => {
-        loadPresetList()
+        loadPresetList(presetName)
     },[])
 
     return (

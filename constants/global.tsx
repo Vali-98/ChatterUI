@@ -205,9 +205,8 @@ export const uploadPreset = async (api = apiType()) => {
             to: `${FS.documentDirectory}/presets/${api}/${name}.json`
         }).then(() => {
             return FS.readAsStringAsync(`${FS.documentDirectory}/presets/${api}/${name}.json`, {encoding: FS.EncodingType.UTF8})
-        }).then((file) => {
-
-            let filekeys =Object.keys(JSON.parse(file))
+        }).then(async (file) => {
+            let tempfile = JSON.parse(file)
             let preset : any = defaultPresetKAI()
             if(api === 'tgwui')
                 preset = defaultPresetTGWUI()
@@ -215,14 +214,23 @@ export const uploadPreset = async (api = apiType()) => {
                 preset = defaultPresetNovelAI()
             // change to generate default values insstead ??
             let correctkeys = Object.keys(preset)
-            let samekeys =  filekeys.every((element, index) => {return element === correctkeys[index]})
+            let filekeys = Object.keys(tempfile)
+            let samekeys =  correctkeys.every(key => {return filekeys.includes(key)})
+            console.log(samekeys)
             if (!samekeys) {
-                return FS.deleteAsync(`${FS.documentDirectory}/presets/${api}/${name}.json`).then(() => {
-                    throw new TypeError(`JSON file has invalid format`)
-                })
+                //return FS.deleteAsync(`${FS.documentDirectory}/presets/${api}/${name}.json`).then(() => {
+                //    throw new TypeError(`JSON file has invalid format`)})
+                console.log(`Mismatched object keys, adding missing keys.`)
+                correctkeys.map(key => {
+                    if(!filekeys.includes(key)){
+                        tempfile[key] = preset[key]
+                        console.log(`Value for ${key} created.`)
+                    }
+                })    
+                await writePreset(name, tempfile)
             }
-            else
-                return name
+
+            return name
         }).catch(error => {
             console.log(error)
             ToastAndroid.show(error.message, 2000)
