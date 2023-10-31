@@ -8,18 +8,19 @@ module.exports = function (api) {
       'react-native-reanimated/plugin',
       ["module-resolver", {
         root: ["."],
+        extension: [
+          '.js',
+          '.ts',
+          '.tsx',
+        ],
         alias: {
           "@globals": "./constants/global",
           "@components": "./components",
           "@assets": "./assets",
           "@public": "./public",
           "@constants" : "./constants",
-        },
-        extension: [
-          '.js',
-          '.ts',
-          '.tsx',
-        ],
+          "@lib" : "./lib"
+        }
       }],
     ],
   };

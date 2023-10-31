@@ -46,7 +46,7 @@ const Layout = () => {
 		setCharName('Welcome')
 		setCurrentChat('')
         setCurrentCard(null)
-		setNowGenerating(false)
+		setNowGenerating(nowGenerating => false)
         setHordeWorkers([])
         setHordeModels([])
         

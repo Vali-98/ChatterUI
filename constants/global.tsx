@@ -5,8 +5,10 @@ import * as DocumentPicker from 'expo-document-picker'
 import { ToastAndroid, StyleSheet } from 'react-native'
 import * as Crypto from 'expo-crypto';
 import * as Application from 'expo-application'
-const mmkv = new MMKV()
+
+export const mmkv = new MMKV()
 export const MessageContext = createContext([])
+
 
 export const enum Color {
     Header= '#1e1e1e',
@@ -465,6 +467,52 @@ export const saveChatFile = async (
 }
 
 // DIRS - should be removed
+export const createChatEntry = (name : string, is_user : string, message : string) => {
+    let api : any= 'unknown'
+    let model : any= 'unknown'
+    const apitype = mmkv.getString(Global.APIType)
+    switch(apitype) {
+        case API.KAI: 
+            api = 'kobold'
+            break
+        case API.TGWUI: 
+            api = 'text-generation-webui'
+            break
+        case API.HORDE:
+            api = 'horde'
+            model = mmkv.getString(Global.HordeModels)
+            break
+        case API.MANCER:
+            api = 'mancer'
+            model = mmkv.getString(Global.MancerModel)
+            break
+        case API.NOVELAI:
+            api = 'novelai'
+            model = mmkv.getString(Global.NovelModel)
+            break
+    }
+
+	return {
+		// important stuff
+		"name":name,
+		"is_user":is_user,
+		"mes":message,
+		// metadata
+		"send_date": humanizedISO8601DateTime(),
+		// gen_started
+		// gen_finished
+		"extra":{"api":api,"model":model},
+		"swipe_id":0,
+		"swipes":[message],
+		"swipe_info":[
+			// metadata
+			{	
+				"send_date": humanizedISO8601DateTime(),
+				"extra":{"api":api,"model":model},
+			},
+		],
+	}
+}
 
 export const getChatFileDirectory = (
     charName = mmkv.getString(Global.CurrentCharacter),
