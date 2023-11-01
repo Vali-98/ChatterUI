@@ -99,7 +99,6 @@ const Home = () => {
 		})		
 	}
 	
-
 	const abortResponse = () => {
 		console.log(`Aborting Generation`)
 		if(abortFunction !== undefined)
@@ -163,24 +162,25 @@ const Home = () => {
 					</MenuOptions>
 				</Menu>
 
-					<TextInput
-						style={styles.input}
-						placeholder="Message..."
-						placeholderTextColor={Color.Offwhite}
-						value={newMessage}
-						onChangeText={(text) => setNewMessage(text)}
-						multiline={true}
-					/>
+				<TextInput
+					style={styles.input}
+					placeholder="Message..."
+					placeholderTextColor={Color.Offwhite}
+					value={newMessage}
+					onChangeText={(text) => setNewMessage(text)}
+					multiline={true}
+				/>
 
-					{ nowGenerating ?
-					<TouchableOpacity style={styles.sendButton} onPress={abortResponse}>
-						<MaterialIcons name='stop' color={Color.Button} size={30}/>
-					</TouchableOpacity>
-						:
-					<TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-						<MaterialIcons name='send' color={Color.Button} size={30}/>
-					</TouchableOpacity>
-					}
+				{ nowGenerating ?
+				<TouchableOpacity style={styles.sendButton} onPress={abortResponse}>
+					<MaterialIcons name='stop' color={Color.Button} size={30}/>
+				</TouchableOpacity>
+					:
+				<TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+					<MaterialIcons name='send' color={Color.Button} size={30}/>
+				</TouchableOpacity>
+				}
+
 				</View>
 			</View>
 			</MessageContext.Provider>
