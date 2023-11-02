@@ -88,10 +88,8 @@ const Home = () => {
 				const newmessage = (createnew) ? createChatEntry(charName, false, "") : messages.at(-1)
 				newmessage.mes = mescontent
 				newmessage.swipes[newmessage.swipe_id] = mescontent
-				console.log(Date() + ' ' + newmessage.gen_started)
 				newmessage.gen_finished =  Date()
 				newmessage.swipe_info[newmessage.swipe_id].gen_finished = Date()
-				console.log(newmessage.gen_finished + ' ' + newmessage.gen_started)
 				const finalized_messages = createnew ?	[...messages , newmessage] : [...messages.slice(0,-1), newmessage]
 				return finalized_messages
 			} catch (error) {
