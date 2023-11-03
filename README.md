@@ -17,7 +17,7 @@ Built for the purpose of learning Javascript, so it may be a little rough around
 
 ### Building from source.
 Building from source has **not** been tested.
-Requires Node.js and Android SDK. Expo uses EAS to build apps which in a Linux environment. Release APKs are built in WSL.
+Requires Node.js and Android SDK. Expo uses EAS to build apps which requires a Linux environment. Release APKs are built in WSL.
 ```
 npm install
 eas build --platform android --local
