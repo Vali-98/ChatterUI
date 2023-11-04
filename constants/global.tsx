@@ -182,8 +182,37 @@ const apiType = () => {
     return type
 }
 
+const getDefaultPreset = () => {
+    const api = apiType()
+    let preset : any = defaultPresetKAI()
+    if(api === 'tgwui')
+        preset = defaultPresetTGWUI()
+    if(api === 'novelai')
+        preset = defaultPresetNovelAI()
+    return preset
+}
+
+const fixPreset = async (preset : any, filename = '') => {
+    const existingKeys = Object.keys(preset)
+    const defaultPreset = getDefaultPreset()
+    const defaultKeys = Object.keys(defaultPreset)
+    let samekeys = true
+    defaultKeys.map( (key : any) => {
+        if(existingKeys.includes(key)) return
+        preset[key] = defaultPreset[key]
+        samekeys = false
+    })
+    if(filename !== '')
+        await writePreset(filename, preset)
+    if(!samekeys)
+        console.log(`Preset fixed!`)
+    return  JSON.stringify(preset)
+}
+
 export const loadPreset = async (name : string, api = apiType()) => {    
-    return FS.readAsStringAsync(`${FS.documentDirectory}presets/${api}/${name}.json`, {encoding: FS.EncodingType.UTF8})
+    return FS.readAsStringAsync(`${FS.documentDirectory}presets/${api}/${name}.json`, {encoding: FS.EncodingType.UTF8}).then((file) => {
+        return fixPreset(JSON.parse(file), name)
+    })
 }
 
 export const writePreset = async (name : string, preset : Object, api = apiType()) => {
@@ -211,30 +240,7 @@ export const uploadPreset = async (api = apiType()) => {
         }).then(() => {
             return FS.readAsStringAsync(`${FS.documentDirectory}/presets/${api}/${name}.json`, {encoding: FS.EncodingType.UTF8})
         }).then(async (file) => {
-            let tempfile = JSON.parse(file)
-            let preset : any = defaultPresetKAI()
-            if(api === 'tgwui')
-                preset = defaultPresetTGWUI()
-            if(api === 'novelai')
-                preset = defaultPresetNovelAI()
-            // change to generate default values insstead ??
-            let correctkeys = Object.keys(preset)
-            let filekeys = Object.keys(tempfile)
-            let samekeys =  correctkeys.every(key => {return filekeys.includes(key)})
-            console.log(samekeys)
-            if (!samekeys) {
-                //return FS.deleteAsync(`${FS.documentDirectory}/presets/${api}/${name}.json`).then(() => {
-                //    throw new TypeError(`JSON file has invalid format`)})
-                console.log(`Mismatched object keys, adding missing keys.`)
-                correctkeys.map(key => {
-                    if(!filekeys.includes(key)){
-                        tempfile[key] = preset[key]
-                        console.log(`Value for ${key} created.`)
-                    }
-                })    
-                await writePreset(name, tempfile)
-            }
-
+            await fixPreset(JSON.parse(file), name)
             return name
         }).catch(error => {
             console.log(error)
@@ -466,7 +472,6 @@ export const saveChatFile = async (
         {encoding:FS.EncodingType.UTF8}).catch(error => console.log(`Could not save file! ${error}`))
 }
 
-
 // DIRS - should be removed
 export const createChatEntry = (name : string, is_user : string, message : string) => {
     let api : any= 'unknown'
@@ -606,6 +611,7 @@ export const defaultPresetKAI = () => {
         "top_p": 0.9,
         "top_a": 0.9,
         "top_k": 20,
+        "min_p" : 0.05,
         "typical": 1,
         "tfs": 1,
         "rep_pen_slope": 0.9,
