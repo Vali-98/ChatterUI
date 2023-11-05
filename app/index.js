@@ -1,7 +1,9 @@
 import {
 	View, Text, TextInput,
 	SafeAreaView, TouchableOpacity,
-	StyleSheet
+	StyleSheet,
+	ToastAndroid,
+	ActivityIndicator
 } from 'react-native'
 import { useState, useEffect} from 'react'
 import {ChatWindow }from '@components/ChatMenu/ChatWindow/ChatWindow' 
@@ -23,11 +25,16 @@ const Home = () => {
 	const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
 	// Instruct
 	const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
+	
+	// api / adventure
+	const [apiType, setApiType] = useMMKVString(Global.APIType)
+	const [adventureMode, setAdventureMode] = useMMKVBoolean(Global.AdventureEnabled)
 	// Local
 	const [messages, setMessages] = useState([]);
 	const [newMessage, setNewMessage] = useState('');
 	const [targetLength, setTargetLength] = useState(0)
 	const [abortFunction, setAbortFunction] = useState(undefined)
+
 
 	// load character chat upon character change
 	useEffect(() => {
@@ -42,6 +49,10 @@ const Home = () => {
 		
 	}, [charName])
 	
+	useEffect(() => {
+		//setAdventureMode(false)
+	}, [apiType])
+
 	// triggers generation when set true
 	// TODO : Use this to save instead 
 	useEffect(() => {
@@ -68,7 +79,7 @@ const Home = () => {
 		generateResponse(setAbortFunction, insertGeneratedMessage, messages)
 	}
 
-	const handleSend = () => {
+	const handleSend = (newMessage) => {
 		if (newMessage.trim() !== ''){	
 			const newMessageItem = createChatEntry(userName, true, newMessage)		
 			setMessages(messages => [...messages, newMessageItem])
@@ -78,18 +89,32 @@ const Home = () => {
 		setNowGenerating(true)
 	}
 
-	const insertGeneratedMessage = (data) => {
+	const insertGeneratedMessage = (input_data) => {
+		let data = ""
+		let adventure_data = ""
+		if(adventureMode) {
+			const filtered = input_data.split("```")
+			data = filtered[0]
+			if(filtered.length > 1)
+			adventure_data = filtered[1].split('\n').filter(item => {return item.startsWith(`[`)}).map(text => {return text.split(`] `)[1]}).join('||')
+		} 
+		else data = input_data
+
 		setMessages(messages => {
 			try {
 				const createnew = (messages.length < targetLength)
 				const mescontent = ((createnew )  ?  data : messages.at(-1).mes + data)
 				.replaceAll(currentInstruct.input_sequence, ``)
 				.replaceAll(currentInstruct.output_sequence, ``)
-				const newmessage = (createnew) ? createChatEntry(charName, false, "") : messages.at(-1)
-				newmessage.mes = mescontent
+				let newmessage = {
+					...((createnew) ? createChatEntry(charName, false, "") : messages.at(-1)),
+					mes : mescontent,
+					gen_finished:Date() ,
+					adventure_options : adventure_data
+				}
 				newmessage.swipes[newmessage.swipe_id] = mescontent
-				newmessage.gen_finished =  Date()
 				newmessage.swipe_info[newmessage.swipe_id].gen_finished = Date()
+				newmessage.swipe_info[newmessage.swipe_id].adventure_options = adventure_data
 				const finalized_messages = createnew ?	[...messages , newmessage] : [...messages.slice(0,-1), newmessage]
 				return finalized_messages
 			} catch (error) {
@@ -99,6 +124,16 @@ const Home = () => {
 		})		
 	}
 	
+	const getAdventureOptions = () => {
+		if(messages.length === 0|| messages.at(-1).name !== charName || messages.at(-1)?.adventure_options === undefined) return []
+		try {
+			return messages.at(-1)?.adventure_options.split("||") ?? messages.at(-1)?.data?.adventure_options.split("||")
+		} catch {
+			ToastAndroid.show(`Something is wrong with Options formatting`, 2000)
+			return []
+		}
+	}
+
 	const abortResponse = () => {
 		console.log(`Aborting Generation`)
 		if(abortFunction !== undefined)
@@ -144,6 +179,41 @@ const Home = () => {
 				
 				<ChatWindow messages={messages} />
 
+				{(adventureMode) ?
+				(nowGenerating ?
+				<View style={styles.adventureInput}>
+					<ActivityIndicator size="large" />
+				</View>	
+				:	
+				(messages.at(-1).name === charName &&
+					<View style={styles.adventureInput}>
+					{(messages.at(-1)?.adventure_options !== undefined && messages.at(-1)?.adventure_options !== '') ?
+					getAdventureOptions().map((text, index) => (
+					<View key={index}> 
+						<TouchableOpacity style={styles.adventureOptionContainer}
+							onPress={() => {
+								setNewMessage(text)
+								setTargetLength(messages.length + 1)
+								handleSend(text)
+							}}
+						>
+							<Text style={{color: Color.Text}}>{text}</Text>
+						</TouchableOpacity>
+					</View>))
+					:
+					<View> 
+						<TouchableOpacity style={styles.adventureOptionContainer}
+							onPress={() => {
+								setTargetLength(messages.length)
+								setNowGenerating(true)
+							}}
+						>
+							<Text style={{color: Color.Text}}>Generate Responses</Text>
+						</TouchableOpacity>
+					</View>
+					}
+				</View>))
+				:
 				<View style={styles.inputContainer}>
 				
 				<Menu>
@@ -176,12 +246,13 @@ const Home = () => {
 					<MaterialIcons name='stop' color={Color.Button} size={30}/>
 				</TouchableOpacity>
 					:
-				<TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+				<TouchableOpacity style={styles.sendButton} onPress={() => handleSend(newMessage)}>
 					<MaterialIcons name='send' color={Color.Button} size={30}/>
 				</TouchableOpacity>
 				}
 
 				</View>
+				}
 			</View>
 			</MessageContext.Provider>
 			}
@@ -256,6 +327,19 @@ const styles = StyleSheet.create({
 	optionText : {
 		color: Color.Text,
 		marginLeft: 16,	
+	},
+
+	adventureInput: {
+		marginBottom: 8,
+	},
+
+	adventureOptionContainer: {
+		marginHorizontal: 16, 
+		marginVertical: 2,
+		padding: 12,
+		borderRadius: 16,
+		backgroundColor: Color.DarkContainer,
+		justifyContent: 'center',
 	},
 });
 

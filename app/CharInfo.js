@@ -135,6 +135,23 @@ const CharInfo = () => {
         numberOfLines={8}
       />
       </ScrollView>
+
+      <Text style={styles.boxText}>Adventure Options</Text>
+      <Text style={styles.boxTextGray}>eg. option1 || option2 || option3</Text>
+      <ScrollView style={styles.inputContainer}>
+      <TextInput 
+        style={styles.input}
+        multiline
+        onChangeText={(mes) => {
+          if(characterCard.spec !== undefined && characterCard.spec === 'chara_card_v2')
+          setCharacterCard({...characterCard, adventure_options: mes, data: {...characterCard.data, adventure_options: mes} })
+          else 
+          setCharacterCard({...characterCard, adventure_options: mes })
+        }}
+        value={characterCard?.data?.adventure_options ?? characterCard?.adventure_options}
+        numberOfLines={8}
+      />
+      </ScrollView>
     </ScrollView>   
     </SafeAreaView>
   )
@@ -196,6 +213,11 @@ const styles = StyleSheet.create({
   boxText:{
     color:Color.Text, 
     paddingTop:16,
+    paddingBottom: 8,
+  },
+
+  boxTextGray:{
+    color:Color.Offwhite, 
     paddingBottom: 8,
   },
 

@@ -1,14 +1,15 @@
 import { SafeAreaView, View, Text, Image, StyleSheet } from 'react-native'
 import { Global,  Color, API, getUserImageDirectory } from '@globals'
 import React from 'react'
-import { useMMKVString } from 'react-native-mmkv'
-import { TouchableOpacity } from 'react-native-gesture-handler'
+import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
+import { Switch, TouchableOpacity } from 'react-native-gesture-handler'
 import { FontAwesome } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 
 const Settings = () => {
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const [apiType, setAPIType] = useMMKVString(Global.APIType)
+    const [adventureMode, setAdventureMode] = useMMKVBoolean(Global.AdventureEnabled)
     const router = useRouter()
 
     return (
@@ -47,6 +48,19 @@ const Settings = () => {
                 <Text style={styles.largeButtonText}>API</Text>
             </TouchableOpacity>
         </View>
+
+        
+        { (apiType === API.KAI) && (
+        <View style={styles.switchContainer}>
+            <Switch style={styles.largeButton}
+                value={adventureMode}
+                onValueChange={setAdventureMode}
+                thumbColor={adventureMode ? Color.White : Color.Offwhite}
+                trackColor={{false: Color.DarkContainer, true: Color.Offwhite}}
+            />
+            <Text style={{color:adventureMode ? Color.Text : Color.Offwhite, fontSize: 18, marginLeft: 12}}>Adventure Mode</Text>
+        </View>
+        )}
 
 
         </SafeAreaView>
@@ -122,5 +136,12 @@ const styles = StyleSheet.create({
         fontSize: 20,
         borderColor: Color.Offwhite,
     },
+
+    switchContainer : {
+        marginTop: 20,
+        alignItems: 'center',
+        flexDirection: 'row',
+        marginHorizontal: 16,
+    }
 
 })

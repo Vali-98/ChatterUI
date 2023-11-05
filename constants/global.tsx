@@ -87,6 +87,11 @@ export const enum Global {
     NovelModel='novelmodel',            // novelai model
 
     AphroditeKey = 'aphroditekey',      // api key for aphrodite, default is `EMPTY`
+
+    // ADVENTURE
+
+    AdventureEnabled = `adventureEnabled`,
+    AdventureSettings = 'adventuresettings',
 }
 
 export const enum API {
@@ -393,7 +398,7 @@ const createNewChat = (userName : any, characterName : any, initmessage : any) =
 		{"name":characterName,"is_user":false,"send_date":humanizedISO8601DateTime(),
             "mes":initmessage
                 .replaceAll(`{{char}}`, mmkv.getString(Global.CurrentCharacter))
-                .replaceAll(`{{user}}`, mmkv.getString(Global.CurrentUser))
+                .replaceAll(`{{user}}`, mmkv.getString(Global.CurrentUser)) 
             },
 	]
 }
@@ -411,7 +416,8 @@ export const createNewDefaultChat = (
             {encoding: FS.EncodingType.UTF8})
         .then( response => {
             let card = JSON.parse(response)
-            const newmessage = createNewChat(userName, charName, ( card?.data?.first_mes ?? card.first_mes ))
+            let newmessage : any = createNewChat(userName, charName, ( card?.data?.first_mes ?? card.first_mes ))
+            newmessage[1].adventure_options = card?.adventure_options ?? card?.data?.adventure_options ?? ""
             return FS.writeAsStringAsync(
                 `${FS.documentDirectory}characters/${charName}/chats/${newmessage[0].create_date}.jsonl`, 
                 newmessage.map((item: any)=> JSON.stringify(item)).join('\u000d\u000a'),
@@ -510,6 +516,7 @@ export const createChatEntry = (name : string, is_user : string, message : strin
 		"extra":{"api":api,"model":model},
 		"swipe_id":0,
 		"swipes":[message],
+        "adventure_options" : "",
 		"swipe_info":[
 			// metadata
 			{	
@@ -517,6 +524,7 @@ export const createChatEntry = (name : string, is_user : string, message : strin
 				"extra":{"api":api,"model":model},
                 "gen_started" : new Date(),
 		        "gen_finished" : new Date(),
+                "adventure_options" : "",
 			},
 		],
 	}

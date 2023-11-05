@@ -192,6 +192,7 @@ const ChatItem = ({ message, id, scroll}) => {
                         newmessages.at(id + 1).send_date = messages.at(id + 1).swipe_info.at(swipeid).send_date
                         newmessages.at(id + 1).gen_started = messages.at(id + 1).swipe_info.at(swipeid).gen_started
                         newmessages.at(id + 1).gen_finished = messages.at(id + 1).swipe_info.at(swipeid).gen_finished
+                        newmessages.at(id + 1).adventure_options = messages.at(id + 1).swipe_info.at(swipeid).adventure_options
 
                         newmessages.at(id + 1).swipe_id = swipeid
                         saveChatFile(newmessages)
@@ -220,9 +221,9 @@ const ChatItem = ({ message, id, scroll}) => {
                             newmessages.at(id + 1).send_date = messages.at(id + 1).swipe_info.at(swipeid).send_date
                             newmessages.at(id + 1).gen_started = messages.at(id + 1).swipe_info.at(swipeid).gen_started
                             newmessages.at(id + 1).gen_finished = messages.at(id + 1).swipe_info.at(swipeid).gen_finished
+                            newmessages.at(id + 1).adventure_options = messages.at(id + 1).swipe_info.at(swipeid).adventure_options
 
                             newmessages.at(id + 1).swipe_id = swipeid
-
 
                             saveChatFile(newmessages)
                             return newmessages
