@@ -1,5 +1,5 @@
 import { SafeAreaView, View, Text, Image, StyleSheet } from 'react-native'
-import { Global,  Color, API, getUserImageDirectory } from '@globals'
+import { Global,  Color, API, Users } from '@globals'
 import React from 'react'
 import { useMMKVString } from 'react-native-mmkv'
 import { TouchableOpacity } from 'react-native-gesture-handler'
@@ -15,7 +15,7 @@ const Settings = () => {
         <SafeAreaView style={styles.mainContainer}>
         <View style={styles.userContainer}> 
             <View style={styles.imageContainer}>    
-                <Image style={styles.userImage} source={{uri:getUserImageDirectory(userName)}} />
+                <Image style={styles.userImage} source={{uri:Users.getImageDir(userName)}} />
             </View> 
             <View>
                 <Text style={styles.userName}>{userName}</Text>
@@ -33,10 +33,11 @@ const Settings = () => {
 
         <View style={styles.largeButtonContainer}>
             <TouchableOpacity style={styles.largeButton} onPress={() => {
-                if(apiType === API.KAI || apiType === API.HORDE)
+                /*if(apiType === API.KAI || apiType === API.HORDE)
                     router.push("PresetsKAI")
                 if(apiType === API.MANCER || apiType === API.TGWUI)
-                    router.push("PresetsTGWUI")
+                    router.push("PresetsTGWUI")*/
+                router.push("/Presets")
             }} >
                 <Text style={styles.largeButtonText}>Presets</Text>
             </TouchableOpacity>

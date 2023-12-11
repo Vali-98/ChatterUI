@@ -2,7 +2,7 @@ import { SafeAreaView, View, Text, Image, TouchableOpacity, StyleSheet, TextInpu
 import React from 'react'
 import { Stack, useRouter } from 'expo-router'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
-import { Global, Color, getUserImageDirectory, saveUserCard, copyUserImage } from '@globals'
+import { Global, Color, Users } from '@globals'
 import { FontAwesome  } from '@expo/vector-icons'
 import * as DocumentPicker from 'expo-document-picker'
 
@@ -12,7 +12,7 @@ const UserInfo = () => {
     const [userCard, setUserCard] = useMMKVObject(Global.CurrentUserCard)
 
     const saveCard = () => {
-        saveUserCard(userName, userCard)
+        Users.saveFile(userName, userCard)
     }
     
 
@@ -27,7 +27,7 @@ const UserInfo = () => {
 
         <View style={styles.userContainer}> 
             <View style={styles.imageContainer}>    
-                <Image style={styles.userImage} source={{uri:getUserImageDirectory(userName)}} />
+                <Image style={styles.userImage} source={{uri:Users.getImageDir(userName)}} />
             </View>
             <View>
                 <Text style={styles.userName}>{userName}</Text>
@@ -42,7 +42,7 @@ const UserInfo = () => {
                         onPress={() => {
                             DocumentPicker.getDocumentAsync({copyToCacheDirectory: true, type:'image/*'}).then((result) => {
                             if(result.canceled) return
-                            copyUserImage(result.assets[0].uri, userName)
+                            Users.copyImage(result.assets[0].uri, userName)
                         })
                     }}>
                         <FontAwesome size={20} name='upload' color={Color.Button}/>

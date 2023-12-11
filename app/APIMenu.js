@@ -4,7 +4,7 @@ import { useMMKVString } from 'react-native-mmkv'
 import { Global, Color, API } from '@globals'
 import { useEffect } from 'react'
 import { Dropdown } from 'react-native-element-dropdown'
-import { KAI, Horde, TGWUI, Mancer } from '@components/Endpoint'
+import { KAI, Horde, TGWUI, Mancer, Completions } from '@components/Endpoint'
 import { ScrollView } from 'react-native-gesture-handler'
 const APIMenu = () => {
 
@@ -14,6 +14,7 @@ const APIMenu = () => {
         {label: 'Horde', value: API.HORDE },
         {label: 'Text Generation Web UI', value: API.TGWUI},
         {label: 'Mancer', value:API.MANCER},
+        {label: 'Chat Completions', value: API.COMPLETIONS}
         //{label: 'NovelAI', value:API.NOVELAI},
     ]
     
@@ -53,6 +54,7 @@ const APIMenu = () => {
             {(APIType === API.HORDE) && <Horde/>}
             {(APIType === API.TGWUI) && <TGWUI/>}
             {(APIType === API.MANCER) && <Mancer/>}
+            {(APIType === API.COMPLETIONS) && <Completions/>}
         </ScrollView>
         </SafeAreaView>
     )

@@ -3,10 +3,7 @@ import { Stack, useRouter} from 'expo-router'
 import { TouchableOpacity, View, StyleSheet} from 'react-native'
 import { useEffect } from 'react'
 import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import { Global, generateDefaultDirectories, createNewDefaultChat, createDefaultPresets,
-    loadUserCard, createNewUser,  writeInstruct, Color, 
-    defaultInstruct, defaultPresetKAI, defaultPresetTGWUI, defaultPresetNovelAI,
-} from '@globals'
+import { Global, Color, Chats, generateDefaultDirectories, createDefaultPresets, Users,  Instruct, Presets } from '@globals'
 import { MenuProvider } from 'react-native-popup-menu';
 import * as SystemUI from 'expo-system-ui'
 
@@ -28,6 +25,7 @@ const Layout = () => {
     const [instructName, setInstructName] = useMMKVObject(Global.InstructName)
     const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
     
+    /*
     const [presetKAI, setPresetKAI] = useMMKVObject(Global.PresetKAI)
     const [presetNameKAI, setPresetNameKAI] = useMMKVString(Global.PresetNameKAI)
 
@@ -36,6 +34,8 @@ const Layout = () => {
 
     const [presetNovelAI, setPresetNovelAI] = useMMKVObject(Global.PresetNovelAI)
     const [presetNameNovelAI, setPresetNameNovelAI] = useMMKVObject(Global.PresetNameNovelAI)
+    */
+    const [preset, setPreset] = useMMKVObject(Global.PresetData)
 
     const [hordeModels, setHordeModels] = useMMKVObject(Global.HordeModels)
     const [hordeWorkers, setHordeWorkers] = useMMKVObject(Global.HordeWorkers)
@@ -49,7 +49,7 @@ const Layout = () => {
 		setNowGenerating(nowGenerating => false)
         setHordeWorkers([])
         setHordeModels([])
-        
+        setPreset(Presets.defaultPreset())
         console.log("Reset values")
         SystemUI.setBackgroundColorAsync(Color.Background)
 
@@ -57,14 +57,14 @@ const Layout = () => {
         
 		FS.readDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => generateDefaultDirectories().then(() => {
             
-            createNewUser('User').then(() => {
+            Users.createUser('User').then(() => {
                 console.log(`Creating Default User`)
-                loadUserCard('User').then(card => {
+                Users.loadUser('User').then(card => {
                     setUserName('User')
                     setUserCard(card)
                 })
             })
-            
+            /*
             createDefaultPresets()
             setPresetKAI(defaultPresetKAI())
             setPresetNameKAI(`Default`)
@@ -72,10 +72,13 @@ const Layout = () => {
             setPresetNameTGWUI(`Default`)
             setPresetNovelAI(defaultPresetNovelAI())
             setPresetNameNovelAI(`Default`)
+            */
+            setPreset(Presets.defaultPreset())
+            Presets.saveFile('Default', Presets.defaultPreset())
 
-            writeInstruct('Default', defaultInstruct()).then(() => {
+            Instruct.writeInstruct('Default', Instruct.defaultInstruct()).then(() => {
                 console.log(`Creating Default Instruct`)
-                setCurrentInstruct(defaultInstruct())
+                setCurrentInstruct(Instruct.defaultInstruct())
                 setInstructName(`Default`)
             })
 
@@ -144,7 +147,7 @@ const Layout = () => {
                          (<View style={styles.headerButtonContainer}>
                             <TouchableOpacity style={styles.headerButtonRight} onPress={() => {
                                 // create new default chat from globals
-                                createNewDefaultChat(charName).then( response =>
+                                Chats.createNewDefaultChat(charName).then( response =>
                                     setCurrentChat(response)
                                 )
                                 router.back()

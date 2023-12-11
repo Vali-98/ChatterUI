@@ -4,9 +4,9 @@ import {
 	StyleSheet
 } from 'react-native'
 import { useState, useEffect} from 'react'
-import {ChatWindow }from '@components/ChatMenu/ChatWindow/ChatWindow' 
+import { ChatWindow }from '@components/ChatMenu/ChatWindow/ChatWindow' 
 import { useMMKVString,  useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import { Global, Color, getChatFile, getNewestChatFilename , MessageContext, saveChatFile, getCharacterCard, humanizedISO8601DateTime, createChatEntry} from '@globals'
+import { Global, Color, Chats, Characters, MessageContext } from '@globals'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu'
 import { generateResponse } from '@lib/Inference'
@@ -33,10 +33,10 @@ const Home = () => {
 	useEffect(() => {
 		if (charName === 'Welcome' || charName === undefined) return
 		console.log(`Character changed to ${charName}`)
-		getNewestChatFilename(charName).then(
+		Chats.getNewest(charName).then(
 			filename => setCurrentChat(filename)
 		)
-		getCharacterCard().then(data =>{
+		Characters.getCard(charName).then(data =>{
 			setCurrentCard(JSON.parse(data))
 		})
 		
@@ -48,7 +48,7 @@ const Home = () => {
 		nowGenerating && startInference()
 		if(!nowGenerating && currentChat !== '' && charName !== 'Welcome' && messages.length !== 0) {
 			console.log(`Saving chat`)
-			saveChatFile(messages, charName, currentChat)
+			Chats.saveFile(messages, charName, currentChat)
 		}
 	}, [nowGenerating]) 
 
@@ -58,7 +58,7 @@ const Home = () => {
 			return
 		}
 		console.log("Now reading " + currentChat + " for " + charName)
-		getChatFile(charName, currentChat).then(newmessage => {
+		Chats.getFile(charName, currentChat).then(newmessage => {
 			setMessages(messages => newmessage)
 		})		
 	}, [currentChat])
@@ -70,7 +70,7 @@ const Home = () => {
 
 	const handleSend = () => {
 		if (newMessage.trim() !== ''){	
-			const newMessageItem = createChatEntry(userName, true, newMessage)		
+			const newMessageItem = Chats.createEntry(userName, true, newMessage)		
 			setMessages(messages => [...messages, newMessageItem])
 			setTargetLength(messages.length + 2)
 		} else 

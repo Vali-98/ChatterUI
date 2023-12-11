@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert  } from 'react-native'
+import { View, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert  } from 'react-native'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
-import { Global, Color, getPresetList, writePreset, loadPreset, deletePreset, uploadPreset, saveStringExternal} from '@globals'
+import { Global, Color, Presets, saveStringExternal} from '@globals'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { Dropdown } from 'react-native-element-dropdown'
 import { FontAwesome } from '@expo/vector-icons'
@@ -9,23 +9,22 @@ import { useEffect } from 'react'
 import { ToastAndroid } from 'react-native'
 import {TextBoxModal, SliderItem, TextBox, CheckboxTitle} from '@components'
 
-
 const PresetsKAI = () => {
-    const [presetName, setPresetName] = useMMKVString(Global.PresetNameKAI)
-    const [currentPreset, setCurrentPreset] = useMMKVObject(Global.PresetKAI)
+    const [presetName, setPresetName] = useMMKVString(Global.PresetName)
+    const [currentPreset, setCurrentPreset] = useMMKVObject(Global.PresetData)
     const [presetList, setPresetList] = useState([])
     const [showNewPreset, setShowNewPreset] = useState(false)
-
+    
     const loadPresetList = (name) => {
-        getPresetList().then((list) => {
+        Presets.getFileList().then((list) => {
             const cleanlist = list.map(item => {return item.replace(`.json`, '')})
             const mainlist = cleanlist.map((item) => {return {label: item}})
             setPresetList(mainlist)
             // after deletion, preset may not exist and needs to be changed
             if(cleanlist.includes(name)) return
             setPresetName(cleanlist[0])
-            loadPreset(cleanlist[0]).then(text => setCurrentPreset(JSON.parse(text)))
-        })  
+            Presets.loadFile(cleanlist[0]).then(text => setCurrentPreset(JSON.parse(text)))
+        })
     }
 
     useEffect(() => {
@@ -44,7 +43,7 @@ const PresetsKAI = () => {
                         return
                     }
 
-                writePreset(text, currentPreset).then(() => {
+                Presets.saveFile(text, currentPreset).then(() => {
                     ToastAndroid.show(`Preset created.`, 2000)
                     loadPresetList(text)
                     setPresetName(currentPreset => text)
@@ -54,7 +53,7 @@ const PresetsKAI = () => {
 
         <Stack.Screen options={{
                 animation: 'slide_from_left',
-                title: `KAI Presets`
+                title: `Presets`
             }} />
         
         <View style={styles.dropdownContainer}>
@@ -66,7 +65,7 @@ const PresetsKAI = () => {
                 onChange={(item)=>{
                     if(item.label === presetName) return
                     setPresetName(item.label)
-                    loadPreset(item.label).then((preset) => {
+                    Presets.loadFile(item.label).then((preset) => {
                         setCurrentPreset(JSON.parse(preset))
                     })
                 }}
@@ -77,7 +76,7 @@ const PresetsKAI = () => {
             />
             <TouchableOpacity style={styles.button} 
                 onPress={()=>{
-                    writePreset(presetName, currentPreset).then(
+                    Presets.saveFile(presetName, currentPreset).then(
                     ToastAndroid.show(`Preset Updated!`, 2000)
                 )}}>
                 <FontAwesome  size={24} name='save' color={Color.Button}/>
@@ -96,7 +95,7 @@ const PresetsKAI = () => {
                                 text:`Confirm`, 
                                 style: `destructive`, 
                                 onPress: () =>  {               
-                                    deletePreset(presetName).then(() => { 
+                                    Presets.deleteFile(presetName).then(() => { 
                                         loadPresetList()
                                     })
                                 }
@@ -107,11 +106,11 @@ const PresetsKAI = () => {
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.button} onPress={() => {
-                uploadPreset().then(name => {
+                Presets.uploadFile().then(name => {
                     if(name === undefined){
                         return
                     }                  
-                    loadPreset(name).then((preset)=> {
+                    Presets.loadFile(name).then((preset)=> {
                         setCurrentPreset(JSON.parse(preset))
                         setPresetName(name)
                         loadPresetList(name)

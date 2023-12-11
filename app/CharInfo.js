@@ -1,7 +1,7 @@
 import { View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity, Alert, ToastAndroid } from 'react-native'
 import { useState } from 'react'
 
-import { Global, Color, copyCharImage, deleteCharacter, getCharacterCard, getCharacterImageDirectory, saveCharacterCard } from '@globals'
+import { Global, Color, Characters } from '@globals'
 import { useMMKVString } from 'react-native-mmkv'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { useEffect } from 'react'
@@ -18,13 +18,13 @@ const CharInfo = () => {
   // redo charactercard as CONTEXT
 
   const loadcard = () => {
-    getCharacterCard().then(data =>{
+    Characters.getCard().then(data =>{
       setCharacterCard(JSON.parse(data))
     })
   }
   
   const savecard = () => {
-    return saveCharacterCard(charName, JSON.stringify(characterCard))
+    return Characters.saveCard(charName, JSON.stringify(characterCard))
   }
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const CharInfo = () => {
                     text: 'Confirm',
                     onPress: () => {
                       
-                      deleteCharacter(charName)
+                      Characters.deleteCard(charName)
                       setCharName('Welcome')
                       router.back()
                     },
@@ -77,7 +77,7 @@ const CharInfo = () => {
     <ScrollView>
       
       <View style={styles.characterHeader}>
-        <Image source={{uri:getCharacterImageDirectory(charName)}} style={styles.avatar}/>
+        <Image source={{uri:Characters.getImageDir(charName)}} style={styles.avatar}/>
 
         <View style={styles.characterHeaderInfo}>
           
@@ -88,7 +88,7 @@ const CharInfo = () => {
               onPress={() => {
                 DocumentPicker.getDocumentAsync({copyToCacheDirectory: true, type:'image/*'}).then((result) => {
                   if(result.canceled) return
-                  copyCharImage(result.assets[0].uri, charName)
+                  Characters.copyImage(result.assets[0].uri, charName)
                 })
               }}
               >

@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, ToastAndroid, Alert} from 'react-native'
 import { Stack } from 'expo-router'
-import { Global, Color, getInstructList, writeInstruct, loadInstruct, deleteInstruct, uploadInstruct, saveStringExternal} from '@globals'
+import { Global, Color, Instructs, saveStringExternal} from '@globals'
 import { useMMKVObject } from 'react-native-mmkv'
 import { ScrollView } from 'react-native-gesture-handler'
 import TextBox from '@components/TextBox'
@@ -9,7 +9,6 @@ import { Dropdown } from 'react-native-element-dropdown'
 import { useState, useEffect } from 'react'
 import { FontAwesome } from '@expo/vector-icons'
 import TextBoxModal from '@components/TextBoxModal'
-import * as FS from 'expo-file-system'
 const Instruct = () => {
 
     const [instructName, setInstructName] = useMMKVObject(Global.InstructName)
@@ -19,7 +18,7 @@ const Instruct = () => {
     const [showNewInstruct, setShowNewInstruct] = useState(false)
 
     const loadInstructList = (name) => {
-        getInstructList().then((list) => {
+        Instructs.getFileList().then((list) => {
             const mainlist = list.map((item, index) => {return {label: item.replace(`.json`, ''), value:index}})
             setInstructList(mainlist)
             for (const item of mainlist){
@@ -29,7 +28,7 @@ const Instruct = () => {
                 }
             }
             setSelectedItem(0)
-            loadInstruct(list[0].replace(`.json`, '')).then((preset)=>{
+            Instructs.loadFile(list[0].replace(`.json`, '')).then((preset)=>{
                 setCurrentInstruct(JSON.parse(preset))
             })
         })
@@ -56,7 +55,7 @@ const Instruct = () => {
                         return
                     }
 
-                writeInstruct(text, {...currentInstruct, name: text}).then(() => {
+                Instructs.writeFile(text, {...currentInstruct, name: text}).then(() => {
                     ToastAndroid.show(`Preset created.`, 2000)
                     setInstructName(text)
                     loadInstructList()
@@ -76,7 +75,7 @@ const Instruct = () => {
                     if(item.label === instructName) return
 
                     setInstructName(item.label)
-                    loadInstruct(item.label).then((preset) => {
+                    Instructs.loadFile(item.label).then((preset) => {
                         setCurrentInstruct(JSON.parse(preset))
                     })
                 }}
@@ -84,7 +83,7 @@ const Instruct = () => {
             />
             <TouchableOpacity style={styles.button} 
                 onPress={()=>{
-                    writeInstruct(instructName, currentInstruct).then(ToastAndroid.show(`Preset Updated!`, 2000))
+                    Instructs.saveFile(instructName, currentInstruct).then(ToastAndroid.show(`Preset Updated!`, 2000))
                 }}
                 >
                 <FontAwesome  size={24} name='save' color={Color.Button}/>
@@ -103,7 +102,7 @@ const Instruct = () => {
                                         ToastAndroid.show(`Cannot delete last preset`, 2000)
                                         return
                                     }
-                                    deleteInstruct(instructName).then(() => { 
+                                    Instructs.deleteFile(instructName).then(() => { 
                                         loadInstructList()
                                     })
                                 }
@@ -114,11 +113,11 @@ const Instruct = () => {
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.button} onPress={() => {
-                uploadInstruct().then(name => {
+                Instructs.uploadFile().then(name => {
                     if(name === undefined){
                         return
                     }                  
-                    loadInstruct(name).then((instruct)=> {
+                    Instructs.loadFile(name).then((instruct)=> {
                         setCurrentInstruct(JSON.parse(instruct))
                         setInstructName(name)
                         loadInstructList(name)

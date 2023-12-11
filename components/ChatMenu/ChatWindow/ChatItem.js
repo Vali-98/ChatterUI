@@ -1,9 +1,9 @@
 import {
-    View, Text, StyleSheet, Image, Animated, Easing, TextInput, TouchableWithoutFeedback,  TouchableOpacity
+    View, Text, StyleSheet, Image, Animated, Easing, TextInput,  TouchableOpacity
 } from 'react-native'
 import { useRef, useEffect, useState, useContext} from 'react'
 import { AntDesign, MaterialIcons} from '@expo/vector-icons'
-import {  Global, Color, MessageContext, saveChatFile, getCharacterImageDirectory, getUserImageDirectory, humanizedISO8601DateTime } from '@globals'
+import {  Global, Color, MessageContext, Chats, Characters, Users, humanizedISO8601DateTime } from '@globals'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 import SimpleMarkdown from 'simple-markdown'
 import Markdown from 'react-native-markdown-package'
@@ -32,7 +32,7 @@ const ChatItem = ({ message, id, scroll}) => {
 
 
     useEffect(() => {
-        FS.readAsStringAsync((message.name === charName) ? getCharacterImageDirectory(charName) : getUserImageDirectory(userName)).then(
+        FS.readAsStringAsync((message.name === charName) ? Characters.getImageDir(charName) : Users.getImageDir(userName)).then(
             () => setImageExists(true)
         ).catch(
             () => setImageExists(false)
@@ -72,9 +72,9 @@ const ChatItem = ({ message, id, scroll}) => {
             <View style={{alignItems: 'center'}}>
                 <Image style={styles.avatar} source={
                     (message.name === charName)?
-                    ((imageExists)? {uri:getCharacterImageDirectory(charName)} : require('@assets/user.png'))
+                    ((imageExists)? {uri:Characters.getImageDir(charName)} : require('@assets/user.png'))
                     :
-                    ((imageExists)? {uri:getUserImageDirectory(userName)} : require('@assets/user.png'))
+                    ((imageExists)? {uri:Users.getImageDir(userName)} : require('@assets/user.png'))
                 } />
                 <Text style={styles.graytext}>#{id}</Text>
                 {(message?.gen_started !== undefined && message?.gen_finished !== undefined && message.name === charName)
@@ -99,7 +99,7 @@ const ChatItem = ({ message, id, scroll}) => {
                             setMessages(messages => {
                                 let newmessages = messages.slice()
                                 newmessages.splice(id + 1, 1)
-                                saveChatFile(newmessages)
+                                Chats.saveFile(newmessages)
                                 return newmessages
                             })
                             setEditMode(editMode => false)
@@ -115,7 +115,7 @@ const ChatItem = ({ message, id, scroll}) => {
                                 newmessages.at(id + 1).mes = placeholderText
                                 if(newmessages.swipes !== undefined)
                                     newmessages.at(id + 1).swipes[newmessages.at(id + 1).swipe_id] = placeholderText
-                                saveChatFile(newmessages)
+                                Chats.saveFile(newmessages)
                                 return newmessages
                             })
                             setEditMode(editMode => false)
@@ -194,7 +194,7 @@ const ChatItem = ({ message, id, scroll}) => {
                         newmessages.at(id + 1).gen_finished = messages.at(id + 1).swipe_info.at(swipeid).gen_finished
 
                         newmessages.at(id + 1).swipe_id = swipeid
-                        saveChatFile(newmessages)
+                        Chats.saveFile(newmessages)
                         return newmessages
                     })
                     setPlaceholderText(message.swipes.at(message.swipe_id  - 1))
@@ -224,7 +224,7 @@ const ChatItem = ({ message, id, scroll}) => {
                             newmessages.at(id + 1).swipe_id = swipeid
 
 
-                            saveChatFile(newmessages)
+                            Chats.saveFile(newmessages)
                             return newmessages
                         })
                         setPlaceholderText(message.swipes.at(message.swipe_id + 1))
@@ -248,7 +248,7 @@ const ChatItem = ({ message, id, scroll}) => {
                         newmessages.at(id + 1).gen_started = Date()
                         newmessages.at(id + 1).gen_finished = Date()
                         newmessages.at(id + 1).swipe_id = newmessages.at(id + 1).swipe_id + 1
-                        saveChatFile(newmessages).then(() => {
+                        Chats.saveFile(newmessages).then(() => {
                             setTargetLength(messages.length)
                             setNowGenerating(true)
                         })

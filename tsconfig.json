@@ -18,5 +18,5 @@
     "**/*.js",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "app/test.jsx", "constants/Preset.jsx", "app/deprecated"  ]
 }

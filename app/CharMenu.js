@@ -6,16 +6,15 @@ import {
     Image,
     StyleSheet,
     View,
-    Modal,
     ToastAndroid,
 } from 'react-native'
 import { useEffect, useState } from 'react'
 import {useRouter} from 'expo-router'
 import * as FS from 'expo-file-system'
 import { useMMKVString } from 'react-native-mmkv'
-import { Color, Global, copyCharImage, createNewCharacter, saveCharacterCard } from '@globals'
+import { Color, Global, Characters } from '@globals'
 import { Stack } from 'expo-router'
-import { FontAwesome, MaterialIcons} from '@expo/vector-icons'
+import { FontAwesome } from '@expo/vector-icons'
 import * as DocumentPicker from 'expo-document-picker'
 import  extractChunks  from 'png-chunks-extract'
 import { decode } from 'png-chunk-text'
@@ -56,10 +55,10 @@ const CharMenu = () => {
                 ToastAndroid.show('Invalid Character ID', 2000)
                 return
             }
-            createNewCharacter(newname).then(() => {
-                return saveCharacterCard(newname, JSON.stringify(charactercard))
+            Characters.createNewCharacter(newname).then(() => {
+                return Characters.saveCard(newname, JSON.stringify(charactercard))
             }).then(() => {
-                return copyCharImage(uri, newname)
+                return Characters.copyImage(uri, newname)
             }).then(() => {
                 ToastAndroid.show(`Successfully Imported Character`, ToastAndroid.SHORT)
                 getCharacterList()
@@ -107,7 +106,7 @@ const CharMenu = () => {
             <TextBoxModal 
                 booleans={[showNewChar, setShowNewChar]}
                 onConfirm={(text)=> {
-                    createNewCharacter(text).then(() => {
+                    Characters.create(text).then(() => {
                         setCharName(text)
                         router.push('CharInfo')
                         getCharacterList()
