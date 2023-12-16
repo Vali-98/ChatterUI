@@ -1,0 +1,68 @@
+
+export const enum Global {
+
+    // Processing
+    
+    NowGenerating='nowgenerating',      // generation signal
+    EditedWindow='editedwindow',        // exit editing window confirmation
+
+    // Character
+
+    CurrentCharacter='currentchar',     // current char filename, locates dir
+    CurrentCharacterCard='charcard',    // note: use Object ? - stores charactercard
+
+    // User
+
+    CurrentUser='currentuser',          // current username, locates dir
+    CurrentUserCard='usercard',         // note: use Object ? - stores usercard
+    
+    // Chat
+
+    CurrentChat='currentchat',          // current chat filename, locates dir
+    
+    // Instruct
+
+    InstructName='instructname',        // name of current instruct preset
+    CurrentInstruct='currentinstruct',  // note: use Object ? - stores instruct
+
+    // Presets
+
+    //CurrentPreset='currentpreset',      // note: use Object ? - stores preset 
+    //PresetName='presetname',            // name of current preset
+
+    PresetKAI='currentpresetkai',
+    PresetNameKAI='presetnamekai',
+
+    PresetTGWUI='currentpresettgwui',
+    PresetNameTGWUI='presetnametgwui',
+
+    PresetNovelAI='currentpresetnovelai',
+    PresetNameNovelAI='presetnamenovelai',
+
+    PresetData = 'presetdata',
+    PresetName = 'presetdame',
+    
+    // APIs
+
+    APIType='endpointtype',             // name of current api mode
+    
+    KAIEndpoint='kaiendpoint',          // kai api endpoint
+    
+    TGWUIBlockingEndpoint='tgwuiblockingendpoint',   // tgwui endpoint
+    TGWUIStreamingEndpoint='tgwuistreamingendpoint', // tgwui streaming web socket - DEPRECATED
+
+    HordeKey='hordekey',                // api key for horde 
+    HordeModels='hordemodel',           // names of horde models to be used
+    HordeWorkers = 'hordeworker',       // List of available horde workers
+
+    MancerKey='mancerkey',              // api key for mancer
+    MancerModel='mancermodel',          // selected mancer model
+
+    NovelKey='novelkey',                // novelai key
+    NovelModel='novelmodel',            // novelai model
+
+    AphroditeKey = 'aphroditekey',      // api key for aphrodite, default is `EMPTY`
+
+    CompletionsEndpoint = 'completionsendpoint',
+    CompletionsKey = 'completionskey',
+}

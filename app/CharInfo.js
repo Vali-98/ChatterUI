@@ -18,7 +18,7 @@ const CharInfo = () => {
   // redo charactercard as CONTEXT
 
   const loadcard = () => {
-    Characters.getCard().then(data =>{
+    Characters.getCard(charName).then(data =>{
       setCharacterCard(JSON.parse(data))
     })
   }
@@ -30,6 +30,24 @@ const CharInfo = () => {
   useEffect(() => {
     loadcard()
   }, [])
+
+  const deleteCard = () => {
+    Alert.alert(
+      `Delete Character`,
+      `Are you sure you want to delete this character? This cannot be undone.`,
+      [
+        { text: 'Cancel', onPress: () => {}, style: 'cancel' }, 
+        { text: 'Confirm',
+          onPress: () => {
+            
+            Characters.deleteCard(charName)
+            setCharName('Welcome')
+            router.back()
+          },
+          style: 'destructive'}],
+      { cancelable: true }
+    )
+  }
 
 
   return (
@@ -43,33 +61,7 @@ const CharInfo = () => {
                 <FontAwesome name='save' size={28} color={Color.Button} />
             </TouchableOpacity>
 
-            <TouchableOpacity  style={styles.button} onPress={() => {
-              Alert.alert(
-                `Delete Character`,
-                `Are you sure you want to delete this character? This cannot be undone.`,
-                [
-                  {
-                    text: 'Cancel',
-                    onPress: () => {},
-                    style: 'cancel',
-                  }, 
-                  {
-                    text: 'Confirm',
-                    onPress: () => {
-                      
-                      Characters.deleteCard(charName)
-                      setCharName('Welcome')
-                      router.back()
-                    },
-                    style: 'destructive',
-                  },
-                  
-                ],
-                {
-                  cancelable: true
-                }
-              )}
-              }>
+            <TouchableOpacity  style={styles.button} onPress={deleteCard}>
               <FontAwesome name='trash' size={28} color={Color.Button} />
             </TouchableOpacity></View>)
     }} />
@@ -99,8 +91,7 @@ const CharInfo = () => {
         </View>
       </View>
       
-     
-
+      
       <Text
         style={styles.boxText}
       >Description    Tokens: {(characterCard?.description ?? characterCard?.data?.description) !== undefined && llamaTokenizer.encode(characterCard?.description ?? characterCard.data.description).length}</Text>

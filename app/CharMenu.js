@@ -55,7 +55,7 @@ const CharMenu = () => {
                 ToastAndroid.show('Invalid Character ID', 2000)
                 return
             }
-            Characters.createNewCharacter(newname).then(() => {
+            Characters.createCard(newname).then(() => {
                 return Characters.saveCard(newname, JSON.stringify(charactercard))
             }).then(() => {
                 return Characters.copyImage(uri, newname)
@@ -106,7 +106,7 @@ const CharMenu = () => {
             <TextBoxModal 
                 booleans={[showNewChar, setShowNewChar]}
                 onConfirm={(text)=> {
-                    Characters.create(text).then(() => {
+                    Characters.createCard(text).then(() => {
                         setCharName(text)
                         router.push('CharInfo')
                         getCharacterList()

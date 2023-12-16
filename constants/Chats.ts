@@ -1,6 +1,9 @@
-import { mmkv, Global, API } from "@globals"
-import { humanizedISO8601DateTime } from "@globals"
+//@ts-ignore
+import { humanizedISO8601DateTime } from "./Utils"
 import * as FS from 'expo-file-system'
+import { Global } from "./GlobalValues"
+import { API } from "./API"
+import { mmkv } from "./mmkv"
 
 export namespace Chats {
 

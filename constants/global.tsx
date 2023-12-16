@@ -1,5 +1,4 @@
 import * as FS from 'expo-file-system'
-import {MMKV} from 'react-native-mmkv'
 import { createContext } from 'react'
 import { ToastAndroid, StyleSheet } from 'react-native'
 import * as Crypto from 'expo-crypto';
@@ -10,10 +9,14 @@ import { Instructs } from './Instructs'
 import { Users } from './Users'
 import { Characters } from './Characters'
 import { Chats } from './Chats'
+import { Global } from './GlobalValues'
+import { API } from './API';
+import { mmkv } from './mmkv';
+import { humanizedISO8601DateTime } from './Utils';
 
-export { Presets, Instructs, Users, Characters, Chats }
+export { Presets, Instructs, Users, Characters, Chats, Global, API, humanizedISO8601DateTime }
 
-export const mmkv = new MMKV()
+
 export const MessageContext = createContext([])
 
 /*
@@ -47,84 +50,6 @@ export const enum Color {
     Button = '#ddd',
     TextWhite = '#fff',
     TextBlack = '#000',
-}
-
-export const enum Global {
-
-    // Processing
-    
-    NowGenerating='nowgenerating',      // generation signal
-    EditedWindow='editedwindow',        // exit editing window confirmation
-
-    // Character
-
-    CurrentCharacter='currentchar',     // current char filename, locates dir
-    CurrentCharacterCard='charcard',    // note: use Object ? - stores charactercard
-
-    // User
-
-    CurrentUser='currentuser',          // current username, locates dir
-    CurrentUserCard='usercard',         // note: use Object ? - stores usercard
-    
-    // Chat
-
-    CurrentChat='currentchat',          // current chat filename, locates dir
-    
-    // Instruct
-
-    InstructName='instructname',        // name of current instruct preset
-    CurrentInstruct='currentinstruct',  // note: use Object ? - stores instruct
-
-    // Presets
-
-    //CurrentPreset='currentpreset',      // note: use Object ? - stores preset 
-    //PresetName='presetname',            // name of current preset
-
-    PresetKAI='currentpresetkai',
-    PresetNameKAI='presetnamekai',
-
-    PresetTGWUI='currentpresettgwui',
-    PresetNameTGWUI='presetnametgwui',
-
-    PresetNovelAI='currentpresetnovelai',
-    PresetNameNovelAI='presetnamenovelai',
-
-    PresetData = 'presetdata',
-    PresetName = 'presetdame',
-    
-    // APIs
-
-    APIType='endpointtype',             // name of current api mode
-    
-    KAIEndpoint='kaiendpoint',          // kai api endpoint
-    
-    TGWUIBlockingEndpoint='tgwuiblockingendpoint',   // tgwui endpoint
-    TGWUIStreamingEndpoint='tgwuistreamingendpoint', // tgwui streaming web socket - DEPRECATED
-
-    HordeKey='hordekey',                // api key for horde 
-    HordeModels='hordemodel',           // names of horde models to be used
-    HordeWorkers = 'hordeworker',       // List of available horde workers
-
-    MancerKey='mancerkey',              // api key for mancer
-    MancerModel='mancermodel',          // selected mancer model
-
-    NovelKey='novelkey',                // novelai key
-    NovelModel='novelmodel',            // novelai model
-
-    AphroditeKey = 'aphroditekey',      // api key for aphrodite, default is `EMPTY`
-
-    CompletionsEndpoint = 'completionsendpoint',
-    CompletionsKey = 'completionskey',
-}
-
-export const enum API {
-    KAI = 'kai',
-    HORDE = 'horde',
-    TGWUI = 'textgenwebui',
-    MANCER = 'mancer',
-    NOVELAI = 'novel',
-    APHRODITE = 'aphrodite',
-    COMPLETIONS = 'completions'
 }
 
 export const GlobalStyle = StyleSheet.create({
@@ -187,17 +112,35 @@ export const generateDefaultDirectories = async () => {
 
 // FORMATS
 
-export const humanizedISO8601DateTime = (date: string = '') => {
-    let baseDate = typeof date === 'number' ? new Date(date) : new Date();
-    let humanYear = baseDate.getFullYear();
-    let humanMonth = (baseDate.getMonth() + 1);
-    let humanDate = baseDate.getDate();
-    let humanHour = (baseDate.getHours() < 10 ? '0' : '') + baseDate.getHours();
-    let humanMinute = (baseDate.getMinutes() < 10 ? '0' : '') + baseDate.getMinutes();
-    let humanSecond = (baseDate.getSeconds() < 10 ? '0' : '') + baseDate.getSeconds();
-    let humanMillisecond = (baseDate.getMilliseconds() < 10 ? '0' : '') + baseDate.getMilliseconds();
-    let HumanizedDateTime = (humanYear + "-" + humanMonth + "-" + humanDate + " @" + humanHour + "h " + humanMinute + "m " + humanSecond + "s " + humanMillisecond + "ms");
-    return HumanizedDateTime;
-}
+
 
 // TODO: create function that loads presets from old files to new one
+
+// Migrate seperated presets from 0.4.2 to unified presets
+export const migratePresets = async () => {
+       
+    FS.readDirectoryAsync(`${FS.documentDirectory}presets/kai`).then(async () => {
+        // move all files
+        // delete /kai /tgwui /novelai
+        const dirs = ['/kai', '/tgwui', '/novelai']
+        console.log('Migrating old presets.')
+        let count = 1
+        dirs.map(async dir => 
+        await FS.readDirectoryAsync(`${FS.documentDirectory}presets${dir}`).then(async (files) => {
+            let names :  any = []
+            files.map(async (file) => {
+                if(names.includes(file)){
+                    await FS.copyAsync({from: `${FS.documentDirectory}presets${dir}/${file}`, to:`${FS.documentDirectory}presets/${count}-${file}`})
+                    count = count + 1
+                }   
+                else {
+                    names.push(file)
+                    await FS.copyAsync({from: `${FS.documentDirectory}presets${dir}/${file}`, to:`${FS.documentDirectory}presets/${file}`})
+                }
+            })
+            await FS.deleteAsync(`${FS.documentDirectory}presets${dir}`)
+        }))
+        console.log('Migration successful.')
+    })
+    .catch(() => {})
+}
