@@ -52,11 +52,10 @@ const Mancer = () => {
                 setKeyInput('')
                 ToastAndroid.show('Key saved!', 2000)
             }}>
-            
-            
             <FontAwesome name='save' color={Color.Button} size={28} />
             </TouchableOpacity>
             </View>
+
             <View style={styles.dropdownContainer}>
             <Text style={{color:Color.Text, fontSize: 16}}>Model</Text>
             <Dropdown 
@@ -108,7 +107,6 @@ const styles = StyleSheet.create({
         paddingHorizontal:20,
     },
 
-    
     title : {
         color: Color.Text,
         fontSize: 20,
