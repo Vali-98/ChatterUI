@@ -3,7 +3,7 @@ import { Stack, useRouter} from 'expo-router'
 import { TouchableOpacity, View, StyleSheet} from 'react-native'
 import { useEffect } from 'react'
 import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import { Global, Color, Chats, generateDefaultDirectories, migratePresets, Users,  Instruct, Presets } from '@globals'
+import { Global, Color, Chats, generateDefaultDirectories, migratePresets, Users,  Instructs, Presets, API } from '@globals'
 import { MenuProvider } from 'react-native-popup-menu';
 import * as SystemUI from 'expo-system-ui'
 
@@ -39,7 +39,7 @@ const Layout = () => {
 
     const [hordeModels, setHordeModels] = useMMKVObject(Global.HordeModels)
     const [hordeWorkers, setHordeWorkers] = useMMKVObject(Global.HordeWorkers)
-
+    const [APIType, setAPIType] = useMMKVString(Global.APIType)
 
     // reset defaults
     useEffect(() => {
@@ -53,13 +53,14 @@ const Layout = () => {
         console.log("Reset values")
         SystemUI.setBackgroundColorAsync(Color.Background)
         migratePresets()
+        
         // replace this entire call with specific to each field
         
 		FS.readDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => generateDefaultDirectories().then(() => {
-            
+            setAPIType(API.KAI)
             Users.createUser('User').then(() => {
                 console.log(`Creating Default User`)
-                Users.loadUser('User').then(card => {
+                Users.loadFile('User').then(card => {
                     setUserName('User')
                     setUserCard(card)
                 })
@@ -76,9 +77,9 @@ const Layout = () => {
             setPreset(Presets.defaultPreset())
             Presets.saveFile('Default', Presets.defaultPreset())
 
-            Instruct.writeInstruct('Default', Instruct.defaultInstruct()).then(() => {
+            Instructs.saveFile('Default', Instructs.defaultInstruct()).then(() => {
                 console.log(`Creating Default Instruct`)
-                setCurrentInstruct(Instruct.defaultInstruct())
+                setCurrentInstruct(Instructs.defaultInstruct())
                 setInstructName(`Default`)
             })
 
