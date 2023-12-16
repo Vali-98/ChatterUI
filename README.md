@@ -1,6 +1,10 @@
 
 # ChatterUI
-<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/images/adaptive-icon.png" width="150" > 
+<div>
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/mainchat.png" width="150" > 
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/charsmenu.png" width="150" > 
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/optionsmenu.png" width="150" > 
+</div>
 Simple frontend for LLMs built using react-native. 
 
 ***This app is highly experimental, expect to lose your chat histories on updates.***
