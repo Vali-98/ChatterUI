@@ -10,7 +10,7 @@ Simple frontend for LLMs built using react-native.
 ***This app is highly experimental, expect to lose your chat histories on updates.***
 
 ### What Is ChatterUI?
-ChatterUI frontend for managing chat files and character cards similar to projects like TavernAI / SillyTavern.
+ChatterUI is a native mobile frontend for managing chat files and character cards similar to projects like TavernAI / SillyTavern.
 Built for the purpose of learning Javascript, so it might be a little rough around the edges.
 
 ### Supported Backends
