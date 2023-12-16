@@ -14,7 +14,7 @@ import { API } from './API';
 import { mmkv } from './mmkv';
 import { humanizedISO8601DateTime } from './Utils';
 
-export { Presets, Instructs, Users, Characters, Chats, Global, API, humanizedISO8601DateTime }
+export { mmkv, Presets, Instructs, Users, Characters, Chats, Global, API, humanizedISO8601DateTime }
 
 
 export const MessageContext = createContext([])

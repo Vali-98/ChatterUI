@@ -85,7 +85,7 @@ const Home = () => {
 				const mescontent = ((createnew )  ?  data : messages.at(-1).mes + data)
 				.replaceAll(currentInstruct.input_sequence, ``)
 				.replaceAll(currentInstruct.output_sequence, ``)
-				const newmessage = (createnew) ? createChatEntry(charName, false, "") : messages.at(-1)
+				const newmessage = (createnew) ? Chats.createEntry(charName, false, "") : messages.at(-1)
 				newmessage.mes = mescontent
 				newmessage.swipes[newmessage.swipe_id] = mescontent
 				newmessage.gen_finished =  Date()
