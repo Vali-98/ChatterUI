@@ -18,7 +18,7 @@ const ChatSelector = () => {
     },[])
 
     const refreshfilenames = () => {
-        Chats.getFileList().then(setChats)
+        Chats.getFileList(charName).then(setChats)
     }
 
     const deleteChat = (chatname) => {

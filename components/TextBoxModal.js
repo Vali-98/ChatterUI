@@ -2,7 +2,7 @@ import { View, Text, Modal, TextInput, StyleSheet, TouchableOpacity } from 'reac
 import { useState, useEffect } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
 import { Color } from '@globals'
-const TextBoxModal = ({booleans: [showModal, setShowModal], onConfirm = (text) => {}}) => {
+const TextBoxModal = ({booleans: [showModal, setShowModal], onConfirm = (text) => {}, title="Enter Name"}) => {
     const [text, setText] = useState('')
 
     useEffect(() => {
@@ -20,7 +20,7 @@ const TextBoxModal = ({booleans: [showModal, setShowModal], onConfirm = (text) =
 
         <View style={{backgroundColor: 'rgba(0, 0, 0, 0.5)', flex:1, justifyContent: 'center'}}>
         <View style={styles.modalview}>
-            <Text style={styles.title}>Enter Name</Text>
+            <Text style={styles.title}>{title}</Text>
             <TextInput 
                 style={styles.input} 
                 value={text}
