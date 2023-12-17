@@ -19,7 +19,7 @@ export const APIFields : Object = {
     'truncation_length', 'ban_eos_token', 'skip_special_tokens', 'freq_pen', 
     'presence_pen'],
     [API.HORDE] : ['max_length', 'genamt', 'rep_pen', 'rep_pen_range', 
-    'rep_pen_slope', 'temp', 'tfs', 'top_a', 'top_k', 'top_p', 'ban_eos_token',
+    'rep_pen_slope', 'temp', 'tfs', 'top_a', 'top_k', 'top_p', 'min_p', 'ban_eos_token',
     'typical', 'single_line'],
     [API.MANCER] : ['max_length', 'genamt', 'rep_pen', 'temp', 
     'top_a', 'top_k', 'top_p', 'freq_pen', 'presence_pen'],
