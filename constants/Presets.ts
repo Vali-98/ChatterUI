@@ -29,17 +29,16 @@ export const APIFields : Object = {
     'grammar']
 }
 
-
 export const defaultPreset = () => {
     return {
-        "temp": 0.5,
-        "top_p": 0.9,
+        "temp": 1,
+        "top_p": 1,
         "top_k": 0,
-        "top_a": 0,
+        "top_a": 1,
         // merged from KAI
 
-        "min_p" : 0.05,
-        "typical" : 0.01,
+        "min_p" : 0.00,
+        "typical" : 0.00,
         "single_line" : false,
         "sampler_order" : [6,0,1,3,4,2,5],
         "seed": -1,
@@ -49,7 +48,7 @@ export const defaultPreset = () => {
         "epsilon_cutoff": 0,
         "eta_cutoff": 0,
         "typical_p": 1,
-        "rep_pen": 1.1,
+        "rep_pen": 1,
         "rep_pen_range": 0,
         "rep_pen_slope": 1,
         "no_repeat_ngram_size": 20,
@@ -74,7 +73,6 @@ export const defaultPreset = () => {
         "negative_prompt": "",
         "grammar_string": "",
         "banned_tokens": "",
-        "type": "ooba",
         "rep_pen_size": 0,
         "genamt": 256,
         "max_length": 4096
