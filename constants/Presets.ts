@@ -38,7 +38,6 @@ export const defaultPreset = () => {
         // merged from KAI
 
         "min_p" : 0.00,
-        "typical" : 0.00,
         "single_line" : false,
         "sampler_order" : [6,0,1,3,4,2,5],
         "seed": -1,
@@ -47,7 +46,7 @@ export const defaultPreset = () => {
         "tfs": 1,
         "epsilon_cutoff": 0,
         "eta_cutoff": 0,
-        "typical_p": 1,
+        "typical": 1,
         "rep_pen": 1,
         "rep_pen_range": 0,
         "rep_pen_slope": 1,

@@ -40,7 +40,7 @@ const PresetMenu = () => {
         top_a: {type: SLIDER,  data : {name: 'Top A', precision:2, min: 0, max:1}},
         top_k: {type: SLIDER,  data : {name: 'Top K', min: 0, max:100}},
         min_p: {type: SLIDER,  data : {name: 'Min P', precision:2, step:0.01, min: 0, max:1}},
-        typical_p: {type: SLIDER,  data : {name: 'Typical Sampling', precision:2, min: 0, max:1}},
+        typical: {type: SLIDER,  data : {name: 'Typical Sampling', precision:2, min: 0, max:1}},
         tfs: {type: SLIDER,  data : {name: 'Tail-Free Sampling', precision:2, min: 0, max:1}},
         epsilon_cutoff: {type: SLIDER,  data : {name: 'Epsilon Cutoff', precision:2, min: 0, max:9}},
         eta_cutoff: {type: SLIDER,  data : {name: 'Eta Cutoff', precision:2, min: 0, max:20}},
