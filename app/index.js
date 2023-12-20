@@ -7,12 +7,15 @@ import { useState, useEffect} from 'react'
 import { ChatWindow }from '@components/ChatMenu/ChatWindow/ChatWindow' 
 import { useMMKVString,  useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 import { Global, Color, Chats, Characters, MessageContext } from '@globals'
-import { Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'
 import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu'
 import { generateResponse } from '@lib/Inference'
+import { Stack, useRouter } from 'expo-router'
 
 
 const Home = () => {
+
+	const router = useRouter()
 	// User
 	const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
 	const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
@@ -26,10 +29,12 @@ const Home = () => {
 	// Local
 	const [messages, setMessages] = useState([]);
 	const [newMessage, setNewMessage] = useState('');
+	// this target length allows for managing whether a message is replaced, added or swiped
 	const [targetLength, setTargetLength] = useState(0)
+	// dynamically set abort function that is set by respective API
 	const [abortFunction, setAbortFunction] = useState(undefined)
 
-	// load character chat upon character change
+	// load character chat upon character change, this may live better elsewhere
 	useEffect(() => {
 		if (charName === 'Welcome' || charName === undefined) return
 		console.log(`Character changed to ${charName}`)
@@ -52,7 +57,7 @@ const Home = () => {
 		}
 	}, [nowGenerating]) 
 
-	// load character upon currentChat changing 
+	// load character upon currentChat changing - consider replacing for global messages
 	useEffect(() => {	
 		if(currentChat === '' || charName === 'Welcome' || charName === undefined) {
 			return
@@ -134,6 +139,32 @@ const Home = () => {
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			
+			<Stack.Screen options={{
+				title: charName,
+				headerRight : () => 
+				(<View style={styles.headerButtonContainer}>
+				{charName !== 'Welcome' && 
+					<View style={styles.headerButtonContainer}>
+						<TouchableOpacity style={styles.headerButtonRight} onPress={() => {router.push('ChatSelector')}}>
+							<Ionicons name='chatbox' size={28} color={Color.Button} />
+						</TouchableOpacity>
+						<TouchableOpacity style={styles.headerButtonRight} onPress={() => router.push(`CharInfo`)}>
+							<FontAwesome name='cog' size={28} color={Color.Button} />
+						</TouchableOpacity> 
+					</View>
+				}
+				<TouchableOpacity style={styles.headerButtonRight} onPress={() => {router.push('CharMenu')}}>
+				<Ionicons name='person' size={28} color={Color.Button}/>
+				</TouchableOpacity>
+				</View>)
+			,
+			headerLeft :() =>  (
+				<TouchableOpacity style={styles.headerButtonLeft} onPress={() => router.push('Settings')}>
+					<Ionicons name='menu' size={28} color={Color.Button}/>
+				</TouchableOpacity>
+			)}}/>
+
+
 			{ (charName === 'Welcome') ?
 			<View><Text style={styles.welcometext}> 
 				Select A Character To Get Started!
@@ -257,6 +288,25 @@ const styles = StyleSheet.create({
 		color: Color.Text,
 		marginLeft: 16,	
 	},
+
+	navbar : {
+        alignItems:'center',
+        paddingRight:100,
+    },
+
+    headerButtonRight : {
+        marginLeft:20,
+        marginRight:4,
+    },
+
+    headerButtonLeft : {
+        marginRight:20,
+
+    },
+
+    headerButtonContainer : {
+        flexDirection: 'row',
+    },
 });
 
 export default Home;

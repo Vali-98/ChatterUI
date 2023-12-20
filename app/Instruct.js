@@ -1,7 +1,7 @@
 import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, ToastAndroid, Alert} from 'react-native'
 import { Stack } from 'expo-router'
 import { Global, Color, Instructs, saveStringExternal} from '@globals'
-import { useMMKVObject } from 'react-native-mmkv'
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { ScrollView } from 'react-native-gesture-handler'
 import TextBox from '@components/TextBox'
 import CheckBox from '@react-native-community/checkbox'
@@ -9,9 +9,10 @@ import { Dropdown } from 'react-native-element-dropdown'
 import { useState, useEffect } from 'react'
 import { FontAwesome } from '@expo/vector-icons'
 import TextBoxModal from '@components/TextBoxModal'
+import CheckboxTitle from '@components/CheckboxTitle'
 const Instruct = () => {
 
-    const [instructName, setInstructName] = useMMKVObject(Global.InstructName)
+    const [instructName, setInstructName] = useMMKVString(Global.InstructName)
     const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
     const [instructList, setInstructList] = useState([])
     const [selectedItem, setSelectedItem] = useState(null)
@@ -55,7 +56,7 @@ const Instruct = () => {
                         return
                     }
 
-                Instructs.writeFile(text, {...currentInstruct, name: text}).then(() => {
+                Instructs.saveFile(text, {...currentInstruct, name: text}).then(() => {
                     ToastAndroid.show(`Preset created.`, 2000)
                     setInstructName(text)
                     loadInstructList()
@@ -88,7 +89,7 @@ const Instruct = () => {
                 >
                 <FontAwesome  size={24} name='save' color={Color.Button}/>
             </TouchableOpacity>
-            
+           
             <TouchableOpacity style={styles.button} 
                 onPress={() => {
                     Alert.alert(`Delete Preset`, `Are you sure you want to delete \'${instructName}\'?`, 
@@ -147,7 +148,7 @@ const Instruct = () => {
                 varname="system_prompt"
                 lines={3}
                 body={currentInstruct}
-                setvalue={setCurrentInstruct}
+                setValue={setCurrentInstruct}
             />
 
             <View style={{flexDirection: 'row'}}>
@@ -155,13 +156,13 @@ const Instruct = () => {
                 text='Input Sequence'
                 varname='input_sequence'
                 body={currentInstruct}
-                setvalue={setCurrentInstruct}
+                setValue={setCurrentInstruct}
             />
             <TextBox 
                 text='Output Sequence'
                 varname= "output_sequence"
                 body={currentInstruct}
-                setvalue={setCurrentInstruct}
+                setValue={setCurrentInstruct}
             />
             </View>
             
@@ -170,13 +171,13 @@ const Instruct = () => {
                 text='First Output Sequence'
                 varname='first_output_sequence'
                 body={currentInstruct}
-                setvalue={setCurrentInstruct}
+                setValue={setCurrentInstruct}
             />
             <TextBox 
                 text='Last Output Sequence'
                 varname= "last_output_sequence"
                 body={currentInstruct}
-                setvalue={setCurrentInstruct}
+                setValue={setCurrentInstruct}
             />
             </View>
 
@@ -185,13 +186,13 @@ const Instruct = () => {
                 text='System Sequence Suffix'
                 varname='system_sequence_prefix'
                 body={currentInstruct}
-                setvalue={setCurrentInstruct}
+                setValue={setCurrentInstruct}
             />
             <TextBox 
                 text='System Sequence Suffix'
                 varname= "system_sequence_suffix"
                 body={currentInstruct}
-                setvalue={setCurrentInstruct}
+                setValue={setCurrentInstruct}
             />
             </View>
 
@@ -200,71 +201,50 @@ const Instruct = () => {
                 text='Stop Sequence'
                 varname='stop_sequence'
                 body={currentInstruct}
-                setvalue={setCurrentInstruct}
+                setValue={setCurrentInstruct}
             />
             <TextBox 
                 text='Seperator Sequence'
                 varname= "separator_sequence"
                 body={currentInstruct}
-                setvalue={setCurrentInstruct}
+                setValue={setCurrentInstruct}
             />
-            </View>
-
-            
-
-        <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
-            <CheckBox 
-                tintColors={{false:Color.White, true:Color.White}}
-                onFillColor={Color.White}
-                onCheckColor={Color.White}
-                body={currentInstruct.wrap}
-                onValueChange={value => setCurrentInstruct({...currentInstruct, "wrap" : value})}
-            />
-            <Text style={{paddingLeft: 8, color:Color.Text}}>Wrap Sequence with Newline</Text>
         </View>
+      
+        <CheckboxTitle 
+            name={'Wrap Sequence with Newline'}
+            varname={'wrap'}
+            body={currentInstruct}
+            setValue={setCurrentInstruct}
+        />
 
-        <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
-            <CheckBox
-                tintColors={{false:Color.White, true:Color.White}}
-                onFillColor={Color.White}
-                onCheckColor={Color.White} 
-                value={currentInstruct.macro}
-                onValueChange={value => setCurrentInstruct({...currentInstruct, ["macro"] : value})}
-            />
-            <Text style={{paddingLeft: 8, color:Color.Text}}>Replace Macro In Sequences</Text>
-        </View>
+        <CheckboxTitle 
+            name={'Replace Macro In Sequences'}
+            varname={'macro'}
+            body={currentInstruct}
+            setValue={setCurrentInstruct}
+        />
 
-        <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
-            <CheckBox 
-                tintColors={{false:Color.White, true:Color.White}}
-                onFillColor={Color.White}
-                onCheckColor={Color.White}
-                value={currentInstruct.names}
-                onValueChange={value => setCurrentInstruct({...currentInstruct, names : value})}
-            />
-            <Text style={{paddingLeft: 8, color:Color.Text}}>Include Names</Text>
-        </View>
+        <CheckboxTitle 
+            name={'Include Names'}
+            varname={'names'}
+            body={currentInstruct}
+            setValue={setCurrentInstruct}
+        />
 
-        <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
-            <CheckBox 
-                tintColors={{false:Color.White, true:Color.Text}}
-                onFillColor={Color.White}
-                onCheckColor={Color.White}
-                value={currentInstruct.names_force_groups}
-                onValueChange={value => setCurrentInstruct({...currentInstruct, names_force_groups : value})}
-            />
-            <Text style={{paddingLeft: 8, color:Color.Text}}>Force for Groups and Personas</Text>
-        </View>
-
-            <TextBox 
-                text='Activation Regex'
-                varname="activation_regex"
-                body={currentInstruct}
-                setvalue={setCurrentInstruct}
-            />
-
-
-       
+        <CheckboxTitle 
+            name={'Force for Groups and Personas'}
+            varname={'names_force_groups'}
+            body={currentInstruct}
+            setValue={setCurrentInstruct}
+        />
+      
+        <TextBox 
+            name='Activation Regex'
+            varname="activation_regex"
+            body={currentInstruct}
+            setValue={setCurrentInstruct}
+        />
 
         </View>
         </ScrollView>

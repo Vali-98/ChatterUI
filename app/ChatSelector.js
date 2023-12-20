@@ -5,7 +5,7 @@ import { Global, Color, Chats, Characters, saveStringExternal}  from '@globals'
 import { useRouter } from 'expo-router'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { FontAwesome } from '@expo/vector-icons'
-
+import { Stack } from 'expo-router'
 
 const ChatSelector = () => {
     const router = useRouter()
@@ -54,6 +54,22 @@ const ChatSelector = () => {
 
     return (
         <ScrollView style={styles.mainContainer}>
+
+        <Stack.Screen options={{
+                         headerRight : () => 
+                         (<View style={styles.headerButtonContainer}>
+                            <TouchableOpacity style={styles.headerButtonRight} onPress={() => {
+                                // create new default chat from globals
+                                Chats.createDefault(charName, userName).then( response =>
+                                    setCurrentChat(response)
+                                )
+                                router.back()
+                            }}>
+                                <FontAwesome name='plus' size={28} color={Color.Button} />
+                            </TouchableOpacity>
+                        </View>),
+                         
+        }}/> 
         {
             chats.reverse().map((chat,index) => (
             <TouchableOpacity
