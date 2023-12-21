@@ -41,7 +41,7 @@ const ChatItem = ({ message, id, scroll}) => {
         setPlaceholderText(messages.at(id + 1).mes)
     }, [message])
     
-    useEffect(() => {setPlaceholderText(message)}, [nowGenerating])
+    useEffect(() => {setEditMode(false)}, [nowGenerating])
 
     useEffect(() => {
         Animated.parallel([
@@ -141,7 +141,10 @@ const ChatItem = ({ message, id, scroll}) => {
 
             {!editMode?
                 <TouchableOpacity style={styles.messageTextContainer} activeOpacity={0.7}
-                    onLongPress={() => setEditMode(!nowGenerating)}
+                    onLongPress={() => {
+                        setPlaceholderText(message.mes)   
+                        setEditMode(!nowGenerating)
+                    }}
                 >
                     <Markdown
                         style={styles.messageText}
@@ -166,7 +169,7 @@ const ChatItem = ({ message, id, scroll}) => {
                 :
                 <View style={styles.messageInput} >
                 <TextInput
-                    style ={{color:Color.Text}}
+                    style={{color:Color.Text}}
                     value={placeholderText} 
                     onChangeText={setPlaceholderText}        
                     textBreakStrategy='simple'

@@ -27,20 +27,12 @@ export const enum Global {
 
     // Presets
 
-    //CurrentPreset='currentpreset',      // note: use Object ? - stores preset 
-    //PresetName='presetname',            // name of current preset
-
-    //PresetKAI='currentpresetkai',
-    //PresetNameKAI='presetnamekai',
-
-    //PresetTGWUI='currentpresettgwui',
-    //PresetNameTGWUI='presetnametgwui',
-
-    //PresetNovelAI='currentpresetnovelai',
-    //PresetNameNovelAI='presetnamenovelai',
-
     PresetData = 'presetdata',
     PresetName = 'presetdame',
+
+    // Lorebooks
+
+    LorebookNames = 'lorebooknames',
     
     // APIs
 
@@ -48,7 +40,6 @@ export const enum Global {
     
     KAIEndpoint='kaiendpoint',          // kai api endpoint
     
-    //TGWUIBlockingEndpoint='tgwuiblockingendpoint',   // tgwui endpoint - DEPRECATED
     TGWUIStreamingEndpoint='tgwuistreamingendpoint', // tgwui streaming web socket 
 
     HordeKey='hordekey',                // api key for horde 

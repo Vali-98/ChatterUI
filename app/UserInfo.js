@@ -15,7 +15,6 @@ const UserInfo = () => {
         Users.saveFile(userName, userCard)
     }
     
-
     return (
     <SafeAreaView style={styles.mainContainer}>
         <Stack.Screen
