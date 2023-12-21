@@ -22,13 +22,17 @@ const UserSelector = () => {
             if(response.length === 0) {
                 const defaultName = 'User'
                 Users.createUser(defaultName).then(() => {
-                    setUserList(response)
                     setUserName(defaultName)
                     Users.loadFile(defaultName).then(card => setUserCard(card))
-                    loadUserList()
+                    setUserList([defaultName])
                 })
+                return
             }
-            else setUserList(response)
+            setUserList(response)
+            const cleanlist = response.map(item => item.replace('.json', ''))
+            if(cleanlist.includes(userName)) return
+            setUserName(cleanlist[0])
+            Users.loadFile(cleanlist[0]).then((card) => setUserCard(card))
         }).catch(() => setUserList([]))
     }
 
@@ -52,7 +56,6 @@ const UserSelector = () => {
             }}
         />
        
-        
         <ScrollView>
             {
                 userList.map((name, index) => 
