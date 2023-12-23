@@ -20,6 +20,7 @@ const Instruct = () => {
 
     const loadInstructList = (name) => {
         Instructs.getFileList().then((list) => {
+
             const mainlist = list.map((item, index) => {return {label: item.replace(`.json`, ''), value:index}})
             setInstructList(mainlist)
             for (const item of mainlist){
@@ -29,14 +30,14 @@ const Instruct = () => {
                 }
             }
             setSelectedItem(0)
-            Instructs.loadFile(list[0].replace(`.json`, '')).then((preset)=>{
-                setCurrentInstruct(JSON.parse(preset))
+            Instructs.loadFile(list[0].replace(`.json`, '')).then((instruct)=>{
+                setCurrentInstruct(JSON.parse(instruct))
             })
         })
     }
 
     useEffect(() => {
-        loadInstructList()
+        loadInstructList(instructName)
     },[])
 
     return (
@@ -50,16 +51,16 @@ const Instruct = () => {
             <TextBoxModal 
             booleans={[showNewInstruct, setShowNewInstruct]}
             onConfirm={(text) => {
-                for(item of instructList) 
-                    if(item.label === text) {
-                        ToastAndroid.show(`Preset name already exists.`, 2000)
-                        return
-                    }
+                
+                if(instructList.some(item => item.label == text)) {
+                    ToastAndroid.show(`Preset name already exists.`, 2000)
+                    return
+                }
 
                 Instructs.saveFile(text, {...currentInstruct, name: text}).then(() => {
                     ToastAndroid.show(`Preset created.`, 2000)
                     setInstructName(text)
-                    loadInstructList()
+                    loadInstructList(text)
                 })
             }}
         />
@@ -92,6 +93,10 @@ const Instruct = () => {
            
             <TouchableOpacity style={styles.button} 
                 onPress={() => {
+                    if(instructList.length === 1) {
+                        ToastAndroid.show(`Cannot delete last Instruct preset.`, 2000)
+                        return
+                    }
                     Alert.alert(`Delete Preset`, `Are you sure you want to delete \'${instructName}\'?`, 
                         [
                             {text:`Cancel`, style: `cancel`},
@@ -99,10 +104,7 @@ const Instruct = () => {
                                 text:`Confirm`, 
                                 style: `destructive`, 
                                 onPress: () =>  {
-                                    if(instructList.length === 1) {
-                                        ToastAndroid.show(`Cannot delete last preset`, 2000)
-                                        return
-                                    }
+                                    
                                     Instructs.deleteFile(instructName).then(() => { 
                                         loadInstructList()
                                     })
