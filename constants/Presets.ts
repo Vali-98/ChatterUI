@@ -30,7 +30,10 @@ export const APIFields : Object = {
     [API.COMPLETIONS] : ['max_length', 'genamt', 'rep_pen', 'temp', 'tfs',
     'top_a', 'top_k', 'top_p', 'min_p','freq_pen', 'presence_pen', 'seed', 
     'typical', 'ban_eos_tokens', 'mirostat_mode', 'mirostat_tau', 'mirostat_eta',
-    'grammar']
+    'grammar'],
+    [API.LOCAL] : ['genamt', 'rep_pen', 'rep_pen_range', 'temp', 
+    'top_a', 'top_k', 'top_p', 'freq_pen', 'tfs', 'typical', 'presence_pen',
+    'mirostat_mode', 'mirostat_tau', 'mirostat_eta', 'grammar'],
 }
 
 export const defaultPreset = () => {

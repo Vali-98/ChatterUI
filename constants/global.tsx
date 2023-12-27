@@ -14,8 +14,9 @@ import { Global } from './GlobalValues'
 import { API } from './API';
 import { mmkv } from './mmkv';
 import { humanizedISO8601DateTime } from './Utils';
+import { Llama } from './llama';
 
-export { mmkv, Presets, Instructs, Users, Characters, Chats, Global, API, humanizedISO8601DateTime }
+export { mmkv, Presets, Instructs, Users, Characters, Chats, Global, API, Llama, humanizedISO8601DateTime }
 
 export const MessageContext = createContext([])
 
@@ -100,12 +101,12 @@ export const startupApp = async () => {
     mmkv.set(Global.NowGenerating, false)
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
     mmkv.set(Global.HordeModels, JSON.stringify([]))
-
+    mmkv.set(Global.LocalModelWeights, JSON.stringify({}))
     if(mmkv.getString(Global.LorebookNames) == undefined)
         mmkv.set(Global.LorebookNames, JSON.stringify([]))
     if(mmkv.getString(Global.APIType) == undefined)
         mmkv.set(Global.APIType, API.KAI)
-
+    Llama.setLlamaPreset()
     console.log("Reset values")
     SystemUI.setBackgroundColorAsync(Color.Background)
 }
@@ -149,7 +150,7 @@ export const initializeApp = async () => {
 
 export const generateDefaultDirectories = async () => {
 
-    const dirs = ['characters', 'presets', 'instruct', 'persona', 'lorebooks']
+    const dirs = ['characters', 'presets', 'instruct', 'persona', 'lorebooks', 'models']
 
     dirs.map(async (dir : string)  => {
         await FS.makeDirectoryAsync(`${FS.documentDirectory}${dir}`, {})

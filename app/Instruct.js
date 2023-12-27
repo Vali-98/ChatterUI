@@ -4,7 +4,6 @@ import { Global, Color, Instructs, saveStringExternal} from '@globals'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { ScrollView } from 'react-native-gesture-handler'
 import TextBox from '@components/TextBox'
-import CheckBox from '@react-native-community/checkbox'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useState, useEffect } from 'react'
 import { FontAwesome } from '@expo/vector-icons'
@@ -185,7 +184,7 @@ const Instruct = () => {
 
             <View style={{flexDirection: 'row'}}>
             <TextBox 
-                name='System Sequence Suffix'
+                name='System Sequence Prefix'
                 varname='system_sequence_prefix'
                 body={currentInstruct}
                 setValue={setCurrentInstruct}

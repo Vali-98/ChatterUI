@@ -51,7 +51,7 @@ export const defaultInstruct = () => {
         "output_sequence": "### Response: ",
         "first_output_sequence": "",
         "last_output_sequence": "",
-        "system_sequence_prefix": "",
+        "system_sequence_prefix": "### Instruction: ",
         "system_sequence_suffix": "",
         "stop_sequence": "",
         "separator_sequence": "",
