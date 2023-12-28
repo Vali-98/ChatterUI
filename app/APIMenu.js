@@ -4,17 +4,18 @@ import { useMMKVString } from 'react-native-mmkv'
 import { Global, Color, API } from '@globals'
 import { useEffect } from 'react'
 import { Dropdown } from 'react-native-element-dropdown'
-import { KAI, Horde, TGWUI, Mancer, TextCompletions, Local } from '@components/Endpoint'
+import { KAI, Horde, TGWUI, Mancer, TextCompletions, Local, OpenRouter } from '@components/Endpoint'
 import { ScrollView } from 'react-native-gesture-handler'
 const APIMenu = () => {
 
     const [APIType, setAPIType] = useMMKVString(Global.APIType)
     const apinames = [
         {label: 'KoboldAI', value:API.KAI },
-        {label: 'Horde', value: API.HORDE },
         {label: 'Text Generation Web UI', value: API.TGWUI},
-        {label: 'Mancer', value:API.MANCER},
         {label: 'Text Completions', value: API.COMPLETIONS},
+        {label: 'Horde', value: API.HORDE },
+        {label: 'Mancer', value:API.MANCER},
+        {label: 'Open Router', value: API.OPENROUTER},
         {label: 'Local', value: API.LOCAL},
         //{label: 'NovelAI', value:API.NOVELAI},
     ]
@@ -49,6 +50,7 @@ const APIMenu = () => {
                 itemTextStyle={{color: Color.Text}}
                 itemContainerStyle={{backgroundColor:Color.DarkContainer, borderRadius:8}}
                 activeColor={Color.Container}
+                maxHeight={500}
             />
             </View>
             {APIType === API.KAI && <KAI/>}
@@ -57,6 +59,7 @@ const APIMenu = () => {
             {APIType === API.MANCER && <Mancer/>}
             {APIType === API.COMPLETIONS && <TextCompletions/>}
             {APIType === API.LOCAL && <Local />}
+            {APIType === API.OPENROUTER && <OpenRouter />}
         </ScrollView>
         </SafeAreaView>
     )
