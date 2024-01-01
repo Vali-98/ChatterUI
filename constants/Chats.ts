@@ -7,14 +7,31 @@ import { mmkv } from "./mmkv"
 
 export namespace Chats {
 
-    const create = (userName : any, characterName : any, initmessage : any) => {
+    const create = (userName : any, characterName : any, card  : any) => {
+
+        const initmessage : String = card?.data?.first_mes ?? card.first_mes
+
+        const newMessage : any = createEntry(characterName, false, initmessage)
+
+        if(card?.data?.alternate_greetings != undefined && card.data.alternate_greetings.length != 0) {
+            newMessage.swipes = []
+            newMessage.swipe_info = []
+            card.data.alternate_greetings.map((item : any) => {
+                newMessage.swipes.push(item)
+                newMessage.swipe_info.push(
+                    {
+                        "send_date":humanizedISO8601DateTime(),
+                        "gen_started":Date(),
+                        "gen_finished":Date(),
+                        "extra":{"api":"none","model":"none"}
+                    }
+                )
+            })
+        }
+
         return [
             {"user_name":userName,"character_name":characterName,"create_date":humanizedISO8601DateTime(),"chat_metadata":{"note_prompt":"","note_interval":1,"note_position":1,"note_depth":4,"objective":{"currentObjectiveId":0,"taskTree":{"id":0,"description":"","completed":false,"parentId":"","children":[]},"checkFrequency":"3","chatDepth":"2","hideTasks":false,"prompts":{"createTask":"Pause your roleplay and generate a list of tasks to complete an objective. Your next response must be formatted as a numbered list of plain text entries. Do not include anything but the numbered list. The list must be prioritized in the order that tasks must be completed.\n\nThe objective that you must make a numbered task list for is: [{{objective}}].\nThe tasks created should take into account the character traits of {{char}}. These tasks may or may not involve {{user}} directly. Be sure to include the objective as the final task.\n\nGiven an example objective of 'Make me a four course dinner', here is an example output:\n1. Determine what the courses will be\n2. Find recipes for each course\n3. Go shopping for supplies with {{user}}\n4. Cook the food\n5. Get {{user}} to set the table\n6. Serve the food\n7. Enjoy eating the meal with {{user}}\n    ","checkTaskCompleted":"Pause your roleplay. Determine if this task is completed: [{{task}}].\nTo do this, examine the most recent messages. Your response must only contain either true or false, nothing other words.\nExample output:\ntrue\n    ","currentTask":"Your current task is [{{task}}]. Balance existing roleplay with completing this task."}}}},
-            {"name":characterName,"is_user":false,"send_date":humanizedISO8601DateTime(),
-                "mes":initmessage
-                    .replaceAll(`{{char}}`, characterName)
-                    .replaceAll(`{{user}}`, userName)
-                },
+            newMessage,
         ]
     }
     
@@ -31,7 +48,8 @@ export namespace Chats {
                 {encoding: FS.EncodingType.UTF8})
             .then( response => {
                 let card = JSON.parse(response)
-                const newmessage = create(userName, charName, ( card?.data?.first_mes ?? card.first_mes ))
+                const newmessage = create(userName, charName, card)
+            
                 return FS.writeAsStringAsync(
                     `${FS.documentDirectory}characters/${charName}/chats/${newmessage[0].create_date}.jsonl`, 
                     newmessage.map((item: any)=> JSON.stringify(item)).join('\u000d\u000a'),
@@ -92,7 +110,7 @@ export namespace Chats {
             {encoding:FS.EncodingType.UTF8}).catch(error => console.log(`Could not save file! ${error}`))
     }
     
-    export const createEntry = (name : string, is_user : string, message : string) => {
+    export const createEntry = (name : String, is_user : boolean, message : String) => {
         let api : any= 'unknown'
         let model : any= 'unknown'
         const apitype = mmkv.getString(Global.APIType)

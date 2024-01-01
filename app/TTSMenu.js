@@ -1,10 +1,11 @@
-import { StyleSheet, Text, TouchableOpacity, View, Switch } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, Switch, ToastAndroid } from 'react-native'
 import { useEffect, useState } from 'react'
 import * as Speech from 'expo-speech'
 import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv';
 import { Global, Color } from '@globals';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Stack } from 'expo-router';
+import { FontAwesome } from '@expo/vector-icons';
 
 function groupBy(array, key) {
 	if (array.length == 0) return []
@@ -58,21 +59,27 @@ const TTSMenu = () => {
 			<Text style={{...styles.title, marginTop: 8}}>Language</Text>		
 			<Text style={styles.subtitle}>Languages: {Object.keys(languageList).length}</Text>	
 			<View style={{marginTop: 8}}>
-			<Dropdown 
-				value={lang}
-				style={styles.dropdownbox}
-				selectedTextStyle={styles.selected}
-				data={languages}
-				labelField={"name"}
-				valueField={"name"}
-				containerStyle={styles.dropdownbox}
-                itemTextStyle={{color: Color.Text}}
-                itemContainerStyle={{backgroundColor:Color.DarkContainer, borderRadius:8}}
-                activeColor={Color.Container}
-                placeholderStyle={styles.selected}
-                placeholder='Select Language'
-				onChange={(item) => setLang(item.name)}
-			/>
+			<View style={{flexDirection: 'row', alignItems: 'center'}}>
+				<Dropdown 
+					value={lang}
+					style={{...styles.dropdownbox, flex: 1}}
+					selectedTextStyle={styles.selected}
+					data={languages}
+					labelField={"name"}
+					valueField={"name"}
+					containerStyle={styles.dropdownbox}
+					itemTextStyle={{color: Color.Text}}
+					itemContainerStyle={{backgroundColor:Color.DarkContainer, borderRadius:8}}
+					activeColor={Color.Container}
+					placeholderStyle={styles.selected}
+					placeholder='Select Language'
+					onChange={(item) => setLang(item.name)}
+				/>
+				<TouchableOpacity style={{...styles.button, marginLeft: 8}} onPress={getVoices}>
+					<FontAwesome  name='refresh' size={20} color={Color.White}/>
+				</TouchableOpacity>
+			</View>
+			
 			</View>
 
 			<Text style={{...styles.title, marginTop: 8}}>Speaker</Text>		
@@ -98,6 +105,10 @@ const TTSMenu = () => {
 			</View>
 			<View style={{flexDirection: 'row', alignItems: 'center'}}>
 				<TouchableOpacity onPress={() => {
+					if(currentSpeaker == undefined) {
+						ToastAndroid.show('No Speaker Chosen', 2000)
+						return
+					}
 					Speech.speak('This is a test audio.', {
 						language: currentSpeaker.language,
 						voice: currentSpeaker.identifier,
@@ -105,7 +116,7 @@ const TTSMenu = () => {
 					}}
 					style={{...styles.button, padding: 8, marginRight: 16}}
 				>
-					<Text>Test</Text>
+					<Text style={styles.buttonlabel}>Test</Text>
 				</TouchableOpacity>
 				<Text style={styles.subtitle}>"This is a test audio."</Text>
 			</View>

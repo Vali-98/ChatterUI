@@ -139,7 +139,7 @@ const Home = () => {
 		<SafeAreaView style={styles.safeArea}>
 			
 			<Stack.Screen options={{
-				title: charName,
+				title: '',
 				headerRight : () => 
 				(<View style={styles.headerButtonContainer}>
 				{charName !== 'Welcome' && 
