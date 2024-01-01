@@ -59,7 +59,8 @@
     "react-native-screens": "~3.22.0",
     "react-native-web": "~0.19.6",
     "semver": "^7.5.4",
-    "undefined": "web-streams-polyfill/ponyfill/es6"
+    "undefined": "web-streams-polyfill/ponyfill/es6",
+    "expo-speech": "~11.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

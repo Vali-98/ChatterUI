@@ -64,5 +64,8 @@ export const enum Global {
     LocalPreset = 'localpreset',
 
     OpenRouterModel = 'openroutermodel',
-    OpenRouterKey = 'openrouterkey'
+    OpenRouterKey = 'openrouterkey',
+
+    TTSSpeaker = 'ttsspeaker',
+    TTSEnable = 'ttsenable',
 }

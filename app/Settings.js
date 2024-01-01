@@ -43,7 +43,9 @@ const Settings = () => {
             <TouchableOpacity style={styles.largeButton} onPress={() => router.push("APIMenu")}>
                 <Text style={styles.largeButtonText}>API</Text>
             </TouchableOpacity>
-          
+            <TouchableOpacity style={styles.largeButton} onPress={() => router.push("TTSMenu")}>
+                <Text style={styles.largeButtonText}>TTS</Text>
+            </TouchableOpacity>
         </View>
         </SafeAreaView>
     )
