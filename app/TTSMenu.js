@@ -29,9 +29,14 @@ const TTSMenu = () => {
 	const languages = Object.keys(languageList).sort().map(name => {return {name: name}})
 
 	useEffect(() => {
-		Speech.getAvailableVoicesAsync().then((list) => setModelList(list)
-		)
+		getVoices()
 	}, [])
+
+	const getVoices = (value = false) => {
+		if(enableTTS || value)
+		Speech.getAvailableVoicesAsync()
+		.then((list) => setModelList(current => list))
+	}
 
 	return (
 		<View style={styles.mainContainer}>
@@ -42,7 +47,10 @@ const TTSMenu = () => {
 					trackColor={{false: Color.Offwhite, true: '#f4f3f4'}}
 					thumbColor={enableTTS ? '#f4f3f4' : Color.Offwhite}
 					ios_backgroundColor="#3e3e3e"
-					onValueChange={setEnableTTS}
+					onValueChange={value => {
+						if(value) {getVoices(true)}
+						setEnableTTS(value)
+					}}
 					value={enableTTS}
 				/>
 			</View>
@@ -93,9 +101,11 @@ const TTSMenu = () => {
 					Speech.speak('This is a test audio.', {
 						language: currentSpeaker.language,
 						voice: currentSpeaker.identifier,
-					})
-				}}>
-					<Text style={{...styles.button, padding: 8, marginRight: 16}}>Test</Text>
+						})
+					}}
+					style={{...styles.button, padding: 8, marginRight: 16}}
+				>
+					<Text>Test</Text>
 				</TouchableOpacity>
 				<Text style={styles.subtitle}>"This is a test audio."</Text>
 			</View>
