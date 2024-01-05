@@ -51,11 +51,12 @@ const Home = () => {
 	// TODO : Use this to save instead 
 	useEffect(() => {
 		nowGenerating && startInference()
+
 		if(!nowGenerating && currentChat !== '' && charName !== 'Welcome' && messages.length !== 0) {
 			console.log(`Saving chat`)
 			Chats.saveFile(messages, charName, currentChat)
 		}
-	}, [nowGenerating]) 
+	}, [nowGenerating])
 
 	// load character upon currentChat changing - consider replacing for global messages
 	useEffect(() => {	
@@ -68,8 +69,9 @@ const Home = () => {
 		})		
 	}, [currentChat])
 
-	const startInference = () => {
-		setNewMessage('')
+	const startInference = async () => {
+		setNewMessage(message => '')
+		insertGeneratedMessage('')
 		generateResponse(setAbortFunction, insertGeneratedMessage, messages)
 	}
 
@@ -80,6 +82,7 @@ const Home = () => {
 			setTargetLength(messages.length + 2)
 		} else 
 			setTargetLength(messages.length + 1)
+			
 		setNowGenerating(true)
 	}
 
