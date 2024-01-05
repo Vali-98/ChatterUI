@@ -3,7 +3,7 @@ import {
 	SafeAreaView, TouchableOpacity,
 	StyleSheet
 } from 'react-native'
-import { useState, useEffect} from 'react'
+import { useState, useEffect, useRef} from 'react'
 import { ChatWindow }from '@components/ChatMenu/ChatWindow/ChatWindow' 
 import { useMMKVString,  useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 import { Global, Color, Chats, Characters, MessageContext } from '@globals'
@@ -34,7 +34,15 @@ const Home = () => {
 	// dynamically set abort function that is set by respective API
 	const [abortFunction, setAbortFunction] = useState(undefined)
 
-	// load character chat upon character change, this may live better elsewhere
+	// load character chat upon character change, functionality might better be a dedicated function
+
+	/*
+		One big issue with state management is the old message passing, caused by
+		very pre-global design using useContext. It may be more viable to somehow drill 
+		proper functionality down to ChatItem and handle message states and character loading.
+		
+	*/
+
 	useEffect(() => {
 		if (charName === 'Welcome' || charName === undefined) return
 		console.log(`Character changed to ${charName}`)

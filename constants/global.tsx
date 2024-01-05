@@ -94,7 +94,7 @@ export const hordeHeader = () => {
 
 // runs every startup to clear some MMKV values
 
-export const startupApp = async () => {
+export const startupApp = () => {
     mmkv.set(Global.CurrentCharacter, 'Welcome')
     mmkv.set(Global.CurrentChat, '')
     mmkv.set(Global.CurrentCharacterCard, JSON.stringify(`{}`))
