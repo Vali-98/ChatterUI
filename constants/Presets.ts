@@ -13,7 +13,7 @@ export const APIFields : Object = {
     [API.KAI] : ['max_length', 'genamt', 'rep_pen', 'rep_pen_range', 
     'rep_pen_slope', 'temp', 'tfs', 'top_a', 'top_k', 'top_p', 
     'min_p', 'typical', 'single_line', 'seed', 'mirostat_mode',
-    'mirostat_tau', 'mirostat_eta', 'grammar'],
+    'mirostat_tau', 'mirostat_eta', 'grammar', 'dynatemp_range'],
     [API.TGWUI] : ['max_length', 'genamt', 'rep_pen', 'rep_pen_range', 
     'rep_pen_slope', 'temp', 'tfs', 'top_a', 'top_k', 'top_p', 
     'min_p', 'typical', 'single_line', 'seed', 'mirostat_mode',
@@ -83,7 +83,11 @@ export const defaultPreset = () => {
         "banned_tokens": "",
         "rep_pen_size": 0,
         "genamt": 256,
-        "max_length": 4096
+        "max_length": 4096,
+
+        
+        "dynatemp_range" : 0,
+    
     }
 }
 
