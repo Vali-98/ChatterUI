@@ -44,7 +44,8 @@ const Home = () => {
 	*/
 
 
-	// this use effect isnt needed at all, card can be set from charmenu 
+	// TODO: Move messages to MMKV, this will solve all these needless useEffects
+
 	useEffect(() => {
 		if (charName === 'Welcome' || charName === undefined) return
 		console.log(`Character changed to ${charName}`)
@@ -57,6 +58,17 @@ const Home = () => {
 		
 	}, [charName])
 	
+	// load character upon currentChat changing - consider replacing for global messages
+	useEffect(() => {	
+		if(currentChat === '' || charName === 'Welcome' || charName === undefined) {
+			return
+		}
+		console.log("Now reading " + currentChat + " for " + charName)
+		Chats.getFile(charName, currentChat).then(newmessage => {
+			setMessages(messages => newmessage)
+		})		
+	}, [currentChat])
+
 	// triggers generation when set true
 	// TODO : Use this to save instead 
 	useEffect(() => {
@@ -68,16 +80,7 @@ const Home = () => {
 		}
 	}, [nowGenerating])
 
-	// load character upon currentChat changing - consider replacing for global messages
-	useEffect(() => {	
-		if(currentChat === '' || charName === 'Welcome' || charName === undefined) {
-			return
-		}
-		console.log("Now reading " + currentChat + " for " + charName)
-		Chats.getFile(charName, currentChat).then(newmessage => {
-			setMessages(messages => newmessage)
-		})		
-	}, [currentChat])
+	
 
 	const startInference = async () => {
 		setNewMessage(message => '')
