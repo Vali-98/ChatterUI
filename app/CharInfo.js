@@ -2,13 +2,14 @@ import { View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity, Alert, T
 import { useState } from 'react'
 
 import { Global, Color, Characters } from '@globals'
-import { useMMKVString } from 'react-native-mmkv'
+import { useMMKVString, useMMKVObject } from 'react-native-mmkv'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { useEffect } from 'react'
 import { FontAwesome } from '@expo/vector-icons'
 import llamaTokenizer from '@constants/tokenizer'
 import { Stack, useRouter } from 'expo-router'
 import * as DocumentPicker from 'expo-document-picker'
+import TextBoxModal from '@components/TextBoxModal'
 
 const CharInfo = () => {
   const router = useRouter()
@@ -33,7 +34,7 @@ const CharInfo = () => {
   useEffect(() => {
     loadcard()
   }, [])
-
+  
   const deleteCard = () => {
     Alert.alert(
       `Delete Character`,

@@ -24,7 +24,7 @@ export const APIFields : Object = {
     'presence_pen'],
     [API.HORDE] : ['max_length', 'genamt', 'rep_pen', 'rep_pen_range', 
     'rep_pen_slope', 'temp', 'tfs', 'top_a', 'top_k', 'top_p', 'min_p', 'ban_eos_token',
-    'typical', 'single_line'],
+    'typical', 'single_line', 'min_p'],
     [API.MANCER] : ['max_length', 'genamt', 'rep_pen', 'temp', 
     'top_a', 'top_k', 'top_p', 'freq_pen', 'presence_pen'],
     [API.COMPLETIONS] : ['max_length', 'genamt', 'rep_pen', 'temp', 'tfs',
@@ -33,7 +33,7 @@ export const APIFields : Object = {
     'grammar'],
     [API.LOCAL] : ['genamt', 'rep_pen', 'rep_pen_range', 'temp', 
     'top_a', 'top_k', 'top_p', 'freq_pen', 'tfs', 'typical', 'presence_pen',
-    'mirostat_mode', 'mirostat_tau', 'mirostat_eta', 'grammar'],
+    'mirostat_mode', 'mirostat_tau', 'mirostat_eta', 'grammar', "min_p"],
     [API.OPENROUTER] : ["freq_pen", "genamt", "presence_pen", "seed", "temp", 
     "top_p", "top_k",  ],
 }
