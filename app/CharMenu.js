@@ -15,12 +15,6 @@ import { useMMKVString } from 'react-native-mmkv'
 import { Color, Global, Characters } from '@globals'
 import { Stack } from 'expo-router'
 import { FontAwesome } from '@expo/vector-icons'
-import * as DocumentPicker from 'expo-document-picker'
-import  extractChunks  from 'png-chunks-extract'
-import { decode } from 'png-chunk-text'
-import { Buffer } from '@craftzdog/react-native-buffer'
-import * as Base64 from 'base-64'
-import axios from 'axios'
 import TextBoxModal from '@components/TextBoxModal'
 
 const CharMenu = () => {
@@ -31,8 +25,9 @@ const CharMenu = () => {
     const [showDownload, setShowDownload] = useState(false)
 
     const getCharacterList = async () => {
-        await Characters.getCardList().then((response) => {
-            setCharacterList(response)
+        console.log('test')
+        await Characters.getCardList().then((list) => {
+            setCharacterList(list)
         }).catch(error => console.log(`Could not retrieve characters.\n${error}`))
     }
 
@@ -40,40 +35,7 @@ const CharMenu = () => {
         getCharacterList()
     },[])
 
-    const createCharacter = (uri) => {
-        FS.readAsStringAsync(uri, {encoding: FS.EncodingType.Base64}).then((file)=>{
-            const chunks = extractChunks(Buffer.from(file, 'base64'))
-            const textChunks = chunks.filter(function (chunk) {
-                return chunk.name === 'tEXt'
-                }).map(function (chunk) {
-                return decode(chunk.data)
-                })
-            const charactercard = JSON.parse(Base64.decode(textChunks[0].text))
-            const newname = charactercard?.data?.name ?? charactercard.name
-            console.log(`Creating new character: ${newname}`)
-            if(newname === 'Detailed Example Character' || charactercard === undefined){
-                ToastAndroid.show('Invalid Character ID', 2000)
-                return
-            }
-            Characters.createCard(newname).then(() => {
-                return Characters.saveCard(newname, JSON.stringify(charactercard))
-            }).then(() => {
-                return Characters.copyImage(uri, newname)
-            }).then(() => {
-                ToastAndroid.show(`Successfully Imported Character`, ToastAndroid.SHORT)
-                getCharacterList()
-            }).catch(() => {
-                ToastAndroid.show(`Failed to create card - Character might already exist.`, 2000)
-            })
-        }).catch(error => {
-            ToastAndroid.show(`Failed to create card - Character might already exist?`, 2000)
-            console.log(error)
-        })
-
-    }
-
     return (
-
         <SafeAreaView style={styles.mainContainer}>
             <Stack.Screen options={{headerRight : () => 
             (<View style={styles.headerButtonContainer}>
@@ -84,12 +46,7 @@ const CharMenu = () => {
                 <FontAwesome name='cloud-download' size={28} color={Color.Button} />
                 </TouchableOpacity>
 
-               <TouchableOpacity style={styles.headerButtonRight} onPress={() => {
-                    DocumentPicker.getDocumentAsync({copyToCacheDirectory: true, type:'image/*'}).then((result) => {
-                        if(result.canceled) return
-                        createCharacter(result.assets[0].uri)
-                      })
-               }}>
+               <TouchableOpacity style={styles.headerButtonRight} onPress={() => Characters.importCharacterFromImage().then(() => getCharacterList())}>
                <FontAwesome name='upload' size={28} color={Color.Button} />
                </TouchableOpacity>
 
@@ -116,30 +73,8 @@ const CharMenu = () => {
             <TextBoxModal 
                 title={"Enter Character Hub Link"}
                 booleans={[showDownload, setShowDownload]}
-                onConfirm={(text)=> {
-                    axios.create({timeout: 1000}).post(
-                        'https://api.chub.ai/api/characters/download', 
-                        {
-                            "format" : "tavern",
-                            "fullPath" : text.replace('https://chub.ai/characters/', '')
-                        },
-                        {responseType: 'arraybuffer'}
-                        ).then((res) => {
-                            const response = Buffer.from(res.data, 'base64').toString('base64')
-                            FS.writeAsStringAsync(
-                                `${FS.cacheDirectory}image.png`, 
-                                response, 
-                                {encoding:FS.EncodingType.Base64}).then( async () => {
-                                    createCharacter(`${FS.cacheDirectory}image.png`)
-                            })
-                            
-                        }).catch((error) => {
-                            console.log(`Could not retrieve card. ${error}`)
-                            ToastAndroid.show(`Invalid ID or URL`, ToastAndroid.SHORT)
-                        })
-                }}
+                onConfirm={(text) => Characters.importCharacterFromRemote(text).then(() => {getCharacterList()})}
             />
-            
             
             <ScrollView style={styles.characterContainer}>         
                 {characterList.map((character,index) => (                
