@@ -2,8 +2,7 @@ import * as FS from 'expo-file-system'
 
 import { ToastAndroid } from 'react-native';
 import { CompletionParams, LlamaContext, initLlama } from 'llama.rn'
-import DocumentPicker from 'react-native-document-picker'
-import { DocumentPickerResult, getDocumentAsync } from 'expo-document-picker';
+import DocumentPicker, { DocumentPickerResponse } from 'react-native-document-picker'
 import { mmkv } from './mmkv';
 import { Global } from './GlobalValues';
 
@@ -27,13 +26,13 @@ export namespace Llama {
         let dir = `${model_dir}${name}`
         // if not using from cache, pick model and load it
         if(!usecache)
-        newname = await getDocumentAsync().then(async (result : DocumentPickerResult) => {
-            if(result.canceled) return ''
-            let name = result.assets[0].name
+        newname = await DocumentPicker.pickSingle().then(async (result : DocumentPickerResponse) => {
+            if(DocumentPicker.isCancel(result)) return ''
+            let name = result.name
             console.log(`Picked file: ${name}`)
-            dir = result.assets[0].uri
+            dir = result.uri
             console.log(dir)
-            return name
+            return name ?? ''
         }).catch(() => {
             console.log('Picking cancelled')
             ToastAndroid.show('No Model Chosen', 2000)
