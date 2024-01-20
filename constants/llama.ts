@@ -25,6 +25,7 @@ export namespace Llama {
         let newname = name
         let dir = `${model_dir}${name}`
         // if not using from cache, pick model and load it
+        /*
         if(!usecache)
         newname = await DocumentPicker.pickSingle().then(async (result : DocumentPickerResponse) => {
             if(DocumentPicker.isCancel(result)) return ''
@@ -38,7 +39,8 @@ export namespace Llama {
             ToastAndroid.show('No Model Chosen', 2000)
             return ''
         })
-
+        */
+        
         if(newname == ''){
             ToastAndroid.show('No Model Chosen', 2000)
             console.log(`No model chosen, new name was blank!`)
