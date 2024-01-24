@@ -1,8 +1,7 @@
-import { View, Text } from 'react-native'
+import { Text, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import { Lorebooks } from '@constants/Lorebooks'
-import { ScrollView } from 'react-native-gesture-handler'
 
 const LorebookEntryInfo = () => {
 	const { bookName } = useLocalSearchParams()

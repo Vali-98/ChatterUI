@@ -1,8 +1,7 @@
-import { SafeAreaView, View, Text, Image, StyleSheet } from 'react-native'
+import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import { Global,  Color, API, Users } from '@globals'
 import React from 'react'
 import { useMMKVString } from 'react-native-mmkv'
-import { TouchableOpacity } from 'react-native-gesture-handler'
 import { FontAwesome } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 

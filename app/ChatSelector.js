@@ -1,9 +1,8 @@
-import { ScrollView, View, Text, StyleSheet, Image ,Alert, ToastAndroid } from 'react-native'
+import { ScrollView, View, Text, StyleSheet, Image ,Alert, ToastAndroid, TouchableOpacity } from 'react-native'
 import { useEffect, useState } from 'react'
 import { useMMKVString } from 'react-native-mmkv'
 import { Global, Color, Chats, Characters, saveStringExternal}  from '@globals'
 import { useRouter } from 'expo-router'
-import { TouchableOpacity } from 'react-native-gesture-handler'
 import { FontAwesome } from '@expo/vector-icons'
 import { Stack } from 'expo-router'
 

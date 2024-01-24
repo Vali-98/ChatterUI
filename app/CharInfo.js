@@ -1,9 +1,8 @@
-import { View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity, Alert, ToastAndroid } from 'react-native'
+import { View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity, Alert, ToastAndroid, ScrollView, TextInput  } from 'react-native'
 import { useState } from 'react'
 
 import { Global, Color, Characters } from '@globals'
 import { useMMKVString, useMMKVObject } from 'react-native-mmkv'
-import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { useEffect } from 'react'
 import { FontAwesome } from '@expo/vector-icons'
 import llamaTokenizer from '@constants/tokenizer'
