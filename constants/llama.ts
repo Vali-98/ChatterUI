@@ -55,7 +55,7 @@ export namespace Llama {
         
         if(usecache && ! (await modelExists(name))) {
             console.log('Model does not exist!')
-            ToastAndroid.show('Model Does Not Exit!', 2000)
+            ToastAndroid.show('Model Does Not Exist!', 2000)
             return
         }
        
