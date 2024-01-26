@@ -1,1 +1,2 @@
-declare module `llama_tokenizer-js`
+declare;
+module`llama_tokenizer-js`;

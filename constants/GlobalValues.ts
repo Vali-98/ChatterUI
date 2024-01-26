@@ -1,29 +1,27 @@
-
 export const enum Global {
-
     // Processing
-    
-    NowGenerating='nowgenerating',      // generation signal
-    EditedWindow='editedwindow',        // exit editing window confirmation
+
+    NowGenerating = 'nowgenerating', // generation signal
+    EditedWindow = 'editedwindow', // exit editing window confirmation
 
     // Character
 
-    CurrentCharacter='currentchar',     // current char filename, locates dir
-    CurrentCharacterCard='charcard',    // note: use Object ? - stores charactercard
+    CurrentCharacter = 'currentchar', // current char filename, locates dir
+    CurrentCharacterCard = 'charcard', // note: use Object ? - stores charactercard
 
     // User
 
-    CurrentUser='currentuser',          // current username, locates dir
-    CurrentUserCard='usercard',         // note: use Object ? - stores usercard
-    
+    CurrentUser = 'currentuser', // current username, locates dir
+    CurrentUserCard = 'usercard', // note: use Object ? - stores usercard
+
     // Chat
 
-    CurrentChat='currentchat',          // current chat filename, locates dir
-    
+    CurrentChat = 'currentchat', // current chat filename, locates dir
+
     // Instruct
 
-    InstructName='instructname',        // name of current instruct preset
-    CurrentInstruct='currentinstruct',  // note: use Object ? - stores instruct
+    InstructName = 'instructname', // name of current instruct preset
+    CurrentInstruct = 'currentinstruct', // note: use Object ? - stores instruct
 
     // Presets
 
@@ -33,30 +31,30 @@ export const enum Global {
     // Lorebooks
 
     LorebookNames = 'lorebooknames',
-    
+
     // APIs
 
-    APIType='endpointtype',             // name of current api mode
-    
-    KAIEndpoint='kaiendpoint',          // kai api endpoint
-    
-    TGWUIStreamingEndpoint='tgwuistreamingendpoint', // tgwui streaming web socket 
+    APIType = 'endpointtype', // name of current api mode
 
-    HordeKey='hordekey',                // api key for horde 
-    HordeModels='hordemodel',           // names of horde models to be used
-    HordeWorkers = 'hordeworker',       // List of available horde workers
+    KAIEndpoint = 'kaiendpoint', // kai api endpoint
 
-    MancerKey='mancerkey',              // api key for mancer
-    MancerModel='mancermodel',          // selected mancer model
+    TGWUIStreamingEndpoint = 'tgwuistreamingendpoint', // tgwui streaming web socket
 
-    NovelKey='novelkey',                // novelai key
-    NovelModel='novelmodel',            // novelai model
+    HordeKey = 'hordekey', // api key for horde
+    HordeModels = 'hordemodel', // names of horde models to be used
+    HordeWorkers = 'hordeworker', // List of available horde workers
 
-    AphroditeKey = 'aphroditekey',      // api key for aphrodite, default is `EMPTY`
+    MancerKey = 'mancerkey', // api key for mancer
+    MancerModel = 'mancermodel', // selected mancer model
+
+    NovelKey = 'novelkey', // novelai key
+    NovelModel = 'novelmodel', // novelai model
+
+    AphroditeKey = 'aphroditekey', // api key for aphrodite, default is `EMPTY`
 
     CompletionsEndpoint = 'completionsendpoint',
     CompletionsKey = 'completionskey',
-    
+
     // Local
 
     LocalModel = 'localmodel',

@@ -1,22 +1,26 @@
 {
-  "extends": "expo/tsconfig.base",
-  "compilerOptions": {
-    "strict": true,
-    "baseUrl": ".",
-    "paths": {
-      "@globals": ["constants/global"],
-      "@components/*": ["components/*"],
-      "@assets/*" : ["assets/*"],
-      "@public/*" : ["public/*"],
-      "@constants/*" : ["constants/*"],
-      "@lib/*" : ["lib/*"]
+    "extends": "expo/tsconfig.base",
+    "compilerOptions": {
+        "strict": true,
+        "baseUrl": ".",
+        "paths": {
+            "@globals": ["constants/global"],
+            "@components/*": ["components/*"],
+            "@assets/*": ["assets/*"],
+            "@public/*": ["public/*"],
+            "@constants/*": ["constants/*"],
+            "@lib/*": ["lib/*"],
+        },
     },
-  },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-, "app/test.jsx", "constants/Preset.jsx", "app/deprecated", "app/_layout.jsx"  ]
+    "include": [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.js",
+        ".expo/types/**/*.ts",
+        "expo-env.d.ts",
+        "app/test.jsx",
+        "constants/Preset.jsx",
+        "app/deprecated",
+        "app/_layout.jsx",
+    ],
 }
