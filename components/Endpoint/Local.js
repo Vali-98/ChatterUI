@@ -1,3 +1,6 @@
+import { Llama } from '@constants/llama';
+import { Color, Global } from '@globals';
+import { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -6,13 +9,11 @@ import {
     TextInput,
     ToastAndroid,
     Alert,
+    ActivityIndicator,
 } from 'react-native';
-import { Color, Global } from '@globals';
-import { useEffect, useState } from 'react';
-import { Llama } from '@constants/llama';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
-import { ActivityIndicator } from 'react-native';
+
 import { SliderItem } from '..';
 
 const Local = () => {
@@ -57,7 +58,7 @@ const Local = () => {
             return;
         }
 
-        Alert.alert(`Delete Model`, `Are you sure you want to delete \'${currentModel}\'?`, [
+        Alert.alert(`Delete Model`, `Are you sure you want to delete '${currentModel}'?`, [
             { text: `Cancel`, style: `cancel` },
             {
                 text: `Confirm`,
@@ -111,7 +112,7 @@ const Local = () => {
                 }}>
                 <Text style={styles.subtitle}>Current Model : </Text>
                 <Text style={{ ...styles.subtitle, color: Color.Text }}>
-                    {loadedModel == '' ? 'None' : loadedModel}
+                    {loadedModel === '' ? 'None' : loadedModel}
                 </Text>
             </View>
 
@@ -121,8 +122,8 @@ const Local = () => {
                     style={styles.dropdownbox}
                     selectedTextStyle={styles.selected}
                     data={dropdownValues}
-                    labelField={'name'}
-                    valueField={'name'}
+                    labelField="name"
+                    valueField="name"
                     containerStyle={styles.dropdownbox}
                     itemTextStyle={{ color: Color.Text }}
                     itemContainerStyle={{
@@ -196,7 +197,7 @@ const Local = () => {
                     name="Max Context"
                     body={preset}
                     setValue={setPreset}
-                    varname={'context_length'}
+                    varname="context_length"
                     min={32}
                     max={8096}
                     step={32}
@@ -205,7 +206,7 @@ const Local = () => {
                     name="Threads"
                     body={preset}
                     setValue={setPreset}
-                    varname={'threads'}
+                    varname="threads"
                     min={1}
                     max={8}
                     step={1}
@@ -215,7 +216,7 @@ const Local = () => {
                     name="Batch"
                     body={preset}
                     setValue={setPreset}
-                    varname={'batch'}
+                    varname="batch"
                     min={16}
                     max={512}
                     step={1}

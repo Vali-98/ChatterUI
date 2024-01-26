@@ -1,3 +1,10 @@
+import CheckboxTitle from '@components/CheckboxTitle';
+import TextBox from '@components/TextBox';
+import TextBoxModal from '@components/TextBoxModal';
+import { FontAwesome } from '@expo/vector-icons';
+import { Global, Color, Instructs, saveStringExternal } from '@globals';
+import { Stack } from 'expo-router';
+import { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -8,15 +15,9 @@ import {
     Alert,
     ScrollView,
 } from 'react-native';
-import { Stack } from 'expo-router';
-import { Global, Color, Instructs, saveStringExternal } from '@globals';
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
-import TextBox from '@components/TextBox';
 import { Dropdown } from 'react-native-element-dropdown';
-import { useState, useEffect } from 'react';
-import { FontAwesome } from '@expo/vector-icons';
-import TextBoxModal from '@components/TextBoxModal';
-import CheckboxTitle from '@components/CheckboxTitle';
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
+
 const Instruct = () => {
     const [instructName, setInstructName] = useMMKVString(Global.InstructName);
     const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct);
@@ -59,7 +60,7 @@ const Instruct = () => {
             <TextBoxModal
                 booleans={[showNewInstruct, setShowNewInstruct]}
                 onConfirm={(text) => {
-                    if (instructList.some((item) => item.label == text)) {
+                    if (instructList.some((item) => item.label === text)) {
                         ToastAndroid.show(`Preset name already exists.`, 2000);
                         return;
                     }
@@ -78,8 +79,8 @@ const Instruct = () => {
                     style={styles.dropdownbox}
                     data={instructList}
                     selectedTextStyle={styles.selected}
-                    labelField={'label'}
-                    valueField={'value'}
+                    labelField="label"
+                    valueField="value"
                     onChange={(item) => {
                         if (item.label === instructName) return;
 
@@ -108,7 +109,7 @@ const Instruct = () => {
                         }
                         Alert.alert(
                             `Delete Preset`,
-                            `Are you sure you want to delete  \'${instructName}\'?`,
+                            `Are you sure you want to delete  '${instructName}'?`,
                             [
                                 { text: `Cancel`, style: `cancel` },
                                 {
@@ -173,7 +174,7 @@ const Instruct = () => {
                         lines={3}
                         body={currentInstruct}
                         setValue={setCurrentInstruct}
-                        multiline={true}
+                        multiline
                     />
 
                     <View style={{ flexDirection: 'row' }}>
@@ -182,14 +183,14 @@ const Instruct = () => {
                             varname="input_sequence"
                             body={currentInstruct}
                             setValue={setCurrentInstruct}
-                            multiline={true}
+                            multiline
                         />
                         <TextBox
                             name="Output Sequence"
                             varname="output_sequence"
                             body={currentInstruct}
                             setValue={setCurrentInstruct}
-                            multiline={true}
+                            multiline
                         />
                     </View>
 
@@ -199,14 +200,14 @@ const Instruct = () => {
                             varname="first_output_sequence"
                             body={currentInstruct}
                             setValue={setCurrentInstruct}
-                            multiline={true}
+                            multiline
                         />
                         <TextBox
                             name="Last Output Sequence"
                             varname="last_output_sequence"
                             body={currentInstruct}
                             setValue={setCurrentInstruct}
-                            multiline={true}
+                            multiline
                         />
                     </View>
 
@@ -216,14 +217,14 @@ const Instruct = () => {
                             varname="system_sequence_prefix"
                             body={currentInstruct}
                             setValue={setCurrentInstruct}
-                            multiline={true}
+                            multiline
                         />
                         <TextBox
                             name="System Sequence Suffix"
                             varname="system_sequence_suffix"
                             body={currentInstruct}
                             setValue={setCurrentInstruct}
-                            multiline={true}
+                            multiline
                         />
                     </View>
 
@@ -233,41 +234,41 @@ const Instruct = () => {
                             varname="stop_sequence"
                             body={currentInstruct}
                             setValue={setCurrentInstruct}
-                            multiline={true}
+                            multiline
                         />
                         <TextBox
                             name="Seperator Sequence"
                             varname="separator_sequence"
                             body={currentInstruct}
                             setValue={setCurrentInstruct}
-                            multiline={true}
+                            multiline
                         />
                     </View>
 
                     <CheckboxTitle
-                        name={'Wrap Sequence with Newline'}
-                        varname={'wrap'}
+                        name="Wrap Sequence with Newline"
+                        varname="wrap"
                         body={currentInstruct}
                         setValue={setCurrentInstruct}
                     />
 
                     <CheckboxTitle
-                        name={'Replace Macro In Sequences'}
-                        varname={'macro'}
+                        name="Replace Macro In Sequences"
+                        varname="macro"
                         body={currentInstruct}
                         setValue={setCurrentInstruct}
                     />
 
                     <CheckboxTitle
-                        name={'Include Names'}
-                        varname={'names'}
+                        name="Include Names"
+                        varname="names"
                         body={currentInstruct}
                         setValue={setCurrentInstruct}
                     />
 
                     <CheckboxTitle
-                        name={'Force for Groups and Personas'}
-                        varname={'names_force_groups'}
+                        name="Force for Groups and Personas"
+                        varname="names_force_groups"
                         body={currentInstruct}
                         setValue={setCurrentInstruct}
                     />

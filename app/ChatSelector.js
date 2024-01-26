@@ -1,3 +1,7 @@
+import { FontAwesome } from '@expo/vector-icons';
+import { Global, Color, Chats, Characters, saveStringExternal } from '@globals';
+import { useRouter, Stack } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
     ScrollView,
     View,
@@ -8,12 +12,7 @@ import {
     ToastAndroid,
     TouchableOpacity,
 } from 'react-native';
-import { useEffect, useState } from 'react';
 import { useMMKVString } from 'react-native-mmkv';
-import { Global, Color, Chats, Characters, saveStringExternal } from '@globals';
-import { useRouter } from 'expo-router';
-import { FontAwesome } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
 
 const ChatSelector = () => {
     const router = useRouter();

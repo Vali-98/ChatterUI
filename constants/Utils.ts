@@ -2,16 +2,16 @@ import { Global } from './GlobalValues';
 import { mmkv } from './mmkv';
 
 export const humanizedISO8601DateTime = (date = '') => {
-    let baseDate = typeof date === 'number' ? new Date(date) : new Date();
-    let humanYear = baseDate.getFullYear();
-    let humanMonth = baseDate.getMonth() + 1;
-    let humanDate = baseDate.getDate();
-    let humanHour = (baseDate.getHours() < 10 ? '0' : '') + baseDate.getHours();
-    let humanMinute = (baseDate.getMinutes() < 10 ? '0' : '') + baseDate.getMinutes();
-    let humanSecond = (baseDate.getSeconds() < 10 ? '0' : '') + baseDate.getSeconds();
-    let humanMillisecond =
+    const baseDate = typeof date === 'number' ? new Date(date) : new Date();
+    const humanYear = baseDate.getFullYear();
+    const humanMonth = baseDate.getMonth() + 1;
+    const humanDate = baseDate.getDate();
+    const humanHour = (baseDate.getHours() < 10 ? '0' : '') + baseDate.getHours();
+    const humanMinute = (baseDate.getMinutes() < 10 ? '0' : '') + baseDate.getMinutes();
+    const humanSecond = (baseDate.getSeconds() < 10 ? '0' : '') + baseDate.getSeconds();
+    const humanMillisecond =
         (baseDate.getMilliseconds() < 10 ? '0' : '') + baseDate.getMilliseconds();
-    let HumanizedDateTime =
+    const HumanizedDateTime =
         humanYear +
         '-' +
         humanMonth +
@@ -39,7 +39,7 @@ export const replaceMacros = (text: string) => {
     let newtext: string = text;
     const charName = mmkv.getString(Global.CurrentCharacter);
     const userName = mmkv.getString(Global.CurrentUser);
-    const rules: Array<Rule> = [
+    const rules: Rule[] = [
         { macro: '{{user}}', value: userName ?? '' },
         { macro: '{{char}}', value: charName ?? '' },
     ];

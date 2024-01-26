@@ -1,3 +1,8 @@
+import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from '@components';
+import { FontAwesome } from '@expo/vector-icons';
+import { Global, Color, Presets, saveStringExternal, API } from '@globals';
+import { Stack } from 'expo-router';
+import { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -6,16 +11,10 @@ import {
     ScrollView,
     TouchableOpacity,
     Alert,
+    ToastAndroid,
 } from 'react-native';
-import { Stack } from 'expo-router';
-import { useState } from 'react';
-import { Global, Color, Presets, saveStringExternal, API } from '@globals';
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
 import { Dropdown } from 'react-native-element-dropdown';
-import { FontAwesome } from '@expo/vector-icons';
-import { useEffect } from 'react';
-import { ToastAndroid } from 'react-native';
-import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from '@components';
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
 
 const SLIDER = 'slider';
 const CHECKBOX = 'checbox';
@@ -190,7 +189,7 @@ const PresetMenu = () => {
             <TextBoxModal
                 booleans={[showNewPreset, setShowNewPreset]}
                 onConfirm={(text) => {
-                    for (item of presetList)
+                    for (const item of presetList)
                         if (item.label === text) {
                             ToastAndroid.show(`Preset name already exists.`, 2000);
                             return;
@@ -215,8 +214,8 @@ const PresetMenu = () => {
                 <Dropdown
                     value={presetName}
                     data={presetList}
-                    valueField={'label'}
-                    labelField={'label'}
+                    valueField="label"
+                    labelField="label"
                     onChange={(item) => {
                         if (item.label === presetName) return;
                         setPresetName(item.label);
@@ -246,7 +245,7 @@ const PresetMenu = () => {
                         }
                         Alert.alert(
                             `Delete Preset`,
-                            `Are you sure you want to delete \'${presetName}\'?`,
+                            `Are you sure you want to delete '${presetName}'?`,
                             [
                                 { text: `Cancel`, style: `cancel` },
                                 {

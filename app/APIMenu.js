@@ -1,9 +1,3 @@
-import { SafeAreaView, Text, StyleSheet, View, ScrollView } from 'react-native';
-import { Stack } from 'expo-router';
-import { useMMKVString } from 'react-native-mmkv';
-import { Global, Color, API } from '@globals';
-import { useEffect } from 'react';
-import { Dropdown } from 'react-native-element-dropdown';
 import {
     KAI,
     Horde,
@@ -13,6 +7,13 @@ import {
     Local,
     OpenRouter,
 } from '@components/Endpoint';
+import { Global, Color, API } from '@globals';
+import { Stack } from 'expo-router';
+import { useEffect } from 'react';
+import { SafeAreaView, Text, StyleSheet, View, ScrollView } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
+import { useMMKVString } from 'react-native-mmkv';
+
 const APIMenu = () => {
     const [APIType, setAPIType] = useMMKVString(Global.APIType);
     const apinames = [
@@ -46,8 +47,8 @@ const APIMenu = () => {
                         style={styles.dropdownbox}
                         selectedTextStyle={styles.selected}
                         data={apinames}
-                        labelField={'label'}
-                        valueField={'value'}
+                        labelField="label"
+                        valueField="value"
                         onChange={(item) => {
                             if (item.value === APIType) return;
                             setAPIType(item.value);

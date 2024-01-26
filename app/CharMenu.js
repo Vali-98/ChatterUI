@@ -1,3 +1,9 @@
+import TextBoxModal from '@components/TextBoxModal';
+import { FontAwesome } from '@expo/vector-icons';
+import { Color, Global, Characters } from '@globals';
+import * as FS from 'expo-file-system';
+import { useRouter, Stack } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
     SafeAreaView,
     TouchableOpacity,
@@ -8,14 +14,7 @@ import {
     View,
     ToastAndroid,
 } from 'react-native';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'expo-router';
-import * as FS from 'expo-file-system';
 import { useMMKVString } from 'react-native-mmkv';
-import { Color, Global, Characters } from '@globals';
-import { Stack } from 'expo-router';
-import { FontAwesome } from '@expo/vector-icons';
-import TextBoxModal from '@components/TextBoxModal';
 
 const CharMenu = () => {
     const router = useRouter();
@@ -84,7 +83,7 @@ const CharMenu = () => {
             />
 
             <TextBoxModal
-                title={'Enter Character Hub Link'}
+                title="Enter Character Hub Link"
                 booleans={[showDownload, setShowDownload]}
                 onConfirm={(text) =>
                     Characters.importCharacterFromRemote(text).then(() => {

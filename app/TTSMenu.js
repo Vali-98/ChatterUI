@@ -1,14 +1,14 @@
-import { StyleSheet, Text, TouchableOpacity, View, Switch, ToastAndroid } from 'react-native';
-import { useEffect, useState } from 'react';
-import * as Speech from 'expo-speech';
-import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv';
-import { Global, Color } from '@globals';
-import { Dropdown } from 'react-native-element-dropdown';
-import { Stack } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
+import { Global, Color } from '@globals';
+import { Stack } from 'expo-router';
+import * as Speech from 'expo-speech';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View, Switch, ToastAndroid } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
+import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv';
 
 function groupBy(array, key) {
-    if (array.length == 0) return [];
+    if (array.length === 0) return [];
     return array.reduce((result, obj) => {
         const keyValue = obj[key];
         if (!result[keyValue]) {
@@ -29,7 +29,7 @@ const TTSMenu = () => {
     const languages = Object.keys(languageList)
         .sort()
         .map((name) => {
-            return { name: name };
+            return { name };
         });
 
     useEffect(() => {
@@ -69,8 +69,8 @@ const TTSMenu = () => {
                         style={{ ...styles.dropdownbox, flex: 1 }}
                         selectedTextStyle={styles.selected}
                         data={languages}
-                        labelField={'name'}
-                        valueField={'name'}
+                        labelField="name"
+                        valueField="name"
                         containerStyle={styles.dropdownbox}
                         itemTextStyle={{ color: Color.Text }}
                         itemContainerStyle={{
@@ -92,18 +92,18 @@ const TTSMenu = () => {
 
             <Text style={{ ...styles.title, marginTop: 8 }}>Speaker</Text>
             <Text style={styles.subtitle}>
-                Speakers: {modelList.filter((item) => item.language == lang).length}
+                Speakers: {modelList.filter((item) => item.language === lang).length}
             </Text>
 
             <View style={{ marginTop: 8, marginBottom: 16 }}>
-                {modelList.length != 0 && (
+                {modelList.length !== 0 && (
                     <Dropdown
                         value={currentSpeaker?.identifier ?? ''}
                         style={styles.dropdownbox}
                         selectedTextStyle={styles.selected}
                         data={languageList[lang] ?? {}}
-                        labelField={'identifier'}
-                        valueField={'name'}
+                        labelField="identifier"
+                        valueField="name"
                         containerStyle={styles.dropdownbox}
                         itemTextStyle={{ color: Color.Text }}
                         itemContainerStyle={{
@@ -120,7 +120,7 @@ const TTSMenu = () => {
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <TouchableOpacity
                     onPress={() => {
-                        if (currentSpeaker == undefined) {
+                        if (currentSpeaker === undefined) {
                             ToastAndroid.show('No Speaker Chosen', 2000);
                             return;
                         }

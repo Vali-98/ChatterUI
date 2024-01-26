@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
-import { Global, Color } from '@globals';
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
-import { useCallback, useEffect, useState } from 'react';
 import { FontAwesome } from '@expo/vector-icons';
+import { Global, Color } from '@globals';
+import { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
 
 const OpenRouter = () => {
     const [openRouterModel, setOpenRouterModel] = useMMKVObject(Global.OpenRouterModel);
@@ -63,8 +63,8 @@ const OpenRouter = () => {
                 <Dropdown
                     value={openRouterModel}
                     data={modelList}
-                    labelField={'id'}
-                    valueField={'id'}
+                    labelField="id"
+                    valueField="id"
                     onChange={(item) => {
                         if (item.id === openRouterModel?.id) return;
                         setOpenRouterModel(item);

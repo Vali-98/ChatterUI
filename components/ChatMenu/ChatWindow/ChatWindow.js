@@ -1,8 +1,9 @@
-import { ScrollView, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { useEffect, useRef } from 'react';
+import { ScrollView, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { useMMKVBoolean, useMMKVListener } from 'react-native-mmkv';
+
 import { ChatItem } from './ChatItem';
 import { Global } from '../../../constants/global';
-import { useMMKVBoolean, useMMKVListener } from 'react-native-mmkv';
 
 const ChatWindow = ({ messages }) => {
     const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating);

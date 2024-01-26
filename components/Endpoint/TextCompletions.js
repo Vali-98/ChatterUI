@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
-import { useState } from 'react';
-import { useMMKVString } from 'react-native-mmkv';
-import { Global, Color } from '@globals';
 import { FontAwesome } from '@expo/vector-icons';
+import { Global, Color } from '@globals';
+import { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
+import { useMMKVString } from 'react-native-mmkv';
 
 const TextCompletions = () => {
     const [endpoint, setEndpoint] = useMMKVString(Global.CompletionsEndpoint);
@@ -31,7 +31,8 @@ const TextCompletions = () => {
                         setCompletionsKey(keyInput);
                         setKeyInput('');
                         ToastAndroid.show('Key saved!', 2000);
-                    }}></TouchableOpacity>
+                    }}
+                />
                 <TouchableOpacity>
                     <FontAwesome name="save" color={Color.Button} size={28} />
                 </TouchableOpacity>

@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
-import { Global, Color } from '@globals';
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
-import { useEffect, useState } from 'react';
 import { FontAwesome } from '@expo/vector-icons';
+import { Global, Color } from '@globals';
+import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
 const Mancer = () => {
     const [mancerModel, setMancerModel] = useMMKVObject(Global.MancerModel);
     const [mancerKey, setMancerKey] = useMMKVString(Global.MancerKey);
@@ -62,8 +62,8 @@ const Mancer = () => {
                 <Dropdown
                     value={mancerModel}
                     data={modelList}
-                    labelField={'name'}
-                    valueField={'id'}
+                    labelField="name"
+                    valueField="id"
                     onChange={(item) => {
                         if (item.name === mancerModel?.name) return;
                         setMancerModel(item);

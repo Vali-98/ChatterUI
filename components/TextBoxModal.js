@@ -1,7 +1,7 @@
-import { View, Text, Modal, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
-import { useState, useEffect } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Color } from '@globals';
+import { useState, useEffect } from 'react';
+import { View, Text, Modal, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 const TextBoxModal = ({
     booleans: [showModal, setShowModal],
     onConfirm = (text) => {},

@@ -1,12 +1,12 @@
-import { View, Text, TextInput, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
-import { useState, useEffect, useRef } from 'react';
 import { ChatWindow } from '@components/ChatMenu/ChatWindow/ChatWindow';
-import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv';
-import { Global, Color, Chats, Characters, MessageContext } from '@globals';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
-import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu';
+import { Global, Color, Chats, Characters, MessageContext } from '@globals';
 import { generateResponse } from '@lib/Inference';
 import { Stack, useRouter } from 'expo-router';
+import { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
+import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv';
+import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu';
 
 const Home = () => {
     const router = useRouter();
@@ -235,7 +235,7 @@ const Home = () => {
                                 placeholderTextColor={Color.Offwhite}
                                 value={newMessage}
                                 onChangeText={(text) => setNewMessage(text)}
-                                multiline={true}
+                                multiline
                             />
 
                             {nowGenerating ? (

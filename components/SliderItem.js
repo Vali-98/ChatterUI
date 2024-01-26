@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { Color } from '@globals';
 import Slider from '@react-native-community/slider';
 import { useState, useEffect } from 'react';
-import { Color } from '@globals';
+import { View, Text, StyleSheet, TextInput } from 'react-native';
 const SliderItem = ({
     name,
     body,

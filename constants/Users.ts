@@ -31,7 +31,7 @@ export namespace Users {
         });
     };
 
-    export const saveFile = async (name: string, card: Object) => {
+    export const saveFile = async (name: string, card: object) => {
         return FS.writeAsStringAsync(
             `${FS.documentDirectory}persona/${name}/${name}.json`,
             JSON.stringify(card),

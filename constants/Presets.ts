@@ -1,6 +1,7 @@
-import * as FS from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
+import * as FS from 'expo-file-system';
 import { ToastAndroid } from 'react-native';
+
 import { API } from './API';
 
 export namespace Presets {
@@ -8,7 +9,7 @@ export namespace Presets {
 
     const getPresetDir = (name: string) => `${presetdir}${name}.json`;
 
-    export const APIFields: Object = {
+    export const APIFields: object = {
         [API.KAI]: [
             'max_length',
             'genamt',
@@ -208,7 +209,7 @@ export namespace Presets {
         });
     };
 
-    export const saveFile = async (name: string, preset: Object) => {
+    export const saveFile = async (name: string, preset: object) => {
         return FS.writeAsStringAsync(getPresetDir(name), JSON.stringify(preset), {
             encoding: FS.EncodingType.UTF8,
         });
@@ -232,7 +233,7 @@ export namespace Presets {
                 ToastAndroid.show(`Invalid File Type!`, 3000);
                 return;
             }
-            let name = result.assets[0].name.replace(`.json`, '').replace('.settings', '');
+            const name = result.assets[0].name.replace(`.json`, '').replace('.settings', '');
             return FS.copyAsync({
                 from: result.assets[0].uri,
                 to: getPresetDir(name),
