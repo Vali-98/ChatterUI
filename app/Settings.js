@@ -1,9 +1,9 @@
-import { Global, Color, Users } from '@globals';
-import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import React from 'react';
-import { useMMKVString } from 'react-native-mmkv';
 import { FontAwesome } from '@expo/vector-icons';
+import { Global, Color, Users } from '@globals';
 import { useRouter } from 'expo-router';
+import React from 'react';
+import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { useMMKVString } from 'react-native-mmkv';
 
 const Settings = () => {
     const [userName, setUserName] = useMMKVString(Global.CurrentUser);
