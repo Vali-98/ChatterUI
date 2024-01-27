@@ -1,104 +1,104 @@
-import { Buffer } from '@craftzdog/react-native-buffer';
-import axios from 'axios';
-import * as Base64 from 'base-64';
-import * as DocumentPicker from 'expo-document-picker';
-import * as FS from 'expo-file-system';
-import { decode } from 'png-chunk-text';
-import extractChunks from 'png-chunks-extract';
-import { ToastAndroid } from 'react-native';
+import { Buffer } from '@craftzdog/react-native-buffer'
+import axios from 'axios'
+import * as Base64 from 'base-64'
+import * as DocumentPicker from 'expo-document-picker'
+import * as FS from 'expo-file-system'
+import { decode } from 'png-chunk-text'
+import extractChunks from 'png-chunks-extract'
+import { ToastAndroid } from 'react-native'
 
 export namespace Characters {
     export const createCard = async (charName: string) => {
         return FS.makeDirectoryAsync(getDir(charName))
             .then(() => {
-                return FS.makeDirectoryAsync(getChatDir(charName));
+                return FS.makeDirectoryAsync(getChatDir(charName))
             })
             .then(() => {
                 return FS.writeAsStringAsync(
                     getCardDir(charName),
                     JSON.stringify(TavernCardV2(charName)),
                     { encoding: FS.EncodingType.UTF8 }
-                );
-            });
-    };
+                )
+            })
+    }
 
     export const getCard = async (charName: string) => {
         return await FS.readAsStringAsync(getCardDir(charName), {
             encoding: FS.EncodingType.UTF8,
-        });
-    };
+        })
+    }
 
     export const saveCard = async (charName: string, data: string) => {
         return await FS.writeAsStringAsync(getCardDir(charName), data, {
             encoding: FS.EncodingType.UTF8,
-        });
-    };
+        })
+    }
 
     export const deleteCard = async (charName: string) => {
-        return await FS.deleteAsync(getDir(charName));
-    };
+        return await FS.deleteAsync(getDir(charName))
+    }
 
     export const getCardList = async () => {
-        return await FS.readDirectoryAsync(`${FS.documentDirectory}characters`);
-    };
+        return await FS.readDirectoryAsync(`${FS.documentDirectory}characters`)
+    }
 
     export const copyImage = async (uri: string, charName: string) => {
         FS.copyAsync({
             from: uri,
             to: getImageDir(charName),
-        });
-    };
+        })
+    }
 
     export const createCharacterFromImage = async (uri: string) => {
         return FS.readAsStringAsync(uri, { encoding: FS.EncodingType.Base64 })
             .then((file) => {
-                const chunks = extractChunks(Buffer.from(file, 'base64'));
+                const chunks = extractChunks(Buffer.from(file, 'base64'))
                 const textChunks = chunks
                     .filter(function (chunk: any) {
-                        return chunk.name === 'tEXt';
+                        return chunk.name === 'tEXt'
                     })
                     .map(function (chunk) {
-                        return decode(chunk.data);
-                    });
-                const charactercard = JSON.parse(Base64.decode(textChunks[0].text));
-                const newname = charactercard?.data?.name ?? charactercard.name;
-                console.log(`Creating new character: ${newname}`);
+                        return decode(chunk.data)
+                    })
+                const charactercard = JSON.parse(Base64.decode(textChunks[0].text))
+                const newname = charactercard?.data?.name ?? charactercard.name
+                console.log(`Creating new character: ${newname}`)
                 if (newname === 'Detailed Example Character' || charactercard === undefined) {
-                    ToastAndroid.show('Invalid Character ID', 2000);
-                    return;
+                    ToastAndroid.show('Invalid Character ID', 2000)
+                    return
                 }
                 Characters.createCard(newname)
                     .then(() => {
-                        return Characters.saveCard(newname, JSON.stringify(charactercard));
+                        return Characters.saveCard(newname, JSON.stringify(charactercard))
                     })
                     .then(() => {
-                        return Characters.copyImage(uri, newname);
+                        return Characters.copyImage(uri, newname)
                     })
                     .then(() => {
-                        ToastAndroid.show(`Successfully Imported Character`, ToastAndroid.SHORT);
+                        ToastAndroid.show(`Successfully Imported Character`, ToastAndroid.SHORT)
                     })
                     .catch(() => {
                         ToastAndroid.show(
                             `Failed to create card - Character might already exist.`,
                             2000
-                        );
-                    });
+                        )
+                    })
             })
             .catch((error) => {
-                ToastAndroid.show(`Failed to create card - Character might already exist?`, 2000);
-                console.log(error);
-            });
-    };
+                ToastAndroid.show(`Failed to create card - Character might already exist?`, 2000)
+                console.log(error)
+            })
+    }
 
     export const importCharacterFromImage = async () => {
         return DocumentPicker.getDocumentAsync({
             copyToCacheDirectory: true,
             type: 'image/*',
         }).then((result) => {
-            if (result.canceled) return;
-            return createCharacterFromImage(result.assets[0].uri);
-        });
-    };
+            if (result.canceled) return
+            return createCharacterFromImage(result.assets[0].uri)
+        })
+    }
 
     export const importCharacterFromRemote = async (text: string) => {
         return axios
@@ -112,34 +112,34 @@ export namespace Characters {
                 { responseType: 'arraybuffer' }
             )
             .then((res) => {
-                const response = Buffer.from(res.data, 'base64').toString('base64');
+                const response = Buffer.from(res.data, 'base64').toString('base64')
                 return FS.writeAsStringAsync(`${FS.cacheDirectory}image.png`, response, {
                     encoding: FS.EncodingType.Base64,
                 }).then(async () => {
-                    return createCharacterFromImage(`${FS.cacheDirectory}image.png`);
-                });
+                    return createCharacterFromImage(`${FS.cacheDirectory}image.png`)
+                })
             })
             .catch((error) => {
-                console.log(`Could not retrieve card. ${error}`);
-                ToastAndroid.show(`Invalid ID or URL`, ToastAndroid.SHORT);
-            });
-    };
+                console.log(`Could not retrieve card. ${error}`)
+                ToastAndroid.show(`Invalid ID or URL`, ToastAndroid.SHORT)
+            })
+    }
 
     export const getChatDir = (charName: string) => {
-        return `${FS.documentDirectory}characters/${charName}/chats`;
-    };
+        return `${FS.documentDirectory}characters/${charName}/chats`
+    }
 
     export const getCardDir = (charName: string) => {
-        return `${FS.documentDirectory}characters/${charName}/${charName}.json`;
-    };
+        return `${FS.documentDirectory}characters/${charName}/${charName}.json`
+    }
 
     export const getImageDir = (charName: string) => {
-        return `${FS.documentDirectory}characters/${charName}/${charName}.png`;
-    };
+        return `${FS.documentDirectory}characters/${charName}/${charName}.png`
+    }
 
     export const getDir = (charName: string) => {
-        return `${FS.documentDirectory}characters/${charName}`;
-    };
+        return `${FS.documentDirectory}characters/${charName}`
+    }
 }
 
 const TavernCardV2 = (name: string) => {
@@ -174,5 +174,5 @@ const TavernCardV2 = (name: string) => {
             character_version: '',
             extensions: {},
         },
-    };
-};
+    }
+}

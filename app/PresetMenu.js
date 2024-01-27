@@ -1,8 +1,8 @@
-import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from '@components';
-import { FontAwesome } from '@expo/vector-icons';
-import { Global, Color, Presets, saveStringExternal, API } from '@globals';
-import { Stack } from 'expo-router';
-import { useState, useEffect } from 'react';
+import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from '@components'
+import { FontAwesome } from '@expo/vector-icons'
+import { Global, Color, Presets, saveStringExternal, API } from '@globals'
+import { Stack } from 'expo-router'
+import { useState, useEffect } from 'react'
 import {
     View,
     Text,
@@ -12,20 +12,20 @@ import {
     TouchableOpacity,
     Alert,
     ToastAndroid,
-} from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
+} from 'react-native'
+import { Dropdown } from 'react-native-element-dropdown'
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
-const SLIDER = 'slider';
-const CHECKBOX = 'checbox';
-const TEXTBOX = 'textbox';
+const SLIDER = 'slider'
+const CHECKBOX = 'checbox'
+const TEXTBOX = 'textbox'
 
 const PresetMenu = () => {
-    const [APIType, setAPIType] = useMMKVString(Global.APIType);
-    const [presetName, setPresetName] = useMMKVString(Global.PresetName);
-    const [currentPreset, setCurrentPreset] = useMMKVObject(Global.PresetData);
-    const [presetList, setPresetList] = useState([]);
-    const [showNewPreset, setShowNewPreset] = useState(false);
+    const [APIType, setAPIType] = useMMKVString(Global.APIType)
+    const [presetName, setPresetName] = useMMKVString(Global.PresetName)
+    const [currentPreset, setCurrentPreset] = useMMKVObject(Global.PresetData)
+    const [presetList, setPresetList] = useState([])
+    const [showNewPreset, setShowNewPreset] = useState(false)
 
     const presetData = {
         max_length: {
@@ -162,27 +162,27 @@ const PresetMenu = () => {
             type: SLIDER,
             data: { name: 'Penalty Alpha', precision: 2, min: 0, max: 5 },
         },
-    };
+    }
 
     const loadPresetList = (name) => {
         Presets.getFileList().then((list) => {
             const cleanlist = list.map((item) => {
-                return item.replace(`.json`, '');
-            });
+                return item.replace(`.json`, '')
+            })
             const mainlist = cleanlist.map((item) => {
-                return { label: item };
-            });
-            setPresetList(mainlist);
+                return { label: item }
+            })
+            setPresetList(mainlist)
             // after deletion, preset may not exist and needs to be changed
             //if(cleanlist.includes(name)) return
-            setPresetName(cleanlist[0]);
-            Presets.loadFile(cleanlist[0]).then((text) => setCurrentPreset(JSON.parse(text)));
-        });
-    };
+            setPresetName(cleanlist[0])
+            Presets.loadFile(cleanlist[0]).then((text) => setCurrentPreset(JSON.parse(text)))
+        })
+    }
 
     useEffect(() => {
-        loadPresetList(presetName);
-    }, []);
+        loadPresetList(presetName)
+    }, [])
 
     return (
         <SafeAreaView style={{ backgroundColor: Color.Background }}>
@@ -191,15 +191,15 @@ const PresetMenu = () => {
                 onConfirm={(text) => {
                     for (const item of presetList)
                         if (item.label === text) {
-                            ToastAndroid.show(`Preset name already exists.`, 2000);
-                            return;
+                            ToastAndroid.show(`Preset name already exists.`, 2000)
+                            return
                         }
 
                     Presets.saveFile(text, currentPreset).then(() => {
-                        ToastAndroid.show(`Preset created.`, 2000);
-                        loadPresetList(text);
-                        setPresetName((currentPreset) => text);
-                    });
+                        ToastAndroid.show(`Preset created.`, 2000)
+                        loadPresetList(text)
+                        setPresetName((currentPreset) => text)
+                    })
                 }}
             />
 
@@ -217,11 +217,11 @@ const PresetMenu = () => {
                     valueField="label"
                     labelField="label"
                     onChange={(item) => {
-                        if (item.label === presetName) return;
-                        setPresetName(item.label);
+                        if (item.label === presetName) return
+                        setPresetName(item.label)
                         Presets.loadFile(item.label).then((preset) => {
-                            setCurrentPreset(JSON.parse(preset));
-                        });
+                            setCurrentPreset(JSON.parse(preset))
+                        })
                     }}
                     style={styles.dropdownbox}
                     selectedTextStyle={styles.selected}
@@ -231,7 +231,7 @@ const PresetMenu = () => {
                     onPress={() => {
                         Presets.saveFile(presetName, currentPreset).then(
                             ToastAndroid.show(`Preset Updated!`, 2000)
-                        );
+                        )
                     }}>
                     <FontAwesome size={24} name="save" color={Color.Button} />
                 </TouchableOpacity>
@@ -240,8 +240,8 @@ const PresetMenu = () => {
                     style={styles.button}
                     onPress={() => {
                         if (presetList.length === 1) {
-                            ToastAndroid.show(`Cannot delete last Preset`, 2000);
-                            return;
+                            ToastAndroid.show(`Cannot delete last Preset`, 2000)
+                            return
                         }
                         Alert.alert(
                             `Delete Preset`,
@@ -253,12 +253,12 @@ const PresetMenu = () => {
                                     style: `destructive`,
                                     onPress: () => {
                                         Presets.deleteFile(presetName).then(() => {
-                                            loadPresetList();
-                                        });
+                                            loadPresetList()
+                                        })
                                     },
                                 },
                             ]
-                        );
+                        )
                     }}>
                     <FontAwesome size={24} name="trash" color={Color.Button} />
                 </TouchableOpacity>
@@ -268,14 +268,14 @@ const PresetMenu = () => {
                     onPress={() => {
                         Presets.uploadFile().then((name) => {
                             if (name === undefined) {
-                                return;
+                                return
                             }
                             Presets.loadFile(name).then((preset) => {
-                                setCurrentPreset(JSON.parse(preset));
-                                setPresetName(name);
-                                loadPresetList(name);
-                            });
-                        });
+                                setCurrentPreset(JSON.parse(preset))
+                                setPresetName(name)
+                                loadPresetList(name)
+                            })
+                        })
                     }}>
                     <FontAwesome size={24} name="upload" color={Color.Button} />
                 </TouchableOpacity>
@@ -283,7 +283,7 @@ const PresetMenu = () => {
                 <TouchableOpacity
                     style={styles.button}
                     onPress={async () => {
-                        saveStringExternal(`${presetName}.json`, JSON.stringify(currentPreset));
+                        saveStringExternal(`${presetName}.json`, JSON.stringify(currentPreset))
                     }}>
                     <FontAwesome size={24} name="download" color={Color.Button} />
                 </TouchableOpacity>
@@ -291,7 +291,7 @@ const PresetMenu = () => {
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => {
-                        setShowNewPreset(true);
+                        setShowNewPreset(true)
                     }}>
                     <FontAwesome size={24} name="plus" color={Color.Button} />
                 </TouchableOpacity>
@@ -300,7 +300,7 @@ const PresetMenu = () => {
             <ScrollView>
                 <View style={styles.mainContainer}>
                     {Object.keys(presetData).map((item, index) => {
-                        if (!Presets.APIFields[APIType].includes(item)) return;
+                        if (!Presets.APIFields[APIType].includes(item)) return
                         switch (presetData[item].type) {
                             case SLIDER:
                                 return (
@@ -311,7 +311,7 @@ const PresetMenu = () => {
                                         setValue={setCurrentPreset}
                                         {...presetData[item].data}
                                     />
-                                );
+                                )
                             case CHECKBOX:
                                 return (
                                     <CheckboxTitle
@@ -321,7 +321,7 @@ const PresetMenu = () => {
                                         setValue={setCurrentPreset}
                                         {...presetData[item].data}
                                     />
-                                );
+                                )
                             case TEXTBOX:
                                 return (
                                     <TextBox
@@ -331,18 +331,18 @@ const PresetMenu = () => {
                                         setValue={setCurrentPreset}
                                         {...presetData[item].data}
                                     />
-                                );
+                                )
                             default:
-                                return <Text>Something Went Wrong!</Text>;
+                                return <Text>Something Went Wrong!</Text>
                         }
                     })}
                 </View>
             </ScrollView>
         </SafeAreaView>
-    );
-};
+    )
+}
 
-export default PresetMenu;
+export default PresetMenu
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -375,4 +375,4 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         marginLeft: 8,
     },
-});
+})

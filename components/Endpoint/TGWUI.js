@@ -1,9 +1,9 @@
-import { Global, Color } from '@globals';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
-import { useMMKVString } from 'react-native-mmkv';
+import { Global, Color } from '@globals'
+import { View, Text, StyleSheet, TextInput } from 'react-native'
+import { useMMKVString } from 'react-native-mmkv'
 
 const TGWUI = () => {
-    const [streamEnd, setStreamEnd] = useMMKVString(Global.TGWUIStreamingEndpoint);
+    const [streamEnd, setStreamEnd] = useMMKVString(Global.TGWUIStreamingEndpoint)
 
     return (
         <View style={styles.mainContainer}>
@@ -12,16 +12,16 @@ const TGWUI = () => {
                 style={styles.input}
                 value={streamEnd}
                 onChangeText={(value) => {
-                    setStreamEnd(value);
+                    setStreamEnd(value)
                 }}
                 placeholder="eg. https://127.0.0.1:5000"
                 placeholderTextColor={Color.Offwhite}
             />
         </View>
-    );
-};
+    )
+}
 
-export default TGWUI;
+export default TGWUI
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
         marginVertical: 8,
         borderRadius: 8,
     },
-});
+})

@@ -1,4 +1,4 @@
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 import {
     Global,
     Color,
@@ -7,9 +7,9 @@ import {
     Characters,
     Users,
     humanizedISO8601DateTime,
-} from '@globals';
-import * as FS from 'expo-file-system';
-import React, { useRef, useEffect, useState, useContext } from 'react';
+} from '@globals'
+import * as FS from 'expo-file-system'
+import React, { useRef, useEffect, useState, useContext } from 'react'
 import {
     View,
     Text,
@@ -19,34 +19,34 @@ import {
     Easing,
     TextInput,
     TouchableOpacity,
-} from 'react-native';
-import Markdown from 'react-native-markdown-package';
-import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv';
-import AnimatedEllipsis from 'rn-animated-ellipsis';
-import SimpleMarkdown from 'simple-markdown';
+} from 'react-native'
+import Markdown from 'react-native-markdown-package'
+import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
+import AnimatedEllipsis from 'rn-animated-ellipsis'
+import SimpleMarkdown from 'simple-markdown'
 
-import TTSMenu from './TTS';
+import TTSMenu from './TTS'
 // global chat property for editing
 
 const ChatItem = ({ message, id, scroll }) => {
     // fade in anim
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const dyAnim = useRef(new Animated.Value(50)).current;
+    const fadeAnim = useRef(new Animated.Value(0)).current
+    const dyAnim = useRef(new Animated.Value(50)).current
 
     // globals
-    const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating);
-    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter);
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser);
-    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat);
-    const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable);
+    const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
+    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
+    const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
     // drilled
-    const [messages, setMessages, setTargetLength] = useContext(MessageContext);
+    const [messages, setMessages, setTargetLength] = useContext(MessageContext)
 
     // local
-    const [placeholderText, setPlaceholderText] = useState(message.mes);
-    const [editMode, setEditMode] = useState(false);
+    const [placeholderText, setPlaceholderText] = useState(message.mes)
+    const [editMode, setEditMode] = useState(false)
     // figure this  out
-    const [imageExists, setImageExists] = useState(true);
+    const [imageExists, setImageExists] = useState(true)
 
     useEffect(() => {
         FS.readAsStringAsync(
@@ -55,13 +55,13 @@ const ChatItem = ({ message, id, scroll }) => {
                 : Users.getImageDir(userName)
         )
             .then(() => setImageExists(true))
-            .catch(() => setImageExists(false));
-        setPlaceholderText(messages.at(id + 1).mes);
-    }, [message]);
+            .catch(() => setImageExists(false))
+        setPlaceholderText(messages.at(id + 1).mes)
+    }, [message])
 
     useEffect(() => {
-        setEditMode(false);
-    }, [nowGenerating]);
+        setEditMode(false)
+    }, [nowGenerating])
 
     useEffect(() => {
         Animated.parallel([
@@ -76,8 +76,8 @@ const ChatItem = ({ message, id, scroll }) => {
                 useNativeDriver: true,
                 easing: Easing.out(Easing.exp),
             }),
-        ]).start();
-    }, [fadeAnim]);
+        ]).start()
+    }, [fadeAnim])
 
     const markdownFormat = {
         em: {
@@ -90,94 +90,94 @@ const ChatItem = ({ message, id, scroll }) => {
         list: {
             color: Color.Text,
         },
-    };
+    }
 
     const swapMessage = (n) => {
-        const newmessages = Array.from(messages);
+        const newmessages = Array.from(messages)
 
-        const swipeid = message.swipe_id + n;
-        newmessages.at(id + 1).mes = messages.at(id + 1).swipes.at(swipeid);
-        newmessages.at(id + 1).extra = messages.at(id + 1).swipe_info.at(swipeid).extra;
-        newmessages.at(id + 1).send_date = messages.at(id + 1).swipe_info.at(swipeid).send_date;
-        newmessages.at(id + 1).gen_started = messages.at(id + 1).swipe_info.at(swipeid).gen_started;
+        const swipeid = message.swipe_id + n
+        newmessages.at(id + 1).mes = messages.at(id + 1).swipes.at(swipeid)
+        newmessages.at(id + 1).extra = messages.at(id + 1).swipe_info.at(swipeid).extra
+        newmessages.at(id + 1).send_date = messages.at(id + 1).swipe_info.at(swipeid).send_date
+        newmessages.at(id + 1).gen_started = messages.at(id + 1).swipe_info.at(swipeid).gen_started
         newmessages.at(id + 1).gen_finished = messages
             .at(id + 1)
-            .swipe_info.at(swipeid).gen_finished;
-        newmessages.at(id + 1).swipe_id = swipeid;
-        Chats.saveFile(newmessages, charName, currentChat);
-        setMessages(newmessages);
-    };
+            .swipe_info.at(swipeid).gen_finished
+        newmessages.at(id + 1).swipe_id = swipeid
+        Chats.saveFile(newmessages, charName, currentChat)
+        setMessages(newmessages)
+    }
 
     const generateSwipe = () => {
-        const newmessages = messages;
-        newmessages.at(id + 1).mes = '';
-        newmessages.at(id + 1).swipes.push(``);
+        const newmessages = messages
+        newmessages.at(id + 1).mes = ''
+        newmessages.at(id + 1).swipes.push(``)
         newmessages.at(id + 1).swipe_info.push({
             send_date: humanizedISO8601DateTime(),
             gen_started: Date(),
             gen_finished: Date(),
             extra: { api: 'kobold', model: 'concedo/koboldcpp' },
-        });
-        newmessages.at(id + 1).send_date = humanizedISO8601DateTime();
-        newmessages.at(id + 1).gen_started = Date();
-        newmessages.at(id + 1).gen_finished = Date();
-        newmessages.at(id + 1).swipe_id = newmessages.at(id + 1).swipe_id + 1;
+        })
+        newmessages.at(id + 1).send_date = humanizedISO8601DateTime()
+        newmessages.at(id + 1).gen_started = Date()
+        newmessages.at(id + 1).gen_finished = Date()
+        newmessages.at(id + 1).swipe_id = newmessages.at(id + 1).swipe_id + 1
         Chats.saveFile(newmessages, charName, currentChat).then(() => {
-            setTargetLength(messages.length);
-            setNowGenerating(true);
-        });
-        setMessages(newmessages);
-    };
+            setTargetLength(messages.length)
+            setNowGenerating(true)
+        })
+        setMessages(newmessages)
+    }
 
     const handleSwipe = (n) => {
-        const swipeid = message.swipe_id + n;
-        if (swipeid < 0) return;
+        const swipeid = message.swipe_id + n
+        if (swipeid < 0) return
         if (swipeid < message.swipes.length) {
-            swapMessage(n);
-            return;
+            swapMessage(n)
+            return
         }
-        if (id === 0) return;
-        generateSwipe();
-        scroll.current?.scrollToEnd();
-    };
+        if (id === 0) return
+        generateSwipe()
+        scroll.current?.scrollToEnd()
+    }
 
     const handleEditMessage = () => {
         setMessages((messages) => {
-            const newmessages = messages;
+            const newmessages = messages
 
-            newmessages.at(id + 1).mes = placeholderText;
+            newmessages.at(id + 1).mes = placeholderText
             if (newmessages.swipes !== undefined)
-                newmessages.at(id + 1).swipes[newmessages.at(id + 1).swipe_id] = placeholderText;
-            Chats.saveFile(newmessages, charName, currentChat);
-            return newmessages;
-        });
-        setEditMode((editMode) => false);
-    };
+                newmessages.at(id + 1).swipes[newmessages.at(id + 1).swipe_id] = placeholderText
+            Chats.saveFile(newmessages, charName, currentChat)
+            return newmessages
+        })
+        setEditMode((editMode) => false)
+    }
 
     const handleDeleteMessage = () => {
         setMessages((messages) => {
-            const newmessages = messages.slice();
-            newmessages.splice(id + 1, 1);
-            Chats.saveFile(newmessages, charName, currentChat);
-            return newmessages;
-        });
-        setEditMode((editMode) => false);
-    };
+            const newmessages = messages.slice()
+            newmessages.splice(id + 1, 1)
+            Chats.saveFile(newmessages, charName, currentChat)
+            return newmessages
+        })
+        setEditMode((editMode) => false)
+    }
 
     const handleEnableEdit = () => {
-        setPlaceholderText(message.mes);
-        setEditMode(!nowGenerating);
-    };
+        setPlaceholderText(message.mes)
+        setEditMode(!nowGenerating)
+    }
 
     const handleDisableEdit = () => {
-        setPlaceholderText(message.mes);
-        setEditMode((editMode) => false);
-    };
+        setPlaceholderText(message.mes)
+        setEditMode((editMode) => false)
+    }
 
     const deltaTime = Math.max(
         0,
         ((new Date(message.gen_finished) - new Date(message.gen_started)) / 1000).toFixed(0)
-    );
+    )
 
     return (
         <Animated.View
@@ -292,7 +292,7 @@ const ChatItem = ({ message, id, scroll }) => {
                     {!nowGenerating && (
                         <TouchableOpacity
                             onPress={() => {
-                                handleSwipe(-1);
+                                handleSwipe(-1)
                             }}>
                             <AntDesign name="left" size={20} color={Color.Button} />
                         </TouchableOpacity>
@@ -306,7 +306,7 @@ const ChatItem = ({ message, id, scroll }) => {
                     {!nowGenerating && (
                         <TouchableOpacity
                             onPress={() => {
-                                handleSwipe(1);
+                                handleSwipe(1)
                             }}>
                             <AntDesign name="right" size={20} color={Color.Button} />
                         </TouchableOpacity>
@@ -314,10 +314,10 @@ const ChatItem = ({ message, id, scroll }) => {
                 </View>
             )}
         </Animated.View>
-    );
-};
+    )
+}
 
-export { ChatItem };
+export { ChatItem }
 
 const styles = StyleSheet.create({
     chatItem: {
@@ -377,25 +377,25 @@ const styles = StyleSheet.create({
         color: Color.Offwhite,
         paddingTop: 4,
     },
-});
+})
 
-const speechStyle = { color: Color.TextQuote };
+const speechStyle = { color: Color.TextQuote }
 const speech = {
     order: SimpleMarkdown.defaultRules.em.order + 0.6,
     match(source, state, lookbehind) {
-        return /^"([\s\S]+?)"(?!")/.exec(source);
+        return /^"([\s\S]+?)"(?!")/.exec(source)
     },
     parse(capture, parse, state) {
         return {
             content: parse(capture[1], state),
-        };
+        }
     },
     react(node, output, { ...state }) {
-        state.withinText = true;
+        state.withinText = true
         state.style = {
             ...(state.style || {}),
             ...speechStyle,
-        };
+        }
         return React.createElement(
             Text,
             {
@@ -405,7 +405,7 @@ const speech = {
             `"`,
             output(node.content, state),
             `"`
-        );
+        )
     },
     html: undefined,
-};
+}

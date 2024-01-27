@@ -1,7 +1,7 @@
-import { Color } from '@globals';
-import Slider from '@react-native-community/slider';
-import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { Color } from '@globals'
+import Slider from '@react-native-community/slider'
+import { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, TextInput } from 'react-native'
 const SliderItem = ({
     name,
     body,
@@ -12,12 +12,12 @@ const SliderItem = ({
     step = 0,
     precision = 0,
 }) => {
-    const clamp = (val) => Math.min(Math.max(parseFloat(val?.toFixed(2) ?? 0), min), max);
-    const [textValue, setTextValue] = useState(body[varname]?.toFixed(precision));
+    const clamp = (val) => Math.min(Math.max(parseFloat(val?.toFixed(2) ?? 0), min), max)
+    const [textValue, setTextValue] = useState(body[varname]?.toFixed(precision))
 
     useEffect(() => {
-        setTextValue(body[varname]?.toFixed(precision));
-    }, [body]);
+        setTextValue(body[varname]?.toFixed(precision))
+    }, [body])
 
     return (
         <View style={{ alignItems: `center` }}>
@@ -30,8 +30,8 @@ const SliderItem = ({
                     maximumValue={max}
                     value={body[varname]}
                     onValueChange={(value) => {
-                        setValue({ ...body, [varname]: clamp(value) });
-                        setTextValue(clamp(value).toFixed(precision));
+                        setValue({ ...body, [varname]: clamp(value) })
+                        setTextValue(clamp(value).toFixed(precision))
                     }}
                     minimumTrackTintColor={Color.White}
                     maximumTrackTintColor={Color.Offwhite}
@@ -44,24 +44,24 @@ const SliderItem = ({
                     onChangeText={setTextValue}
                     onEndEditing={() => {
                         if (isNaN(clamp(parseFloat(textValue))))
-                            setTextValue(body[varname].toFixed(precision));
+                            setTextValue(body[varname].toFixed(precision))
                         else {
-                            setValue({ ...body, [varname]: clamp(parseFloat(textValue)) });
+                            setValue({ ...body, [varname]: clamp(parseFloat(textValue)) })
                             setTextValue(
                                 clamp(textValue !== null ? parseFloat(textValue) : 0).toFixed(
                                     precision
                                 ) ?? min
-                            );
+                            )
                         }
                     }}
                     keyboardType="number-pad"
                 />
             </View>
         </View>
-    );
-};
+    )
+}
 
-export default SliderItem;
+export default SliderItem
 
 const styles = StyleSheet.create({
     itemName: {
@@ -85,4 +85,4 @@ const styles = StyleSheet.create({
         flex: 1.5,
         textAlign: `center`,
     },
-});
+})

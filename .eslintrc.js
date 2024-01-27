@@ -1,5 +1,6 @@
 module.exports = {
     root: true,
+    env: 'node',
     extends: ['universe/native', 'universe/shared/typescript-analysis'],
     overrides: [
         {
@@ -24,4 +25,4 @@ module.exports = {
         radix: 'off',
         'no-unused-vars': 'off',
     },
-};
+}

@@ -1,10 +1,10 @@
-import TextBoxModal from '@components/TextBoxModal';
-import llamaTokenizer from '@constants/tokenizer';
-import { FontAwesome } from '@expo/vector-icons';
-import { Global, Color, Characters } from '@globals';
-import * as DocumentPicker from 'expo-document-picker';
-import { Stack, useRouter } from 'expo-router';
-import { useState, useEffect } from 'react';
+import TextBoxModal from '@components/TextBoxModal'
+import llamaTokenizer from '@constants/tokenizer'
+import { FontAwesome } from '@expo/vector-icons'
+import { Global, Color, Characters } from '@globals'
+import * as DocumentPicker from 'expo-document-picker'
+import { Stack, useRouter } from 'expo-router'
+import { useState, useEffect } from 'react'
 import {
     View,
     Text,
@@ -16,32 +16,32 @@ import {
     ToastAndroid,
     ScrollView,
     TextInput,
-} from 'react-native';
-import { useMMKVString, useMMKVObject } from 'react-native-mmkv';
+} from 'react-native'
+import { useMMKVString, useMMKVObject } from 'react-native-mmkv'
 
 const CharInfo = () => {
-    const router = useRouter();
-    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter);
-    const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard);
-    const [characterCard, setCharacterCard] = useState({});
+    const router = useRouter()
+    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+    const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
+    const [characterCard, setCharacterCard] = useState({})
 
     // redo charactercard as CONTEXT
 
     const loadcard = () => {
         Characters.getCard(charName).then((data) => {
-            setCharacterCard(JSON.parse(data));
-        });
-    };
+            setCharacterCard(JSON.parse(data))
+        })
+    }
 
     const savecard = () => {
         return Characters.saveCard(charName, JSON.stringify(characterCard)).then(() => {
-            setCurrentCard(characterCard);
-        });
-    };
+            setCurrentCard(characterCard)
+        })
+    }
 
     useEffect(() => {
-        loadcard();
-    }, []);
+        loadcard()
+    }, [])
 
     const deleteCard = () => {
         Alert.alert(
@@ -52,16 +52,16 @@ const CharInfo = () => {
                 {
                     text: 'Confirm',
                     onPress: () => {
-                        Characters.deleteCard(charName);
-                        setCharName('Welcome');
-                        router.back();
+                        Characters.deleteCard(charName)
+                        setCharName('Welcome')
+                        router.back()
                     },
                     style: 'destructive',
                 },
             ],
             { cancelable: true }
-        );
-    };
+        )
+    }
 
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -72,8 +72,8 @@ const CharInfo = () => {
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
-                                    savecard().then(() => loadcard());
-                                    ToastAndroid.show(`Character saved!`, ToastAndroid.SHORT);
+                                    savecard().then(() => loadcard())
+                                    ToastAndroid.show(`Character saved!`, ToastAndroid.SHORT)
                                 }}>
                                 <FontAwesome name="save" size={28} color={Color.Button} />
                             </TouchableOpacity>
@@ -105,9 +105,9 @@ const CharInfo = () => {
                                         copyToCacheDirectory: true,
                                         type: 'image/*',
                                     }).then((result) => {
-                                        if (result.canceled) return;
-                                        Characters.copyImage(result.assets[0].uri, charName);
-                                    });
+                                        if (result.canceled) return
+                                        Characters.copyImage(result.assets[0].uri, charName)
+                                    })
                                 }}>
                                 <FontAwesome name="upload" size={20} color={Color.Button} />
                             </TouchableOpacity>
@@ -137,8 +137,8 @@ const CharInfo = () => {
                                     ...characterCard,
                                     description: mes,
                                     data: { ...characterCard.data, description: mes },
-                                });
-                            else setCharacterCard({ ...characterCard, description: mes });
+                                })
+                            else setCharacterCard({ ...characterCard, description: mes })
                         }}
                         value={characterCard?.data?.description ?? characterCard?.description}
                         numberOfLines={8}
@@ -159,8 +159,8 @@ const CharInfo = () => {
                                     ...characterCard,
                                     first_mes: mes,
                                     data: { ...characterCard.data, first_mes: mes },
-                                });
-                            else setCharacterCard({ ...characterCard, first_mes: mes });
+                                })
+                            else setCharacterCard({ ...characterCard, first_mes: mes })
                         }}
                         value={characterCard?.data?.first_mes ?? characterCard?.first_mes}
                         numberOfLines={8}
@@ -168,8 +168,8 @@ const CharInfo = () => {
                 </ScrollView>
             </ScrollView>
         </SafeAreaView>
-    );
-};
+    )
+}
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -233,11 +233,11 @@ const styles = StyleSheet.create({
         textAlignVertical: 'top',
         paddingVertical: 8,
     },
-});
+})
 
-export default CharInfo;
+export default CharInfo
 
-const string = '';
+const string = ''
 const TavernCardV1 = {
     name: string,
     description: string,
@@ -245,7 +245,7 @@ const TavernCardV1 = {
     scenario: string,
     first_mes: string,
     mes_example: string,
-};
+}
 
 const TavernCardV2 = () => {
     return {
@@ -272,5 +272,5 @@ const TavernCardV2 = () => {
             character_version: '',
             extensions: {},
         },
-    };
-};
+    }
+}

@@ -1,24 +1,24 @@
-import TextBoxModal from '@components/TextBoxModal';
-import { Lorebooks } from '@constants/Lorebooks';
-import { FontAwesome } from '@expo/vector-icons';
-import { Color } from '@globals';
-import { Stack, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import TextBoxModal from '@components/TextBoxModal'
+import { Lorebooks } from '@constants/Lorebooks'
+import { FontAwesome } from '@expo/vector-icons'
+import { Color } from '@globals'
+import { Stack, useRouter } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native'
 
 const LorebookMenu = () => {
-    const router = useRouter();
-    const [books, setBooks] = useState([]);
-    const [showNewBook, setShowNewBook] = useState(false);
-    const [searchData, setSearchData] = useState('');
+    const router = useRouter()
+    const [books, setBooks] = useState([])
+    const [showNewBook, setShowNewBook] = useState(false)
+    const [searchData, setSearchData] = useState('')
 
     useEffect(() => {
-        loadBooksList();
-    }, []);
+        loadBooksList()
+    }, [])
 
     const loadBooksList = async () => {
-        setBooks((await Lorebooks.getFileList()).map((item) => item.replace('.json', '')));
-    };
+        setBooks((await Lorebooks.getFileList()).map((item) => item.replace('.json', '')))
+    }
 
     return (
         <View style={styles.mainContainer}>
@@ -36,14 +36,14 @@ const LorebookMenu = () => {
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => {
-                        Lorebooks.uploadFile().then(() => loadBooksList());
+                        Lorebooks.uploadFile().then(() => loadBooksList())
                     }}>
                     <FontAwesome size={24} name="upload" color={Color.Button} />
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => {
-                        setShowNewBook(true);
+                        setShowNewBook(true)
                     }}>
                     <FontAwesome size={24} name="plus" color={Color.Button} />
                 </TouchableOpacity>
@@ -52,7 +52,7 @@ const LorebookMenu = () => {
                 {books.length > 0 &&
                     books
                         .filter((book) => {
-                            return book.toLowerCase().includes(searchData.toLowerCase());
+                            return book.toLowerCase().includes(searchData.toLowerCase())
                         })
                         .map((book, index) => (
                             <TouchableOpacity
@@ -80,10 +80,10 @@ const LorebookMenu = () => {
                 onConfirm={(text) => {}}
             />
         </View>
-    );
-};
+    )
+}
 
-export default LorebookMenu;
+export default LorebookMenu
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -128,4 +128,4 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         marginVertical: 4,
     },
-});
+})

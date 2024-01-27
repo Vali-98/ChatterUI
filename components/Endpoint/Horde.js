@@ -1,55 +1,55 @@
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import { Global, Color, hordeHeader } from '@globals';
-import { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ToastAndroid } from 'react-native';
-import { MultiSelect } from 'react-native-element-dropdown';
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
+import { Global, Color, hordeHeader } from '@globals'
+import { useState, useEffect } from 'react'
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ToastAndroid } from 'react-native'
+import { MultiSelect } from 'react-native-element-dropdown'
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
 const Horde = () => {
-    const [hordeKey, setHordeKey] = useMMKVString(Global.HordeKey);
-    const [hordeModels, setHordeModels] = useMMKVObject(Global.HordeModels);
-    const [hordeWorkers, setHordeWorkers] = useMMKVObject(Global.HordeWorkers);
+    const [hordeKey, setHordeKey] = useMMKVString(Global.HordeKey)
+    const [hordeModels, setHordeModels] = useMMKVObject(Global.HordeModels)
+    const [hordeWorkers, setHordeWorkers] = useMMKVObject(Global.HordeWorkers)
 
     const [dropdownValues, setDropdownValues] = useState(
         hordeModels.map((item) => {
-            return item.name;
+            return item.name
         })
-    );
-    const [keyInput, setKeyInput] = useState('');
-    const [modelList, setModelList] = useState([]);
+    )
+    const [keyInput, setKeyInput] = useState('')
+    const [modelList, setModelList] = useState([])
 
     const getModels = async () => {
         const modelresults = await fetch(`https://stablehorde.net/api/v2/status/models?type=text`, {
             method: 'GET',
             headers: { ...hordeHeader() },
         }).catch(() => {
-            ToastAndroid.show(`Could not connect to horde.`, 2000);
-            return [];
-        });
-        const list = await modelresults.json();
-        setModelList(list);
+            ToastAndroid.show(`Could not connect to horde.`, 2000)
+            return []
+        })
+        const list = await modelresults.json()
+        setModelList(list)
         const names = list.map((item) => {
-            return item.name;
-        });
+            return item.name
+        })
 
-        setDropdownValues(dropdownValues.filter((item) => names.includes(item)));
-        setHordeModels(hordeModels.filter((item) => dropdownValues.includes(item.name)));
+        setDropdownValues(dropdownValues.filter((item) => names.includes(item)))
+        setHordeModels(hordeModels.filter((item) => dropdownValues.includes(item.name)))
 
         const workerresults = await fetch(`https://stablehorde.net/api/v2/workers?type=text`, {
             method: 'GET',
             ...hordeHeader(),
         }).catch(() => {
-            ToastAndroid.show(`Could not connect to horde.`, 2000);
-            return [];
-        });
-        const workerlist = await workerresults.json();
-        setHordeWorkers(workerlist);
-    };
+            ToastAndroid.show(`Could not connect to horde.`, 2000)
+            return []
+        })
+        const workerlist = await workerresults.json()
+        setHordeWorkers(workerlist)
+    }
 
     useEffect(() => {
-        if (hordeKey === undefined) setHordeKey('0000000000');
-        getModels();
-    }, []);
+        if (hordeKey === undefined) setHordeKey('0000000000')
+        getModels()
+    }, [])
 
     return (
         <View style={styles.mainContainer}>
@@ -60,7 +60,7 @@ const Horde = () => {
                     style={styles.input}
                     value={keyInput}
                     onChangeText={(value) => {
-                        setKeyInput(value);
+                        setKeyInput(value)
                     }}
                     placeholder="Press save to confirm key"
                     placeholderTextColor={Color.Offwhite}
@@ -70,12 +70,12 @@ const Horde = () => {
                     style={styles.button}
                     onPress={() => {
                         if (keyInput === '') {
-                            ToastAndroid.show('No key entered!', 2000);
-                            return;
+                            ToastAndroid.show('No key entered!', 2000)
+                            return
                         }
-                        setHordeKey(keyInput);
-                        setKeyInput('');
-                        ToastAndroid.show('Key saved!', 2000);
+                        setHordeKey(keyInput)
+                        setKeyInput('')
+                        ToastAndroid.show('Key saved!', 2000)
                     }}>
                     <FontAwesome name="save" color={Color.Button} size={28} />
                 </TouchableOpacity>
@@ -87,7 +87,7 @@ const Horde = () => {
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
-                            getModels();
+                            getModels()
                         }}>
                         <MaterialIcons name="refresh" color={Color.Button} size={28} />
                     </TouchableOpacity>
@@ -103,10 +103,10 @@ const Horde = () => {
                     onChange={(item) => {
                         setHordeModels(
                             modelList.filter((value) => {
-                                return item.includes(value.name);
+                                return item.includes(value.name)
                             })
-                        );
-                        setDropdownValues(item);
+                        )
+                        setDropdownValues(item)
                     }}
                     containerStyle={styles.dropdownbox}
                     itemTextStyle={{ color: Color.Text }}
@@ -147,10 +147,10 @@ const Horde = () => {
                 />
             </View>
         </View>
-    );
-};
+    )
+}
 
-export default Horde;
+export default Horde
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -211,4 +211,4 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 8,
     },
-});
+})

@@ -1,6 +1,6 @@
-import { Llama } from '@constants/llama';
-import { Color, Global } from '@globals';
-import { useEffect, useState } from 'react';
+import { Llama } from '@constants/llama'
+import { Color, Global } from '@globals'
+import { useEffect, useState } from 'react'
 import {
     View,
     Text,
@@ -10,52 +10,52 @@ import {
     ToastAndroid,
     Alert,
     ActivityIndicator,
-} from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
+} from 'react-native'
+import { Dropdown } from 'react-native-element-dropdown'
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
-import { SliderItem } from '..';
+import { SliderItem } from '..'
 
 const Local = () => {
-    const [modelLoading, setModelLoading] = useState(false);
-    const [modelList, setModelList] = useState([]);
+    const [modelLoading, setModelLoading] = useState(false)
+    const [modelList, setModelList] = useState([])
     const dropdownValues = modelList.map((item) => {
-        return { name: item };
-    });
-    const [currentModel, setCurrentModel] = useMMKVString(Global.LocalModel);
-    const [downloadLink, setDownloadLink] = useState('');
-    const [preset, setPreset] = useMMKVObject(Global.LocalPreset);
-    const [loadedModel, setLoadedModel] = useState(Llama.getModelname());
+        return { name: item }
+    })
+    const [currentModel, setCurrentModel] = useMMKVString(Global.LocalModel)
+    const [downloadLink, setDownloadLink] = useState('')
+    const [preset, setPreset] = useMMKVObject(Global.LocalPreset)
+    const [loadedModel, setLoadedModel] = useState(Llama.getModelname())
 
     const getModels = async () => {
-        setModelList(await Llama.getModels());
-    };
+        setModelList(await Llama.getModels())
+    }
 
     useEffect(() => {
-        getModels();
-    }, []);
+        getModels()
+    }, [])
 
     const handleLoad = async () => {
-        setModelLoading(true);
+        setModelLoading(true)
         await Llama.loadModel(currentModel, preset).then(() => {
-            setLoadedModel(Llama.getModelname());
-        });
-        setModelLoading(false);
-        getModels();
-    };
+            setLoadedModel(Llama.getModelname())
+        })
+        setModelLoading(false)
+        getModels()
+    }
 
     const handleLoadExternal = async () => {
-        setModelLoading(true);
+        setModelLoading(true)
         await Llama.loadModel('', preset, false).then(() => {
-            setLoadedModel(Llama.getModelname());
-        });
-        setModelLoading(false);
-    };
+            setLoadedModel(Llama.getModelname())
+        })
+        setModelLoading(false)
+    }
 
     const handleDelete = async () => {
         if (!(await Llama.modelExists(currentModel))) {
-            ToastAndroid.show('Model Does Not Exist!', ToastAndroid.SHORT);
-            return;
+            ToastAndroid.show('Model Does Not Exist!', ToastAndroid.SHORT)
+            return
         }
 
         Alert.alert(`Delete Model`, `Are you sure you want to delete '${currentModel}'?`, [
@@ -66,37 +66,37 @@ const Local = () => {
                 onPress: () => {
                     Llama.deleteModel(currentModel)
                         .then(() => {
-                            ToastAndroid.show('Model Deleted Successfully', ToastAndroid.SHORT);
-                            setLoadedModel(Llama.getModelname());
-                            getModels();
+                            ToastAndroid.show('Model Deleted Successfully', ToastAndroid.SHORT)
+                            setLoadedModel(Llama.getModelname())
+                            getModels()
                         })
                         .catch(() =>
                             ToastAndroid.show('Could Not Delete Model', ToastAndroid.SHORT)
-                        );
+                        )
                 },
             },
-        ]);
-    };
+        ])
+    }
 
     const handleUnload = async () => {
-        await Llama.unloadModel();
-        setLoadedModel(Llama.getModelname());
-    };
+        await Llama.unloadModel()
+        setLoadedModel(Llama.getModelname())
+    }
 
     const handleDownload = () => {
-        setDownloadLink('');
+        setDownloadLink('')
         Llama.downloadModel(downloadLink).then(() => {
-            getModels();
-        });
-    };
+            getModels()
+        })
+    }
 
     const handleImport = async () => {
-        setModelLoading(true);
+        setModelLoading(true)
         await Llama.importModel().then(() => {
-            getModels();
-        });
-        setModelLoading(false);
-    };
+            getModels()
+        })
+        setModelLoading(false)
+    }
 
     return (
         <View style={styles.mainContainer}>
@@ -235,10 +235,10 @@ const Local = () => {
 		*/}
             </View>
         </View>
-    );
-};
+    )
+}
 
-export default Local;
+export default Local
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -299,4 +299,4 @@ const styles = StyleSheet.create({
     selected: {
         color: Color.Text,
     },
-});
+})

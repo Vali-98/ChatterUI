@@ -1,32 +1,32 @@
-import { FontAwesome } from '@expo/vector-icons';
-import { Global, Color } from '@globals';
-import { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
+import { FontAwesome } from '@expo/vector-icons'
+import { Global, Color } from '@globals'
+import { useCallback, useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native'
+import { Dropdown } from 'react-native-element-dropdown'
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
 const OpenRouter = () => {
-    const [openRouterModel, setOpenRouterModel] = useMMKVObject(Global.OpenRouterModel);
-    const [openRouterKey, setOpenRouterKey] = useMMKVString(Global.OpenRouterKey);
-    const [keyInput, setKeyInput] = useState('');
+    const [openRouterModel, setOpenRouterModel] = useMMKVObject(Global.OpenRouterModel)
+    const [openRouterKey, setOpenRouterKey] = useMMKVString(Global.OpenRouterKey)
+    const [keyInput, setKeyInput] = useState('')
 
-    const [modelList, setModelList] = useState([]);
+    const [modelList, setModelList] = useState([])
 
     const getModels = useCallback(async () => {
         const modelresults = await fetch('https://openrouter.ai/api/v1/models', {
             method: 'GET',
             headers: { accept: 'application/json' },
         }).catch(() => {
-            ToastAndroid.show(`Could not get OpenRouter Mddels`, 2000);
-            return [];
-        });
-        const list = (await modelresults.json()).data;
-        setModelList(list);
-    }, [modelList]);
+            ToastAndroid.show(`Could not get OpenRouter Mddels`, 2000)
+            return []
+        })
+        const list = (await modelresults.json()).data
+        setModelList(list)
+    }, [modelList])
 
     useEffect(() => {
-        getModels();
-    }, []);
+        getModels()
+    }, [])
 
     return (
         <View style={styles.mainContainer}>
@@ -37,7 +37,7 @@ const OpenRouter = () => {
                     style={styles.input}
                     value={keyInput}
                     onChangeText={(value) => {
-                        setKeyInput(value);
+                        setKeyInput(value)
                     }}
                     placeholder="Press save to confirm key"
                     placeholderTextColor={Color.Offwhite}
@@ -47,12 +47,12 @@ const OpenRouter = () => {
                     style={styles.button}
                     onPress={() => {
                         if (keyInput === '') {
-                            ToastAndroid.show('No key entered!', 2000);
-                            return;
+                            ToastAndroid.show('No key entered!', 2000)
+                            return
                         }
-                        setOpenRouterKey(keyInput);
-                        setKeyInput('');
-                        ToastAndroid.show('Key saved!', 2000);
+                        setOpenRouterKey(keyInput)
+                        setKeyInput('')
+                        ToastAndroid.show('Key saved!', 2000)
                     }}>
                     <FontAwesome name="save" color={Color.Button} size={28} />
                 </TouchableOpacity>
@@ -66,8 +66,8 @@ const OpenRouter = () => {
                     labelField="id"
                     valueField="id"
                     onChange={(item) => {
-                        if (item.id === openRouterModel?.id) return;
-                        setOpenRouterModel(item);
+                        if (item.id === openRouterModel?.id) return
+                        setOpenRouterModel(item)
                     }}
                     style={styles.dropdownbox}
                     selectedTextStyle={styles.selected}
@@ -121,10 +121,10 @@ const OpenRouter = () => {
                 </View>
             )}
         </View>
-    );
-};
+    )
+}
 
-export default OpenRouter;
+export default OpenRouter
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -182,4 +182,4 @@ const styles = StyleSheet.create({
         padding: 16,
         marginTop: 12,
     },
-});
+})

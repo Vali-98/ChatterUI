@@ -1,17 +1,17 @@
-import { Color, initializeApp, startupApp } from '@globals';
-import { Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { MenuProvider } from 'react-native-popup-menu';
+import { Color, initializeApp, startupApp } from '@globals'
+import { Stack } from 'expo-router'
+import { useEffect, useState } from 'react'
+import { MenuProvider } from 'react-native-popup-menu'
 
 // init values should be here
 const Layout = () => {
-    const [firstRender, setFirstRender] = useState(true);
+    const [firstRender, setFirstRender] = useState(true)
     // reset defaults
     useEffect(() => {
-        startupApp();
-        initializeApp();
-        setFirstRender(false);
-    }, []);
+        startupApp()
+        initializeApp()
+        setFirstRender(false)
+    }, [])
 
     if (!firstRender)
         return (
@@ -58,7 +58,7 @@ const Layout = () => {
                     />
                 </Stack>
             </MenuProvider>
-        );
-};
+        )
+}
 
-export default Layout;
+export default Layout

@@ -1,5 +1,5 @@
-import { Color } from '@globals';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { Color } from '@globals'
+import { View, Text, StyleSheet, TextInput } from 'react-native'
 
 const TextBox = ({
     name,
@@ -22,17 +22,17 @@ const TextBox = ({
                 }}
                 value={body[varname]?.toString() ?? ''}
                 onChangeText={(value) => {
-                    setValue({ ...body, [varname]: value });
+                    setValue({ ...body, [varname]: value })
                 }}
                 placeholder="----"
                 placeholderTextColor={Color.TextItalic}
                 keyboardType={keyboardType}
             />
         </View>
-    );
-};
+    )
+}
 
-export default TextBox;
+export default TextBox
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -53,4 +53,4 @@ const styles = StyleSheet.create({
         marginHorizontal: 4,
         borderRadius: 8,
     },
-});
+})

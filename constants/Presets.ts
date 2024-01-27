@@ -1,13 +1,13 @@
-import * as DocumentPicker from 'expo-document-picker';
-import * as FS from 'expo-file-system';
-import { ToastAndroid } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker'
+import * as FS from 'expo-file-system'
+import { ToastAndroid } from 'react-native'
 
-import { API } from './API';
+import { API } from './API'
 
 export namespace Presets {
-    const presetdir = `${FS.documentDirectory}presets/`;
+    const presetdir = `${FS.documentDirectory}presets/`
 
-    const getPresetDir = (name: string) => `${presetdir}${name}.json`;
+    const getPresetDir = (name: string) => `${presetdir}${name}.json`
 
     export const APIFields: object = {
         [API.KAI]: [
@@ -133,7 +133,7 @@ export namespace Presets {
             'seed',
         ],
         [API.OPENROUTER]: ['freq_pen', 'genamt', 'presence_pen', 'seed', 'temp', 'top_p', 'top_k'],
-    };
+    }
 
     export const defaultPreset = () => {
         return {
@@ -183,45 +183,45 @@ export namespace Presets {
             max_length: 4096,
 
             dynatemp_range: 0,
-        };
-    };
+        }
+    }
 
     const fixPreset = async (preset: any, filename = '') => {
-        const existingKeys = Object.keys(preset);
-        const targetPreset: any = defaultPreset();
-        const defaultKeys = Object.keys(targetPreset);
-        let samekeys = true;
+        const existingKeys = Object.keys(preset)
+        const targetPreset: any = defaultPreset()
+        const defaultKeys = Object.keys(targetPreset)
+        let samekeys = true
         defaultKeys.map((key: any) => {
-            if (existingKeys.includes(key)) return;
-            preset[key] = targetPreset[key];
-            samekeys = false;
-        });
-        if (filename !== '') await saveFile(filename, preset);
-        if (!samekeys) console.log(`Preset fixed!`);
-        return JSON.stringify(preset);
-    };
+            if (existingKeys.includes(key)) return
+            preset[key] = targetPreset[key]
+            samekeys = false
+        })
+        if (filename !== '') await saveFile(filename, preset)
+        if (!samekeys) console.log(`Preset fixed!`)
+        return JSON.stringify(preset)
+    }
 
     export const loadFile = async (name: string) => {
         return FS.readAsStringAsync(getPresetDir(name), {
             encoding: FS.EncodingType.UTF8,
         }).then((file) => {
-            return fixPreset(JSON.parse(file), name);
-        });
-    };
+            return fixPreset(JSON.parse(file), name)
+        })
+    }
 
     export const saveFile = async (name: string, preset: object) => {
         return FS.writeAsStringAsync(getPresetDir(name), JSON.stringify(preset), {
             encoding: FS.EncodingType.UTF8,
-        });
-    };
+        })
+    }
 
     export const deleteFile = async (name: string) => {
-        return FS.deleteAsync(getPresetDir(name));
-    };
+        return FS.deleteAsync(getPresetDir(name))
+    }
 
     export const getFileList = async () => {
-        return FS.readDirectoryAsync(presetdir);
-    };
+        return FS.readDirectoryAsync(presetdir)
+    }
 
     export const uploadFile = async () => {
         return DocumentPicker.getDocumentAsync({ type: ['application/*'] }).then((result) => {
@@ -230,10 +230,10 @@ export namespace Presets {
                 (!result.assets[0].name.endsWith('json') &&
                     !result.assets[0].name.endsWith('settings'))
             ) {
-                ToastAndroid.show(`Invalid File Type!`, 3000);
-                return;
+                ToastAndroid.show(`Invalid File Type!`, 3000)
+                return
             }
-            const name = result.assets[0].name.replace(`.json`, '').replace('.settings', '');
+            const name = result.assets[0].name.replace(`.json`, '').replace('.settings', '')
             return FS.copyAsync({
                 from: result.assets[0].uri,
                 to: getPresetDir(name),
@@ -241,16 +241,16 @@ export namespace Presets {
                 .then(() => {
                     return FS.readAsStringAsync(getPresetDir(name), {
                         encoding: FS.EncodingType.UTF8,
-                    });
+                    })
                 })
                 .then(async (file) => {
-                    await fixPreset(JSON.parse(file), name);
-                    return name;
+                    await fixPreset(JSON.parse(file), name)
+                    return name
                 })
                 .catch((error) => {
-                    console.log(error);
-                    ToastAndroid.show(error.message, 2000);
-                });
-        });
-    };
+                    console.log(error)
+                    ToastAndroid.show(error.message, 2000)
+                })
+        })
+    }
 }
