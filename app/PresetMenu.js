@@ -174,7 +174,7 @@ const PresetMenu = () => {
             })
             setPresetList(mainlist)
             // after deletion, preset may not exist and needs to be changed
-            //if(cleanlist.includes(name)) return
+            if (cleanlist.includes(name)) return
             setPresetName(cleanlist[0])
             Presets.loadFile(cleanlist[0]).then((text) => setCurrentPreset(JSON.parse(text)))
         })

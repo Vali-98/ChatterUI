@@ -64,6 +64,7 @@ export namespace Presets {
             'skip_special_tokens',
             'freq_pen',
             'presence_pen',
+            'dynatemp_range',
         ],
         [API.HORDE]: [
             'max_length',

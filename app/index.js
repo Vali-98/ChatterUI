@@ -99,6 +99,8 @@ const Home = () => {
                     .replaceAll(currentInstruct.input_sequence, ``)
                     .replaceAll(currentInstruct.output_sequence, ``)
                     .replaceAll(currentInstruct.stop_sequence, '')
+                    .replaceAll(userName + ':', '')
+                    .replaceAll(charName + ':', '')
                 const newmessage = createnew
                     ? Chats.createEntry(charName, false, '')
                     : messages.at(-1)
