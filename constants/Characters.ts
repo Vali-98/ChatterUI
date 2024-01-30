@@ -5,7 +5,7 @@ import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
 import { decode } from 'png-chunk-text'
 import extractChunks from 'png-chunks-extract'
-import { ToastAndroid } from 'react-native'
+import { Logger } from './Logger'
 
 export namespace Characters {
     export const createCard = async (charName: string) => {
@@ -22,20 +22,22 @@ export namespace Characters {
             })
     }
 
-    export const getCard = async (charName: string) => {
-        return await FS.readAsStringAsync(getCardDir(charName), {
-            encoding: FS.EncodingType.UTF8,
-        })
+    export const getCard = async (charName: string | undefined) => {
+        if (charName)
+            return await FS.readAsStringAsync(getCardDir(charName), {
+                encoding: FS.EncodingType.UTF8,
+            })
     }
 
-    export const saveCard = async (charName: string, data: string) => {
-        return await FS.writeAsStringAsync(getCardDir(charName), data, {
-            encoding: FS.EncodingType.UTF8,
-        })
+    export const saveCard = async (charName: string | undefined, data: string) => {
+        if (charName)
+            return await FS.writeAsStringAsync(getCardDir(charName), data, {
+                encoding: FS.EncodingType.UTF8,
+            })
     }
 
-    export const deleteCard = async (charName: string) => {
-        return await FS.deleteAsync(getDir(charName))
+    export const deleteCard = async (charName: string | undefined) => {
+        if (charName) return await FS.deleteAsync(getDir(charName))
     }
 
     export const getCardList = async () => {
@@ -43,10 +45,11 @@ export namespace Characters {
     }
 
     export const copyImage = async (uri: string, charName: string) => {
-        FS.copyAsync({
-            from: uri,
-            to: getImageDir(charName),
-        })
+        if (charName)
+            FS.copyAsync({
+                from: uri,
+                to: getImageDir(charName),
+            })
     }
 
     export const createCharacterFromImage = async (uri: string) => {
@@ -64,7 +67,7 @@ export namespace Characters {
                 const newname = charactercard?.data?.name ?? charactercard.name
                 console.log(`Creating new character: ${newname}`)
                 if (newname === 'Detailed Example Character' || charactercard === undefined) {
-                    ToastAndroid.show('Invalid Character ID', 2000)
+                    Logger.log('Invalid Character ID', true)
                     return
                 }
                 Characters.createCard(newname)
@@ -75,17 +78,14 @@ export namespace Characters {
                         return Characters.copyImage(uri, newname)
                     })
                     .then(() => {
-                        ToastAndroid.show(`Successfully Imported Character`, ToastAndroid.SHORT)
+                        Logger.log(`Successfully Imported Character`, true)
                     })
                     .catch(() => {
-                        ToastAndroid.show(
-                            `Failed to create card - Character might already exist.`,
-                            2000
-                        )
+                        Logger.log(`Failed to create card - Character might already exist.`, true)
                     })
             })
             .catch((error) => {
-                ToastAndroid.show(`Failed to create card - Character might already exist?`, 2000)
+                Logger.log(`Failed to create card - Character might already exist?`, true)
                 console.log(error)
             })
     }
@@ -120,8 +120,7 @@ export namespace Characters {
                 })
             })
             .catch((error) => {
-                console.log(`Could not retrieve card. ${error}`)
-                ToastAndroid.show(`Invalid ID or URL`, ToastAndroid.SHORT)
+                Logger.log(`Could not retreive card. ${error}`)
             })
     }
 
@@ -133,18 +132,51 @@ export namespace Characters {
         return `${FS.documentDirectory}characters/${charName}/${charName}.json`
     }
 
-    export const getImageDir = (charName: string) => {
-        return `${FS.documentDirectory}characters/${charName}/${charName}.png`
+    export const getImageDir = (charName: string | undefined) => {
+        return charName ? `${FS.documentDirectory}characters/${charName}/${charName}.png` : ''
     }
 
     export const getDir = (charName: string) => {
         return `${FS.documentDirectory}characters/${charName}`
     }
+
+    export type CharacterCard = {
+        name: string
+        description: string
+        personality: string
+        scenario: string
+        first_mes: string
+        mes_example: string
+
+        spec: string
+        spec_version: string
+        data: {
+            name: string
+            description: string
+            personality: string
+            scenario: string
+            first_mes: string
+            mes_example: string
+
+            // New fields start here
+            creator_notes: string
+            system_prompt: string
+            post_history_instructions: string
+            alternate_greetings: Array<string>
+            character_book: string
+
+            // May 8th additions
+            tags: Array<string>
+            creator: string
+            character_version: string
+            //extensions: {},
+        }
+    }
 }
 
 const TavernCardV2 = (name: string) => {
     return {
-        name,
+        name: name,
         description: '',
         personality: '',
         scenario: '',
@@ -154,7 +186,7 @@ const TavernCardV2 = (name: string) => {
         spec: 'chara_card_v2',
         spec_version: '2.0',
         data: {
-            name,
+            name: name,
             description: '',
             personality: '',
             scenario: '',

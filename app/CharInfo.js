@@ -1,7 +1,6 @@
-import TextBoxModal from '@components/TextBoxModal'
 import llamaTokenizer from '@constants/tokenizer'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Characters } from '@globals'
+import { Global, Color, Characters, Logger } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
 import { useState, useEffect } from 'react'
@@ -13,7 +12,6 @@ import {
     Image,
     TouchableOpacity,
     Alert,
-    ToastAndroid,
     ScrollView,
     TextInput,
 } from 'react-native'
@@ -73,7 +71,7 @@ const CharInfo = () => {
                                 style={styles.button}
                                 onPress={() => {
                                     savecard().then(() => loadcard())
-                                    ToastAndroid.show(`Character saved!`, ToastAndroid.SHORT)
+                                    Logger.log(`Character saved!`, true)
                                 }}>
                                 <FontAwesome name="save" size={28} color={Color.Button} />
                             </TouchableOpacity>

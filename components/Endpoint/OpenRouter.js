@@ -1,7 +1,7 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color } from '@globals'
+import { Global, Color, Logger } from '@globals'
 import { useCallback, useEffect, useState } from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
@@ -17,7 +17,7 @@ const OpenRouter = () => {
             method: 'GET',
             headers: { accept: 'application/json' },
         }).catch(() => {
-            ToastAndroid.show(`Could not get OpenRouter Mddels`, 2000)
+            Logger.log(`Could not get OpenRouter Mddels`, true)
             return []
         })
         const list = (await modelresults.json()).data
@@ -47,12 +47,12 @@ const OpenRouter = () => {
                     style={styles.button}
                     onPress={() => {
                         if (keyInput === '') {
-                            ToastAndroid.show('No key entered!', 2000)
+                            Logger.log('No key entered!', true)
                             return
                         }
                         setOpenRouterKey(keyInput)
                         setKeyInput('')
-                        ToastAndroid.show('Key saved!', 2000)
+                        Logger.log('Key saved!', true)
                     }}>
                     <FontAwesome name="save" color={Color.Button} size={28} />
                 </TouchableOpacity>

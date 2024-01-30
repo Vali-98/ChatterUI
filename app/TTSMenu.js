@@ -1,9 +1,9 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color } from '@globals'
+import { Global, Color, Logger } from '@globals'
 import { Stack } from 'expo-router'
 import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View, Switch, ToastAndroid } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, Switch } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 
@@ -121,7 +121,7 @@ const TTSMenu = () => {
                 <TouchableOpacity
                     onPress={() => {
                         if (currentSpeaker === undefined) {
-                            ToastAndroid.show('No Speaker Chosen', 2000)
+                            Logger.log(`No Speaker Chosen`, true)
                             return
                         }
                         Speech.speak('This is a test audio.', {

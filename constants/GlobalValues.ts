@@ -3,7 +3,8 @@ export const enum Global {
 
     NowGenerating = 'nowgenerating', // generation signal
     EditedWindow = 'editedwindow', // exit editing window confirmation
-
+    Messeges = 'messeges',
+    Logs = 'logs',
     // Character
 
     CurrentCharacter = 'currentchar', // current char filename, locates dir

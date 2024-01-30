@@ -12,7 +12,6 @@ import {
     Image,
     StyleSheet,
     View,
-    ToastAndroid,
 } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
 

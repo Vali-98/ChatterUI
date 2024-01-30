@@ -1,17 +1,8 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Chats, Characters, saveStringExternal } from '@globals'
+import { Global, Color, Chats, Characters, saveStringExternal, Logger } from '@globals'
 import { useRouter, Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
-import {
-    ScrollView,
-    View,
-    Text,
-    StyleSheet,
-    Image,
-    Alert,
-    ToastAndroid,
-    TouchableOpacity,
-} from 'react-native'
+import { ScrollView, View, Text, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
 
 const ChatSelector = () => {
@@ -57,8 +48,7 @@ const ChatSelector = () => {
             await Chats.getFile(charName, chatname),
             'application/*'
         ).catch((error) => {
-            ToastAndroid.show(`Could not save file.`, 2000)
-            console.log(error)
+            Logger.log(`Could not save file. ${error}`, true)
         })
     }
 

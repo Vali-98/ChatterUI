@@ -1,6 +1,6 @@
 import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
-import { ToastAndroid } from 'react-native'
+import { Logger } from './Logger'
 
 export namespace Instructs {
     export const loadFile = async (name: string) => {
@@ -52,7 +52,7 @@ export namespace Instructs {
                         )
                     } else return name
                 })
-                .catch((error) => ToastAndroid.show(error.message, 2000))
+                .catch((error) => Logger.log(`Failed to load: ${error.message}`, true))
         })
     }
 

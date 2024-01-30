@@ -1,6 +1,6 @@
 import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from '@components'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Presets, saveStringExternal, API } from '@globals'
+import { Global, Color, Presets, saveStringExternal, Logger } from '@globals'
 import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
 import {
@@ -11,7 +11,6 @@ import {
     ScrollView,
     TouchableOpacity,
     Alert,
-    ToastAndroid,
 } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
@@ -191,12 +190,12 @@ const PresetMenu = () => {
                 onConfirm={(text) => {
                     for (const item of presetList)
                         if (item.label === text) {
-                            ToastAndroid.show(`Preset name already exists.`, 2000)
+                            Logger.log(`Preset name already exists.`, true)
                             return
                         }
 
                     Presets.saveFile(text, currentPreset).then(() => {
-                        ToastAndroid.show(`Preset created.`, 2000)
+                        Logger.log(`Preset created.`, true)
                         loadPresetList(text)
                         setPresetName((currentPreset) => text)
                     })
@@ -230,7 +229,7 @@ const PresetMenu = () => {
                     style={styles.button}
                     onPress={() => {
                         Presets.saveFile(presetName, currentPreset).then(
-                            ToastAndroid.show(`Preset Updated!`, 2000)
+                            Logger.log(`Preset Updated!.`, true)
                         )
                     }}>
                     <FontAwesome size={24} name="save" color={Color.Button} />
@@ -240,7 +239,7 @@ const PresetMenu = () => {
                     style={styles.button}
                     onPress={() => {
                         if (presetList.length === 1) {
-                            ToastAndroid.show(`Cannot delete last Preset`, 2000)
+                            Logger.log(`Cannot Delete Last Preset.`, true)
                             return
                         }
                         Alert.alert(
