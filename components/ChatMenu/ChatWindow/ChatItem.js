@@ -20,26 +20,27 @@ import SimpleMarkdown from 'simple-markdown'
 import TTSMenu from './TTS'
 // global chat property for editing
 
-const ChatItem = ({ message, id, scroll }) => {
+const ChatItem = ({ id, scroll }) => {
     // fade in anim
     const fadeAnim = useRef(new Animated.Value(0)).current
     const dyAnim = useRef(new Animated.Value(50)).current
-
     // globals
     const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
+
     // drilled
     const [messages, setMessages] = useMMKVObject(Global.Messages)
     // local
+    const message = messages?.at(id + 1)
     const [placeholderText, setPlaceholderText] = useState(message.mes)
     const [editMode, setEditMode] = useState(false)
     // figure this  out
-    const [imageExists, setImageExists] = useState(true)
-
-    useEffect(() => {
+    //const [imageExists, setImageExists] = useState(true)
+    console.log(id)
+    /*useEffect(() => {
         FS.readAsStringAsync(
             message.name === charName
                 ? Characters.getImageDir(charName)
@@ -48,7 +49,7 @@ const ChatItem = ({ message, id, scroll }) => {
             .then(() => setImageExists(true))
             .catch(() => setImageExists(false))
         setPlaceholderText(messages.at(id + 1).mes)
-    }, [message])
+    }, [message])*/
 
     useEffect(() => {
         setEditMode(false)
@@ -142,12 +143,8 @@ const ChatItem = ({ message, id, scroll }) => {
                         style={styles.avatar}
                         source={
                             message.name === charName
-                                ? imageExists
-                                    ? { uri: Characters.getImageDir(charName) }
-                                    : require('@assets/user.png')
-                                : imageExists
-                                  ? { uri: Users.getImageDir(userName) }
-                                  : require('@assets/user.png')
+                                ? { uri: Characters.getImageDir(charName) }
+                                : { uri: Users.getImageDir(userName) }
                         }
                     />
                     <Text style={styles.graytext}>#{id}</Text>

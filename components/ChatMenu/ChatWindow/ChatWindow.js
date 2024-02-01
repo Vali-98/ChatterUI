@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { ScrollView, StyleSheet, KeyboardAvoidingView, Text } from 'react-native'
+import { ScrollView, StyleSheet, KeyboardAvoidingView, Text, VirtualizedList } from 'react-native'
 import { useMMKVBoolean, useMMKVListener } from 'react-native-mmkv'
 
 import { ChatItem } from './ChatItem'
@@ -17,22 +17,34 @@ const ChatWindow = ({ messages }) => {
         if (!nowGenerating) scrollViewRef.current?.scrollToEnd()
     }, [nowGenerating])
 
+    const getitemcount = () => {
+        return messages.length ? messages?.length - 1 : 0
+    }
+    const getitems = (_data, index) => {
+        return {
+            index: index,
+            message: messages.at(index + 1),
+            key: messages.at(index + 1).send_date,
+        }
+    }
+
     return (
         <KeyboardAvoidingView style={styles.chatHistory}>
-            <ScrollView
+            <VirtualizedList
+                showsVerticalScrollIndicator={false}
+                getItemCount={getitemcount}
+                onScrollToIndexFailed={() => {}}
+                onContentSizeChange={() => scrollViewRef?.current?.scrollToEnd()}
                 ref={scrollViewRef}
-                onContentSizeChange={() => {
-                    if (nowGenerating) scrollViewRef.current?.scrollToEnd()
-                }}
-                style={{ flex: 1, padding: 4 }}>
-                {messages
-                    ?.slice(1)
-                    ?.map((message, index) => (
-                        <ChatItem key={index} id={index} message={message} scroll={scrollViewRef} />
-                    )) ?? (
-                    <Text style={styles.errorMessage}>Something Has Gone Terribly Wrong</Text>
-                )}
-            </ScrollView>
+                initialNumToRender={0}
+                initialScrollIndex={getitemcount() - 1 > -1 ? getitemcount() - 1 : 0}
+                style={{ flex: 1, padding: 4 }}
+                getItem={getitems}
+                keyExtractor={(item) => item.key}
+                windowSize={2}
+                renderItem={(item) => (
+                    <ChatItem index={item.index} id={item.index} message={item.message} />
+                )}></VirtualizedList>
         </KeyboardAvoidingView>
     )
 }

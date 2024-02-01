@@ -8,7 +8,6 @@ import { useMMKVObject } from 'react-native-mmkv'
 const TTS = ({ message }) => {
     const [isSpeaking, setIsSpeaking] = useState(false)
     const [currentSpeaker, setCurrentSpeaker] = useMMKVObject(Global.TTSSpeaker)
-
     return (
         <View style={{ marginTop: 8 }}>
             {isSpeaking ? (
