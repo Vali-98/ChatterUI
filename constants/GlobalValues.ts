@@ -3,7 +3,7 @@ export const enum Global {
 
     NowGenerating = 'nowgenerating', // generation signal
     EditedWindow = 'editedwindow', // exit editing window confirmation
-    Messeges = 'messeges',
+    Messages = 'messages',
     Logs = 'logs',
     // Character
 

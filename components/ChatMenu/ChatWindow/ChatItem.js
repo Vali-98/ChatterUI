@@ -1,15 +1,7 @@
 import { AntDesign, MaterialIcons } from '@expo/vector-icons'
-import {
-    Global,
-    Color,
-    MessageContext,
-    Chats,
-    Characters,
-    Users,
-    humanizedISO8601DateTime,
-} from '@globals'
+import { Global, Color, Chats, Characters, Users, Messages } from '@globals'
 import * as FS from 'expo-file-system'
-import React, { useRef, useEffect, useState, useContext } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import {
     View,
     Text,
@@ -21,7 +13,7 @@ import {
     TouchableOpacity,
 } from 'react-native'
 import Markdown from 'react-native-markdown-package'
-import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
+import { useMMKVBoolean, useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import AnimatedEllipsis from 'rn-animated-ellipsis'
 import SimpleMarkdown from 'simple-markdown'
 
@@ -40,8 +32,7 @@ const ChatItem = ({ message, id, scroll }) => {
     const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
     // drilled
-    const [messages, setMessages, setTargetLength] = useContext(MessageContext)
-
+    const [messages, setMessages] = useMMKVObject(Global.Messages)
     // local
     const [placeholderText, setPlaceholderText] = useState(message.mes)
     const [editMode, setEditMode] = useState(false)
@@ -92,76 +83,30 @@ const ChatItem = ({ message, id, scroll }) => {
         },
     }
 
-    const swapMessage = (n) => {
-        const newmessages = Array.from(messages)
-
-        const swipeid = message.swipe_id + n
-        newmessages.at(id + 1).mes = messages.at(id + 1).swipes.at(swipeid)
-        newmessages.at(id + 1).extra = messages.at(id + 1).swipe_info.at(swipeid).extra
-        newmessages.at(id + 1).send_date = messages.at(id + 1).swipe_info.at(swipeid).send_date
-        newmessages.at(id + 1).gen_started = messages.at(id + 1).swipe_info.at(swipeid).gen_started
-        newmessages.at(id + 1).gen_finished = messages
-            .at(id + 1)
-            .swipe_info.at(swipeid).gen_finished
-        newmessages.at(id + 1).swipe_id = swipeid
-        Chats.saveFile(newmessages, charName, currentChat)
-        setMessages(newmessages)
+    const handleSwipeLeft = () => {
+        Messages.swipeLeft(id + 1)
     }
 
-    const generateSwipe = () => {
-        const newmessages = messages
-        newmessages.at(id + 1).mes = ''
-        newmessages.at(id + 1).swipes.push(``)
-        newmessages.at(id + 1).swipe_info.push({
-            send_date: humanizedISO8601DateTime(),
-            gen_started: Date(),
-            gen_finished: Date(),
-            extra: { api: 'kobold', model: 'concedo/koboldcpp' },
-        })
-        newmessages.at(id + 1).send_date = humanizedISO8601DateTime()
-        newmessages.at(id + 1).gen_started = Date()
-        newmessages.at(id + 1).gen_finished = Date()
-        newmessages.at(id + 1).swipe_id = newmessages.at(id + 1).swipe_id + 1
-        Chats.saveFile(newmessages, charName, currentChat).then(() => {
-            setTargetLength(messages.length)
+    const handleSwipeRight = () => {
+        const atLimit = Messages.swipeRight(id + 1)
+        console.log(atLimit)
+        if (atLimit) {
+            console.log(`at limit`)
+            Messages.addSwipe(id + 1)
             setNowGenerating(true)
-        })
-        setMessages(newmessages)
-    }
-
-    const handleSwipe = (n) => {
-        const swipeid = message.swipe_id + n
-        if (swipeid < 0) return
-        if (swipeid < message.swipes.length) {
-            swapMessage(n)
-            return
         }
-        if (id === 0) return
-        generateSwipe()
-        scroll.current?.scrollToEnd()
     }
 
     const handleEditMessage = () => {
-        setMessages((messages) => {
-            const newmessages = messages
-
-            newmessages.at(id + 1).mes = placeholderText
-            if (newmessages.swipes !== undefined)
-                newmessages.at(id + 1).swipes[newmessages.at(id + 1).swipe_id] = placeholderText
-            Chats.saveFile(newmessages, charName, currentChat)
-            return newmessages
-        })
-        setEditMode((editMode) => false)
+        const newmessages = Messages.updateEntry(id + 1, placeholderText)
+        Chats.saveFile(newmessages, charName, currentChat)
+        setEditMode(false)
     }
 
     const handleDeleteMessage = () => {
-        setMessages((messages) => {
-            const newmessages = messages.slice()
-            newmessages.splice(id + 1, 1)
-            Chats.saveFile(newmessages, charName, currentChat)
-            return newmessages
-        })
-        setEditMode((editMode) => false)
+        const newmessages = Messages.deleteEntry(id + 1)
+        Chats.saveFile(newmessages, charName, currentChat)
+        setEditMode(false)
     }
 
     const handleEnableEdit = () => {
@@ -291,10 +236,13 @@ const ChatItem = ({ message, id, scroll }) => {
                 <View style={styles.swipesItem}>
                     {!nowGenerating && (
                         <TouchableOpacity
-                            onPress={() => {
-                                handleSwipe(-1)
-                            }}>
-                            <AntDesign name="left" size={20} color={Color.Button} />
+                            onPress={handleSwipeLeft}
+                            disabled={message.swipe_id === 0}>
+                            <AntDesign
+                                name="left"
+                                size={20}
+                                color={message.swipe_id === 0 ? Color.Offwhite : Color.Button}
+                            />
                         </TouchableOpacity>
                     )}
                     <View style={styles.swipeTextContainer}>
@@ -304,10 +252,7 @@ const ChatItem = ({ message, id, scroll }) => {
                     </View>
 
                     {!nowGenerating && (
-                        <TouchableOpacity
-                            onPress={() => {
-                                handleSwipe(1)
-                            }}>
+                        <TouchableOpacity onPress={handleSwipeRight}>
                             <AntDesign name="right" size={20} color={Color.Button} />
                         </TouchableOpacity>
                     )}

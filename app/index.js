@@ -1,6 +1,6 @@
 import { ChatWindow } from '@components/ChatMenu/ChatWindow/ChatWindow'
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Chats, Characters, MessageContext } from '@globals'
+import { Global, Color, Chats, Messages } from '@globals'
 import { generateResponse } from '@lib/Inference'
 import { Stack, useRouter } from 'expo-router'
 import { useState, useEffect } from 'react'
@@ -10,56 +10,16 @@ import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-m
 
 const Home = () => {
     const router = useRouter()
-    // User
+
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
-    const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
-    // Character
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
-    // Process
     const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
-    // Instruct
-    const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
-    // Local
-    const [messages, setMessages] = useState([])
+    const [messages, setMessages] = useMMKVObject(Global.Messages)
+
     const [newMessage, setNewMessage] = useState('')
-    // this target length allows for managing whether a message is replaced, added or swiped
-    const [targetLength, setTargetLength] = useState(0)
     // dynamically set abort function that is set by respective API
     const [abortFunction, setAbortFunction] = useState(undefined)
 
-    // load character chat upon character change, functionality might better be a dedicated function
-
-    /*
-		One big issue with state management is the old message passing, caused by
-		very pre-global design using useContext. It may be more viable to somehow drill 
-		proper functionality down to ChatItem and handle message states and character loading.
-		
-	*/
-
-    // TODO: Move messages to MMKV, this will solve all these needless useEffects
-
-    useEffect(() => {
-        if (charName === 'Welcome' || charName === undefined) return
-        console.log(`Character changed to ${charName}`)
-        Chats.getNewest(charName).then((filename) => setCurrentChat(filename))
-        Characters.getCard(charName).then((data) => {
-            setCurrentCard(JSON.parse(data))
-        })
-    }, [charName])
-
-    // load character upon currentChat changing - consider replacing for global messages
-    useEffect(() => {
-        if (currentChat === '' || charName === 'Welcome' || charName === undefined) {
-            return
-        }
-        console.log('Now reading ' + currentChat + ' for ' + charName)
-        Chats.getFile(charName, currentChat).then((newmessage) => {
-            setMessages((messages) => newmessage)
-        })
-    }, [currentChat])
-
-    // triggers generation when set true
     useEffect(() => {
         nowGenerating && startInference()
 
@@ -76,46 +36,13 @@ const Home = () => {
 
     const startInference = async () => {
         setNewMessage((message) => '')
-        insertGeneratedMessage('')
-        generateResponse(setAbortFunction, insertGeneratedMessage, messages)
+        generateResponse(setAbortFunction, Messages.insert, messages)
     }
 
     const handleSend = () => {
-        if (newMessage.trim() !== '') {
-            const newMessageItem = Chats.createEntry(userName, true, newMessage)
-            setMessages((messages) => [...messages, newMessageItem])
-            setTargetLength(messages.length + 2)
-        } else setTargetLength(messages.length + 1)
-
+        if (newMessage.trim() !== '') Messages.insertUserEntry(newMessage)
+        Messages.insertCharacterEntry()
         setNowGenerating(true)
-    }
-
-    const insertGeneratedMessage = (data) => {
-        setMessages((messages) => {
-            try {
-                const createnew = messages.length < targetLength
-                const mescontent = (createnew ? data : messages.at(-1).mes + data)
-                    .replaceAll(currentInstruct.input_sequence, ``)
-                    .replaceAll(currentInstruct.output_sequence, ``)
-                    .replaceAll(currentInstruct.stop_sequence, '')
-                    .replaceAll(userName + ':', '')
-                    .replaceAll(charName + ':', '')
-                const newmessage = createnew
-                    ? Chats.createEntry(charName, false, '')
-                    : messages.at(-1)
-                newmessage.mes = mescontent
-                newmessage.swipes[newmessage.swipe_id] = mescontent
-                newmessage.gen_finished = Date()
-                newmessage.swipe_info[newmessage.swipe_id].gen_finished = Date()
-                const finalized_messages = createnew
-                    ? [...messages, newmessage]
-                    : [...messages.slice(0, -1), newmessage]
-                return finalized_messages
-            } catch (error) {
-                console.log('Couldnt write due to:' + error)
-                return messages
-            }
-        })
     }
 
     const abortResponse = () => {
@@ -128,17 +55,13 @@ const Home = () => {
         const len = messages.length
         if (messages.at(-1)?.name === charName) {
             setMessages(messages.slice(0, -1))
-            setTargetLength(len)
-        } else setTargetLength(len + 1)
+        }
+        Messages.insertCharacterEntry()
         setNowGenerating(true)
     }
 
     const continueResponse = () => {
         console.log(`Continuing Reponse`)
-        setTargetLength(messages.length + (messages.at(-1).name === charName) ? 0 : 1)
-        if (messages.at(-1).name === charName) {
-            setTargetLength(messages.length)
-        } else setTargetLength(messages.length + 1)
         setNowGenerating(true)
     }
 
@@ -195,62 +118,60 @@ const Home = () => {
                     <Text style={styles.welcometext}>Select A Character To Get Started!</Text>
                 </View>
             ) : (
-                <MessageContext.Provider value={[messages, setMessages, setTargetLength]}>
-                    <View style={styles.container}>
-                        <ChatWindow messages={messages} />
+                <View style={styles.container}>
+                    <ChatWindow messages={messages} />
 
-                        <View style={styles.inputContainer}>
-                            <Menu>
-                                <MenuTrigger>
-                                    <MaterialIcons
-                                        name="menu"
-                                        style={styles.optionsButton}
-                                        size={36}
-                                        color={Color.Button}
-                                    />
-                                </MenuTrigger>
-                                <MenuOptions customStyles={styles.optionMenu}>
-                                    {menuoptions.map((item, index) => (
-                                        <MenuOption key={index} onSelect={item.callback}>
-                                            <View
-                                                style={
-                                                    index === menuoptions.length - 1
-                                                        ? styles.optionItemLast
-                                                        : styles.optionItem
-                                                }>
-                                                <Ionicons
-                                                    name={item.button}
-                                                    color={Color.Button}
-                                                    size={24}
-                                                />
-                                                <Text style={styles.optionText}>{item.text}</Text>
-                                            </View>
-                                        </MenuOption>
-                                    ))}
-                                </MenuOptions>
-                            </Menu>
+                    <View style={styles.inputContainer}>
+                        <Menu>
+                            <MenuTrigger>
+                                <MaterialIcons
+                                    name="menu"
+                                    style={styles.optionsButton}
+                                    size={36}
+                                    color={Color.Button}
+                                />
+                            </MenuTrigger>
+                            <MenuOptions customStyles={styles.optionMenu}>
+                                {menuoptions.map((item, index) => (
+                                    <MenuOption key={index} onSelect={item.callback}>
+                                        <View
+                                            style={
+                                                index === menuoptions.length - 1
+                                                    ? styles.optionItemLast
+                                                    : styles.optionItem
+                                            }>
+                                            <Ionicons
+                                                name={item.button}
+                                                color={Color.Button}
+                                                size={24}
+                                            />
+                                            <Text style={styles.optionText}>{item.text}</Text>
+                                        </View>
+                                    </MenuOption>
+                                ))}
+                            </MenuOptions>
+                        </Menu>
 
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Message..."
-                                placeholderTextColor={Color.Offwhite}
-                                value={newMessage}
-                                onChangeText={(text) => setNewMessage(text)}
-                                multiline
-                            />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Message..."
+                            placeholderTextColor={Color.Offwhite}
+                            value={newMessage}
+                            onChangeText={(text) => setNewMessage(text)}
+                            multiline
+                        />
 
-                            {nowGenerating ? (
-                                <TouchableOpacity style={styles.sendButton} onPress={abortResponse}>
-                                    <MaterialIcons name="stop" color={Color.Button} size={30} />
-                                </TouchableOpacity>
-                            ) : (
-                                <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-                                    <MaterialIcons name="send" color={Color.Button} size={30} />
-                                </TouchableOpacity>
-                            )}
-                        </View>
+                        {nowGenerating ? (
+                            <TouchableOpacity style={styles.sendButton} onPress={abortResponse}>
+                                <MaterialIcons name="stop" color={Color.Button} size={30} />
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+                                <MaterialIcons name="send" color={Color.Button} size={30} />
+                            </TouchableOpacity>
+                        )}
                     </View>
-                </MessageContext.Provider>
+                </View>
             )}
         </SafeAreaView>
     )

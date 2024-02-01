@@ -16,6 +16,7 @@ import { humanizedISO8601DateTime } from './Utils'
 import { Llama } from './llama'
 import { mmkv } from './mmkv'
 import { Logger } from './Logger'
+import { Messages } from './Messages'
 export {
     mmkv,
     Presets,
@@ -28,9 +29,8 @@ export {
     Llama,
     humanizedISO8601DateTime,
     Logger,
+    Messages,
 }
-
-export const MessageContext = createContext([])
 
 /*
     Partition data
@@ -116,6 +116,7 @@ export const startupApp = () => {
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
     mmkv.set(Global.HordeModels, JSON.stringify([]))
     mmkv.set(Global.LocalModelWeights, JSON.stringify({}))
+    mmkv.set(Global.Messages, JSON.stringify([]))
     if (mmkv.getString(Global.Logs) === undefined) mmkv.set(Global.Logs, JSON.stringify([]))
     if (mmkv.getString(Global.LorebookNames) === undefined)
         mmkv.set(Global.LorebookNames, JSON.stringify([]))
