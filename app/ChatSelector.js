@@ -1,5 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Chats, Characters, saveStringExternal, Logger } from '@globals'
+import { Global, Color, Chats, Characters, saveStringExternal, Logger, Messages } from '@globals'
 import { useRouter, Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, View, Text, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native'
@@ -52,6 +52,14 @@ const ChatSelector = () => {
         })
     }
 
+    const handleSelectChat = async (filename) => {
+        setCurrentChat(filename)
+        Chats.getFile(charName, filename).then((chat) => {
+            Messages.set(chat)
+        })
+        router.back()
+    }
+
     return (
         <ScrollView style={styles.mainContainer}>
             <Stack.Screen
@@ -62,10 +70,9 @@ const ChatSelector = () => {
                                 style={styles.headerButtonRight}
                                 onPress={() => {
                                     // create new default chat from globals
-                                    Chats.createDefault(charName, userName).then((response) =>
-                                        setCurrentChat(response)
+                                    Chats.createDefault(charName, userName).then((filename) =>
+                                        handleSelectChat(filename)
                                     )
-                                    router.back()
                                 }}>
                                 <FontAwesome name="plus" size={28} color={Color.Button} />
                             </TouchableOpacity>
@@ -73,24 +80,23 @@ const ChatSelector = () => {
                     ),
                 }}
             />
-            {chats.reverse().map((chat, index) => (
+            {chats.reverse().map((filename, index) => (
                 <TouchableOpacity
                     key={index}
-                    onPress={() => {
-                        setCurrentChat(chat)
-                        router.back()
-                    }}
-                    style={chat === currentChat ? styles.selectedchatlogitem : styles.chatlogitem}>
+                    onPress={() => handleSelectChat(filename)}
+                    style={
+                        filename === currentChat ? styles.selectedchatlogitem : styles.chatlogitem
+                    }>
                     <Image
                         source={{ uri: Characters.getImageDir(charName) }}
                         style={styles.avatar}
                     />
-                    <Text style={styles.chatname}>{chat.replace('.jsonl', '')}</Text>
+                    <Text style={styles.chatname}>{filename.replace('.jsonl', '')}</Text>
 
-                    <TouchableOpacity style={styles.button} onPress={() => exportChat(chat)}>
+                    <TouchableOpacity style={styles.button} onPress={() => exportChat(filename)}>
                         <FontAwesome name="download" size={32} color={Color.Button} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={() => deleteChat(chat)}>
+                    <TouchableOpacity style={styles.button} onPress={() => deleteChat(filename)}>
                         <FontAwesome name="trash" size={32} color={Color.Button} />
                     </TouchableOpacity>
                 </TouchableOpacity>
