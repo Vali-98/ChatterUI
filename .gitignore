@@ -11,6 +11,9 @@ android
 eas.json
 *.apk
 
+# IoS Build
+ios
+
 # builds
 builds/
 
