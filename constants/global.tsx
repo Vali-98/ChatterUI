@@ -2,8 +2,8 @@ import * as Application from 'expo-application'
 import * as Crypto from 'expo-crypto'
 import * as FS from 'expo-file-system'
 import * as SystemUI from 'expo-system-ui'
-import { createContext } from 'react'
-import { StyleSheet } from 'react-native'
+import * as Sharing from 'expo-sharing'
+import { Platform, StyleSheet } from 'react-native'
 
 import { API } from './API'
 import { Characters } from './Characters'
@@ -82,20 +82,22 @@ export const saveStringExternal = async (
     filedata: string,
     mimetype = 'application/json'
 ) => {
-    const permissions = await FS.StorageAccessFramework.requestDirectoryPermissionsAsync()
-    if (permissions.granted) {
-        const directoryUri = permissions.directoryUri
-        await FS.StorageAccessFramework.createFileAsync(directoryUri, filename, mimetype)
-            .then(async (fileUri) => {
-                await FS.writeAsStringAsync(fileUri, filedata, {
-                    encoding: FS.EncodingType.UTF8,
+    if (Platform.OS === 'android') {
+        const permissions = await FS.StorageAccessFramework.requestDirectoryPermissionsAsync()
+        if (permissions.granted) {
+            const directoryUri = permissions.directoryUri
+            await FS.StorageAccessFramework.createFileAsync(directoryUri, filename, mimetype)
+                .then(async (fileUri) => {
+                    await FS.writeAsStringAsync(fileUri, filedata, {
+                        encoding: FS.EncodingType.UTF8,
+                    })
+                    Logger.log(`File saved sucessfully`, true)
                 })
-                Logger.log(`File saved sucessfully`, true)
-            })
-            .catch((e) => {
-                console.log(e)
-            })
-    }
+                .catch((e) => {
+                    console.log(e)
+                })
+        }
+    } else if (Platform.OS === 'ios') Sharing.shareAsync(filename)
 }
 
 // HEADER FOR REQUESTS
