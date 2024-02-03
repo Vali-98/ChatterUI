@@ -23,5 +23,6 @@
         "app/test.jsx",
         "app/deprecated",
         "app/_layout.js",
+        "app/LorebookInfo/BookInfojs",
     ],
 }

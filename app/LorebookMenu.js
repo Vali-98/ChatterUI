@@ -58,7 +58,7 @@ const LorebookMenu = () => {
                             <TouchableOpacity
                                 key={index}
                                 style={styles.lorebookItem}
-                                onPress={() => router.push(`/LorebookInfo/${book}`)}>
+                                onPress={() => router.push(`/BookInfo/${book}`)}>
                                 <Text style={{ color: Color.Text }}>{book}</Text>
                                 <TouchableOpacity>
                                     <FontAwesome

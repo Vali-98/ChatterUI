@@ -17,13 +17,13 @@ import {
 } from 'react-native'
 import { useMMKVString, useMMKVObject } from 'react-native-mmkv'
 
+import { useAutosave } from 'react-autosave'
+
 const CharInfo = () => {
     const router = useRouter()
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
     const [characterCard, setCharacterCard] = useState({})
-
-    // redo charactercard as CONTEXT
 
     const loadcard = () => {
         Characters.getCard(charName).then((data) => {
@@ -31,11 +31,23 @@ const CharInfo = () => {
         })
     }
 
-    const savecard = () => {
+    const autosave = () => {
+        Logger.log(`Autosaved Card ${charName}`)
+        savecard()
+    }
+
+    const savecard = async (data) => {
         return Characters.saveCard(charName, JSON.stringify(characterCard)).then(() => {
             setCurrentCard(characterCard)
         })
     }
+
+    if (characterCard)
+        useAutosave({
+            data: characterCard,
+            onSave: autosave,
+            interval: 3000,
+        })
 
     useEffect(() => {
         loadcard()

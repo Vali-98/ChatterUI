@@ -39,6 +39,7 @@
     "expo-image-picker": "~14.7.1",
     "expo-linking": "~6.2.2",
     "expo-router": "~3.4.6",
+    "expo-sharing": "~11.10.0",
     "expo-speech": "~11.7.0",
     "expo-splash-screen": "~0.26.4",
     "expo-status-bar": "~1.11.1",
@@ -48,6 +49,7 @@
     "png-chunk-text": "^1.0.0",
     "png-chunks-extract": "^1.0.0",
     "react": "18.2.0",
+    "react-autosave": "^0.4.4",
     "react-devtools-core": "^5.0.0",
     "react-dom": "18.2.0",
     "react-native": "0.73.2",
@@ -66,8 +68,7 @@
     "react-native-web": "~0.19.6",
     "rn-animated-ellipsis": "^2.1.3",
     "semver": "^7.5.4",
-    "undefined": "web-streams-polyfill/ponyfill/es6",
-    "expo-sharing": "~11.10.0"
+    "undefined": "web-streams-polyfill/ponyfill/es6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
