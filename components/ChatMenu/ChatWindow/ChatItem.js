@@ -219,7 +219,6 @@ const ChatItem = ({ id }) => {
                                 onChangeText={setPlaceholderText}
                                 textBreakStrategy="simple"
                                 multiline
-                                autoFocus
                             />
                         </View>
                     )}

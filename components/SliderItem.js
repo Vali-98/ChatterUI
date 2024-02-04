@@ -11,6 +11,7 @@ const SliderItem = ({
     max = 1,
     step = 0,
     precision = 0,
+    onChange = undefined,
 }) => {
     const clamp = (val) => Math.min(Math.max(parseFloat(val?.toFixed(2) ?? 0), min), max)
     const [textValue, setTextValue] = useState(body[varname]?.toFixed(precision))
@@ -29,10 +30,17 @@ const SliderItem = ({
                     minimumValue={min}
                     maximumValue={max}
                     value={body[varname]}
-                    onValueChange={(value) => {
-                        setValue({ ...body, [varname]: clamp(value) })
-                        setTextValue(clamp(value).toFixed(precision))
-                    }}
+                    onValueChange={
+                        onChange
+                            ? (value) => {
+                                  onChange(clamp(value))
+                                  setTextValue(clamp(value).toFixed(precision))
+                              }
+                            : (value) => {
+                                  setValue({ ...body, [varname]: clamp(value) })
+                                  setTextValue(clamp(value).toFixed(precision))
+                              }
+                    }
                     minimumTrackTintColor={Color.White}
                     maximumTrackTintColor={Color.Offwhite}
                     thumbTintColor={Color.White}

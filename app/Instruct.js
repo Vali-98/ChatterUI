@@ -2,12 +2,13 @@ import CheckboxTitle from '@components/CheckboxTitle'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Instructs, saveStringExternal, Logger, useAutosave } from '@globals'
+import { Global, Color, Instructs, saveStringExternal, Logger } from '@globals'
 import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
 import { View, SafeAreaView, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
+import { useAutosave } from 'react-autosave'
 
 const Instruct = () => {
     const [instructName, setInstructName] = useMMKVString(Global.InstructName)
