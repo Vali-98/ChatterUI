@@ -119,6 +119,10 @@ export const startupApp = () => {
     mmkv.set(Global.HordeModels, JSON.stringify([]))
     mmkv.set(Global.LocalModelWeights, JSON.stringify({}))
     mmkv.set(Global.Messages, JSON.stringify([]))
+    mmkv.set(
+        Global.PresetData,
+        Presets.fixPreset(JSON.parse(mmkv.getString(Global.PresetData) ?? '{}'))
+    )
     if (mmkv.getString(Global.Logs) === undefined) mmkv.set(Global.Logs, JSON.stringify([]))
     if (mmkv.getString(Global.LorebookNames) === undefined)
         mmkv.set(Global.LorebookNames, JSON.stringify([]))
