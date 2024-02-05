@@ -121,7 +121,7 @@ export namespace Messages {
     export const insertFromBuffer = () => {
         //@ts-ignore
         const buffer = useBuffer.getState().buffer
-        updateLastEntry(buffer)
+        if (buffer) updateLastEntry(buffer)
     }
 
     export const deleteEntry = (index: number, range: number = 1) => {
