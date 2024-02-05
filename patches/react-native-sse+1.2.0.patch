@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-sse/src/EventSource.js b/node_modules/react-native-sse/src/EventSource.js
+index ee03edc..bdf0fc3 100644
+--- a/node_modules/react-native-sse/src/EventSource.js
++++ b/node_modules/react-native-sse/src/EventSource.js
+@@ -111,6 +111,7 @@ class EventSource {
+ 
+           if (xhr.readyState === XMLHttpRequest.DONE) {
+             this._logDebug('[EventSource][onreadystatechange][DONE] Operation done.');
++            this.close()
+             this._pollAgain(this.interval, false);
+           }
+         } else if (xhr.status !== 0) {

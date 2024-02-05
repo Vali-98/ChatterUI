@@ -1,9 +1,9 @@
-import { StyleSheet, KeyboardAvoidingView, FlatList } from 'react-native'
+import { StyleSheet, KeyboardAvoidingView, FlatList, ScrollView } from 'react-native'
 import { ChatItem } from './ChatItem'
 import { Color, Global } from '@globals'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useEffect, useRef } from 'react'
-
+import { ChatItemLast } from './ChatItemLast'
 const ChatWindow = ({ messages }) => {
     // this solution will have to change once editing is enabled as updating the content will scroll
     const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
@@ -23,18 +23,27 @@ const ChatWindow = ({ messages }) => {
             }))
             .reverse()
     }
+
+    const renderItems = ({ item, index }) => {
+        if (index === 0) return <ChatItemLast id={item.index} message={item.message} />
+        return <ChatItem id={item.index} message={item.message} />
+    }
+
     return (
         <KeyboardAvoidingView style={styles.chatHistory}>
-            <FlatList
-                ref={flatListRef}
-                inverted
-                windowSize={3}
-                data={getItems()}
-                keyExtractor={(item) => item.key}
-                renderItem={({ item, index }) => (
-                    <ChatItem id={item.index} message={item.message} />
-                )}
-            />
+            {/*messages.slice(1).map((item, index) => (
+                    <ChatItem id={index} message={item} />
+                ))*/}
+            {
+                <FlatList
+                    ref={flatListRef}
+                    inverted
+                    windowSize={3}
+                    data={getItems()}
+                    keyExtractor={(item) => item.key}
+                    renderItem={renderItems}
+                />
+            }
         </KeyboardAvoidingView>
     )
 }

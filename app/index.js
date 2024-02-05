@@ -15,14 +15,11 @@ const Home = () => {
     const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     const [messages, setMessages] = useMMKVObject(Global.Messages)
-
     const [newMessage, setNewMessage] = useState('')
     // dynamically set abort function that is set by respective API
     const [abortFunction, setAbortFunction] = useState(undefined)
-
     useEffect(() => {
         nowGenerating && startInference()
-
         if (
             !nowGenerating &&
             currentChat !== '' &&
@@ -30,6 +27,7 @@ const Home = () => {
             messages.length !== 0
         ) {
             console.log(`Saving chat`)
+            Messages.insertFromBuffer()
             Chats.saveFile(messages, charName, currentChat)
         }
     }, [nowGenerating])
@@ -52,7 +50,6 @@ const Home = () => {
 
     const regenerateResponse = () => {
         console.log('Regenerate Response')
-        console.log(messages.length)
         if (messages.at(-1)?.name === charName && messages.length !== 2) {
             setMessages(messages.slice(0, -1))
         }
