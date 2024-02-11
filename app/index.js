@@ -27,8 +27,7 @@ const Home = () => {
             messages.length !== 0
         ) {
             console.log(`Saving chat`)
-            Messages.insertFromBuffer()
-            Chats.saveFile(messages, charName, currentChat)
+            Chats.saveFile(Messages.insertFromBuffer(), charName, currentChat)
         }
     }, [nowGenerating])
 

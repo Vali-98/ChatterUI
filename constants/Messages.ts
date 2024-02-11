@@ -5,12 +5,186 @@ import { Logger } from './Logger'
 import { humanizedISO8601DateTime } from './Utils'
 import { mmkv } from './mmkv'
 import { create } from 'zustand'
+import * as FS from 'expo-file-system'
+import { randomUUID } from 'expo-crypto'
+
+type MessageExtra = {
+    api: string
+    model: string
+}
+
+type MessageSwipeInfo = {
+    send_date: string
+    extra: MessageExtra
+    gen_started: string
+    gen_finished: string
+}
+
+type MessageEntry = {
+    name: string
+    is_user: boolean
+    mes: string
+    // metadata
+    send_date: string
+    gen_started: string
+    gen_finished: string
+    extra: MessageExtra
+    swipe_id: number
+    swipes: Array<string>
+    swipe_info: Array<MessageSwipeInfo>
+}
+
+type MessageObject = {
+    [key: number]: MessageEntry
+}
+
+type ChatMetadata = {
+    note_prompt: string
+    note_interval: number
+    note_position: number
+    note_depth: number
+    objective: any
+}
+
+type ChatInfo = {
+    userName: string
+    charName: string
+    createDate: string
+    chat_metadata: ChatMetadata
+}
+
+interface ChatState {
+    name: string | undefined
+    metadata: ChatInfo | undefined
+    data: MessageObject | undefined
+    buffer: string
+    load: (charName: string, chatName: string) => void
+    delete: (charName: string, chatName: string) => void
+    save: (name: string) => void
+    reset: () => void
+    swipe: (id: number, direction: number) => boolean
+    setBuffer: (data: string) => void
+    insertBuffer: (data: string) => void
+}
+
+const getChatDir = (charName: string, chatfilename: string): string => {
+    return `${FS.documentDirectory}characters/${charName}/chats/${chatfilename}`
+}
+
+const useChat = create<ChatState>((set, get: () => ChatState) => ({
+    name: undefined,
+    metadata: undefined,
+    data: undefined,
+    buffer: '',
+
+    load: async (charName: string, chatName: string) => {
+        const chat = await FS.readAsStringAsync(
+            getChatDir(charName, chatName),
+            FS.EncodingType.UTF8
+        ).catch((error) => {
+            Logger.log('Failed to load: ' + error, true)
+        })
+        if (!chat) {
+            Logger.log('Chat does not exist', true)
+            return
+        }
+        const chatlist = chat.split('\u000d\u000a').map((row) => JSON.parse(row))
+
+        /*const chatObject = {
+            ...chatlist.splice(1).map((item: MessageEntry) => ({ [randomUUID()]: item })).values,
+        }*/
+        const chatObject = chatlist.reduce(
+            (object: MessageObject, entry: MessageEntry) => ({
+                ...object,
+                [randomUUID()]: entry,
+            }),
+            {}
+        )
+
+        set((state: ChatState) => ({
+            ...state,
+            metadata: chatlist[1],
+            data: chatObject,
+            name: chatName,
+            charName: charName,
+        }))
+    },
+
+    delete: async (charName: string, chatName: string) => {
+        await FS.deleteAsync(getChatDir(charName, chatName)).catch((error) => {
+            Logger.log('Failed to load: ' + error, true)
+        })
+        if (get().name === chatName) get().reset()
+    },
+
+    reset: () =>
+        set((state: ChatState) => ({
+            ...state,
+            metadata: undefined,
+            data: undefined,
+            name: undefined,
+            charName: undefined,
+        })),
+
+    save: (name: string) => {
+        const dataarray = Object.entries(get().data ?? {}).map((key, value) => value)
+        const output: string = [get().metadata, ...dataarray]
+            .map((item) => JSON.stringify(item))
+            .join('\u000d\u000a')
+        const charName: string = get()?.metadata?.charName ?? ''
+        const chatName: string = get().name ?? ''
+        if (charName && chatName)
+            FS.writeAsStringAsync(getChatDir(charName, chatName), output).catch((error) => {
+                Logger.log('Failed to load: ' + error, true)
+            })
+    },
+
+    swipe: (id: number, direction: number) => {
+        const message: MessageEntry | undefined = get()?.data?.[id]
+
+        if (!message) return false
+
+        const target = message.swipe_id + direction
+        const limit = message.swipes.length - 1
+
+        if (target < 0) return false
+        if (target > limit) return true
+
+        const new_swipe: string = message.swipes.at(target) ?? ''
+        const new_info = message.swipe_info.at(target)
+        const newmessage: MessageEntry = {
+            ...message,
+            mes: new_swipe,
+            ...new_info,
+            swipe_id: target,
+        }
+
+        set((state: ChatState) => ({
+            ...state,
+            data: { ...state.data, [id]: newmessage },
+        }))
+
+        return false
+    },
+
+    setBuffer: (newBuffer: string) => set((state: any) => ({ ...state, buffer: newBuffer })),
+
+    insertBuffer: (data: string) =>
+        set((state: any) => ({ ...state, buffer: state.buffer + data })),
+}))
+
 export namespace Messages {
     export const set = (data: Array<any>) => {
         mmkv.set(Global.Messages, JSON.stringify(data))
     }
 
-    export const useBuffer = create((set) => ({
+    interface BufferState {
+        buffer: string
+        setBuffer: (data: string) => void
+        insertBuffer: (data: string) => void
+    }
+
+    export const useBuffer = create<BufferState>((set) => ({
         buffer: '',
         setBuffer: (newBuffer: string) => set({ buffer: newBuffer }),
         insertBuffer: (data: string) => set((state: any) => ({ buffer: state.buffer + data })),
@@ -119,9 +293,9 @@ export namespace Messages {
     }
 
     export const insertFromBuffer = () => {
-        //@ts-ignore
         const buffer = useBuffer.getState().buffer
-        if (buffer) updateLastEntry(buffer)
+        if (buffer) return updateLastEntry(buffer)
+        useBuffer.getState().setBuffer('')
     }
 
     export const deleteEntry = (index: number, range: number = 1) => {
@@ -147,6 +321,8 @@ export namespace Messages {
         const index = messages.length - 1
         messages.at(index).mes = data
         messages.at(index).swipes[messages.at(index).swipe_id] = data
+        messages.at(index).gen_finished = new Date()
+        messages.at(index).swipe_info[messages.at(index).swipe_id].gen_finished = new Date()
         mmkv.set(Global.Messages, JSON.stringify(messages))
         return messages
     }
