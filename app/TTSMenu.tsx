@@ -7,7 +7,7 @@ import { StyleSheet, Text, TouchableOpacity, View, Switch } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 
-function groupBy(array, key) {
+function groupBy(array: Array<any>, key: string) {
     if (array.length === 0) return []
     return array.reduce((result, obj) => {
         const keyValue = obj[key]
@@ -19,12 +19,16 @@ function groupBy(array, key) {
     }, {})
 }
 
+type LanguageListItem = {
+    [key: string]: Array<Speech.Voice>
+}
+
 const TTSMenu = () => {
-    const [currentSpeaker, setCurrentSpeaker] = useMMKVObject(Global.TTSSpeaker)
+    const [currentSpeaker, setCurrentSpeaker] = useMMKVObject<Speech.Voice>(Global.TTSSpeaker)
     const [enableTTS, setEnableTTS] = useMMKVBoolean(Global.TTSEnable)
     const [lang, setLang] = useState(currentSpeaker?.language ?? 'en-US')
-    const [modelList, setModelList] = useState([])
-    const languageList = groupBy(modelList, 'language')
+    const [modelList, setModelList] = useState<Array<Speech.Voice>>([])
+    const languageList: LanguageListItem = groupBy(modelList, 'language')
 
     const languages = Object.keys(languageList)
         .sort()
@@ -84,7 +88,7 @@ const TTSMenu = () => {
                     />
                     <TouchableOpacity
                         style={{ ...styles.button, marginLeft: 8 }}
-                        onPress={getVoices}>
+                        onPress={() => getVoices()}>
                         <FontAwesome name="refresh" size={20} color={Color.White} />
                     </TouchableOpacity>
                 </View>
@@ -101,9 +105,9 @@ const TTSMenu = () => {
                         value={currentSpeaker?.identifier ?? ''}
                         style={styles.dropdownbox}
                         selectedTextStyle={styles.selected}
-                        data={languageList[lang] ?? {}}
-                        labelField="identifier"
-                        valueField="name"
+                        data={languageList[lang]}
+                        labelField={'identifier'}
+                        valueField={'name'}
                         containerStyle={styles.dropdownbox}
                         itemTextStyle={{ color: Color.Text }}
                         itemContainerStyle={{

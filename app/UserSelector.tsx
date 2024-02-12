@@ -20,8 +20,8 @@ const UserSelector = () => {
 
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const [userCard, setUserCard] = useMMKVString(Global.CurrentUserCard)
-    const [userList, setUserList] = useState([])
-    const [showNewUser, setShowNewUser] = useState(false)
+    const [userList, setUserList] = useState<Array<string>>([])
+    const [showNewUser, setShowNewUser] = useState<boolean>(false)
 
     const loadUserList = () => {
         Users.getFileList()
@@ -37,7 +37,7 @@ const UserSelector = () => {
                 }
                 setUserList(response)
                 const cleanlist = response.map((item) => item.replace('.json', ''))
-                if (cleanlist.includes(userName)) return
+                if (userName && cleanlist.includes(userName)) return
                 setUserName(cleanlist[0])
                 Users.loadFile(cleanlist[0]).then((card) => setUserCard(card))
             })

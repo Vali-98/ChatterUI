@@ -1,5 +1,9 @@
 import * as FS from 'expo-file-system'
 
+export type UserCard = {
+    description: string
+}
+
 export namespace Users {
     export const defaultUserName = 'User'
 

@@ -5,7 +5,7 @@ import { MenuProvider } from 'react-native-popup-menu'
 
 // init values should be here
 const Layout = () => {
-    const [firstRender, setFirstRender] = useState(true)
+    const [firstRender, setFirstRender] = useState<boolean>(true)
     // reset defaults
     useEffect(() => {
         startupApp()

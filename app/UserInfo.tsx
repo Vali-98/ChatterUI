@@ -1,3 +1,4 @@
+import { UserCard } from '@constants/Users'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Users } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
@@ -17,10 +18,10 @@ import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 const UserInfo = () => {
     const router = useRouter()
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-    const [userCard, setUserCard] = useMMKVObject(Global.CurrentUserCard)
+    const [userCard, setUserCard] = useMMKVObject<UserCard>(Global.CurrentUserCard)
 
     const saveCard = () => {
-        Users.saveFile(userName, userCard)
+        if (userName && userCard) Users.saveFile(userName, userCard)
     }
 
     return (
@@ -34,7 +35,10 @@ const UserInfo = () => {
 
             <View style={styles.userContainer}>
                 <View style={styles.imageContainer}>
-                    <Image style={styles.userImage} source={{ uri: Users.getImageDir(userName) }} />
+                    <Image
+                        style={styles.userImage}
+                        source={{ uri: Users.getImageDir(userName ?? '') }}
+                    />
                 </View>
                 <View>
                     <Text style={styles.userName}>{userName}</Text>
@@ -55,7 +59,7 @@ const UserInfo = () => {
                                     type: 'image/*',
                                 }).then((result) => {
                                     if (result.canceled) return
-                                    Users.copyImage(result.assets[0].uri, userName)
+                                    if (userName) Users.copyImage(result.assets[0].uri, userName)
                                 })
                             }}>
                             <FontAwesome size={20} name="upload" color={Color.Button} />
@@ -71,7 +75,7 @@ const UserInfo = () => {
                     numberOfLines={6}
                     value={userCard?.description ?? ''}
                     onChangeText={(text) => {
-                        setUserCard({ ...userCard, description: text })
+                        if (userCard) setUserCard({ ...userCard, description: text })
                     }}
                     placeholder="----"
                     placeholderTextColor={Color.Offwhite}
