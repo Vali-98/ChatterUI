@@ -19,7 +19,11 @@ import { polyfill as polyfillTextEncoding } from 'react-native-polyfill-globals/
 polyfillBase64()
 polyfillTextEncoding()
 
-const llamaTokenizer = {}
+const llamaTokenizer = {
+    encode: (string) => {
+        return string
+    },
+}
 
 if (typeof window !== 'undefined') {
     window.llamaTokenizer = llamaTokenizer
