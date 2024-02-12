@@ -10,6 +10,7 @@ import {
     Easing,
     TextInput,
     TouchableOpacity,
+    ImageBackground,
 } from 'react-native'
 //@ts-ignore
 import Markdown from 'react-native-markdown-package'
@@ -29,8 +30,8 @@ type ChatItemProps = {
 
 const ChatItem: React.FC<ChatItemProps> = ({ id }) => {
     // fade in anim
-    //const fadeAnim = useRef(new Animated.Value(0)).current
-    //const dyAnim = useRef(new Animated.Value(50)).current
+    const fadeAnim = useRef(new Animated.Value(0)).current
+    const dyAnim = useRef(new Animated.Value(50)).current
     // globals
     const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
@@ -47,34 +48,23 @@ const ChatItem: React.FC<ChatItemProps> = ({ id }) => {
     const [placeholderText, setPlaceholderText] = useState(message.mes)
     const [editMode, setEditMode] = useState(false)
 
-    const { updateChat, deleteChat, swipeChat, addSwipe } = Chats.useChat(
+    const { updateChat, deleteChat, swipeChat, addSwipe, saveChat } = Chats.useChat(
         useShallow((state) => ({
             updateChat: state.updateEntry,
             deleteChat: state.deleteEntry,
             swipeChat: state.swipe,
             addSwipe: state.addSwipe,
+            saveChat: state.save,
         }))
     )
 
     const buffer = Chats.useChat((state) => (id === messagesLength - 1 ? state.buffer : ''))
-    // figure this  out
-    const [imageExists, setImageExists] = useState(true)
-    useEffect(() => {
-        FS.readAsStringAsync(
-            message.name === charName
-                ? Characters.getImageDir(charName)
-                : Users.getImageDir(userName ?? '')
-        )
-            .then(() => setImageExists(true))
-            .catch(() => setImageExists(false))
-        setPlaceholderText(message.mes)
-    }, [message])
 
     useEffect(() => {
         setEditMode(false)
     }, [nowGenerating])
 
-    /*useEffect(() => {
+    useEffect(() => {
         Animated.parallel([
             Animated.timing(fadeAnim, {
                 toValue: 1, // Target opacity 1 (fully visible)
@@ -88,7 +78,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ id }) => {
                 easing: Easing.out(Easing.exp),
             }),
         ]).start()
-    }, [fadeAnim])*/
+    }, [fadeAnim])
 
     const markdownFormat = {
         em: {
@@ -105,10 +95,12 @@ const ChatItem: React.FC<ChatItemProps> = ({ id }) => {
 
     const handleSwipeLeft = () => {
         swipeChat(id, -1)
+        saveChat()
     }
 
-    const handleSwipeRight = () => {
+    const handleSwipeRight = async () => {
         const atLimit = swipeChat(id, 1)
+        await saveChat()
         if (atLimit) {
             addSwipe()
             setNowGenerating(true)
@@ -116,16 +108,14 @@ const ChatItem: React.FC<ChatItemProps> = ({ id }) => {
     }
 
     const handleEditMessage = () => {
-        //const newmessages = Messages.updateEntry(id + 1, placeholderText)
-        //Chats.saveFile(newmessages, charName, currentChat)
         updateChat(id, placeholderText)
+        saveChat()
         setEditMode(false)
     }
 
     const handleDeleteMessage = () => {
-        //const newmessages = Messages.deleteEntry(id + 1)
-        //Chats.saveFile(newmessages, charName, currentChat)
         deleteChat(id)
+        saveChat()
         setEditMode(false)
     }
     const handleEnableEdit = () => {
@@ -145,11 +135,10 @@ const ChatItem: React.FC<ChatItemProps> = ({ id }) => {
 
     return (
         <Animated.View
-        /*style={{
+            style={{
                 opacity: fadeAnim,
                 transform: [{ translateY: dyAnim }],
-            }}*/
-        >
+            }}>
             <View
                 style={{
                     ...styles.chatItem,
@@ -158,16 +147,20 @@ const ChatItem: React.FC<ChatItemProps> = ({ id }) => {
                         : {}),
                 }}>
                 <View style={{ alignItems: 'center' }}>
-                    <Image
-                        style={styles.avatar}
-                        source={
-                            imageExists
-                                ? message.name === charName
-                                    ? { uri: Characters.getImageDir(charName) }
-                                    : { uri: Users.getImageDir(userName ?? '') }
-                                : require('@assets/user.png')
-                        }
-                    />
+                    <ImageBackground
+                        imageStyle={styles.avatar}
+                        style={styles.avatarBackgroundView}
+                        source={require('@assets/user.png')}>
+                        <Image
+                            style={styles.avatar}
+                            source={{
+                                uri:
+                                    message.name === charName
+                                        ? Characters.getImageDir(charName)
+                                        : Users.getImageDir(userName ?? ''),
+                            }}
+                        />
+                    </ImageBackground>
                     <Text style={styles.graytext}>#{id}</Text>
                     {message?.gen_started !== undefined &&
                         message?.gen_finished !== undefined &&
@@ -309,6 +302,9 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 16,
+    },
+
+    avatarBackgroundView: {
         marginBottom: 4,
         marginLeft: 4,
         marginRight: 8,
