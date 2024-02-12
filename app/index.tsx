@@ -1,44 +1,61 @@
 import { ChatWindow } from '@components/ChatMenu/ChatWindow/ChatWindow'
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Chats, Messages } from '@globals'
+import { Global, Color, Chats } from '@globals'
 import { generateResponse } from '@lib/Inference'
 import { Stack, useRouter } from 'expo-router'
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native'
-import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import { Menu, MenuTrigger, MenuOptions, MenuOption, renderers } from 'react-native-popup-menu'
+import { useMMKVString, useMMKVBoolean } from 'react-native-mmkv'
+import {
+    Menu,
+    MenuTrigger,
+    MenuOptions,
+    MenuOption,
+    renderers,
+    MenuOptionsCustomStyle,
+} from 'react-native-popup-menu'
 const { SlideInMenu } = renderers
+import { useShallow } from 'zustand/react/shallow'
+
 const Home = () => {
     const router = useRouter()
-
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
-    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
-    const [messages, setMessages] = useMMKVObject(Global.Messages)
-    const [newMessage, setNewMessage] = useState('')
+    const [newMessage, setNewMessage] = useState<string>('')
+    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     // dynamically set abort function that is set by respective API
-    const [abortFunction, setAbortFunction] = useState(undefined)
+    const [abortFunction, setAbortFunction] = useState<undefined | Function>(undefined)
+
+    const messagesLength = Chats.useChat(useShallow((state) => state?.data?.length)) ?? -1
+
+    const { updateFromBuffer, saveChat, insertEntry, deleteEntry, setBuffer } = Chats.useChat(
+        useShallow((state) => ({
+            updateFromBuffer: state.updateFromBuffer,
+            saveChat: state.save,
+            insertEntry: state.addEntry,
+            deleteEntry: state.deleteEntry,
+            setBuffer: state.setBuffer,
+        }))
+    )
+
     useEffect(() => {
         nowGenerating && startInference()
-        if (
-            !nowGenerating &&
-            currentChat !== '' &&
-            charName !== 'Welcome' &&
-            messages.length !== 0
-        ) {
+        if (!nowGenerating && charName !== 'Welcome' && messagesLength !== 0) {
             console.log(`Saving chat`)
-            Chats.saveFile(Messages.insertFromBuffer(), charName, currentChat)
+            updateFromBuffer()
+            setBuffer('')
+            saveChat()
         }
     }, [nowGenerating])
 
     const startInference = async () => {
         setNewMessage((message) => '')
-        generateResponse(setAbortFunction, Messages.insert, messages)
+        generateResponse(setAbortFunction, () => {}, [])
     }
 
     const handleSend = () => {
-        if (newMessage.trim() !== '') Messages.insertUserEntry(newMessage)
-        Messages.insertCharacterEntry()
+        if (newMessage.trim() !== '') insertEntry(userName ?? '', true, newMessage)
+        insertEntry(charName ?? '', false, '')
         setNowGenerating(true)
     }
 
@@ -49,10 +66,10 @@ const Home = () => {
 
     const regenerateResponse = () => {
         console.log('Regenerate Response')
-        if (messages.at(-1)?.name === charName && messages.length !== 2) {
-            setMessages(messages.slice(0, -1))
+        if (charName && messagesLength !== 2) {
+            deleteEntry(messagesLength - 1)
         }
-        Messages.insertCharacterEntry()
+        insertEntry(charName ?? '', false, '')
         setNowGenerating(true)
     }
 
@@ -79,13 +96,13 @@ const Home = () => {
                                     <TouchableOpacity
                                         style={styles.headerButtonRight}
                                         onPress={() => {
-                                            router.push('ChatSelector')
+                                            router.push('/ChatSelector')
                                         }}>
                                         <Ionicons name="chatbox" size={28} color={Color.Button} />
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={styles.headerButtonRight}
-                                        onPress={() => router.push(`CharInfo`)}>
+                                        onPress={() => router.push(`/CharInfo`)}>
                                         <FontAwesome name="cog" size={28} color={Color.Button} />
                                     </TouchableOpacity>
                                 </View>
@@ -93,7 +110,7 @@ const Home = () => {
                             <TouchableOpacity
                                 style={styles.headerButtonRight}
                                 onPress={() => {
-                                    router.push('CharMenu')
+                                    router.push('/CharMenu')
                                 }}>
                                 <Ionicons name="person" size={28} color={Color.Button} />
                             </TouchableOpacity>
@@ -102,7 +119,7 @@ const Home = () => {
                     headerLeft: () => (
                         <TouchableOpacity
                             style={styles.headerButtonLeft}
-                            onPress={() => router.push('Settings')}>
+                            onPress={() => router.push('/Settings')}>
                             <Ionicons name="menu" size={28} color={Color.Button} />
                         </TouchableOpacity>
                     ),
@@ -115,7 +132,7 @@ const Home = () => {
                 </View>
             ) : (
                 <View style={styles.container}>
-                    <ChatWindow messages={messages} />
+                    <ChatWindow />
 
                     <View style={styles.inputContainer}>
                         <Menu renderer={SlideInMenu}>
@@ -127,7 +144,7 @@ const Home = () => {
                                     color={Color.Button}
                                 />
                             </MenuTrigger>
-                            <MenuOptions customStyles={styles.optionMenu}>
+                            <MenuOptions customStyles={menustyle}>
                                 {menuoptions.map((item, index) => (
                                     <MenuOption key={index} onSelect={item.callback}>
                                         <View
@@ -137,6 +154,7 @@ const Home = () => {
                                                     : styles.optionItem
                                             }>
                                             <Ionicons
+                                                //@ts-ignore
                                                 name={item.button}
                                                 color={Color.Button}
                                                 size={24}
@@ -172,6 +190,16 @@ const Home = () => {
     )
 }
 
+const menustyle: MenuOptionsCustomStyle = {
+    optionsContainer: {
+        backgroundColor: Color.DarkContainer,
+        padding: 4,
+        borderRadius: 8,
+        //borderColor: Color.Offwhite,
+        //borderWidth: 1,
+    },
+}
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -193,6 +221,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 8,
     },
+
     input: {
         color: Color.Text,
         backgroundColor: Color.DarkContainer,
@@ -213,16 +242,6 @@ const styles = StyleSheet.create({
         marginRight: 4,
     },
 
-    optionMenu: {
-        optionsContainer: {
-            backgroundColor: Color.DarkContainer,
-            padding: 4,
-            borderRadius: 8,
-            //borderColor: Color.Offwhite,
-            //borderWidth: 1,
-        },
-    },
-
     optionItem: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -230,6 +249,7 @@ const styles = StyleSheet.create({
         borderBottomColor: Color.Offwhite,
         borderBottomWidth: 1,
     },
+
     optionItemLast: {
         flexDirection: 'row',
         alignItems: 'center',

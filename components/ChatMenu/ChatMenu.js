@@ -4,10 +4,10 @@ import { ChatWindow } from './ChatWindow/ChatWindow'
 
 // TODO: Move all generation logic here
 
-const ChatMenu = ({ messages }) => {
+const ChatMenu = () => {
     return (
         <View style={{ flex: 1 }}>
-            <ChatWindow messages={messages} />
+            <ChatWindow />
         </View>
     )
 }

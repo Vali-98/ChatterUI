@@ -1,5 +1,5 @@
 import { AntDesign, MaterialIcons } from '@expo/vector-icons'
-import { Global, Color, Chats, Characters, Users, Messages } from '@globals'
+import { Global, Color, Chats, Characters, Users } from '@globals'
 import React, { useRef, useEffect, useState } from 'react'
 import {
     View,
@@ -11,48 +11,70 @@ import {
     TextInput,
     TouchableOpacity,
 } from 'react-native'
+//@ts-ignore
 import Markdown from 'react-native-markdown-package'
 import { useMMKVBoolean, useMMKVObject, useMMKVString } from 'react-native-mmkv'
+//@ts-ignore
 import AnimatedEllipsis from 'rn-animated-ellipsis'
 import SimpleMarkdown from 'simple-markdown'
 import * as FS from 'expo-file-system'
 import TTSMenu from './TTS'
+import { ChatEntry } from '@constants/Chat'
 // global chat property for editing
+import { useShallow } from 'zustand/react/shallow'
 
-const ChatItemLast = ({ id }) => {
+type ChatItemProps = {
+    id: number
+}
+
+const ChatItem: React.FC<ChatItemProps> = ({ id }) => {
     // fade in anim
-    const fadeAnim = useRef(new Animated.Value(0)).current
-    const dyAnim = useRef(new Animated.Value(50)).current
+    //const fadeAnim = useRef(new Animated.Value(0)).current
+    //const dyAnim = useRef(new Animated.Value(50)).current
     // globals
     const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
+    //const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
-    const [messages, setMessages] = useMMKVObject(Global.Messages)
-    const message = messages?.at(id + 1)
+    //const [messages, setMessages] = useMMKVObject < Array<MessageEntry> | undefined>(Global.Messages)
+    //const message = messages?.at(id + 1)
     // local
+    const message: ChatEntry =
+        Chats.useChat(useShallow((state) => state?.data?.[id])) ?? Chats.createEntry('', false, '')
+    const messagesLength = Chats.useChat(useShallow((state) => state.data?.length)) ?? -1
+
     const [placeholderText, setPlaceholderText] = useState(message.mes)
     const [editMode, setEditMode] = useState(false)
-    const buffer = Messages.useBuffer((state) => state.buffer)
+
+    const { updateChat, deleteChat, swipeChat, addSwipe } = Chats.useChat(
+        useShallow((state) => ({
+            updateChat: state.updateEntry,
+            deleteChat: state.deleteEntry,
+            swipeChat: state.swipe,
+            addSwipe: state.addSwipe,
+        }))
+    )
+
+    const buffer = Chats.useChat((state) => (id === messagesLength - 1 ? state.buffer : ''))
     // figure this  out
     const [imageExists, setImageExists] = useState(true)
     useEffect(() => {
         FS.readAsStringAsync(
             message.name === charName
                 ? Characters.getImageDir(charName)
-                : Users.getImageDir(userName)
+                : Users.getImageDir(userName ?? '')
         )
             .then(() => setImageExists(true))
             .catch(() => setImageExists(false))
-        setPlaceholderText(message)
+        setPlaceholderText(message.mes)
     }, [message])
 
     useEffect(() => {
         setEditMode(false)
     }, [nowGenerating])
 
-    useEffect(() => {
+    /*useEffect(() => {
         Animated.parallel([
             Animated.timing(fadeAnim, {
                 toValue: 1, // Target opacity 1 (fully visible)
@@ -66,7 +88,7 @@ const ChatItemLast = ({ id }) => {
                 easing: Easing.out(Easing.exp),
             }),
         ]).start()
-    }, [fadeAnim])
+    }, [fadeAnim])*/
 
     const markdownFormat = {
         em: {
@@ -82,29 +104,30 @@ const ChatItemLast = ({ id }) => {
     }
 
     const handleSwipeLeft = () => {
-        Messages.swipeLeft(id + 1)
+        swipeChat(id, -1)
     }
 
     const handleSwipeRight = () => {
-        const atLimit = Messages.swipeRight(id + 1)
+        const atLimit = swipeChat(id, 1)
         if (atLimit) {
-            Messages.addSwipe(id + 1)
+            addSwipe()
             setNowGenerating(true)
         }
     }
 
     const handleEditMessage = () => {
-        const newmessages = Messages.updateEntry(id + 1, placeholderText)
-        Chats.saveFile(newmessages, charName, currentChat)
+        //const newmessages = Messages.updateEntry(id + 1, placeholderText)
+        //Chats.saveFile(newmessages, charName, currentChat)
+        updateChat(id, placeholderText)
         setEditMode(false)
     }
 
     const handleDeleteMessage = () => {
-        const newmessages = Messages.deleteEntry(id + 1)
-        Chats.saveFile(newmessages, charName, currentChat)
+        //const newmessages = Messages.deleteEntry(id + 1)
+        //Chats.saveFile(newmessages, charName, currentChat)
+        deleteChat(id)
         setEditMode(false)
     }
-
     const handleEnableEdit = () => {
         setPlaceholderText(message.mes)
         setEditMode(!nowGenerating)
@@ -117,23 +140,20 @@ const ChatItemLast = ({ id }) => {
 
     const deltaTime = Math.max(
         0,
-        (
-            ((nowGenerating ? new Date() : new Date(message.gen_finished)) -
-                new Date(message.gen_started)) /
-            1000
-        ).toFixed(0)
+        (Date.parse(message.gen_finished) - Date.parse(message.gen_started)) / 1000
     )
 
     return (
         <Animated.View
-            style={{
+        /*style={{
                 opacity: fadeAnim,
                 transform: [{ translateY: dyAnim }],
-            }}>
+            }}*/
+        >
             <View
                 style={{
                     ...styles.chatItem,
-                    ...(id === messages.length - 2
+                    ...(id === messagesLength - 1
                         ? { borderBottomWidth: 1, borderColor: Color.Offwhite }
                         : {}),
                 }}>
@@ -144,7 +164,7 @@ const ChatItemLast = ({ id }) => {
                             imageExists
                                 ? message.name === charName
                                     ? { uri: Characters.getImageDir(charName) }
-                                    : { uri: Users.getImageDir(userName) }
+                                    : { uri: Users.getImageDir(userName ?? '') }
                                 : require('@assets/user.png')
                         }
                     />
@@ -197,7 +217,7 @@ const ChatItemLast = ({ id }) => {
                         message.name === charName &&
                         buffer === '' &&
                         nowGenerating &&
-                        id === messages.length - 2 ? (
+                        id === messagesLength - 1 ? (
                             <View style={{ ...styles.messageTextContainer, padding: 5 }}>
                                 <AnimatedEllipsis style={{ color: Color.White, fontSize: 20 }} />
                             </View>
@@ -210,9 +230,9 @@ const ChatItemLast = ({ id }) => {
                                     style={styles.messageText}
                                     styles={markdownFormat}
                                     rules={{ speech }}>
-                                    {nowGenerating && id === messages.length - 2
-                                        ? buffer.trim('\n')
-                                        : message.mes.trim(`\n`)}
+                                    {nowGenerating && id === messagesLength - 1
+                                        ? buffer.trim()
+                                        : message.mes.trim()}
                                 </Markdown>
                             </TouchableOpacity>
                         )
@@ -230,7 +250,7 @@ const ChatItemLast = ({ id }) => {
                 </View>
             </View>
 
-            {((id === messages?.length - 2 &&
+            {((id === messagesLength - 1 &&
                 message.name === charName &&
                 message?.swipes !== undefined &&
                 id !== 0) ||
@@ -264,7 +284,7 @@ const ChatItemLast = ({ id }) => {
     )
 }
 
-export { ChatItemLast }
+export { ChatItem }
 
 const styles = StyleSheet.create({
     chatItem: {
@@ -329,15 +349,15 @@ const styles = StyleSheet.create({
 const speechStyle = { color: Color.TextQuote }
 const speech = {
     order: SimpleMarkdown.defaultRules.em.order + 0.6,
-    match(source, state, lookbehind) {
+    match(source: string, state: any, lookbehind: any) {
         return /^"([\s\S]+?)"(?!")/.exec(source)
     },
-    parse(capture, parse, state) {
+    parse(capture: any, parse: any, state: any) {
         return {
             content: parse(capture[1], state),
         }
     },
-    react(node, output, { ...state }) {
+    react(node: any, output: any, { ...state }) {
         state.withinText = true
         state.style = {
             ...(state.style || {}),

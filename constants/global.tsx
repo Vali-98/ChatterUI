@@ -7,7 +7,7 @@ import { Platform, StyleSheet } from 'react-native'
 
 import { API } from './API'
 import { Characters } from './Characters'
-import { Chats } from './Chats'
+import { Chats } from './Chat'
 import { Global } from './GlobalValues'
 import { Instructs } from './Instructs'
 import { Presets } from './Presets'
@@ -17,6 +17,7 @@ import { Llama } from './llama'
 import { mmkv } from './mmkv'
 import { Logger } from './Logger'
 import { Messages } from './Messages'
+
 export {
     mmkv,
     Presets,
@@ -29,7 +30,6 @@ export {
     Llama,
     humanizedISO8601DateTime,
     Logger,
-    Messages,
 }
 
 /*
@@ -112,13 +112,13 @@ export const hordeHeader = () => {
 
 export const startupApp = () => {
     mmkv.set(Global.CurrentCharacter, 'Welcome')
-    mmkv.set(Global.CurrentChat, '')
+    //mmkv.set(Global.CurrentChat, '')
     mmkv.set(Global.CurrentCharacterCard, JSON.stringify(`{}`))
     mmkv.set(Global.NowGenerating, false)
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
     mmkv.set(Global.HordeModels, JSON.stringify([]))
     mmkv.set(Global.LocalModelWeights, JSON.stringify({}))
-    mmkv.set(Global.Messages, JSON.stringify([]))
+    //mmkv.set(Global.Messages, JSON.stringify([]))
     mmkv.set(
         Global.PresetData,
         Presets.fixPreset(JSON.parse(mmkv.getString(Global.PresetData) ?? '{}'))
