@@ -26,16 +26,26 @@ import { useShallow } from 'zustand/react/shallow'
 
 type ChatItemProps = {
     id: number
+    nowGenerating: boolean
+    setNowGenerating: (b: boolean) => void
+    charName: string
+    userName: string
 }
 
-const ChatItem: React.FC<ChatItemProps> = ({ id }) => {
+const ChatItem: React.FC<ChatItemProps> = ({
+    id,
+    nowGenerating,
+    setNowGenerating,
+    charName,
+    userName,
+}) => {
     // fade in anim
     const fadeAnim = useRef(new Animated.Value(0)).current
     const dyAnim = useRef(new Animated.Value(50)).current
     // globals
-    const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
-    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    //const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
+    //const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+    //const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     //const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
     //const [messages, setMessages] = useMMKVObject < Array<MessageEntry> | undefined>(Global.Messages)
@@ -57,12 +67,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ id }) => {
             saveChat: state.save,
         }))
     )
-
     const buffer = Chats.useChat((state) => (id === messagesLength - 1 ? state.buffer : ''))
-
-    useEffect(() => {
-        setEditMode(false)
-    }, [nowGenerating])
 
     useEffect(() => {
         Animated.parallel([
@@ -79,6 +84,10 @@ const ChatItem: React.FC<ChatItemProps> = ({ id }) => {
             }),
         ]).start()
     }, [fadeAnim])
+
+    useEffect(() => {
+        setEditMode(false)
+    }, [nowGenerating])
 
     const markdownFormat = {
         em: {
@@ -157,7 +166,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ id }) => {
                                 uri:
                                     message.name === charName
                                         ? Characters.getImageDir(charName)
-                                        : Users.getImageDir(userName ?? ''),
+                                        : Users.getImageDir(userName),
                             }}
                         />
                     </ImageBackground>

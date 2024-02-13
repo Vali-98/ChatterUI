@@ -25,7 +25,6 @@ const Home = () => {
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     // dynamically set abort function that is set by respective API
     const [abortFunction, setAbortFunction] = useState<undefined | Function>(undefined)
-
     const messagesLength = Chats.useChat(useShallow((state) => state?.data?.length)) ?? -1
 
     const { updateFromBuffer, saveChat, insertEntry, deleteEntry, setBuffer } = Chats.useChat(
