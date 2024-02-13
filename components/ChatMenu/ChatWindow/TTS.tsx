@@ -5,9 +5,13 @@ import { useState } from 'react'
 import { View, TouchableOpacity } from 'react-native'
 import { useMMKVObject } from 'react-native-mmkv'
 
-const TTS = ({ message }) => {
-    const [isSpeaking, setIsSpeaking] = useState(false)
-    const [currentSpeaker, setCurrentSpeaker] = useMMKVObject(Global.TTSSpeaker)
+type TTSProps = {
+    message: string
+}
+
+const TTS: React.FC<TTSProps> = ({ message }) => {
+    const [isSpeaking, setIsSpeaking] = useState<boolean>(false)
+    const [currentSpeaker, setCurrentSpeaker] = useMMKVObject<Speech.Voice>(Global.TTSSpeaker)
     return (
         <View style={{ marginTop: 8 }}>
             {isSpeaking ? (
@@ -22,14 +26,14 @@ const TTS = ({ message }) => {
                 <TouchableOpacity
                     onPress={async () => {
                         if (currentSpeaker === undefined) {
-                            Logger.log(`No Speaker Chosen`, 2000)
+                            Logger.log(`No Speaker Chosen`, true)
                             return
                         }
                         setIsSpeaking(true)
                         if (await Speech.isSpeakingAsync()) Speech.stop()
                         Speech.speak(message, {
-                            language: currentSpeaker.language,
-                            voice: currentSpeaker.identifier,
+                            language: currentSpeaker?.language,
+                            voice: currentSpeaker?.identifier,
                             onDone: () => setIsSpeaking(false),
                             onStopped: () => setIsSpeaking(false),
                         })

@@ -16,13 +16,13 @@ import { SliderItem } from '..'
 
 const Local = () => {
     const [modelLoading, setModelLoading] = useState(false)
-    const [modelList, setModelList] = useState([])
+    const [modelList, setModelList] = useState<Array<string>>([])
     const dropdownValues = modelList.map((item) => {
         return { name: item }
     })
     const [currentModel, setCurrentModel] = useMMKVString(Global.LocalModel)
     const [downloadLink, setDownloadLink] = useState('')
-    const [preset, setPreset] = useMMKVObject(Global.LocalPreset)
+    const [preset, setPreset] = useMMKVObject<Llama.LlamaPreset>(Global.LocalPreset)
     const [loadedModel, setLoadedModel] = useState(Llama.getModelname())
 
     const getModels = async () => {
@@ -35,7 +35,7 @@ const Local = () => {
 
     const handleLoad = async () => {
         setModelLoading(true)
-        await Llama.loadModel(currentModel, preset).then(() => {
+        await Llama.loadModel(currentModel ?? '', preset).then(() => {
             setLoadedModel(Llama.getModelname())
         })
         setModelLoading(false)
@@ -51,7 +51,7 @@ const Local = () => {
     }
 
     const handleDelete = async () => {
-        if (!(await Llama.modelExists(currentModel))) {
+        if (!(await Llama.modelExists(currentModel ?? ''))) {
             Logger.log(`Model Does Not Exist!`, true)
             return
         }
@@ -62,7 +62,7 @@ const Local = () => {
                 text: `Confirm`,
                 style: `destructive`,
                 onPress: () => {
-                    Llama.deleteModel(currentModel)
+                    Llama.deleteModel(currentModel ?? '')
                         .then(() => {
                             Logger.log('Model Deleted Successfully', true)
                             setLoadedModel(Llama.getModelname())
@@ -136,7 +136,7 @@ const Local = () => {
             {modelLoading ? (
                 <ActivityIndicator size="large" color={Color.White} />
             ) : (
-                <View style={{ flexDirection: 'row', overflowX: 'true' }}>
+                <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity
                         style={{ ...styles.textbutton, marginRight: 8 }}
                         onPress={handleLoad}>
@@ -217,7 +217,7 @@ const Local = () => {
                     max={512}
                     step={1}
                 />
-
+                {/* Note: llama.rn does not have any Android gpu acceleration */}
                 {Platform.OS == 'ios' && (
                     <SliderItem
                         name="GPU Layers"

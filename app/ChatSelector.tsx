@@ -29,6 +29,9 @@ const ChatSelector = () => {
             refreshfilenames()
             return
         }
+        if (charName && currentChat && !list.includes(currentChat)) {
+            loadChat(charName, list[0])
+        }
         setChats(list)
     }
 

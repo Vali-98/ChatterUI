@@ -22,6 +22,7 @@ const CharMenu = () => {
     //const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     //const [messages, setMessages] = useMMKVObject(Global.Messages)
     const [characterList, setCharacterList] = useState<Array<string>>([])
     const [showNewChar, setShowNewChar] = useState<boolean>(false)
@@ -46,11 +47,19 @@ const CharMenu = () => {
         Chats.getNewest(character)
             .then(async (filename) => {
                 //setCurrentChat(filename)
-                if (!filename) return
-                await loadChat(character, filename)
                 await Characters.getCard(character).then((data) => {
                     if (data) setCurrentCard(JSON.parse(data))
                 })
+                let file = filename
+                if (!file) {
+                    file = await Chats.createChat(character, userName ?? '')
+                }
+                if (!file) {
+                    Logger.log('Chat creation backup has failed! Please report.', true)
+                    return
+                }
+                await loadChat(character, file)
+
                 router.back()
             })
             .catch((error: any) => {
@@ -80,9 +89,9 @@ const CharMenu = () => {
                             <TouchableOpacity
                                 style={styles.headerButtonRight}
                                 onPress={() =>
-                                    Characters.importCharacterFromImage().then(() =>
+                                    Characters.importCharacterFromImage().then(async () => {
                                         getCharacterList()
-                                    )
+                                    })
                                 }>
                                 <FontAwesome name="upload" size={28} color={Color.Button} />
                             </TouchableOpacity>
