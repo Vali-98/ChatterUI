@@ -1,6 +1,6 @@
 import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { Color, Global, Characters, Chats } from '@globals'
+import { Color, Global, Characters, Chats, Logger } from '@globals'
 import * as FS from 'expo-file-system'
 import { useRouter, Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
@@ -43,15 +43,20 @@ const CharMenu = () => {
         setNowLoading(true)
         setCharName(character)
 
-        Chats.getNewest(character).then(async (filename) => {
-            //setCurrentChat(filename)
-            if (!filename) return
-            await loadChat(character, filename)
-            await Characters.getCard(character).then((data) => {
-                if (data) setCurrentCard(JSON.parse(data))
+        Chats.getNewest(character)
+            .then(async (filename) => {
+                //setCurrentChat(filename)
+                if (!filename) return
+                await loadChat(character, filename)
+                await Characters.getCard(character).then((data) => {
+                    if (data) setCurrentCard(JSON.parse(data))
+                })
+                router.back()
             })
-            router.back()
-        })
+            .catch((error: any) => {
+                Logger.log(`Couldn't load character: ${error}`, true)
+                setNowLoading(false)
+            })
     }
 
     useEffect(() => {
