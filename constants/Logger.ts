@@ -11,7 +11,7 @@ export namespace Logger {
     }
 
     export const log = (data: string, toast: boolean = false) => {
-        const timestamped = `[${humanizedISO8601DateTime()}] : ${data}`
+        const timestamped = `[${new Date().toTimeString().substring(0, 8)}] : ${data}`
         console.log(timestamped)
         let logs = getLogs()
         logs.push(timestamped)
