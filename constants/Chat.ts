@@ -66,6 +66,7 @@ export interface ChatState {
     setBuffer: (data: string) => void
     insertBuffer: (data: string) => void
     updateFromBuffer: () => void
+    insertLastToBuffer: () => void
 }
 
 export namespace Chats {
@@ -78,10 +79,11 @@ export namespace Chats {
             const chatlist = await getFileObject(charName, chatName)
             if (!chatlist) return
 
+            const meta = chatlist[0]
             set((state: ChatState) => ({
                 ...state,
-                metadata: chatlist[0] as ChatInfo,
-                data: chatlist.splice(1) as [ChatEntry],
+                metadata: meta as ChatInfo,
+                data: chatlist.slice(1) as [ChatEntry],
                 name: chatName,
                 charName: charName,
             }))
@@ -118,11 +120,12 @@ export namespace Chats {
         },
 
         addEntry: (name: string, is_user: boolean, message: string) => {
-            const data = get()?.data
-            if (!data) return
             const entry = createEntry(name, is_user, message)
-            data.push(entry)
-            set((state: ChatState) => ({ ...state, data: data }))
+
+            set((state: ChatState) => ({
+                ...state,
+                data: [...(state.data ? state.data : []), entry],
+            }))
         },
 
         deleteEntry: (id: number) =>
@@ -136,7 +139,7 @@ export namespace Chats {
             if (!data) return
             data[id].mes = message
             data[id].swipes[data[id].swipe_id] = message
-            set((state: ChatState) => ({ ...state, data: data }))
+            //set((state: ChatState) => ({ ...state, data: data }))
         },
 
         // returns true if overflowing right swipe, used to trigger generate
@@ -187,7 +190,7 @@ export namespace Chats {
                 swipe_id: data[index].swipe_id + 1,
             }
 
-            set((state: ChatState) => ({ ...state, data: data }))
+            //set((state: ChatState) => ({ ...state, data: data }))
         },
 
         setBuffer: (newBuffer: string) =>
@@ -214,11 +217,14 @@ export namespace Chats {
                 swipes: swipes,
                 swipe_info: swipe_info,
             }
+            /*
             set((state: ChatState) => ({
                 ...state,
                 data: data,
-            }))
+            }))*/
         },
+        insertLastToBuffer: () =>
+            set((state: ChatState) => ({ ...state, buffer: get()?.data?.at(-1)?.mes ?? '' })),
     }))
 
     const getChatFileDir = (charName: string, chatfilename: string): string => {
@@ -293,7 +299,7 @@ export namespace Chats {
             ...defaultSwipeInfo(),
             swipe_id: 0,
             swipes: [message, ...swipes],
-            swipe_info: new Array(10).fill(defaultSwipeInfo()),
+            swipe_info: new Array(swipesize).fill(defaultSwipeInfo()),
         }
     }
 

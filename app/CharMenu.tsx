@@ -36,7 +36,7 @@ const CharMenu = () => {
             .then((list: Array<string>) => {
                 setCharacterList(list)
             })
-            .catch((error) => console.log(`Could not retrieve characters.\n${error}`))
+            .catch((error) => Logger.log(`Could not retrieve characters.\n${error}`, true))
     }
 
     const setCurrentCharacter = async (character: string) => {

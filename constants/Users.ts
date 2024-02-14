@@ -1,4 +1,5 @@
 import * as FS from 'expo-file-system'
+import { Logger } from './Logger'
 
 export type UserCard = {
     description: string
@@ -21,7 +22,7 @@ export namespace Users {
                 )
             })
             .catch(() => {
-                console.log(`Could not create user.`)
+                Logger.log(`Could not create user.`)
             })
     }
 

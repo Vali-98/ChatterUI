@@ -203,7 +203,7 @@ export namespace Presets {
             samekeys = false
         })
         if (filename !== '') saveFile(filename, preset)
-        if (!samekeys) console.log(`Preset fixed!`)
+        if (!samekeys) Logger.log(`Preset had missing fields and was fixed!`)
         return JSON.stringify(preset)
     }
 
@@ -254,7 +254,6 @@ export namespace Presets {
                     return name
                 })
                 .catch((error) => {
-                    console.log(error)
                     Logger.log(`Upload Failed: ${error.message}`, true)
                 })
         })

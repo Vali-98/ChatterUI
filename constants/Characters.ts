@@ -65,7 +65,7 @@ export namespace Characters {
                     })
                 const charactercard = JSON.parse(Base64.decode(textChunks[0].text))
                 const newname = charactercard?.data?.name ?? charactercard.name
-                console.log(`Creating new character: ${newname}`)
+                Logger.log(`Creating new character: ${newname}`)
                 if (newname === 'Detailed Example Character' || charactercard === undefined) {
                     Logger.log('Invalid Character ID', true)
                     return
@@ -86,7 +86,7 @@ export namespace Characters {
             })
             .catch((error) => {
                 Logger.log(`Failed to create card - Character might already exist?`, true)
-                console.log(error)
+                Logger.log(error)
             })
     }
 

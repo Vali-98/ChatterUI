@@ -22,15 +22,12 @@ const ChatWindow = () => {
         if (nowGenerating) flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 })
     }, [nowGenerating])
     const getItems = (): Array<ListItem> => {
-        return Array<ListItem>(messagesLength)
-            .fill({ index: 1, key: 1 })
-            .map(
-                (item, index): ListItem => ({
-                    index: index,
-                    key: index,
-                })
-            )
-            .reverse()
+        const arr: Array<ListItem> = []
+        for (let i = 0; i < messagesLength; i++) {
+            arr.push({ index: i, key: i })
+        }
+
+        return arr.reverse()
     }
 
     const renderItems = ({ item, index }: { item: ListItem; index: number }) => {
@@ -48,19 +45,14 @@ const ChatWindow = () => {
 
     return (
         <KeyboardAvoidingView style={styles.chatHistory}>
-            {/*messages.slice(1).map((item, index) => (
-                    <ChatItem id={index} message={item} />
-                ))*/}
-            {
-                <FlatList
-                    ref={flatListRef}
-                    inverted
-                    windowSize={3}
-                    data={getItems()}
-                    keyExtractor={(item) => item.key.toString()}
-                    renderItem={renderItems}
-                />
-            }
+            <FlatList
+                ref={flatListRef}
+                inverted
+                windowSize={3}
+                data={getItems()}
+                keyExtractor={(item) => item.key.toString()}
+                renderItem={renderItems}
+            />
         </KeyboardAvoidingView>
     )
 }
