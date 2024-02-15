@@ -249,7 +249,7 @@ const Instruct = () => {
                             multiline
                         />
                         <TextBox
-                            name="Seperator Sequence"
+                            name="Separator Sequence"
                             varname="separator_sequence"
                             body={currentInstruct}
                             setValue={setCurrentInstruct}
