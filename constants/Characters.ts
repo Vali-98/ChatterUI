@@ -52,6 +52,22 @@ export namespace Characters {
             })
     }
 
+    const createCharacter = (name: string, card: CharacterCardV2, imageuri: string = '') => {
+        Characters.createCard(name)
+            .then(() => {
+                return Characters.saveCard(name, JSON.stringify(card))
+            })
+            .then(() => {
+                if (imageuri) return Characters.copyImage(imageuri, name)
+            })
+            .then(() => {
+                Logger.log(`Successfully Imported Character`, true)
+            })
+            .catch(() => {
+                Logger.log(`Failed to create card - Character might already exist.`, true)
+            })
+    }
+
     export const createCharacterFromImage = async (uri: string) => {
         return FS.readAsStringAsync(uri, { encoding: FS.EncodingType.Base64 })
             .then((file) => {
@@ -70,19 +86,7 @@ export namespace Characters {
                     Logger.log('Invalid Character ID', true)
                     return
                 }
-                Characters.createCard(newname)
-                    .then(() => {
-                        return Characters.saveCard(newname, JSON.stringify(charactercard))
-                    })
-                    .then(() => {
-                        return Characters.copyImage(uri, newname)
-                    })
-                    .then(() => {
-                        Logger.log(`Successfully Imported Character`, true)
-                    })
-                    .catch(() => {
-                        Logger.log(`Failed to create card - Character might already exist.`, true)
-                    })
+                createCharacter(newname, charactercard, uri)
             })
             .catch((error) => {
                 Logger.log(`Failed to create card - Character might already exist?`, true)
@@ -102,7 +106,7 @@ export namespace Characters {
 
     export const importCharacterFromRemote = async (text: string) => {
         return axios
-            .create({ timeout: 1000 })
+            .create({ timeout: 10000 })
             .post(
                 'https://api.chub.ai/api/characters/download',
                 {
@@ -122,6 +126,36 @@ export namespace Characters {
             .catch((error) => {
                 Logger.log(`Could not retreive card. ${error}`)
             })
+    }
+
+    export const importCharacterFromPyg = async (id: string) => {
+        const data = await fetch(
+            `https://server.pygmalion.chat/galatea.v1.PublicCharacterService/CharacterExport`,
+            {
+                method: 'POST',
+                body: JSON.stringify({ character_id: id }),
+                headers: {
+                    accept: 'application/json',
+                    'content-type': 'application/json',
+                },
+            }
+        )
+
+        const { card } = await data.json()
+        console.log(Object.keys(card.data))
+        // pyg site currently out of v2 spec
+        card.data.first_mes = card.data.firstMes
+        const name = card.data.name
+        const res = await fetch(card.data.avatar, {
+            method: 'GET',
+        })
+        const buffer = await res.arrayBuffer()
+        const image = Buffer.from(buffer).toString('base64')
+        return FS.writeAsStringAsync(`${FS.cacheDirectory}image.png`, image, {
+            encoding: FS.EncodingType.Base64,
+        }).then(async () => {
+            return createCharacter(name, card, `${FS.cacheDirectory}image.png`)
+        })
     }
 
     export const getChatDir = (charName: string) => {
