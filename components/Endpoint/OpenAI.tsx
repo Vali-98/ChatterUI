@@ -33,7 +33,6 @@ const OpenAI = () => {
             return
         }
         const list = (await modelresults.json()).data
-        //console.log(await modelresults.json())
         setModelList(list.filter((item: OpenAIModel) => item.id.startsWith('gpt')))
     }
 
