@@ -133,7 +133,7 @@ const buildContext = (max_length: number) => {
 }
 
 const buildChatCompletionContext = (max_length: number) => {
-    const messages = Chats.useChat.getState().data
+    const messages = [...(Chats.useChat.getState().data ?? [])]
     const userCard = getObject(Global.CurrentUserCard)
     const currentCard = getObject(Global.CurrentCharacterCard)
     const charName = getString(Global.CurrentCharacter)
