@@ -137,7 +137,17 @@ export namespace Presets {
             'min_p',
             'seed',
         ],
-        [API.OPENROUTER]: ['freq_pen', 'genamt', 'presence_pen', 'seed', 'temp', 'top_p', 'top_k'],
+        [API.OPENROUTER]: [
+            'max_length',
+            'freq_pen',
+            'genamt',
+            'presence_pen',
+            'seed',
+            'temp',
+            'top_p',
+            'top_k',
+        ],
+        [API.OPENAI]: ['max_length', 'freq_pen', 'genamt', 'presence_pen', 'seed', 'temp', 'top_p'],
     }
 
     export const defaultPreset = () => {

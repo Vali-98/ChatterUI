@@ -228,6 +228,7 @@ const PresetMenu = () => {
                     }}
                     style={styles.dropdownbox}
                     selectedTextStyle={styles.selected}
+                    placeholderStyle={{ color: Color.Offwhite }}
                 />
                 <TouchableOpacity
                     style={styles.button}

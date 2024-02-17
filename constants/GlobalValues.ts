@@ -56,6 +56,9 @@ export const enum Global {
     CompletionsEndpoint = 'completionsendpoint',
     CompletionsKey = 'completionskey',
 
+    OpenAIKey = 'openaikey',
+    OpenAIModel = 'openaimodel',
+
     // Local
 
     LocalModel = 'localmodel',

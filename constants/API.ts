@@ -8,4 +8,5 @@ export const enum API {
     COMPLETIONS = 'completions',
     LOCAL = 'local',
     OPENROUTER = 'openrouter',
+    OPENAI = 'openai',
 }

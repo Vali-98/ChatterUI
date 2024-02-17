@@ -32,8 +32,12 @@ export const generateResponse = async (setAbortFunction: AbortFunction) => {
             case API.OPENROUTER:
                 openRouterResponseStream(setAbortFunction)
                 break
+            case API.OPENAI:
+                openAIResponseStream(setAbortFunction)
+                break
             default:
                 setValue(Global.NowGenerating, false)
+                Logger.log('Default inference case reached, this should never happen!', true)
         }
     } catch (error) {
         Logger.log(`Something went wrong: ${error}`, true)
@@ -418,12 +422,36 @@ const constructOpenRouterPayload = () => {
         max_tokens: preset.genamt,
         presence_penalty: preset.presence_pen,
         response_format: 'text',
-        seed: preset.seed,
+        seed:
+            preset?.seed === undefined || preset.seed === -1
+                ? Math.floor(Math.random() * 999999)
+                : parseInt(preset.seed),
         stop: constructStopSequence(currentInstruct),
         stream: true,
         temperature: preset.temp,
         top_p: preset.top_p,
         top_k: preset.top_a,
+    }
+}
+
+const constructOpenAIPayload = () => {
+    const openAIModel = getObject(Global.OpenAIModel)
+    const currentInstruct = instructReplaceMacro()
+    const preset = getObject(Global.PresetData)
+    return {
+        messages: buildChatCompletionContext(preset.genamt),
+        model: openAIModel.id,
+        max_tokens: preset.genamt,
+        frequency_penalty: preset.freq_pen,
+        presence_penalty: preset.presence_pen,
+        seed:
+            preset?.seed === undefined || preset.seed === -1
+                ? Math.floor(Math.random() * 999999)
+                : parseInt(preset.seed),
+        stop: constructStopSequence(currentInstruct),
+        stream: true,
+        temperature: preset.temp,
+        top_p: preset.top_p,
     }
 }
 
@@ -616,6 +644,19 @@ const openRouterResponseStream = async (setAbortFunction: AbortFunction) => {
     )
 }
 
+const openAIResponseStream = async (setAbortFunction: AbortFunction) => {
+    readableStreamResponse(
+        'https://api.openai.com/v1/chat/completions',
+        JSON.stringify(constructOpenAIPayload()),
+        (item) => {
+            return JSON.parse(item).choices[0]?.delta?.content ?? ''
+        },
+        setAbortFunction,
+        () => {},
+        { Authorization: `Bearer ${getString(Global.OpenAIKey)}` }
+    )
+}
+
 const constructReplaceStrings = (): Array<string> => {
     const currentInstruct: InstructType = instructReplaceMacro()
     const userName: string = mmkv.getString(Global.CurrentUser) ?? ''
@@ -712,7 +753,8 @@ const readableStreamResponse = async (
     })
 
     es.addEventListener('error', (event) => {
-        Logger.log(`And error occured of type: ${event.type}`)
+        if ('message' in event) Logger.log(`An error occured : ${event?.message ?? ''}`)
+        closeStream()
     })
     es.addEventListener('close', (event) => {
         closeStream()
