@@ -18,13 +18,13 @@ import { useMMKVString } from 'react-native-mmkv'
 const APIMenu = () => {
     const [APIType, setAPIType] = useMMKVString(Global.APIType)
     const apinames = [
+        { label: 'Local', value: API.LOCAL },
         { label: 'KoboldAI', value: API.KAI },
         { label: 'Text Generation Web UI', value: API.TGWUI },
         { label: 'Text Completions', value: API.COMPLETIONS },
         { label: 'Horde', value: API.HORDE },
         { label: 'Mancer', value: API.MANCER },
         { label: 'Open Router', value: API.OPENROUTER },
-        { label: 'Local', value: API.LOCAL },
         { label: 'OpenAI', value: API.OPENAI },
         //{label: 'NovelAI', value:API.NOVELAI},
     ]

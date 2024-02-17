@@ -18,7 +18,6 @@ import { useMMKVBoolean, useMMKVObject, useMMKVString } from 'react-native-mmkv'
 //@ts-ignore
 import AnimatedEllipsis from 'rn-animated-ellipsis'
 import SimpleMarkdown from 'simple-markdown'
-import * as FS from 'expo-file-system'
 import TTSMenu from './TTS'
 import { ChatEntry } from '@constants/Chat'
 // global chat property for editing
