@@ -2,7 +2,21 @@ import { Color } from '@globals'
 import CheckBox from '@react-native-community/checkbox'
 import { View, Text } from 'react-native'
 
-const CheckboxTitle = ({ name, body, varname, setValue, onChange = undefined }) => {
+type CheckboxTitleProps = {
+    name: string
+    body: any
+    varname: string
+    setValue: (item: any) => {}
+    onChange: undefined | ((item: any) => {})
+}
+
+const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
+    name,
+    body,
+    varname,
+    setValue,
+    onChange = undefined,
+}) => {
     return (
         <View style={{ flexDirection: `row`, alignItems: `center`, paddingVertical: 4 }}>
             <CheckBox

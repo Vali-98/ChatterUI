@@ -2,7 +2,20 @@ import { Color } from '@globals'
 import Slider from '@react-native-community/slider'
 import { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, TextInput } from 'react-native'
-const SliderItem = ({
+
+type SliderItemProps = {
+    name: string
+    body: any
+    varname: string
+    setValue: (item: any) => {}
+    onChange: undefined | ((item: any) => {})
+    min: number
+    max: number
+    step: number
+    precision: number
+}
+
+const SliderItem: React.FC<SliderItemProps> = ({
     name,
     body,
     varname,
@@ -13,7 +26,7 @@ const SliderItem = ({
     precision = 0,
     onChange = undefined,
 }) => {
-    const clamp = (val) => Math.min(Math.max(parseFloat(val?.toFixed(2) ?? 0), min), max)
+    const clamp = (val: number) => Math.min(Math.max(parseFloat(val?.toFixed(2) ?? 0), min), max)
     const [textValue, setTextValue] = useState(body[varname]?.toFixed(precision))
 
     useEffect(() => {
