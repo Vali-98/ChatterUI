@@ -1,11 +1,11 @@
 import { ChatWindow } from '@components/ChatMenu/ChatWindow/ChatWindow'
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Chats, Logger } from '@globals'
-import { generateResponse } from '@lib/Inference'
+import { generateResponse } from '@constants/Inference'
 import { Stack, useRouter } from 'expo-router'
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native'
-import { useMMKVString, useMMKVBoolean } from 'react-native-mmkv'
+import { useMMKVString } from 'react-native-mmkv'
 import {
     Menu,
     MenuTrigger,
@@ -20,64 +20,48 @@ import { useShallow } from 'zustand/react/shallow'
 const Home = () => {
     const router = useRouter()
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
-    const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     const [newMessage, setNewMessage] = useState<string>('')
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     // dynamically set abort function that is set by respective API
-    const [abortFunction, setAbortFunction] = useState<undefined | Function>(undefined)
+    //const [abortFunction, setAbortFunction] = useState<undefined | Function>(undefined)
     const messagesLength = Chats.useChat(useShallow((state) => state?.data?.length)) ?? -1
 
-    const { updateFromBuffer, saveChat, insertEntry, deleteEntry, setBuffer, inserLastToBuffer } =
+    const { insertEntry, deleteEntry, inserLastToBuffer, nowGenerating, abortFunction } =
         Chats.useChat(
             useShallow((state) => ({
-                updateFromBuffer: state.updateFromBuffer,
-                saveChat: state.save,
                 insertEntry: state.addEntry,
                 deleteEntry: state.deleteEntry,
-                setBuffer: state.setBuffer,
                 inserLastToBuffer: state.insertLastToBuffer,
+                nowGenerating: state.nowGenerating,
+                abortFunction: state.abortFunction,
             }))
         )
 
-    useEffect(() => {
-        nowGenerating && startInference()
-        if (!nowGenerating && charName !== 'Welcome' && messagesLength !== 0) {
-            Logger.log(`Saving Chat`)
-            updateFromBuffer()
-            setBuffer('')
-            saveChat()
-        }
-    }, [nowGenerating])
-
-    const startInference = async () => {
-        setNewMessage((message) => '')
-        generateResponse(setAbortFunction)
-    }
-
-    const handleSend = () => {
+    const handleSend = async () => {
         if (newMessage.trim() !== '') insertEntry(userName ?? '', true, newMessage)
         insertEntry(charName ?? '', false, '')
-        setNowGenerating(true)
+        setNewMessage((message) => '')
+        generateResponse()
     }
 
-    const abortResponse = () => {
+    const abortResponse = async () => {
         Logger.log(`Aborting Generation`)
         if (abortFunction !== undefined) abortFunction()
     }
 
-    const regenerateResponse = () => {
+    const regenerateResponse = async () => {
         Logger.log('Regenerate Response')
         if (charName && messagesLength !== 2) {
             deleteEntry(messagesLength - 1)
         }
         insertEntry(charName ?? '', false, '')
-        setNowGenerating(true)
+        generateResponse()
     }
 
     const continueResponse = () => {
         Logger.log(`Continuing Reponse`)
         inserLastToBuffer()
-        setNowGenerating(true)
+        generateResponse()
     }
 
     const menuoptions = [

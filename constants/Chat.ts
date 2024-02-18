@@ -49,6 +49,10 @@ export type ChatInfo = {
 
 type ChatDataArray = [ChatInfo, ...ChatEntry[]]
 
+type AbortFunction = () => void
+
+type SetAbortFunction = (fn: AbortFunction) => void
+
 export interface ChatState {
     name: string | undefined
     metadata: ChatInfo | undefined
@@ -67,6 +71,11 @@ export interface ChatState {
     insertBuffer: (data: string) => void
     updateFromBuffer: () => void
     insertLastToBuffer: () => void
+    nowGenerating: boolean
+    stopGenerating: () => void
+    startGenerating: () => void
+    abortFunction: undefined | AbortFunction
+    setAbortFunction: SetAbortFunction
 }
 
 export namespace Chats {
@@ -75,6 +84,19 @@ export namespace Chats {
         metadata: undefined,
         data: undefined,
         buffer: '',
+        nowGenerating: false,
+        startGenerating: () => {
+            get().nowGenerating = true
+        },
+        stopGenerating: () => {
+            get().nowGenerating = false
+            Logger.log(`Saving Chat`)
+            get().updateFromBuffer()
+            get().setBuffer('')
+            get().save()
+        },
+        abortFunction: undefined,
+        setAbortFunction: (fn) => set((state) => ({ ...state, abortFunction: fn })),
         load: async (charName: string, chatName: string) => {
             const chatlist = await getFileObject(charName, chatName)
             if (!chatlist) return

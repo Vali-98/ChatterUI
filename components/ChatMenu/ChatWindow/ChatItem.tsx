@@ -14,7 +14,6 @@ import {
 } from 'react-native'
 //@ts-ignore
 import Markdown from 'react-native-markdown-package'
-import { useMMKVBoolean, useMMKVObject, useMMKVString } from 'react-native-mmkv'
 //@ts-ignore
 import AnimatedEllipsis from 'rn-animated-ellipsis'
 import SimpleMarkdown from 'simple-markdown'
@@ -26,23 +25,24 @@ import { useShallow } from 'zustand/react/shallow'
 type ChatItemProps = {
     id: number
     nowGenerating: boolean
-    setNowGenerating: (b: boolean) => void
+    startGenerating: () => void
     charName: string
     userName: string
+    TTSenabled: boolean
 }
 
 const ChatItem: React.FC<ChatItemProps> = ({
     id,
     nowGenerating,
-    setNowGenerating,
+    startGenerating,
     charName,
     userName,
+    TTSenabled,
 }) => {
     // fade in anim
-    const fadeAnim = useRef(new Animated.Value(0)).current
-    const dyAnim = useRef(new Animated.Value(50)).current
+    const fadeAnim = useRef(new Animated.Value(1)).current
+    const dyAnim = useRef(new Animated.Value(0)).current
     // globals
-    const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
 
     const message: ChatEntry =
         Chats.useChat(useShallow((state) => state?.data?.[id])) ?? Chats.createEntry('', false, '')
@@ -76,7 +76,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                 easing: Easing.out(Easing.exp),
             }),
         ]).start()
-    }, [fadeAnim])
+    }, [])
 
     const markdownFormat = {
         em: {
@@ -101,7 +101,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
         await saveChat()
         if (atLimit && id !== 0) {
             addSwipe()
-            setNowGenerating(true)
+            startGenerating()
         }
     }
 

@@ -11,12 +11,16 @@ type ListItem = {
 
 const ChatWindow = () => {
     // this solution will have to change once editing is enabled as updating the content will scroll
-    const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
+    const { nowGenerating, startGenerating } = Chats.useChat((state) => ({
+        nowGenerating: state.nowGenerating,
+        startGenerating: state.startGenerating,
+    }))
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const flatListRef = useRef<FlatList>(null)
     const messages = Chats.useChat((state) => state?.data) ?? ''
     const messagesLength = messages?.length ?? 0
+    const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
 
     useEffect(() => {
         if (nowGenerating) flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 })
@@ -35,9 +39,10 @@ const ChatWindow = () => {
             <ChatItem
                 id={item.index}
                 nowGenerating={nowGenerating ?? false}
-                setNowGenerating={setNowGenerating ?? ((b: boolean) => {})}
+                startGenerating={startGenerating}
                 charName={charName ?? ''}
                 userName={userName ?? ''}
+                TTSenabled={TTSenabled ?? false}
             />
         )
     }
