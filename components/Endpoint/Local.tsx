@@ -108,7 +108,7 @@ const Local = () => {
                 }}>
                 <Text style={styles.subtitle}>Current Model : </Text>
                 <Text style={{ ...styles.subtitle, color: Color.Text }}>
-                    {loadedModel === '' ? 'None' : loadedModel}
+                    {loadedModel === undefined ? 'None' : loadedModel}
                 </Text>
             </View>
 

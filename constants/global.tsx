@@ -15,6 +15,7 @@ import { humanizedISO8601DateTime } from './Utils'
 import { Llama } from './llama'
 import { mmkv } from './mmkv'
 import { Logger } from './Logger'
+import { LlamaTokenizer } from './tokenizer'
 export {
     mmkv,
     Presets,
@@ -27,6 +28,7 @@ export {
     Llama,
     humanizedISO8601DateTime,
     Logger,
+    LlamaTokenizer,
 }
 
 /*
@@ -103,18 +105,16 @@ export const saveStringExternal = async (
 
 export const startupApp = () => {
     mmkv.set(Global.CurrentCharacter, 'Welcome')
-    //mmkv.set(Global.CurrentChat, '')
     mmkv.set(Global.CurrentCharacterCard, JSON.stringify(`{}`))
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
     mmkv.set(Global.HordeModels, JSON.stringify([]))
-    mmkv.set(Global.LocalModelWeights, JSON.stringify({}))
     if (mmkv.getString(Global.OpenAIModel) === undefined)
         mmkv.set(Global.OpenAIModel, JSON.stringify({}))
-    //mmkv.set(Global.Messages, JSON.stringify([]))
     mmkv.set(
         Global.PresetData,
         Presets.fixPreset(JSON.parse(mmkv.getString(Global.PresetData) ?? '{}'))
     )
+    if (mmkv.getString(Global.HordeKey) === undefined) mmkv.set(Global.HordeKey, '0000000000')
     if (mmkv.getString(Global.Logs) === undefined) mmkv.set(Global.Logs, JSON.stringify([]))
     if (mmkv.getString(Global.LorebookNames) === undefined)
         mmkv.set(Global.LorebookNames, JSON.stringify([]))

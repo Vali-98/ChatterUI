@@ -5,10 +5,10 @@ type TextBoxProps = {
     name: string
     body: any
     varname: string
-    setValue: (item: any) => {}
-    lines: number
-    keyboardType: KeyboardTypeOptions
-    multiline: boolean
+    setValue: (item: any) => void
+    lines?: number
+    keyboardType?: KeyboardTypeOptions
+    multiline?: boolean
 }
 
 const TextBox: React.FC<TextBoxProps> = ({

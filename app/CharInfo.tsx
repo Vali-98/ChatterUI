@@ -1,4 +1,4 @@
-import llamaTokenizer from '@constants/tokenizer'
+import { LlamaTokenizer } from '@globals'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Characters, Logger } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
@@ -134,7 +134,7 @@ const CharInfo = () => {
                     <Text style={styles.boxText}>
                         Description Tokens:{' '}
                         {characterCard?.data?.description !== undefined &&
-                            llamaTokenizer.encode(characterCard.data.description).length}
+                            LlamaTokenizer.encode(characterCard.data.description).length}
                     </Text>
 
                     <ScrollView style={styles.inputContainer}>

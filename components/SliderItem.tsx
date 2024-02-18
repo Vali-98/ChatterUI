@@ -7,12 +7,12 @@ type SliderItemProps = {
     name: string
     body: any
     varname: string
-    setValue: (item: any) => {}
-    onChange: undefined | ((item: any) => {})
-    min: number
-    max: number
-    step: number
-    precision: number
+    setValue: (item: any) => void
+    onChange?: undefined | ((item: any) => void)
+    min?: number
+    max?: number
+    step?: number
+    precision?: number
 }
 
 const SliderItem: React.FC<SliderItemProps> = ({

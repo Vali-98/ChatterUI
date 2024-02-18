@@ -290,12 +290,14 @@ const Instruct = () => {
                     />
                     */}
 
+                    {/* Now idea what this does - leftover from ST
+                    
                     <TextBox
                         name="Activation Regex"
                         varname="activation_regex"
                         body={currentInstruct}
                         setValue={setCurrentInstruct}
-                    />
+                />*/}
                 </View>
             </ScrollView>
         </SafeAreaView>

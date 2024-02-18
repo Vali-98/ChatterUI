@@ -6,59 +6,6 @@ import { MultiSelect } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { hordeHeader } from '@constants/Inference'
 
-type HordeModel = {
-    name: string
-    count: number
-    performance: number
-    queued: number
-    jobs: number
-    eta: number
-    type: 'image' | 'text'
-}
-
-type HordeWorker = {
-    type: 'image' | 'text'
-    name: string
-    id: string
-    online: boolean
-    requests_fulfilled: number
-    kudos_rewards: number
-    kudos_details: {
-        generated: number
-        uptime: number
-    }
-    performance: string
-    threads: number
-    uptime: number
-    maintenance_mode: boolean
-    paused: boolean
-    info: string
-    nsfw: boolean
-    owner: string
-    ipaddr: string
-    trusted: boolean
-    flagged: boolean
-    suspicious: number
-    uncompleted_jobs: number
-    models: Array<string>
-    forms: Array<string>
-    team: {
-        name: string
-        id: string
-    }
-    contact: string
-    bridge_agent: string
-    max_pixels: number
-    megapixelsteps_generated: number
-    img2img: boolean
-    painting: boolean
-    'post-processing': boolean
-    lora: boolean
-    max_length: number
-    max_context_length: number
-    tokens_generated: number
-}
-
 const Horde = () => {
     const [hordeKey, setHordeKey] = useMMKVString(Global.HordeKey)
     const [hordeModels, setHordeModels] = useMMKVObject<Array<HordeModel>>(Global.HordeModels)
@@ -103,7 +50,6 @@ const Horde = () => {
     }
 
     useEffect(() => {
-        if (hordeKey === undefined) setHordeKey('0000000000')
         getModels()
     }, [])
 
@@ -268,3 +214,56 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
     },
 })
+
+type HordeModel = {
+    name: string
+    count: number
+    performance: number
+    queued: number
+    jobs: number
+    eta: number
+    type: 'image' | 'text'
+}
+
+type HordeWorker = {
+    type: 'image' | 'text'
+    name: string
+    id: string
+    online: boolean
+    requests_fulfilled: number
+    kudos_rewards: number
+    kudos_details: {
+        generated: number
+        uptime: number
+    }
+    performance: string
+    threads: number
+    uptime: number
+    maintenance_mode: boolean
+    paused: boolean
+    info: string
+    nsfw: boolean
+    owner: string
+    ipaddr: string
+    trusted: boolean
+    flagged: boolean
+    suspicious: number
+    uncompleted_jobs: number
+    models: Array<string>
+    forms: Array<string>
+    team: {
+        name: string
+        id: string
+    }
+    contact: string
+    bridge_agent: string
+    max_pixels: number
+    megapixelsteps_generated: number
+    img2img: boolean
+    painting: boolean
+    'post-processing': boolean
+    lora: boolean
+    max_length: number
+    max_context_length: number
+    tokens_generated: number
+}

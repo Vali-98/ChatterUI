@@ -34,22 +34,6 @@ export namespace Llama {
     ) => {
         const newname = name
         const dir = `${model_dir}${name}`
-        // if not using from cache, pick model and load it
-        /*
-        if(!usecache)
-        newname = await DocumentPicker.pickSingle().then(async (result : DocumentPickerResponse) => {
-            if(DocumentPicker.isCancel(result)) return ''
-            let name = result.name
-            Logger.log(`Picked file: ${name}`)
-            dir = result.uri
-            Logger.log(dir)
-            return name ?? ''
-        }).catch(() => {
-            Logger.log('Picking cancelled')
-            Logger.log(`No Model Chosen`, true)
-            return ''
-        })
-        */
 
         if (newname === '') {
             Logger.log('No Model Chosen', true)
@@ -92,14 +76,6 @@ export namespace Llama {
             .catch((error) => {
                 Logger.log(`Could Not Load Model: ${error} `, true)
             })
-
-        /* session code fails atm
-        await FS.getInfoAsync(`${model_dir}session.bin`).then((result) => {
-            if (!result.exists) return;
-            Logger.log('Loading previous session');
-            if (llamaContext) llamaContext.loadSession(result.uri);
-        });
-        */
     }
 
     export const completion = async (params: CompletionParams, callback = (text: string) => {}) => {
@@ -186,10 +162,6 @@ export namespace Llama {
             .catch(() => {
                 Logger.log('No Model Chosen', true)
             })
-        /*
-        return getDocumentAsync({copyToCacheDirectory: false, type: 'application/octet-stream'}).then( async (result : any) => {
-            
-        })*/
     }
 
     export const isModelLoaded = (showmessage = true) => {
