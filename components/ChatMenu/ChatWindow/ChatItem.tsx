@@ -20,11 +20,11 @@ import TTSMenu from './TTS'
 import { ChatEntry } from '@constants/Chat'
 // global chat property for editing
 import { useShallow } from 'zustand/react/shallow'
+import { generateResponse } from '@constants/Inference'
 
 type ChatItemProps = {
     id: number
     nowGenerating: boolean
-    startGenerating: () => void
     charName: string
     userName: string
     TTSenabled: boolean
@@ -33,7 +33,6 @@ type ChatItemProps = {
 const ChatItem: React.FC<ChatItemProps> = ({
     id,
     nowGenerating,
-    startGenerating,
     charName,
     userName,
     TTSenabled,
@@ -100,7 +99,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
         await saveChat()
         if (atLimit && id !== 0) {
             addSwipe()
-            startGenerating()
+            generateResponse()
         }
     }
 

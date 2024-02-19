@@ -11,9 +11,8 @@ type ListItem = {
 
 const ChatWindow = () => {
     // this solution will have to change once editing is enabled as updating the content will scroll
-    const { nowGenerating, startGenerating } = Chats.useChat((state) => ({
+    const { nowGenerating } = Chats.useChat((state) => ({
         nowGenerating: state.nowGenerating,
-        startGenerating: state.startGenerating,
     }))
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
@@ -39,7 +38,6 @@ const ChatWindow = () => {
             <ChatItem
                 id={item.index}
                 nowGenerating={nowGenerating ?? false}
-                startGenerating={startGenerating}
                 charName={charName ?? ''}
                 userName={userName ?? ''}
                 TTSenabled={TTSenabled ?? false}
