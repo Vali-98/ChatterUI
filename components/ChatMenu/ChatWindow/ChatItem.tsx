@@ -1,26 +1,15 @@
-import { AntDesign, MaterialIcons } from '@expo/vector-icons'
-import { Color, Chats, Characters, Users } from '@globals'
+import { MaterialIcons } from '@expo/vector-icons'
+import { Color, Chats } from '@globals'
 import React, { useRef, useEffect, useState } from 'react'
-import {
-    View,
-    Text,
-    StyleSheet,
-    Image,
-    Animated,
-    Easing,
-    TextInput,
-    TouchableOpacity,
-} from 'react-native'
+import { View, Text, StyleSheet, Animated, Easing, TextInput, TouchableOpacity } from 'react-native'
 //@ts-ignore
 import Markdown from 'react-native-markdown-package'
 //@ts-ignore
 import AnimatedEllipsis from 'rn-animated-ellipsis'
 import SimpleMarkdown from 'simple-markdown'
-import TTSMenu from './TTS'
 import { ChatEntry } from '@constants/Chat'
 // global chat property for editing
 import { useShallow } from 'zustand/react/shallow'
-import { generateResponse } from '@constants/Inference'
 import Swipes from './Swipes'
 import ChatFrame from './ChatFrame'
 
@@ -40,13 +29,14 @@ const ChatItem: React.FC<ChatItemProps> = ({
     TTSenabled,
 }) => {
     // fade in anim
-    const fadeAnim = useRef(new Animated.Value(1)).current
-    const dyAnim = useRef(new Animated.Value(0)).current
     // globals
 
     const message: ChatEntry =
         Chats.useChat(useShallow((state) => state?.data?.[id])) ?? Chats.createEntry('', false, '')
     const messagesLength = Chats.useChat(useShallow((state) => state.data?.length)) ?? -1
+
+    const fadeAnim = useRef(new Animated.Value(0)).current
+    const dyAnim = useRef(new Animated.Value(50)).current
 
     const [placeholderText, setPlaceholderText] = useState(message.mes)
     const [editMode, setEditMode] = useState(false)
@@ -65,12 +55,12 @@ const ChatItem: React.FC<ChatItemProps> = ({
         Animated.parallel([
             Animated.timing(fadeAnim, {
                 toValue: 1, // Target opacity 1 (fully visible)
-                duration: 1000, // Duration in milliseconds
+                duration: 200, // Duration in milliseconds
                 useNativeDriver: true, // To improve performance
             }),
             Animated.timing(dyAnim, {
                 toValue: 0, // Target translateY 0 (no translation)
-                duration: 1000,
+                duration: 400,
                 useNativeDriver: true,
                 easing: Easing.out(Easing.exp),
             }),
