@@ -172,7 +172,7 @@ export namespace Characters {
     }
 
     export const importCharacterFromRemote = async (text: string) => {
-        const stripwww = text.replaceAll('www.', '')
+        const stripwww = text.replace('www.', '')
         if (stripwww.startsWith('https://chub.ai/characters/'))
             return importCharacterFromChub(stripwww)
         if (stripwww.startsWith(`https://pygmalion.chat`)) return importCharacterFromPyg(stripwww)
