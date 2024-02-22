@@ -33,6 +33,26 @@ const SliderItem: React.FC<SliderItemProps> = ({
         setTextValue(body[varname]?.toFixed(precision))
     }, [body])
 
+    const handleSliderChange = (value: number) => {
+        if (onChange) {
+            onChange(clamp(value))
+            setTextValue(clamp(value).toFixed(precision))
+            return
+        }
+        setValue({ ...body, [varname]: clamp(value) })
+        setTextValue(clamp(value).toFixed(precision))
+    }
+
+    const handleTextInputChange = () => {
+        if (isNaN(clamp(parseFloat(textValue)))) setTextValue(body[varname].toFixed(precision))
+        else {
+            setValue({ ...body, [varname]: clamp(parseFloat(textValue)) })
+            setTextValue(
+                clamp(textValue !== null ? parseFloat(textValue) : 0).toFixed(precision) ?? min
+            )
+        }
+    }
+
     return (
         <View style={{ alignItems: `center` }}>
             <Text style={styles.itemName}>{name}</Text>
@@ -43,17 +63,7 @@ const SliderItem: React.FC<SliderItemProps> = ({
                     minimumValue={min}
                     maximumValue={max}
                     value={body[varname]}
-                    onValueChange={
-                        onChange
-                            ? (value) => {
-                                  onChange(clamp(value))
-                                  setTextValue(clamp(value).toFixed(precision))
-                              }
-                            : (value) => {
-                                  setValue({ ...body, [varname]: clamp(value) })
-                                  setTextValue(clamp(value).toFixed(precision))
-                              }
-                    }
+                    onValueChange={handleSliderChange}
                     minimumTrackTintColor={Color.White}
                     maximumTrackTintColor={Color.Offwhite}
                     thumbTintColor={Color.White}
@@ -63,18 +73,8 @@ const SliderItem: React.FC<SliderItemProps> = ({
                     style={styles.textBox}
                     value={textValue}
                     onChangeText={setTextValue}
-                    onEndEditing={() => {
-                        if (isNaN(clamp(parseFloat(textValue))))
-                            setTextValue(body[varname].toFixed(precision))
-                        else {
-                            setValue({ ...body, [varname]: clamp(parseFloat(textValue)) })
-                            setTextValue(
-                                clamp(textValue !== null ? parseFloat(textValue) : 0).toFixed(
-                                    precision
-                                ) ?? min
-                            )
-                        }
-                    }}
+                    onEndEditing={handleTextInputChange}
+                    onPressOut={handleTextInputChange}
                     keyboardType="number-pad"
                 />
             </View>

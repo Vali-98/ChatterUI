@@ -104,14 +104,16 @@ export namespace Characters {
         })
     }
 
-    export const importCharacterFromRemote = async (text: string) => {
+    export const importCharacterFromChub = async (text: string) => {
+        const character_id = text.replaceAll(`https://chub.ai/characters/`, '')
+        Logger.log(`Importing character from Chub: ${character_id}`, true)
         return axios
             .create({ timeout: 10000 })
             .post(
                 'https://api.chub.ai/api/characters/download',
                 {
                     format: 'tavern',
-                    fullPath: text.replace('https://chub.ai/characters/', ''),
+                    fullPath: character_id,
                 },
                 { responseType: 'arraybuffer' }
             )
@@ -129,24 +131,35 @@ export namespace Characters {
     }
 
     export const importCharacterFromPyg = async (id: string) => {
+        const character_id = id
+            .replace(
+                `https://pygmalion.chat/characters#modal=false&type=%22character%22&id=%22`,
+                ''
+            )
+            .replace(`https://pygmalion.chat/characters#modal=true&type=%22character%22&id=%22`, '')
+            .replace(`%22&page=1`, '')
+            .trim()
+        Logger.log(`Loading from Pygmalion with id: ${character_id}`, true)
         const data = await fetch(
-            `https://server.pygmalion.chat/galatea.v1.PublicCharacterService/CharacterExport`,
+            `https://server.pygmalion.chat/api/export/character/${character_id}/v2`,
             {
-                method: 'POST',
-                body: JSON.stringify({ character_id: id }),
+                method: 'GET',
+                //body: JSON.stringify({ character_id: clean }),
                 headers: {
                     accept: 'application/json',
                     'content-type': 'application/json',
                 },
             }
         )
+        if (data.status !== 200) {
+            Logger.log(`Failed to retrieve card from Pygmalion: ${data.status}`, true)
+            return
+        }
 
-        const { card } = await data.json()
-        console.log(Object.keys(card.data))
-        // pyg site currently out of v2 spec
-        card.data.first_mes = card.data.firstMes
-        const name = card.data.name
-        const res = await fetch(card.data.avatar, {
+        const { character } = await data.json()
+
+        const name = character.data.name
+        const res = await fetch(character.data.avatar, {
             method: 'GET',
         })
         const buffer = await res.arrayBuffer()
@@ -154,10 +167,19 @@ export namespace Characters {
         return FS.writeAsStringAsync(`${FS.cacheDirectory}image.png`, image, {
             encoding: FS.EncodingType.Base64,
         }).then(async () => {
-            return createCharacter(name, card, `${FS.cacheDirectory}image.png`)
+            return createCharacter(name, character, `${FS.cacheDirectory}image.png`)
         })
     }
 
+    export const importCharacterFromRemote = async (text: string) => {
+        const stripwww = text.replaceAll('www.', '')
+        if (stripwww.startsWith('https://chub.ai/characters/'))
+            return importCharacterFromChub(stripwww)
+        if (stripwww.startsWith(`https://pygmalion.chat`)) return importCharacterFromPyg(stripwww)
+        if (stripwww.includes('/')) return importCharacterFromChub(stripwww)
+        if (stripwww.includes(`-`)) return importCharacterFromPyg(stripwww)
+        Logger.log(`Invalid input!`, true)
+    }
     export const getChatDir = (charName: string) => {
         return `${FS.documentDirectory}characters/${charName}/chats`
     }
