@@ -21,6 +21,7 @@ import { ChatEntry } from '@constants/Chat'
 // global chat property for editing
 import { useShallow } from 'zustand/react/shallow'
 import { generateResponse } from '@constants/Inference'
+import Swipes from './Swipes'
 
 type ChatItemProps = {
     id: number
@@ -49,12 +50,10 @@ const ChatItem: React.FC<ChatItemProps> = ({
     const [placeholderText, setPlaceholderText] = useState(message.mes)
     const [editMode, setEditMode] = useState(false)
 
-    const { updateChat, deleteChat, swipeChat, addSwipe, saveChat } = Chats.useChat(
+    const { updateChat, deleteChat, saveChat } = Chats.useChat(
         useShallow((state) => ({
             updateChat: state.updateEntry,
             deleteChat: state.deleteEntry,
-            swipeChat: state.swipe,
-            addSwipe: state.addSwipe,
             saveChat: state.save,
         }))
     )
@@ -89,18 +88,15 @@ const ChatItem: React.FC<ChatItemProps> = ({
         },
     }
 
-    const handleSwipeLeft = () => {
-        swipeChat(id, -1)
-        saveChat()
-    }
+    const [imageSource, setImageSource] = useState({
+        uri:
+            message.name === charName
+                ? Characters.getImageDir(charName)
+                : Users.getImageDir(userName),
+    })
 
-    const handleSwipeRight = async () => {
-        const atLimit = swipeChat(id, 1)
-        await saveChat()
-        if (atLimit && id !== 0) {
-            addSwipe()
-            generateResponse()
-        }
+    const handleImageError = () => {
+        setImageSource(require('@assets/user.png'))
     }
 
     const handleEditMessage = () => {
@@ -129,16 +125,9 @@ const ChatItem: React.FC<ChatItemProps> = ({
         (Date.parse(message.gen_finished) - Date.parse(message.gen_started)) / 1000
     )
 
-    const [imageSource, setImageSource] = useState({
-        uri:
-            message.name === charName
-                ? Characters.getImageDir(charName)
-                : Users.getImageDir(userName),
-    })
-
-    const handleImageError = () => {
-        setImageSource(require('@assets/user.png'))
-    }
+    const isFirstWithSwipes = id === 0 && message.swipes.length > 1 && messagesLength === 1
+    const isLastMessage = id === messagesLength - 1
+    const showSwipe = message.name === charName && (isFirstWithSwipes || isLastMessage)
 
     return (
         <Animated.View
@@ -162,11 +151,9 @@ const ChatItem: React.FC<ChatItemProps> = ({
                         source={imageSource}
                     />
                     <Text style={styles.graytext}>#{id}</Text>
-                    {message?.gen_started !== undefined &&
-                        message?.gen_finished !== undefined &&
-                        message.name === charName && (
-                            <Text style={styles.graytext}>{deltaTime}s</Text>
-                        )}
+                    {deltaTime !== undefined && message.name === charName && (
+                        <Text style={styles.graytext}>{deltaTime}s</Text>
+                    )}
                     {TTSenabled && <TTSMenu message={message.mes} />}
                 </View>
 
@@ -252,39 +239,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                 </View>
             </View>
 
-            {((id === messagesLength - 1 &&
-                message.name === charName &&
-                message?.swipes !== undefined &&
-                id !== 0) ||
-                (id === 0 &&
-                    messagesLength === 1 &&
-                    message?.swipes !== undefined &&
-                    message?.swipes?.length !== 1)) && (
-                <View style={styles.swipesItem}>
-                    {!nowGenerating && (
-                        <TouchableOpacity
-                            onPress={handleSwipeLeft}
-                            disabled={message.swipe_id === 0}>
-                            <AntDesign
-                                name="left"
-                                size={20}
-                                color={message.swipe_id === 0 ? Color.Offwhite : Color.Button}
-                            />
-                        </TouchableOpacity>
-                    )}
-                    <View style={styles.swipeTextContainer}>
-                        <Text style={styles.swipeText}>
-                            {message.swipe_id + 1} / {message.swipes.length}
-                        </Text>
-                    </View>
-
-                    {!nowGenerating && (
-                        <TouchableOpacity onPress={handleSwipeRight}>
-                            <AntDesign name="right" size={20} color={Color.Button} />
-                        </TouchableOpacity>
-                    )}
-                </View>
-            )}
+            {showSwipe && <Swipes message={message} id={id} nowGenerating={nowGenerating} />}
         </Animated.View>
     )
 }
@@ -328,21 +283,6 @@ const styles = StyleSheet.create({
         backgroundColor: Color.DarkContainer,
         borderRadius: 8,
         padding: 8,
-    },
-
-    swipesItem: {
-        flexDirection: 'row',
-        marginVertical: 8,
-        marginHorizontal: 8,
-    },
-
-    swipeText: {
-        color: Color.Text,
-    },
-
-    swipeTextContainer: {
-        alignItems: 'center',
-        flex: 1,
     },
 
     graytext: {
