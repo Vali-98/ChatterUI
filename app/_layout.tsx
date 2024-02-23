@@ -30,6 +30,7 @@ const Layout = () => {
                         options={{
                             animation: 'slide_from_right',
                             title: 'Characters',
+                            animationDuration: 200,
                         }}
                     />
 
@@ -38,6 +39,7 @@ const Layout = () => {
                         options={{
                             animation: 'slide_from_right',
                             title: 'Edit',
+                            animationDuration: 200,
                         }}
                     />
 
@@ -46,6 +48,7 @@ const Layout = () => {
                         options={{
                             animation: 'slide_from_right',
                             title: 'History',
+                            animationDuration: 200,
                         }}
                     />
 
@@ -53,6 +56,8 @@ const Layout = () => {
                         name="Settings"
                         options={{
                             animation: 'slide_from_left',
+                            title: 'Settings',
+                            animationDuration: 200,
                         }}
                     />
                 </Stack>

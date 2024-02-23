@@ -60,7 +60,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
                 )}
                 {TTSenabled && <TTSMenu message={message.mes} />}
             </View>
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, flexDirection: 'column' }}>
                 <View style={{ flex: 1 }}>
                     <View style={{ marginBottom: 8 }}>
                         <Text style={{ fontSize: 16, color: Color.Text, marginRight: 4 }}>

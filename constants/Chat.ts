@@ -5,6 +5,7 @@ import { mmkv } from './mmkv'
 import { create } from 'zustand'
 import * as FS from 'expo-file-system'
 import { CharacterCardV2 } from './Characters'
+import { RecentMessages } from './RecentMessages'
 
 export type ChatExtra = {
     api: string
@@ -109,6 +110,7 @@ export namespace Chats {
                 name: chatName,
                 charName: charName,
             }))
+            RecentMessages.insertEntry(charName, chatName)
         },
 
         delete: async (charName: string, chatName: string) => {
@@ -284,7 +286,7 @@ export namespace Chats {
     }
     export const getNewest = async (charName: string): Promise<string | undefined> => {
         const filelist = await FS.readDirectoryAsync(getChatDir(charName))
-        return filelist?.[0]
+        return filelist?.[filelist?.length - 1]
     }
 
     export const getList = async (charName: string): Promise<string[]> => {
@@ -300,7 +302,7 @@ export namespace Chats {
     })
 
     const defaultSwipeInfo = (): ChatSwipeInfo => ({
-        send_date: new Date().toString(),
+        send_date: new Date().toString().slice(0, -9),
         gen_finished: new Date().toString(),
         gen_started: new Date().toString(),
         extra: defaultExtra(),
@@ -367,5 +369,9 @@ export namespace Chats {
                 Logger.log('Failed create message: ' + error, true)
                 return undefined
             })
+    }
+
+    export const exists = async (charName: string, chatName: string) => {
+        return FS.getInfoAsync(getChatFileDir(charName, chatName)).then((info) => info.exists)
     }
 }

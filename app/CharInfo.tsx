@@ -1,6 +1,5 @@
-import { LlamaTokenizer } from '@globals'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Characters, Logger } from '@globals'
+import { Global, Color, Characters, Logger, LlamaTokenizer } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
 import { useState, useEffect } from 'react'

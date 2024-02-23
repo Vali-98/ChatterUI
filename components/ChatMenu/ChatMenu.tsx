@@ -16,6 +16,7 @@ import {
 } from 'react-native-popup-menu'
 const { SlideInMenu } = renderers
 import { useShallow } from 'zustand/react/shallow'
+import Recents from './Recents'
 
 const ChatMenu = () => {
     const router = useRouter()
@@ -113,6 +114,7 @@ const ChatMenu = () => {
             {charName === 'Welcome' ? (
                 <View>
                     <Text style={styles.welcometext}>Select A Character To Get Started!</Text>
+                    <Recents />
                 </View>
             ) : (
                 <View style={styles.container}>

@@ -29,11 +29,11 @@ const Horde = () => {
         if (!modelresults) return
 
         const list = await modelresults.json()
-
         const names = list.map((item: HordeModel) => {
             return item.name
         })
         setDropdownValues(dropdownValues.filter((item) => names.includes(item)))
+        setModelList(list)
         if (hordeModels)
             setHordeModels(hordeModels.filter((item) => dropdownValues.includes(item.name)))
 
