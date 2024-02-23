@@ -106,27 +106,29 @@ const ChatMenu = () => {
     const headerViewRight = (
         <View style={styles.headerButtonContainer}>
             {charName !== 'Welcome' && (
-                <View style={styles.headerButtonContainer}>
-                    <TouchableOpacity
-                        style={styles.headerButtonRight}
-                        onPress={() => {
-                            setCharName('Welcome')
-                        }}>
-                        <Ionicons name="chevron-back" size={28} color={Color.Button} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.headerButtonRight}
-                        onPress={() => {
-                            router.push('/ChatSelector')
-                        }}>
-                        <Ionicons name="chatbox" size={28} color={Color.Button} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.headerButtonRight}
-                        onPress={() => router.push(`/CharInfo`)}>
-                        <FontAwesome name="cog" size={28} color={Color.Button} />
-                    </TouchableOpacity>
-                </View>
+                <AnimatedView dx={300} tduration={300} fduration={200} fade={0}>
+                    <View style={styles.headerButtonContainer}>
+                        <TouchableOpacity
+                            style={styles.headerButtonRight}
+                            onPress={() => {
+                                setCharName('Welcome')
+                            }}>
+                            <Ionicons name="chevron-back" size={28} color={Color.Button} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.headerButtonRight}
+                            onPress={() => {
+                                router.push('/ChatSelector')
+                            }}>
+                            <Ionicons name="chatbox" size={28} color={Color.Button} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.headerButtonRight}
+                            onPress={() => router.push(`/CharInfo`)}>
+                            <FontAwesome name="cog" size={28} color={Color.Button} />
+                        </TouchableOpacity>
+                    </View>
+                </AnimatedView>
             )}
             <TouchableOpacity
                 style={styles.headerButtonRight}
