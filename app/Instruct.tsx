@@ -10,6 +10,7 @@ import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { useAutosave } from 'react-autosave'
 import { InstructType } from '@constants/Instructs'
+import AnimatedView from '@components/AnimatedView'
 
 type InstructListItem = {
     label: string
@@ -58,154 +59,155 @@ const Instruct = () => {
     useAutosave({ data: currentInstruct, onSave: () => handleSaveInstruct(false), interval: 3000 })
 
     return (
-        <SafeAreaView style={styles.mainContainer}>
-            <Stack.Screen
-                options={{
-                    title: `Instruct`,
-                    animation: 'slide_from_left',
-                }}
-            />
-
-            <TextBoxModal
-                booleans={[showNewInstruct, setShowNewInstruct]}
-                onConfirm={(text) => {
-                    if (instructList.some((item) => item.label === text)) {
-                        Logger.log(`Preset name already exists.`, true)
-                        return
-                    }
-                    if (!currentInstruct) return
-
-                    Instructs.saveFile(text, { ...currentInstruct, name: text }).then(() => {
-                        Logger.log(`Preset created.`, true)
-                        setInstructName(text)
-                        loadInstructList(text)
-                    })
-                }}
-            />
-
-            <View style={styles.dropdownContainer}>
-                <Dropdown
-                    value={selectedItem ?? ''}
-                    style={styles.dropdownbox}
-                    data={instructList}
-                    selectedTextStyle={styles.selected}
-                    labelField="label"
-                    valueField="value"
-                    onChange={(item) => {
-                        if (item.label === instructName) return
-
-                        setInstructName(item.label)
-                        Instructs.loadFile(item.label).then((preset) => {
-                            setCurrentInstruct(JSON.parse(preset))
-                        })
+        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+            <SafeAreaView style={styles.mainContainer}>
+                <Stack.Screen
+                    options={{
+                        title: `Instruct`,
+                        animation: 'fade',
                     }}
-                    placeholderStyle={{ color: Color.Offwhite }}
                 />
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        handleSaveInstruct(true)
-                    }}>
-                    <FontAwesome size={24} name="save" color={Color.Button} />
-                </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        if (instructList.length === 1) {
-                            Logger.log(`Cannot delete last Instruct preset.`, true)
+                <TextBoxModal
+                    booleans={[showNewInstruct, setShowNewInstruct]}
+                    onConfirm={(text) => {
+                        if (instructList.some((item) => item.label === text)) {
+                            Logger.log(`Preset name already exists.`, true)
                             return
                         }
-                        Alert.alert(
-                            `Delete Preset`,
-                            `Are you sure you want to delete  '${instructName}'?`,
-                            [
-                                { text: `Cancel`, style: `cancel` },
-                                {
-                                    text: `Confirm`,
-                                    style: `destructive`,
-                                    onPress: () => {
-                                        if (!instructName) return
-                                        Instructs.deleteFile(instructName).then(() => {
-                                            loadInstructList()
-                                        })
-                                    },
-                                },
-                            ]
-                        )
-                    }}>
-                    <FontAwesome size={24} name="trash" color={Color.Button} />
-                </TouchableOpacity>
+                        if (!currentInstruct) return
 
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        Instructs.uploadFile().then((name) => {
-                            if (name === undefined) {
+                        Instructs.saveFile(text, { ...currentInstruct, name: text }).then(() => {
+                            Logger.log(`Preset created.`, true)
+                            setInstructName(text)
+                            loadInstructList(text)
+                        })
+                    }}
+                />
+
+                <View style={styles.dropdownContainer}>
+                    <Dropdown
+                        value={selectedItem ?? ''}
+                        style={styles.dropdownbox}
+                        data={instructList}
+                        selectedTextStyle={styles.selected}
+                        labelField="label"
+                        valueField="value"
+                        onChange={(item) => {
+                            if (item.label === instructName) return
+
+                            setInstructName(item.label)
+                            Instructs.loadFile(item.label).then((preset) => {
+                                setCurrentInstruct(JSON.parse(preset))
+                            })
+                        }}
+                        placeholderStyle={{ color: Color.Offwhite }}
+                    />
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            handleSaveInstruct(true)
+                        }}>
+                        <FontAwesome size={24} name="save" color={Color.Button} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            if (instructList.length === 1) {
+                                Logger.log(`Cannot delete last Instruct preset.`, true)
                                 return
                             }
-                            Instructs.loadFile(name).then((instruct) => {
-                                setCurrentInstruct(JSON.parse(instruct))
-                                setInstructName(name)
-                                loadInstructList(name)
+                            Alert.alert(
+                                `Delete Preset`,
+                                `Are you sure you want to delete  '${instructName}'?`,
+                                [
+                                    { text: `Cancel`, style: `cancel` },
+                                    {
+                                        text: `Confirm`,
+                                        style: `destructive`,
+                                        onPress: () => {
+                                            if (!instructName) return
+                                            Instructs.deleteFile(instructName).then(() => {
+                                                loadInstructList()
+                                            })
+                                        },
+                                    },
+                                ]
+                            )
+                        }}>
+                        <FontAwesome size={24} name="trash" color={Color.Button} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            Instructs.uploadFile().then((name) => {
+                                if (name === undefined) {
+                                    return
+                                }
+                                Instructs.loadFile(name).then((instruct) => {
+                                    setCurrentInstruct(JSON.parse(instruct))
+                                    setInstructName(name)
+                                    loadInstructList(name)
+                                })
                             })
-                        })
-                    }}>
-                    <FontAwesome size={24} name="upload" color={Color.Button} />
-                </TouchableOpacity>
+                        }}>
+                        <FontAwesome size={24} name="upload" color={Color.Button} />
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={async () => {
-                        if (instructName)
-                            saveStringExternal(instructName, JSON.stringify(currentInstruct))
-                    }}>
-                    <FontAwesome size={24} name="download" color={Color.Button} />
-                </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={async () => {
+                            if (instructName)
+                                saveStringExternal(instructName, JSON.stringify(currentInstruct))
+                        }}>
+                        <FontAwesome size={24} name="download" color={Color.Button} />
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        setShowNewInstruct(true)
-                    }}>
-                    <FontAwesome size={24} name="plus" color={Color.Button} />
-                </TouchableOpacity>
-            </View>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            setShowNewInstruct(true)
+                        }}>
+                        <FontAwesome size={24} name="plus" color={Color.Button} />
+                    </TouchableOpacity>
+                </View>
 
-            <ScrollView>
-                <View
-                    style={{
-                        paddingVertical: 20,
-                        paddingHorizontal: 16,
-                        paddingBottom: 150,
-                    }}>
-                    <TextBox
-                        name="System Sequence"
-                        varname="system_prompt"
-                        lines={3}
-                        body={currentInstruct}
-                        setValue={setCurrentInstruct}
-                        multiline
-                    />
-
-                    <View style={{ flexDirection: 'row' }}>
+                <ScrollView>
+                    <View
+                        style={{
+                            paddingVertical: 20,
+                            paddingHorizontal: 16,
+                            paddingBottom: 150,
+                        }}>
                         <TextBox
-                            name="Input Sequence"
-                            varname="input_sequence"
+                            name="System Sequence"
+                            varname="system_prompt"
+                            lines={3}
                             body={currentInstruct}
                             setValue={setCurrentInstruct}
                             multiline
                         />
-                        <TextBox
-                            name="Output Sequence"
-                            varname="output_sequence"
-                            body={currentInstruct}
-                            setValue={setCurrentInstruct}
-                            multiline
-                        />
-                    </View>
 
-                    {/* Unused Sequences
+                        <View style={{ flexDirection: 'row' }}>
+                            <TextBox
+                                name="Input Sequence"
+                                varname="input_sequence"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />
+                            <TextBox
+                                name="Output Sequence"
+                                varname="output_sequence"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />
+                        </View>
+
+                        {/* Unused Sequences
                     <View style={{ flexDirection: 'row' }}>
                         <TextBox
                             name="First Output Sequence"
@@ -224,48 +226,48 @@ const Instruct = () => {
                     </View>
                     */}
 
-                    <View style={{ flexDirection: 'row' }}>
-                        <TextBox
-                            name="System Sequence Prefix"
-                            varname="system_sequence_prefix"
-                            body={currentInstruct}
-                            setValue={setCurrentInstruct}
-                            multiline
-                        />
-                        <TextBox
-                            name="System Sequence Suffix"
-                            varname="system_sequence_suffix"
-                            body={currentInstruct}
-                            setValue={setCurrentInstruct}
-                            multiline
-                        />
-                    </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <TextBox
+                                name="System Sequence Prefix"
+                                varname="system_sequence_prefix"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />
+                            <TextBox
+                                name="System Sequence Suffix"
+                                varname="system_sequence_suffix"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />
+                        </View>
 
-                    <View style={{ flexDirection: 'row' }}>
-                        <TextBox
-                            name="Stop Sequence"
-                            varname="stop_sequence"
+                        <View style={{ flexDirection: 'row' }}>
+                            <TextBox
+                                name="Stop Sequence"
+                                varname="stop_sequence"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />
+                            <TextBox
+                                name="Separator Sequence"
+                                varname="separator_sequence"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />
+                        </View>
+
+                        <CheckboxTitle
+                            name="Wrap Sequence with Newline"
+                            varname="wrap"
                             body={currentInstruct}
                             setValue={setCurrentInstruct}
-                            multiline
                         />
-                        <TextBox
-                            name="Separator Sequence"
-                            varname="separator_sequence"
-                            body={currentInstruct}
-                            setValue={setCurrentInstruct}
-                            multiline
-                        />
-                    </View>
 
-                    <CheckboxTitle
-                        name="Wrap Sequence with Newline"
-                        varname="wrap"
-                        body={currentInstruct}
-                        setValue={setCurrentInstruct}
-                    />
-
-                    {/* @TODO: Macros are always replaced - people may want this to be changed
+                        {/* @TODO: Macros are always replaced - people may want this to be changed
                     <CheckboxTitle
                         name="Replace Macro In Sequences"
                         varname="macro"
@@ -274,14 +276,14 @@ const Instruct = () => {
                     />
                     */}
 
-                    <CheckboxTitle
-                        name="Include Names"
-                        varname="names"
-                        body={currentInstruct}
-                        setValue={setCurrentInstruct}
-                    />
+                        <CheckboxTitle
+                            name="Include Names"
+                            varname="names"
+                            body={currentInstruct}
+                            setValue={setCurrentInstruct}
+                        />
 
-                    {/*  Groups are not implemented - leftover from ST
+                        {/*  Groups are not implemented - leftover from ST
                     <CheckboxTitle
                         name="Force for Groups and Personas"
                         varname="names_force_groups"
@@ -290,7 +292,7 @@ const Instruct = () => {
                     />
                     */}
 
-                    {/* Now idea what this does - leftover from ST
+                        {/* Now idea what this does - leftover from ST
                     
                     <TextBox
                         name="Activation Regex"
@@ -298,9 +300,10 @@ const Instruct = () => {
                         body={currentInstruct}
                         setValue={setCurrentInstruct}
                 />*/}
-                </View>
-            </ScrollView>
-        </SafeAreaView>
+                    </View>
+                </ScrollView>
+            </SafeAreaView>
+        </AnimatedView>
     )
 }
 

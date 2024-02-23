@@ -8,6 +8,7 @@ type AnimatedViewProps = {
     tduration?: number
     fduration?: number
     children?: ReactNode
+    style?: any
 }
 
 const AnimatedView: React.FC<AnimatedViewProps> = ({
@@ -17,6 +18,7 @@ const AnimatedView: React.FC<AnimatedViewProps> = ({
     tduration = 1,
     fduration = 1,
     children,
+    style = {},
 }) => {
     const fadeAnim = useRef(new Animated.Value(fade)).current
     const dyAnim = useRef(new Animated.Value(dy)).current
@@ -47,6 +49,7 @@ const AnimatedView: React.FC<AnimatedViewProps> = ({
             style={{
                 opacity: fadeAnim,
                 transform: [{ translateY: dyAnim }, { translateX: dxAnim }],
+                ...style,
             }}>
             {children}
         </Animated.View>

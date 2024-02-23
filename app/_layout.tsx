@@ -23,12 +23,12 @@ const Layout = () => {
                         headerTintColor: Color.White,
                         contentStyle: { backgroundColor: Color.Background },
                     }}>
-                    <Stack.Screen name="index" />
+                    <Stack.Screen name="index" options={{ animation: 'fade' }} />
 
                     <Stack.Screen
                         name="CharMenu"
                         options={{
-                            animation: 'slide_from_right',
+                            animation: 'fade',
                             title: 'Characters',
                             animationDuration: 200,
                         }}
@@ -37,7 +37,7 @@ const Layout = () => {
                     <Stack.Screen
                         name="CharInfo"
                         options={{
-                            animation: 'slide_from_right',
+                            animation: 'fade',
                             title: 'Edit',
                             animationDuration: 200,
                         }}
@@ -46,7 +46,7 @@ const Layout = () => {
                     <Stack.Screen
                         name="ChatSelector"
                         options={{
-                            animation: 'slide_from_right',
+                            animation: 'fade',
                             title: 'History',
                             animationDuration: 200,
                         }}

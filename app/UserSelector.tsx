@@ -14,7 +14,7 @@ import {
     Alert,
 } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
-
+import AnimatedView from '@components/AnimatedView'
 const UserSelector = () => {
     const router = useRouter()
 
@@ -49,96 +49,98 @@ const UserSelector = () => {
     }, [])
 
     return (
-        <SafeAreaView style={styles.mainContainer}>
-            <Stack.Screen
-                options={{
-                    title: 'Personas',
-                    animation: 'slide_from_left',
-                    headerRight: () => {
-                        return (
-                            <View>
+        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+            <SafeAreaView style={styles.mainContainer}>
+                <Stack.Screen
+                    options={{
+                        title: 'Personas',
+                        animation: 'fade',
+                        headerRight: () => {
+                            return (
+                                <View>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            setShowNewUser(true)
+                                        }}>
+                                        <FontAwesome size={28} name="plus" color={Color.Button} />
+                                    </TouchableOpacity>
+                                </View>
+                            )
+                        },
+                    }}
+                />
+
+                <ScrollView>
+                    {userList.map((name, index) => (
+                        <View
+                            key={index}
+                            style={
+                                name === userName
+                                    ? { ...styles.useritem, backgroundColor: Color.Container }
+                                    : styles.useritem
+                            }>
+                            <TouchableOpacity
+                                style={styles.useritembutton}
+                                onPress={() => {
+                                    Users.loadFile(name).then((file) => {
+                                        setUserCard(file)
+                                        setUserName(name)
+                                        router.back()
+                                    })
+                                }}>
+                                <Image
+                                    source={{ uri: Users.getImageDir(name) }}
+                                    loadingIndicatorSource={require('@assets/user.png')}
+                                    style={styles.avatar}
+                                />
+
+                                <Text style={{ flex: 1, color: Color.Text }}>{name}</Text>
+
                                 <TouchableOpacity
                                     onPress={() => {
-                                        setShowNewUser(true)
+                                        Alert.alert(
+                                            `Delete Persona`,
+                                            `Are you sure you want to delete '${name}'?`,
+                                            [
+                                                { text: `Cancel`, style: `cancel` },
+                                                {
+                                                    text: `Confirm`,
+                                                    style: `destructive`,
+                                                    onPress: () =>
+                                                        Users.deleteFile(name).then(() => {
+                                                            loadUserList()
+                                                        }),
+                                                },
+                                            ]
+                                        )
                                     }}>
-                                    <FontAwesome size={28} name="plus" color={Color.Button} />
+                                    <FontAwesome size={28} name="trash" color={Color.Button} />
                                 </TouchableOpacity>
-                            </View>
-                        )
-                    },
-                }}
-            />
-
-            <ScrollView>
-                {userList.map((name, index) => (
-                    <View
-                        key={index}
-                        style={
-                            name === userName
-                                ? { ...styles.useritem, backgroundColor: Color.Container }
-                                : styles.useritem
-                        }>
-                        <TouchableOpacity
-                            style={styles.useritembutton}
-                            onPress={() => {
-                                Users.loadFile(name).then((file) => {
-                                    setUserCard(file)
-                                    setUserName(name)
-                                    router.back()
-                                })
-                            }}>
-                            <Image
-                                source={{ uri: Users.getImageDir(name) }}
-                                loadingIndicatorSource={require('@assets/user.png')}
-                                style={styles.avatar}
-                            />
-
-                            <Text style={{ flex: 1, color: Color.Text }}>{name}</Text>
-
-                            <TouchableOpacity
-                                onPress={() => {
-                                    Alert.alert(
-                                        `Delete Persona`,
-                                        `Are you sure you want to delete '${name}'?`,
-                                        [
-                                            { text: `Cancel`, style: `cancel` },
-                                            {
-                                                text: `Confirm`,
-                                                style: `destructive`,
-                                                onPress: () =>
-                                                    Users.deleteFile(name).then(() => {
-                                                        loadUserList()
-                                                    }),
-                                            },
-                                        ]
-                                    )
-                                }}>
-                                <FontAwesome size={28} name="trash" color={Color.Button} />
                             </TouchableOpacity>
-                        </TouchableOpacity>
-                    </View>
-                ))}
-            </ScrollView>
+                        </View>
+                    ))}
+                </ScrollView>
 
-            <TextBoxModal
-                booleans={[showNewUser, setShowNewUser]}
-                onConfirm={(text) => {
-                    if (userList.includes(text)) {
-                        Logger.log(`Persona Already Exists`, true)
-                        return
-                    }
-                    Users.createUser(text)
-                        .then(async () => {
-                            return Users.loadFile(text)
-                        })
-                        .then((card) => {
-                            setUserName(text)
-                            setUserCard(card)
-                            router.back()
-                        })
-                }}
-            />
-        </SafeAreaView>
+                <TextBoxModal
+                    booleans={[showNewUser, setShowNewUser]}
+                    onConfirm={(text) => {
+                        if (userList.includes(text)) {
+                            Logger.log(`Persona Already Exists`, true)
+                            return
+                        }
+                        Users.createUser(text)
+                            .then(async () => {
+                                return Users.loadFile(text)
+                            })
+                            .then((card) => {
+                                setUserName(text)
+                                setUserCard(card)
+                                router.back()
+                            })
+                    }}
+                />
+            </SafeAreaView>
+        </AnimatedView>
     )
 }
 
