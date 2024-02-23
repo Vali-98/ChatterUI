@@ -68,11 +68,11 @@ const ChatItem: React.FC<ChatItemProps> = ({
 
     const isFirstWithSwipes = id === 0 && message.swipes.length > 1 && messagesLength === 1
     const isLastMessage = id === messagesLength - 1 && messagesLength !== 1
-    const showSwipe = message.name === charName && (isFirstWithSwipes || isLastMessage)
+    const showSwipe = !message.is_user && (isFirstWithSwipes || isLastMessage)
 
     const showEditor = editMode && !nowGenerating
     const showEllipsis =
-        message.name === charName && buffer === '' && id === messagesLength - 1 && nowGenerating
+        !message.is_user && buffer === '' && id === messagesLength - 1 && nowGenerating
 
     type EditorProps = {
         name: 'delete' | 'check' | 'close'

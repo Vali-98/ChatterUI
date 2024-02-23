@@ -111,7 +111,7 @@ const buildContext = (max_length: number) => {
     const payload_length = LlamaTokenizer.encode(payload).length
     let message_acc_length = LlamaTokenizer.encode(message_acc).length
     for (const message of messages?.reverse() ?? []) {
-        let message_shard = `${message.name === charName ? currentInstruct.output_sequence : currentInstruct.input_sequence}`
+        let message_shard = `${message.is_user ? currentInstruct.input_sequence : currentInstruct.output_sequence}`
 
         if (currentInstruct.names) message_shard += message.name + ': '
         message_shard += message.mes
@@ -157,7 +157,7 @@ const buildChatCompletionContext = (max_length: number) => {
         const len = LlamaTokenizer.encode(message.mes).length + total_length
         if (len > max_length) break
         payload.push({
-            role: message.name === charName ? 'assistant' : 'user',
+            role: message.is_user ? 'user' : 'assistant',
             content: replaceMacros(message.mes),
         })
         total_length += len
