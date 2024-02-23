@@ -18,6 +18,7 @@ import { useMMKVString, useMMKVObject } from 'react-native-mmkv'
 
 import { useAutosave } from 'react-autosave'
 import { CharacterCardV2 } from '@constants/Characters'
+import { RecentMessages } from '@constants/RecentMessages'
 
 const CharInfo = () => {
     const router = useRouter()
@@ -64,6 +65,7 @@ const CharInfo = () => {
                 {
                     text: 'Confirm',
                     onPress: () => {
+                        RecentMessages.deleteByCharacter(charName ?? '')
                         Characters.deleteCard(charName)
                         setCharName('Welcome')
                         router.back()

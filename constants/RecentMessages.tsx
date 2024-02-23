@@ -34,4 +34,12 @@ export namespace RecentMessages {
         if (index !== -1) entries.splice(index, 1)
         mmkv.set(Global.RecentMessages, JSON.stringify(entries))
     }
+
+    export const deleteByCharacter = (charName: string) => {
+        const data = mmkv.getString(Global.RecentMessages)
+        let entries: Array<RecentEntry> = []
+        if (data) entries = JSON.parse(data)
+        const cleaned = entries.filter((item) => item.charName !== charName)
+        mmkv.set(Global.RecentMessages, JSON.stringify(cleaned))
+    }
 }

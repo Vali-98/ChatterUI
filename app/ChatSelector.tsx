@@ -1,4 +1,5 @@
 import ChatMenu from '@components/ChatMenu/ChatMenu'
+import { RecentMessages } from '@constants/RecentMessages'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Chats, Characters, saveStringExternal, Logger } from '@globals'
 import { useRouter, Stack } from 'expo-router'
@@ -45,7 +46,8 @@ const ChatSelector = () => {
             {
                 text: 'Confirm',
                 onPress: () => {
-                    deleteChat(charName ?? '', chatname).then(() =>
+                    deleteChat(charName ?? '', chatname).then(() => {
+                        RecentMessages.deleteEntry(chatname)
                         Chats.getNewest(charName ?? '').then(async (filename) => {
                             if (!filename)
                                 await Chats.createChat(charName ?? '', userName ?? '').then(
@@ -54,7 +56,7 @@ const ChatSelector = () => {
                                 )
                             refreshfilenames()
                         })
-                    )
+                    })
                 },
                 style: 'destructive',
             },

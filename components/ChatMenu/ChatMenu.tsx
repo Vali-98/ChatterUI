@@ -81,6 +81,17 @@ const ChatMenu = () => {
                                     <TouchableOpacity
                                         style={styles.headerButtonRight}
                                         onPress={() => {
+                                            setCharName('Welcome')
+                                        }}>
+                                        <Ionicons
+                                            name="chevron-back"
+                                            size={28}
+                                            color={Color.Button}
+                                        />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.headerButtonRight}
+                                        onPress={() => {
                                             router.push('/ChatSelector')
                                         }}>
                                         <Ionicons name="chatbox" size={28} color={Color.Button} />
