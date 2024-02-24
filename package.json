@@ -44,7 +44,7 @@
         "expo-splash-screen": "~0.26.4",
         "expo-status-bar": "~1.11.1",
         "expo-system-ui": "~2.9.3",
-        "llama.rn": "^0.3.0-rc.15",
+        "llama.rn": "^0.3.0-rc.16",
         "png-chunk-text": "^1.0.0",
         "png-chunks-extract": "^1.0.0",
         "react": "18.2.0",

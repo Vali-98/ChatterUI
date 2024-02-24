@@ -7,6 +7,23 @@ import { Global } from './GlobalValues'
 import { mmkv } from './mmkv'
 import { Logger } from './Logger'
 
+type CompletionTimings = {
+    predicted_per_token_ms: number
+    predicted_per_second: number | null
+    predicted_ms: number
+    predicted_n: number
+
+    prompt_per_token_ms: number
+    prompt_per_second: number | null
+    prompt_ms: number
+    prompt_n: number
+}
+
+type CompletionOutput = {
+    text: string
+    timings: CompletionTimings
+}
+
 export namespace Llama {
     const model_dir = `${FS.documentDirectory}models/`
 
@@ -81,15 +98,26 @@ export namespace Llama {
     export const completion = async (params: CompletionParams, callback = (text: string) => {}) => {
         if (!isModelLoaded()) return
         Logger.log('Completion Started with Prompt:')
-        Logger.log(params.prompt)
+        Logger.log(`Completion Input:\n\n` + params.prompt)
         if (llamaContext === undefined) return
         return llamaContext
             ?.completion(params, (data: any) => {
                 callback(data.token)
             })
-            .then(({ text, timings }: any) => {
-                Logger.log(JSON.stringify(timings))
-                Logger.log(text)
+            .then(({ text, timings }: CompletionOutput) => {
+                Logger.log(`Completion Output:\n\n` + text)
+                const timingtext =
+                    `\n[Prompt Timings]` +
+                    `\nPrompt Per Token: ${timings.prompt_per_token_ms} ms/token` +
+                    `\nPrompt Per Second: ${timings.prompt_per_second?.toFixed(2) ?? 0} tokens/s` +
+                    `\nPrompt Time: ${(timings.prompt_ms / 1000).toFixed(2)}s` +
+                    `\nPrompt Tokens: ${timings.prompt_n} tokens` +
+                    `\n\n[Predicted Timings]` +
+                    `\nPredicted Per Token: ${timings.predicted_per_token_ms} ms/token` +
+                    `\nPredicted Per Second: ${timings.predicted_per_second?.toFixed(2) ?? 0} tokens/s` +
+                    `\nPrediction Time: ${(timings.predicted_ms / 1000).toFixed(2)}s` +
+                    `\nPredicted Tokens: ${timings.predicted_n} tokens`
+                Logger.log(timingtext)
             })
     }
 
