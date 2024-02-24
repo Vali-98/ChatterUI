@@ -98,8 +98,7 @@ export namespace Chats {
                 .save()
                 .then(() => {
                     // AUTO TTS
-                    const auto = mmkv.getBoolean(Global.TTSAuto)
-                    if (auto) {
+                    if (mmkv.getBoolean(Global.TTSEnable) && mmkv.getBoolean(Global.TTSAuto)) {
                         Logger.log(`Automatically using TTS`)
                         mmkv.set(Global.TTSAutoStart, JSON.stringify(true))
                     }
