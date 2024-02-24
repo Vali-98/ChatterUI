@@ -29,6 +29,16 @@ const CharInfo = () => {
     )
     const [characterCard, setCharacterCard] = useState<CharacterCardV2 | undefined>(currentCard)
 
+    const imageDir = Characters.getImageDir(charName ?? '')
+
+    const [imageSource, setImageSource] = useState({
+        uri: imageDir,
+    })
+
+    const handleImageError = () => {
+        setImageSource(require('@assets/user.png'))
+    }
+
     const loadcard = () => {
         Characters.getCard(charName).then((data) => {
             if (data) setCharacterCard(JSON.parse(data))
@@ -105,8 +115,9 @@ const CharInfo = () => {
                     <ScrollView>
                         <View style={styles.characterHeader}>
                             <Image
-                                source={{ uri: Characters.getImageDir(charName) }}
+                                source={imageSource}
                                 style={styles.avatar}
+                                onError={handleImageError}
                             />
 
                             <View style={styles.characterHeaderInfo}>
@@ -217,7 +228,7 @@ const styles = StyleSheet.create({
     avatar: {
         width: 64,
         height: 64,
-        borderRadius: 32,
+        borderRadius: 16,
         marginBottom: 4,
         marginLeft: 4,
         marginRight: 8,

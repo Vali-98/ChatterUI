@@ -7,56 +7,73 @@ import {
     View,
     Image,
 } from 'react-native'
-import Animated, { SlideInLeft, Easing, SlideOutRight } from 'react-native-reanimated'
+import Animated, {
+    SlideInLeft,
+    Easing,
+    SlideOutRight,
+    SlideOutLeft,
+    FadeIn,
+} from 'react-native-reanimated'
 import { Color, Global, Users } from '@globals'
 import { usePathname, useRouter } from 'expo-router'
 import { useMMKVString } from 'react-native-mmkv'
 import { FontAwesome } from '@expo/vector-icons'
-import { SetStateAction, useEffect, useState } from 'react'
+import { SetStateAction, useState } from 'react'
 type SettingsDrawerProps = {
     booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
 }
 
 const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, setShowModal] }) => {
     const router = useRouter()
-
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    const imageDir = Users.getImageDir(userName ?? '')
+
+    const [imageSource, setImageSource] = useState({
+        uri: imageDir,
+    })
+
+    const handleImageError = () => {
+        setImageSource(require('@assets/user.png'))
+    }
+
     const handleOverlayClick = (e: GestureResponderEvent) => {
         if (e.target === e.currentTarget) setShowModal(false)
     }
 
     const handlePush = (route: any) => {
         router.navigate(route)
-        setShowModal(false)
     }
-
-    return (
-        <Modal
-            visible={showModal}
-            onRequestClose={() => {
-                setShowModal(false)
-            }}
-            transparent
-            animationType={'fade'}>
-            <TouchableOpacity
-                activeOpacity={1}
-                onPress={handleOverlayClick}
-                style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    flex: 1,
-                    justifyContent: 'center',
-                }}>
+    if (showModal)
+        return (
+            <View style={styles.absolute}>
                 <Animated.View
-                    style={{ flex: 1, backgroundColor: Color.Background, width: '70%' }}
-                    entering={SlideInLeft.duration(200).easing(Easing.out(Easing.quad))}
-                    exiting={SlideOutRight.duration(200).easing(Easing.out(Easing.quad))}>
+                    entering={FadeIn.duration(200).easing(Easing.ease)}
+                    style={styles.absolute}>
+                    <TouchableOpacity
+                        activeOpacity={1}
+                        onPress={handleOverlayClick}
+                        style={{
+                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                            ...styles.absolute,
+                            justifyContent: 'center',
+                        }}
+                    />
+                </Animated.View>
+
+                <Animated.View
+                    style={{
+                        backgroundColor: Color.Background,
+                        ...styles.absolute,
+                        width: '70%',
+                    }}
+                    entering={SlideInLeft.duration(300).easing(Easing.out(Easing.quad))}
+                    exiting={SlideOutLeft.duration(300).easing(Easing.out(Easing.quad))}>
                     <View style={styles.userContainer}>
-                        <View style={styles.imageContainer}>
-                            <Image
-                                style={styles.userImage}
-                                source={{ uri: Users.getImageDir(userName ?? '') }}
-                            />
-                        </View>
+                        <Image
+                            style={styles.userImage}
+                            source={imageSource}
+                            onError={handleImageError}
+                        />
                         <View>
                             <Text style={styles.userName}>{userName}</Text>
                             <View style={styles.buttonContainer}>
@@ -78,7 +95,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                         onPress={() => {
                             handlePush('/PresetMenu')
                         }}>
-                        <Text style={styles.largeButtonText}>Presets</Text>
+                        <Text style={styles.largeButtonText}>Sampler</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.largeButton}
@@ -114,14 +131,19 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                         {'v' + require(`../../app.json`).expo.version}
                     </Text>
                 </Animated.View>
-            </TouchableOpacity>
-        </Modal>
-    )
+            </View>
+        )
 }
 
 export default SettingsDrawer
 
 const styles = StyleSheet.create({
+    absolute: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+    },
+
     mainContainer: {
         flex: 1,
         backgroundColor: Color.Background,
@@ -157,17 +179,15 @@ const styles = StyleSheet.create({
     imageContainer: {
         width: 108,
         height: 108,
-        borderRadius: 54,
+        borderRadius: 27,
         margin: 4,
         borderWidth: 2,
-        borderColor: Color.White,
-        backgroundColor: Color.DarkContainer,
     },
 
     userImage: {
-        width: 108,
-        height: 108,
-        borderRadius: 54,
+        width: 80,
+        height: 80,
+        borderRadius: 20,
     },
 
     largeButtonContainer: {

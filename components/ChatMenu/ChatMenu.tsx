@@ -20,7 +20,13 @@ import Recents from './Recents'
 import AnimatedView from '@components/AnimatedView'
 import SettingsDrawer from './SettingsDrawer'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { runOnJS } from 'react-native-reanimated'
+import Animated, {
+    SlideInRight,
+    runOnJS,
+    Easing,
+    SlideOutLeft,
+    SlideOutRight,
+} from 'react-native-reanimated'
 
 const ChatMenu = () => {
     const router = useRouter()
@@ -113,10 +119,30 @@ const ChatMenu = () => {
         </Menu>
     )
 
+    const headerViewRightSettings = (
+        <Animated.View
+            entering={SlideInRight.withInitialValues({ originX: 150 })
+                .duration(200)
+                .easing(Easing.out(Easing.ease))}>
+            <TouchableOpacity
+                style={styles.headerButtonRight}
+                onPress={() => {
+                    const data = Math.floor(Math.random() * 3)
+                    if (data === 2) Logger.log(`Haha funny number`, true)
+                    else Logger.log('Coming Soon', true)
+                }}>
+                <FontAwesome name="cog" size={28} color={Color.Button} />
+            </TouchableOpacity>
+        </Animated.View>
+    )
+
     const headerViewRight = (
         <View style={styles.headerButtonContainer}>
             {charName !== 'Welcome' && (
-                <AnimatedView dx={300} tduration={300} fduration={200} fade={0}>
+                <Animated.View
+                    entering={SlideInRight.withInitialValues({ originX: 150 })
+                        .duration(200)
+                        .easing(Easing.out(Easing.ease))}>
                     <View style={styles.headerButtonContainer}>
                         <TouchableOpacity
                             style={styles.headerButtonRight}
@@ -138,15 +164,20 @@ const ChatMenu = () => {
                             <FontAwesome name="edit" size={28} color={Color.Button} />
                         </TouchableOpacity>
                     </View>
-                </AnimatedView>
+                </Animated.View>
             )}
-            <TouchableOpacity
-                style={styles.headerButtonRight}
-                onPress={() => {
-                    router.push('/CharMenu')
-                }}>
-                <Ionicons name="person" size={28} color={Color.Button} />
-            </TouchableOpacity>
+            <Animated.View
+                entering={SlideInRight.withInitialValues({ originX: 200 })
+                    .duration(200)
+                    .easing(Easing.out(Easing.ease))}>
+                <TouchableOpacity
+                    style={styles.headerButtonRight}
+                    onPress={() => {
+                        router.push('/CharMenu')
+                    }}>
+                    <Ionicons name="person" size={28} color={Color.Button} />
+                </TouchableOpacity>
+            </Animated.View>
         </View>
     )
 
@@ -154,9 +185,13 @@ const ChatMenu = () => {
         <TouchableOpacity
             style={styles.headerButtonLeft}
             onPress={() => {
-                setShowDrawer(true)
+                setShowDrawer(!showDrawer)
             }}>
-            <Ionicons name="menu" size={28} color={Color.Button} />
+            {showDrawer ? (
+                <Ionicons name="close" size={28} color={Color.Button} />
+            ) : (
+                <Ionicons name="menu" size={28} color={Color.Button} />
+            )}
         </TouchableOpacity>
     )
 
@@ -166,11 +201,11 @@ const ChatMenu = () => {
                 <Stack.Screen
                     options={{
                         title: '',
-                        headerRight: () => headerViewRight,
+                        headerRight: () => (showDrawer ? headerViewRightSettings : headerViewRight),
                         headerLeft: () => headerViewLeft,
                     }}
                 />
-                <SettingsDrawer booleans={[showDrawer, setShowDrawer]} />
+
                 {charName === 'Welcome' ? (
                     <AnimatedView dy={100} tduration={200} fade={0} fduration={100}>
                         <Text style={styles.welcometext}>Select A Character To Get Started!</Text>
@@ -203,6 +238,8 @@ const ChatMenu = () => {
                         </View>
                     </View>
                 )}
+
+                <SettingsDrawer booleans={[showDrawer, setShowDrawer]} />
             </SafeAreaView>
         </GestureDetector>
     )
@@ -222,6 +259,7 @@ const styles = StyleSheet.create({
     },
     safeArea: {
         flex: 1,
+        flexDirection: 'row',
     },
 
     welcometext: {

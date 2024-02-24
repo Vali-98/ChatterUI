@@ -65,11 +65,4 @@ const styles = StyleSheet.create({
     chatHistory: {
         flex: 1,
     },
-    errorMessage: {
-        margin: 16,
-        alignSelf: 'center',
-        flex: 1,
-        color: Color.Text,
-        fontSize: 20,
-    },
 })

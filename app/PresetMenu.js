@@ -211,7 +211,7 @@ const PresetMenu = () => {
                 <Stack.Screen
                     options={{
                         animation: 'fade',
-                        title: `Presets`,
+                        title: `Sampler Settings`,
                     }}
                 />
 
