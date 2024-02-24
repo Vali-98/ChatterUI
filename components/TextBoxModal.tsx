@@ -1,7 +1,17 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Color } from '@globals'
 import { useState, useEffect } from 'react'
-import { View, Text, Modal, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
+import {
+    View,
+    Text,
+    Modal,
+    TextInput,
+    StyleSheet,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    GestureResponderEvent,
+    Platform,
+} from 'react-native'
 
 type TextBoxModalProps = {
     booleans: [boolean, (b: boolean) => void]
@@ -20,15 +30,25 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
         setText('')
     }, [showModal])
 
+    const handleOverlayClick = (e: GestureResponderEvent) => {
+        if (e.target === e.currentTarget) setShowModal(false)
+    }
+
     return (
         <Modal
             visible={showModal}
+            onRequestClose={() => {
+                setShowModal(false)
+            }}
             transparent
+            statusBarTranslucent={Platform.OS === 'android'}
             animationType="fade"
             onDismiss={() => {
                 setShowModal(false)
             }}>
-            <View
+            <TouchableOpacity
+                activeOpacity={1}
+                onPress={handleOverlayClick}
                 style={{
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     flex: 1,
@@ -54,7 +74,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                         </TouchableOpacity>
                     </View>
                 </View>
-            </View>
+            </TouchableOpacity>
         </Modal>
     )
 }

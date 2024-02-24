@@ -18,13 +18,23 @@ const { SlideInMenu } = renderers
 import { useShallow } from 'zustand/react/shallow'
 import Recents from './Recents'
 import AnimatedView from '@components/AnimatedView'
+import SettingsDrawer from './SettingsDrawer'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import { runOnJS } from 'react-native-reanimated'
 
 const ChatMenu = () => {
     const router = useRouter()
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [newMessage, setNewMessage] = useState<string>('')
+    const [showDrawer, setShowDrawer] = useState<boolean>(false)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const messagesLength = Chats.useChat(useShallow((state) => state?.data?.length)) ?? -1
+
+    const gesture = Gesture.Fling()
+        .direction(1)
+        .onEnd(() => {
+            runOnJS(setShowDrawer)(true)
+        })
 
     const { insertEntry, deleteEntry, inserLastToBuffer, nowGenerating, abortFunction } =
         Chats.useChat(
@@ -141,54 +151,61 @@ const ChatMenu = () => {
     )
 
     const headerViewLeft = (
-        <TouchableOpacity style={styles.headerButtonLeft} onPress={() => router.push('/Settings')}>
+        <TouchableOpacity
+            style={styles.headerButtonLeft}
+            onPress={() => {
+                //router.push('/Settings')
+                setShowDrawer(true)
+            }}>
             <Ionicons name="menu" size={28} color={Color.Button} />
         </TouchableOpacity>
     )
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <Stack.Screen
-                options={{
-                    title: '',
-                    headerRight: () => headerViewRight,
-                    headerLeft: () => headerViewLeft,
-                }}
-            />
+        <GestureDetector gesture={gesture}>
+            <SafeAreaView style={styles.safeArea}>
+                <Stack.Screen
+                    options={{
+                        title: '',
+                        headerRight: () => headerViewRight,
+                        headerLeft: () => headerViewLeft,
+                    }}
+                />
+                <SettingsDrawer booleans={[showDrawer, setShowDrawer]} />
+                {charName === 'Welcome' ? (
+                    <AnimatedView dy={100} tduration={200} fade={0} fduration={100}>
+                        <Text style={styles.welcometext}>Select A Character To Get Started!</Text>
+                        <Recents />
+                    </AnimatedView>
+                ) : (
+                    <View style={styles.container}>
+                        <ChatWindow />
 
-            {charName === 'Welcome' ? (
-                <AnimatedView dy={100} tduration={200} fade={0} fduration={100}>
-                    <Text style={styles.welcometext}>Select A Character To Get Started!</Text>
-                    <Recents />
-                </AnimatedView>
-            ) : (
-                <View style={styles.container}>
-                    <ChatWindow />
+                        <View style={styles.inputContainer}>
+                            {modificationMenu}
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Message..."
+                                placeholderTextColor={Color.Offwhite}
+                                value={newMessage}
+                                onChangeText={(text) => setNewMessage(text)}
+                                multiline
+                            />
 
-                    <View style={styles.inputContainer}>
-                        {modificationMenu}
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Message..."
-                            placeholderTextColor={Color.Offwhite}
-                            value={newMessage}
-                            onChangeText={(text) => setNewMessage(text)}
-                            multiline
-                        />
-
-                        {nowGenerating ? (
-                            <TouchableOpacity style={styles.sendButton} onPress={abortResponse}>
-                                <MaterialIcons name="stop" color={Color.Button} size={30} />
-                            </TouchableOpacity>
-                        ) : (
-                            <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-                                <MaterialIcons name="send" color={Color.Button} size={30} />
-                            </TouchableOpacity>
-                        )}
+                            {nowGenerating ? (
+                                <TouchableOpacity style={styles.sendButton} onPress={abortResponse}>
+                                    <MaterialIcons name="stop" color={Color.Button} size={30} />
+                                </TouchableOpacity>
+                            ) : (
+                                <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+                                    <MaterialIcons name="send" color={Color.Button} size={30} />
+                                </TouchableOpacity>
+                            )}
+                        </View>
                     </View>
-                </View>
-            )}
-        </SafeAreaView>
+                )}
+            </SafeAreaView>
+        </GestureDetector>
     )
 }
 
