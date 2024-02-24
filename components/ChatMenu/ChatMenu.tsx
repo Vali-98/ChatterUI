@@ -127,9 +127,7 @@ const ChatMenu = () => {
             <TouchableOpacity
                 style={styles.headerButtonRight}
                 onPress={() => {
-                    const data = Math.floor(Math.random() * 3)
-                    if (data === 2) Logger.log(`Haha funny number`, true)
-                    else Logger.log('Coming Soon', true)
+                    Logger.log('Unimplemented', true)
                 }}>
                 <FontAwesome name="cog" size={28} color={Color.Button} />
             </TouchableOpacity>
