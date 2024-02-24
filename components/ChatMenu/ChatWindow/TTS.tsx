@@ -27,6 +27,7 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
     }, [start])
 
     const handleSpeak = async () => {
+        Logger.log('Starting TTS')
         setStart(false)
         if (currentSpeaker === undefined) {
             Logger.log(`No Speaker Chosen`, true)
@@ -34,12 +35,20 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
         }
         setIsSpeaking(true)
         if (await Speech.isSpeakingAsync()) Speech.stop()
-        Speech.speak(message, {
-            language: currentSpeaker?.language,
-            voice: currentSpeaker?.identifier,
-            onDone: () => setIsSpeaking(false),
-            onStopped: () => setIsSpeaking(false),
-        })
+        const chunks = message
+            .split(/[\n.,]/)
+            .map((item) => item.trim())
+            .filter((item) => item.length > 0)
+        chunks.forEach((chunk, index) =>
+            Speech.speak(chunk, {
+                language: currentSpeaker?.language,
+                voice: currentSpeaker?.identifier,
+                onDone: () => {
+                    index === chunks.length - 1 && setIsSpeaking(false)
+                },
+                onStopped: () => setIsSpeaking(false),
+            })
+        )
     }
 
     const handleStopSpeaking = () => {
