@@ -354,6 +354,7 @@ const constructMancerPayload = () => {
 }
 
 const constructCompletionsPayload = () => {
+    const completionsModel = getObject(Global.CompletionsModel)
     const preset = getObject(Global.PresetData)
     const currentInstruct = instructReplaceMacro()
     return {
@@ -363,6 +364,7 @@ const constructCompletionsPayload = () => {
         prompt: buildContext(preset.max_length),
         rep_pen: preset.rep_pen,
         rep_pen_range: preset.rep_pen_range,
+        model: completionsModel.id,
         //rep_pen_slope: preset.rep_pen_slope,
         temperature: preset.temp,
         tfs: preset.tfs,
