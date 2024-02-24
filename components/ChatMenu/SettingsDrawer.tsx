@@ -21,20 +21,13 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
     const router = useRouter()
 
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-    const [routed, setRouted] = useState(false)
     const handleOverlayClick = (e: GestureResponderEvent) => {
         if (e.target === e.currentTarget) setShowModal(false)
     }
 
     const handlePush = (route: any) => {
         router.navigate(route)
-        setRouted(true)
         setShowModal(false)
-    }
-
-    if (usePathname() === '/' && routed) {
-        setShowModal(() => true)
-        setRouted(() => false)
     }
 
     return (
@@ -44,10 +37,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                 setShowModal(false)
             }}
             transparent
-            animationType="fade"
-            onDismiss={() => {
-                console.log('test')
-            }}>
+            animationType={'fade'}>
             <TouchableOpacity
                 activeOpacity={1}
                 onPress={handleOverlayClick}

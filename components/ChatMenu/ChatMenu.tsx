@@ -135,7 +135,7 @@ const ChatMenu = () => {
                         <TouchableOpacity
                             style={styles.headerButtonRight}
                             onPress={() => router.push(`/CharInfo`)}>
-                            <FontAwesome name="cog" size={28} color={Color.Button} />
+                            <FontAwesome name="edit" size={28} color={Color.Button} />
                         </TouchableOpacity>
                     </View>
                 </AnimatedView>
@@ -154,7 +154,6 @@ const ChatMenu = () => {
         <TouchableOpacity
             style={styles.headerButtonLeft}
             onPress={() => {
-                //router.push('/Settings')
                 setShowDrawer(true)
             }}>
             <Ionicons name="menu" size={28} color={Color.Button} />
