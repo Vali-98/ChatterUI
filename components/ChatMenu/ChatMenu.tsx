@@ -199,7 +199,7 @@ const ChatMenu = () => {
                 <Stack.Screen
                     options={{
                         title: '',
-                        headerRight: () => (showDrawer ? headerViewRightSettings : headerViewRight),
+                        headerRight: () => !showDrawer && headerViewRight,
                         headerLeft: () => headerViewLeft,
                     }}
                 />
