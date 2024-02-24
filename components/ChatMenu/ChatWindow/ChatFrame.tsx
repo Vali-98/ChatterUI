@@ -11,6 +11,7 @@ type ChatFrameProps = {
     charName: string
     TTSenabled: boolean
     id: number
+    isLast?: boolean
 }
 
 const ChatFrame: React.FC<ChatFrameProps> = ({
@@ -20,6 +21,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
     charName,
     TTSenabled,
     id,
+    isLast,
 }) => {
     const imageDir = message.is_user
         ? Users.getImageDir(userName)
@@ -58,7 +60,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
                 {deltaTime !== undefined && !message.is_user && (
                     <Text style={styles.graytext}>{deltaTime}s</Text>
                 )}
-                {TTSenabled && <TTSMenu message={message.mes} />}
+                {TTSenabled && <TTSMenu message={message.mes} isLast={isLast} />}
             </View>
             <View style={{ flex: 1, flexDirection: 'column' }}>
                 <View style={{ flex: 1 }}>
