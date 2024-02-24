@@ -57,7 +57,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
                     source={imageSource}
                 />
                 <Text style={styles.graytext}>#{id}</Text>
-                {deltaTime !== undefined && !message.is_user && (
+                {deltaTime !== undefined && !message.is_user && id !== 0 && (
                     <Text style={styles.graytext}>{deltaTime}s</Text>
                 )}
                 {TTSenabled && <TTSMenu message={message.mes} isLast={isLast} />}
