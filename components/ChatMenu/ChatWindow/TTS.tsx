@@ -33,8 +33,8 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
             Logger.log(`No Speaker Chosen`, true)
             return
         }
+        if (await Speech.isSpeakingAsync()) await Speech.stop()
         setIsSpeaking(true)
-        if (await Speech.isSpeakingAsync()) Speech.stop()
         const filter = /([!?.,])/
         const finalchunks: Array<string> = []
         const chunks = message.split(filter)
@@ -48,7 +48,7 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
                 language: currentSpeaker?.language,
                 voice: currentSpeaker?.identifier,
                 onDone: () => {
-                    index === chunks.length - 1 && setIsSpeaking(false)
+                    index === finalchunks.length - 1 && setIsSpeaking(false)
                 },
                 onStopped: () => setIsSpeaking(false),
             })
