@@ -39,6 +39,7 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
             .split(/[\n.,]/)
             .map((item) => item.trim())
             .filter((item) => item.length > 0)
+        Logger.debug('TTS started with ' + chunks.length + ' chunks')
         chunks.forEach((chunk, index) =>
             Speech.speak(chunk, {
                 language: currentSpeaker?.language,
@@ -51,9 +52,10 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
         )
     }
 
-    const handleStopSpeaking = () => {
+    const handleStopSpeaking = async () => {
+        Logger.log('TTS stopped')
+        await Speech.stop()
         setIsSpeaking(false)
-        Speech.stop()
     }
 
     return (
