@@ -109,7 +109,12 @@ const ChatItem: React.FC<ChatItemProps> = ({
 
                     {showEditor && (
                         <View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    marginBottom: 2,
+                                }}>
                                 {id !== 0 && (
                                     <EditorButton name="delete" onPress={handleDeleteMessage} />
                                 )}
@@ -129,6 +134,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                                     onChangeText={setPlaceholderText}
                                     textBreakStrategy="simple"
                                     multiline
+                                    autoFocus
                                 />
                             </View>
                         </View>
