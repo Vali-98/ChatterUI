@@ -60,7 +60,7 @@ const TTSMenu = () => {
                         onValueChange={(value) => {
                             if (value) {
                                 getVoices(true)
-                            }
+                            } else Speech.stop()
                             setEnableTTS(value)
                         }}
                         value={enableTTS}

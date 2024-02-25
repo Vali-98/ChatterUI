@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons'
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { Color } from '@globals'
 import { useState, useEffect } from 'react'
 import {
@@ -8,21 +8,23 @@ import {
     TextInput,
     StyleSheet,
     TouchableOpacity,
-    TouchableWithoutFeedback,
     GestureResponderEvent,
     Platform,
 } from 'react-native'
+import { getStringAsync } from 'expo-clipboard'
 
 type TextBoxModalProps = {
     booleans: [boolean, (b: boolean) => void]
     onConfirm: (text: string) => void
     title?: string
+    showPaste?: boolean
 }
 
 const TextBoxModal: React.FC<TextBoxModalProps> = ({
     booleans: [showModal, setShowModal],
     onConfirm = (text) => {},
     title = 'Enter Name',
+    showPaste = false,
 }) => {
     const [text, setText] = useState('')
 
@@ -33,7 +35,6 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
     const handleOverlayClick = (e: GestureResponderEvent) => {
         if (e.target === e.currentTarget) setShowModal(false)
     }
-
     return (
         <Modal
             visible={showModal}
@@ -56,7 +57,18 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                 }}>
                 <View style={styles.modalview}>
                     <Text style={styles.title}>{title}</Text>
-                    <TextInput style={styles.input} value={text} onChangeText={setText} />
+                    <View style={styles.inputContainer}>
+                        <TextInput style={styles.input} value={text} onChangeText={setText} />
+                        {showPaste && (
+                            <TouchableOpacity
+                                style={styles.inputButton}
+                                onPress={async () => {
+                                    setText(await getStringAsync())
+                                }}>
+                                <FontAwesome name="paste" size={24} color={Color.Button} />
+                            </TouchableOpacity>
+                        )}
+                    </View>
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
@@ -113,13 +125,22 @@ const styles = StyleSheet.create({
         marginHorizontal: 30,
     },
 
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+
     input: {
         color: Color.White,
-        minWidth: 280,
+        flex: 1,
         backgroundColor: Color.DarkContainer,
         borderRadius: 8,
         paddingHorizontal: 8,
         paddingVertical: 8,
         margin: 8,
+    },
+
+    inputButton: {
+        marginLeft: 12,
     },
 })

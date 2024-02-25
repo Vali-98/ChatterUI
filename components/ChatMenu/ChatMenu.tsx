@@ -1,9 +1,9 @@
 import { ChatWindow } from './ChatWindow/ChatWindow'
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Chats, Logger } from '@globals'
-import { generateResponse } from '@constants/Inference'
+import { continueResponse, generateResponse, regenerateResponse } from '@constants/Inference'
 import { Stack, useFocusEffect, useRouter } from 'expo-router'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
     View,
     Text,
@@ -36,7 +36,6 @@ const ChatMenu = () => {
     const [newMessage, setNewMessage] = useState<string>('')
     const [showDrawer, setShowDrawer] = useState<boolean>(false)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-    const messagesLength = Chats.useChat(useShallow((state) => state?.data?.length)) ?? -1
 
     const backAction = () => {
         if (showDrawer) {
@@ -64,11 +63,24 @@ const ChatMenu = () => {
         }, [charName, showDrawer])
     )
 
-    const gesture = Gesture.Fling()
+    const goToChars = () => {
+        if (showDrawer) setShowDrawer(false)
+        else router.push('/CharMenu')
+    }
+
+    const swipeDrawer = Gesture.Fling()
         .direction(1)
         .onEnd(() => {
             runOnJS(setShowDrawer)(true)
         })
+
+    const swipeChar = Gesture.Fling()
+        .direction(3)
+        .onEnd(() => {
+            runOnJS(goToChars)()
+        })
+
+    const gesture = Gesture.Exclusive(swipeDrawer, swipeChar)
 
     const { insertEntry, deleteEntry, inserLastToBuffer, nowGenerating, abortFunction } =
         Chats.useChat(
@@ -93,32 +105,35 @@ const ChatMenu = () => {
         if (abortFunction !== undefined) abortFunction()
     }
 
-    const regenerateResponse = async () => {
-        Logger.log('Regenerate Response')
-        if (charName && messagesLength !== 2) {
-            deleteEntry(messagesLength - 1)
-        }
-        insertEntry(charName ?? '', false, '')
-        generateResponse()
-    }
-
-    const continueResponse = () => {
-        Logger.log(`Continuing Reponse`)
-        inserLastToBuffer()
-        generateResponse()
-    }
-
     const menuoptions = [
-        { callback: abortResponse, text: 'Stop', button: 'stop' },
-        { callback: continueResponse, text: 'Continue', button: 'arrow-forward' },
-        { callback: regenerateResponse, text: 'Regenerate', button: 'reload' },
+        {
+            callback: () => {
+                setCharName('Welcome')
+            },
+            text: 'Main Menu',
+            button: 'chevron-left',
+        },
+        {
+            callback: () => {
+                router.push('/CharInfo')
+            },
+            text: 'Edit Character',
+            button: 'edit',
+        },
+        {
+            callback: () => {
+                router.push('/ChatSelector')
+            },
+            text: 'Chat History',
+            button: 'comment',
+        },
     ]
 
     const modificationMenu = (
         <Menu renderer={SlideInMenu}>
             <MenuTrigger>
-                <MaterialIcons
-                    name="menu"
+                <FontAwesome
+                    name="cog"
                     style={styles.optionsButton}
                     size={36}
                     color={Color.Button}
@@ -133,8 +148,9 @@ const ChatMenu = () => {
                                     ? styles.optionItemLast
                                     : styles.optionItem
                             }>
-                            <Ionicons
-                                //@ts-ignore
+                            <FontAwesome
+                                style={{ minWidth: 25, marginLeft: 5 }}
+                                //@ts-expect-error
                                 name={item.button}
                                 color={Color.Button}
                                 size={24}
@@ -164,19 +180,19 @@ const ChatMenu = () => {
 
     const headerViewRight = (
         <View style={styles.headerButtonContainer}>
-            {charName !== 'Welcome' && (
+            {/*charName !== 'Welcome' && (
                 <Animated.View
                     entering={SlideInRight.withInitialValues({ originX: 150 })
                         .duration(200)
                         .easing(Easing.out(Easing.ease))}>
                     <View style={styles.headerButtonContainer}>
-                        {/*<TouchableOpacity
+                        <TouchableOpacity
                             style={styles.headerButtonRight}
                             onPress={() => {
                                 setCharName('Welcome')
                             }}>
                             <Ionicons name="chevron-back" size={28} color={Color.Button} />
-                        </TouchableOpacity>*/}
+                        </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.headerButtonRight}
                             onPress={() => {
@@ -191,7 +207,7 @@ const ChatMenu = () => {
                         </TouchableOpacity>
                     </View>
                 </Animated.View>
-            )}
+                        )*/}
             <Animated.View
                 entering={SlideInRight.withInitialValues({ originX: 200 })
                     .duration(200)
@@ -298,7 +314,8 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 8,
+        justifyContent: 'space-between',
+        paddingHorizontal: 12,
         paddingVertical: 8,
     },
 
@@ -311,16 +328,12 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         paddingHorizontal: 16,
         paddingVertical: 8,
+        marginHorizontal: 8,
     },
 
-    sendButton: {
-        marginLeft: 8,
-        padding: 8,
-    },
+    sendButton: {},
 
-    optionsButton: {
-        marginRight: 4,
-    },
+    optionsButton: {},
 
     optionItem: {
         flexDirection: 'row',

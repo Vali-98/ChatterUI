@@ -52,8 +52,8 @@ export namespace Characters {
             })
     }
 
-    const createCharacter = (name: string, card: CharacterCardV2, imageuri: string = '') => {
-        Characters.createCard(name)
+    const createCharacter = async (name: string, card: CharacterCardV2, imageuri: string = '') => {
+        await Characters.createCard(name)
             .then(() => {
                 return Characters.saveCard(name, JSON.stringify(card))
             })
@@ -70,7 +70,7 @@ export namespace Characters {
 
     export const createCharacterFromImage = async (uri: string) => {
         return FS.readAsStringAsync(uri, { encoding: FS.EncodingType.Base64 })
-            .then((file) => {
+            .then(async (file) => {
                 const chunks = extractChunks(Buffer.from(file, 'base64'))
                 const textChunks = chunks
                     .filter(function (chunk: any) {
@@ -86,7 +86,7 @@ export namespace Characters {
                     Logger.log('Invalid Character ID', true)
                     return
                 }
-                createCharacter(newname, charactercard, uri)
+                return createCharacter(newname, charactercard, uri)
             })
             .catch((error) => {
                 Logger.log(`Failed to create card - Character might already exist?`, true)

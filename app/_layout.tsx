@@ -30,7 +30,7 @@ const Layout = () => {
                         <Stack.Screen
                             name="CharMenu"
                             options={{
-                                animation: 'fade',
+                                animation: 'slide_from_right',
                                 title: 'Characters',
                                 animationDuration: 200,
                             }}
