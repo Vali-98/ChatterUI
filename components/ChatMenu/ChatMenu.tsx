@@ -1,9 +1,9 @@
 import { ChatWindow } from './ChatWindow/ChatWindow'
-import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'
+import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons'
 import { Global, Color, Chats, Logger } from '@globals'
 import { generateResponse } from '@constants/Inference'
 import { Stack, useFocusEffect, useRouter } from 'expo-router'
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import {
     View,
     Text,
@@ -34,10 +34,24 @@ const ChatMenu = () => {
     const router = useRouter()
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [newMessage, setNewMessage] = useState<string>('')
-    const [showDrawer, setShowDrawer] = useState<boolean>(false)
+    const [showDrawer, setDrawer] = useState<boolean>(false)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    const menuRef = useRef<Menu | null>(null)
+
+    const setShowDrawer = (show: boolean | ((b: boolean) => void)) => {
+        if (typeof show === 'boolean') setDrawer(show)
+        else Logger.debug('This was not supposed to be used!')
+        if (menuRef.current?.isOpen()) {
+            menuRef.current.close()
+        }
+    }
 
     const backAction = () => {
+        if (menuRef.current?.isOpen()) {
+            menuRef.current.close()
+            return true
+        }
+
         if (showDrawer) {
             setShowDrawer(false)
             Logger.debug('Closing Drawer')
@@ -60,7 +74,7 @@ const ChatMenu = () => {
             return () => {
                 BackHandler.removeEventListener('hardwareBackPress', backAction)
             }
-        }, [charName, showDrawer])
+        }, [charName, showDrawer, menuRef.current?.isOpen()])
     )
 
     const goToChars = () => {
@@ -106,12 +120,22 @@ const ChatMenu = () => {
     }
 
     const menuoptions = [
+        /*{
+            callback: () => {},
+            text: 'Continue',
+            button: 'forward',
+        },
+        {
+            callback: () => {},
+            text: 'Regenerate',
+            button: 'retweet',
+        },*/
         {
             callback: () => {
                 setCharName('Welcome')
             },
             text: 'Main Menu',
-            button: 'chevron-left',
+            button: 'back',
         },
         {
             callback: () => {
@@ -125,12 +149,12 @@ const ChatMenu = () => {
                 router.push('/ChatSelector')
             },
             text: 'Chat History',
-            button: 'comment',
+            button: 'paperclip',
         },
     ]
 
     const modificationMenu = (
-        <Menu renderer={SlideInMenu}>
+        <Menu renderer={SlideInMenu} ref={menuRef}>
             <MenuTrigger>
                 <FontAwesome
                     name="cog"
@@ -148,7 +172,7 @@ const ChatMenu = () => {
                                     ? styles.optionItemLast
                                     : styles.optionItem
                             }>
-                            <FontAwesome
+                            <AntDesign
                                 style={{ minWidth: 25, marginLeft: 5 }}
                                 //@ts-expect-error
                                 name={item.button}
