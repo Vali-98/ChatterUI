@@ -48,9 +48,6 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
 
         const cleanedchunks = filteredchunks.map((item) => item.replaceAll(/[*"]/g, '').trim())
         Logger.debug('TTS started with ' + cleanedchunks.length + ' chunks')
-        console.log(message)
-        console.log(filteredchunks)
-        console.log(cleanedchunks)
         cleanedchunks.forEach((chunk, index) =>
             Speech.speak(chunk, {
                 language: currentSpeaker?.language,
