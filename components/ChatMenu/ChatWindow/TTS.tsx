@@ -35,26 +35,33 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
         }
         if (await Speech.isSpeakingAsync()) await Speech.stop()
         setIsSpeaking(true)
-        const filter = /([!?.,])/
-        const finalchunks: Array<string> = []
+        const filter = /([!?.,*"])/
+        const filteredchunks: Array<string> = []
         const chunks = message.split(filter)
-        console.log(chunks.length)
-        chunks.forEach(
-            (item, index) =>
-                index > 0 && filter.test(item) && finalchunks.push(chunks.at(index - 1) + item)
-        )
-        if (finalchunks.length === 0) finalchunks.push(message)
-        Logger.debug('TTS started with ' + finalchunks.length + ' chunks')
-        finalchunks.forEach((chunk, index) =>
+        chunks.forEach((item, index) => {
+            if (!filter.test(item) && item) return filteredchunks.push(item)
+            if (index > 0)
+                filteredchunks[filteredchunks.length - 1] =
+                    filteredchunks[filteredchunks.length - 1] + item
+        })
+        if (filteredchunks.length === 0) filteredchunks.push(message)
+
+        const cleanedchunks = filteredchunks.map((item) => item.replaceAll(/[*"]/g, '').trim())
+        Logger.debug('TTS started with ' + cleanedchunks.length + ' chunks')
+        console.log(message)
+        console.log(filteredchunks)
+        console.log(cleanedchunks)
+        cleanedchunks.forEach((chunk, index) =>
             Speech.speak(chunk, {
                 language: currentSpeaker?.language,
                 voice: currentSpeaker?.identifier,
                 onDone: () => {
-                    index === finalchunks.length - 1 && setIsSpeaking(false)
+                    index === cleanedchunks.length - 1 && setIsSpeaking(false)
                 },
                 onStopped: () => setIsSpeaking(false),
             })
         )
+        if (cleanedchunks.length === 0) setIsSpeaking(false)
     }
 
     const handleStopSpeaking = async () => {
