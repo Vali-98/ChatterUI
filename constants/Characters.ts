@@ -131,15 +131,12 @@ export namespace Characters {
     }
 
     export const importCharacterFromPyg = async (id: string) => {
-        const character_id = id
-            .replace(
-                `https://pygmalion.chat/characters#modal=false&type=%22character%22&id=%22`,
-                ''
-            )
-            .replace(`https://pygmalion.chat/characters#modal=true&type=%22character%22&id=%22`, '')
-            .replace(`%22&page=1`, '')
-            .trim()
+        // takes in either a pyg URL or
+        const param = new URLSearchParams(id)
+        const character_id = param.get('id')?.replaceAll(`"`, '') ?? id
+
         Logger.log(`Loading from Pygmalion with id: ${character_id}`, true)
+
         const data = await fetch(
             `https://server.pygmalion.chat/api/export/character/${character_id}/v2`,
             {
