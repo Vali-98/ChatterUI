@@ -68,10 +68,6 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
             path: '/TTSMenu',
         },
         {
-            name: 'Sampler',
-            path: '/PresetMenu',
-        },
-        {
             name: 'Logs',
             path: '/Logs',
         },
