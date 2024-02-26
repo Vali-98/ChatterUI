@@ -104,8 +104,7 @@ export namespace Characters {
         })
     }
 
-    export const importCharacterFromChub = async (text: string) => {
-        const character_id = text.replaceAll(`https://chub.ai/characters/`, '')
+    export const importCharacterFromChub = async (character_id: string) => {
         Logger.log(`Importing character from Chub: ${character_id}`, true)
         return axios
             .create({ timeout: 10000 })
@@ -130,11 +129,7 @@ export namespace Characters {
             })
     }
 
-    export const importCharacterFromPyg = async (id: string) => {
-        // takes in either a pyg URL or
-        const param = new URLSearchParams(id)
-        const character_id = param.get('id')?.replaceAll(`"`, '') ?? id
-
+    export const importCharacterFromPyg = async (character_id: string) => {
         Logger.log(`Loading from Pygmalion with id: ${character_id}`, true)
 
         const data = await fetch(
@@ -169,14 +164,36 @@ export namespace Characters {
     }
 
     export const importCharacterFromRemote = async (text: string) => {
-        const stripwww = text.replace('www.', '')
-        if (stripwww.startsWith('https://chub.ai/characters/'))
-            return importCharacterFromChub(stripwww)
-        if (stripwww.startsWith(`https://pygmalion.chat`)) return importCharacterFromPyg(stripwww)
-        if (stripwww.includes('/')) return importCharacterFromChub(stripwww)
-        if (stripwww.includes(`-`)) return importCharacterFromPyg(stripwww)
+        const url = new URL(text)
+
+        if (url.hostname === 'pygmalion.chat') {
+            const param = new URLSearchParams(text)
+            const character_id = param.get('id')?.replaceAll(`"`, '')
+            if (character_id) return importCharacterFromPyg(character_id)
+            else {
+                Logger.log(`Failed to get id from Pygmalion URL`, true)
+                return
+            }
+        }
+
+        if (url.hostname === 'chub.ai') {
+            const path = url.pathname.replace('/characters/', '')
+            if (/^[^\/]+\/[^\/]+$/.test(path)) return importCharacterFromChub(path)
+            else {
+                Logger.log(`Failed to get id from Chub URL`, true)
+                return
+            }
+        }
+
+        // Regex checks for format of [name][/][character]
+        if (/^[^\/]+\/[^\/]+$/.test(text)) return importCharacterFromChub(text)
+        // UUID standard RFC 4122, only used by pyg for now
+        const uuidRegex =
+            /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+        if (uuidRegex.test(text)) return importCharacterFromPyg(text)
         Logger.log(`Invalid input!`, true)
     }
+
     export const getChatDir = (charName: string) => {
         return `${FS.documentDirectory}characters/${charName}/chats`
     }
