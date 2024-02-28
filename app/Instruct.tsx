@@ -2,7 +2,7 @@ import CheckboxTitle from '@components/CheckboxTitle'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Instructs, saveStringExternal, Logger } from '@globals'
+import { Global, Instructs, saveStringExternal, Logger, Style } from '@globals'
 import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
 import { View, SafeAreaView, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native'
@@ -101,14 +101,22 @@ const Instruct = () => {
                                 setCurrentInstruct(JSON.parse(preset))
                             })
                         }}
-                        placeholderStyle={{ color: Color.Offwhite }}
+                        placeholderStyle={{ color: Style.getColor('primary-text2') }}
+                        containerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
+                        itemContainerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
+                        itemTextStyle={{ color: Style.getColor('primary-text1') }}
+                        activeColor={Style.getColor('primary-surface4')}
                     />
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
                             handleSaveInstruct(true)
                         }}>
-                        <FontAwesome size={24} name="save" color={Color.Button} />
+                        <FontAwesome
+                            size={24}
+                            name="save"
+                            color={Style.getColor('primary-text1')}
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -136,7 +144,11 @@ const Instruct = () => {
                                 ]
                             )
                         }}>
-                        <FontAwesome size={24} name="trash" color={Color.Button} />
+                        <FontAwesome
+                            size={24}
+                            name="trash"
+                            color={Style.getColor('primary-text1')}
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -153,7 +165,11 @@ const Instruct = () => {
                                 })
                             })
                         }}>
-                        <FontAwesome size={24} name="upload" color={Color.Button} />
+                        <FontAwesome
+                            size={24}
+                            name="upload"
+                            color={Style.getColor('primary-text1')}
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -162,7 +178,11 @@ const Instruct = () => {
                             if (instructName)
                                 saveStringExternal(instructName, JSON.stringify(currentInstruct))
                         }}>
-                        <FontAwesome size={24} name="download" color={Color.Button} />
+                        <FontAwesome
+                            size={24}
+                            name="download"
+                            color={Style.getColor('primary-text1')}
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -170,16 +190,18 @@ const Instruct = () => {
                         onPress={() => {
                             setShowNewInstruct(true)
                         }}>
-                        <FontAwesome size={24} name="plus" color={Color.Button} />
+                        <FontAwesome
+                            size={24}
+                            name="plus"
+                            color={Style.getColor('primary-text1')}
+                        />
                     </TouchableOpacity>
                 </View>
 
-                <ScrollView>
+                <ScrollView showsVerticalScrollIndicator={false}>
                     <View
                         style={{
                             paddingVertical: 20,
-                            paddingHorizontal: 16,
-                            paddingBottom: 150,
                         }}>
                         <TextBox
                             name="System Sequence"
@@ -311,12 +333,11 @@ export default Instruct
 
 const styles = StyleSheet.create({
     mainContainer: {
+        padding: 16,
         flex: 1,
-        backgroundColor: Color.Background,
     },
 
     dropdownContainer: {
-        marginHorizontal: 16,
         marginTop: 16,
         flexDirection: 'row',
         paddingBottom: 12,
@@ -326,17 +347,16 @@ const styles = StyleSheet.create({
     dropdownbox: {
         flex: 1,
         paddingHorizontal: 8,
-        backgroundColor: Color.DarkContainer,
+        backgroundColor: Style.getColor('primary-surface3'),
         borderRadius: 8,
     },
 
     selected: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 
     button: {
         padding: 5,
-        backgroundColor: Color.DarkContainer,
         borderRadius: 4,
         marginLeft: 8,
     },

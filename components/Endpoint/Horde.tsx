@@ -1,5 +1,5 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
-import { Global, Color, Logger } from '@globals'
+import { Global, Logger, Style } from '@globals'
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import { MultiSelect } from 'react-native-element-dropdown'
@@ -65,7 +65,7 @@ const Horde = () => {
                         setKeyInput(value)
                     }}
                     placeholder="Press save to confirm key"
-                    placeholderTextColor={Color.Offwhite}
+                    placeholderTextColor={Style.getColor('primary-text2')}
                     secureTextEntry
                 />
                 <TouchableOpacity
@@ -79,7 +79,7 @@ const Horde = () => {
                         setKeyInput('')
                         Logger.log(`Key Saved!`, true)
                     }}>
-                    <FontAwesome name="save" color={Color.Button} size={28} />
+                    <FontAwesome name="save" color={Style.getColor('primary-text1')} size={28} />
                 </TouchableOpacity>
             </View>
 
@@ -91,14 +91,16 @@ const Horde = () => {
                         onPress={() => {
                             getModels()
                         }}>
-                        <MaterialIcons name="refresh" color={Color.Button} size={28} />
+                        <MaterialIcons
+                            name="refresh"
+                            color={Style.getColor('primary-text1')}
+                            size={28}
+                        />
                     </TouchableOpacity>
                 </View>
 
                 <MultiSelect
                     value={dropdownValues}
-                    style={styles.dropdownbox}
-                    selectedTextStyle={styles.selected}
                     data={modelList}
                     labelField="name"
                     valueField="name"
@@ -110,38 +112,66 @@ const Horde = () => {
                         )
                         setDropdownValues(item)
                     }}
-                    containerStyle={styles.dropdownbox}
-                    itemTextStyle={{ color: Color.Text }}
+                    placeholderStyle={{ color: Style.getColor('primary-text2') }}
+                    containerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
                     itemContainerStyle={{
-                        backgroundColor: Color.DarkContainer,
+                        backgroundColor: Style.getColor('primary-surface2'),
+                    }}
+                    itemTextStyle={{ color: Style.getColor('primary-text1') }}
+                    activeColor={Style.getColor('primary-surface4')}
+                    selectedTextStyle={{
+                        color: Style.getColor('primary-text1'),
+                    }}
+                    style={{
+                        backgroundColor: Style.getColor('primary-surface3'),
+                        paddingHorizontal: 8,
+                        paddingVertical: 2,
+                        marginVertical: 8,
                         borderRadius: 8,
                     }}
-                    activeColor={Color.Container}
-                    placeholderStyle={styles.selected}
                     placeholder="Select Model"
                     renderSelectedItem={(item: HordeModel, unSelect) => (
                         <View style={styles.iteminfo}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Text style={{ color: Color.Text, flex: 1, fontSize: 16 }}>
+                                <Text
+                                    style={{
+                                        color: Style.getColor('primary-text1'),
+                                        flex: 1,
+                                        fontSize: 16,
+                                    }}>
                                     {item.name}
                                 </Text>
                                 <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
-                                    <MaterialIcons name="delete" color={Color.Button} size={28} />
+                                    <MaterialIcons
+                                        name="delete"
+                                        color={Style.getColor('primary-text1')}
+                                        size={28}
+                                    />
                                 </TouchableOpacity>
                             </View>
 
                             <View style={{ flexDirection: 'row' }}>
                                 <View>
-                                    <Text style={{ color: Color.Offwhite }}>Workers</Text>
-                                    <Text style={{ color: Color.Offwhite }}>Performance</Text>
-                                    <Text style={{ color: Color.Offwhite }}>ETA</Text>
+                                    <Text style={{ color: Style.getColor('primary-text2') }}>
+                                        Workers
+                                    </Text>
+                                    <Text style={{ color: Style.getColor('primary-text2') }}>
+                                        Performance
+                                    </Text>
+                                    <Text style={{ color: Style.getColor('primary-text2') }}>
+                                        ETA
+                                    </Text>
                                 </View>
                                 <View style={{ marginLeft: 8 }}>
-                                    <Text style={{ color: Color.Offwhite }}>: {item.count}</Text>
-                                    <Text style={{ color: Color.Offwhite }}>
+                                    <Text style={{ color: Style.getColor('primary-text2') }}>
+                                        : {item.count}
+                                    </Text>
+                                    <Text style={{ color: Style.getColor('primary-text2') }}>
                                         : {item.performance}
                                     </Text>
-                                    <Text style={{ color: Color.Offwhite }}>: {item.eta}s</Text>
+                                    <Text style={{ color: Style.getColor('primary-text2') }}>
+                                        : {item.eta}s
+                                    </Text>
                                 </View>
                             </View>
                         </View>
@@ -158,23 +188,23 @@ const styles = StyleSheet.create({
     mainContainer: {
         paddingVertical: 16,
         paddingHorizontal: 20,
-        backgroundColor: Color.Background,
         flex: 1,
     },
 
     title: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         fontSize: 20,
     },
 
     subtitle: {
-        color: Color.Offwhite,
+        color: Style.getColor('primary-text2'),
     },
 
     input: {
         flex: 1,
-        color: Color.Text,
-        backgroundColor: Color.DarkContainer,
+        color: Style.getColor('primary-text1'),
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         paddingVertical: 4,
         paddingHorizontal: 8,
         marginVertical: 8,
@@ -183,7 +213,8 @@ const styles = StyleSheet.create({
 
     button: {
         padding: 5,
-        backgroundColor: Color.DarkContainer,
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         borderRadius: 4,
         marginLeft: 8,
     },
@@ -192,22 +223,10 @@ const styles = StyleSheet.create({
         marginVertical: 16,
     },
 
-    dropdownbox: {
-        paddingHorizontal: 8,
-        paddingVertical: 8,
-        marginVertical: 8,
-        backgroundColor: Color.DarkContainer,
-        borderRadius: 8,
-    },
-
-    selected: {
-        color: Color.Text,
-    },
-
     iteminfo: {
         width: '100%',
         borderRadius: 8,
-        backgroundColor: Color.Container,
+        backgroundColor: Style.getColor('primary-surface2'),
         marginTop: 8,
         marginRight: 12,
         paddingHorizontal: 12,

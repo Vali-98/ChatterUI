@@ -1,4 +1,4 @@
-import { Color } from '@globals'
+import { Style } from '@globals'
 import { View, Text, StyleSheet, TextInput, KeyboardTypeOptions } from 'react-native'
 
 type TextBoxProps = {
@@ -35,7 +35,7 @@ const TextBox: React.FC<TextBoxProps> = ({
                     setValue({ ...body, [varname]: value })
                 }}
                 placeholder="----"
-                placeholderTextColor={Color.TextItalic}
+                placeholderTextColor={Style.getColor('primary-text2')}
                 keyboardType={keyboardType}
             />
         </View>
@@ -51,12 +51,14 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 
     input: {
-        color: Color.Text,
-        backgroundColor: Color.DarkContainer,
+        color: Style.getColor('primary-text1'),
+        backgroundColor: Style.getColor('primary-surface1'),
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         paddingVertical: 4,
         paddingHorizontal: 8,
         marginVertical: 8,

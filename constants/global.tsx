@@ -16,6 +16,7 @@ import { Llama } from './llama'
 import { mmkv } from './mmkv'
 import { Logger } from './Logger'
 import { LlamaTokenizer } from './tokenizer'
+import { Style, ComponentStyle } from './Style'
 export {
     mmkv,
     Presets,
@@ -29,6 +30,8 @@ export {
     humanizedISO8601DateTime,
     Logger,
     LlamaTokenizer,
+    Style,
+    ComponentStyle,
 }
 
 export const enum Color {
@@ -84,8 +87,6 @@ export const saveStringExternal = async (
     } else if (Platform.OS === 'ios') Sharing.shareAsync(filename)
 }
 
-// HEADER FOR REQUESTS
-
 // runs every startup to clear some MMKV values
 
 export const startupApp = () => {
@@ -106,7 +107,7 @@ export const startupApp = () => {
     if (mmkv.getString(Global.APIType) === undefined) mmkv.set(Global.APIType, API.KAI)
     Llama.setLlamaPreset()
     Logger.log('Resetting state values for startup.')
-    SystemUI.setBackgroundColorAsync(Color.Background)
+    SystemUI.setBackgroundColorAsync(Style.getColor('primary-surface1'))
 }
 
 // creates default dirs and default objects
@@ -157,6 +158,7 @@ export const generateDefaultDirectories = async () => {
 }
 
 // Migrate seperated presets from 0.4.2 to unified presets
+// few use, probably safe to delete
 export const migratePresets = async () => {
     return FS.readDirectoryAsync(`${FS.documentDirectory}presets/kai`)
         .then(async () => {

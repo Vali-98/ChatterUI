@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import { Color, Chats } from '@globals'
+import { Color, Chats, Style } from '@globals'
 import React, { useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 //@ts-ignore
@@ -90,9 +90,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
             <View
                 style={{
                     ...styles.chatItem,
-                    ...(id === messagesLength - 1
-                        ? { borderBottomWidth: 1, borderColor: Color.Offwhite }
-                        : {}),
                 }}>
                 <ChatFrame
                     charName={charName}
@@ -155,10 +152,11 @@ const ChatItem: React.FC<ChatItemProps> = ({
                             </Markdown>
                         </TouchableOpacity>
                     )}
+                    {!showEditor && showSwipe && (
+                        <Swipes message={message} id={id} nowGenerating={nowGenerating} />
+                    )}
                 </ChatFrame>
             </View>
-
-            {showSwipe && <Swipes message={message} id={id} nowGenerating={nowGenerating} />}
         </AnimatedView>
     )
 }
@@ -178,10 +176,12 @@ const styles = StyleSheet.create({
     },
 
     messageTextContainer: {
-        backgroundColor: Color.Container,
+        backgroundColor: Style.getColor('primary-surface3'),
         paddingHorizontal: 8,
         borderRadius: 8,
         textAlignVertical: 'center',
+        shadowColor: Style.getColor('primary-shadow'),
+        elevation: 4,
     },
 
     avatar: {
@@ -199,7 +199,9 @@ const styles = StyleSheet.create({
 
     messageInput: {
         color: Color.Text,
-        backgroundColor: Color.DarkContainer,
+        backgroundColor: Style.getColor('primary-surface1'),
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         borderRadius: 8,
         padding: 8,
     },

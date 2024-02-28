@@ -1,4 +1,4 @@
-import { Color, initializeApp, startupApp } from '@globals'
+import { Color, Style, initializeApp, startupApp } from '@globals'
 import { Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -14,16 +14,19 @@ const Layout = () => {
         setFirstRender(false)
     }, [])
 
+    const color = Style.useColorScheme((state) => state.colors)
+
     if (!firstRender)
         return (
             <GestureHandlerRootView style={{ flex: 1 }}>
                 <MenuProvider>
                     <Stack
                         screenOptions={{
-                            headerStyle: { backgroundColor: Color.Header },
-                            headerTitleStyle: { color: Color.Text },
-                            headerTintColor: Color.White,
-                            contentStyle: { backgroundColor: Color.Background },
+                            headerStyle: { backgroundColor: Style.getColor('primary-surface1') },
+                            headerTitleStyle: { color: Style.getColor('primary-text1') },
+                            headerTintColor: Style.getColor('primary-text1'),
+                            contentStyle: { backgroundColor: Style.getColor('primary-surface1') },
+                            headerShadowVisible: false,
                         }}>
                         <Stack.Screen name="index" options={{ animation: 'fade' }} />
 

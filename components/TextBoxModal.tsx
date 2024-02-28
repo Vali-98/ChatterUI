@@ -1,5 +1,5 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
-import { Color } from '@globals'
+import { Style } from '@globals'
 import { useState, useEffect } from 'react'
 import {
     View,
@@ -65,7 +65,11 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                                 onPress={async () => {
                                     setText(await getStringAsync())
                                 }}>
-                                <FontAwesome name="paste" size={24} color={Color.Button} />
+                                <FontAwesome
+                                    name="paste"
+                                    size={24}
+                                    color={Style.getColor('primary-text1')}
+                                />
                             </TouchableOpacity>
                         )}
                     </View>
@@ -74,7 +78,11 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                         <TouchableOpacity
                             style={styles.modalButton}
                             onPress={() => setShowModal(false)}>
-                            <MaterialIcons name="close" size={28} color={Color.White} />
+                            <MaterialIcons
+                                name="close"
+                                size={28}
+                                color={Style.getColor('primary-text1')}
+                            />
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.modalButton}
@@ -82,7 +90,11 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                                 onConfirm(text)
                                 setShowModal(false)
                             }}>
-                            <MaterialIcons name="check" size={28} color={Color.White} />
+                            <MaterialIcons
+                                name="check"
+                                size={28}
+                                color={Style.getColor('primary-text1')}
+                            />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -95,13 +107,13 @@ export default TextBoxModal
 
 const styles = StyleSheet.create({
     title: {
-        color: Color.White,
+        color: Style.getColor('primary-text1'),
         marginBottom: 16,
     },
 
     modalview: {
         margin: 20,
-        backgroundColor: Color.Background,
+        backgroundColor: Style.getColor('primary-surface2'),
         borderRadius: 20,
         padding: 35,
         alignItems: 'center',
@@ -131,9 +143,9 @@ const styles = StyleSheet.create({
     },
 
     input: {
-        color: Color.White,
+        color: Style.getColor('primary-text1'),
+        backgroundColor: Style.getColor('primary-surface1'),
         flex: 1,
-        backgroundColor: Color.DarkContainer,
         borderRadius: 8,
         paddingHorizontal: 8,
         paddingVertical: 8,

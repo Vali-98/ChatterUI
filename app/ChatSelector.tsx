@@ -1,8 +1,7 @@
 import AnimatedView from '@components/AnimatedView'
-import ChatMenu from '@components/ChatMenu/ChatMenu'
 import { RecentMessages } from '@constants/RecentMessages'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Chats, Characters, saveStringExternal, Logger } from '@globals'
+import { Global, Chats, Characters, saveStringExternal, Logger, Style } from '@globals'
 import { useRouter, Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, View, Text, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native'
@@ -94,7 +93,11 @@ const ChatSelector = () => {
                         headerRight: () => (
                             <View>
                                 <TouchableOpacity onPress={handleCreateChat}>
-                                    <FontAwesome name="plus" size={28} color={Color.Button} />
+                                    <FontAwesome
+                                        name="plus"
+                                        size={28}
+                                        color={Style.getColor('primary-text1')}
+                                    />
                                 </TouchableOpacity>
                             </View>
                         ),
@@ -106,8 +109,8 @@ const ChatSelector = () => {
                         onPress={() => handleSelectChat(filename)}
                         style={
                             filename === currentChat
-                                ? styles.selectedchatlogitem
-                                : styles.chatlogitem
+                                ? styles.longButtonSelectedContainer
+                                : styles.longButtonContainer
                         }>
                         <Image
                             source={{ uri: Characters.getImageDir(charName) }}
@@ -118,12 +121,20 @@ const ChatSelector = () => {
                         <TouchableOpacity
                             style={styles.button}
                             onPress={() => handleExportChat(filename)}>
-                            <FontAwesome name="download" size={32} color={Color.Button} />
+                            <FontAwesome
+                                name="download"
+                                size={32}
+                                color={Style.getColor('primary-text1')}
+                            />
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.button}
                             onPress={() => handleDeleteChat(filename)}>
-                            <FontAwesome name="trash" size={32} color={Color.Button} />
+                            <FontAwesome
+                                name="trash"
+                                size={32}
+                                color={Style.getColor('primary-text1')}
+                            />
                         </TouchableOpacity>
                     </TouchableOpacity>
                 ))}
@@ -137,40 +148,49 @@ export default ChatSelector
 const styles = StyleSheet.create({
     mainContainer: {
         paddingVertical: 16,
-        paddingHorizontal: 16,
-        backgroundColor: Color.Background,
+        paddingHorizontal: 8,
     },
 
     chatname: {
-        color: Color.Text,
+        color: Style.getColor('primary-text2'),
+        marginLeft: 8,
         flex: 1,
     },
 
-    chatlogitem: {
-        flex: 1,
+    longButtonContainer: {
+        backgroundColor: Style.getColor('primary-surface1'),
+        borderColor: Style.getColor('primary-surface1'),
+        borderWidth: 2,
         flexDirection: 'row',
+        marginBottom: 8,
+        justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 12,
         borderRadius: 8,
-        marginVertical: 4,
-        backgroundColor: Color.DarkContainer,
+        paddingVertical: 8,
+        padding: 8,
+        flex: 1,
     },
 
-    selectedchatlogitem: {
-        flex: 1,
+    longButtonSelectedContainer: {
+        backgroundColor: Style.getColor('primary-surface1'),
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 2,
         flexDirection: 'row',
+        marginBottom: 8,
+        justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 12,
         borderRadius: 8,
-        marginVertical: 4,
-        backgroundColor: Color.Container,
+        paddingVertical: 8,
+        padding: 8,
+        flex: 1,
     },
 
     avatar: {
         width: 48,
         height: 48,
-        borderRadius: 16,
-        marginRight: 8,
+        borderRadius: 12,
+        margin: 4,
+        backgroundColor: 'gray',
     },
 
     button: {

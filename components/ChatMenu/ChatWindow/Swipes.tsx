@@ -103,22 +103,20 @@ export default Swipes
 const styles = StyleSheet.create({
     swipesItem: {
         flexDirection: 'row',
-        paddingVertical: 2,
-        paddingHorizontal: 1,
-        justifyContent: 'space-between',
+        justifyContent: 'space-evenly',
         flex: 1,
+        marginTop: 4,
     },
 
     swipeText: {
         color: Color.Text,
         borderRadius: 20,
         paddingVertical: 6,
+        paddingHorizontal: 8,
     },
 
     swipeButton: {
-        borderRadius: 20,
         alignItems: 'center',
-        margin: 2,
         paddingHorizontal: 24,
         paddingVertical: 4,
     },

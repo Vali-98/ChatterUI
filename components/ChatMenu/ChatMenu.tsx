@@ -1,6 +1,6 @@
 import { ChatWindow } from './ChatWindow/ChatWindow'
 import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons'
-import { Global, Color, Chats, Logger } from '@globals'
+import { Global, Chats, Logger, Style } from '@globals'
 import { generateResponse } from '@constants/Inference'
 import { Stack, useFocusEffect, useRouter } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
@@ -156,11 +156,11 @@ const ChatMenu = () => {
     const modificationMenu = (
         <Menu renderer={SlideInMenu} ref={menuRef}>
             <MenuTrigger>
-                <FontAwesome
-                    name="cog"
+                <Ionicons
+                    name="ellipsis-vertical-circle"
                     style={styles.optionsButton}
-                    size={36}
-                    color={Color.Button}
+                    size={32}
+                    color={Style.getColor('primary-text2')}
                 />
             </MenuTrigger>
             <MenuOptions customStyles={menustyle}>
@@ -176,7 +176,7 @@ const ChatMenu = () => {
                                 style={{ minWidth: 25, marginLeft: 5 }}
                                 //@ts-expect-error
                                 name={item.button}
-                                color={Color.Button}
+                                color={Style.getColor('primary-text2')}
                                 size={24}
                             />
                             <Text style={styles.optionText}>{item.text}</Text>
@@ -197,7 +197,7 @@ const ChatMenu = () => {
                 onPress={() => {
                     Logger.log('Unimplemented', true)
                 }}>
-                <FontAwesome name="cog" size={28} color={Color.Button} />
+                <FontAwesome name="cog" size={28} color={Style.getColor('primary-text1')} />
             </TouchableOpacity>
         </Animated.View>
     )
@@ -241,7 +241,7 @@ const ChatMenu = () => {
                     onPress={() => {
                         router.push('/CharMenu')
                     }}>
-                    <Ionicons name="person" size={28} color={Color.Button} />
+                    <Ionicons name="person" size={28} color={Style.getColor('primary-text1')} />
                 </TouchableOpacity>
             </Animated.View>
         </View>
@@ -254,9 +254,9 @@ const ChatMenu = () => {
                 setShowDrawer(!showDrawer)
             }}>
             {showDrawer ? (
-                <Ionicons name="close" size={28} color={Color.Button} />
+                <Ionicons name="close" size={28} color={Style.getColor('primary-text1')} />
             ) : (
-                <Ionicons name="menu" size={28} color={Color.Button} />
+                <Ionicons name="menu" size={28} color={Style.getColor('primary-text1')} />
             )}
         </TouchableOpacity>
     )
@@ -283,22 +283,31 @@ const ChatMenu = () => {
 
                         <View style={styles.inputContainer}>
                             {modificationMenu}
+
                             <TextInput
                                 style={styles.input}
                                 placeholder="Message..."
-                                placeholderTextColor={Color.Offwhite}
+                                placeholderTextColor={Style.getColor('primary-text2')}
                                 value={newMessage}
                                 onChangeText={(text) => setNewMessage(text)}
                                 multiline
                             />
 
                             {nowGenerating ? (
-                                <TouchableOpacity style={styles.sendButton} onPress={abortResponse}>
-                                    <MaterialIcons name="stop" color={Color.Button} size={30} />
+                                <TouchableOpacity style={styles.stopButton} onPress={abortResponse}>
+                                    <MaterialIcons
+                                        name="stop"
+                                        color={Style.getColor('destructive-text1')}
+                                        size={30}
+                                    />
                                 </TouchableOpacity>
                             ) : (
                                 <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-                                    <MaterialIcons name="send" color={Color.Button} size={30} />
+                                    <MaterialIcons
+                                        name="send"
+                                        color={Style.getColor('primary-surface1')}
+                                        size={30}
+                                    />
                                 </TouchableOpacity>
                             )}
                         </View>
@@ -313,7 +322,7 @@ const ChatMenu = () => {
 
 const menustyle: MenuOptionsCustomStyle = {
     optionsContainer: {
-        backgroundColor: Color.DarkContainer,
+        backgroundColor: Style.getColor('primary-surface1'),
         padding: 4,
         borderRadius: 8,
     },
@@ -323,6 +332,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+
     safeArea: {
         flex: 1,
         flexDirection: 'row',
@@ -332,7 +342,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         margin: 40,
         fontSize: 20,
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 
     inputContainer: {
@@ -344,18 +354,32 @@ const styles = StyleSheet.create({
     },
 
     input: {
-        color: Color.Text,
-        backgroundColor: Color.DarkContainer,
+        color: Style.getColor('primary-text1'),
+        backgroundColor: Style.getColor('primary-surface1'),
         flex: 1,
         borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 24,
+        borderColor: Style.getColor('primary-brand'),
+        borderRadius: 12,
         paddingHorizontal: 16,
         paddingVertical: 8,
         marginHorizontal: 8,
     },
 
-    sendButton: {},
+    sendButton: {
+        borderRadius: 8,
+        minWidth: 42,
+        minHeight: 42,
+        backgroundColor: Style.getColor('primary-brand'),
+        padding: 6,
+    },
+
+    stopButton: {
+        borderRadius: 8,
+        minWidth: 42,
+        minHeight: 42,
+        backgroundColor: Style.getColor('destructive-brand'),
+        padding: 6,
+    },
 
     optionsButton: {},
 
@@ -363,7 +387,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingBottom: 8,
-        borderBottomColor: Color.Offwhite,
+        borderBottomColor: Style.getColor('primary-surface3'),
         borderBottomWidth: 1,
     },
 
@@ -373,13 +397,8 @@ const styles = StyleSheet.create({
     },
 
     optionText: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         marginLeft: 16,
-    },
-
-    navbar: {
-        alignItems: 'center',
-        paddingRight: 100,
     },
 
     headerButtonRight: {
@@ -389,6 +408,7 @@ const styles = StyleSheet.create({
 
     headerButtonLeft: {
         marginRight: 20,
+        padding: 2,
     },
 
     headerButtonContainer: {

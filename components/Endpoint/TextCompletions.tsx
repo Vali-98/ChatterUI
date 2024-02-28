@@ -1,5 +1,5 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
-import { Global, Color, Logger } from '@globals'
+import { Global, Logger, Style } from '@globals'
 import { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
@@ -53,7 +53,7 @@ const TextCompletions = () => {
                     value={keyInput}
                     onChangeText={setKeyInput}
                     placeholder="Press save to confirm key"
-                    placeholderTextColor={Color.Offwhite}
+                    placeholderTextColor={Style.getColor('primary-text2')}
                     secureTextEntry
                 />
                 <TouchableOpacity
@@ -69,7 +69,7 @@ const TextCompletions = () => {
                     }}
                 />
                 <TouchableOpacity>
-                    <FontAwesome name="save" color={Color.Button} size={28} />
+                    <FontAwesome name="save" color={Style.getColor('primary-text1')} size={28} />
                 </TouchableOpacity>
             </View>
 
@@ -84,7 +84,7 @@ const TextCompletions = () => {
                     setEndpoint(value)
                 }}
                 placeholder="eg. https://127.0.0.1:5000"
-                placeholderTextColor={Color.Offwhite}
+                placeholderTextColor={Style.getColor('primary-text2')}
             />
 
             <View style={styles.dropdownContainer}>
@@ -95,7 +95,11 @@ const TextCompletions = () => {
                         onPress={() => {
                             getModelList()
                         }}>
-                        <MaterialIcons name="refresh" color={Color.Button} size={28} />
+                        <MaterialIcons
+                            name="refresh"
+                            color={Style.getColor('primary-text1')}
+                            size={28}
+                        />
                     </TouchableOpacity>
                 </View>
                 <Text style={styles.subtitle}>API Key must be provided to get model list.</Text>
@@ -108,16 +112,23 @@ const TextCompletions = () => {
                         if (item.id === completionsModel?.id) return
                         setCompletionsModel(item)
                     }}
-                    style={styles.dropdownbox}
-                    selectedTextStyle={styles.selected}
-                    containerStyle={styles.dropdownbox}
-                    itemTextStyle={{ color: Color.Text }}
+                    placeholderStyle={{ color: Style.getColor('primary-text2') }}
+                    containerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
                     itemContainerStyle={{
-                        backgroundColor: Color.DarkContainer,
+                        backgroundColor: Style.getColor('primary-surface2'),
+                    }}
+                    itemTextStyle={{ color: Style.getColor('primary-text1') }}
+                    activeColor={Style.getColor('primary-surface4')}
+                    selectedTextStyle={{
+                        color: Style.getColor('primary-text1'),
+                    }}
+                    style={{
+                        backgroundColor: Style.getColor('primary-surface3'),
+                        paddingHorizontal: 8,
+                        paddingVertical: 2,
+                        marginVertical: 8,
                         borderRadius: 8,
                     }}
-                    activeColor={Color.Container}
-                    placeholderStyle={{ color: Color.Offwhite }}
                     placeholder={modelList.length === 0 ? 'No Models Available' : 'Select Model'}
                 />
             </View>
@@ -126,20 +137,22 @@ const TextCompletions = () => {
                     <Text style={{ ...styles.title, marginBottom: 8 }}>{completionsModel.id}</Text>
                     <View style={{ flexDirection: 'row' }}>
                         <View>
-                            <Text style={{ color: Color.Offwhite }}>Id</Text>
-                            <Text style={{ color: Color.Offwhite }}>Object</Text>
-                            <Text style={{ color: Color.Offwhite }}>Created</Text>
-                            <Text style={{ color: Color.Offwhite }}>Owned By</Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>Id</Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>Object</Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>Created</Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>Owned By</Text>
                         </View>
                         <View style={{ marginLeft: 8 }}>
-                            <Text style={{ color: Color.Offwhite }}>: {completionsModel.id}</Text>
-                            <Text style={{ color: Color.Offwhite }}>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
+                                : {completionsModel.id}
+                            </Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
                                 : {completionsModel.object}
                             </Text>
-                            <Text style={{ color: Color.Offwhite }}>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
                                 : {completionsModel.created}
                             </Text>
-                            <Text style={{ color: Color.Offwhite }}>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
                                 : {completionsModel.owned_by}
                             </Text>
                         </View>
@@ -160,18 +173,19 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        color: Color.Text,
-        fontSize: 20,
+        color: Style.getColor('primary-text1'),
+        fontSize: 16,
     },
 
     subtitle: {
-        color: Color.Offwhite,
+        color: Style.getColor('primary-text2'),
     },
 
     input: {
         flex: 1,
-        color: Color.Text,
-        backgroundColor: Color.DarkContainer,
+        color: Style.getColor('primary-text1'),
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         paddingVertical: 4,
         paddingHorizontal: 8,
         marginVertical: 8,
@@ -180,7 +194,8 @@ const styles = StyleSheet.create({
 
     button: {
         padding: 5,
-        backgroundColor: Color.DarkContainer,
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         borderRadius: 4,
         marginLeft: 8,
     },
@@ -189,21 +204,9 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
 
-    dropdownbox: {
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        marginVertical: 8,
-        backgroundColor: Color.DarkContainer,
-        borderRadius: 8,
-    },
-
-    selected: {
-        color: Color.Text,
-    },
-
     modelInfo: {
         borderRadius: 8,
-        backgroundColor: Color.Container,
+        backgroundColor: Style.getColor('primary-surface2'),
         flex: 1,
         padding: 16,
         marginTop: 12,

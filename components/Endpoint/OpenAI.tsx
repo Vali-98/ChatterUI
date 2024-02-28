@@ -1,5 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Logger } from '@globals'
+import { Global, Style, Logger } from '@globals'
 import { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
@@ -52,7 +52,7 @@ const OpenAI = () => {
                         setKeyInput(value)
                     }}
                     placeholder="Press save to confirm key"
-                    placeholderTextColor={Color.Offwhite}
+                    placeholderTextColor={Style.getColor('primary-text2')}
                     secureTextEntry
                 />
                 <TouchableOpacity
@@ -66,12 +66,12 @@ const OpenAI = () => {
                         setKeyInput('')
                         Logger.log('Key Saved!', true)
                     }}>
-                    <FontAwesome name="save" color={Color.Button} size={28} />
+                    <FontAwesome name="save" color={Style.getColor('primary-text1')} size={28} />
                 </TouchableOpacity>
             </View>
 
             <View style={styles.dropdownContainer}>
-                <Text style={{ color: Color.Text, fontSize: 16 }}>Model</Text>
+                <Text style={{ color: Style.getColor('primary-text1'), fontSize: 16 }}>Model</Text>
                 <Text style={styles.subtitle}>API Key must be provided to get model list.</Text>
                 <Dropdown
                     value={openAIModel}
@@ -82,16 +82,23 @@ const OpenAI = () => {
                         if (item.id === openAIModel?.id) return
                         setOpenAIModel(item)
                     }}
-                    style={styles.dropdownbox}
-                    selectedTextStyle={styles.selected}
-                    containerStyle={styles.dropdownbox}
-                    itemTextStyle={{ color: Color.Text }}
+                    placeholderStyle={{ color: Style.getColor('primary-text2') }}
+                    containerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
                     itemContainerStyle={{
-                        backgroundColor: Color.DarkContainer,
+                        backgroundColor: Style.getColor('primary-surface2'),
+                    }}
+                    itemTextStyle={{ color: Style.getColor('primary-text1') }}
+                    activeColor={Style.getColor('primary-surface4')}
+                    selectedTextStyle={{
+                        color: Style.getColor('primary-text1'),
+                    }}
+                    style={{
+                        backgroundColor: Style.getColor('primary-surface3'),
+                        paddingHorizontal: 8,
+                        paddingVertical: 2,
+                        marginVertical: 8,
                         borderRadius: 8,
                     }}
-                    activeColor={Color.Container}
-                    placeholderStyle={{ color: Color.Offwhite }}
                     placeholder={modelList.length === 0 ? 'No Models Available' : 'Select Model'}
                 />
             </View>
@@ -100,16 +107,24 @@ const OpenAI = () => {
                     <Text style={{ ...styles.title, marginBottom: 8 }}>{openAIModel.id}</Text>
                     <View style={{ flexDirection: 'row' }}>
                         <View>
-                            <Text style={{ color: Color.Offwhite }}>Id</Text>
-                            <Text style={{ color: Color.Offwhite }}>Object</Text>
-                            <Text style={{ color: Color.Offwhite }}>Created</Text>
-                            <Text style={{ color: Color.Offwhite }}>Owned By</Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>Id</Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>Object</Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>Created</Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>Owned By</Text>
                         </View>
                         <View style={{ marginLeft: 8 }}>
-                            <Text style={{ color: Color.Offwhite }}>: {openAIModel.id}</Text>
-                            <Text style={{ color: Color.Offwhite }}>: {openAIModel.object}</Text>
-                            <Text style={{ color: Color.Offwhite }}>: {openAIModel.created}</Text>
-                            <Text style={{ color: Color.Offwhite }}>: {openAIModel.owned_by}</Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
+                                : {openAIModel.id}
+                            </Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
+                                : {openAIModel.object}
+                            </Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
+                                : {openAIModel.created}
+                            </Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
+                                : {openAIModel.owned_by}
+                            </Text>
                         </View>
                     </View>
                 </View>
@@ -128,18 +143,20 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         fontSize: 20,
     },
 
     subtitle: {
-        color: Color.Offwhite,
+        color: Style.getColor('primary-text2'),
     },
 
     input: {
         flex: 1,
-        color: Color.Text,
-        backgroundColor: Color.DarkContainer,
+        color: Style.getColor('primary-text1'),
+
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         paddingVertical: 4,
         paddingHorizontal: 8,
         marginVertical: 8,
@@ -148,7 +165,8 @@ const styles = StyleSheet.create({
 
     button: {
         padding: 5,
-        backgroundColor: Color.DarkContainer,
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         borderRadius: 4,
         marginLeft: 8,
     },
@@ -157,21 +175,9 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
 
-    dropdownbox: {
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        marginVertical: 8,
-        backgroundColor: Color.DarkContainer,
-        borderRadius: 8,
-    },
-
-    selected: {
-        color: Color.Text,
-    },
-
     modelInfo: {
         borderRadius: 8,
-        backgroundColor: Color.Container,
+        backgroundColor: Style.getColor('primary-surface2'),
         flex: 1,
         padding: 16,
         marginTop: 12,

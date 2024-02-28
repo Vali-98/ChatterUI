@@ -24,5 +24,6 @@
         "app/deprecated",
         "app/_layout.tsx",
         "app/LorebookInfo/BookInfojs",
+        "app/PresetMenu.jsx",
     ],
 }

@@ -8,9 +8,9 @@ import {
 } from 'react-native'
 import { useState } from 'react'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
-import { Characters, Chats, Color, Global, Logger } from '@globals'
+import { Characters, Chats, Global, Logger, Style } from '@globals'
 import { RecentEntry, RecentMessages } from '@constants/RecentMessages'
-import { FontAwesome } from '@expo/vector-icons'
+import { AntDesign, FontAwesome } from '@expo/vector-icons'
 
 const Recents = () => {
     const [recentMessages, setRecentMessages] = useMMKVObject<Array<RecentEntry>>(
@@ -43,54 +43,61 @@ const Recents = () => {
     }
     const noRecents = !recentMessages || (recentMessages.length === 0 && !nowLoading)
     const showRecents = !nowLoading && recentMessages && recentMessages.length > 0
-
-    return (
-        <ScrollView style={styles.mainContainer}>
-            <View style={styles.titleContainer}>
-                <Text style={styles.title}>Recent</Text>
-                {!noRecents && (
-                    <TouchableOpacity style={styles.button} onPress={RecentMessages.flush}>
-                        <FontAwesome size={20} name="trash" color={Color.Button} />
-                    </TouchableOpacity>
+    if (recentMessages && recentMessages?.length !== 0)
+        return (
+            <ScrollView style={styles.mainContainer}>
+                <View style={styles.titleContainer}>
+                    <Text style={styles.title}>Recent</Text>
+                    {!noRecents && (
+                        <TouchableOpacity style={styles.button} onPress={RecentMessages.flush}>
+                            <FontAwesome
+                                size={20}
+                                name="trash"
+                                color={Style.getColor('primary-text1')}
+                            />
+                        </TouchableOpacity>
+                    )}
+                </View>
+                {nowLoading && (
+                    <ActivityIndicator
+                        color={Style.getColor('primary-text2')}
+                        size={'large'}
+                        style={{ marginRight: 24 }}
+                    />
                 )}
-            </View>
-            {nowLoading && (
-                <ActivityIndicator
-                    color={Color.Offwhite}
-                    size={'large'}
-                    style={{ marginRight: 24 }}
-                />
-            )}
-            {showRecents &&
-                [...recentMessages].reverse()?.map((item, index) => (
-                    <View key={index} style={{ flexDirection: 'row' }}>
-                        <TouchableOpacity
-                            style={{ ...styles.longButton, flex: 1, marginRight: 8 }}
-                            onPress={() => {
-                                handleLoadEntry(item)
-                            }}>
-                            <View>
-                                <Text style={styles.longButtonTitle}>{item.charName}</Text>
-                                <Text style={styles.longButtonBody}>{item.chatName}</Text>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.longButton}
-                            onPress={() => RecentMessages.deleteEntry(item.chatName)}>
-                            <FontAwesome color={Color.Button} name="close" size={28} />
-                        </TouchableOpacity>
-                    </View>
-                ))}
-            {noRecents && <Text style={styles.subtitle}>No Recent Messages</Text>}
-        </ScrollView>
-    )
+                {showRecents &&
+                    [...recentMessages].reverse()?.map((item, index) => (
+                        <View key={index} style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity
+                                style={styles.longButton}
+                                onPress={() => {
+                                    handleLoadEntry(item)
+                                }}>
+                                <View style={styles.textContainer}>
+                                    <Text style={styles.longButtonTitle}>{item.charName}</Text>
+                                    <Text style={styles.longButtonBody}>{item.chatName}</Text>
+                                </View>
+                                <TouchableOpacity
+                                    style={{ marginTop: 8 }}
+                                    onPress={() => RecentMessages.deleteEntry(item.chatName)}>
+                                    <FontAwesome
+                                        color={Style.getColor('primary-text2')}
+                                        name="close"
+                                        size={28}
+                                    />
+                                </TouchableOpacity>
+                            </TouchableOpacity>
+                        </View>
+                    ))}
+                {noRecents && <Text style={styles.subtitle}>No Recent Messages</Text>}
+            </ScrollView>
+        )
 }
 
 const styles = StyleSheet.create({
     mainContainer: {
         paddingVertical: 16,
         paddingHorizontal: 16,
-        backgroundColor: Color.Background,
     },
 
     titleContainer: {
@@ -101,38 +108,46 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        color: Color.TextWhite,
+        color: Style.getColor('primary-text1'),
         fontSize: 20,
     },
 
     subtitle: {
-        color: Color.Offwhite,
+        color: Style.getColor('primary-text2'),
         fontSize: 18,
     },
 
     button: {
         padding: 8,
-        backgroundColor: Color.DarkContainer,
+        borderColor: Style.getColor('primary-surface3'),
+        borderWidth: 2,
         borderRadius: 4,
         marginLeft: 12,
     },
 
     longButton: {
-        backgroundColor: Color.DarkContainer,
+        flex: 1,
+        backgroundColor: Style.getColor('primary-surface3'),
         flexDirection: 'row',
-        padding: 12,
+        paddingHorizontal: 12,
         borderRadius: 8,
         marginVertical: 4,
         justifyContent: 'space-between',
-        alignItems: 'center',
+        shadowColor: Style.getColor('primary-shadow'),
+        elevation: 12,
+    },
+
+    textContainer: {
+        paddingVertical: 12,
     },
 
     longButtonTitle: {
-        color: Color.White,
+        color: Style.getColor('primary-text1'),
+        fontSize: 16,
     },
 
     longButtonBody: {
-        color: Color.Offwhite,
+        color: Style.getColor('primary-text2'),
     },
 })
 
