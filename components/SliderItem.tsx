@@ -64,7 +64,7 @@ const SliderItem: React.FC<SliderItemProps> = ({
                     maximumValue={max}
                     value={body[varname]}
                     onValueChange={handleSliderChange}
-                    minimumTrackTintColor={Style.getColor('primary-brand')}
+                    minimumTrackTintColor={Style.getColor('primary-surface4')}
                     maximumTrackTintColor={Style.getColor('primary-surface3')}
                     thumbTintColor={Style.getColor('primary-brand')}
                 />
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     },
 
     textBox: {
-        borderColor: Style.getColor('primary-brand'),
+        borderColor: Style.getColor('primary-surface4'),
         color: Style.getColor('primary-text1'),
         borderWidth: 1,
         borderRadius: 12,
