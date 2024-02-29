@@ -1,33 +1,32 @@
-# ChatterUI
+# ChatterUI - A simple app for LLMs
+
+ChatterUI is a native mobile frontend for managing chat files and character cards inspired by SillyTavern.
+It aims to provide a mobile friendly experience to inferface with Large Language models.
+ChatterUI supports multiple backends and can even run GGUF models locally on your device.
 
 <div>
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/recents.png" width="150" > 
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/mainchat.png" width="150" > 
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/charsmenu.png" width="150" > 
+<br/>
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/sampler.png" width="150" > 
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/instruct.png" width="150" > 
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/optionsmenu.png" width="150" > 
 </div>
-Simple frontend for LLMs built in react-native.
-
-**_This app is highly experimental, expect to lose your chat histories on updates._**
-
-### What Is ChatterUI?
-
-ChatterUI is a native mobile frontend for managing chat files and character cards similar to projects like TavernAI / SillyTavern.
-Built for the purpose of learning Javascript, so it might be a little rough around the edges.
 
 ### Supported Backends
 
--   KoboldAI
--   AI Horde
--   text-generation-webui
--   Mancer
--   Text Completion
 -   Local using [llama.rn](https://github.com/mybigday/llama.rn)
+-   koboldcpp
+-   text-generation-webui
+-   Generic Text Completions - you can plug this into any spec compliant backend
+-   AI Horde
+-   Mancer
 -   Open Router
 -   OpenAI
 
 ### Building From Source
 
-Building from source has **not** been tested.
 Requires Node.js and Android SDK. Expo uses EAS to build apps which requires a Linux environment.
 
 ```
@@ -37,7 +36,7 @@ eas build --platform android --local
 
 ### IOS
 
-Currently untested as I do not own proper devices to run it. Assistance here would be greatly appreciated!
+Currently untested as I do have the resources to develop for IoS. Assistance here would be greatly appreciated!
 
 ### Fix For Text Streaming in Development
 
