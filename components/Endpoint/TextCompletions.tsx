@@ -66,9 +66,7 @@ const TextCompletions = () => {
                         setCompletionsKey(keyInput)
                         setKeyInput('')
                         Logger.log('Key saved!', true)
-                    }}
-                />
-                <TouchableOpacity>
+                    }}>
                     <FontAwesome name="save" color={Style.getColor('primary-text1')} size={28} />
                 </TouchableOpacity>
             </View>

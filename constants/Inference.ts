@@ -657,7 +657,7 @@ const CompletionsResponseStream = async (setAbortFunction: AbortFunction) => {
         },
         setAbortFunction,
         () => {},
-        { 'X-API-KEY': getString(Global.CompletionsKey) }
+        { Authorization: `Bearer ${getString(Global.CompletionsKey)}` }
     )
 }
 
