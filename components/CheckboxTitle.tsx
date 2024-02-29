@@ -1,4 +1,4 @@
-import { Color, Style } from '@globals'
+import { Style } from '@globals'
 import CheckBox from '@react-native-community/checkbox'
 import { View, Text } from 'react-native'
 
@@ -24,8 +24,8 @@ const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
                     false: Style.getColor('primary-brand'),
                     true: Style.getColor('primary-brand'),
                 }}
-                onFillColor={Color.White}
-                onCheckColor={Color.White}
+                onFillColor={Style.getColor('primary-brand')}
+                onCheckColor={Style.getColor('primary-brand')}
                 value={body[varname]}
                 onValueChange={
                     onChange !== undefined
@@ -33,7 +33,7 @@ const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
                         : (value) => setValue({ ...body, [varname]: value })
                 }
             />
-            <Text style={{ paddingLeft: 8, color: Color.Text }}>{name}</Text>
+            <Text style={{ paddingLeft: 8, color: Style.getColor('primary-text1') }}>{name}</Text>
         </View>
     )
 }

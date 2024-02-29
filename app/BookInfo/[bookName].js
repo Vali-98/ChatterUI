@@ -1,5 +1,5 @@
 import { Lorebooks } from '@constants/Lorebooks'
-import { Color } from '@globals'
+import { Style } from '@globals'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
@@ -59,13 +59,13 @@ const styles = StyleSheet.create({
         marginVertical: 4,
         marginHorizontal: 16,
         padding: 16,
-        backgroundColor: Color.Container,
+        backgroundColor: Style.getColor('primary-surface2'),
         borderRadius: 16,
     },
 
     inputContainer: {
         marginTop: 8,
-        backgroundColor: Color.DarkContainer,
+        backgroundColor: Style.getColor('primary-surface3'),
         borderRadius: 8,
         paddingHorizontal: 8,
         maxHeight: 160,

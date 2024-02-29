@@ -1,7 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Users } from '@globals'
+import { Global, Style, Users } from '@globals'
 import { useRouter } from 'expo-router'
-import { nativeApplicationVersion } from 'expo-application'
 import React from 'react'
 import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
@@ -25,12 +24,20 @@ const Settings = () => {
                         <TouchableOpacity
                             style={styles.button}
                             onPress={() => router.push('/UserInfo')}>
-                            <FontAwesome size={20} name="edit" color={Color.Button} />
+                            <FontAwesome
+                                size={20}
+                                name="edit"
+                                color={Style.getColor('primary-text1')}
+                            />
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.button}
                             onPress={() => router.push('/UserSelector')}>
-                            <FontAwesome size={20} name="th-list" color={Color.Button} />
+                            <FontAwesome
+                                size={20}
+                                name="th-list"
+                                color={Style.getColor('primary-text1')}
+                            />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -71,7 +78,12 @@ const Settings = () => {
                     </TouchableOpacity>
                 )}
 
-                <Text style={{ alignSelf: 'center', color: Color.Offwhite, marginTop: 8 }}>
+                <Text
+                    style={{
+                        alignSelf: 'center',
+                        color: Style.getColor('primary-text2'),
+                        marginTop: 8,
+                    }}>
                     {__DEV__ && 'DEV BUILD\t'}
                     {'v' + require(`../app.json`).expo.version}
                 </Text>
@@ -85,7 +97,7 @@ export default Settings
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        backgroundColor: Color.Background,
+        backgroundColor: Style.getColor('primary-surface1'),
     },
 
     userContainer: {
@@ -100,7 +112,7 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        backgroundColor: Color.DarkContainer,
+        backgroundColor: Style.getColor('primary-surface2'),
         marginRight: 10,
         borderRadius: 4,
         padding: 8,
@@ -111,7 +123,7 @@ const styles = StyleSheet.create({
         marginTop: 16,
         marginBottom: 8,
         marginLeft: 12,
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 
     imageContainer: {
@@ -120,8 +132,8 @@ const styles = StyleSheet.create({
         borderRadius: 54,
         margin: 4,
         borderWidth: 2,
-        borderColor: Color.White,
-        backgroundColor: Color.DarkContainer,
+        borderColor: Style.getColor('primary-text1'),
+        backgroundColor: Style.getColor('primary-surface2'),
     },
 
     userImage: {
@@ -132,19 +144,19 @@ const styles = StyleSheet.create({
 
     largeButtonContainer: {
         borderTopWidth: 1,
-        borderColor: Color.Offwhite,
+        borderColor: Style.getColor('primary-text2'),
     },
 
     largeButtonText: {
         fontSize: 20,
         paddingVertical: 12,
         paddingLeft: 30,
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 
     largeButton: {
         borderBottomWidth: 1,
         fontSize: 20,
-        borderColor: Color.Offwhite,
+        borderColor: Style.getColor('primary-text2'),
     },
 })

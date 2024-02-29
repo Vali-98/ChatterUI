@@ -84,7 +84,7 @@ const createColor = (
 
     switch (component) {
         case 'brand':
-            return getHSLString(h, s / 2, l / 1.5)
+            return getHSLString(h, s / 1.5, l / 1.5)
         case 'text1':
             return getHSLString(h, 10, 85)
         case 'text2':
@@ -148,9 +148,15 @@ export namespace Style {
     export const drawer = {
         default: {
             placeholderStyle: { color: Style.getColor('primary-text2') },
-            containerStyle: { backgroundColor: Style.getColor('primary-surface2') },
+            containerStyle: {
+                backgroundColor: Style.getColor('primary-surface1'),
+                borderBottomLeftRadius: 8,
+                borderBottomRightRadius: 8,
+            },
             itemContainerStyle: {
                 backgroundColor: Style.getColor('primary-surface2'),
+                borderBottomLeftRadius: 8,
+                borderBottomRightRadius: 8,
             },
             itemTextStyle: { color: Style.getColor('primary-text1') },
             activeColor: Style.getColor('primary-surface4'),

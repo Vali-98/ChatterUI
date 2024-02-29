@@ -1,5 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Logger, Chats } from '@globals'
+import { Global, Logger, Chats, Style } from '@globals'
 import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'
 import { View, TouchableOpacity } from 'react-native'
@@ -68,14 +68,22 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
     }
 
     return (
-        <View style={{ marginTop: 8 }}>
+        <View style={{ marginTop: 2 }}>
             {isSpeaking ? (
                 <TouchableOpacity onPress={handleStopSpeaking}>
-                    <FontAwesome name="stop" size={20} color={Color.Button} />
+                    <FontAwesome
+                        name="stop"
+                        size={20}
+                        color={Style.getColor('destructive-brand')}
+                    />
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity onPress={handleSpeak}>
-                    <FontAwesome name="volume-down" size={28} color={Color.Button} />
+                    <FontAwesome
+                        name="volume-down"
+                        size={28}
+                        color={Style.getColor('primary-text2')}
+                    />
                 </TouchableOpacity>
             )}
         </View>
