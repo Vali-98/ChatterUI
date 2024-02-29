@@ -122,7 +122,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                 <Animated.View
                     entering={FadeIn.duration(200)}
                     exiting={FadeOut.duration(200)}
-                    style={{ ...styles.absolute, borderTopWidth: 3 }}>
+                    style={styles.absolute}>
                     <TouchableOpacity
                         activeOpacity={1}
                         onPress={handleOverlayClick}
