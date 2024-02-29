@@ -273,10 +273,7 @@ const ChatMenu = () => {
                 />
 
                 {charName === 'Welcome' ? (
-                    <AnimatedView dy={100} tduration={200} fade={0} fduration={100}>
-                        <Text style={styles.welcometext}>Select A Character To Get Started!</Text>
-                        <Recents />
-                    </AnimatedView>
+                    <Recents />
                 ) : (
                     <View style={styles.container}>
                         <ChatWindow />
@@ -340,7 +337,8 @@ const styles = StyleSheet.create({
 
     welcometext: {
         justifyContent: 'center',
-        margin: 40,
+        margin: 30,
+        flex: 1,
         fontSize: 20,
         color: Style.getColor('primary-text1'),
     },
