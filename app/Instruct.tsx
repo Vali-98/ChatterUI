@@ -88,9 +88,7 @@ const Instruct = () => {
                 <View style={styles.dropdownContainer}>
                     <Dropdown
                         value={selectedItem ?? ''}
-                        style={styles.dropdownbox}
                         data={instructList}
-                        selectedTextStyle={styles.selected}
                         labelField="label"
                         valueField="value"
                         onChange={(item) => {
@@ -101,11 +99,7 @@ const Instruct = () => {
                                 setCurrentInstruct(JSON.parse(preset))
                             })
                         }}
-                        placeholderStyle={{ color: Style.getColor('primary-text2') }}
-                        containerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
-                        itemContainerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
-                        itemTextStyle={{ color: Style.getColor('primary-text1') }}
-                        activeColor={Style.getColor('primary-surface4')}
+                        {...Style.drawer.default}
                     />
                     <TouchableOpacity
                         style={styles.button}
@@ -342,13 +336,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingBottom: 12,
         alignItems: 'center',
-    },
-
-    dropdownbox: {
-        flex: 1,
-        paddingHorizontal: 8,
-        backgroundColor: Style.getColor('primary-surface3'),
-        borderRadius: 8,
     },
 
     selected: {

@@ -144,29 +144,53 @@ export namespace Style {
             }))
         },
     }))
+
+    export const drawer = {
+        default: {
+            placeholderStyle: { color: Style.getColor('primary-text2') },
+            containerStyle: { backgroundColor: Style.getColor('primary-surface2') },
+            itemContainerStyle: {
+                backgroundColor: Style.getColor('primary-surface2'),
+            },
+            itemTextStyle: { color: Style.getColor('primary-text1') },
+            activeColor: Style.getColor('primary-surface4'),
+            selectedTextStyle: {
+                color: Style.getColor('primary-text1'),
+            },
+            style: {
+                backgroundColor: Style.getColor('primary-surface3'),
+                paddingHorizontal: 8,
+                paddingVertical: 2,
+                marginVertical: 8,
+                borderRadius: 8,
+                flex: 1,
+            },
+        },
+    }
+
+    export const view = StyleSheet.create({
+        mainContainer: {
+            paddingVertical: 16,
+            paddingHorizontal: 16,
+            flex: 1,
+        },
+
+        headerButtonRight: {
+            marginLeft: 20,
+            marginRight: 4,
+        },
+
+        headerButtonLeft: {
+            marginRight: 20,
+            padding: 2,
+        },
+
+        buttonLarge: {
+            borderRadius: 8,
+            minWidth: 42,
+            minHeight: 42,
+            backgroundColor: Style.getColor('primary-brand'),
+            padding: 6,
+        },
+    })
 }
-export const ComponentStyle = StyleSheet.create({
-    mainContainer: {
-        paddingVertical: 16,
-        paddingHorizontal: 16,
-        flex: 1,
-    },
-
-    headerButtonRight: {
-        marginLeft: 20,
-        marginRight: 4,
-    },
-
-    headerButtonLeft: {
-        marginRight: 20,
-        padding: 2,
-    },
-
-    buttonLarge: {
-        borderRadius: 8,
-        minWidth: 42,
-        minHeight: 42,
-        backgroundColor: Style.getColor('primary-brand'),
-        padding: 6,
-    },
-})
