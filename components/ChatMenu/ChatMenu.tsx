@@ -295,7 +295,7 @@ const ChatMenu = () => {
                                     <MaterialIcons
                                         name="stop"
                                         color={Style.getColor('destructive-text1')}
-                                        size={30}
+                                        size={28}
                                     />
                                 </TouchableOpacity>
                             ) : (
@@ -303,7 +303,7 @@ const ChatMenu = () => {
                                     <MaterialIcons
                                         name="send"
                                         color={Style.getColor('primary-surface1')}
-                                        size={30}
+                                        size={28}
                                     />
                                 </TouchableOpacity>
                             )}
@@ -347,8 +347,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        marginVertical: 8,
         paddingHorizontal: 12,
-        paddingVertical: 8,
     },
 
     input: {
@@ -365,18 +365,18 @@ const styles = StyleSheet.create({
 
     sendButton: {
         borderRadius: 8,
-        minWidth: 42,
-        minHeight: 42,
+        minWidth: 44,
+        minHeight: 44,
         backgroundColor: Style.getColor('primary-brand'),
-        padding: 6,
+        padding: 8,
     },
 
     stopButton: {
         borderRadius: 8,
-        minWidth: 42,
-        minHeight: 42,
+        minWidth: 44,
+        minHeight: 44,
         backgroundColor: Style.getColor('destructive-brand'),
-        padding: 6,
+        padding: 8,
     },
 
     optionsButton: {},
