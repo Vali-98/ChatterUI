@@ -107,7 +107,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                     handlePush(item.path)
                 }}>
                 <AntDesign
-                    size={28}
+                    size={24}
                     name={item.icon ?? 'question'}
                     color={Style.getColor('primary-text2')}
                 />
@@ -138,7 +138,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                     style={{
                         backgroundColor: Style.getColor('primary-surface1'),
                         ...styles.absolute,
-                        width: '70%',
+                        width: '60%',
                         shadowColor: Style.getColor('primary-shadow'),
                         borderTopWidth: 3,
                         elevation: 20,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     },
 
     largeButtonText: {
-        fontSize: 20,
+        fontSize: 16,
         paddingVertical: 12,
         paddingLeft: 15,
         color: Style.getColor('primary-text1'),

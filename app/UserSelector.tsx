@@ -94,7 +94,6 @@ const UserSelector = () => {
                                 }}>
                                 <Image
                                     source={{ uri: Users.getImageDir(name) }}
-                                    loadingIndicatorSource={require('@assets/user.png')}
                                     style={styles.avatar}
                                 />
 
