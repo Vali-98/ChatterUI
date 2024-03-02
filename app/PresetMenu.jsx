@@ -42,7 +42,7 @@ const PresetMenu = () => {
         },
         temp: {
             type: SLIDER,
-            data: { name: 'Temperature', precision: 2, min: 0, max: 2 },
+            data: { name: 'Temperature', precision: 2, min: 0, max: 5 },
         },
         dynatemp_range: {
             type: SLIDER,
