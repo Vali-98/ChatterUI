@@ -1,20 +1,42 @@
 import { Style, initializeApp, startupApp } from '@globals'
 import { Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
+import { View, Text } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { MenuProvider } from 'react-native-popup-menu'
+import migrations from '../db/migrations/migrations'
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
+import { db } from '@db'
 // init values should be here
 const Layout = () => {
     const [firstRender, setFirstRender] = useState<boolean>(true)
-    // reset defaults
+    const { success, error } = useMigrations(db, migrations)
+
     useEffect(() => {
+        // reset defaults
         startupApp()
         initializeApp()
         setFirstRender(false)
     }, [])
 
     const color = Style.useColorScheme((state) => state.colors)
+    if (!success)
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: Style.getColor('primary-text1'), fontSize: 16 }}>
+                    Loading Database...
+                </Text>
+            </View>
+        )
 
+    if (error)
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: Style.getColor('primary-text1'), fontSize: 16 }}>
+                    Database Migration Failed!
+                </Text>
+            </View>
+        )
     if (!firstRender)
         return (
             <GestureHandlerRootView style={{ flex: 1 }}>

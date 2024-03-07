@@ -16,18 +16,12 @@ import AnimatedView from '@components/AnimatedView'
 type ChatItemProps = {
     id: number
     nowGenerating: boolean
-    charName: string
+    charId: number
     userName: string
     TTSenabled: boolean
 }
 
-const ChatItem: React.FC<ChatItemProps> = ({
-    id,
-    nowGenerating,
-    charName,
-    userName,
-    TTSenabled,
-}) => {
+const ChatItem: React.FC<ChatItemProps> = ({ id, nowGenerating, charId, userName, TTSenabled }) => {
     const message: ChatEntry =
         Chats.useChat(useShallow((state) => state?.data?.[id])) ?? Chats.createEntry('', false, '')
     const messagesLength = Chats.useChat(useShallow((state) => state.data?.length)) ?? -1
@@ -92,7 +86,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                     ...styles.chatItem,
                 }}>
                 <ChatFrame
-                    charName={charName}
+                    charId={charId}
                     userName={userName}
                     message={message}
                     id={id}

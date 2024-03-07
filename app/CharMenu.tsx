@@ -15,23 +15,31 @@ import {
     ActivityIndicator,
 } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { useMMKVString, useMMKVObject } from 'react-native-mmkv'
+import { useMMKVString, useMMKVObject, useMMKVNumber } from 'react-native-mmkv'
 import { runOnJS } from 'react-native-reanimated'
+import { useShallow } from 'zustand/react/shallow'
 
 const CharMenu = () => {
     const router = useRouter()
 
     //const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
-    const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
-    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+    //const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
+    //const [charName, setCharName] = useMMKVNumber(Global.CurrentCharacter)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     //const [messages, setMessages] = useMMKVObject(Global.Messages)
 
+    const { charName, setCurrentCard } = Characters.useCharacterCard(
+        useShallow((state) => ({
+            charName: state?.card?.data.name,
+            setCurrentCard: state.setCard,
+        }))
+    )
+
     type CharInfo = {
         name: string
-        n: number
+        id: number
+        tags: Array<string>
     }
-
     const [characterList, setCharacterList] = useState<Array<CharInfo>>([])
     const [showNewChar, setShowNewChar] = useState<boolean>(false)
     const [showDownload, setShowDownload] = useState(false)
@@ -47,47 +55,41 @@ const CharMenu = () => {
             runOnJS(goBack)()
         })
     const getCharacterList = async () => {
-        await Characters.getCardList()
-            .then(async (list: Array<string>) => {
-                const data: Array<CharInfo> = []
-                for (const name of list) {
-                    const n = await await Chats.getNumber(name)
-                    data.push({ name: name, n: n })
-                }
-                setCharacterList(data)
-            })
-            .catch((error) => Logger.log(`Could not retrieve characters.\n${error}`, true))
+        try {
+            const list = await Characters.getCardList()
+            setCharacterList(list)
+        } catch (error) {
+            Logger.log(`Could not retrieve characters.\n${error}`, true)
+        }
     }
 
-    const setCurrentCharacter = async (character: string, edit: boolean = false) => {
+    const setCurrentCharacter = async (charId: number, edit: boolean = false) => {
         if (nowLoading) return
         setNowLoading(true)
-        setCharName(character)
+        const charName = await setCurrentCard(charId)
+        if (charName)
+            Chats.getNewest(charName)
+                .then(async (filename) => {
+                    //setCurrentChat(filename)
 
-        Chats.getNewest(character)
-            .then(async (filename) => {
-                //setCurrentChat(filename)
-                await Characters.getCard(character).then((data) => {
-                    if (data) setCurrentCard(JSON.parse(data))
+                    let file = filename
+                    if (!file) {
+                        file = await Chats.createChat(charId, userName ?? '')
+                    }
+                    if (!file) {
+                        Logger.log('Chat creation backup has failed! Please report.', true)
+                        return
+                    }
+                    await loadChat(charName, file)
+
+                    setNowLoading(false)
+                    if (edit) router.push('/CharInfo')
+                    else router.back()
                 })
-                let file = filename
-                if (!file) {
-                    file = await Chats.createChat(character, userName ?? '')
-                }
-                if (!file) {
-                    Logger.log('Chat creation backup has failed! Please report.', true)
-                    return
-                }
-                await loadChat(character, file)
-
-                setNowLoading(false)
-                if (edit) router.push('/CharInfo')
-                else router.back()
-            })
-            .catch((error: any) => {
-                Logger.log(`Couldn't load character: ${error}`, true)
-                setNowLoading(false)
-            })
+                .catch((error: any) => {
+                    Logger.log(`Couldn't load character: ${error}`, true)
+                    setNowLoading(false)
+                })
     }
 
     const handleCreateCharacter = async (text: string) => {
@@ -95,16 +97,12 @@ const CharMenu = () => {
             Logger.log('Name Cannot Be Empty!', true)
             return
         }
-        if (await Characters.exists(text)) {
-            Logger.log('Character Name Already Exists', true)
-            return
-        }
-        Characters.createCard(text).then(async () => {
-            setCharName(text)
-            router.push(`/CharInfo`)
-            getCharacterList()
+        Characters.createCard(text).then(async (id) => {
+            await setCurrentCharacter(id, true)
         })
     }
+
+    const getImage = (id: number) => Characters.getImageDir(id)
 
     useEffect(() => {
         getCharacterList()
@@ -117,6 +115,44 @@ const CharMenu = () => {
                     options={{
                         headerRight: () => (
                             <View style={styles.headerButtonContainer}>
+                                {__DEV__ && (
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <TouchableOpacity
+                                            style={styles.headerButtonRight}
+                                            onPress={async () => {
+                                                await Characters.debugDeleteTags()
+                                            }}>
+                                            <FontAwesome
+                                                name="close"
+                                                size={28}
+                                                color={Style.getColor('primary-text1')}
+                                            />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={styles.headerButtonRight}
+                                            onPress={async () => {
+                                                await Characters.debugCheckTags()
+                                            }}>
+                                            <FontAwesome
+                                                name="question"
+                                                size={28}
+                                                color={Style.getColor('primary-text1')}
+                                            />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={styles.headerButtonRight}
+                                            onPress={async () => {
+                                                await Characters.debugDelete()
+                                                getCharacterList()
+                                            }}>
+                                            <FontAwesome
+                                                name="trash"
+                                                size={28}
+                                                color={Style.getColor('primary-text1')}
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
                                 <TouchableOpacity
                                     style={styles.headerButtonRight}
                                     onPress={async () => {
@@ -215,17 +251,41 @@ const CharMenu = () => {
                                         justifyContent: 'space-between',
                                     }}
                                     disabled={nowLoading}
-                                    onPress={() => setCurrentCharacter(character.name)}>
+                                    onPress={() => setCurrentCharacter(character.id)}>
                                     <View style={styles.longButton}>
                                         <Image
                                             source={{
-                                                uri: Characters.getImageDir(character.name),
+                                                uri: getImage(character.id),
                                             }}
                                             style={styles.avatar}
                                         />
-                                        <View>
+                                        <View style={{ flex: 1 }}>
                                             <Text style={styles.nametag}>{character.name}</Text>
-                                            <Text style={styles.subtag}>Chats: {character.n}</Text>
+                                            <View
+                                                style={{
+                                                    paddingLeft: 16,
+                                                    flex: 1,
+                                                    flexDirection: 'row',
+                                                    flexWrap: 'wrap',
+                                                }}>
+                                                {character.tags.map((item, index) => (
+                                                    <Text
+                                                        style={{
+                                                            color: Style.getColor('primary-text2'),
+                                                            fontSize: 12,
+                                                            backgroundColor:
+                                                                Style.getColor('primary-surface4'),
+                                                            marginHorizontal: 2,
+                                                            marginVertical: 2,
+                                                            paddingHorizontal: 4,
+                                                            paddingVertical: 2,
+                                                            borderRadius: 4,
+                                                        }}
+                                                        key={index}>
+                                                        {item}
+                                                    </Text>
+                                                ))}
+                                            </View>
                                         </View>
                                     </View>
                                     {nowLoading && character.name == charName ? (
@@ -236,9 +296,9 @@ const CharMenu = () => {
                                         />
                                     ) : (
                                         <TouchableOpacity
-                                            onPress={() =>
-                                                setCurrentCharacter(character.name, true)
-                                            }>
+                                            onPress={async () => {
+                                                await setCurrentCharacter(character.id, true)
+                                            }}>
                                             <AntDesign
                                                 color={Style.getColor('primary-text2')}
                                                 name="idcard"

@@ -1,0 +1,276 @@
+import { relations } from 'drizzle-orm'
+import { integer, sqliteTable, text, primaryKey } from 'drizzle-orm/sqlite-core'
+
+// TAVERN V2 SPEC
+
+export const characters = sqliteTable('characters', {
+    id: integer('id', { mode: 'number' }).notNull().primaryKey(),
+    type: text('type', { enum: ['user', 'character'] }).notNull(),
+
+    name: text('name').notNull().default('User'),
+    description: text('description').notNull().default(''),
+    first_mes: text('first_mes').notNull().default(''),
+    mes_example: text('mes_example').notNull().default(''),
+    creator_notes: text('creator_notes').notNull().default(''),
+    system_prompt: text('system_prompt').notNull().default(''),
+    scenario: text('scenario').notNull().default(''),
+    personality: text('personality').notNull().default(''),
+    post_history_instructions: text('post_history_instructions').notNull().default(''),
+    //character_book: text('character_book').default(''),
+
+    creator: text('creator').notNull().default(''),
+    character_version: text('character_version').notNull().default(''),
+})
+
+export const characterGreetings = sqliteTable('character_greetings', {
+    id: integer('id', { mode: 'number' }).notNull().primaryKey(),
+    character_id: integer('character_id')
+        .notNull()
+        .references(() => characters.id, { onDelete: 'cascade' }),
+    greeting: text('greeting').notNull(),
+})
+
+export const tags = sqliteTable('tags', {
+    id: integer('id', { mode: 'number' }).notNull().primaryKey(),
+    tag: text('tag').notNull().unique(),
+})
+
+export const characterTags = sqliteTable(
+    'character_tags',
+    {
+        character_id: integer('character_id', { mode: 'number' })
+            .notNull()
+            .references(() => characters.id, { onDelete: 'cascade' }),
+        tag_id: integer('tag_id', { mode: 'number' })
+            .notNull()
+            .references(() => tags.id, { onDelete: 'cascade' }),
+    },
+    (table) => {
+        return { pk: primaryKey({ columns: [table.character_id, table.tag_id] }) }
+    }
+)
+
+export const characterGreetingRelations = relations(characters, ({ many }) => ({
+    alternate_greetings: many(characterGreetings),
+}))
+
+export const greetingsToCharacterRelations = relations(characterGreetings, ({ one }) => ({
+    character_id: one(characters, {
+        fields: [characterGreetings.character_id],
+        references: [characters.id],
+    }),
+}))
+
+/*export const characterTagsToCharacterRelations = relations(characterTags, ({ one }) => ({
+    
+}))*/
+
+export const characterTagsRelations = relations(characterTags, ({ one }) => ({
+    tag: one(tags, {
+        fields: [characterTags.tag_id],
+        references: [tags.id],
+    }),
+    character: one(characters, {
+        fields: [characterTags.character_id],
+        references: [characters.id],
+    }),
+}))
+
+export const characterToCharacterTagRelations = relations(characters, ({ many }) => ({
+    tags: many(characterTags),
+}))
+
+export const tagToCharacterTagsRelations = relations(tags, ({ many }) => ({
+    characters: many(characterTags),
+}))
+
+// CHATS
+
+export const chats = sqliteTable('chats', {
+    id: integer('id', { mode: 'number' }).primaryKey().notNull(),
+    createDate: integer('create_date', { mode: 'timestamp' })
+        .notNull()
+        .$defaultFn(() => new Date()),
+    character_id: integer('character_id', { mode: 'number' })
+        .notNull()
+        .references(() => characters.id),
+})
+
+export const chatEntries = sqliteTable('chat_entries', {
+    id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+    chat_id: integer('id', { mode: 'number' })
+        .notNull()
+        .references(() => chats.id, { onDelete: 'cascade' }),
+    is_user: integer('is_user', { mode: 'boolean' }).notNull(),
+    name: text('name').notNull(),
+    /* Stored in chat_swipes, reconstruct for use in state
+    mes: text('mes').notNull().default(''),
+
+    send_date: integer('send_date', { mode: 'timestamp' })
+        .notNull()
+        .$defaultFn(() => new Date()),
+
+    gen_started: integer('gen_started', { mode: 'timestamp' })
+        .notNull()
+        .$defaultFn(() => new Date()),
+
+    gen_finished: integer('gen_finished', { mode: 'timestamp' })
+        .notNull()
+        .$defaultFn(() => new Date()),
+    */
+
+    swipe_id: integer('swipe_id', { mode: 'number' }).default(0),
+})
+
+export const chatSwipes = sqliteTable('chat_swipes', {
+    id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+    entry_id: integer('id', { mode: 'number' })
+        .notNull()
+        .references(() => chatEntries.id, { onDelete: 'cascade' }),
+    swipe: text('swipe').notNull().default(''),
+
+    send_date: integer('send_date', { mode: 'timestamp' })
+        .notNull()
+        .$defaultFn(() => new Date()),
+
+    gen_started: integer('gen_started', { mode: 'timestamp' })
+        .notNull()
+        .$defaultFn(() => new Date()),
+
+    gen_finished: integer('gen_finished', { mode: 'timestamp' })
+        .notNull()
+        .$defaultFn(() => new Date()),
+})
+
+export const chatsToEntriesRelations = relations(chats, ({ many }) => ({
+    messages: many(chatEntries),
+}))
+
+export const chatEntriesToSwipeRelations = relations(chatEntries, ({ many }) => ({
+    swipes: many(chatSwipes),
+}))
+
+export const entriesToChatRelations = relations(chatEntries, ({ one }) => ({
+    chat: one(chats, {
+        fields: [chatEntries.chat_id],
+        references: [chats.id],
+    }),
+}))
+
+export const swipesToEntriesRelations = relations(chatSwipes, ({ one }) => ({
+    entry: one(chatEntries, {
+        fields: [chatSwipes.entry_id],
+        references: [chatEntries.id],
+    }),
+}))
+
+// INSTRUCT
+
+export const instructs = sqliteTable('instructs', {
+    id: integer('id', { mode: 'number' }).primaryKey(),
+    name: text('name').notNull(),
+
+    system_prompt: text('system_prompt').notNull(),
+
+    input_sequence: text('input_sequence').notNull(),
+    output_sequence: text('output_sequence').notNull(),
+
+    first_output_sequence: text('first_output_sequence').notNull(),
+    system_sequence_prefix: text('system_sequence_prefix').notNull(),
+
+    stop_sequence: text('stop_sequence').notNull(),
+    separator_sequence: text('separator_sequence').notNull(),
+
+    activation_regex: text('activation_regex').notNull(),
+
+    wrap: integer('wrap', { mode: 'boolean' }).notNull(),
+    macro: integer('macro', { mode: 'boolean' }).notNull(),
+    names: integer('names', { mode: 'boolean' }).notNull(),
+    names_force_groups: integer('names_force_groups', { mode: 'boolean' }).notNull(),
+})
+
+// LOREBOOKS
+
+export const lorebooks = sqliteTable('lorebooks', {
+    id: integer('id', { mode: 'number' }).primaryKey(),
+    name: text('name').notNull(),
+    description: text('description').notNull(),
+    scanDepth: integer('scan_depth'),
+    tokenBudget: integer('token_budget'),
+    recursiveScanning: integer('recursive_scanning', { mode: 'boolean' }).default(false),
+})
+
+export const lorebookEntries = sqliteTable('lorebook_entries', {
+    id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+    lorebook_id: integer('id', { mode: 'number' })
+        .notNull()
+        .references(() => lorebooks.id, { onDelete: 'cascade' }),
+    keys: text('keys').notNull(),
+    content: text('content').notNull(),
+    enable: integer('enable', { mode: 'boolean' }).default(true),
+    insertion_order: integer('insertion_order').default(100),
+    case_sensitive: integer('case_sensitive', { mode: 'boolean' }).default(true),
+
+    name: text('name').notNull(),
+    priority: integer('priority').default(100),
+})
+
+export const lorebooksToEntriesRelations = relations(lorebooks, ({ many }) => ({
+    entries: many(lorebookEntries),
+}))
+
+export const entriesToLorebooksRelations = relations(lorebookEntries, ({ one }) => ({
+    lorebook: one(lorebooks, {
+        fields: [lorebookEntries.lorebook_id],
+        references: [lorebooks.id],
+    }),
+}))
+
+export const characterLorebooks = sqliteTable(
+    'character_lorebooks',
+    {
+        character_id: integer('character_id', { mode: 'number' }).references(() => characters.id, {
+            onDelete: 'cascade',
+        }),
+        lorebook_id: integer('lorebook_id', { mode: 'number' }).references(() => lorebooks.id, {
+            onDelete: 'cascade',
+        }),
+    },
+    (table) => {
+        return { pk: primaryKey({ columns: [table.character_id, table.lorebook_id] }) }
+    }
+)
+
+export const charactersToCharacterLorebooksRelations = relations(characters, ({ many }) => ({
+    lorebooks: many(characterLorebooks),
+}))
+
+export const lorebooksToCharacterorebooksRelations = relations(lorebooks, ({ many }) => ({
+    lorebooks: many(characterLorebooks),
+}))
+
+export const characterLorebooksToCharactersRelations = relations(characterLorebooks, ({ one }) => ({
+    character: one(characters, {
+        fields: [characterLorebooks.character_id],
+        references: [characters.id],
+    }),
+}))
+
+export const characterLorebooksToLorebookRelations = relations(characterLorebooks, ({ one }) => ({
+    lorebook: one(lorebooks, {
+        fields: [characterLorebooks.lorebook_id],
+        references: [lorebooks.id],
+    }),
+}))
+
+// TODO:
+
+////// presets - 1 table
+
+// export const presets = sqliteTable('presets', {})
+
+////// group chats - 2 tables
+
+// export const groupChats = sqliteTable('group_chats', {})
+
+// export const characterGroupChats = sqliteTable('character_group_chats', {})

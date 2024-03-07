@@ -10,6 +10,7 @@
             "@public/*": ["public/*"],
             "@constants/*": ["constants/*"],
             "@lib/*": ["lib/*"],
+            "@db": ["db/db"],
         },
         "allowJs": true,
     },

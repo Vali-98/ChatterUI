@@ -9,7 +9,8 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "postinstall": "patch-package",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "migrate": "npx drizzle-kit generate:sqlite"
   },
   "jest": {
     "preset": "jest-expo"
@@ -25,9 +26,11 @@
     "@react-navigation/native": "^6.0.2",
     "@shopify/flash-list": "1.6.3",
     "axios": "^1.5.0",
+    "babel-plugin-inline-import": "^3.0.0",
     "babel-plugin-module-resolver": "^5.0.0",
     "base-64": "^1.0.0",
     "dicer": "^0.3.1",
+    "drizzle-orm": "^0.29.4",
     "expo": "~50.0.8",
     "expo-application": "~5.8.3",
     "expo-build-properties": "~0.11.1",
@@ -42,6 +45,7 @@
     "expo-sharing": "~11.10.0",
     "expo-speech": "~11.7.0",
     "expo-splash-screen": "~0.26.4",
+    "expo-sqlite": "~13.2.2",
     "expo-status-bar": "~1.11.1",
     "expo-system-ui": "~2.9.3",
     "llama.rn": "^0.3.0-rc.16",
@@ -74,6 +78,7 @@
     "@types/png-chunk-text": "^1.0.3",
     "@types/png-chunks-extract": "^1.0.2",
     "@types/react": "~18.2.45",
+    "drizzle-kit": "^0.20.14",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-universe": "^12.0.0",

@@ -1,6 +1,6 @@
 import { StyleSheet, FlatList } from 'react-native'
 import { ChatItem } from './ChatItem'
-import { Chats, Global } from '@globals'
+import { Characters, Chats, Global } from '@globals'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 import { useEffect, useRef } from 'react'
 
@@ -14,7 +14,9 @@ const ChatWindow = () => {
     const { nowGenerating } = Chats.useChat((state) => ({
         nowGenerating: state.nowGenerating,
     }))
-    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+
+    const charId = Characters.useCharacterCard((state) => state?.id)
+
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const flatListRef = useRef<FlatList>(null)
     const messages = Chats.useChat((state) => state?.data) ?? ''
@@ -38,7 +40,7 @@ const ChatWindow = () => {
             <ChatItem
                 id={item.index}
                 nowGenerating={nowGenerating ?? false}
-                charName={charName ?? ''}
+                charId={charId ?? -1}
                 userName={userName ?? ''}
                 TTSenabled={TTSenabled ?? false}
             />
