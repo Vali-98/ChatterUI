@@ -8,8 +8,8 @@ export const enum Global {
     RecentMessages = 'recentmessages',
     // Character
 
-    CurrentCharacter = 'currentchar', // current char filename, locates dir
-    CurrentCharacterCard = 'charcard', // note: use Object ? - stores charactercard
+    //CurrentCharacter = 'currentchar', // current char filename, locates dir
+    //CurrentCharacterCard = 'charcard', // note: use Object ? - stores charactercard
 
     // User
 

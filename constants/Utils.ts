@@ -1,3 +1,4 @@
+import { Characters } from './Characters'
 import { Global } from './GlobalValues'
 import { mmkv } from './mmkv'
 
@@ -37,7 +38,7 @@ type Rule = {
 export const replaceMacros = (text: string) => {
     if (text == undefined) return ''
     let newtext: string = text
-    const charName = mmkv.getString(Global.CurrentCharacter)
+    const charName = Characters.useCharacterCard.getState().card?.data.name
     const userName = mmkv.getString(Global.CurrentUser)
     const rules: Rule[] = [
         { macro: '{{user}}', value: userName ?? '' },

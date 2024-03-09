@@ -7,39 +7,34 @@ import {
     ActivityIndicator,
 } from 'react-native'
 import { useState } from 'react'
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
+import { useMMKVObject } from 'react-native-mmkv'
 import { Characters, Chats, Global, Logger, Style } from '@globals'
 import { RecentEntry, RecentMessages } from '@constants/RecentMessages'
-import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons'
+import { FontAwesome, Ionicons } from '@expo/vector-icons'
 import AnimatedView from '@components/AnimatedView'
 
 const Recents = () => {
     const [recentMessages, setRecentMessages] = useMMKVObject<Array<RecentEntry>>(
         Global.RecentMessages
     )
-    const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
-    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+
+    const setCurrentCard = Characters.useCharacterCard((state) => state.setCard)
+
     const [nowLoading, setNowLoading] = useState<boolean>(false)
     const { loadChat } = Chats.useChat((state) => ({ loadChat: state.load }))
     const handleLoadEntry = async (entry: RecentEntry) => {
         if (nowLoading) return
         setNowLoading(true)
-        if (
-            !(await Characters.exists(entry.charName)) ||
-            !(await Chats.exists(entry.charName, entry.chatName))
-        ) {
+        if (!(await Characters.exists(entry.charId)) || !(await Chats.exists(entry.chatId))) {
             Logger.log('Character or Chat no longer exists', true)
-            RecentMessages.deleteEntry(entry.chatName)
+            RecentMessages.deleteEntry(entry.chatId)
             setNowLoading(false)
             return
         }
 
-        await Characters.getCard(entry.charName).then((data) => {
-            if (data) setCurrentCard(JSON.parse(data))
-        })
+        await setCurrentCard(entry.charId)
 
-        await loadChat(entry.charName, entry.chatName)
-        setCharName(entry.charName)
+        await loadChat(entry.chatId)
         setNowLoading(false)
     }
     const noRecents = !recentMessages || (recentMessages.length === 0 && !nowLoading)
@@ -77,11 +72,13 @@ const Recents = () => {
                                     }}>
                                     <View style={styles.textContainer}>
                                         <Text style={styles.longButtonTitle}>{item.charName}</Text>
-                                        <Text style={styles.longButtonBody}>{item.chatName}</Text>
+                                        <Text style={styles.longButtonBody}>
+                                            {item.lastModified}
+                                        </Text>
                                     </View>
                                     <TouchableOpacity
                                         style={{ marginTop: 8 }}
-                                        onPress={() => RecentMessages.deleteEntry(item.chatName)}>
+                                        onPress={() => RecentMessages.deleteEntry(item.chatId)}>
                                         <FontAwesome
                                             color={Style.getColor('primary-text2')}
                                             name="close"

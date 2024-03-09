@@ -22,11 +22,12 @@ type ChatItemProps = {
 }
 
 const ChatItem: React.FC<ChatItemProps> = ({ id, nowGenerating, charId, userName, TTSenabled }) => {
-    const message: ChatEntry =
-        Chats.useChat(useShallow((state) => state?.data?.[id])) ?? Chats.createEntry('', false, '')
-    const messagesLength = Chats.useChat(useShallow((state) => state.data?.length)) ?? -1
+    const message =
+        Chats.useChat(useShallow((state) => state?.data?.messages?.[id])) ?? Chats.dummyEntry
 
-    const [placeholderText, setPlaceholderText] = useState(message.mes)
+    const messagesLength = Chats.useChat(useShallow((state) => state.data?.messages.length)) ?? -1
+    const mes = message.swipes[message.swipe_id].swipe ?? ''
+    const [placeholderText, setPlaceholderText] = useState(mes)
     const [editMode, setEditMode] = useState(false)
 
     const { updateChat, deleteChat, saveChat } = Chats.useChat(
@@ -51,12 +52,12 @@ const ChatItem: React.FC<ChatItemProps> = ({ id, nowGenerating, charId, userName
         setEditMode(false)
     }
     const handleEnableEdit = () => {
-        setPlaceholderText(message.mes)
+        setPlaceholderText(mes)
         setEditMode(!nowGenerating)
     }
 
     const handleDisableEdit = () => {
-        setPlaceholderText(message.mes)
+        setPlaceholderText(mes)
         setEditMode((editMode) => false)
     }
 
@@ -144,7 +145,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ id, nowGenerating, charId, userName
                                 styles={markdownFormat}>
                                 {nowGenerating && id === messagesLength - 1
                                     ? buffer.trim()
-                                    : message.mes.trim()}
+                                    : mes.trim()}
                             </Markdown>
                         </TouchableOpacity>
                     )}
