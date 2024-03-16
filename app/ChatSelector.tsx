@@ -6,6 +6,7 @@ import { useRouter, Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, View, Text, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
+import { useShallow } from 'zustand/react/shallow'
 
 type ListItem = {
     id: number
@@ -16,10 +17,12 @@ type ListItem = {
 const ChatSelector = () => {
     const router = useRouter()
     const [chats, setChats] = useState<Array<ListItem>>([])
-    const { charName, charId } = Characters.useCharacterCard((state) => ({
-        charName: state.card?.data.name,
-        charId: state.id,
-    }))
+    const { charName, charId } = Characters.useCharacterCard(
+        useShallow((state) => ({
+            charName: state.card?.data.name,
+            charId: state.id,
+        }))
+    )
 
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
 

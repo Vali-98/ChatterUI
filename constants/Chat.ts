@@ -74,7 +74,7 @@ export type ChatData = {
     id: number
     createDate: Date
     character_id: number
-    messages: Array<ChatEntry>
+    messages: Array<ChatEntry> | undefined
 }
 
 //type ChatDataArray = [ChatInfo, ...ChatEntry[]]
@@ -130,11 +130,15 @@ export namespace Chats {
         abortFunction: undefined,
         setAbortFunction: (fn) => set((state) => ({ ...state, abortFunction: fn })),
         load: async (chatId: number) => {
+            let start = performance.now()
             const data = await readChat(chatId)
+            console.log(`time for db query: `, performance.now() - start)
+            start = performance.now()
             set((state: ChatState) => ({
                 ...state,
                 data: data,
             }))
+            console.log('time for zustand set: ', performance.now() - start)
             // TODO : Add recents
             const charName = Characters.useCharacterCard.getState().card?.data.name
             const charId = Characters.useCharacterCard.getState().id
@@ -253,7 +257,7 @@ export namespace Chats {
             await get().updateEntry(index, get().buffer)
         },
         insertLastToBuffer: () => {
-            const message = get()?.data?.messages.at(-1)
+            const message = get()?.data?.messages?.at(-1)
             if (!message) return
             const mes = message.swipes[message.swipe_id].swipe
 
@@ -367,7 +371,7 @@ export namespace Chats {
                 },
             },
         })
-        return chat
+        if (chat) return { ...chat }
     }
 
     export const insertSwipeDB = async (entryId: number) => {

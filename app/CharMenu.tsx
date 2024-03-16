@@ -15,23 +15,15 @@ import {
     ActivityIndicator,
 } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { useMMKVString, useMMKVObject, useMMKVNumber } from 'react-native-mmkv'
 import { runOnJS } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 const CharMenu = () => {
     const router = useRouter()
-
-    //const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
-    //const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
-    //const [charName, setCharName] = useMMKVNumber(Global.CurrentCharacter)
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-    //const [messages, setMessages] = useMMKVObject(Global.Messages)
-
-    const { charName, setCurrentCard } = Characters.useCharacterCard(
+    const { setCurrentCard } = Characters.useCharacterCard(
         useShallow((state) => ({
-            charName: state?.card?.data.name,
             setCurrentCard: state.setCard,
+            //charId: state.id,
         }))
     )
 
@@ -44,7 +36,7 @@ const CharMenu = () => {
     const [showNewChar, setShowNewChar] = useState<boolean>(false)
     const [showDownload, setShowDownload] = useState(false)
     const [nowLoading, setNowLoading] = useState(false)
-
+    const [loadedCharId, setLoadedCharId] = useState(Characters.useCharacterCard.getState().id)
     const loadChat = Chats.useChat((state) => state.load)
 
     const goBack = () => router.back()
@@ -62,13 +54,13 @@ const CharMenu = () => {
             Logger.log(`Could not retrieve characters.\n${error}`, true)
         }
     }
-
     const setCurrentCharacter = async (charId: number, edit: boolean = false) => {
         if (nowLoading) return
+        setLoadedCharId(charId)
+
         try {
+            await setCurrentCard(charId)
             setNowLoading(true)
-            const charName = await setCurrentCard(charId)
-            if (!charName) return
             const returnedChatId = await Chats.getNewest(charId)
             let chatId = returnedChatId
             if (!chatId) {
@@ -78,6 +70,7 @@ const CharMenu = () => {
                 Logger.log('Chat creation backup has failed! Please report.', true)
                 return
             }
+
             await loadChat(chatId)
 
             setNowLoading(false)
@@ -87,6 +80,7 @@ const CharMenu = () => {
             Logger.log(`Couldn't load character: ${error}`, true)
             setNowLoading(false)
         }
+        setLoadedCharId(-1)
     }
 
     const handleCreateCharacter = async (text: string) => {
@@ -232,7 +226,7 @@ const CharMenu = () => {
                         {characterList.map((character, index) => (
                             <AnimatedView
                                 style={
-                                    character.name === charName
+                                    character.id === loadedCharId
                                         ? styles.longButtonSelectedContainer
                                         : styles.longButtonContainer
                                 }
@@ -285,7 +279,7 @@ const CharMenu = () => {
                                             </View>
                                         </View>
                                     </View>
-                                    {nowLoading && character.name == charName ? (
+                                    {nowLoading && character.id == loadedCharId ? (
                                         <ActivityIndicator
                                             color={Style.getColor('primary-text2')}
                                             style={{ paddingLeft: 8 }}
@@ -294,8 +288,9 @@ const CharMenu = () => {
                                     ) : (
                                         <TouchableOpacity
                                             onPress={async () => {
-                                                await setCurrentCharacter(character.id, true)
-                                            }}>
+                                                setCurrentCharacter(character.id, true)
+                                            }}
+                                            disabled={nowLoading}>
                                             <AntDesign
                                                 color={Style.getColor('primary-text2')}
                                                 name="idcard"
