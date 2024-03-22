@@ -8,7 +8,7 @@ import { RecentMessages } from './RecentMessages'
 import { db } from '@db'
 import { chatEntries, chatSwipes, chats } from 'db/schema'
 import { eq } from 'drizzle-orm'
-
+import * as FS from 'expo-file-system'
 /*
 export type ChatExtra = {
     api: string
@@ -109,6 +109,8 @@ export interface ChatState {
 }
 
 export namespace Chats {
+    export namespace database {}
+
     export const useChat = create<ChatState>((set, get: () => ChatState) => ({
         data: undefined,
         buffer: '',
@@ -132,14 +134,14 @@ export namespace Chats {
         load: async (chatId: number) => {
             let start = performance.now()
             const data = await readChat(chatId)
-            console.log(`time for db query: `, performance.now() - start)
+            Logger.debug(`[Chats] time for db query: ${performance.now() - start}`)
             start = performance.now()
             set((state: ChatState) => ({
                 ...state,
                 data: data,
             }))
-            console.log('time for zustand set: ', performance.now() - start)
-            // TODO : Add recents
+            Logger.debug(`[Chats] time for zustand set: ${performance.now() - start}`)
+
             const charName = Characters.useCharacterCard.getState().card?.data.name
             const charId = Characters.useCharacterCard.getState().id
             if (charName && charId) RecentMessages.insertEntry(charName, charId, chatId)
@@ -159,7 +161,6 @@ export namespace Chats {
         //save: async () => {},
 
         addEntry: async (name: string, is_user: boolean, message: string) => {
-            // CHATTODO
             const messages = get().data?.messages
             const chatId = get().data?.id
             if (!messages || !chatId) return
@@ -206,7 +207,6 @@ export namespace Chats {
 
         // returns true if overflowing right swipe, used to trigger generate
         swipe: async (index: number, direction: number) => {
-            // CHATTODO
             const messages = get()?.data?.messages
             if (!messages) return false
 
@@ -229,7 +229,6 @@ export namespace Chats {
         },
 
         addSwipe: async () => {
-            // CHATTODO
             let messages = get().data?.messages
             if (!messages) return
             const index = messages?.length - 1
@@ -239,8 +238,7 @@ export namespace Chats {
             const swipe = await createSwipe(entryId, '')
             if (swipe) messages[index].swipes.push(swipe)
             await updateEntrySwipeId(entryId, messages[index].swipes.length - 1)
-            //if(get().data)
-            //get().data.messages = messages
+
             set((state: ChatState) => ({ ...state }))
         },
 
@@ -263,7 +261,6 @@ export namespace Chats {
 
             set((state: ChatState) => ({ ...state, buffer: mes }))
         },
-        // CHATTODO
     }))
 
     export const getNewest = async (charId: number): Promise<number | undefined> => {

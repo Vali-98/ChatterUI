@@ -3,13 +3,13 @@ export const enum Global {
 
     NowGenerating = 'nowgenerating', // generation signal
     EditedWindow = 'editedwindow', // exit editing window confirmation
-    //Messages = 'messages',
+    //Messages = 'messages', === removed on zustand migration
     Logs = 'logs',
     RecentMessages = 'recentmessages',
     // Character
 
-    //CurrentCharacter = 'currentchar', // current char filename, locates dir
-    //CurrentCharacterCard = 'charcard', // note: use Object ? - stores charactercard
+    //CurrentCharacter = 'currentchar', // current char filename, locates dir   == removed on db migration
+    //CurrentCharacterCard = 'charcard', // note: use Object ? - stores charactercard   == removed on db migration
 
     // User
 
@@ -18,7 +18,7 @@ export const enum Global {
 
     // Chat
 
-    // CurrentChat = 'currentchat', // current chat filename, locates dir
+    // CurrentChat = 'currentchat', // current chat filename, locates dir    == removed on db migration
 
     // Instruct
 

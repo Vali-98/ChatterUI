@@ -1,6 +1,9 @@
 import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
 import { Logger } from './Logger'
+import { db } from '@db'
+import { eq } from 'drizzle-orm'
+import { instructs } from 'db/schema'
 
 export namespace Instructs {
     export const loadFile = async (name: string) => {
@@ -54,6 +57,30 @@ export namespace Instructs {
                 })
                 .catch((error) => Logger.log(`Failed to load: ${error.message}`, true))
         })
+    }
+
+    // db
+
+    export const createDefaultInstruct = async () => {
+        await createInstruct(defaultInstruct())
+    }
+
+    export const createInstruct = async (instruct: InstructType) => {
+        await db.insert(instructs).values(instruct)
+    }
+
+    export const readInstruct = async (id: number) => {
+        const instruct = await db.query.instructs.findFirst({
+            where: eq(instructs.id, id),
+        })
+    }
+
+    export const updateInstruct = async (id: number, instruct: InstructType) => {
+        await db.update(instructs).set(instruct).where(eq(instructs.id, id))
+    }
+
+    export const deleteInstruct = async (id: number) => {
+        await db.delete(instructs).where(eq(instructs.id, id))
     }
 
     export const defaultInstruct = (): InstructType => {

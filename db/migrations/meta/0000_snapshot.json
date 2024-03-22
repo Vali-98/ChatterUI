@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "b2939fe9-b273-42b5-8f08-b86b6e3dd4de",
+  "id": "1400ff2f-fa52-4fd1-9ee4-4b8e28085b01",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "character_greetings": {
@@ -253,6 +253,13 @@
           "autoincrement": false,
           "default": "''"
         },
+        "image_id": {
+          "name": "image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "creator": {
           "name": "creator",
           "type": "text",
@@ -317,7 +324,7 @@
           "name": "swipe_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": 0
         }

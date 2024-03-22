@@ -11,15 +11,15 @@ type ListItem = {
 }
 
 const ChatWindow = () => {
-    // this solution will have to change once editing is enabled as updating the content will scroll
-    const { nowGenerating } = Chats.useChat((state) => ({
-        nowGenerating: state.nowGenerating,
-    }))
+    const { nowGenerating } = Chats.useChat(
+        useShallow((state) => ({
+            nowGenerating: state.nowGenerating,
+        }))
+    )
     const charId = Characters.useCharacterCard(useShallow((state) => state?.id))
 
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const flatListRef = useRef<FlatList>(null)
-    //const messages = Chats.useChat(useShallow((state) => state.messages)) ?? []
     const messagesLength = Chats.useChat((state) => state?.data?.messages?.length) ?? -1
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
 
@@ -31,7 +31,6 @@ const ChatWindow = () => {
         for (let i = 0; i < messagesLength; i++) {
             arr.push({ index: i, key: i })
         }
-
         return arr.reverse()
     }
 
@@ -54,7 +53,7 @@ const ChatWindow = () => {
             keyboardShouldPersistTaps={'handled'}
             removeClippedSubviews={false}
             inverted
-            windowSize={3}
+            windowSize={2}
             data={getItems()}
             keyExtractor={(item) => item.key.toString()}
             renderItem={renderItems}

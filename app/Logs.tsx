@@ -1,7 +1,8 @@
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Logger, Style, saveStringExternal } from '@globals'
 import { Stack } from 'expo-router'
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
 import { useMMKVObject } from 'react-native-mmkv'
 import AnimatedView from '@components/AnimatedView'
 const Logs = () => {
@@ -35,37 +36,38 @@ const Logs = () => {
 
     return (
         <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+            <Stack.Screen
+                options={{
+                    animation: 'fade',
+                    headerRight: () => (
+                        <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity
+                                style={{ marginRight: 30, marginTop: 12 }}
+                                onPress={handleFlushLogs}>
+                                <FontAwesome
+                                    name="trash"
+                                    size={28}
+                                    color={Style.getColor('primary-text1')}
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ marginRight: 20, marginTop: 12 }}
+                                onPress={handleExportLogs}>
+                                <FontAwesome
+                                    name="download"
+                                    size={28}
+                                    color={Style.getColor('primary-text1')}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                }}
+            />
+
             <View style={styles.container}>
-                <Stack.Screen
-                    options={{
-                        animation: 'fade',
-                        headerRight: () => (
-                            <View style={{ flexDirection: 'row' }}>
-                                <TouchableOpacity
-                                    style={{ marginRight: 30, marginTop: 12 }}
-                                    onPress={handleFlushLogs}>
-                                    <FontAwesome
-                                        name="trash"
-                                        size={28}
-                                        color={Style.getColor('primary-text1')}
-                                    />
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={{ marginRight: 20, marginTop: 12 }}
-                                    onPress={handleExportLogs}>
-                                    <FontAwesome
-                                        name="download"
-                                        size={28}
-                                        color={Style.getColor('primary-text1')}
-                                    />
-                                </TouchableOpacity>
-                            </View>
-                        ),
-                    }}
-                />
-                <FlatList
+                <FlashList
                     inverted
-                    windowSize={3}
+                    estimatedItemSize={30}
                     data={logitems}
                     keyExtractor={(item) => `${item.key}`}
                     renderItem={({ item, index }) => <Text style={styles.entry}>{item.entry}</Text>}
@@ -85,6 +87,7 @@ const styles = StyleSheet.create({
         margin: 16,
         padding: 16,
         borderRadius: 16,
+        flex: 1,
     },
     entry: {
         color: Style.getColor('primary-text1'),

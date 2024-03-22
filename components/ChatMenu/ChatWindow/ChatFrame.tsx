@@ -8,22 +8,24 @@ type ChatFrameProps = {
     children?: ReactNode
     message: ChatEntry
     userName: string
-    charId: number
     TTSenabled: boolean
     id: number
+    charId: number
     isLast?: boolean
 }
 
 const ChatFrame: React.FC<ChatFrameProps> = ({
     children,
     message,
-    userName,
     charId,
+    userName,
     TTSenabled,
     id,
     isLast,
 }) => {
-    const imageDir = message.is_user ? Users.getImageDir(userName) : Characters.getImageDir(charId)
+    const imageDir = message.is_user
+        ? Users.getImageDir(userName)
+        : Characters.useCharacterCard.getState().getImage()
     const swipe = message.swipes[message.swipe_id]
     const [imageSource, setImageSource] = useState({
         uri: imageDir,
@@ -32,7 +34,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
     useEffect(() => {
         const newdir = message.is_user
             ? Users.getImageDir(userName)
-            : Characters.getImageDir(charId)
+            : Characters.useCharacterCard.getState().getImage()
         setImageSource({ uri: newdir })
     }, [charId])
 

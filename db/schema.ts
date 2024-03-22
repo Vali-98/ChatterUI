@@ -17,7 +17,9 @@ export const characters = sqliteTable('characters', {
     personality: text('personality').notNull().default(''),
     post_history_instructions: text('post_history_instructions').notNull().default(''),
     //character_book: text('character_book').default(''),
-
+    image_id: integer('image_id', { mode: 'number' })
+        .notNull()
+        .$defaultFn(() => new Date().getTime()),
     creator: text('creator').notNull().default(''),
     character_version: text('character_version').notNull().default(''),
 })

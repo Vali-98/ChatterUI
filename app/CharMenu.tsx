@@ -18,26 +18,27 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
+type CharInfo = {
+    name: string
+    id: number
+    image_id: number
+    tags: Array<string>
+}
+
 const CharMenu = () => {
     const router = useRouter()
     const { setCurrentCard } = Characters.useCharacterCard(
         useShallow((state) => ({
             setCurrentCard: state.setCard,
-            //charId: state.id,
         }))
     )
+    const loadChat = Chats.useChat((state) => state.load)
 
-    type CharInfo = {
-        name: string
-        id: number
-        tags: Array<string>
-    }
     const [characterList, setCharacterList] = useState<Array<CharInfo>>([])
     const [showNewChar, setShowNewChar] = useState<boolean>(false)
     const [showDownload, setShowDownload] = useState(false)
     const [nowLoading, setNowLoading] = useState(false)
     const [loadedCharId, setLoadedCharId] = useState(Characters.useCharacterCard.getState().id)
-    const loadChat = Chats.useChat((state) => state.load)
 
     const goBack = () => router.back()
 
@@ -92,8 +93,6 @@ const CharMenu = () => {
             await setCurrentCharacter(id, true)
         })
     }
-
-    const getImage = (id: number) => Characters.getImageDir(id)
 
     useEffect(() => {
         getCharacterList()
@@ -246,7 +245,7 @@ const CharMenu = () => {
                                     <View style={styles.longButton}>
                                         <Image
                                             source={{
-                                                uri: getImage(character.id),
+                                                uri: Characters.getImageDir(character.image_id),
                                             }}
                                             style={styles.avatar}
                                         />

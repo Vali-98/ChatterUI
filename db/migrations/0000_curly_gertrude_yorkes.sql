@@ -33,6 +33,7 @@ CREATE TABLE `characters` (
 	`scenario` text DEFAULT '' NOT NULL,
 	`personality` text DEFAULT '' NOT NULL,
 	`post_history_instructions` text DEFAULT '' NOT NULL,
+	`image_id` integer NOT NULL,
 	`creator` text DEFAULT '' NOT NULL,
 	`character_version` text DEFAULT '' NOT NULL
 );
@@ -43,7 +44,7 @@ CREATE TABLE `chat_entries` (
 	`is_user` integer NOT NULL,
 	`name` text NOT NULL,
 	`order` integer NOT NULL,
-	`swipe_id` integer DEFAULT 0,
+	`swipe_id` integer DEFAULT 0 NOT NULL,
 	FOREIGN KEY (`chat_id`) REFERENCES `chats`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
