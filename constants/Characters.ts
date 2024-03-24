@@ -102,7 +102,11 @@ export namespace Characters {
     }
 
     export const deleteCard = async (charID: number) => {
-        deleteImage(charID)
+        const data = await db.query.characters.findFirst({
+            where: eq(characters.id, charID),
+            columns: { image_id: true },
+        })
+        if (data) deleteImage(data.image_id)
         await db.delete(characters).where(eq(characters.id, charID))
         await db
             .delete(tags)
@@ -291,7 +295,8 @@ export namespace Characters {
         if (url.hostname === 'pygmalion.chat') {
             const param = new URLSearchParams(text)
             let character_id = param.get('id')?.replaceAll(`"`, '')
-            const path = url.pathname.replace('/characters/', '')
+            const path = url.pathname.replace('/character/', '')
+            console.log(path)
             if (character_id) return importCharacterFromPyg(character_id)
             else if (uuidRegex.test(path)) return importCharacterFromPyg(path)
             else {

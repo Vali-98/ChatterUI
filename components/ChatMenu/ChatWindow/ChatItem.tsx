@@ -1,17 +1,27 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Chats, Style } from '@globals'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 //@ts-expect-error
 import Markdown from 'react-native-markdown-package'
 //@ts-expect-error
 import AnimatedEllipsis from 'rn-animated-ellipsis'
 import SimpleMarkdown from 'simple-markdown'
-import { ChatEntry } from '@constants/Chat'
 import { useShallow } from 'zustand/react/shallow'
 import Swipes from './Swipes'
 import ChatFrame from './ChatFrame'
 import AnimatedView from '@components/AnimatedView'
+
+type EditorProps = {
+    name: 'delete' | 'check' | 'close'
+    onPress: () => void
+}
+
+const EditorButton = ({ name, onPress }: EditorProps) => (
+    <TouchableOpacity style={styles.editButton} onPress={onPress}>
+        <MaterialIcons name={name} size={28} color={Style.getColor('primary-text1')} />
+    </TouchableOpacity>
+)
 
 type ChatItemProps = {
     id: number
@@ -19,24 +29,33 @@ type ChatItemProps = {
     charId: number
     userName: string
     TTSenabled: boolean
+    messagesLength: number
 }
 
-const ChatItem: React.FC<ChatItemProps> = ({ id, nowGenerating, charId, userName, TTSenabled }) => {
-    const message =
-        Chats.useChat(useShallow((state) => state?.data?.messages?.[id])) ?? Chats.dummyEntry
-
-    const mes = message.swipes[message.swipe_id].swipe ?? ''
-    const [placeholderText, setPlaceholderText] = useState(mes)
-    const [editMode, setEditMode] = useState(false)
-
-    const { updateChat, deleteChat, messagesLength } = Chats.useChat(
+const ChatItem: React.FC<ChatItemProps> = ({
+    id,
+    nowGenerating,
+    charId,
+    userName,
+    TTSenabled,
+    messagesLength,
+}) => {
+    const { updateChat, deleteChat, buffer, message } = Chats.useChat(
         useShallow((state) => ({
             updateChat: state.updateEntry,
             deleteChat: state.deleteEntry,
-            messagesLength: state?.data?.messages?.length ?? -1,
+            buffer: id === messagesLength - 1 ? state.buffer : '',
+            message: state?.data?.messages?.[id] ?? Chats.dummyEntry,
         }))
     )
-    const buffer = Chats.useChat((state) => (id === messagesLength - 1 ? state.buffer : ''))
+    const mes = Chats.useChat(
+        (state) =>
+            state?.data?.messages?.[id].swipes[state?.data?.messages?.[id].swipe_id ?? -1].swipe ??
+            ''
+    )
+
+    const [editMode, setEditMode] = useState(false)
+    const [placeholderText, setPlaceholderText] = useState('')
 
     const handleEditMessage = () => {
         updateChat(id, placeholderText)
@@ -64,17 +83,6 @@ const ChatItem: React.FC<ChatItemProps> = ({ id, nowGenerating, charId, userName
     const showEditor = editMode && !nowGenerating
     const showEllipsis =
         !message.is_user && buffer === '' && id === messagesLength - 1 && nowGenerating
-
-    type EditorProps = {
-        name: 'delete' | 'check' | 'close'
-        onPress: () => void
-    }
-
-    const EditorButton = ({ name, onPress }: EditorProps) => (
-        <TouchableOpacity style={styles.editButton} onPress={onPress}>
-            <MaterialIcons name={name} size={28} color={Style.getColor('primary-text1')} />
-        </TouchableOpacity>
-    )
 
     return (
         <AnimatedView dy={100} fade={0} fduration={200} tduration={400}>
@@ -146,7 +154,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ id, nowGenerating, charId, userName
                         </TouchableOpacity>
                     )}
                     {!showEditor && showSwipe && (
-                        <Swipes message={message} id={id} nowGenerating={nowGenerating} />
+                        <Swipes message={message} index={id} nowGenerating={nowGenerating} />
                     )}
                 </ChatFrame>
             </View>

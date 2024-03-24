@@ -95,8 +95,8 @@ export interface ChatState {
     updateEntry: (index: number, message: string) => Promise<void>
     deleteEntry: (index: number) => Promise<void>
     reset: () => void
-    swipe: (id: number, direction: number) => Promise<boolean>
-    addSwipe: () => Promise<void>
+    swipe: (index: number, direction: number) => Promise<boolean>
+    addSwipe: (index: number) => Promise<void>
     setBuffer: (data: string) => void
     insertBuffer: (data: string) => void
     updateFromBuffer: () => Promise<void>
@@ -195,7 +195,6 @@ export namespace Chats {
             if (!messages) return
             const chatSwipeId = messages[index].swipes[messages[index].swipe_id].id
             if (!chatSwipeId) return
-
             await updateChatSwipe(chatSwipeId, message)
 
             messages[index].swipes[messages[index].swipe_id].swipe = message
@@ -228,18 +227,19 @@ export namespace Chats {
             return false
         },
 
-        addSwipe: async () => {
+        addSwipe: async (index: number) => {
             let messages = get().data?.messages
             if (!messages) return
-            const index = messages?.length - 1
-            if (!index) return
             const entryId = messages[index].id
 
             const swipe = await createSwipe(entryId, '')
             if (swipe) messages[index].swipes.push(swipe)
             await updateEntrySwipeId(entryId, messages[index].swipes.length - 1)
-
-            set((state: ChatState) => ({ ...state }))
+            messages[index].swipe_id = messages[index].swipes.length - 1
+            set((state: ChatState) => ({
+                ...state,
+                data: state?.data ? { ...state.data, messages: messages } : state.data,
+            }))
         },
 
         setBuffer: (newBuffer: string) =>
@@ -274,6 +274,8 @@ export namespace Chats {
     }
 
     export const debugChatCount = async () => {
+        console.log(await FS.readDirectoryAsync(FS.documentDirectory + `characters`))
+
         const chats = await db.query.chats.findMany()
         console.log(chats.length)
         const entries = await db.query.chatEntries.findMany()
@@ -371,13 +373,9 @@ export namespace Chats {
         if (chat) return { ...chat }
     }
 
-    export const insertSwipeDB = async (entryId: number) => {
-        await db.insert(chatSwipes).values({
-            entry_id: entryId,
-        })
+    export const updateEntrySwipeId = async (entryId: number, swipeId: number) => {
+        await db.update(chatEntries).set({ swipe_id: swipeId }).where(eq(chatEntries.id, entryId))
     }
-
-    export const updateEntrySwipeId = async (entryId: number, swipeId: number) => {}
 
     export const updateChatSwipe = async (chatSwipeId: number, message: string) => {
         await db

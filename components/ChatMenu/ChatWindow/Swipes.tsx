@@ -9,32 +9,30 @@ import { continueResponse, generateResponse, regenerateResponse } from '@constan
 type SwipesProps = {
     message: ChatEntry
     nowGenerating: boolean
-    id: number
+    index: number
 }
 
-const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, id }) => {
-    const { swipeChat, addSwipe, saveChat } = Chats.useChat(
+const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, index }) => {
+    const { swipeChat, addSwipe } = Chats.useChat(
         useShallow((state) => ({
             swipeChat: state.swipe,
             addSwipe: state.addSwipe,
-            saveChat: state.save,
         }))
     )
 
     const handleSwipeLeft = () => {
-        swipeChat(id, -1)
-        saveChat()
+        swipeChat(index, -1)
     }
 
     const handleSwipeRight = async () => {
-        const atLimit = await swipeChat(id, 1)
-        if (atLimit && id !== 0) {
-            await addSwipe()
+        const atLimit = await swipeChat(index, 1)
+        if (atLimit && index !== 0) {
+            await addSwipe(index)
             generateResponse()
         }
     }
 
-    const isLastAltGreeting = id === 0 && message.swipe_id === message.swipes.length - 1
+    const isLastAltGreeting = index === 0 && message.swipe_id === message.swipes.length - 1
 
     return (
         <View style={styles.swipesItem}>
@@ -53,7 +51,7 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, id }) => {
                 />
             </TouchableHighlight>
 
-            {id !== 0 && (
+            {index !== 0 && (
                 <TouchableHighlight
                     onPress={regenerateResponse}
                     disabled={nowGenerating}
@@ -74,7 +72,7 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, id }) => {
                 {message.swipe_id + 1} / {message.swipes.length}
             </Text>
 
-            {id !== 0 && (
+            {index !== 0 && (
                 <TouchableHighlight
                     onPress={continueResponse}
                     disabled={nowGenerating}
