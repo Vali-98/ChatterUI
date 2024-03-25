@@ -50,7 +50,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
     )
     const mes = Chats.useChat(
         (state) =>
-            state?.data?.messages?.[id].swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
+            state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
                 .swipe ?? ''
     )
 
