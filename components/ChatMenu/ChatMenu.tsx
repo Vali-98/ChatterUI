@@ -115,8 +115,8 @@ const ChatMenu = () => {
         )
 
     const handleSend = async () => {
-        if (newMessage.trim() !== '') insertEntry(userName ?? '', true, newMessage)
-        insertEntry(charName ?? '', false, '')
+        if (newMessage.trim() !== '') await insertEntry(userName ?? '', true, newMessage)
+        await insertEntry(charName ?? '', false, '')
         setNewMessage((message) => '')
         generateResponse()
     }
