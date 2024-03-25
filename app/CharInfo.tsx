@@ -126,7 +126,7 @@ const CharInfo = () => {
                     }}
                 />
                 {characterCard && (
-                    <ScrollView>
+                    <ScrollView keyboardShouldPersistTaps={'handled'}>
                         <View style={styles.characterHeader}>
                             <Image
                                 source={imageSource}
@@ -162,7 +162,9 @@ const CharInfo = () => {
                                 LlamaTokenizer.encode(characterCard.data.description).length}
                         </Text>
 
-                        <ScrollView style={styles.inputContainer}>
+                        <ScrollView
+                            keyboardShouldPersistTaps={'handled'}
+                            style={styles.inputContainer}>
                             <TextInput
                                 style={styles.input}
                                 multiline
@@ -178,7 +180,9 @@ const CharInfo = () => {
                         </ScrollView>
 
                         <Text style={styles.boxText}>First Message</Text>
-                        <ScrollView style={styles.inputContainer}>
+                        <ScrollView
+                            keyboardShouldPersistTaps={'handled'}
+                            style={styles.inputContainer}>
                             <TextInput
                                 style={styles.input}
                                 multiline
