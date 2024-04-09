@@ -1,11 +1,10 @@
 import AnimatedView from '@components/AnimatedView'
 import { RecentMessages } from '@constants/RecentMessages'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Chats, Characters, saveStringExternal, Logger, Style } from '@globals'
+import { Chats, Characters, saveStringExternal, Logger, Style } from '@globals'
 import { useRouter, Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, View, Text, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native'
-import { useMMKVString } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
 type ListItem = {
@@ -58,19 +57,17 @@ const ChatSelector = () => {
             },
             {
                 text: 'Confirm',
-                onPress: () => {
-                    deleteChat(chatId).then(async () => {
-                        RecentMessages.deleteEntry(chatId)
-                        if (charId && !currentChatId) {
-                            const returnedChatId = await Chats.getNewest(charId)
-                            const chatId = returnedChatId
-                                ? returnedChatId
-                                : await Chats.createChat(charId)
-                            chatId && (await loadChat(chatId))
-                        }
-
-                        refreshfilenames()
-                    })
+                onPress: async () => {
+                    await deleteChat(chatId)
+                    RecentMessages.deleteEntry(chatId)
+                    if (charId && currentChatId === chatId) {
+                        const returnedChatId = await Chats.getNewest(charId)
+                        const chatId = returnedChatId
+                            ? returnedChatId
+                            : await Chats.createChat(charId)
+                        chatId && (await loadChat(chatId))
+                    }
+                    refreshfilenames()
                 },
                 style: 'destructive',
             },
