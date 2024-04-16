@@ -61,26 +61,28 @@ export namespace Instructs {
 
     // db
 
-    export const createDefaultInstruct = async () => {
-        await createInstruct(defaultInstruct())
-    }
+    export namespace Database {
+        export const createDefault = async () => {
+            await create(defaultInstruct())
+        }
 
-    export const createInstruct = async (instruct: InstructType) => {
-        await db.insert(instructs).values(instruct)
-    }
+        export const create = async (instruct: InstructType) => {
+            await db.insert(instructs).values(instruct)
+        }
 
-    export const readInstruct = async (id: number) => {
-        const instruct = await db.query.instructs.findFirst({
-            where: eq(instructs.id, id),
-        })
-    }
+        export const read = async (id: number) => {
+            const instruct = await db.query.instructs.findFirst({
+                where: eq(instructs.id, id),
+            })
+        }
 
-    export const updateInstruct = async (id: number, instruct: InstructType) => {
-        await db.update(instructs).set(instruct).where(eq(instructs.id, id))
-    }
+        export const update = async (id: number, instruct: InstructType) => {
+            await db.update(instructs).set(instruct).where(eq(instructs.id, id))
+        }
 
-    export const deleteInstruct = async (id: number) => {
-        await db.delete(instructs).where(eq(instructs.id, id))
+        export const deleteInstruct = async (id: number) => {
+            await db.delete(instructs).where(eq(instructs.id, id))
+        }
     }
 
     export const defaultInstruct = (): InstructType => {
@@ -121,5 +123,30 @@ export type InstructType = {
     names: boolean
     names_force_groups: boolean
     activation_regex: string
+    name: string
+}
+
+export type InstructTypeNew = {
+    system_prompt: string
+    input_sequence: string
+    output_sequence: string
+    first_output_sequence: string
+    last_output_sequence: string
+    system_sequence_prefix: string
+    system_sequence_suffix: string
+    stop_sequence: string
+    wrap: boolean
+    macro: boolean
+    names: boolean
+    names_force_groups: boolean
+    activation_regex: string
+    output_suffix: string
+    input_suffix: string
+    system_sequence: string
+    system_suffix: string
+    user_alignment_message: string
+    last_system_sequence: string
+    skip_examples: boolean
+    system_same_as_user: boolean
     name: string
 }
