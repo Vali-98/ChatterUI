@@ -16,6 +16,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@babel/traverse": "^7.24.1",
     "@craftzdog/react-native-buffer": "^6.0.5",
     "@expo/config-plugins": "~7.8.0",
     "@expo/prebuild-config": "~6.7.0",
@@ -31,7 +32,7 @@
     "base-64": "^1.0.0",
     "dicer": "^0.3.1",
     "drizzle-orm": "^0.30.1",
-    "expo": "~50.0.14",
+    "expo": "~50.0.15",
     "expo-application": "~5.8.3",
     "expo-build-properties": "^0.11.1",
     "expo-clipboard": "~5.0.1",
@@ -73,7 +74,7 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0",
+    "@babel/core": "^7.24.4",
     "@types/base-64": "^1.0.2",
     "@types/png-chunk-text": "^1.0.3",
     "@types/png-chunks-extract": "^1.0.2",
