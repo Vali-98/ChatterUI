@@ -198,5 +198,9 @@ export namespace Style {
             backgroundColor: Style.getColor('primary-brand'),
             padding: 6,
         },
+
+        row: {
+            flexDirection: 'row',
+        },
     })
 }

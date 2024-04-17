@@ -22,9 +22,9 @@ export const enum Global {
 
     // Instruct
 
-    InstructName = 'instructname', // name of current instruct preset
-    CurrentInstruct = 'currentinstruct', // note: use Object ? - stores instruct
-
+    //InstructName = 'instructname', // name of current instruct preset
+    //CurrentInstruct = 'currentinstruct', // note: use Object ? - stores instruct
+    InstructID = 'instructid',
     // Presets
 
     PresetData = 'presetdata',
