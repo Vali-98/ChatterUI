@@ -93,23 +93,6 @@ export const startupApp = () => {
         Presets.fixPreset(JSON.parse(mmkv.getString(Global.PresetData) ?? '{}'))
     )
 
-    const instructid = mmkv.getNumber(Global.InstructID)
-    if (instructid === undefined) {
-        Logger.log('Instruct ID is undefined, creating default Instruct')
-        createDefaultInstructData()
-    } else {
-        Instructs.Database.readList().then((list) => {
-            if (!list) {
-                Logger.log('Database is Invalid, this should not happen!')
-            } else if (list?.length === 0) {
-                Logger.log('No Instructs exist, creating default Instruct')
-                createDefaultInstructData()
-            } else if (!list?.some((item) => item.id === instructid)) {
-                Logger.log('Instruct ID does not exist in database, defaulting to oldest Instruct')
-                Instructs.useInstruct.getState().load(list[0].id)
-            } else Instructs.useInstruct.getState().load(instructid)
-        })
-    }
     if (mmkv.getString(Global.HordeKey) === undefined) mmkv.set(Global.HordeKey, '0000000000')
     if (mmkv.getString(Global.Logs) === undefined) mmkv.set(Global.Logs, JSON.stringify([]))
     if (mmkv.getString(Global.LorebookNames) === undefined)
@@ -155,6 +138,24 @@ export const initializeApp = async () => {
         })
         .catch((error) => Logger.log(`Could not generate default Instruct. Reason: ${error}`))*/
     // TODO: New init script
+
+    const instructid = mmkv.getNumber(Global.InstructID)
+    if (instructid === undefined) {
+        Logger.log('Instruct ID is undefined, creating default Instruct')
+        createDefaultInstructData()
+    } else {
+        Instructs.Database.readList().then((list) => {
+            if (!list) {
+                Logger.log('Database is Invalid, this should not happen!')
+            } else if (list?.length === 0) {
+                Logger.log('No Instructs exist, creating default Instruct')
+                createDefaultInstructData()
+            } else if (!list?.some((item) => item.id === instructid)) {
+                Logger.log('Instruct ID does not exist in database, defaulting to oldest Instruct')
+                Instructs.useInstruct.getState().load(list[0].id)
+            } else Instructs.useInstruct.getState().load(instructid)
+        })
+    }
 
     await migratePresets()
 }

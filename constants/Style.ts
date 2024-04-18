@@ -149,16 +149,12 @@ export namespace Style {
         default: {
             placeholderStyle: { color: Style.getColor('primary-text2') },
             containerStyle: {
-                backgroundColor: Style.getColor('primary-surface1'),
-                borderRadius: 8,
                 borderWidth: 0,
                 shadowColor: Style.getColor('primary-shadow'),
                 elevation: 4,
             },
             itemContainerStyle: {
                 backgroundColor: Style.getColor('primary-surface2'),
-                borderBottomLeftRadius: 8,
-                borderBottomRightRadius: 8,
             },
             itemTextStyle: {
                 color: Style.getColor('primary-text1'),
