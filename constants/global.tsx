@@ -100,11 +100,11 @@ export const startupApp = () => {
     } else {
         Instructs.Database.readList().then((list) => {
             if (!list) {
+                Logger.log('Database is Invalid, this should not happen!')
+            } else if (list?.length === 0) {
                 Logger.log('No Instructs exist, creating default Instruct')
                 createDefaultInstructData()
-                return
-            }
-            if (!list.some((item) => item.id === instructid)) {
+            } else if (!list?.some((item) => item.id === instructid)) {
                 Logger.log('Instruct ID does not exist in database, defaulting to oldest Instruct')
                 Instructs.useInstruct.getState().load(list[0].id)
             } else Instructs.useInstruct.getState().load(instructid)

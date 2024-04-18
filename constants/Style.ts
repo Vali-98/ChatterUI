@@ -150,15 +150,20 @@ export namespace Style {
             placeholderStyle: { color: Style.getColor('primary-text2') },
             containerStyle: {
                 backgroundColor: Style.getColor('primary-surface1'),
-                borderBottomLeftRadius: 8,
-                borderBottomRightRadius: 8,
+                borderRadius: 8,
+                borderWidth: 0,
+                shadowColor: Style.getColor('primary-shadow'),
+                elevation: 4,
             },
             itemContainerStyle: {
                 backgroundColor: Style.getColor('primary-surface2'),
                 borderBottomLeftRadius: 8,
                 borderBottomRightRadius: 8,
             },
-            itemTextStyle: { color: Style.getColor('primary-text1') },
+            itemTextStyle: {
+                color: Style.getColor('primary-text1'),
+                borderColor: Style.getColor('primary-surface1'),
+            },
             activeColor: Style.getColor('primary-surface4'),
             selectedTextStyle: {
                 color: Style.getColor('primary-text1'),
@@ -171,6 +176,7 @@ export namespace Style {
                 borderRadius: 8,
                 flex: 1,
             },
+            showsVerticalScrollIndicator: false,
         },
     }
 

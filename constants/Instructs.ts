@@ -1,5 +1,3 @@
-import * as DocumentPicker from 'expo-document-picker'
-import * as FS from 'expo-file-system'
 import { db } from '@db'
 import { eq } from 'drizzle-orm'
 import { instructs } from 'db/schema'

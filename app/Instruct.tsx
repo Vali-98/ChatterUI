@@ -7,9 +7,9 @@ import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
 import { View, SafeAreaView, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
-import { useMMKVNumber, useMMKVObject, useMMKVString } from 'react-native-mmkv'
+import { useMMKVNumber } from 'react-native-mmkv'
 import { useAutosave } from 'react-autosave'
-import { InstructListItem, InstructType } from '@constants/Instructs'
+import { InstructListItem } from '@constants/Instructs'
 import AnimatedView from '@components/AnimatedView'
 
 const Instruct = () => {
@@ -51,7 +51,7 @@ const Instruct = () => {
     }
 
     useAutosave({ data: currentInstruct, onSave: () => handleSaveInstruct(false), interval: 3000 })
-    //TODO: Fix fields!!!
+
     if (currentInstruct)
         return (
             <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
@@ -93,7 +93,6 @@ const Instruct = () => {
                             valueField="id"
                             onChange={(item) => {
                                 if (item.id === instructID) return
-
                                 setInstructID(item.id)
                                 loadInstruct(item.id)
                             }}
