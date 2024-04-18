@@ -70,8 +70,8 @@ export const saveStringExternal = async (
 
 // runs every startup to clear some MMKV values
 
-const createDefaultInstructData = () => {
-    Instructs.Database.createDefault().then(() => {
+const createDefaultInstructData = async () => {
+    await Instructs.Database.createDefault().then(() => {
         const defaultid = 1
         mmkv.set(Global.InstructID, JSON.stringify(defaultid))
         Instructs.useInstruct.getState().load(defaultid)
@@ -142,14 +142,14 @@ export const initializeApp = async () => {
     const instructid = mmkv.getNumber(Global.InstructID)
     if (instructid === undefined) {
         Logger.log('Instruct ID is undefined, creating default Instruct')
-        createDefaultInstructData()
+        await createDefaultInstructData()
     } else {
-        Instructs.Database.readList().then((list) => {
+        Instructs.Database.readList().then(async (list) => {
             if (!list) {
                 Logger.log('Database is Invalid, this should not happen!')
             } else if (list?.length === 0) {
                 Logger.log('No Instructs exist, creating default Instruct')
-                createDefaultInstructData()
+                await createDefaultInstructData()
             } else if (!list?.some((item) => item.id === instructid)) {
                 Logger.log('Instruct ID does not exist in database, defaulting to oldest Instruct')
                 Instructs.useInstruct.getState().load(list[0].id)
