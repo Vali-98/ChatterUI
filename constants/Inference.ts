@@ -12,7 +12,6 @@ import axios from 'axios'
 import EventSource from 'react-native-sse'
 import * as Application from 'expo-application'
 import { Characters } from './Characters'
-import Instruct from 'app/Instruct'
 
 export const regenerateResponse = async () => {
     const charName = Characters.useCharacterCard.getState().card?.data.name
@@ -134,11 +133,11 @@ const buildContext = (max_length: number) => {
     let message_acc_length = LlamaTokenizer.encode(message_acc).length
     for (const message of messages?.reverse() ?? []) {
         let message_shard = `${message.is_user ? currentInstruct.input_prefix : currentInstruct.output_prefix}`
-
         if (currentInstruct.names) message_shard += message.name + ': '
         message_shard += message.swipes[message.swipe_id].swipe
         //if (currentInstruct.separator_sequence) message_shard += currentInstruct.separator_sequence
-        message_shard += `${message.is_user ? currentInstruct.input_suffix : currentInstruct.output_suffix}`
+        if (message.swipes[message.swipe_id].swipe)
+            message_shard += `${message.is_user ? currentInstruct.input_suffix : currentInstruct.output_suffix}`
         message_shard += currentInstruct.wrap ? `\n` : ' '
 
         const shard_length = LlamaTokenizer.encode(message_shard).length
@@ -150,14 +149,7 @@ const buildContext = (max_length: number) => {
     }
 
     payload += message_acc
-    /*
-    if (messages?.at(-1)?.name === charName) {
-        payload += currentInstruct.output_sequence
-        if (currentInstruct.names) payload += charName + ': '
-    } else {
-        payload += currentInstruct.input_sequence
-        if (currentInstruct.names) payload += userCard.name + ': '
-    }*/
+
     payload = replaceMacros(payload)
     Logger.log(`Payload size: ${LlamaTokenizer.encode(payload).length}`)
     Logger.log(`${new Date().getTime() - delta}ms taken to build context`)
@@ -670,7 +662,8 @@ const CompletionsResponseStream = async (setAbortFunction: AbortFunction) => {
         `${endpoint}/v1/completions`,
         JSON.stringify(constructCompletionsPayload()),
         (item) => {
-            return JSON.parse(item).choices[0].text
+            const output = JSON.parse(item)
+            return output?.choices?.[0]?.text ?? output.content
         },
         setAbortFunction,
         () => {},
