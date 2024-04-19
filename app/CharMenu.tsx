@@ -49,7 +49,7 @@ const CharMenu = () => {
         })
     const getCharacterList = async () => {
         try {
-            const list = await Characters.getCardList()
+            const list = await Characters.getCardList('character')
             setCharacterList(list)
         } catch (error) {
             Logger.log(`Could not retrieve characters.\n${error}`, true)

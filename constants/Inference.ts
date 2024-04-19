@@ -103,12 +103,16 @@ export const hordeHeader = () => {
 /**
  *  Context Structure:
  *  System
+ *      - System Prefix
  *      - System Prompt
  *      - User Card
  *      - Character Card
+ *      - Example Messages (if max_length allows after Context)
+ *      - System Suffix
  *  Context
- *      - Input Sequence + User Resposne
- *      - Output Sequence + Bot Response
+ *      - Input Prefix + User Response + Input Suffix
+ *      - Output Prefix + Bot Response + Output Suffix
+ *      - Repeat
  */
 
 const buildContext = (max_length: number) => {
@@ -125,11 +129,13 @@ const buildContext = (max_length: number) => {
     if (currentInstruct.system_prompt) payload += `${currentInstruct.system_prompt}\n`
     if (usercarddata) payload += usercarddata + '\n'
     if (charcarddata) payload += charcarddata + '\n'
-
-    if (currentInstruct.system_suffix) payload += ' ' + currentInstruct.system_suffix
+    // suffix must be delayed for example messages
+    const payload_length =
+        LlamaTokenizer.encode(payload).length + currentInstruct.system_suffix
+            ? LlamaTokenizer.encode(currentInstruct.system_suffix).length
+            : 0
 
     let message_acc = ``
-    const payload_length = LlamaTokenizer.encode(payload).length
     let message_acc_length = LlamaTokenizer.encode(message_acc).length
     for (const message of messages?.reverse() ?? []) {
         let message_shard = `${message.is_user ? currentInstruct.input_prefix : currentInstruct.output_prefix}`
@@ -147,6 +153,16 @@ const buildContext = (max_length: number) => {
         message_acc_length += shard_length
         message_acc = message_shard + message_acc
     }
+
+    const examples = Characters.useCharacterCard.getState()?.card?.data.mes_example
+    if (examples) {
+        const examples_length = LlamaTokenizer.encode(examples).length
+        if (message_acc_length + payload_length + examples_length < max_length) {
+            payload += examples
+        }
+    }
+
+    if (currentInstruct.system_suffix) payload += ' ' + currentInstruct.system_suffix
 
     payload += message_acc
 

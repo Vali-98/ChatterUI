@@ -1,32 +1,42 @@
 export const enum Global {
-    // Processing
-
-    NowGenerating = 'nowgenerating', // generation signal
-    EditedWindow = 'editedwindow', // exit editing window confirmation
-    //Messages = 'messages', === removed on zustand migration
-    Logs = 'logs',
-    RecentMessages = 'recentmessages',
-    // Character
+    // Removed
 
     //CurrentCharacter = 'currentchar', // current char filename, locates dir   == removed on db migration
     //CurrentCharacterCard = 'charcard', // note: use Object ? - stores charactercard   == removed on db migration
 
-    // User
+    //InstructName = 'instructname', // name of current instruct preset == removed on db migration
+    //CurrentInstruct = 'currentinstruct', // note: use Object ? - stores instruct == removed on db migration
 
+    // CurrentChat = 'currentchat', // current chat filename, locates dir    == removed on db migration
+    //Messages = 'messages', === removed on zustand migration
+
+    // EditedWindow = 'editedwindow', // exit editing window confirmation == never used
+
+    // Processing
+
+    NowGenerating = 'nowgenerating', // generation signal
+
+    // Management
+
+    Logs = 'logs',
+    RecentMessages = 'recentmessages',
+
+    // Character
+
+    // User
+    UserID = 'userid',
     CurrentUser = 'currentuser', // current username, locates dir
     CurrentUserCard = 'usercard', // note: use Object ? - stores usercard
 
     // Chat
 
-    // CurrentChat = 'currentchat', // current chat filename, locates dir    == removed on db migration
-
     // Instruct
 
-    //InstructName = 'instructname', // name of current instruct preset
-    //CurrentInstruct = 'currentinstruct', // note: use Object ? - stores instruct
     InstructID = 'instructid',
+
     // Presets
 
+    PresetID = 'presetID',
     PresetData = 'presetdata',
     PresetName = 'presetdame',
 
