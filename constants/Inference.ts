@@ -807,7 +807,10 @@ const readableStreamResponse = async (
     })
 
     es.addEventListener('error', (event) => {
-        if ('message' in event) Logger.log(`An error occured : ${event?.message ?? ''}`)
+        if ('message' in event) {
+            Logger.log('Generation Failed. Check Logs', true)
+            Logger.log(`An error occured : ${event?.message ?? ''}`)
+        }
         closeStream()
     })
     es.addEventListener('close', (event) => {
