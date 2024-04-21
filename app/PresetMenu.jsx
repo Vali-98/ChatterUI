@@ -30,7 +30,7 @@ const PresetMenu = () => {
     const presetData = {
         max_length: {
             type: SLIDER,
-            data: { name: 'Context Size', step: 16, min: 1024, max: 8192 },
+            data: { name: 'Context Size', step: 16, min: 1024, max: 32768 },
         },
         genamt: {
             type: SLIDER,
