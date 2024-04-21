@@ -4,12 +4,68 @@ import * as FS from 'expo-file-system'
 import { API } from './API'
 import { Logger } from './Logger'
 
+export type SamplerPreset = {
+    temp: number
+    top_p: number
+    top_k: number
+    top_a: number
+    // merged from KAI
+
+    min_p: number
+    single_line: boolean
+    sampler_order: Array<number>
+    seed: number
+
+    //
+    tfs: number
+    epsilon_cutoff: number
+    eta_cutoff: number
+    typical: number
+    rep_pen: number
+    rep_pen_range: number
+    rep_pen_slope: number
+    no_repeat_ngram_size: number
+    penalty_alpha: number
+    num_beams: number
+    length_penalty: number
+    min_length: number
+    encoder_rep_pen: number
+    freq_pen: number
+    presence_pen: number
+    do_sample: boolean
+    early_stopping: boolean
+    add_bos_token: boolean
+    truncation_length: number
+    ban_eos_token: boolean
+    skip_special_tokens: boolean
+    streaming: boolean
+    mirostat_mode: number
+    mirostat_tau: number
+    mirostat_eta: number
+    guidance_scale: number
+    negative_prompt: string
+    grammar_string: string
+    banned_tokens: string
+    rep_pen_size: number
+    genamt: number
+    max_length: number
+
+    dynatemp_range: number
+    smoothing_factor: number
+}
+
+export type SamplerField = keyof SamplerPreset
+
 export namespace Presets {
     const presetdir = `${FS.documentDirectory}presets/`
 
     const getPresetDir = (name: string) => `${presetdir}${name}.json`
 
-    export const APIFields: object = {
+    type FieldList = {
+        [key in API]: Array<SamplerField>
+    }
+
+    export const APIFields: FieldList = {
         [API.KAI]: [
             'max_length',
             'genamt',
@@ -28,7 +84,7 @@ export namespace Presets {
             'mirostat_mode',
             'mirostat_tau',
             'mirostat_eta',
-            'grammar',
+            'grammar_string',
             'dynatemp_range',
             'smoothing_factor',
         ],
@@ -50,7 +106,7 @@ export namespace Presets {
             'mirostat_mode',
             'mirostat_tau',
             'mirostat_eta',
-            'grammar',
+            'grammar_string',
             'epsilon_cutoff',
             'eta_cutoff',
             'min_length',
@@ -110,13 +166,12 @@ export namespace Presets {
             'presence_pen',
             'seed',
             'typical',
-            'ban_eos_tokens',
-
+            'ban_eos_token',
             'smoothing_factor',
             'mirostat_mode',
             'mirostat_tau',
             'mirostat_eta',
-            'grammar',
+            'grammar_string',
         ],
         [API.LOCAL]: [
             'genamt',
@@ -133,7 +188,7 @@ export namespace Presets {
             'mirostat_mode',
             'mirostat_tau',
             'mirostat_eta',
-            'grammar',
+            'grammar_string',
             'min_p',
             'seed',
         ],
@@ -148,13 +203,15 @@ export namespace Presets {
             'top_k',
         ],
         [API.OPENAI]: ['max_length', 'freq_pen', 'genamt', 'presence_pen', 'seed', 'temp', 'top_p'],
+        [API.NOVELAI]: [],
+        [API.APHRODITE]: [],
     }
 
     export const defaultPreset = () => {
         return {
             temp: 1,
             top_p: 1,
-            top_k: 0,
+            top_k: 40,
             top_a: 0,
             // merged from KAI
 

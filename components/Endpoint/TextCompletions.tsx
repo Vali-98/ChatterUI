@@ -5,7 +5,6 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-nativ
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { OpenAIModel } from './OpenAI'
 import { Dropdown } from 'react-native-element-dropdown'
-import axios from 'axios'
 
 const TextCompletions = () => {
     const [endpoint, setEndpoint] = useMMKVString(Global.CompletionsEndpoint)
@@ -21,26 +20,19 @@ const TextCompletions = () => {
         getModelList()
     }, [])
 
-    const getModelList = () => {
+    const getModelList = async () => {
         if (!endpoint) return
-        axios
-            .create({ timeout: 5000 })
-            .get(endpoint + '/v1/models', {
-                headers: { accept: 'application/json', Authorization: `Bearer ${completionsKey}` },
-            })
 
-            .then(async (response) => {
-                if (response.status !== 200) {
-                    Logger.log(`Error with response: ${response.status}`, true)
-                    return
-                }
-                const { data } = response.data
-                setModelList(data)
-            })
-            .catch((error: any) => {
-                Logger.log(`Could not get models: ${error}`, true)
-                setModelList([])
-            })
+        const response = await fetch(endpoint + '/v1/models', {
+            headers: { accept: 'application/json', Authorization: `Bearer ${completionsKey}` },
+        })
+
+        if (response.status !== 200) {
+            Logger.log(`Error with response: ${response.status}`, true)
+            return
+        }
+        const { data } = await response.json()
+        setModelList(data)
     }
 
     return (
