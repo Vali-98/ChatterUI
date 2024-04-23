@@ -10,34 +10,68 @@ import { db } from '@db'
 import { characterGreetings, characterTags, characters, tags } from 'db/schema'
 import { eq, inArray, notExists, notInArray, sql } from 'drizzle-orm'
 import { create } from 'zustand'
+import { LlamaTokenizer } from './tokenizer'
+import { mmkv } from './mmkv'
+import { Global } from './GlobalValues'
+
+type CharacterTokenCache = {
+    otherName: string
+    description_length: number
+    examples_length: number
+}
 
 type CharacterCardState = {
     card: CharacterCardV2 | undefined
+    tokenCache: CharacterTokenCache | undefined
     id: number | undefined
     setCard: (id: number) => Promise<string | undefined>
     unloadCard: () => void
     getImage: () => string
+    getCache: (otherName: string) => CharacterTokenCache
 }
 
 export namespace Characters {
     export const useUserCard = create<CharacterCardState>((set, get: () => CharacterCardState) => ({
         id: undefined,
         card: undefined,
+        tokenCache: undefined,
         setCard: async (id: number) => {
             let start = performance.now()
             const card = await readCard(id)
             Logger.debug(`[User] time for db query: ${performance.now() - start}`)
             start = performance.now()
-            set((state) => ({ ...state, card: card, id: id }))
+            set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
 
             Logger.debug(`[User] time for zustand set: ${performance.now() - start}`)
             return card?.data.name
         },
         unloadCard: () => {
-            set((state) => ({ ...state, id: undefined, card: undefined }))
+            set((state) => ({ ...state, id: undefined, card: undefined, tokenCache: undefined }))
         },
         getImage: () => {
             return getImageDir(get().card?.data.image_id ?? 0)
+        },
+        getCache: (userName: string) => {
+            const cache = get().tokenCache
+            if (cache) return cache
+
+            const card = get().card
+            if (!card)
+                return {
+                    otherName: userName,
+                    description_length: 0,
+                    examples_length: 0,
+                }
+            const description = replaceMacros(card.data.description)
+            const examples = replaceMacros(card.data.mes_example)
+            const newCache = {
+                otherName: userName,
+                description_length: LlamaTokenizer.encode(description).length,
+                examples_length: LlamaTokenizer.encode(examples).length,
+            }
+
+            set((state) => ({ ...state, tokenCache: newCache }))
+            return newCache
         },
     }))
 
@@ -45,6 +79,7 @@ export namespace Characters {
         (set, get: () => CharacterCardState) => ({
             id: undefined,
             card: undefined,
+            tokenCache: undefined,
             setCard: async (id: number) => {
                 let start = performance.now()
                 const card = await readCard(id)
@@ -60,6 +95,28 @@ export namespace Characters {
             },
             getImage: () => {
                 return getImageDir(get().card?.data.image_id ?? 0)
+            },
+            getCache: (charName: string) => {
+                const cache = get().tokenCache
+                if (cache && cache.otherName && cache.otherName === charName) return cache
+
+                const card = get().card
+                if (!card)
+                    return {
+                        otherName: charName,
+                        description_length: 0,
+                        examples_length: 0,
+                    }
+                const description = replaceMacros(card.data.description)
+                const examples = replaceMacros(card.data.mes_example)
+                const newCache = {
+                    otherName: charName,
+                    description_length: LlamaTokenizer.encode(description).length,
+                    examples_length: LlamaTokenizer.encode(examples).length,
+                }
+
+                set((state) => ({ ...state, tokenCache: newCache }))
+                return newCache
             },
         })
     )
@@ -444,4 +501,21 @@ const TavernCardV2 = (name: string) => {
             extensions: {},
         },
     }
+}
+type Rule = {
+    macro: string
+    value: string
+}
+
+export const replaceMacros = (text: string) => {
+    if (text == undefined) return ''
+    let newtext: string = text
+    const charName = Characters.useCharacterCard.getState().card?.data.name
+    const userName = mmkv.getString(Global.CurrentUser)
+    const rules: Rule[] = [
+        { macro: '{{user}}', value: userName ?? '' },
+        { macro: '{{char}}', value: charName ?? '' },
+    ]
+    for (const rule of rules) newtext = newtext.replaceAll(rule.macro, rule.value)
+    return newtext
 }

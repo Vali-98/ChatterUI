@@ -4,12 +4,18 @@ import { instructs } from 'db/schema'
 import { create } from 'zustand'
 import { mmkv } from './mmkv'
 import { Global } from './GlobalValues'
+import { LlamaTokenizer } from './tokenizer'
+import { replaceMacros } from './Utils'
+import { Logger } from './Logger'
 
 type InstructState = {
     data: InstructType | undefined
     load: (id: number) => Promise<void>
     loadCurrent: () => Promise<void>
     setData: (instruct: InstructType) => void
+    tokenCache: InstructTokenCache | undefined
+    getCache: (charName: string, userName: string) => InstructTokenCache
+    replacedMacros: () => InstructType
 }
 
 export type InstructListItem = {
@@ -17,12 +23,26 @@ export type InstructListItem = {
     name: string
 }
 
+type InstructTokenCache = {
+    charName: string
+    userName: string
+    system_prompt_length: number
+    system_prefix_length: number
+    system_suffix_length: number
+    input_prefix_length: number
+    input_suffix_length: number
+    output_prefix_length: number
+    output_suffix_length: number
+    user_alignment_message_length: number
+}
+
 export namespace Instructs {
     export const useInstruct = create<InstructState>((set, get: () => InstructState) => ({
         data: undefined,
+        tokenCache: undefined,
         load: async (id: number) => {
             const data = await Database.read(id)
-            set((state) => ({ ...state, data: data }))
+            set((state) => ({ ...state, data: data, tokenCache: undefined }))
             mmkv.set(Global.InstructID, id)
         },
         loadCurrent: async () => {
@@ -30,7 +50,52 @@ export namespace Instructs {
             if (id) get().load(id)
         },
         setData: (instruct: InstructType) => {
-            set((state) => ({ ...state, data: instruct }))
+            set((state) => ({ ...state, data: instruct, tokenCache: undefined }))
+        },
+        getCache: (charName: string, userName: string) => {
+            const cache = get().tokenCache
+            if (cache && cache.charName === charName && cache.userName === userName) return cache
+            const instruct = get().replacedMacros()
+            if (!instruct)
+                return {
+                    charName: charName,
+                    userName: userName,
+                    system_prompt_length: 0,
+                    system_prefix_length: 0,
+                    system_suffix_length: 0,
+                    input_prefix_length: 0,
+                    input_suffix_length: 0,
+                    output_prefix_length: 0,
+                    output_suffix_length: 0,
+                    user_alignment_message_length: 0,
+                }
+            const newCache: InstructTokenCache = {
+                charName: charName,
+                userName: userName,
+                system_prompt_length: LlamaTokenizer.encode(instruct.system_prompt).length,
+                system_prefix_length: LlamaTokenizer.encode(instruct.system_prefix).length,
+                system_suffix_length: LlamaTokenizer.encode(instruct.system_suffix).length,
+                input_prefix_length: LlamaTokenizer.encode(instruct.input_prefix).length,
+                input_suffix_length: LlamaTokenizer.encode(instruct.input_suffix).length,
+                output_prefix_length: LlamaTokenizer.encode(instruct.output_prefix).length,
+                output_suffix_length: LlamaTokenizer.encode(instruct.output_suffix).length,
+                user_alignment_message_length: LlamaTokenizer.encode(instruct.system_prompt).length,
+            }
+            set((state) => ({ ...state, tokenCache: newCache }))
+            return newCache
+        },
+        replacedMacros: () => {
+            const rawinstruct = get().data
+            if (!rawinstruct) {
+                Logger.log('Something wrong happened with Instruct data', true)
+                return Instructs.defaultInstruct
+            }
+            const instruct = { ...rawinstruct }
+            const keys = Object.keys(instruct) as (keyof typeof instruct)[]
+            keys.forEach((key) => {
+                if (typeof instruct[key] === 'string') replaceMacros(instruct[key] as string)
+            })
+            return instruct
         },
     }))
     /*
