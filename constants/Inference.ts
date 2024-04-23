@@ -119,6 +119,9 @@ export const hordeHeader = () => {
  *  cached Instructs
  */
 
+// Multiplier to token counts due to inaccuracy of tokenizer, TODO: Find better tokenizer base
+const token_mult = 0.87
+
 const buildContext = (max_length: number) => {
     const delta = performance.now()
     const messages = [...(Chats.useChat.getState().data?.messages ?? [])]
@@ -140,25 +143,25 @@ const buildContext = (max_length: number) => {
     let payload_length = 0
     if (currentInstruct.system_prefix) {
         payload += currentInstruct.system_prefix
-        payload_length += instructCache.system_prefix_length
+        payload_length += instructCache.system_prefix_length * token_mult
     }
+
     if (currentInstruct.system_prompt) {
         payload += `${currentInstruct.system_prompt}`
-        payload_length += instructCache.system_prompt_length
+        payload_length += instructCache.system_prompt_length * token_mult
     }
     if (char_card_data) {
         payload += char_card_data
-        payload_length += characterCache.description_length
+        payload_length += characterCache.description_length * token_mult
     }
     if (user_card_data) {
         payload += user_card_data
-        payload_length += LlamaTokenizer.encode(user_card_data).length
+        payload_length += LlamaTokenizer.encode(user_card_data).length * token_mult
     }
     // suffix must be delayed for example messages
 
     let message_acc = ``
     let message_acc_length = 0
-
     let is_last = true
     let index = messages.length - 1
     for (const message of messages?.reverse() ?? []) {
@@ -184,22 +187,21 @@ const buildContext = (max_length: number) => {
 
         message_shard += currentInstruct.wrap ? `\n` : ' '
 
-        message_acc_length += shard_length
+        message_acc_length += shard_length * token_mult
         message_acc = message_shard + message_acc
         index--
     }
-
     const examples = currentCard.data?.mes_example
     if (examples) {
         if (message_acc_length + payload_length + characterCache.examples_length < max_length) {
             payload += examples
-            message_acc_length += characterCache.examples_length
+            message_acc_length += characterCache.examples_length * token_mult
         }
     }
 
     if (currentInstruct.system_suffix) {
         payload += ' ' + currentInstruct.system_suffix
-        message_acc_length += instructCache.system_suffix_length
+        message_acc_length += instructCache.system_suffix_length * token_mult
     }
     payload = replaceMacros(payload + message_acc)
     //Logger.log(`Payload size: ${LlamaTokenizer.encode(payload).length}`)
