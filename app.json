@@ -2,7 +2,7 @@
     "expo": {
         "name": "ChatterUI",
         "slug": "ChatterUI",
-        "version": "0.7.1",
+        "version": "0.7.2",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
         "scheme": "myapp",
@@ -45,8 +45,8 @@
                 "expo-build-properties",
                 {
                     "android": {
-                        "usesCleartextTraffic": true,
-                        "useLegacyPackaging": true
+                        "usesCleartextTraffic": true
+                        //"useLegacyPackaging": true
                     }
                 }
             ]
