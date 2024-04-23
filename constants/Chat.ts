@@ -9,6 +9,7 @@ import { db } from '@db'
 import { chatEntries, chatSwipes, chats } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import * as FS from 'expo-file-system'
+import { LlamaTokenizer } from './tokenizer'
 /*
 export type ChatExtra = {
     api: string
@@ -58,6 +59,7 @@ export type ChatSwipe = {
     send_date: Date
     gen_started: Date
     gen_finished: Date
+    token_count?: number
 }
 
 export type ChatEntry = {
@@ -97,6 +99,7 @@ export interface ChatState {
     reset: () => void
     swipe: (index: number, direction: number) => Promise<boolean>
     addSwipe: (index: number) => Promise<void>
+    getTokenCount: (index: number) => number
     setBuffer: (data: string) => void
     insertBuffer: (data: string) => void
     updateFromBuffer: () => Promise<void>
@@ -197,6 +200,7 @@ export namespace Chats {
             if (!chatSwipeId) return
             const date = await updateChatSwipe(chatSwipeId, message)
             messages[index].swipes[messages[index].swipe_id].swipe = message
+            messages[index].swipes[messages[index].swipe_id].token_count = undefined
             if (updateTime) messages[index].swipes[messages[index].swipe_id].gen_finished = date
             set((state) => ({
                 ...state,
@@ -242,6 +246,21 @@ export namespace Chats {
             }))
         },
 
+        getTokenCount: (index: number) => {
+            const messages = get()?.data?.messages
+            if (!messages) return 0
+
+            const swipe_id = messages[index].swipe_id
+            const cached_token_count = messages[index].swipes[swipe_id].token_count
+            if (cached_token_count) return cached_token_count
+            const token_count = LlamaTokenizer.encode(messages[index].swipes[swipe_id].swipe).length
+            messages[index].swipes[swipe_id].token_count = token_count
+            set((state: ChatState) => ({
+                ...state,
+                data: state?.data ? { ...state.data, messages: messages } : state.data,
+            }))
+            return token_count
+        },
         setBuffer: (newBuffer: string) =>
             set((state: ChatState) => ({ ...state, buffer: newBuffer })),
 
