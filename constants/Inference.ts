@@ -205,7 +205,9 @@ const buildContext = (max_length: number) => {
     }
     payload = replaceMacros(payload + message_acc)
     //Logger.log(`Payload size: ${LlamaTokenizer.encode(payload).length}`)
-    Logger.log(`Approximate Context Size: ${message_acc_length + payload_length} tokens`)
+    Logger.log(
+        `Approximate Context Size: ${(message_acc_length + payload_length).toFixed(0)} tokens`
+    )
     Logger.log(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
     return payload
 }
@@ -427,9 +429,9 @@ const constructCompletionsPayload = () => {
         max_tokens: preset.genamt,
         prompt: buildContext(preset.max_length),
         rep_pen: preset.rep_pen,
+        repetition_penalty: preset.rep_pen,
         rep_pen_range: preset.rep_pen_range,
         model: completionsModel.id,
-        //rep_pen_slope: preset.rep_pen_slope,
         temperature: preset.temp,
         tfs: preset.tfs,
         top_a: preset.top_a,
@@ -442,7 +444,6 @@ const constructCompletionsPayload = () => {
         mirostat_tau: preset.mirostat_tau,
         mirostat_eta: preset.mirostat_eta,
         grammar: preset.grammar_string,
-        //"trim_stop" : true,
         seed:
             preset?.seed === undefined || preset.seed === -1
                 ? Math.floor(Math.random() * 999999)

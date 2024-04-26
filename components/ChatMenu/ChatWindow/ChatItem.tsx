@@ -1,7 +1,17 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Chats, Style } from '@globals'
-import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import {
+    View,
+    Text,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    NativeSyntheticEvent,
+    TextLayoutEventData,
+    Animated,
+    LayoutChangeEvent,
+} from 'react-native'
 //@ts-expect-error
 import Markdown from 'react-native-markdown-package'
 //@ts-expect-error
@@ -84,6 +94,31 @@ const ChatItem: React.FC<ChatItemProps> = ({
     const showEllipsis =
         !message.is_user && buffer === '' && id === messagesLength - 1 && nowGenerating
 
+    const animatedHeight = useRef(new Animated.Value(10)).current // initial height
+    const height = useRef(0)
+
+    const handleContentSizeChange = (event: LayoutChangeEvent) => {
+        const newheight = event.nativeEvent.layout.height
+        if (height.current === newheight) return
+        height.current = newheight
+        Animated.timing(animatedHeight, {
+            toValue: newheight + 12,
+            duration: 200,
+            useNativeDriver: false,
+        }).start()
+    }
+
+    useEffect(() => {
+        if (!nowGenerating && height) {
+            animatedHeight.stopAnimation()
+            Animated.timing(animatedHeight, {
+                toValue: height.current,
+                duration: 200,
+                useNativeDriver: false,
+            }).start()
+        }
+    }, [nowGenerating])
+
     return (
         <AnimatedView dy={100} fade={0} fduration={200} tduration={400}>
             <View
@@ -143,14 +178,21 @@ const ChatItem: React.FC<ChatItemProps> = ({
                             style={styles.messageTextContainer}
                             activeOpacity={0.7}
                             onLongPress={handleEnableEdit}>
-                            <Markdown
-                                style={styles.messageText}
-                                rules={{ speech }}
-                                styles={markdownFormat}>
-                                {nowGenerating && id === messagesLength - 1
-                                    ? buffer.trim()
-                                    : mes.trim()}
-                            </Markdown>
+                            <Animated.View
+                                style={{
+                                    height: animatedHeight,
+                                    overflow: 'scroll',
+                                }}>
+                                <Markdown
+                                    onLayout={handleContentSizeChange}
+                                    style={styles.messageText}
+                                    rules={{ speech }}
+                                    styles={markdownFormat}>
+                                    {nowGenerating && id === messagesLength - 1
+                                        ? buffer.trim()
+                                        : mes.trim()}
+                                </Markdown>
+                            </Animated.View>
                         </TouchableOpacity>
                     )}
                     {!showEditor && showSwipe && (
@@ -179,6 +221,7 @@ const styles = StyleSheet.create({
     messageTextContainer: {
         backgroundColor: Style.getColor('primary-surface3'),
         paddingHorizontal: 8,
+        minHeight: 40,
         borderRadius: 8,
         textAlignVertical: 'center',
         shadowColor: Style.getColor('primary-shadow'),

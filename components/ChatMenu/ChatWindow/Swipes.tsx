@@ -45,7 +45,7 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, index }) => {
                     size={20}
                     color={
                         message.swipe_id === 0 || nowGenerating
-                            ? Style.getColor('primary-text2')
+                            ? Style.getColor('primary-text3')
                             : Style.getColor('primary-text1')
                     }
                 />
@@ -61,7 +61,7 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, index }) => {
                         size={20}
                         color={
                             nowGenerating
-                                ? Style.getColor('primary-text2')
+                                ? Style.getColor('primary-text3')
                                 : Style.getColor('primary-text1')
                         }
                     />
@@ -82,7 +82,7 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, index }) => {
                         size={20}
                         color={
                             nowGenerating
-                                ? Style.getColor('primary-text2')
+                                ? Style.getColor('primary-text3')
                                 : Style.getColor('primary-text1')
                         }
                     />
@@ -98,7 +98,7 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, index }) => {
                     size={20}
                     color={
                         isLastAltGreeting || nowGenerating
-                            ? Style.getColor('primary-text2')
+                            ? Style.getColor('primary-text3')
                             : Style.getColor('primary-text1')
                     }
                 />
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     },
 
     swipeText: {
-        color: Style.getColor('primary-text1'),
+        color: Style.getColor('primary-text2'),
         borderRadius: 20,
         paddingVertical: 6,
         paddingHorizontal: 8,
