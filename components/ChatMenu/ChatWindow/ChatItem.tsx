@@ -7,8 +7,6 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    NativeSyntheticEvent,
-    TextLayoutEventData,
     Animated,
     LayoutChangeEvent,
 } from 'react-native'
