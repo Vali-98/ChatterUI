@@ -1,0 +1,35 @@
+{
+    "cli": {
+        "version": ">= 5.4.0"
+    },
+    "build": {
+        "development": {
+            "distribution": "internal",
+            "android": {
+                "gradleCommand": ":app:assembleDebug"
+            },
+            "ios": {
+                "buildConfiguration": "Debug"
+            }
+        },
+        "preview": {
+            "distribution": "internal"
+        },
+        "preview2": {
+            "android": {
+                "gradleCommand": ":app:assembleRelease"
+            }
+        },
+        "production": {
+            "android": {
+                "buildType": "apk"
+            },
+            "env": {
+                "ANDROID_SDK_ROOT": "/point this to your Android SDK directory"
+            }
+        }
+    },
+    "submit": {
+        "production": {}
+    }
+}
