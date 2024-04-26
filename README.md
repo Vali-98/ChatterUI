@@ -25,9 +25,28 @@ ChatterUI supports multiple backends and can even run GGUF models locally on you
 -   Open Router
 -   OpenAI
 
-### Building From Source
+### Developing
+
+Clone the repo:
+
+```
+git clone https://github.com/Vali-98/ChatterUI.git
+```
+
+Install dependencies via npm and run via Expo:
+
+```
+npm install
+npx expo run:android
+```
+
+### Building an APK
 
 Requires Node.js and Android SDK. Expo uses EAS to build apps which requires a Linux environment.
+
+Rename the `eas.json.example` to `eas.json` and direct it to your Android SDK.
+
+Clone the repo then run:
 
 ```
 npm install
