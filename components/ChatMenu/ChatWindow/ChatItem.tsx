@@ -95,29 +95,30 @@ const ChatItem: React.FC<ChatItemProps> = ({
     const animatedHeight = useRef(new Animated.Value(10)).current // initial height
     const height = useRef(0)
 
-    const handleContentSizeChange = (event: LayoutChangeEvent) => {
-        const newheight = event.nativeEvent.layout.height
-        if (height.current === newheight) return
-        height.current = newheight
-        const oveflowPadding = 12
+    const handleAnimateHeight = (newheight: number) => {
+        animatedHeight.stopAnimation()
         Animated.timing(animatedHeight, {
-            toValue: newheight + (nowGenerating ? oveflowPadding : 0),
+            toValue: newheight,
             duration: 200,
             useNativeDriver: false,
         }).start()
     }
 
+    const handleContentSizeChange = (event: LayoutChangeEvent) => {
+        const newheight = event.nativeEvent.layout.height
+        const oveflowPadding = 12
+        if (height.current === newheight) return
+        height.current = newheight
+        handleAnimateHeight(newheight + (nowGenerating ? oveflowPadding : 0))
+    }
+
     useEffect(() => {
         if (!nowGenerating && height) {
-            animatedHeight.stopAnimation()
-            Animated.timing(animatedHeight, {
-                toValue: height.current,
-                duration: 200,
-                useNativeDriver: false,
-            }).start()
+            handleAnimateHeight(height.current)
         } else if (nowGenerating && !mes) {
-            animatedHeight.setValue(0)
-            animatedHeight.stopAnimation()
+            // NOTE: this assumes that mes is empty due to a swipe and may break, but unlikely
+            height.current = 0
+            handleAnimateHeight(height.current)
         }
     }, [nowGenerating])
 
@@ -134,14 +135,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
                     id={id}
                     isLast={id === messagesLength - 1}
                     TTSenabled={TTSenabled}>
-                    {showEllipsis && (
-                        <View style={{ ...styles.messageTextContainer, padding: 5 }}>
-                            <AnimatedEllipsis
-                                style={{ color: Style.getColor('primary-text2'), fontSize: 20 }}
-                            />
-                        </View>
-                    )}
-
                     {showEditor && (
                         <View>
                             <View
@@ -175,7 +168,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                         </View>
                     )}
 
-                    {!showEditor && !showEllipsis && (
+                    {!showEditor && (
                         <TouchableOpacity
                             style={styles.messageTextContainer}
                             activeOpacity={0.7}
@@ -185,6 +178,20 @@ const ChatItem: React.FC<ChatItemProps> = ({
                                     height: animatedHeight,
                                     overflow: 'scroll',
                                 }}>
+                                {
+                                    // check elipsis on continue
+                                    showEllipsis && (
+                                        <View
+                                            style={{ ...styles.messageTextContainer, padding: 5 }}>
+                                            <AnimatedEllipsis
+                                                style={{
+                                                    color: Style.getColor('primary-text2'),
+                                                    fontSize: 20,
+                                                }}
+                                            />
+                                        </View>
+                                    )
+                                }
                                 <Markdown
                                     onLayout={handleContentSizeChange}
                                     style={styles.messageText}
