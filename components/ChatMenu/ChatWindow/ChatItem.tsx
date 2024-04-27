@@ -97,13 +97,14 @@ const ChatItem: React.FC<ChatItemProps> = ({
     const height = useRef(0)
 
     const handleAnimateHeight = (newheight: number) => {
-        animatedHeight.stopAnimation()
-        Animated.timing(animatedHeight, {
-            toValue: newheight,
-            duration: 200,
-            useNativeDriver: false,
-            easing: Easing.inOut((x) => x * x),
-        }).start()
+        animatedHeight.stopAnimation(() =>
+            Animated.timing(animatedHeight, {
+                toValue: newheight,
+                duration: 200,
+                useNativeDriver: false,
+                easing: Easing.inOut((x) => x * x),
+            }).start()
+        )
     }
 
     const handleContentSizeChange = (event: LayoutChangeEvent) => {
