@@ -532,11 +532,11 @@ const constructOpenAIPayload = () => {
 // Fetch Response
 
 const KAIresponse = async (setAbortFunction: AbortFunction) => {
-    const kaiendpoint = getString(Global.KAIEndpoint)
+    const endpoint = getString(Global.KAIEndpoint)
     Logger.log(`Using endpoint: KAI`)
 
     readableStreamResponse(
-        `${kaiendpoint}/api/extra/generate/stream`,
+        new URL('/api/extra/generate/stream', endpoint).toString(),
         JSON.stringify(constructKAIPayload()),
         (item) => {
             return JSON.parse(item).token
@@ -545,7 +545,7 @@ const KAIresponse = async (setAbortFunction: AbortFunction) => {
         () => {
             axios
                 .create({ timeout: 1000 })
-                .post(`${kaiendpoint}/api/extra/abort`)
+                .post(new URL('/api/extra/abort', endpoint).toString())
                 .catch(() => {
                     Logger.log(`Abort Failed`, true)
                 })
@@ -658,7 +658,7 @@ const TGWUIReponseStream = async (setAbortFunction: AbortFunction) => {
     const endpoint = getString(Global.TGWUIStreamingEndpoint)
 
     readableStreamResponse(
-        `${endpoint}/v1/completions`,
+        new URL('/v1/completions', endpoint).toString(),
         JSON.stringify(constructTGWUIPayload()),
         (item) => {
             return JSON.parse(item).choices[0].text
@@ -700,7 +700,7 @@ const CompletionsResponseStream = async (setAbortFunction: AbortFunction) => {
     const endpoint = getString(Global.CompletionsEndpoint)
 
     readableStreamResponse(
-        `${endpoint}/v1/completions`,
+        new URL('/v1/completions', endpoint).toString(),
         JSON.stringify(constructCompletionsPayload()),
         (item) => {
             const output = JSON.parse(item)
