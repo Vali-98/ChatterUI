@@ -2,21 +2,27 @@ import { View, Text, StyleSheet, TouchableHighlight } from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
 import { Style } from '@globals'
 import React from 'react'
-import { ChatEntry, Chats } from '@constants/Chat'
+import { Chats } from '@constants/Chat'
 import { useShallow } from 'zustand/react/shallow'
 import { continueResponse, generateResponse, regenerateResponse } from '@constants/Inference'
 
 type SwipesProps = {
-    message: ChatEntry
     nowGenerating: boolean
+    isGreeting: boolean
     index: number
 }
 
-const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, index }) => {
+const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => {
     const { swipeChat, addSwipe } = Chats.useChat(
         useShallow((state) => ({
             swipeChat: state.swipe,
             addSwipe: state.addSwipe,
+        }))
+    )
+
+    const { message } = Chats.useChat(
+        useShallow((state) => ({
+            message: state?.data?.messages?.[index] ?? Chats.dummyEntry,
         }))
     )
 
@@ -26,13 +32,13 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, index }) => {
 
     const handleSwipeRight = async () => {
         const atLimit = await swipeChat(index, 1)
-        if (atLimit && index !== 0) {
+        if (atLimit && !isGreeting) {
             await addSwipe(index)
             generateResponse()
         }
     }
 
-    const isLastAltGreeting = index === 0 && message.swipe_id === message.swipes.length - 1
+    const isLastAltGreeting = isGreeting && message.swipe_id === message.swipes.length - 1
 
     return (
         <View style={styles.swipesItem}>

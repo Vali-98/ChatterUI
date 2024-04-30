@@ -1,12 +1,12 @@
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { ReactNode, useEffect, useState } from 'react'
-import { ChatEntry } from '@constants/Chat'
+import { ChatEntry, Chats } from '@constants/Chat'
 import { Users, Characters, Style } from '@globals'
 import TTSMenu from './TTS'
+import { useShallow } from 'zustand/react/shallow'
 
 type ChatFrameProps = {
     children?: ReactNode
-    message: ChatEntry
     userName: string
     TTSenabled: boolean
     id: number
@@ -17,7 +17,6 @@ type ChatFrameProps = {
 
 const ChatFrame: React.FC<ChatFrameProps> = ({
     children,
-    message,
     charId,
     userName,
     TTSenabled,
@@ -25,6 +24,11 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
     nowGenerating,
     isLast,
 }) => {
+    const { message } = Chats.useChat(
+        useShallow((state) => ({
+            message: state?.data?.messages?.[id] ?? Chats.dummyEntry,
+        }))
+    )
     const imageDir = message.is_user
         ? Users.getImageDir(userName)
         : Characters.useCharacterCard.getState().getImage()
@@ -38,7 +42,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
             ? Users.getImageDir(userName)
             : Characters.useCharacterCard.getState().getImage()
         setImageSource({ uri: newdir })
-    }, [id, charId, userName])
+    }, [message.is_user])
 
     const handleImageError = () => {
         setImageSource(require('@assets/user.png'))
@@ -51,6 +55,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
                 1000
         )
     )
+    // TODO: Change TTS to take id and simply retrieve that data on TTS as needed
     return (
         <View style={{ flexDirection: 'row' }}>
             <View style={{ alignItems: 'center' }}>

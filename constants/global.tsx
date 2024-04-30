@@ -17,6 +17,7 @@ import { mmkv } from './mmkv'
 import { Logger } from './Logger'
 import { LlamaTokenizer } from './tokenizer'
 import { Style } from './Style'
+import { MarkdownStyle } from './Markdown'
 export {
     mmkv,
     Presets,
@@ -31,6 +32,7 @@ export {
     Logger,
     LlamaTokenizer,
     Style,
+    MarkdownStyle,
 }
 
 export const GlobalStyle = StyleSheet.create({})
