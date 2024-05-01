@@ -37,7 +37,12 @@ const ChatBody: React.FC<ChatTextProps> = ({ id, nowGenerating, messagesLength }
     return (
         <View>
             {showEditor && (
-                <Editor id={id} isLastMessage={isLastMessage} setEditMode={setEditMode} />
+                <Editor
+                    id={id}
+                    isLastMessage={isLastMessage}
+                    setEditMode={setEditMode}
+                    editMode={editMode}
+                />
             )}
 
             {!showEditor && (
