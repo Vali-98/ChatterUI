@@ -1,19 +1,9 @@
 import { ChatWindow } from './ChatWindow/ChatWindow'
-import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons'
-import { Global, Chats, Logger, Style, Characters } from '@globals'
-import { generateResponse } from '@constants/Inference'
+import { Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons'
+import { Logger, Style, Characters } from '@globals'
 import { Stack, useFocusEffect, useRouter } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
-import {
-    View,
-    Text,
-    TextInput,
-    SafeAreaView,
-    TouchableOpacity,
-    StyleSheet,
-    BackHandler,
-} from 'react-native'
-import { useMMKVString } from 'react-native-mmkv'
+import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, BackHandler } from 'react-native'
 import {
     Menu,
     MenuTrigger,
