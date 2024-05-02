@@ -1,3 +1,7 @@
+// DEPRECATED //
+
+// This file is no longer in use since the migration to SQL
+
 import { Buffer } from '@craftzdog/react-native-buffer'
 import axios from 'axios'
 import * as Base64 from 'base-64'
