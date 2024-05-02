@@ -1,12 +1,19 @@
+// DEPRECATED //
+
+// This file is no longer in use since the migration to SettingsDrawer
+
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Style, Users } from '@globals'
+import { Characters, Style } from '@globals'
 import { useRouter } from 'expo-router'
 import React from 'react'
 import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
-import { useMMKVString } from 'react-native-mmkv'
 
 const Settings = () => {
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    const { userName, userId } = Characters.useUserCard((state) => ({
+        userName: state.card?.data.name,
+        userId: state.id,
+    }))
+
     const router = useRouter()
 
     return (
@@ -15,7 +22,7 @@ const Settings = () => {
                 <View style={styles.imageContainer}>
                     <Image
                         style={styles.userImage}
-                        source={{ uri: Users.getImageDir(userName ?? '') }}
+                        source={{ uri: Characters.useUserCard.getState().getImage() }}
                     />
                 </View>
                 <View>

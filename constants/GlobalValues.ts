@@ -1,11 +1,14 @@
 export const enum Global {
-    // Removed
+    // Removed - These values are for incase future issues arise due to unhandled cases of their use
 
     //CurrentCharacter = 'currentchar', // current char filename, locates dir   == removed on db migration
     //CurrentCharacterCard = 'charcard', // note: use Object ? - stores charactercard   == removed on db migration
 
     //InstructName = 'instructname', // name of current instruct preset == removed on db migration
     //CurrentInstruct = 'currentinstruct', // note: use Object ? - stores instruct == removed on db migration
+
+    //CurrentUser = 'currentuser', // current username, locates dir == removed on db migration
+    //CurrentUserCard = 'usercard', // note: use Object ? - stores usercard == removed on db migration
 
     // CurrentChat = 'currentchat', // current chat filename, locates dir    == removed on db migration
     //Messages = 'messages', === removed on zustand migration
@@ -24,9 +27,8 @@ export const enum Global {
     // Character
 
     // User
+
     UserID = 'userid',
-    CurrentUser = 'currentuser', // current username, locates dir
-    CurrentUserCard = 'usercard', // note: use Object ? - stores usercard
 
     // Chat
 

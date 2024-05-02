@@ -90,7 +90,7 @@ const CharInfo = () => {
             type: 'image/*',
         }).then((result: DocumentPicker.DocumentPickerResult) => {
             if (result.canceled || !charId) return
-            Characters.copyImage(result.assets[0].uri, charId)
+            Characters.useCharacterCard.getState().updateImage(result.assets[0].uri)
         })
     }
 

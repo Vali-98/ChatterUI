@@ -39,7 +39,7 @@ export const replaceMacros = (text: string) => {
     if (text == undefined) return ''
     let newtext: string = text
     const charName = Characters.useCharacterCard.getState().card?.data.name
-    const userName = mmkv.getString(Global.CurrentUser)
+    const userName = Characters.useCharacterCard.getState().card?.data.name
     const rules: Rule[] = [
         { macro: '{{user}}', value: userName ?? '' },
         { macro: '{{char}}', value: charName ?? '' },

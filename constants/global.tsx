@@ -10,7 +10,6 @@ import { Chats } from './Chat'
 import { Global } from './GlobalValues'
 import { Instructs } from './Instructs'
 import { Presets } from './Presets'
-import { Users } from './Users'
 import { humanizedISO8601DateTime } from './Utils'
 import { Llama } from './llama'
 import { mmkv } from './mmkv'
@@ -22,7 +21,6 @@ export {
     mmkv,
     Presets,
     Instructs,
-    Users,
     Characters,
     Chats,
     Global,
@@ -80,26 +78,48 @@ const createDefaultInstructData = async () => {
     })
 }
 
+const createDefaultUserData = async () => {
+    await Characters.createCard('User', 'user').then((id: number) => {
+        mmkv.set(Global.UserID, id)
+        Characters.useUserCard.getState().setCard(id)
+    })
+}
+
 export const startupApp = () => {
     console.log('[APP STARTED]: T1APT')
 
     // Only for dev to properly reset
     Chats.useChat.getState().reset()
     Characters.useCharacterCard.getState().unloadCard()
+
+    // Resets horde state, may be better if left active
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
     mmkv.set(Global.HordeModels, JSON.stringify([]))
+
+    // Init statea
     if (mmkv.getString(Global.OpenAIModel) === undefined)
         mmkv.set(Global.OpenAIModel, JSON.stringify({}))
+
+    // This was in case of initializing new data into Presets, may change with SQL migration
     mmkv.set(
         Global.PresetData,
         Presets.fixPreset(JSON.parse(mmkv.getString(Global.PresetData) ?? '{}'))
     )
 
+    // default horde [0000000000] key is needed
     if (mmkv.getString(Global.HordeKey) === undefined) mmkv.set(Global.HordeKey, '0000000000')
+
+    // Init step, logs are never null
     if (mmkv.getString(Global.Logs) === undefined) mmkv.set(Global.Logs, JSON.stringify([]))
+
+    // Init step, names[] is never null
     if (mmkv.getString(Global.LorebookNames) === undefined)
         mmkv.set(Global.LorebookNames, JSON.stringify([]))
+
+    // Init step, APIType is never null
     if (mmkv.getString(Global.APIType) === undefined) mmkv.set(Global.APIType, API.KAI)
+
+    // Init step
     Llama.setLlamaPreset()
     Logger.log('Resetting state values for startup.')
     SystemUI.setBackgroundColorAsync(Style.getColor('primary-surface1'))
@@ -110,8 +130,7 @@ export const startupApp = () => {
 export const initializeApp = async () => {
     await generateDefaultDirectories()
 
-    //TODO: DB User defaults
-
+    /*
     await Users.getFileList()
         .then((files) => {
             if (files.length > 0) return
@@ -121,7 +140,7 @@ export const initializeApp = async () => {
             Logger.log('Created default User')
         })
         .catch((error) => Logger.log(`Could not generate default User. Reason: ${error}`))
-
+    */
     await Presets.getFileList()
         .then((files) => {
             if (files.length > 0) return
@@ -131,6 +150,24 @@ export const initializeApp = async () => {
         })
         .catch((error) => Logger.log(`Could not generate default Preset. Reason: ${error}`))
 
+    //TODO: DB User defaults
+    const userid = mmkv.getNumber(Global.UserID)
+    if (userid === undefined) {
+        Logger.log('User ID is undefined, creating default User')
+        await createDefaultUserData()
+    } else {
+        const list = await Characters.getCardList('user')
+        if (!list) {
+            Logger.log('Database is Invalid, this should not happen! Please report this occurence.')
+        } else if (list?.length === 0) {
+            Logger.log('No Instructs exist, creating default Instruct')
+            await createDefaultInstructData()
+        } else if (!list?.some((item) => item.id === userid)) {
+            Logger.log('User ID does not exist in database, defaulting to oldest User')
+            Characters.useUserCard.getState().setCard(list[0].id)
+        } else Characters.useUserCard.getState().setCard(userid)
+    }
+
     const instructid = mmkv.getNumber(Global.InstructID)
     if (instructid === undefined) {
         Logger.log('Instruct ID is undefined, creating default Instruct')
@@ -138,7 +175,9 @@ export const initializeApp = async () => {
     } else {
         Instructs.Database.readList().then(async (list) => {
             if (!list) {
-                Logger.log('Database is Invalid, this should not happen!')
+                Logger.log(
+                    'Database is Invalid, this should not happen! Please report this occurence.'
+                )
             } else if (list?.length === 0) {
                 Logger.log('No Instructs exist, creating default Instruct')
                 await createDefaultInstructData()

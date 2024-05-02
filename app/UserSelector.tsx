@@ -1,6 +1,6 @@
 import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Users, Logger, Style } from '@globals'
+import { Characters, Logger, Style } from '@globals'
 import { Stack, useRouter } from 'expo-router'
 import { useState, useEffect } from 'react'
 import {
@@ -13,39 +13,45 @@ import {
     ScrollView,
     Alert,
 } from 'react-native'
-import { useMMKVString } from 'react-native-mmkv'
 import AnimatedView from '@components/AnimatedView'
+
+type CardInfo = {
+    name: string
+    id: number
+    image_id: number
+}
+
 const UserSelector = () => {
     const router = useRouter()
 
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-    const [userCard, setUserCard] = useMMKVString(Global.CurrentUserCard)
-    const [userList, setUserList] = useState<Array<string>>([])
+    const { userID, setCard, getImage } = Characters.useUserCard((state) => ({
+        userID: state.id,
+        setCard: state.setCard,
+        getImage: state.getImage,
+    }))
+
+    const [userList, setUserList] = useState<Array<CardInfo>>([])
     const [showNewUser, setShowNewUser] = useState<boolean>(false)
 
     const loadUserList = () => {
-        Users.getFileList()
-            .then((response) => {
-                if (response.length === 0) {
+        Characters.getCardList('user')
+            .then(async (list: Array<CardInfo>) => {
+                if (list.length === 0) {
                     const defaultName = 'User'
-                    Users.createUser(defaultName).then(() => {
-                        setUserName(defaultName)
-                        Users.loadFile(defaultName).then((card) => setUserCard(card))
-                        setUserList([defaultName])
-                    })
+                    const id = await Characters.createCard(defaultName, 'user')
+                    await setCard(id)
+                    loadUserList()
                     return
                 }
-                setUserList(response)
-                const cleanlist = response.map((item) => item.replace('.json', ''))
-                if (userName && cleanlist.includes(userName)) return
-                setUserName(cleanlist[0])
-                Users.loadFile(cleanlist[0]).then((card) => setUserCard(card))
+                setUserList(list)
+                if (userID && list.some((item) => item.id === userID)) return
+                setCard(list[0].id)
             })
             .catch(() => setUserList([]))
     }
 
     useEffect(() => {
-        if (userName !== undefined) loadUserList()
+        if (userID !== undefined) loadUserList()
     }, [])
 
     return (
@@ -75,44 +81,41 @@ const UserSelector = () => {
                 />
 
                 <ScrollView>
-                    {userList.map((name, index) => (
+                    {userList.map((info, index) => (
                         <View
                             key={index}
                             style={
-                                name === userName
+                                info.id === userID
                                     ? styles.longButtonSelectedContainer
                                     : styles.longButtonContainer
                             }>
                             <TouchableOpacity
                                 style={styles.useritembutton}
-                                onPress={() => {
-                                    Users.loadFile(name).then((file) => {
-                                        setUserCard(file)
-                                        setUserName(name)
-                                        router.back()
-                                    })
+                                onPress={async () => {
+                                    setCard(info.id)
+                                    router.back()
                                 }}>
                                 <Image
-                                    source={{ uri: Users.getImageDir(name) }}
+                                    source={{ uri: Characters.getImageDir(info.image_id) }}
                                     style={styles.avatar}
                                 />
 
-                                <Text style={styles.username}>{name}</Text>
+                                <Text style={styles.username}>{info.name}</Text>
 
                                 <TouchableOpacity
                                     onPress={() => {
                                         Alert.alert(
                                             `Delete Persona`,
-                                            `Are you sure you want to delete '${name}'?`,
+                                            `Are you sure you want to delete '${info.name}'?`,
                                             [
                                                 { text: `Cancel`, style: `cancel` },
                                                 {
                                                     text: `Confirm`,
                                                     style: `destructive`,
-                                                    onPress: () =>
-                                                        Users.deleteFile(name).then(() => {
-                                                            loadUserList()
-                                                        }),
+                                                    onPress: async () => {
+                                                        await Characters.deleteCard(info.id)
+                                                        loadUserList()
+                                                    },
                                                 },
                                             ]
                                         )
@@ -130,20 +133,10 @@ const UserSelector = () => {
 
                 <TextBoxModal
                     booleans={[showNewUser, setShowNewUser]}
-                    onConfirm={(text) => {
-                        if (userList.includes(text)) {
-                            Logger.log(`Persona Already Exists`, true)
-                            return
-                        }
-                        Users.createUser(text)
-                            .then(async () => {
-                                return Users.loadFile(text)
-                            })
-                            .then((card) => {
-                                setUserName(text)
-                                setUserCard(card)
-                                router.back()
-                            })
+                    onConfirm={async (text) => {
+                        const id = await Characters.createCard(text, 'user')
+                        await setCard(id)
+                        loadUserList()
                     }}
                 />
             </SafeAreaView>

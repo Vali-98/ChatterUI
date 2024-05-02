@@ -1,7 +1,7 @@
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { ReactNode, useEffect, useState } from 'react'
 import { ChatEntry, Chats } from '@constants/Chat'
-import { Users, Characters, Style } from '@globals'
+import { Characters, Style } from '@globals'
 import TTSMenu from './TTS'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -17,7 +17,6 @@ type ChatFrameProps = {
 
 const ChatFrame: React.FC<ChatFrameProps> = ({
     children,
-    charId,
     userName,
     TTSenabled,
     id,
@@ -29,9 +28,13 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
             message: state?.data?.messages?.[id] ?? Chats.dummyEntry,
         }))
     )
+
+    const charImageId = Characters.useCharacterCard((state) => state.card?.data.image_id) ?? 0
+    const userImageId = Characters.useUserCard((state) => state.card?.data.image_id) ?? 0
+
     const imageDir = message.is_user
-        ? Users.getImageDir(userName)
-        : Characters.useCharacterCard.getState().getImage()
+        ? Characters.getImageDir(userImageId)
+        : Characters.getImageDir(charImageId)
     const swipe = message.swipes[message.swipe_id]
     const [imageSource, setImageSource] = useState({
         uri: imageDir,
@@ -39,10 +42,10 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
 
     useEffect(() => {
         const newdir = message.is_user
-            ? Users.getImageDir(userName)
-            : Characters.useCharacterCard.getState().getImage()
+            ? Characters.getImageDir(userImageId)
+            : Characters.getImageDir(charImageId)
         setImageSource({ uri: newdir })
-    }, [message.is_user])
+    }, [message.is_user, charImageId, userImageId])
 
     const handleImageError = () => {
         setImageSource(require('@assets/user.png'))

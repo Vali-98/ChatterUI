@@ -27,6 +27,7 @@ type CharacterCardState = {
     setCard: (id: number) => Promise<string | undefined>
     unloadCard: () => void
     getImage: () => string
+    updateImage: (sourceURI: string) => void
     getCache: (otherName: string) => CharacterTokenCache
 }
 
@@ -50,6 +51,21 @@ export namespace Characters {
         },
         getImage: () => {
             return getImageDir(get().card?.data.image_id ?? 0)
+        },
+        updateImage: async (sourceURI: string) => {
+            const id = get().id
+            const oldImageID = get().card?.data.image_id
+            const card = get().card
+            if (!id || !oldImageID || !card) {
+                Logger.log('Could not get data, something very wrong has happned!', true)
+                return
+            }
+            const imageID = new Date().getTime()
+            await updateCardField('image_id', imageID, id)
+            await deleteImage(oldImageID)
+            await copyImage(sourceURI, imageID)
+            card.data.image_id = imageID
+            set((state) => ({ ...state, card: card }))
         },
         getCache: (userName: string) => {
             const cache = get().tokenCache
@@ -96,6 +112,10 @@ export namespace Characters {
             getImage: () => {
                 return getImageDir(get().card?.data.image_id ?? 0)
             },
+            updateImage: async (sourceURI: string) => {
+                const imageID = get().card?.data.image_id
+                if (imageID) return copyImage(sourceURI, imageID)
+            },
             getCache: (charName: string) => {
                 const cache = get().tokenCache
                 if (cache && cache.otherName && cache.otherName === charName) return cache
@@ -121,10 +141,10 @@ export namespace Characters {
         })
     )
 
-    export const createCard = async (name: string) => {
+    export const createCard = async (name: string, type: 'user' | 'character' = 'character') => {
         const [{ id }, ..._] = await db
             .insert(characters)
-            .values({ ...TavernCardV2(name), type: 'character' })
+            .values({ ...TavernCardV2(name), type: type })
             .returning({ id: characters.id })
         return id
     }
@@ -156,15 +176,19 @@ export namespace Characters {
             }
     }
 
-    export const updateCard = async (card: CharacterCardV2, charId: number) => {
+    export const updateCard = async (card: CharacterCardV2, cardID: number) => {
         await db
             .update(characters)
             .set({ description: card.data.description, first_mes: card.data.first_mes })
-            .where(eq(characters.id, charId))
+            .where(eq(characters.id, cardID))
     }
 
     // TODO: Proper per field updates, though not that expensive
-    export const updateCardField = async (field: string, data: any, charId: number) => {
+    export const updateCardField = async (
+        field: keyof CharacterCardV2Data,
+        data: any,
+        charId: number
+    ) => {
         if (field === 'tags') {
             // find tags and update
             return
@@ -194,8 +218,8 @@ export namespace Characters {
         if (charID === useCharacterCard.getState().id) useCharacterCard.getState().unloadCard()
     }
 
-    export const deleteImage = async (charID: number) => {
-        return FS.deleteAsync(getImageDir(charID), { idempotent: true })
+    export const deleteImage = async (imageID: number) => {
+        return FS.deleteAsync(getImageDir(imageID), { idempotent: true })
     }
 
     export const getCardList = async (type: 'character' | 'user') => {
@@ -220,10 +244,10 @@ export namespace Characters {
         return query.map((item) => ({ ...item, tags: item.tags.map((item) => item.tag.tag) }))
     }
 
-    export const copyImage = async (uri: string, charID: number) => {
+    export const copyImage = async (uri: string, imageID: number) => {
         await FS.copyAsync({
             from: uri,
-            to: getImageDir(charID),
+            to: getImageDir(imageID),
         })
     }
 
@@ -430,44 +454,38 @@ export namespace Characters {
     }
 }
 
-type CharacterCardV1 = {
+export type CharacterCardV2Data = {
+    // field for chatterUI
+    image_id: number
+
     name: string
     description: string
     personality: string
     scenario: string
     first_mes: string
     mes_example: string
+
+    // New fields start here
+    creator_notes: string
+    system_prompt: string
+    post_history_instructions: string
+    alternate_greetings: Array<string>
+    //for ChatterUI this will be removed into its own table
+    //character_book: string
+
+    // May 8th additions
+    tags: Array<string>
+    creator: string
+    character_version: string
+    //extensions: {},
 }
 
 export type CharacterCardV2 = {
     spec: string
     spec_version: string
-    data: {
-        // field for chatterUI
-        image_id: number
-
-        name: string
-        description: string
-        personality: string
-        scenario: string
-        first_mes: string
-        mes_example: string
-
-        // New fields start here
-        creator_notes: string
-        system_prompt: string
-        post_history_instructions: string
-        alternate_greetings: Array<string>
-        //for ChatterUI this will be removed into its own table
-        //character_book: string
-
-        // May 8th additions
-        tags: Array<string>
-        creator: string
-        character_version: string
-        //extensions: {},
-    }
+    data: CharacterCardV2Data
 }
+
 const TavernCardV2 = (name: string) => {
     return {
         name: name,
@@ -502,6 +520,7 @@ const TavernCardV2 = (name: string) => {
         },
     }
 }
+
 type Rule = {
     macro: string
     value: string
@@ -511,7 +530,7 @@ export const replaceMacros = (text: string) => {
     if (text == undefined) return ''
     let newtext: string = text
     const charName = Characters.useCharacterCard.getState().card?.data.name
-    const userName = mmkv.getString(Global.CurrentUser)
+    const userName = Characters.useUserCard.getState().card?.data.name
     const rules: Rule[] = [
         { macro: '{{user}}', value: userName ?? '' },
         { macro: '{{char}}', value: charName ?? '' },

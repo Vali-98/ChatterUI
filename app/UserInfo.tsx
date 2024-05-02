@@ -1,9 +1,9 @@
-import { UserCard } from '@constants/Users'
+import { CharacterCardV2 } from '@constants/Characters'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Style, Users } from '@globals'
+import { Characters, Style } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     SafeAreaView,
     View,
@@ -13,25 +13,46 @@ import {
     StyleSheet,
     TextInput,
 } from 'react-native'
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
+import { useShallow } from 'zustand/react/shallow'
 
 const UserInfo = () => {
     const router = useRouter()
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-    const [userCard, setUserCard] = useMMKVObject<UserCard>(Global.CurrentUserCard)
 
-    const imageDir = Users.getImageDir(userName ?? '')
+    const { userCard, imageID, id, setCard } = Characters.useUserCard(
+        useShallow((state) => ({
+            userCard: state.card,
+            imageID: state.card?.data.image_id ?? 0,
+            id: state.id,
+            setCard: state.setCard,
+        }))
+    )
+
+    const [currentCard, setCurrentCard] = useState<CharacterCardV2 | undefined>(userCard)
+    const userName = userCard?.data.name
+
+    useEffect(() => {
+        setCurrentCard(userCard)
+    }, [])
+
+    useEffect(() => {
+        setImageSource({
+            uri: Characters.getImageDir(imageID),
+        })
+    }, [imageID])
 
     const [imageSource, setImageSource] = useState({
-        uri: imageDir,
+        uri: Characters.getImageDir(imageID),
     })
 
     const handleImageError = () => {
         setImageSource(require('@assets/user.png'))
     }
 
-    const saveCard = () => {
-        if (userName && userCard) Users.saveFile(userName, userCard)
+    const saveCard = async () => {
+        if (currentCard && id) {
+            const newid = await Characters.updateCard(currentCard, id)
+            setCard(id)
+        }
     }
 
     return (
@@ -68,7 +89,10 @@ const UserInfo = () => {
                                     type: 'image/*',
                                 }).then((result) => {
                                     if (result.canceled) return
-                                    if (userName) Users.copyImage(result.assets[0].uri, userName)
+                                    if (id)
+                                        Characters.useUserCard
+                                            .getState()
+                                            .updateImage(result.assets[0].uri)
                                 })
                             }}>
                             <FontAwesome
@@ -86,9 +110,13 @@ const UserInfo = () => {
                     style={styles.input}
                     multiline
                     numberOfLines={6}
-                    value={userCard?.description ?? ''}
+                    value={currentCard?.data.description ?? ''}
                     onChangeText={(text) => {
-                        if (userCard) setUserCard({ ...userCard, description: text })
+                        if (currentCard)
+                            setCurrentCard({
+                                ...currentCard,
+                                data: { ...currentCard.data, description: text },
+                            })
                     }}
                     placeholder="----"
                     placeholderTextColor={Style.getColor('primary-text2')}
