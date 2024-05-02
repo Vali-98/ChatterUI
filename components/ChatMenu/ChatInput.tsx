@@ -76,6 +76,7 @@ export default ChatInput
 const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
+        alignItems: 'flex-end',
         flex: 1,
     },
 
