@@ -1,5 +1,5 @@
 export const enum Global {
-    // Removed - These values are for incase future issues arise due to unhandled cases of their use
+    // Removed - These values are archived incase future issues arise due to unhandled cases
 
     //CurrentCharacter = 'currentchar', // current char filename, locates dir   == removed on db migration
     //CurrentCharacterCard = 'charcard', // note: use Object ? - stores charactercard   == removed on db migration
