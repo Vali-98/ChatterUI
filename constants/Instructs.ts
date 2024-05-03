@@ -98,61 +98,6 @@ export namespace Instructs {
             return instruct
         },
     }))
-    /*
-    export const loadFile = async (name: string) => {
-        return FS.readAsStringAsync(`${FS.documentDirectory}instruct/${name}.json`, {
-            encoding: FS.EncodingType.UTF8,
-        })
-    }
-
-    export const saveFile = async (name: string, preset: InstructType) => {
-        return FS.writeAsStringAsync(
-            `${FS.documentDirectory}instruct/${name}.json`,
-            JSON.stringify(preset),
-            { encoding: FS.EncodingType.UTF8 }
-        )
-    }
-
-    export const deleteFile = async (name: string) => {
-        return FS.deleteAsync(`${FS.documentDirectory}instruct/${name}.json`)
-    }
-
-    export const getFileList = async () => {
-        return FS.readDirectoryAsync(`${FS.documentDirectory}instruct`)
-    }
-
-    export const uploadFile = async () => {
-        return DocumentPicker.getDocumentAsync({ type: 'application/json' }).then((result) => {
-            if (result.canceled) return
-            const name = result.assets[0].name.replace(`.json`, '')
-            return FS.copyAsync({
-                from: result.assets[0].uri,
-                to: `${FS.documentDirectory}/instruct/${name}.json`,
-            })
-                .then(() => {
-                    return FS.readAsStringAsync(`${FS.documentDirectory}/instruct/${name}.json`, {
-                        encoding: FS.EncodingType.UTF8,
-                    })
-                })
-                .then((file) => {
-                    const filekeys = Object.keys(JSON.parse(file))
-                    const correctkeys = Object.keys(defaultInstruct())
-                    const samekeys = filekeys.every((element, index) => {
-                        return element === correctkeys[index]
-                    })
-                    if (!samekeys) {
-                        return FS.deleteAsync(`${FS.documentDirectory}/instruct/${name}.json`).then(
-                            () => {
-                                throw new TypeError(`JSON file has invalid format`)
-                            }
-                        )
-                    } else return name
-                })
-                .catch((error) => Logger.log(`Failed to load: ${error.message}`, true))
-        })
-    }*/
-
-    // db
 
     export namespace Database {
         export const createDefault = async () => {
@@ -210,72 +155,18 @@ export namespace Instructs {
         names_force_groups: false,
         name: 'Default',
     }
-}
-/*
-export type InstructType = {
-    system_prompt: string
-    input_sequence: string
-    output_sequence: string
-    first_output_sequence: string
-    last_output_sequence: string
-    system_sequence_prefix: string
-    system_sequence_suffix: string
 
-    stop_sequence: string
-    separator_sequence: string
-    wrap: boolean
-    macro: boolean
-    names: boolean
-    names_force_groups: boolean
-    activation_regex: string
-    name: string
-}
-
-export const defaultInstruct = (): InstructType => {
-    return {
-        system_prompt:
-            "Write {{char}}'s next reply in a roleplay chat between {{char}} and {{user}}.",
-        input_sequence: '### Instruction: ',
-        output_sequence: '### Response: ',
-        first_output_sequence: '',
-        last_output_sequence: '',
-        system_sequence_prefix: '### Instruction: ',
-        system_sequence_suffix: '',
-        stop_sequence: '',
-        separator_sequence: '',
-        wrap: false,
-        macro: false,
-        names: false,
-        names_force_groups: false,
-        activation_regex: '',
-        name: 'Default',
+    export const generateInitialDefaults = async (bypass: boolean = false) => {
+        const generated = mmkv.getBoolean(Global.GenerateDefaultInstructs)
+        if (generated && !bypass) return
+        const list = await Database.readList()
+        mmkv.set(Global.GenerateDefaultInstructs, true)
+        defaultInstructs.map(async (item) => {
+            if (!list?.some((e) => e.name === item.name)) await Database.create(item)
+        })
+        Logger.log('Default Instructs Successfully Generated')
     }
 }
-
-export type InstructTypeST = {
-    system_prompt: string
-    input_sequence: string
-    output_sequence: string
-    first_output_sequence: string
-    last_output_sequence: string
-    system_sequence_prefix: string
-    system_sequence_suffix: string
-    stop_sequence: string
-    wrap: boolean
-    macro: boolean
-    names: boolean
-    names_force_groups: boolean
-    activation_regex: string
-    output_suffix: string
-    input_suffix: string
-    system_sequence: string
-    system_suffix: string
-    user_alignment_message: string
-    last_system_sequence: string
-    skip_examples: boolean
-    system_same_as_user: boolean
-    name: string
-}*/
 
 export type InstructType = {
     id?: number
@@ -297,4 +188,56 @@ export type InstructType = {
     names_force_groups: boolean
 }
 
-const defaultInstructs: InstructType[] = []
+const defaultInstructs: InstructType[] = [
+    {
+        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prefix: '### Instruction: ',
+        system_suffix: '\n',
+        input_prefix: '### Instruction: ',
+        input_suffix: '\n',
+        output_prefix: '### Response: ',
+        output_suffix: '\n',
+        stop_sequence: '### Instruction',
+        user_alignment_message: '',
+        activation_regex: '',
+        wrap: false,
+        macro: false,
+        names: false,
+        names_force_groups: false,
+        name: 'Alpaca',
+    },
+    {
+        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prefix: '<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n',
+        system_suffix: '<|eot_id|>',
+        input_prefix: '<|start_header_id|>user<|end_header_id|>\n\n',
+        input_suffix: '<|eot_id|>',
+        output_prefix: '<|start_header_id|>assistant<|end_header_id|>\n\n',
+        output_suffix: '<|eot_id|>',
+        stop_sequence: '<|eot_id|>',
+        user_alignment_message: '',
+        activation_regex: '',
+        wrap: false,
+        macro: false,
+        names: false,
+        names_force_groups: false,
+        name: 'Llama 3',
+    },
+    {
+        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prefix: '<|im_start|>system\n',
+        system_suffix: '<|im_end|>\n',
+        input_prefix: '<|im_start|>user\n',
+        input_suffix: '<|im_end|>\n',
+        output_prefix: '<|im_start|>assistant\n',
+        output_suffix: '<|im_end|>\n',
+        stop_sequence: '<|im_end|>',
+        user_alignment_message: '',
+        activation_regex: '',
+        wrap: false,
+        macro: false,
+        names: false,
+        names_force_groups: false,
+        name: 'ChatML',
+    },
+]

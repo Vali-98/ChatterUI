@@ -37,6 +37,7 @@ const Instruct = () => {
         if (currentitem.length === 0) {
             // item no longer exists
             setSelectedItem(list[0])
+            loadInstruct(list[0].id)
         } else {
             setSelectedItem(currentitem[0])
         }
@@ -50,6 +51,24 @@ const Instruct = () => {
         if (currentInstruct && instructID) Instructs.Database.update(instructID, currentInstruct)
     }
 
+    const regenerateDefaults = () => {
+        Alert.alert(
+            `Regenerate Default Instructs`,
+            `Are you sure you want to regenerate default Instructs'?`,
+            [
+                { text: `Cancel`, style: `cancel` },
+                {
+                    text: `Confirm`,
+                    style: `destructive`,
+                    onPress: async () => {
+                        await Instructs.generateInitialDefaults(true)
+                        loadInstructList()
+                    },
+                },
+            ]
+        )
+    }
+
     useAutosave({ data: currentInstruct, onSave: () => handleSaveInstruct(false), interval: 3000 })
 
     if (currentInstruct)
@@ -60,6 +79,17 @@ const Instruct = () => {
                         options={{
                             title: `Instruct`,
                             animation: 'fade',
+                            headerRight: () => (
+                                <TouchableOpacity
+                                    style={{ paddingTop: 8, paddingRight: 8 }}
+                                    onPress={regenerateDefaults}>
+                                    <FontAwesome
+                                        name="repeat"
+                                        color={Style.getColor('primary-text1')}
+                                        size={24}
+                                    />
+                                </TouchableOpacity>
+                            ),
                         }}
                     />
 
@@ -212,6 +242,23 @@ const Instruct = () => {
 
                             <View style={{ flexDirection: 'row' }}>
                                 <TextBox
+                                    name="System Prefix"
+                                    varname="system_prefix"
+                                    body={currentInstruct}
+                                    setValue={setCurrentInstruct}
+                                    multiline
+                                />
+                                <TextBox
+                                    name="System Suffix"
+                                    varname="system_suffix"
+                                    body={currentInstruct}
+                                    setValue={setCurrentInstruct}
+                                    multiline
+                                />
+                            </View>
+
+                            <View style={{ flexDirection: 'row' }}>
+                                <TextBox
                                     name="Input Prefix"
                                     varname="input_prefix"
                                     body={currentInstruct}
@@ -260,23 +307,6 @@ const Instruct = () => {
                                 />
                             </View>
                             */}
-
-                            <View style={{ flexDirection: 'row' }}>
-                                <TextBox
-                                    name="System Prefix"
-                                    varname="system_prefix"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />
-                                <TextBox
-                                    name="System Suffix"
-                                    varname="system_suffix"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />
-                            </View>
 
                             <View style={{ flexDirection: 'row' }}>
                                 <TextBox
