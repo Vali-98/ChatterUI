@@ -20,11 +20,9 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
         }))
     )
 
-    const { message } = Chats.useChat(
-        useShallow((state) => ({
-            message: state?.data?.messages?.[index] ?? Chats.dummyEntry,
-        }))
-    )
+    const { message } = Chats.useChat((state) => ({
+        message: state?.data?.messages?.[index] ?? Chats.dummyEntry,
+    }))
 
     const handleSwipeLeft = () => {
         swipeChat(index, -1)
