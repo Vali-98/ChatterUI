@@ -132,11 +132,12 @@ const buildContext = (max_length: number) => {
     const userName = userCard.data?.name ?? ''
 
     const currentCard = { ...Characters.useCharacterCard.getState().card }
-    const characterCache = Characters.useCharacterCard.getState().getCache(userName)
+    const charName = currentCard.data?.name ?? ''
 
-    const instructCache = Instructs.useInstruct
-        .getState()
-        .getCache(currentCard.data?.name ?? '', userName)
+    const characterCache = Characters.useCharacterCard.getState().getCache(userName)
+    const userCache = Characters.useUserCard.getState().getCache(charName)
+    const instructCache = Instructs.useInstruct.getState().getCache(charName, userName)
+
     const user_card_data = (userCard?.data?.description ?? '').trim()
     const char_card_data = (currentCard?.data?.description ?? '').trim()
 
@@ -157,7 +158,7 @@ const buildContext = (max_length: number) => {
     }
     if (user_card_data) {
         payload += user_card_data
-        payload_length += LlamaTokenizer.encode(user_card_data).length * token_mult
+        payload_length += userCache.description_length * token_mult
     }
     // suffix must be delayed for example messages
 

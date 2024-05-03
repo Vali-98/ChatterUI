@@ -1,7 +1,3 @@
-// DEPRECATED //
-
-// This file is no longer in use since the migration to SQL
-
 import { Buffer } from '@craftzdog/react-native-buffer'
 import axios from 'axios'
 import * as Base64 from 'base-64'
@@ -11,6 +7,10 @@ import { decode } from 'png-chunk-text'
 import extractChunks from 'png-chunks-extract'
 import { Logger } from './Logger'
 
+/**
+ *
+ * @deprecated This file is no longer in use since the migration to SQL
+ */
 export namespace CharactersOld {
     export const createCard = async (charName: string) => {
         return FS.makeDirectoryAsync(getDir(charName))
