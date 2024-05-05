@@ -264,7 +264,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
     },
 
-    optionsButton: {},
+    optionsButton: {
+        paddingBottom: 6,
+    },
 
     optionItem: {
         flexDirection: 'row',

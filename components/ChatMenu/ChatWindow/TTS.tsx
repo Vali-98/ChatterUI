@@ -1,5 +1,6 @@
+import { useInference } from '@constants/Chat'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Logger, Chats, Style } from '@globals'
+import { Global, Logger, Style } from '@globals'
 import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'
 import { View, TouchableOpacity } from 'react-native'
@@ -16,7 +17,7 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
     const [autoTTS, setAutoTTS] = useMMKVBoolean(Global.TTSAuto)
 
     const [start, setStart] = useMMKVBoolean(Global.TTSAutoStart)
-    const nowGenerating = Chats.useChat((state) => state.nowGenerating)
+    const nowGenerating = useInference((state) => state.nowGenerating)
 
     useEffect(() => {
         if (nowGenerating && isSpeaking) handleStopSpeaking()
