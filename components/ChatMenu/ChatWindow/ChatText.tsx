@@ -60,7 +60,7 @@ const ChatText: React.FC<ChatTextProps> = ({ showEllipsis, nowGenerating, id, is
             handleAnimateHeight(height.current)
         } else if (nowGenerating && !mes) {
             // NOTE: this assumes that mes is empty due to a swipe and may break, but unlikely
-            height.current = -1
+            height.current = 0
             handleAnimateHeight(height.current)
         }
     }, [nowGenerating])
