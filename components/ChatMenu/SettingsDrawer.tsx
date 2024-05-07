@@ -5,6 +5,7 @@ import {
     StyleSheet,
     View,
     Image,
+    Linking,
 } from 'react-native'
 import Animated, {
     SlideInLeft,
@@ -159,54 +160,78 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                     }}
                     entering={SlideInLeft.duration(300).easing(Easing.out(Easing.quad))}
                     exiting={SlideOutLeft.duration(300).easing(Easing.out(Easing.quad))}>
-                    <View style={styles.userContainer}>
-                        <Image
-                            style={styles.userImage}
-                            source={imageSource}
-                            onError={handleImageError}
-                        />
+                    <View style={{ justifyContent: 'space-between', flex: 1 }}>
                         <View>
-                            <Text style={styles.userName}>{userName}</Text>
-                            <View style={styles.buttonContainer}>
-                                <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => handlePush('/UserInfo')}>
-                                    <FontAwesome
-                                        size={20}
-                                        name="edit"
-                                        color={Style.getColor('primary-text1')}
-                                    />
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => handlePush('/UserSelector')}>
-                                    <FontAwesome
-                                        size={20}
-                                        name="th-list"
-                                        color={Style.getColor('primary-text1')}
-                                    />
-                                </TouchableOpacity>
+                            <View style={styles.userContainer}>
+                                <Image
+                                    style={styles.userImage}
+                                    source={imageSource}
+                                    onError={handleImageError}
+                                />
+                                <View>
+                                    <Text style={styles.userName}>{userName}</Text>
+                                    <View style={styles.buttonContainer}>
+                                        <TouchableOpacity
+                                            style={styles.button}
+                                            onPress={() => handlePush('/UserInfo')}>
+                                            <FontAwesome
+                                                size={20}
+                                                name="edit"
+                                                color={Style.getColor('primary-text1')}
+                                            />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={styles.button}
+                                            onPress={() => handlePush('/UserSelector')}>
+                                            <FontAwesome
+                                                size={20}
+                                                name="th-list"
+                                                color={Style.getColor('primary-text1')}
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
                             </View>
+                            {(__DEV__ ? [...paths, ...paths_dev] : paths).map((item, index) => (
+                                <DrawerButton item={item} index={index} key={index} />
+                            ))}
+
+                            <Text
+                                style={{
+                                    alignSelf: 'center',
+                                    color: Style.getColor('primary-text2'),
+                                    marginTop: 8,
+                                }}>
+                                {__DEV__ && 'DEV BUILD\t'}
+                                {'v' + require(`../../app.json`).expo.version}
+                            </Text>
                         </View>
+                        <TouchableOpacity
+                            onPress={() => {
+                                Linking.openURL('https://ko-fi.com/vali98')
+                            }}
+                            style={{
+                                alignSelf: 'center',
+                                marginBottom: 16,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                borderColor: Style.getColor('primary-brand'),
+                                padding: 8,
+                                paddingHorizontal: 16,
+                                borderWidth: 1,
+                                borderRadius: 16,
+                            }}>
+                            <Text
+                                style={{ color: Style.getColor('primary-text2'), paddingRight: 4 }}>
+                                Support ChatterUI
+                            </Text>
+                            <FontAwesome
+                                name="coffee"
+                                size={16}
+                                color={Style.getColor('primary-text1')}
+                            />
+                        </TouchableOpacity>
                     </View>
-                    {paths.map((item, index) => (
-                        <DrawerButton item={item} index={index} key={index} />
-                    ))}
-
-                    {__DEV__ &&
-                        paths_dev.map((item, index) => (
-                            <DrawerButton item={item} index={index} key={index} />
-                        ))}
-
-                    <Text
-                        style={{
-                            alignSelf: 'center',
-                            color: Style.getColor('primary-text2'),
-                            marginTop: 8,
-                        }}>
-                        {__DEV__ && 'DEV BUILD\t'}
-                        {'v' + require(`../../app.json`).expo.version}
-                    </Text>
                 </Animated.View>
             </View>
         )
