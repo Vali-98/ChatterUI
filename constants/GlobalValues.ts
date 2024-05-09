@@ -91,3 +91,15 @@ export const enum Global {
     TTSAuto = `ttsauto`,
     TTSAutoStart = 'ttsautostart',
 }
+
+export enum GenerationSettings {
+    DisableFirst = 'disablefirst',
+    UseFormatter = 'useformatter',
+    FormatterTarget = 'formattertarget',
+    FormatterSource = 'formattersource',
+}
+
+export enum AppSettings {
+    DevMode = 'devmode',
+    PrimaryHue = 'primaryhue',
+}

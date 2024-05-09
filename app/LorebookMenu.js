@@ -20,67 +20,90 @@ const LorebookMenu = () => {
         setBooks((await Lorebooks.getFileList()).map((item) => item.replace('.json', '')))
     }
 
-    return (
-        <View style={styles.mainContainer}>
-            <Stack.Screen
-                options={{
-                    animation: 'slide_from_left',
-                    title: `Lorebooks`,
-                }}
-            />
-            <View style={styles.bar}>
-                <View style={styles.searchBox}>
-                    <TextInput style={styles.searchInput} onChangeText={setSearchData} />
-                    <FontAwesome name="search" size={15} color={Style.getColor('primary-text1')} />
+    if (__DEV__)
+        return (
+            <View style={styles.mainContainer}>
+                <Stack.Screen
+                    options={{
+                        animation: 'slide_from_left',
+                        title: `Lorebooks`,
+                    }}
+                />
+                <View style={styles.bar}>
+                    <View style={styles.searchBox}>
+                        <TextInput style={styles.searchInput} onChangeText={setSearchData} />
+                        <FontAwesome
+                            name="search"
+                            size={15}
+                            color={Style.getColor('primary-text1')}
+                        />
+                    </View>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            Lorebooks.uploadFile().then(() => loadBooksList())
+                        }}>
+                        <FontAwesome
+                            size={24}
+                            name="upload"
+                            color={Style.getColor('primary-text1')}
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            setShowNewBook(true)
+                        }}>
+                        <FontAwesome
+                            size={24}
+                            name="plus"
+                            color={Style.getColor('primary-text1')}
+                        />
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        Lorebooks.uploadFile().then(() => loadBooksList())
-                    }}>
-                    <FontAwesome size={24} name="upload" color={Style.getColor('primary-text1')} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        setShowNewBook(true)
-                    }}>
-                    <FontAwesome size={24} name="plus" color={Style.getColor('primary-text1')} />
-                </TouchableOpacity>
-            </View>
-            <ScrollView style={{ marginTop: 16 }}>
-                {books.length > 0 &&
-                    books
-                        .filter((book) => {
-                            return book.toLowerCase().includes(searchData.toLowerCase())
-                        })
-                        .map((book, index) => (
-                            <TouchableOpacity
-                                key={index}
-                                style={styles.lorebookItem}
-                                onPress={() => router.push(`/BookInfo/${book}`)}>
-                                <Text style={{ color: Style.getColor('primary-text1') }}>
-                                    {book}
-                                </Text>
-                                <TouchableOpacity>
-                                    <FontAwesome
-                                        color={Style.getColor('primary-text1')}
-                                        size={24}
-                                        name="trash"
-                                        onPress={() =>
-                                            Lorebooks.deleteFile(book).then(() => loadBooksList())
-                                        }
-                                    />
+                <ScrollView style={{ marginTop: 16 }}>
+                    {books.length > 0 &&
+                        books
+                            .filter((book) => {
+                                return book.toLowerCase().includes(searchData.toLowerCase())
+                            })
+                            .map((book, index) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={styles.lorebookItem}
+                                    onPress={() => router.push(`/BookInfo/${book}`)}>
+                                    <Text style={{ color: Style.getColor('primary-text1') }}>
+                                        {book}
+                                    </Text>
+                                    <TouchableOpacity>
+                                        <FontAwesome
+                                            color={Style.getColor('primary-text1')}
+                                            size={24}
+                                            name="trash"
+                                            onPress={() =>
+                                                Lorebooks.deleteFile(book).then(() =>
+                                                    loadBooksList()
+                                                )
+                                            }
+                                        />
+                                    </TouchableOpacity>
                                 </TouchableOpacity>
-                            </TouchableOpacity>
-                        ))}
-            </ScrollView>
+                            ))}
+                </ScrollView>
 
-            <TextBoxModal
-                title="Create New Lorebook"
-                booleans={[showNewBook, setShowNewBook]}
-                onConfirm={(text) => {}}
-            />
+                <TextBoxModal
+                    title="Create New Lorebook"
+                    booleans={[showNewBook, setShowNewBook]}
+                    onConfirm={(text) => {}}
+                />
+            </View>
+        )
+
+    return (
+        <View style={{ alignItems: 'center' }}>
+            <Text style={{ fontSize: 30, color: Style.getColor('primary-text1') }}>
+                Under Construction
+            </Text>
         </View>
     )
 }

@@ -1,12 +1,31 @@
-import { View, Image, Text, StyleSheet, Linking } from 'react-native'
-import React from 'react'
+import { View, Image, Text, StyleSheet, Linking, Settings } from 'react-native'
+import React, { useState } from 'react'
 import { Stack } from 'expo-router'
-import { Style } from '@globals'
+import { Logger, Style } from '@globals'
 import SupportButton from '@components/SupportButton'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { FontAwesome } from '@expo/vector-icons'
+import { useMMKVBoolean } from 'react-native-mmkv'
+import { AppSettings } from '@constants/GlobalValues'
 
 const About = () => {
+    const [counter, setCounter] = useState<number>(0)
+    const [devMode, setDevMode] = useMMKVBoolean(AppSettings.DevMode)
+
+    const updateCounter = () => {
+        if (devMode) return
+        if (counter === 7) {
+            Logger.log(`You have enabled dev mode.`, true)
+            setDevMode(true)
+        } else if (counter < 7 && counter > 3)
+            Logger.log(
+                `You are ${7 - counter} step${7 - counter === 1 ? '' : 's'} away from entering dev mode.`,
+                true,
+                100
+            )
+        setCounter(counter + 1)
+    }
+
     const version = 'v' + require(`../app.json`).expo.version
     return (
         <View style={styles.container}>
@@ -17,9 +36,13 @@ const About = () => {
                     headerRight: () => <View></View>,
                 }}
             />
-            <Image source={require('../assets/images/icon.png')} style={styles.icon} />
+            <TouchableOpacity activeOpacity={100} onPress={updateCounter}>
+                <Image source={require('../assets/images/icon.png')} style={styles.icon} />
+            </TouchableOpacity>
             <Text style={styles.titleText}>ChatterUI</Text>
-            <Text style={styles.subtitleText}>Version {version}</Text>
+            <Text style={styles.subtitleText}>
+                Version {version} {devMode && '[DEV MODE]'}
+            </Text>
             <Text style={styles.body}>
                 ChatterUI is a free and open-source application developed by Vali98
             </Text>
@@ -39,8 +62,23 @@ const About = () => {
                 style={styles.supportButton}>
                 <Text style={styles.supportText}>Github Repository</Text>
                 <FontAwesome name="github" size={20} color={Style.getColor('primary-text1')} />
-                <Text style={styles.supportText}></Text>
             </TouchableOpacity>
+
+            {devMode && (
+                <TouchableOpacity
+                    style={{
+                        ...styles.supportButton,
+                        marginTop: 24,
+                        borderColor: Style.getColor('destructive-brand'),
+                    }}
+                    onPress={() => {
+                        setCounter(0)
+                        setDevMode(false)
+                        Logger.log('Dev mode disabled')
+                    }}>
+                    <Text style={styles.supportText}>Disable Dev Mode</Text>
+                </TouchableOpacity>
+            )}
         </View>
     )
 }
