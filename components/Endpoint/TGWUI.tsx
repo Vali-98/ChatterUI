@@ -1,6 +1,7 @@
 import { Global, Style } from '@globals'
 import { View, Text, StyleSheet, TextInput } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
+import HeartbeatButton from './HeartbeatButton'
 
 const TGWUI = () => {
     const [streamEnd, setStreamEnd] = useMMKVString(Global.TGWUIStreamingEndpoint)
@@ -17,6 +18,7 @@ const TGWUI = () => {
                 placeholder="eg. https://127.0.0.1:5000"
                 placeholderTextColor={Style.getColor('primary-text2')}
             />
+            {streamEnd && <HeartbeatButton api={streamEnd} />}
         </View>
     )
 }

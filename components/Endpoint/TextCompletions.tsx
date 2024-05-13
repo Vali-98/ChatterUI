@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-nativ
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { OpenAIModel } from './OpenAI'
 import { Dropdown } from 'react-native-element-dropdown'
+import HeartbeatButton from './HeartbeatButton'
 
 const TextCompletions = () => {
     const [endpoint, setEndpoint] = useMMKVString(Global.CompletionsEndpoint)
@@ -23,16 +24,20 @@ const TextCompletions = () => {
     const getModelList = async () => {
         if (!endpoint) return
 
-        const response = await fetch(new URL('/v1/models', endpoint).toString(), {
-            headers: { accept: 'application/json', Authorization: `Bearer ${completionsKey}` },
-        })
-
-        if (response.status !== 200) {
-            Logger.log(`Error with response: ${response.status}`, true)
-            return
+        try {
+            const url = new URL('/v1/models', endpoint).toString()
+            const response = await fetch(url, {
+                headers: { accept: 'application/json', Authorization: `Bearer ${completionsKey}` },
+            })
+            if (response.status !== 200) {
+                Logger.log(`Error with response: ${response.status}`, true)
+                return
+            }
+            const { data } = await response.json()
+            setModelList(data)
+        } catch (e) {
+            setModelList([])
         }
-        const { data } = await response.json()
-        setModelList(data)
     }
 
     return (
@@ -76,6 +81,8 @@ const TextCompletions = () => {
                 placeholder="eg. https://127.0.0.1:5000"
                 placeholderTextColor={Style.getColor('primary-text2')}
             />
+
+            {endpoint && <HeartbeatButton api={endpoint} />}
 
             <View style={styles.dropdownContainer}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 8 }}>

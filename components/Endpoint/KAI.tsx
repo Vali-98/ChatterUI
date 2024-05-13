@@ -2,6 +2,7 @@ import { Global, Style } from '@globals'
 import { useEffect } from 'react'
 import { View, Text, TextInput, StyleSheet } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
+import HeartbeatButton from './HeartbeatButton'
 
 const KAI = () => {
     const [kaiendpoint, setKAIEndpoint] = useMMKVString(Global.KAIEndpoint)
@@ -22,6 +23,7 @@ const KAI = () => {
                 placeholder="eg. http://127.0.0.1:5000"
                 placeholderTextColor={Style.getColor('primary-text2')}
             />
+            {kaiendpoint && <HeartbeatButton api={kaiendpoint} />}
         </View>
     )
 }
