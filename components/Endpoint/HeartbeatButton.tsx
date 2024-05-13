@@ -78,6 +78,7 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
             </TouchableOpacity>
             <View
                 style={{
+                    marginLeft: 4,
                     backgroundColor: buttonColor,
                     borderColor:
                         status === ResponseStatus.DEFAULT
