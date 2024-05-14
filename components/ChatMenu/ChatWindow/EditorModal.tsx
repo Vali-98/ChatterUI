@@ -1,7 +1,6 @@
 import {
     GestureResponderEvent,
     Modal,
-    Platform,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -94,31 +93,24 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
     }
 
     return (
-        <Modal visible={editMode} animationType="fade" transparent onRequestClose={handleClose}>
+        <Modal
+            visible={editMode}
+            animationType="fade"
+            transparent
+            onRequestClose={handleClose}
+            style={{ flex: 1 }}>
             <FadeScreen handleOverlayClick={handleOverlayClick} />
             <View style={{ flex: 1 }} />
+            <View style={styles.topText}>
+                <Text style={styles.nameText}>{message?.name}</Text>
+                <Text style={styles.timeText}>
+                    {message?.swipes[message.swipe_id].send_date.toLocaleTimeString()}
+                </Text>
+            </View>
             <Animated.View
                 style={styles.editorContainer}
                 entering={SlideInDown.duration(300).easing(Easing.out(Easing.quad))}
                 exiting={SlideOutDown.duration(300).easing(Easing.out(Easing.quad))}>
-                <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'flex-end' }}>
-                    <Text
-                        style={{
-                            color: Style.getColor('primary-text1'),
-                            fontSize: 18,
-                            marginLeft: 40,
-                        }}>
-                        {message?.name}
-                    </Text>
-                    <Text
-                        style={{
-                            color: Style.getColor('primary-text2'),
-                            fontSize: 12,
-                            marginLeft: 8,
-                        }}>
-                        {message?.swipes[message.swipe_id].send_date.toLocaleTimeString()}
-                    </Text>
-                </View>
                 <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                     <EditorButton
                         name="delete"
@@ -151,12 +143,31 @@ const styles = StyleSheet.create({
 
     editorContainer: {
         backgroundColor: Style.getColor('primary-surface2'),
-        shadowColor: Style.getColor('primary-shadow'),
         paddingTop: 4,
-        paddingBottom: 16,
-        paddingVertical: 8,
-        maxHeight: '80%',
-        elevation: 20,
+        maxHeight: '70%',
+        paddingVertical: 24,
+    },
+
+    topText: {
+        flexDirection: 'row',
+        padding: 8,
+        alignItems: 'flex-end',
+        shadowColor: Style.getColor('primary-shadow'),
+        backgroundColor: Style.getColor('primary-surface2'),
+        borderTopRightRadius: 8,
+        borderTopLeftRadius: 8,
+    },
+
+    nameText: {
+        color: Style.getColor('primary-text1'),
+        fontSize: 18,
+        marginLeft: 40,
+    },
+
+    timeText: {
+        color: Style.getColor('primary-text2'),
+        fontSize: 12,
+        marginLeft: 8,
     },
 
     editButton: {
@@ -171,7 +182,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         minHeight: 32,
         borderRadius: 8,
-        flex: 1,
         padding: 8,
+        flex: 1,
     },
 })
