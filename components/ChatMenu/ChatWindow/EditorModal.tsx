@@ -94,12 +94,7 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
     }
 
     return (
-        <Modal
-            visible={editMode}
-            animationType="fade"
-            transparent
-            onRequestClose={handleClose}
-            statusBarTranslucent={Platform.OS === 'android'}>
+        <Modal visible={editMode} animationType="fade" transparent onRequestClose={handleClose}>
             <FadeScreen handleOverlayClick={handleOverlayClick} />
             <View style={{ flex: 1 }} />
             <Animated.View
