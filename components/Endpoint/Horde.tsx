@@ -20,11 +20,15 @@ const Horde = () => {
     const [modelList, setModelList] = useState([])
 
     const getModels = async () => {
-        const modelresults = await fetch(`https://stablehorde.net/api/v2/status/models?type=text`, {
-            method: 'GET',
-            headers: { ...hordeHeader() },
-        }).catch(() => {
-            Logger.log(`Could not connect to horde`, true)
+        const modelresults = await fetch(
+            `https://aihorde.net/api/v2/status/models?type=text&model_state=all`,
+            {
+                method: 'GET',
+                headers: { ...hordeHeader(), accept: 'application/json' },
+            }
+        ).catch((error) => {
+            Logger.log(`Could Not Connect To Horde`, true)
+            Logger.log(`${error}`)
         })
         if (!modelresults) return
 
@@ -37,7 +41,7 @@ const Horde = () => {
         if (hordeModels)
             setHordeModels(hordeModels.filter((item) => dropdownValues.includes(item.name)))
 
-        const workerresults = await fetch(`https://stablehorde.net/api/v2/workers?type=text`, {
+        const workerresults = await fetch(`https://aihorde.net/api/v2/workers?type=text`, {
             method: 'GET',
             ...hordeHeader(),
         }).catch(() => {

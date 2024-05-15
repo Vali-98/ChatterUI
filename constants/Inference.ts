@@ -575,7 +575,7 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
     setAbortFunction(() => {
         aborted = true
         if (generation_id !== null)
-            fetch(`https://stablehorde.net/api/v2/generate/text/status/${generation_id}`, {
+            fetch(`https://aihorde.net/api/v2/generate/text/status/${generation_id}`, {
                 method: 'DELETE',
                 headers: {
                     ...hordeHeader(),
@@ -591,7 +591,7 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
     Logger.log(`Using Horde`)
 
     const payload = constructHordePayload()
-    const request = await fetch(`https://stablehorde.net/api/v2/generate/text/async`, {
+    const request = await fetch(`https://aihorde.net/api/v2/generate/text/async`, {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: {
@@ -626,7 +626,7 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
 
         Logger.log(`Checking...`)
         const response = await fetch(
-            `https://stablehorde.net/api/v2/generate/text/status/${generation_id}`,
+            `https://aihorde.net/api/v2/generate/text/status/${generation_id}`,
             {
                 method: 'GET',
                 headers: {
