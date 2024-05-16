@@ -220,29 +220,31 @@ const buildContext = (max_length: number) => {
 
 const buildChatCompletionContext = (max_length: number) => {
     const messages = [...(Chats.useChat.getState().data?.messages ?? [])]
-    const userCard = { ...Characters.useCharacterCard.getState().card }
+    const userCard = { ...Characters.useUserCard.getState().card }
     const currentCard = { ...Characters.useCharacterCard.getState().card }
     const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
+    const buffer = Chats.useChat.getState().buffer
 
-    const initial = `${currentInstruct.system_prefix}
-    ${currentInstruct.system_prompt}
+    // Logic here is that if the buffer is empty, this is not a regen, hence can popped
+    if (!buffer) messages.pop()
+    const initial = `${currentInstruct.system_prompt}
     \n${userCard?.data?.description ?? ''}
-    \n${currentCard?.data?.description ?? ''}
-    \n${currentInstruct.system_suffix}`
+    \n${currentCard?.data?.description ?? ''}`
 
     let total_length = LlamaTokenizer.encode(initial).length
     const payload = [{ role: 'system', content: replaceMacros(initial) }]
+    const messageBuffer = []
     for (const message of messages.reverse()) {
         const len =
             LlamaTokenizer.encode(message.swipes[message.swipe_id].swipe).length + total_length
         if (len > max_length) break
-        payload.push({
+        messageBuffer.push({
             role: message.is_user ? 'user' : 'assistant',
             content: replaceMacros(message.swipes[message.swipe_id].swipe),
         })
         total_length += len
     }
-    return payload
+    return [...payload, ...messageBuffer.reverse()]
 }
 
 const constructStopSequence = (instruct: InstructType): Array<string> => {
@@ -501,7 +503,7 @@ const constructOpenRouterPayload = () => {
         frequency_penalty: preset.freq_pen,
         max_tokens: preset.genamt,
         presence_penalty: preset.presence_pen,
-        response_format: 'text',
+        response_format: { type: 'json_object' },
         seed:
             preset?.seed === undefined || preset.seed === -1
                 ? Math.floor(Math.random() * 999999)
