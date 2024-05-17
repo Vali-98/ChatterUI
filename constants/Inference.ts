@@ -251,8 +251,6 @@ const constructStopSequence = (instruct: InstructType): Array<string> => {
     const sequence: Array<string> = []
     if (instruct.stop_sequence !== '')
         instruct.stop_sequence.split(',').forEach((item) => item !== '' && sequence.push(item))
-    // maybe people rather this not be removed?
-    //sequence.push(instruct.input_sequence)
     return sequence
 }
 
@@ -509,7 +507,6 @@ const constructOpenRouterPayload = () => {
     const openRouterModel = getObject(Global.OpenRouterModel)
     const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
     const preset = getObject(Global.PresetData)
-    console.log(getSeed(preset.seed))
     return {
         messages: buildChatCompletionContext(openRouterModel.context_length),
         model: openRouterModel.id,
