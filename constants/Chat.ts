@@ -10,47 +10,6 @@ import { chatEntries, chatSwipes, chats } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import * as FS from 'expo-file-system'
 import { LlamaTokenizer } from './tokenizer'
-/*
-export type ChatExtra = {
-    api: string
-    model: string
-}
-
-export type ChatSwipeInfo = {
-    send_date: string
-    extra: ChatExtra
-    gen_started: string
-    gen_finished: string
-}
-
-export type ChatEntry = {
-    name: string
-    is_user: boolean
-    mes: string
-    // metadata
-    send_date: string
-    gen_started: string
-    gen_finished: string
-    extra: ChatExtra
-    swipe_id: number
-    swipes: Array<string>
-    swipe_info: Array<ChatSwipeInfo>
-}
-
-export type ChatMetadata = {
-    note_prompt: string
-    note_interval: number
-    note_position: number
-    note_depth: number
-    objective: any
-}
-
-export type ChatInfo = {
-    userName: string
-    charName: string
-    createDate: string
-    //chat_metadata: ChatMetadata
-}*/
 
 export type ChatSwipe = {
     id: number
@@ -60,6 +19,7 @@ export type ChatSwipe = {
     gen_started: Date
     gen_finished: Date
     token_count?: number
+    regen_cache?: string
 }
 
 export type ChatEntry = {
@@ -109,6 +69,7 @@ export interface ChatState {
     insertBuffer: (data: string) => void
     updateFromBuffer: () => Promise<void>
     insertLastToBuffer: () => void
+    setRegenCache: () => void
     stopGenerating: () => void
     startGenerating: () => void
     abortFunction: undefined | AbortFunction
@@ -307,6 +268,17 @@ export namespace Chats {
 
             set((state: ChatState) => ({ ...state, buffer: mes }))
         },
+        setRegenCache: () => {
+            const messages = get()?.data?.messages
+            const message = messages?.[messages.length - 1]
+            if (!messages || !message) return
+            message.swipes[message.swipe_id].regen_cache = message.swipes[message.swipe_id].swipe
+            messages[messages.length - 1] = message
+            set((state) => ({
+                ...state,
+                data: state?.data ? { ...state.data, messages: messages } : state.data,
+            }))
+        },
     }))
 
     export const getNewest = async (charId: number): Promise<number | undefined> => {
@@ -473,147 +445,4 @@ export namespace Chats {
     export const exists = async (chatId: number) => {
         return await db.query.chats.findFirst({ where: eq(chats.id, chatId) })
     }
-
-    /*
-     export const getNumber = async (charName: string): Promise<number> => {
-        return await FS.readDirectoryAsync(getChatDir(charName))
-            .then((result) => {
-                return result.length
-            })
-            .catch((error) => {
-                Logger.log('Could not get Chat list: ' + error, true)
-                return 0
-            })
-    }
-
-    export const getList = async (charName: string): Promise<string[]> => {
-        return await FS.readDirectoryAsync(getChatDir(charName)).catch((error) => {
-            Logger.log('Could not get Chat list: ' + error, true)
-            return []
-        })
-    }
-
-
-    export const getNewestOld = async (charName: string): Promise<string | undefined> => {
-        const filelist = await FS.readDirectoryAsync(getChatDir(charName))
-        return filelist?.[filelist?.length - 1]
-    }
-
-
-      const getChatFileDir = (charName: string, chatfilename: string): string => {
-        return `${FS.documentDirectory}characters/${charName}/chats/${chatfilename}`
-    }
-
-    const getChatDir = (charName: string): string => {
-        return `${FS.documentDirectory}characters/${charName}/chats`
-    }
-
-    export const getFileString = async (charName: string, chatName: string): Promise<any> => {
-        return await FS.readAsStringAsync(getChatFileDir(charName, chatName), {
-            encoding: FS.EncodingType.UTF8,
-        }).catch((error) => {
-            Logger.log('Failed to get string: ' + error, true)
-        })
-    }
-
-    export const getFileObject = async (
-        charName: string,
-        chatName: string
-    ): Promise<ChatDataArray | undefined> => {
-        return await FS.readAsStringAsync(getChatFileDir(charName, chatName), {
-            encoding: FS.EncodingType.UTF8,
-        })
-            .then((result) => {
-                const chatlist = result
-                    .split('\u000d\u000a')
-                    .map((row) => JSON.parse(row)) as ChatDataArray
-                return chatlist
-            })
-            .catch((error) => {
-                Logger.log('Failed to get object: ' + error, true)
-                return undefined
-            })
-    }
-
-    const defaultExtra = (): ChatExtra => ({
-        api: mmkv.getString(Global.APIType) ?? 'undefined',
-        model: 'undefined',
-    })
-
-    const defaultSwipeInfo = (): ChatSwipeInfo => ({
-        send_date: new Date().toString().slice(0, -9),
-        gen_finished: new Date().toString(),
-        gen_started: new Date().toString(),
-        extra: defaultExtra(),
-    })
-    export const createChatOld = async (
-        charId: number,
-        userName: string
-    ): Promise<undefined | string> => {
-        //for now use mmkv, change to zustand later
-        // const cardstring = mmkv.getString(Global.CurrentCharacterCard)
-        // if (!cardstring) return
-
-        const card = { ...Characters.useCharacterCard.getState().card }
-        const charName = card?.data?.name
-        if (!card || !charName) return
-        const metadata: ChatInfo = {
-            charName: charName,
-            userName: userName,
-            createDate: humanizedISO8601DateTime(),
-            chat_metadata: {
-                note_prompt: 'placeholder',
-                note_interval: 1,
-                note_position: 1,
-                note_depth: 1,
-                objective: {},
-            },
-        }
-        const swipes: Array<string> =
-            card.data?.alternate_greetings && card.data.alternate_greetings.length > 0
-                ? card.data?.alternate_greetings.map((item) => replaceMacros(item))
-                : []
-        const firstMessage: ChatEntry = createEntry(
-            charName,
-            false,
-            replaceMacros(card?.data?.first_mes ?? ''),
-            swipes
-        )
-
-        const output = `${JSON.stringify(metadata)}\u000d\u000a${JSON.stringify(firstMessage)}`
-
-        return FS.writeAsStringAsync(getChatFileDir(charName, metadata.createDate), output)
-            .then(() => {
-                return metadata.createDate
-            })
-            .catch((error) => {
-                Logger.log('Failed create message: ' + error, true)
-                return undefined
-            })
-    }
-
-    export const exists = async (charName: string, chatName: string) => {
-        return FS.getInfoAsync(getChatFileDir(charName, chatName)).then((info) => info.exists)
-    }
-    
-      export const createEntryOld = (
-        name: string,
-        is_user: boolean,
-        message: string,
-        swipes: Array<string> = []
-    ): ChatEntry => {
-        const swipesize = swipes.length + 1
-
-        return {
-            name: name,
-            is_user: is_user,
-            mes: message,
-            ...defaultSwipeInfo(),
-            swipe_id: 0,
-            swipes: [message, ...swipes],
-            swipe_info: new Array(swipesize).fill(defaultSwipeInfo()),
-        }
-    }
-    
-    */
 }

@@ -2,7 +2,6 @@ import { Chats, useInference } from '@constants/Chat'
 import { InstructType, Instructs } from '@constants/Instructs'
 import { replaceMacros } from '@constants/Utils'
 import { LlamaTokenizer } from './tokenizer'
-//import { mmkv, Global, API, hordeHeader, Llama, Logger } from '@globals'
 import { Logger } from './Logger'
 import { API } from './API'
 import { Global } from './GlobalValues'
@@ -16,17 +15,20 @@ import { Characters } from './Characters'
 export const regenerateResponse = async () => {
     const charName = Characters.useCharacterCard.getState().card?.data.name
     const messagesLength = Chats.useChat.getState()?.data?.messages?.length ?? -1
-    const message = Chats.useChat.getState()?.data?.messages?.[messagesLength]
+    const message = Chats.useChat.getState()?.data?.messages?.[messagesLength - 1]
 
     Logger.log('Regenerate Response')
     if (!message?.is_user && messagesLength && messagesLength !== 1) {
-        await Chats.useChat.getState().updateEntry(messagesLength - 1, '', true, true)
+        const replacement = message?.swipes[message.swipe_id].regen_cache ?? ''
+        if (replacement) Chats.useChat.getState().setBuffer(replacement)
+        await Chats.useChat.getState().updateEntry(messagesLength - 1, replacement, true, true)
     } else await Chats.useChat.getState().addEntry(charName ?? '', true, '')
     generateResponse()
 }
 
 export const continueResponse = () => {
     Logger.log(`Continuing Response`)
+    Chats.useChat.getState().setRegenCache()
     Chats.useChat.getState().insertLastToBuffer()
     generateResponse()
 }
@@ -858,4 +860,3 @@ const readableStreamResponse = async (
         Logger.log('EventSource closed')
     })
 }
-export { useInference }

@@ -3,16 +3,15 @@ import React, { useState } from 'react'
 import { Characters, Chats, Logger, Style } from '@globals'
 import { useShallow } from 'zustand/react/shallow'
 import { MaterialIcons } from '@expo/vector-icons'
-import { generateResponse, useInference } from '@constants/Inference'
+import { generateResponse } from '@constants/Inference'
+import { useInference } from '@constants/Chat'
 
 const ChatInput = () => {
     const { insertEntry } = Chats.useChat((state) => ({
         insertEntry: state.addEntry,
     }))
 
-    const { abortFunction, nowGenerating } = useInference((state) => ({
-        abortFunction: state.abortFunction,
-
+    const { nowGenerating } = useInference((state) => ({
         nowGenerating: state.nowGenerating,
     }))
 
