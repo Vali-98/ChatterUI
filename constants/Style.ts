@@ -70,17 +70,15 @@ const createColor = (
             case 'brand':
                 return getHSLString(h, s, l)
             case 'text1':
-                return getHSLString(h, s, 10)
+                return getHSLString(h, s, 35)
             case 'text2':
                 return getHSLString(h, 30, 30)
             case 'text3':
                 return getHSLString(h, 2, 30)
             case 'surface1':
-                return getHSLString(h, 25, 90)
-            case 'surface1':
-                return getHSLString(h, 20, 99)
+                return getHSLString(h, 25, 82)
             case 'surface2':
-                return getHSLString(h, 20, 92)
+                return getHSLString(h, 30, 85)
             case 'surface3':
                 return getHSLString(h, 20, 85)
             case 'surface4':

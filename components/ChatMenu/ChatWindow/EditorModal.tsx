@@ -8,7 +8,7 @@ import {
 } from 'react-native'
 import { useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
-import { Chats, Style } from '@globals'
+import { AppSettings, Chats, Style } from '@globals'
 import { useShallow } from 'zustand/react/shallow'
 import Animated, {
     Easing,
@@ -19,6 +19,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { TextInput } from 'react-native-gesture-handler'
 import { ColorId } from '@constants/Style'
+import { useMMKVBoolean } from 'react-native-mmkv'
 
 type EditorButtonProps = {
     name: 'delete' | 'check' | 'close'
@@ -70,6 +71,8 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
     )
     const message = Chats.useChat((state) => state?.data?.messages?.[id])
 
+    const [animateEditor, setAnimateEditor] = useMMKVBoolean(AppSettings.AnimateEditor)
+
     const [placeholderText, setPlaceholderText] = useState(
         message?.swipes[message?.swipe_id]?.swipe ?? ''
     )
@@ -103,8 +106,16 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
             <View style={{ flex: 1 }} />
             <Animated.View
                 style={styles.topText}
-                entering={SlideInDown.duration(300).easing(Easing.out(Easing.quad))}
-                exiting={SlideOutDown.duration(300).easing(Easing.out(Easing.quad))}>
+                entering={
+                    animateEditor
+                        ? SlideInDown.duration(300).easing(Easing.out(Easing.quad))
+                        : undefined
+                }
+                exiting={
+                    animateEditor
+                        ? SlideOutDown.duration(300).easing(Easing.out(Easing.quad))
+                        : undefined
+                }>
                 <Text style={styles.nameText}>{message?.name}</Text>
                 <Text style={styles.timeText}>
                     {message?.swipes[message.swipe_id].send_date.toLocaleTimeString()}
@@ -112,8 +123,16 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
             </Animated.View>
             <Animated.View
                 style={styles.editorContainer}
-                entering={SlideInDown.duration(300).easing(Easing.out(Easing.quad))}
-                exiting={SlideOutDown.duration(300).easing(Easing.out(Easing.quad))}>
+                entering={
+                    animateEditor
+                        ? SlideInDown.duration(300).easing(Easing.out(Easing.quad))
+                        : undefined
+                }
+                exiting={
+                    animateEditor
+                        ? SlideOutDown.duration(300).easing(Easing.out(Easing.quad))
+                        : undefined
+                }>
                 <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                     <EditorButton
                         name="delete"
