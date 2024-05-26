@@ -11,12 +11,15 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 const ColorTest = () => {
-    const { color, setPrimary, toggleDarkMode, darkMode } = Style.useColorScheme((state) => ({
-        color: state.colors.primary,
-        setPrimary: state.setPrimary,
-        toggleDarkMode: state.toggleDarkMode,
-        darkMode: state.darkMode,
-    }))
+    const { color, setPrimary, toggleDarkMode, darkMode, getColor } = Style.useColorScheme(
+        (state) => ({
+            color: state.colors.primary,
+            setPrimary: state.setPrimary,
+            toggleDarkMode: state.toggleDarkMode,
+            darkMode: state.darkMode,
+            getColor: state.getColor,
+        })
+    )
     const [devMode, setDevMode] = useMMKVBoolean(AppSettings.DevMode)
 
     const surfaces: ColorId[] = [
@@ -32,21 +35,22 @@ const ColorTest = () => {
 
     const [edited, setEdited] = useState(false)
     return (
-        <View style={{ backgroundColor: Style.getColor('primary-surface1'), flex: 1, padding: 16 }}>
+        <View style={{ backgroundColor: getColor('primary-surface1'), flex: 1, padding: 16 }}>
             <Stack.Screen
                 options={{
                     headerRight: () => (
                         <TouchableOpacity
-                            onPress={() =>
+                            onPress={() => {
+                                setEdited(true)
                                 setPrimary(
                                     Style.defaultBrandColor.h,
                                     Style.defaultBrandColor.s,
                                     Style.defaultBrandColor.l
                                 )
-                            }>
+                            }}>
                             <FontAwesome
                                 name="refresh"
-                                color={Style.getColor('primary-text1')}
+                                color={getColor('primary-text1')}
                                 size={24}
                             />
                         </TouchableOpacity>
@@ -61,19 +65,19 @@ const ColorTest = () => {
                         setEdited(true)
                         toggleDarkMode()
                     }}
-                    thumbColor={Style.getColor(darkMode ? 'primary-brand' : 'primary-surface1')}
+                    thumbColor={getColor(darkMode ? 'primary-brand' : 'primary-surface1')}
                     trackColor={{
-                        true: Style.getColor('primary-surface3'),
-                        false: Style.getColor('primary-surface3'),
+                        true: getColor('primary-surface3'),
+                        false: getColor('primary-surface3'),
                     }}
                 />
 
-                <Text style={{ color: Style.getColor('primary-text1') }}>
+                <Text style={{ color: getColor('primary-text1') }}>
                     Toggle Dark Mode [ VERY EXPERIMENTAL ]
                 </Text>
             </View>
             <View style={{ alignItems: 'center', flexDirection: 'row' }}>
-                <Text style={{ color: Style.getColor('primary-text1') }}>Hue: {color.h}</Text>
+                <Text style={{ color: getColor('primary-text1') }}>Hue: {color.h}</Text>
                 <Slider
                     minimumValue={1}
                     maximumValue={360}
@@ -84,15 +88,15 @@ const ColorTest = () => {
                         setEdited(true)
                         setPrimary(value, color.s, color.l)
                     }}
-                    maximumTrackTintColor={Style.getColor('primary-surface2')}
-                    minimumTrackTintColor={Style.getColor('primary-brand')}
-                    thumbTintColor={Style.getColor('primary-brand')}
+                    maximumTrackTintColor={getColor('primary-surface2')}
+                    minimumTrackTintColor={getColor('primary-brand')}
+                    thumbTintColor={getColor('primary-brand')}
                 />
             </View>
 
             {!devMode && (
                 <View style={{ alignItems: 'center', flexDirection: 'row' }}>
-                    <Text style={{ color: Style.getColor('primary-text1') }}>Sat: {color.s}</Text>
+                    <Text style={{ color: getColor('primary-text1') }}>Sat: {color.s}</Text>
                     <Slider
                         minimumValue={0}
                         maximumValue={100}
@@ -102,15 +106,18 @@ const ColorTest = () => {
                         onValueChange={(value) => {
                             setPrimary(color.h, value, color.l)
                         }}
-                        maximumTrackTintColor={Style.getColor('primary-surface2')}
-                        minimumTrackTintColor={Style.getColor('primary-brand')}
-                        thumbTintColor={Style.getColor('primary-brand')}
+                        maximumTrackTintColor={getColor('primary-surface2')}
+                        //NOTE: This magically disables react-compiler memoizing
+                        //TODO: Perhaps remove this once a new memoization toggle is added
+                        //sidenote 'use no memo' is temporary so this solution might better
+                        minimumTrackTintColor={(() => getColor('primary-brand'))()}
+                        thumbTintColor={getColor('primary-brand')}
                     />
                 </View>
             )}
             {!devMode && (
                 <View style={{ alignItems: 'center', flexDirection: 'row' }}>
-                    <Text style={{ color: Style.getColor('primary-text1') }}>Lit: {color.l}</Text>
+                    <Text style={{ color: getColor('primary-text1') }}>Lit: {color.l}</Text>
                     <Slider
                         minimumValue={0}
                         maximumValue={100}
@@ -120,21 +127,21 @@ const ColorTest = () => {
                         onValueChange={(value) => {
                             setPrimary(color.h, color.s, value)
                         }}
-                        maximumTrackTintColor={Style.getColor('primary-surface2')}
-                        minimumTrackTintColor={Style.getColor('primary-brand')}
-                        thumbTintColor={Style.getColor('primary-brand')}
+                        maximumTrackTintColor={getColor('primary-surface2')}
+                        minimumTrackTintColor={getColor('primary-brand')}
+                        thumbTintColor={getColor('primary-brand')}
                     />
                 </View>
             )}
             {edited && (
                 <View>
-                    <Text style={{ color: Style.getColor('destructive-brand'), marginTop: 8 }}>
+                    <Text style={{ color: getColor('destructive-brand'), marginTop: 8 }}>
                         Restart ChatterUI to apply changes!
                     </Text>
                     <TouchableOpacity
                         style={{
                             marginVertical: 8,
-                            borderColor: Style.getColor('primary-brand'),
+                            borderColor: getColor('primary-brand'),
                             borderRadius: 4,
                             paddingVertical: 8,
                             paddingHorizontal: 16,
@@ -143,7 +150,7 @@ const ColorTest = () => {
                         onPress={() => {
                             reloadAppAsync()
                         }}>
-                        <Text style={{ color: Style.getColor('primary-text1') }}>Restart Now</Text>
+                        <Text style={{ color: getColor('primary-text1') }}>Restart Now</Text>
                     </TouchableOpacity>
                 </View>
             )}
@@ -185,17 +192,17 @@ const ColorTest = () => {
                             style={{
                                 marginTop: 8,
                                 padding: 12,
-                                backgroundColor: Style.getColor(item),
+                                backgroundColor: getColor(item),
                                 shadowColor: 'black',
                                 shadowOpacity: 1,
                                 shadowRadius: 0,
                                 shadowOffset: { width: 0, height: 20 },
                                 elevation: 5,
                                 borderRadius: 8,
-                                borderColor: Style.getColor('primary-surface1'),
+                                borderColor: getColor('primary-surface1'),
                                 borderWidth: 1,
                             }}>
-                            <Text style={{ color: Style.getColor('primary-text1') }}>
+                            <Text style={{ color: getColor('primary-text1') }}>
                                 {index === surfaces.length - 1 ? 'Brand' : `Surface ${index + 1}`}
                             </Text>
                         </TouchableOpacity>
@@ -204,41 +211,41 @@ const ColorTest = () => {
                         <Text
                             style={{
                                 fontSize: 16,
-                                color: Style.getColor('primary-text1'),
-                                borderColor: Style.getColor('primary-surface3'),
+                                color: getColor('primary-text1'),
+                                borderColor: getColor('primary-surface3'),
                                 borderBottomWidth: 1,
                                 padding: 2,
                                 marginBottom: 2,
                             }}>
                             Text 1
                         </Text>
-                        <Text style={{ color: Style.getColor('primary-text1') }}>{lorem1}</Text>
+                        <Text style={{ color: getColor('primary-text1') }}>{lorem1}</Text>
                         <Text
                             style={{
                                 marginTop: 12,
                                 fontSize: 16,
-                                color: Style.getColor('primary-text2'),
-                                borderColor: Style.getColor('primary-surface3'),
+                                color: getColor('primary-text2'),
+                                borderColor: getColor('primary-surface3'),
                                 borderBottomWidth: 1,
                                 padding: 2,
                                 marginBottom: 2,
                             }}>
                             Text 2
                         </Text>
-                        <Text style={{ color: Style.getColor('primary-text2') }}>{lorem1}</Text>
+                        <Text style={{ color: getColor('primary-text2') }}>{lorem1}</Text>
                         <Text
                             style={{
                                 marginTop: 12,
                                 fontSize: 16,
-                                color: Style.getColor('primary-text3'),
-                                borderColor: Style.getColor('primary-surface3'),
+                                color: getColor('primary-text3'),
+                                borderColor: getColor('primary-surface3'),
                                 borderBottomWidth: 1,
                                 padding: 2,
                                 marginBottom: 2,
                             }}>
                             Text 3
                         </Text>
-                        <Text style={{ color: Style.getColor('primary-text3') }}>{lorem1}</Text>
+                        <Text style={{ color: getColor('primary-text3') }}>{lorem1}</Text>
                     </View>
                 </View>
             </ScrollView>
