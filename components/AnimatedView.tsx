@@ -1,6 +1,5 @@
+import { ReactNode, useRef, useEffect } from 'react'
 import { Animated, Easing } from 'react-native'
-import { ReactNode } from 'react'
-import { useRef, useEffect } from 'react'
 type AnimatedViewProps = {
     dx?: number
     dy?: number

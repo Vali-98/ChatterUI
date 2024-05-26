@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { TouchableOpacity } from 'react-native-gesture-handler'
 import { Style } from '@globals'
+import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 const enum ResponseStatus {
     DEFAULT,

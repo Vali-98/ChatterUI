@@ -12,11 +12,12 @@ import {
 } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
+
 import { SliderItem } from '..'
 
 const Local = () => {
     const [modelLoading, setModelLoading] = useState(false)
-    const [modelList, setModelList] = useState<Array<string>>([])
+    const [modelList, setModelList] = useState<string[]>([])
     const dropdownValues = modelList.map((item) => {
         return { name: item }
     })
@@ -108,7 +109,7 @@ const Local = () => {
                 }}>
                 <Text style={styles.subtitle}>Current Model : </Text>
                 <Text style={{ ...styles.subtitle, color: Style.getColor('primary-text1') }}>
-                    {loadedModel === undefined ? 'None' : loadedModel}
+                    {loadedModel ?? 'None'}
                 </Text>
             </View>
 
@@ -208,12 +209,12 @@ const Local = () => {
                     step={1}
                 />
                 {/* Note: llama.rn does not have any Android gpu acceleration */}
-                {Platform.OS == 'ios' && (
+                {Platform.OS === 'ios' && (
                     <SliderItem
                         name="GPU Layers"
                         body={preset}
                         setValue={setPreset}
-                        varname={'gpu_layers'}
+                        varname="gpu_layers"
                         min={0}
                         max={100}
                         step={1}

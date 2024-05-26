@@ -1,10 +1,10 @@
-import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
-import { Characters, Chats, Logger, Style } from '@globals'
-import { useShallow } from 'zustand/react/shallow'
-import { MaterialIcons } from '@expo/vector-icons'
-import { generateResponse } from '@constants/Inference'
 import { useInference } from '@constants/Chat'
+import { generateResponse } from '@constants/Inference'
+import { MaterialIcons } from '@expo/vector-icons'
+import { Characters, Chats, Logger, Style } from '@globals'
+import React, { useState } from 'react'
+import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 const ChatInput = () => {
     const { insertEntry } = Chats.useChat((state) => ({

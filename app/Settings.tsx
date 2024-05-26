@@ -9,9 +9,9 @@ import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity } from 'r
  * @deprecated This file is no longer in use since the migration to SettingsDrawer
  */
 const Settings = () => {
-    const { userName, userId } = Characters.useUserCard((state) => ({
+    const { userName, imageUri } = Characters.useUserCard((state) => ({
         userName: state.card?.data.name,
-        userId: state.id,
+        imageUri: state.getImage(),
     }))
 
     const router = useRouter()
@@ -20,10 +20,7 @@ const Settings = () => {
         <SafeAreaView style={styles.mainContainer}>
             <View style={styles.userContainer}>
                 <View style={styles.imageContainer}>
-                    <Image
-                        style={styles.userImage}
-                        source={{ uri: Characters.useUserCard.getState().getImage() }}
-                    />
+                    <Image style={styles.userImage} source={{ uri: imageUri }} />
                 </View>
                 <View>
                     <Text style={styles.userName}>{userName}</Text>

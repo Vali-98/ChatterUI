@@ -15,7 +15,7 @@ type ListItem = {
 
 const ChatSelector = () => {
     const router = useRouter()
-    const [chats, setChats] = useState<Array<ListItem>>([])
+    const [chats, setChats] = useState<ListItem[]>([])
     const { charName, charId, imageId } = Characters.useCharacterCard(
         useShallow((state) => ({
             charName: state.card?.data.name,
@@ -78,7 +78,7 @@ const ChatSelector = () => {
         saveStringExternal(
             `Chatlogs-${charName}-${chatId}`,
             JSON.stringify(await Chats.readChat(chatId)),
-            'application/*'
+            'application/json'
         ).catch((error) => {
             Logger.log(`Could not save file. ${error}`, true)
         })

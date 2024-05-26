@@ -1,12 +1,12 @@
-import { View, Image, Text, StyleSheet, Linking, Settings } from 'react-native'
-import React, { useState } from 'react'
-import { Stack } from 'expo-router'
-import { Logger, Style } from '@globals'
 import SupportButton from '@components/SupportButton'
-import { TouchableOpacity } from 'react-native-gesture-handler'
-import { FontAwesome } from '@expo/vector-icons'
-import { useMMKVBoolean } from 'react-native-mmkv'
 import { AppSettings } from '@constants/GlobalValues'
+import { FontAwesome } from '@expo/vector-icons'
+import { Logger, Style } from '@globals'
+import { Stack } from 'expo-router'
+import React, { useState } from 'react'
+import { View, Image, Text, StyleSheet, Linking, Settings } from 'react-native'
+import { TouchableOpacity } from 'react-native-gesture-handler'
+import { useMMKVBoolean } from 'react-native-mmkv'
 
 const About = () => {
     const [counter, setCounter] = useState<number>(0)
@@ -28,7 +28,6 @@ const About = () => {
                 options={{
                     title: 'About',
                     animation: 'fade',
-                    headerRight: () => <View></View>,
                 }}
             />
             <TouchableOpacity activeOpacity={0.8} onPress={updateCounter}>

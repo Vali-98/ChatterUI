@@ -2,10 +2,11 @@ import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { Global, Logger, Style } from '@globals'
 import { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
-import { OpenAIModel } from './OpenAI'
 import { Dropdown } from 'react-native-element-dropdown'
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
+
 import HeartbeatButton from './HeartbeatButton'
+import { OpenAIModel } from './OpenAI'
 
 const TextCompletions = () => {
     const [endpoint, setEndpoint] = useMMKVString(Global.CompletionsEndpoint)
@@ -15,7 +16,7 @@ const TextCompletions = () => {
     )
     const [keyInput, setKeyInput] = useState('')
 
-    const [modelList, setModelList] = useState<Array<OpenAIModel>>([])
+    const [modelList, setModelList] = useState<OpenAIModel[]>([])
 
     useEffect(() => {
         getModelList()

@@ -1,16 +1,16 @@
+import AnimatedView from '@components/AnimatedView'
 import CheckboxTitle from '@components/CheckboxTitle'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
+import { InstructListItem } from '@constants/Instructs'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Instructs, saveStringExternal, Logger, Style } from '@globals'
 import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
+import { useAutosave } from 'react-autosave'
 import { View, SafeAreaView, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVNumber } from 'react-native-mmkv'
-import { useAutosave } from 'react-autosave'
-import { InstructListItem } from '@constants/Instructs'
-import AnimatedView from '@components/AnimatedView'
 
 const Instruct = () => {
     const { currentInstruct, loadInstruct, setCurrentInstruct } = Instructs.useInstruct(
@@ -21,7 +21,7 @@ const Instruct = () => {
         })
     )
     const [instructID, setInstructID] = useMMKVNumber(Global.InstructID)
-    const [instructList, setInstructList] = useState<Array<InstructListItem>>([])
+    const [instructList, setInstructList] = useState<InstructListItem[]>([])
     const [selectedItem, setSelectedItem] = useState<InstructListItem | undefined>(undefined)
     const [showNewInstruct, setShowNewInstruct] = useState<boolean>(false)
 

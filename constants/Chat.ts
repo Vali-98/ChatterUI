@@ -1,14 +1,15 @@
-import { AppSettings, Global } from './GlobalValues'
-import { Logger } from './Logger'
-import { replaceMacros } from './Utils'
-import { mmkv } from './mmkv'
-import { create } from 'zustand'
-import { Characters } from './Characters'
-import { RecentMessages } from './RecentMessages'
 import { db } from '@db'
 import { chatEntries, chatSwipes, chats } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import * as FS from 'expo-file-system'
+import { create } from 'zustand'
+
+import { Characters } from './Characters'
+import { AppSettings, Global } from './GlobalValues'
+import { Logger } from './Logger'
+import { RecentMessages } from './RecentMessages'
+import { replaceMacros } from './Utils'
+import { mmkv } from './mmkv'
 import { LlamaTokenizer } from './tokenizer'
 
 export type ChatSwipe = {
@@ -29,14 +30,14 @@ export type ChatEntry = {
     is_user: boolean
     order: number
     swipe_id: number
-    swipes: Array<ChatSwipe>
+    swipes: ChatSwipe[]
 }
 
 export type ChatData = {
     id: number
     createDate: Date
     character_id: number
-    messages: Array<ChatEntry> | undefined
+    messages: ChatEntry[] | undefined
 }
 
 //type ChatDataArray = [ChatInfo, ...ChatEntry[]]
@@ -159,7 +160,6 @@ export namespace Chats {
                 data: state?.data ? { ...state.data, messages: messages } : state.data,
             }))
         },
-
         deleteEntry: async (index: number) => {
             const messages = get().data?.messages
             if (!messages) return
@@ -171,7 +171,7 @@ export namespace Chats {
             set((state) => ({
                 ...state,
                 data: state?.data
-                    ? { ...state.data, messages: messages.filter((item, ind) => ind != index) }
+                    ? { ...state.data, messages: messages.filter((item, ind) => ind !== index) }
                     : state.data,
             }))
         },
@@ -221,7 +221,7 @@ export namespace Chats {
         },
 
         addSwipe: async (index: number) => {
-            let messages = get().data?.messages
+            const messages = get().data?.messages
             if (!messages) return
             const entryId = messages[index].id
 
@@ -333,12 +333,12 @@ export namespace Chats {
                 swipe: replaceMacros(card.data.first_mes),
             })
 
-            for (const i in card.data.alternate_greetings) {
+            card.data.alternate_greetings.forEach(async (data) => {
                 await tx.insert(chatSwipes).values({
                     entry_id: entryId,
-                    swipe: replaceMacros(card.data.alternate_greetings[i]),
+                    swipe: replaceMacros(data),
                 })
-            }
+            })
 
             return chatId
         })

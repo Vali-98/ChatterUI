@@ -1,8 +1,8 @@
-import { View, StyleSheet, TouchableOpacity, TextInput } from 'react-native'
-import { useState } from 'react'
-import { useShallow } from 'zustand/react/shallow'
-import { Chats, Style } from '@globals'
 import { MaterialIcons } from '@expo/vector-icons'
+import { Chats, Style } from '@globals'
+import { useState } from 'react'
+import { View, StyleSheet, TouchableOpacity, TextInput } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 type EditorButtonProps = {
     name: 'delete' | 'check' | 'close'

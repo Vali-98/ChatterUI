@@ -1,8 +1,12 @@
+import AnimatedView from '@components/AnimatedView'
+import { CharacterCardV2 } from '@constants/Characters'
+import { RecentMessages } from '@constants/RecentMessages'
 import { FontAwesome } from '@expo/vector-icons'
 import { Characters, Logger, LlamaTokenizer, Style } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
 import { useState } from 'react'
+import { useAutosave } from 'react-autosave'
 import {
     View,
     Text,
@@ -14,11 +18,6 @@ import {
     ScrollView,
     TextInput,
 } from 'react-native'
-
-import { useAutosave } from 'react-autosave'
-import { CharacterCardV2 } from '@constants/Characters'
-import { RecentMessages } from '@constants/RecentMessages'
-import AnimatedView from '@components/AnimatedView'
 import { useShallow } from 'zustand/react/shallow'
 
 const CharInfo = () => {
@@ -126,7 +125,7 @@ const CharInfo = () => {
                     }}
                 />
                 {characterCard && (
-                    <ScrollView keyboardShouldPersistTaps={'handled'}>
+                    <ScrollView keyboardShouldPersistTaps="handled">
                         <View style={styles.characterHeader}>
                             <Image
                                 source={imageSource}
@@ -163,7 +162,7 @@ const CharInfo = () => {
                         </Text>
 
                         <ScrollView
-                            keyboardShouldPersistTaps={'handled'}
+                            keyboardShouldPersistTaps="handled"
                             style={styles.inputContainer}>
                             <TextInput
                                 style={styles.input}
@@ -181,7 +180,7 @@ const CharInfo = () => {
 
                         <Text style={styles.boxText}>First Message</Text>
                         <ScrollView
-                            keyboardShouldPersistTaps={'handled'}
+                            keyboardShouldPersistTaps="handled"
                             style={styles.inputContainer}>
                             <TextInput
                                 style={styles.input}

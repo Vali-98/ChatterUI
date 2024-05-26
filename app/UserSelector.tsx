@@ -1,3 +1,4 @@
+import AnimatedView from '@components/AnimatedView'
 import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
 import { Characters, Logger, Style } from '@globals'
@@ -13,7 +14,6 @@ import {
     ScrollView,
     Alert,
 } from 'react-native'
-import AnimatedView from '@components/AnimatedView'
 
 type CardInfo = {
     name: string
@@ -30,12 +30,12 @@ const UserSelector = () => {
         getImage: state.getImage,
     }))
 
-    const [userList, setUserList] = useState<Array<CardInfo>>([])
+    const [userList, setUserList] = useState<CardInfo[]>([])
     const [showNewUser, setShowNewUser] = useState<boolean>(false)
 
     const loadUserList = () => {
         Characters.getCardList('user')
-            .then(async (list: Array<CardInfo>) => {
+            .then(async (list: CardInfo[]) => {
                 if (list.length === 0) {
                     const defaultName = 'User'
                     const id = await Characters.createCard(defaultName, 'user')

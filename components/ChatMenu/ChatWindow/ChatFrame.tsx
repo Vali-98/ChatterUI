@@ -1,9 +1,10 @@
-import { View, Text, Image, StyleSheet } from 'react-native'
-import { ReactNode, useEffect, useState } from 'react'
 import { Chats } from '@constants/Chat'
 import { Characters, Style } from '@globals'
-import TTSMenu from './TTS'
+import { ReactNode, useEffect, useState } from 'react'
+import { View, Text, Image, StyleSheet } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
+
+import TTSMenu from './TTS'
 
 type ChatFrameProps = {
     children?: ReactNode
@@ -66,6 +67,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
                 <Image
                     onError={(error) => {
                         handleImageError()
+                        error.stopPropagation()
                     }}
                     style={styles.avatar}
                     source={imageSource}

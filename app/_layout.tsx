@@ -1,16 +1,19 @@
+import { db, rawdb } from '@db'
 import { Style, initializeApp, startupApp } from '@globals'
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
+import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 import { Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { View, Text } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { MenuProvider } from 'react-native-popup-menu'
+
 import migrations from '../db/migrations/migrations'
-import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
-import { db } from '@db'
 
 const Layout = () => {
     const [firstRender, setFirstRender] = useState<boolean>(true)
     const { success, error } = useMigrations(db, migrations)
+    useDrizzleStudio(rawdb)
 
     useEffect(() => {
         // reset defaults

@@ -22,23 +22,24 @@ type CharInfo = {
     name: string
     id: number
     image_id: number
-    tags: Array<string>
+    tags: string[]
 }
 
 const CharMenu = () => {
     const router = useRouter()
-    const { setCurrentCard } = Characters.useCharacterCard(
+    const { setCurrentCard, id } = Characters.useCharacterCard(
         useShallow((state) => ({
             setCurrentCard: state.setCard,
+            id: state.id,
         }))
     )
     const loadChat = Chats.useChat((state) => state.load)
 
-    const [characterList, setCharacterList] = useState<Array<CharInfo>>([])
+    const [characterList, setCharacterList] = useState<CharInfo[]>([])
     const [showNewChar, setShowNewChar] = useState<boolean>(false)
     const [showDownload, setShowDownload] = useState(false)
     const [nowLoading, setNowLoading] = useState(false)
-    const [loadedCharId, setLoadedCharId] = useState(Characters.useCharacterCard.getState().id)
+    const [loadedCharId, setLoadedCharId] = useState(id)
 
     const goBack = () => router.back()
 
@@ -199,7 +200,7 @@ const CharMenu = () => {
                             getCharacterList()
                         })
                     }
-                    showPaste={true}
+                    showPaste
                 />
                 {characterList.length === 0 && (
                     <View style={{ ...styles.mainContainer, alignItems: 'center', marginTop: 30 }}>
@@ -278,7 +279,7 @@ const CharMenu = () => {
                                             </View>
                                         </View>
                                     </View>
-                                    {nowLoading && character.id == loadedCharId ? (
+                                    {nowLoading && character.id === loadedCharId ? (
                                         <ActivityIndicator
                                             color={Style.getColor('primary-text2')}
                                             style={{ paddingLeft: 8 }}

@@ -1,12 +1,13 @@
 import { db } from '@db'
-import { eq } from 'drizzle-orm'
 import { instructs } from 'db/schema'
+import { eq } from 'drizzle-orm'
 import { create } from 'zustand'
-import { mmkv } from './mmkv'
+
 import { Global } from './GlobalValues'
-import { LlamaTokenizer } from './tokenizer'
-import { replaceMacros } from './Utils'
 import { Logger } from './Logger'
+import { replaceMacros } from './Utils'
+import { mmkv } from './mmkv'
+import { LlamaTokenizer } from './tokenizer'
 
 type InstructState = {
     data: InstructType | undefined
@@ -128,7 +129,7 @@ export namespace Instructs {
             await db.delete(instructs).where(eq(instructs.id, id))
         }
 
-        export const readList = async (): Promise<Array<InstructListItem> | undefined> => {
+        export const readList = async (): Promise<InstructListItem[] | undefined> => {
             return await db.query.instructs.findMany({
                 columns: {
                     id: true,

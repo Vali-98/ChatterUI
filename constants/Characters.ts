@@ -1,18 +1,19 @@
 import { Buffer } from '@craftzdog/react-native-buffer'
+import { db } from '@db'
 import axios from 'axios'
 import * as Base64 from 'base-64'
+import { characterGreetings, characterTags, characters, tags } from 'db/schema'
+import { eq, inArray, notExists, notInArray, sql } from 'drizzle-orm'
 import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
 import { decode } from 'png-chunk-text'
 import extractChunks from 'png-chunks-extract'
-import { Logger } from './Logger'
-import { db } from '@db'
-import { characterGreetings, characterTags, characters, tags } from 'db/schema'
-import { eq, inArray, notExists, notInArray, sql } from 'drizzle-orm'
 import { create } from 'zustand'
-import { LlamaTokenizer } from './tokenizer'
-import { mmkv } from './mmkv'
+
 import { Global } from './GlobalValues'
+import { Logger } from './Logger'
+import { mmkv } from './mmkv'
+import { LlamaTokenizer } from './tokenizer'
 
 type CharacterTokenCache = {
     otherName: string
@@ -118,7 +119,7 @@ export namespace Characters {
             },
             getCache: (charName: string) => {
                 const cache = get().tokenCache
-                if (cache && cache.otherName && cache.otherName === charName) return cache
+                if (cache?.otherName && cache.otherName === charName) return cache
 
                 const card = get().card
                 if (!card)
@@ -395,7 +396,7 @@ export namespace Characters {
         const url = new URL(text)
         if (/pygmalion.chat/.test(url.hostname)) {
             const param = new URLSearchParams(text)
-            let character_id = param.get('id')?.replaceAll(`"`, '')
+            const character_id = param.get('id')?.replaceAll(`"`, '')
             const path = url.pathname.replace('/character/', '')
             console.log(path)
             if (character_id) return importCharacterFromPyg(character_id)
@@ -408,7 +409,7 @@ export namespace Characters {
 
         if (/chub.ai|characterhub.org/.test(url.hostname)) {
             const path = url.pathname.replace('/characters/', '')
-            if (/^[^\/]+\/[^\/]+$/.test(path)) return importCharacterFromChub(path)
+            if (/^[^/]+\/[^/]+$/.test(path)) return importCharacterFromChub(path)
             else {
                 Logger.log(`Failed to get id from Chub URL`, true)
                 return
@@ -416,7 +417,7 @@ export namespace Characters {
         }
 
         // Regex checks for format of [name][/][character]
-        if (/^[^\/]+\/[^\/]+$/.test(text)) return importCharacterFromChub(text)
+        if (/^[^/]+\/[^/]+$/.test(text)) return importCharacterFromChub(text)
         if (uuidRegex.test(text)) return importCharacterFromPyg(text)
         Logger.log(`Invalid input!`, true)
     }
@@ -468,12 +469,12 @@ export type CharacterCardV2Data = {
     creator_notes: string
     system_prompt: string
     post_history_instructions: string
-    alternate_greetings: Array<string>
+    alternate_greetings: string[]
     //for ChatterUI this will be removed into its own table
     //character_book: string
 
     // May 8th additions
-    tags: Array<string>
+    tags: string[]
     creator: string
     character_version: string
     //extensions: {},
@@ -526,7 +527,7 @@ type Rule = {
 }
 
 export const replaceMacros = (text: string) => {
-    if (text == undefined) return ''
+    if (text === undefined) return ''
     let newtext: string = text
     const charName = Characters.useCharacterCard.getState().card?.data.name
     const userName = Characters.useUserCard.getState().card?.data.name

@@ -1,5 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons'
 import { Style } from '@globals'
+import { getStringAsync } from 'expo-clipboard'
 import { useState, useEffect } from 'react'
 import {
     View,
@@ -11,7 +12,6 @@ import {
     GestureResponderEvent,
     Platform,
 } from 'react-native'
-import { getStringAsync } from 'expo-clipboard'
 
 type TextBoxModalProps = {
     booleans: [boolean, (b: boolean) => void]

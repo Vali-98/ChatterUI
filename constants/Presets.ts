@@ -13,7 +13,7 @@ export type SamplerPreset = {
 
     min_p: number
     single_line: boolean
-    sampler_order: Array<number>
+    sampler_order: number[]
     seed: number
 
     //
@@ -62,7 +62,7 @@ export namespace Presets {
     const getPresetDir = (name: string) => `${presetdir}${name}.json`
 
     type FieldList = {
-        [key in API]: Array<SamplerField>
+        [key in API]: SamplerField[]
     }
 
     export const APIFields: FieldList = {

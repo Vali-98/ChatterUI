@@ -1,3 +1,7 @@
+import { ColorId } from '@constants/Style'
+import { MaterialIcons } from '@expo/vector-icons'
+import { AppSettings, Chats, Style } from '@globals'
+import { useState } from 'react'
 import {
     GestureResponderEvent,
     Modal,
@@ -6,10 +10,8 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native'
-import { useState } from 'react'
-import { MaterialIcons } from '@expo/vector-icons'
-import { AppSettings, Chats, Style } from '@globals'
-import { useShallow } from 'zustand/react/shallow'
+import { TextInput } from 'react-native-gesture-handler'
+import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, {
     Easing,
     FadeIn,
@@ -17,9 +19,7 @@ import Animated, {
     SlideInDown,
     SlideOutDown,
 } from 'react-native-reanimated'
-import { TextInput } from 'react-native-gesture-handler'
-import { ColorId } from '@constants/Style'
-import { useMMKVBoolean } from 'react-native-mmkv'
+import { useShallow } from 'zustand/react/shallow'
 
 type EditorButtonProps = {
     name: 'delete' | 'check' | 'close'

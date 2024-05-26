@@ -23,7 +23,7 @@ const Mancer = () => {
     const [mancerKey, setMancerKey] = useMMKVString(Global.MancerKey)
     const [keyInput, setKeyInput] = useState<string>('')
 
-    const [modelList, setModelList] = useState<Array<MancerModel>>([])
+    const [modelList, setModelList] = useState<MancerModel[]>([])
 
     const getModels = async () => {
         const modelresults = await fetch(`https://mancer.tech/oai/v1/models`, {

@@ -1,3 +1,9 @@
+import SupportButton from '@components/SupportButton'
+import { AppSettings } from '@constants/GlobalValues'
+import { AntDesign, FontAwesome } from '@expo/vector-icons'
+import { Characters, Style } from '@globals'
+import { useRouter } from 'expo-router'
+import { SetStateAction, useEffect, useState } from 'react'
 import {
     Text,
     GestureResponderEvent,
@@ -5,8 +11,8 @@ import {
     StyleSheet,
     View,
     Image,
-    Linking,
 } from 'react-native'
+import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, {
     SlideInLeft,
     Easing,
@@ -14,14 +20,7 @@ import Animated, {
     FadeIn,
     FadeOut,
 } from 'react-native-reanimated'
-import { Characters, Style } from '@globals'
-import { useRouter } from 'expo-router'
-import { AntDesign, FontAwesome } from '@expo/vector-icons'
-import { SetStateAction, useEffect, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
-import SupportButton from '@components/SupportButton'
-import { useMMKVBoolean } from 'react-native-mmkv'
-import { AppSettings } from '@constants/GlobalValues'
 type SettingsDrawerProps = {
     booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
 }
@@ -34,7 +33,7 @@ type ButtonData = {
     icon?: Icon
 }
 
-const paths: Array<ButtonData> = [
+const paths: ButtonData[] = [
     {
         name: 'Sampler',
         path: '/PresetMenu',
@@ -67,7 +66,7 @@ const paths: Array<ButtonData> = [
     },
 ]
 
-const paths_dev: Array<ButtonData> = [
+const paths_dev: ButtonData[] = [
     {
         name: '[DEV] Lorebooks',
         path: '/LorebookMenu',

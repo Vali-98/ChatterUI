@@ -1,3 +1,4 @@
+import AnimatedView from '@components/AnimatedView'
 import {
     KAI,
     Horde,
@@ -14,7 +15,7 @@ import { useEffect } from 'react'
 import { SafeAreaView, Text, StyleSheet, View, ScrollView } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVString } from 'react-native-mmkv'
-import AnimatedView from '@components/AnimatedView'
+
 const APIMenu = () => {
     const [APIType, setAPIType] = useMMKVString(Global.APIType)
     const apinames = [
