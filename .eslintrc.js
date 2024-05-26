@@ -1,6 +1,5 @@
 module.exports = {
     root: true,
-    env: 'node',
     extends: ['universe/native', 'universe/shared/typescript-analysis'],
     overrides: [
         {
@@ -10,19 +9,19 @@ module.exports = {
             },
         },
     ],
-    plugins: ['prettier'],
+    plugins: ['prettier', 'eslint-plugin-react-compiler'],
     rules: {
+        'react-compiler/react-compiler': 'error',
         'prettier/prettier': [
             'error',
+            {},
             {
-                trailingComma: 'es5',
-                printWidth: 100,
-                tabWidth: 4,
-                singleQuote: true,
-                bracketSameLine: true,
+                usePrettierrc: true,
             },
         ],
         radix: 'off',
         'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': 'off',
+        'object-shorthand': ['warn', 'consistent'],
     },
 }
