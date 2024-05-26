@@ -4,5 +4,6 @@
     "tabWidth": 4,
     "singleQuote": true,
     "bracketSameLine": true,
+    "endOfLine": "crlf",
     "semi": false
 }
