@@ -13,6 +13,7 @@ import { Logger } from './Logger'
 import { MarkdownStyle } from './Markdown'
 import { Presets } from './Presets'
 import { Style } from './Style'
+import { Llama3Tokenizer } from './Tokenizer/tokenizer'
 import { humanizedISO8601DateTime } from './Utils'
 import { Llama } from './llama'
 import { mmkv } from './mmkv'
@@ -32,6 +33,7 @@ export {
     LlamaTokenizer,
     Style,
     MarkdownStyle,
+    Llama3Tokenizer,
 }
 
 export const GlobalStyle = StyleSheet.create({})
@@ -117,7 +119,6 @@ export const startupApp = () => {
     // Init step, names[] is never null
     if (mmkv.getString(Global.LorebookNames) === undefined)
         mmkv.set(Global.LorebookNames, JSON.stringify([]))
-
     // Init step, APIType is never null
     if (mmkv.getString(Global.APIType) === undefined) mmkv.set(Global.APIType, API.KAI)
 

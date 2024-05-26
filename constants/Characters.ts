@@ -3,7 +3,7 @@ import { db } from '@db'
 import axios from 'axios'
 import * as Base64 from 'base-64'
 import { characterGreetings, characterTags, characters, tags } from 'db/schema'
-import { eq, inArray, notExists, notInArray, sql } from 'drizzle-orm'
+import { eq, inArray, notInArray } from 'drizzle-orm'
 import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
 import { decode } from 'png-chunk-text'
@@ -12,8 +12,8 @@ import { create } from 'zustand'
 
 import { Global } from './GlobalValues'
 import { Logger } from './Logger'
+import { Llama3Tokenizer } from './Tokenizer/tokenizer'
 import { mmkv } from './mmkv'
-import { LlamaTokenizer } from './tokenizer'
 
 type CharacterTokenCache = {
     otherName: string
@@ -70,7 +70,8 @@ export namespace Characters {
         },
         getCache: (userName: string) => {
             const cache = get().tokenCache
-            if (cache) return cache
+            if (cache && cache?.otherName === useCharacterCard.getState().card?.data.name)
+                return cache
 
             const card = get().card
             if (!card)
@@ -83,8 +84,8 @@ export namespace Characters {
             const examples = replaceMacros(card.data.mes_example)
             const newCache = {
                 otherName: userName,
-                description_length: LlamaTokenizer.encode(description).length,
-                examples_length: LlamaTokenizer.encode(examples).length,
+                description_length: Llama3Tokenizer.encode(description).length,
+                examples_length: Llama3Tokenizer.encode(examples).length,
             }
 
             set((state) => ({ ...state, tokenCache: newCache }))
@@ -102,13 +103,18 @@ export namespace Characters {
                 const card = await readCard(id)
                 Logger.debug(`[Characters] time for db query: ${performance.now() - start}`)
                 start = performance.now()
-                set((state) => ({ ...state, card: card, id: id }))
+                set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
 
                 Logger.debug(`[Characters] time for zustand set: ${performance.now() - start}`)
                 return card?.data.name
             },
             unloadCard: () => {
-                set((state) => ({ ...state, id: undefined, card: undefined }))
+                set((state) => ({
+                    ...state,
+                    id: undefined,
+                    card: undefined,
+                    tokenCache: undefined,
+                }))
             },
             getImage: () => {
                 return getImageDir(get().card?.data.image_id ?? 0)
@@ -119,7 +125,8 @@ export namespace Characters {
             },
             getCache: (charName: string) => {
                 const cache = get().tokenCache
-                if (cache?.otherName && cache.otherName === charName) return cache
+                if (cache?.otherName && cache.otherName === useUserCard.getState().card?.data.name)
+                    return cache
 
                 const card = get().card
                 if (!card)
@@ -130,10 +137,11 @@ export namespace Characters {
                     }
                 const description = replaceMacros(card.data.description)
                 const examples = replaceMacros(card.data.mes_example)
+
                 const newCache = {
                     otherName: charName,
-                    description_length: LlamaTokenizer.encode(description).length,
-                    examples_length: LlamaTokenizer.encode(examples).length,
+                    description_length: Llama3Tokenizer.encode(description).length,
+                    examples_length: Llama3Tokenizer.encode(examples).length,
                 }
 
                 set((state) => ({ ...state, tokenCache: newCache }))

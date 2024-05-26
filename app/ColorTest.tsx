@@ -1,7 +1,6 @@
 import { AppSettings } from '@constants/GlobalValues'
 import { ColorId, Style } from '@constants/Style'
 import { FontAwesome } from '@expo/vector-icons'
-import { LlamaTokenizer } from '@globals'
 import Slider from '@react-native-community/slider'
 import { reloadAppAsync } from 'expo'
 import { Stack } from 'expo-router'
@@ -160,35 +159,6 @@ const ColorTest = () => {
                     {surfaces.map((item, index) => (
                         <TouchableOpacity
                             key={index}
-                            onPress={async () => {
-                                const start = performance.now()
-                                const tokens1 = LlamaTokenizer.encode(lorem1)
-                                const final = performance.now() - start
-                                console.log(
-                                    'Took',
-                                    final.toFixed(2),
-                                    'ms to encode locally. It has',
-                                    tokens1.length,
-                                    'tokens'
-                                )
-                                const start2 = performance.now()
-                                const response = await fetch(
-                                    'http://10.0.2.2:4050/api/extra/tokencount',
-                                    {
-                                        method: 'POST',
-                                        body: JSON.stringify({ prompt: lorem1 }),
-                                    }
-                                )
-                                const { ids } = await response.json()
-                                const final2 = performance.now() - start
-                                console.log(
-                                    'Took',
-                                    final2.toFixed(2),
-                                    'ms to encode remotely. It has',
-                                    ids.length,
-                                    'tokens'
-                                )
-                            }}
                             style={{
                                 marginTop: 8,
                                 padding: 12,

@@ -8,9 +8,9 @@ import { Characters } from './Characters'
 import { AppSettings, Global } from './GlobalValues'
 import { Logger } from './Logger'
 import { RecentMessages } from './RecentMessages'
+import { Llama3Tokenizer } from './Tokenizer/tokenizer'
 import { replaceMacros } from './Utils'
 import { mmkv } from './mmkv'
-import { LlamaTokenizer } from './tokenizer'
 
 export type ChatSwipe = {
     id: number
@@ -242,7 +242,9 @@ export namespace Chats {
             const swipe_id = messages[index].swipe_id
             const cached_token_count = messages[index].swipes[swipe_id].token_count
             if (cached_token_count) return cached_token_count
-            const token_count = LlamaTokenizer.encode(messages[index].swipes[swipe_id].swipe).length
+            const token_count = Llama3Tokenizer.encode(
+                messages[index].swipes[swipe_id].swipe
+            ).length
             messages[index].swipes[swipe_id].token_count = token_count
             set((state: ChatState) => ({
                 ...state,

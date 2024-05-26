@@ -125,7 +125,7 @@ export const hordeHeader = () => {
  */
 
 // Multiplier to token counts due to inaccuracy of tokenizer, TODO: Find better tokenizer base
-const token_mult = 0.87
+//const token_mult = 0.87
 
 const buildContext = (max_length: number) => {
     const delta = performance.now()
@@ -147,38 +147,39 @@ const buildContext = (max_length: number) => {
     const char_card_data = (currentCard?.data?.description ?? '').trim()
     let payload = ``
     // set suffix length as its always added
-    let payload_length = instructCache.system_suffix_length * token_mult
+    let payload_length = instructCache.system_suffix_length
     if (currentInstruct.system_prefix) {
         payload += currentInstruct.system_prefix
-        payload_length += instructCache.system_prefix_length * token_mult
+        payload_length += instructCache.system_prefix_length
     }
 
     if (currentInstruct.system_prompt) {
         payload += `${currentInstruct.system_prompt}`
-        payload_length += instructCache.system_prompt_length * token_mult
+        payload_length += instructCache.system_prompt_length
     }
     if (char_card_data) {
         payload += char_card_data
-        payload_length += characterCache.description_length * token_mult
+        payload_length += characterCache.description_length
     }
     if (user_card_data) {
         payload += user_card_data
-        payload_length += userCache.description_length * token_mult
+        payload_length += userCache.description_length
     }
     // suffix must be delayed for example messages
-
     let message_acc = ``
     let message_acc_length = 0
     let is_last = true
     let index = messages.length - 1
     for (const message of messages?.reverse() ?? []) {
-        const swipe_len = message.swipes[message.swipe_id].swipe
-            ? Chats.useChat.getState().getTokenCount(index)
-            : 0
+        const swipe_len = Chats.useChat.getState().getTokenCount(index)
         // for last message, we want to skip the end token to allow the LLM to generate
-        const instruct_len = message.is_user
-            ? instructCache.input_prefix_length + (is_last ? 0 : instructCache.input_suffix_length)
-            : instructCache.input_suffix_length + (is_last ? 0 : instructCache.output_suffix_length)
+        let instruct_len = message.is_user
+            ? instructCache.input_prefix_length
+            : instructCache.output_suffix_length
+        if (!is_last)
+            instruct_len += message.is_user
+                ? instructCache.input_suffix_length
+                : instructCache.output_suffix_length
         const shard_length = swipe_len + instruct_len
         if (message_acc_length + payload_length + shard_length > max_length) {
             break
@@ -190,13 +191,12 @@ const buildContext = (max_length: number) => {
 
         if (!is_last)
             message_shard += `${message.is_user ? currentInstruct.input_suffix : currentInstruct.output_suffix}`
-        else is_last = false
+        is_last = false
 
         if (currentInstruct.wrap) {
             message_shard += `\n`
         }
-
-        message_acc_length += shard_length * token_mult
+        message_acc_length += shard_length
         message_acc = message_shard + message_acc
         index--
     }
@@ -204,19 +204,14 @@ const buildContext = (max_length: number) => {
     if (examples) {
         if (message_acc_length + payload_length + characterCache.examples_length < max_length) {
             payload += examples
-            message_acc_length += characterCache.examples_length * token_mult
+            message_acc_length += characterCache.examples_length
         }
     }
 
-    if (currentInstruct.system_suffix) {
-        payload += ' ' + currentInstruct.system_suffix
-        //message_acc_length += instructCache.system_suffix_length * token_mult
-    }
+    payload += currentInstruct.system_suffix
+
     payload = replaceMacros(payload + message_acc)
-    //Logger.log(`Payload size: ${LlamaTokenizer.encode(payload).length}`)
-    Logger.log(
-        `Approximate Context Size: ${(message_acc_length + payload_length).toFixed(0)} tokens`
-    )
+    Logger.log(`Approximate Context Size: ${message_acc_length + payload_length} tokens`)
     Logger.log(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
     return payload
 }
