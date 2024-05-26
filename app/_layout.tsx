@@ -10,10 +10,14 @@ import { MenuProvider } from 'react-native-popup-menu'
 
 import migrations from '../db/migrations/migrations'
 
+const DevDB = () => {
+    useDrizzleStudio(rawdb)
+    return <></>
+}
+
 const Layout = () => {
     const [firstRender, setFirstRender] = useState<boolean>(true)
     const { success, error } = useMigrations(db, migrations)
-    useDrizzleStudio(rawdb)
 
     useEffect(() => {
         // reset defaults
@@ -43,6 +47,7 @@ const Layout = () => {
     if (!firstRender)
         return (
             <GestureHandlerRootView style={{ flex: 1 }}>
+                {__DEV__ && <DevDB />}
                 <MenuProvider>
                     <Stack
                         screenOptions={{
