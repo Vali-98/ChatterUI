@@ -17,7 +17,6 @@ import { Llama3Tokenizer } from './Tokenizer/tokenizer'
 import { humanizedISO8601DateTime } from './Utils'
 import { Llama } from './llama'
 import { mmkv } from './mmkv'
-import { LlamaTokenizer } from './tokenizer'
 export {
     mmkv,
     Presets,
@@ -30,7 +29,6 @@ export {
     Llama,
     humanizedISO8601DateTime,
     Logger,
-    LlamaTokenizer,
     Style,
     MarkdownStyle,
     Llama3Tokenizer,

@@ -9,9 +9,9 @@ import { API } from './API'
 import { Characters } from './Characters'
 import { Global } from './GlobalValues'
 import { Logger } from './Logger'
+import { Llama3Tokenizer } from './Tokenizer/tokenizer'
 import { Llama } from './llama'
 import { mmkv } from './mmkv'
-import { LlamaTokenizer } from './tokenizer'
 
 export const regenerateResponse = async () => {
     const charName = Characters.useCharacterCard.getState().card?.data.name
@@ -229,12 +229,12 @@ const buildChatCompletionContext = (max_length: number) => {
     \n${userCard?.data?.description ?? ''}
     \n${currentCard?.data?.description ?? ''}`
 
-    let total_length = LlamaTokenizer.encode(initial).length
+    let total_length = Llama3Tokenizer.encode(initial).length
     const payload = [{ role: 'system', content: replaceMacros(initial) }]
     const messageBuffer = []
     for (const message of messages.reverse()) {
         const len =
-            LlamaTokenizer.encode(message.swipes[message.swipe_id].swipe).length + total_length
+            Llama3Tokenizer.encode(message.swipes[message.swipe_id].swipe).length + total_length
         if (len > max_length) break
         messageBuffer.push({
             role: message.is_user ? 'user' : 'assistant',
