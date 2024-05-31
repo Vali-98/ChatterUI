@@ -72,10 +72,6 @@ const paths_dev: ButtonData[] = [
         path: '/LorebookMenu',
     },
     {
-        name: '[DEV] COLOR TEST',
-        path: '/ColorTest',
-    },
-    {
         name: '[DEV] Classifier',
         path: '/Classifier',
     },

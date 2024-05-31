@@ -129,21 +129,46 @@ const Local = () => {
             ) : (
                 <View style={{ flexDirection: 'row', marginTop: 8 }}>
                     <TouchableOpacity
-                        style={{ ...styles.textbutton, marginRight: 8 }}
+                        disabled={modelList.length === 0}
+                        style={{
+                            ...(currentModel ? styles.textbutton : styles.disabletextbutton),
+                            marginRight: 8,
+                        }}
                         onPress={handleLoad}>
-                        <Text style={{ ...styles.buttonlabel }}>Load</Text>
+                        <Text
+                            style={{
+                                ...(currentModel ? styles.buttonlabel : styles.disablebuttonlabel),
+                            }}>
+                            Load
+                        </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={{ ...styles.textbutton, marginRight: 8 }}
+                        style={{
+                            ...(loadedModel ? styles.textbutton : styles.disabletextbutton),
+                            marginRight: 8,
+                        }}
                         onPress={handleUnload}>
-                        <Text style={{ ...styles.buttonlabel }}>Unload</Text>
+                        <Text
+                            style={{
+                                ...(loadedModel ? styles.buttonlabel : styles.disablebuttonlabel),
+                            }}>
+                            Unload
+                        </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={{ ...styles.textbutton, marginRight: 8 }}
+                        style={{
+                            ...(currentModel ? styles.textbutton : styles.disabletextbutton),
+                            marginRight: 8,
+                        }}
                         onPress={handleDelete}>
-                        <Text style={{ ...styles.buttonlabel }}>Delete</Text>
+                        <Text
+                            style={{
+                                ...(currentModel ? styles.buttonlabel : styles.disablebuttonlabel),
+                            }}>
+                            Delete
+                        </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -248,6 +273,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
 
+    disablebuttonlabel: {
+        color: Style.getColor('primary-text2'),
+        fontSize: 16,
+    },
+
     input: {
         flex: 1,
         color: Style.getColor('primary-text1'),
@@ -262,6 +292,13 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 4,
         borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
+    },
+
+    disabletextbutton: {
+        padding: 8,
+        borderRadius: 4,
+        borderColor: Style.getColor('primary-surface3'),
         borderWidth: 1,
     },
 

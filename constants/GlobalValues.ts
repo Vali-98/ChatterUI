@@ -105,5 +105,7 @@ export enum AppSettings {
     PrimaryHue = 'primaryhue',
     AnimateEditor = 'animateeditor',
     CreateFirstMes = 'createfirstmes',
+    ChatOnStartup = 'chatonstartup',
+    AutoLoadLocal = 'autoloadlocal',
     AutoScroll = 'autoscroll',
 }

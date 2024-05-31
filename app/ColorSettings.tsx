@@ -9,7 +9,7 @@ import { View, Text, TouchableOpacity, Switch } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
-const ColorTest = () => {
+const ColorSettings = () => {
     const { color, setPrimary, toggleDarkMode, darkMode, getColor } = Style.useColorScheme(
         (state) => ({
             color: state.colors.primary,
@@ -37,6 +37,7 @@ const ColorTest = () => {
         <View style={{ backgroundColor: getColor('primary-surface1'), flex: 1, padding: 16 }}>
             <Stack.Screen
                 options={{
+                    title: 'Color Settings',
                     headerRight: () => (
                         <TouchableOpacity
                             onPress={() => {
@@ -57,24 +58,26 @@ const ColorTest = () => {
                 }}
             />
 
-            <View style={{ alignItems: 'center', flexDirection: 'row', marginVertical: 8 }}>
-                <Switch
-                    value={darkMode}
-                    onValueChange={(value) => {
-                        setEdited(true)
-                        toggleDarkMode()
-                    }}
-                    thumbColor={getColor(darkMode ? 'primary-brand' : 'primary-surface1')}
-                    trackColor={{
-                        true: getColor('primary-surface3'),
-                        false: getColor('primary-surface3'),
-                    }}
-                />
+            {(__DEV__ || devMode) && (
+                <View style={{ alignItems: 'center', flexDirection: 'row', marginVertical: 8 }}>
+                    <Switch
+                        value={darkMode}
+                        onValueChange={(value) => {
+                            setEdited(true)
+                            toggleDarkMode()
+                        }}
+                        thumbColor={getColor(darkMode ? 'primary-brand' : 'primary-surface1')}
+                        trackColor={{
+                            true: getColor('primary-surface3'),
+                            false: getColor('primary-surface3'),
+                        }}
+                    />
 
-                <Text style={{ color: getColor('primary-text1') }}>
-                    Toggle Dark Mode [ VERY EXPERIMENTAL ]
-                </Text>
-            </View>
+                    <Text style={{ color: getColor('primary-text1') }}>
+                        Toggle Dark Mode [ VERY EXPERIMENTAL ]
+                    </Text>
+                </View>
+            )}
             <View style={{ alignItems: 'center', flexDirection: 'row' }}>
                 <Text style={{ color: getColor('primary-text1') }}>Hue: {color.h}</Text>
                 <Slider
@@ -223,4 +226,4 @@ const ColorTest = () => {
     )
 }
 
-export default ColorTest
+export default ColorSettings

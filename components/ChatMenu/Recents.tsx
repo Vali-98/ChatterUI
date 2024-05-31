@@ -43,13 +43,6 @@ const Recents = () => {
                         <Text style={styles.title}>Recent</Text>
                         {!noRecents && (
                             <TouchableOpacity style={styles.button} onPress={RecentMessages.flush}>
-                                {/*
-                                    <FontAwesome
-                                        size={20}
-                                        name="trash"
-                                        color={Style.getColor('primary-text1')}
-                                    />
-                        */}
                                 <Text style={{ color: Style.getColor('primary-text2') }}>
                                     Clear All
                                 </Text>
