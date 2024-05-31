@@ -6,6 +6,7 @@ import * as Application from 'expo-application'
 import EventSource from 'react-native-sse'
 
 import { API } from './API'
+import { APIState } from './APIState'
 import { Characters } from './Characters'
 import { Global } from './GlobalValues'
 import { Logger } from './Logger'
@@ -42,8 +43,13 @@ export const generateResponse = async () => {
     Chats.useChat.getState().startGenerating()
     Logger.log(`Obtaining response.`)
     const data = performance.now()
-    const setAbortFunction = useInference.getState().setAbort
     const APIType = getString(Global.APIType)
+    const apiState = APIState?.[APIType as API]
+    if (apiState) await apiState.inference()
+    else {
+        Logger.log('An invalid API was somehow chosen, this is bad!', true)
+    }
+    /*
     try {
         switch (APIType) {
             case API.KAI:
@@ -77,7 +83,7 @@ export const generateResponse = async () => {
     } catch (error) {
         Logger.log(`Something went wrong: ${error}`, true)
         stopGenerating()
-    }
+    }*/
     Logger.debug(`Time taken for generateResponse(): ${(performance.now() - data).toFixed(2)}ms`)
 }
 
@@ -245,7 +251,8 @@ const buildChatCompletionContext = (max_length: number) => {
     return [...payload, ...messageBuffer.reverse()]
 }
 
-const constructStopSequence = (instruct: InstructType): string[] => {
+const constructStopSequence = (): string[] => {
+    const instruct = Instructs.useInstruct.getState().replacedMacros()
     const sequence: string[] = []
     if (instruct.stop_sequence !== '')
         instruct.stop_sequence.split(',').forEach((item) => item !== '' && sequence.push(item))
@@ -277,8 +284,6 @@ const getSeed = (seed: string | number | undefined): number => {
 
 const constructKAIPayload = () => {
     const preset = getObject(Global.PresetData)
-    const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
-
     return {
         prompt: buildContext(preset.max_length),
         max_context_length: parseInt(preset.max_length),
@@ -293,7 +298,7 @@ const constructKAIPayload = () => {
         typical: parseFloat(preset.typical),
         sampler_order: [6, 0, 1, 3, 4, 2, 5],
         sampler_seed: getSeed(preset?.seed),
-        stop_sequence: constructStopSequence(currentInstruct),
+        stop_sequence: constructStopSequence(),
         mirostat: parseInt(preset.mirostat_mode),
         mirostat_tau: parseFloat(preset.mirostat_tau),
         mirostat_eta: parseFloat(preset.mirostat_eta),
@@ -307,7 +312,6 @@ const constructKAIPayload = () => {
 
 const constructHordePayload = () => {
     const preset = getObject(Global.PresetData)
-    const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
     const hordeModels = getObject(Global.HordeModels)
     const hordeWorkers = getObject(Global.HordeWorkers)
 
@@ -354,7 +358,7 @@ const constructHordePayload = () => {
             typical: preset.typical,
             singleline: false,
             use_default_badwordsids: preset.ban_eos_token,
-            stop_sequence: constructStopSequence(currentInstruct),
+            stop_sequence: constructStopSequence(),
             min_p: preset.min_p,
         },
         trusted_workers: false,
@@ -368,7 +372,6 @@ const constructHordePayload = () => {
 
 const constructTGWUIPayload = () => {
     const preset = getObject(Global.PresetData)
-    const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
     return {
         stream: true,
         prompt: buildContext(preset.max_length),
@@ -398,14 +401,14 @@ const constructTGWUIPayload = () => {
         truncation_length: parseInt(preset.truncation_length),
         ban_eos_token: preset.ban_eos_token,
         skip_special_tokens: preset.skip_special_tokens,
-        stopping_strings: constructStopSequence(currentInstruct),
+        stopping_strings: constructStopSequence(),
         seed: getSeed(preset?.seed),
         guidance_scale: preset.guidance_scale,
         negative_prompt: preset.negative_prompt,
         temperature_last: parseFloat(preset.min_p) !== 1,
         dynamic_temperature: parseFloat(preset.dynatemp_range) > 0,
         dynatemp_low: parseFloat(preset.temp) - parseFloat(preset.dynatemp_range) / 2,
-        dynatemp_hight: parseFloat(preset.temp) + parseFloat(preset.dynatemp_range) / 2,
+        dynatemp_high: parseFloat(preset.temp) + parseFloat(preset.dynatemp_range) / 2,
         dynatemp_exponent: 0.5,
         smoothing_factor: preset.smoothing_factor,
     }
@@ -413,7 +416,6 @@ const constructTGWUIPayload = () => {
 
 const constructMancerPayload = () => {
     const preset = getObject(Global.PresetData)
-    const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
     const mancerModel = getObject(Global.MancerModel)
 
     const context_len = Math.min(preset.max_length, mancerModel.limits.context)
@@ -425,7 +427,7 @@ const constructMancerPayload = () => {
         stream: true,
         max_tokens: context_len,
         min_tokens: gen_len,
-        stop: constructStopSequence(currentInstruct),
+        stop: constructStopSequence(),
         //"logit_bias": {},
         temperature: preset.temp,
         repetition_penalty: preset.rep_pen,
@@ -435,13 +437,13 @@ const constructMancerPayload = () => {
         top_p: preset.top_p,
         top_a: preset.top_a,
         min_p: preset.min_p,
+        n: 1,
     }
 }
 
 const constructCompletionsPayload = () => {
     const completionsModel = getObject(Global.CompletionsModel)
     const preset = getObject(Global.PresetData)
-    const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
 
     return {
         stream: true,
@@ -466,7 +468,7 @@ const constructCompletionsPayload = () => {
         grammar: preset.grammar_string,
         seed: getSeed(preset?.seed),
         sampler_order: [6, 0, 1, 3, 4, 2, 5],
-        stop: constructStopSequence(currentInstruct),
+        stop: constructStopSequence(),
         frequency_penalty: preset.freq_pen,
         presence_penalty: preset.presence_pen,
         smoothing_factor: preset.smoothing_factor,
@@ -475,12 +477,11 @@ const constructCompletionsPayload = () => {
 
 const constructLocalPayload = () => {
     const preset = getObject(Global.PresetData)
-    const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
     const localPreset = getObject(Global.LocalPreset)
     return {
         prompt: buildContext(preset.max_length),
         grammar: preset.grammar ?? '',
-        stop: constructStopSequence(currentInstruct),
+        stop: constructStopSequence(),
 
         n_predict: preset.genamt,
         n_threads: localPreset.threads,
@@ -503,7 +504,6 @@ const constructLocalPayload = () => {
 
 const constructOpenRouterPayload = () => {
     const openRouterModel = getObject(Global.OpenRouterModel)
-    const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
     const preset = getObject(Global.PresetData)
     return {
         messages: buildChatCompletionContext(openRouterModel.context_length),
@@ -513,17 +513,16 @@ const constructOpenRouterPayload = () => {
         presence_penalty: preset.presence_pen,
         response_format: { type: 'json_object' },
         seed: getSeed(preset?.seed),
-        stop: constructStopSequence(currentInstruct),
+        stop: constructStopSequence(),
         stream: true,
         temperature: preset.temp,
         top_p: preset.top_p,
-        top_k: preset.top_a,
+        top_k: preset.top_k,
     }
 }
 
 const constructOpenAIPayload = () => {
     const openAIModel = getObject(Global.OpenAIModel)
-    const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
     const preset = getObject(Global.PresetData)
     return {
         messages: buildChatCompletionContext(preset.max_length),
@@ -532,7 +531,7 @@ const constructOpenAIPayload = () => {
         frequency_penalty: preset.freq_pen,
         presence_penalty: preset.presence_pen,
         seed: getSeed(preset?.seed),
-        stop: constructStopSequence(currentInstruct),
+        stop: constructStopSequence(),
         stream: true,
         temperature: preset.temp,
         top_p: preset.top_p,
@@ -751,7 +750,7 @@ const openAIResponseStream = async (setAbortFunction: AbortFunction) => {
 const constructReplaceStrings = (): string[] => {
     const currentInstruct: InstructType = Instructs.useInstruct.getState().replacedMacros()
     // default stop strings defined instructs
-    const stops: string[] = constructStopSequence(currentInstruct)
+    const stops: string[] = constructStopSequence()
     // additional stop strings based on context configuration
     const output: string[] = []
 
