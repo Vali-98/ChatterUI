@@ -98,6 +98,7 @@ const AppSettingsMenu = () => {
     const [firstMes, setFirstMes] = useMMKVBoolean(AppSettings.CreateFirstMes)
     const [chatOnStartup, setChatOnStartup] = useMMKVBoolean(AppSettings.ChatOnStartup)
     const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)
+    const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
     return (
         <ScrollView style={styles.mainContainer}>
             <Stack.Screen options={{ title: 'App Settings' }} />
@@ -124,6 +125,9 @@ const AppSettingsMenu = () => {
             </TouchableOpacity>
 
             <Text style={styles.sectionTitle}>Chat</Text>
+
+            <SwitchComponent title="Auto Scroll" value={autoScroll} onValueChange={setAutoScroll} />
+            <Text style={styles.subtitle}>Autoscrolls text during generations</Text>
 
             <SwitchComponent
                 title="Use First Message"
