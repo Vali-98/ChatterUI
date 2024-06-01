@@ -26,7 +26,8 @@
                 "image": "./assets/images/splash.png",
                 "resizeMode": "contain",
                 "backgroundColor": "#000000"
-            }
+            },
+            "userInterfaceStyle": "dark"
         },
         "web": {
             "bundler": "metro",
@@ -46,7 +47,8 @@
                 {
                     "android": {
                         "usesCleartextTraffic": true,
-                        "useLegacyPackaging": true
+                        "enableProguardInReleaseBuilds": true,
+                        "enableShrinkResourcesInReleaseBuilds": true
                     }
                 }
             ],
