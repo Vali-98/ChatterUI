@@ -86,8 +86,25 @@ const TextCompletions = () => {
             {endpoint && <HeartbeatButton api={endpoint} />}
 
             <View style={styles.dropdownContainer}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 8 }}>
-                    <Text style={{ ...styles.title, marginRight: 4 }}>Models</Text>
+                <Text style={styles.title}>Models</Text>
+
+                <Text style={styles.subtitle}>API Key must be provided to get model list.</Text>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Dropdown
+                        value={completionsModel}
+                        data={modelList}
+                        labelField="id"
+                        valueField="id"
+                        onChange={(item: OpenAIModel) => {
+                            if (item.id === completionsModel?.id) return
+                            setCompletionsModel(item)
+                        }}
+                        {...Style.drawer.default}
+                        placeholder={
+                            modelList.length === 0 ? 'No Models Available' : 'Select Model'
+                        }
+                    />
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
@@ -100,19 +117,6 @@ const TextCompletions = () => {
                         />
                     </TouchableOpacity>
                 </View>
-                <Text style={styles.subtitle}>API Key must be provided to get model list.</Text>
-                <Dropdown
-                    value={completionsModel}
-                    data={modelList}
-                    labelField="id"
-                    valueField="id"
-                    onChange={(item: OpenAIModel) => {
-                        if (item.id === completionsModel?.id) return
-                        setCompletionsModel(item)
-                    }}
-                    {...Style.drawer.default}
-                    placeholder={modelList.length === 0 ? 'No Models Available' : 'Select Model'}
-                />
             </View>
             {completionsModel?.id && (
                 <View style={styles.modelInfo}>
@@ -155,6 +159,7 @@ const styles = StyleSheet.create({
     },
 
     title: {
+        paddingTop: 8,
         color: Style.getColor('primary-text1'),
         fontSize: 16,
     },
@@ -190,7 +195,8 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         backgroundColor: Style.getColor('primary-surface2'),
         flex: 1,
-        padding: 16,
-        marginTop: 12,
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        paddingBottom: 24,
     },
 })

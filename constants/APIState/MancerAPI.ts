@@ -45,6 +45,7 @@ class MancerAPI extends APIBase {
     inference = async () => {
         const mancerKey = this.getString(Global.MancerKey)
         const mancerModel = this.getObject(Global.MancerModel)
+        Logger.log(`Using endpoint: Mancer`)
 
         const check = await fetch(`https://neuro.mancer.tech/oai/v1/models/${mancerModel.id}`, {
             method: 'GET',

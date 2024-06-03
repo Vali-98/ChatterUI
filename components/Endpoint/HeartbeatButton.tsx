@@ -12,6 +12,7 @@ const enum ResponseStatus {
 type HeartbeatButtonProps = {
     api: string
     buttonText?: string
+    apiFormat?: (url: string) => string
     messageNeutral?: string
     messageError?: string
     messageOK?: string
@@ -20,6 +21,10 @@ type HeartbeatButtonProps = {
 const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
     api,
     buttonText = 'Test',
+    apiFormat = (url: string) => {
+        const newurl = new URL('/v1/models', api)
+        return newurl.toString()
+    },
     messageNeutral = 'Not Connected',
     messageError = 'Failed To Connect',
     messageOK = 'Connected',
@@ -42,15 +47,16 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
     }
 
     const handleCheck = async () => {
+        const endpoint = apiFormat(api)
         try {
-            const url = new URL('/v1/models', api)
             const controller = new AbortController()
             const timeout = setTimeout(() => {
                 controller.abort()
             }, 1000)
-            const response = await fetch(url, { method: 'GET', signal: controller.signal }).catch(
-                () => ({ status: 400 })
-            )
+            const response = await fetch(endpoint, {
+                method: 'GET',
+                signal: controller.signal,
+            }).catch(() => ({ status: 400 }))
             clearTimeout(timeout)
             setStatus(response.status === 200 ? ResponseStatus.OK : ResponseStatus.ERROR)
         } catch (error) {

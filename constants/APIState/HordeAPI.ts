@@ -78,7 +78,7 @@ class HordeAPI extends APIBase {
     inference = async () => {
         const hordeKey = this.getString(Global.HordeKey)
         const hordeModels = this.getObject(Global.HordeModels)
-
+        Logger.log(`Using endpoint: Horde`)
         let generation_id = ''
         let aborted = false
 

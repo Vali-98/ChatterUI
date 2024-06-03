@@ -86,6 +86,10 @@ export const enum Global {
     OpenRouterModel = 'openroutermodel',
     OpenRouterKey = 'openrouterkey',
 
+    OllamaModel = 'ollamamodel',
+    //OllamaKey = 'ollamakey',
+    OllamaEndpoint = 'ollamaendpoint',
+
     TTSSpeaker = 'ttsspeaker',
     TTSEnable = 'ttsenable',
     TTSAuto = `ttsauto`,

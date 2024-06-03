@@ -1,7 +1,16 @@
 diff --git a/node_modules/react-native-sse/src/EventSource.js b/node_modules/react-native-sse/src/EventSource.js
-index 6a7b146..c25b370 100644
+index 6a7b146..a2e0736 100644
 --- a/node_modules/react-native-sse/src/EventSource.js
 +++ b/node_modules/react-native-sse/src/EventSource.js
+@@ -36,7 +36,7 @@ class EventSource {
+     this.debug = options.debug || false;
+     this.interval = options.pollingInterval ?? 5000;
+     this.lineEndingCharacter = options.lineEndingCharacter || null;
+-
++    this.singleLine = false
+     this._xhr = null;
+     this._pollTimer = null;
+     this._lastIndexProcessed = 0;
 @@ -116,6 +116,7 @@ class EventSource {
  
            if (xhr.readyState === XMLHttpRequest.DONE) {
@@ -10,3 +19,68 @@ index 6a7b146..c25b370 100644
              this._pollAgain(this.interval, false);
            }
          } else if (xhr.status !== 0) {
+@@ -203,7 +204,6 @@ class EventSource {
+     let data = [];
+     let retry = 0;
+     let line = '';
+-
+     for (let i = 0; i < parts.length; i++) {
+       line = parts[i].trim();
+       if (line.startsWith('event')) {
+@@ -215,6 +215,7 @@ class EventSource {
+         }
+       } else if (line.startsWith('data')) {
+         data.push(line.replace(/data:?\s*/, ''));
++        
+       } else if (line.startsWith('id')) {
+         id = line.replace(/id:?\s*/, '');
+         if (id !== '') {
+@@ -231,13 +232,16 @@ class EventSource {
+             url: this.url,
+             lastEventId: this.lastEventId,
+           };
+-
+           this.dispatch(eventType, event);
+-
+           data = [];
+           type = undefined;
+         }
+-      }
++      } else if(this.singleLine) {
++        try {
++          const e = JSON.parse(line)
++          if (e?.model) data.push(line)
++        } catch(e) {}
++      } else console.log('Invalid SingleLine formatting!')
+     }
+   }
+ 
+@@ -252,15 +256,25 @@ class EventSource {
+   }
+ 
+   _getLastDoubleNewlineIndex(response) {
++    if(this.singleLine) return this._getLastSingleNewlineIndex(response)
+     const doubleLineEndingCharacter = this.lineEndingCharacter + this.lineEndingCharacter;
+     const lastIndex = response.lastIndexOf(doubleLineEndingCharacter);
+-    if (lastIndex === -1) {
+-      return -1;
++    if (lastIndex === -1 ) {
++      return this._getLastSingleNewlineIndex(response)
+     }
+-
+     return lastIndex + doubleLineEndingCharacter.length;
+   }
+ 
++  _getLastSingleNewlineIndex(response) {
++    const singleLineEndingCharacter = this.lineEndingCharacter;
++    const lastIndex = response.lastIndexOf(singleLineEndingCharacter);
++    if (lastIndex === -1 ) {
++      return -1 
++    }
++    this.singleLine = true
++    return lastIndex + singleLineEndingCharacter.length;
++  }
++
+   addEventListener(type, listener) {
+     if (this.eventHandlers[type] === undefined) {
+       this.eventHandlers[type] = [];

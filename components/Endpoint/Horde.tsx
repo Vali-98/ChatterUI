@@ -1,10 +1,59 @@
 import { hordeHeader } from '@constants/Inference'
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { Global, Logger, Style } from '@globals'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import { MultiSelect } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
+
+type HordeProps = {
+    item: HordeModel
+    unSelect?: (item: HordeModel) => void
+    hordeWorkers?: HordeWorker[]
+}
+
+const HordeItem: React.FC<HordeProps> = ({ item, unSelect, hordeWorkers }) => {
+    return (
+        <View style={styles.iteminfo}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text
+                    style={{
+                        color: Style.getColor('primary-text1'),
+                        flex: 1,
+                        fontSize: 16,
+                    }}>
+                    {item.name}
+                </Text>
+                <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
+                    <MaterialIcons
+                        name="delete"
+                        color={Style.getColor('primary-text1')}
+                        size={28}
+                    />
+                </TouchableOpacity>
+            </View>
+
+            <View style={{ flexDirection: 'row' }}>
+                <View>
+                    <Text style={{ color: Style.getColor('primary-text2') }}>Workers</Text>
+                    <Text style={{ color: Style.getColor('primary-text2') }}>Performance</Text>
+                    <Text style={{ color: Style.getColor('primary-text2') }}>ETA</Text>
+                    <Text style={{ color: Style.getColor('primary-text2') }}>Context Limit</Text>
+                </View>
+                <View style={{ marginLeft: 8 }}>
+                    <Text style={{ color: Style.getColor('primary-text2') }}>: {item.count}</Text>
+                    <Text style={{ color: Style.getColor('primary-text2') }}>
+                        : {item.performance}
+                    </Text>
+                    <Text style={{ color: Style.getColor('primary-text2') }}>: {item.eta}s</Text>
+                    <Text style={{ color: Style.getColor('primary-text2') }}>
+                        {`: ${hordeWorkers && getContextSize(item, hordeWorkers)}`}
+                    </Text>
+                </View>
+            </View>
+        </View>
+    )
+}
 
 const Horde = () => {
     const [hordeKey, setHordeKey] = useMMKVString(Global.HordeKey)
@@ -57,6 +106,8 @@ const Horde = () => {
         getModels()
     }, [])
 
+    const listRef = useRef()
+
     return (
         <View style={styles.mainContainer}>
             <Text style={styles.title}>API Key</Text>
@@ -87,110 +138,57 @@ const Horde = () => {
                 </TouchableOpacity>
             </View>
 
-            <View>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        paddingTop: 8,
-                        marginBottom: 8,
+            <View
+                style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingTop: 8,
+                    marginBottom: 8,
+                }}>
+                <Text style={styles.title}>Models</Text>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                        getModels()
                     }}>
-                    <Text style={{ ...styles.title, marginRight: 4 }}>Models</Text>
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => {
-                            getModels()
-                        }}>
-                        <MaterialIcons
-                            name="refresh"
-                            color={Style.getColor('primary-text1')}
-                            size={24}
-                        />
-                    </TouchableOpacity>
-                </View>
-
-                <MultiSelect
-                    value={dropdownValues}
-                    data={modelList}
-                    labelField="name"
-                    valueField="name"
-                    onChange={(item) => {
-                        setHordeModels(
-                            modelList.filter((value: HordeModel) => {
-                                return item.includes(value.name)
-                            })
-                        )
-                        setDropdownValues(item)
-                    }}
-                    {...Style.drawer.default}
-                    placeholderStyle={{
-                        color: Style.getColor(
-                            hordeModels && hordeModels?.length === 0
-                                ? 'primary-text2'
-                                : 'primary-text1'
-                        ),
-                    }}
-                    placeholder={
-                        hordeModels?.length === 0
-                            ? 'Select Model'
-                            : `Selected ${hordeModels?.length} ${
-                                  hordeModels && hordeModels?.length > 1 ? 'models' : 'model'
-                              }`
-                    }
-                    renderSelectedItem={(item: HordeModel, unSelect) => (
-                        <View style={styles.iteminfo}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Text
-                                    style={{
-                                        color: Style.getColor('primary-text1'),
-                                        flex: 1,
-                                        fontSize: 16,
-                                    }}>
-                                    {item.name}
-                                </Text>
-                                <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
-                                    <MaterialIcons
-                                        name="delete"
-                                        color={Style.getColor('primary-text1')}
-                                        size={28}
-                                    />
-                                </TouchableOpacity>
-                            </View>
-
-                            <View style={{ flexDirection: 'row' }}>
-                                <View>
-                                    <Text style={{ color: Style.getColor('primary-text2') }}>
-                                        Workers
-                                    </Text>
-                                    <Text style={{ color: Style.getColor('primary-text2') }}>
-                                        Performance
-                                    </Text>
-                                    <Text style={{ color: Style.getColor('primary-text2') }}>
-                                        ETA
-                                    </Text>
-                                    <Text style={{ color: Style.getColor('primary-text2') }}>
-                                        Context Limit
-                                    </Text>
-                                </View>
-                                <View style={{ marginLeft: 8 }}>
-                                    <Text style={{ color: Style.getColor('primary-text2') }}>
-                                        : {item.count}
-                                    </Text>
-                                    <Text style={{ color: Style.getColor('primary-text2') }}>
-                                        : {item.performance}
-                                    </Text>
-                                    <Text style={{ color: Style.getColor('primary-text2') }}>
-                                        : {item.eta}s
-                                    </Text>
-                                    <Text style={{ color: Style.getColor('primary-text2') }}>
-                                        {`: ${hordeWorkers && getContextSize(item, hordeWorkers)}`}
-                                    </Text>
-                                </View>
-                            </View>
-                        </View>
-                    )}
-                />
+                    <MaterialIcons
+                        name="refresh"
+                        color={Style.getColor('primary-text1')}
+                        size={24}
+                    />
+                </TouchableOpacity>
             </View>
+
+            <MultiSelect
+                value={dropdownValues}
+                data={modelList}
+                labelField="name"
+                valueField="name"
+                onChange={(item) => {
+                    setHordeModels(
+                        modelList.filter((value: HordeModel) => {
+                            return item.includes(value.name)
+                        })
+                    )
+                    setDropdownValues(item)
+                }}
+                {...Style.drawer.default}
+                placeholderStyle={{
+                    color: Style.getColor(
+                        hordeModels && hordeModels?.length === 0 ? 'primary-text2' : 'primary-text1'
+                    ),
+                }}
+                placeholder={
+                    hordeModels?.length === 0
+                        ? 'Select Model'
+                        : `Selected ${hordeModels?.length} ${
+                              hordeModels && hordeModels?.length > 1 ? 'models' : 'model'
+                          }`
+                }
+                renderSelectedItem={(item: HordeModel, unSelect) => (
+                    <HordeItem item={item} unSelect={unSelect} hordeWorkers={hordeWorkers} />
+                )}
+            />
         </View>
     )
 }
@@ -205,8 +203,9 @@ const styles = StyleSheet.create({
     },
 
     title: {
+        paddingTop: 8,
         color: Style.getColor('primary-text1'),
-        fontSize: 20,
+        fontSize: 16,
     },
 
     subtitle: {

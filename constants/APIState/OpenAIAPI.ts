@@ -1,4 +1,5 @@
 import { Global } from '@constants/GlobalValues'
+import { Logger } from '@constants/Logger'
 import { SamplerID } from '@constants/Samplers'
 
 import { APIBase, APISampler } from './BaseAPI'
@@ -29,6 +30,7 @@ class OpenAIAPI extends APIBase {
         }
     }
     inference = async () => {
+        Logger.log(`Using endpoint: OpenAI`)
         this.readableStreamResponse(
             'https://api.openai.com/v1/chat/completions',
             JSON.stringify(this.buildPayload()),

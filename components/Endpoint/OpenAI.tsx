@@ -1,4 +1,4 @@
-import { FontAwesome } from '@expo/vector-icons'
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { Global, Style, Logger } from '@globals'
 import { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
@@ -73,18 +73,34 @@ const OpenAI = () => {
             <View style={styles.dropdownContainer}>
                 <Text style={{ color: Style.getColor('primary-text1'), fontSize: 16 }}>Model</Text>
                 <Text style={styles.subtitle}>API Key must be provided to get model list.</Text>
-                <Dropdown
-                    value={openAIModel}
-                    data={modelList}
-                    labelField="id"
-                    valueField="id"
-                    onChange={(item) => {
-                        if (item.id === openAIModel?.id) return
-                        setOpenAIModel(item)
-                    }}
-                    placeholder={modelList.length === 0 ? 'No Models Available' : 'Select Model'}
-                    {...Style.drawer.default}
-                />
+
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Dropdown
+                        value={openAIModel}
+                        data={modelList}
+                        labelField="id"
+                        valueField="id"
+                        onChange={(item) => {
+                            if (item.id === openAIModel?.id) return
+                            setOpenAIModel(item)
+                        }}
+                        placeholder={
+                            modelList.length === 0 ? 'No Models Available' : 'Select Model'
+                        }
+                        {...Style.drawer.default}
+                    />
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            getModels()
+                        }}>
+                        <MaterialIcons
+                            name="refresh"
+                            color={Style.getColor('primary-text1')}
+                            size={24}
+                        />
+                    </TouchableOpacity>
+                </View>
             </View>
             {openAIModel?.id && (
                 <View style={styles.modelInfo}>
@@ -127,8 +143,9 @@ const styles = StyleSheet.create({
     },
 
     title: {
+        paddingTop: 8,
         color: Style.getColor('primary-text1'),
-        fontSize: 20,
+        fontSize: 16,
     },
 
     subtitle: {
