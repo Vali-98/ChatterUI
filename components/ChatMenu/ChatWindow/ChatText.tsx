@@ -56,7 +56,7 @@ const ChatText: React.FC<ChatTextProps> = ({ showEllipsis, nowGenerating, id, is
         handleAnimateHeight(newHeight + (showPadding ? oveflowPadding : 0))
     }
     useEffect(() => {
-        if (!nowGenerating && height.current != -1) {
+        if (!nowGenerating && height.current !== -1) {
             handleAnimateHeight(height.current)
         } else if (nowGenerating && !mes) {
             // NOTE: this assumes that mes is empty due to a swipe and may break, but unlikely
