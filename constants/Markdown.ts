@@ -90,7 +90,6 @@ export namespace MarkdownStyle {
             borderWidth: 1,
             borderColor: Style.getColor('primary-brand'),
             borderRadius: 8,
-            marginBottom: 16,
         },
         tableHeader: {
             backgroundColor: Style.getColor('primary-surface2'),
