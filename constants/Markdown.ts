@@ -89,12 +89,15 @@ export namespace MarkdownStyle {
         table: {
             borderWidth: 1,
             borderColor: Style.getColor('primary-brand'),
-            borderRadius: 3,
+            borderRadius: 8,
+            marginBottom: 16,
         },
         tableHeader: {
-            backgroundColor: Style.getColor('primary-surface3'),
+            backgroundColor: Style.getColor('primary-surface2'),
             flexDirection: 'row',
             justifyContent: 'space-around',
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
         },
         tableHeaderCell: {
             color: Style.getColor('primary-text1'),
@@ -102,13 +105,17 @@ export namespace MarkdownStyle {
             padding: 5,
         },
         tableRow: {
+            backgroundColor: Style.getColor('primary-surface4'),
+            borderColor: Style.getColor('primary-surface3'),
             borderBottomWidth: 1,
-            borderColor: Style.getColor('primary-surface4'),
             flexDirection: 'row',
             justifyContent: 'space-around',
         },
         tableRowLast: {
             borderColor: 'transparent',
+            borderBottomLeftRadius: 8,
+            borderBottomRightRadius: 8,
+            paddingBottom: 8,
         },
         tableRowCell: {
             padding: 5,

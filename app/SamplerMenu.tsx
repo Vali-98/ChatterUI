@@ -103,7 +103,7 @@ const SamplerMenu = () => {
                         onPress={() => {
                             if (presetName && currentPreset)
                                 Presets.saveFile(presetName, currentPreset).then(() =>
-                                    Logger.log(`Preset Updated!.`, true)
+                                    Logger.log(`Preset Updated!`, true)
                                 )
                         }}>
                         <FontAwesome
