@@ -86,6 +86,12 @@ export const enum Global {
     //OllamaKey = 'ollamakey',
     OllamaEndpoint = 'ollamaendpoint',
 
+    ClaudeModel = 'claudemodel',
+    ClaudeEndpoint = 'claudeendpoint',
+    ClaudeAPIKey = 'claudeapikey',
+    ClaudePrefill = 'claudeprefill',
+    ClaudeFirstMessage = 'claudefirstmessage',
+
     TTSSpeaker = 'ttsspeaker',
     TTSEnable = 'ttsenable',
     TTSAuto = `ttsauto`,

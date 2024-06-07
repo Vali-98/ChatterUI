@@ -40,7 +40,7 @@ export abstract class APIBase implements IAPIBase {
                     if (item.samplerID === 'max_length' && max_length) {
                         cleanvalue = Math.min(value, max_length)
                     } else if (samplerItem.values.type === 'integer') cleanvalue = Math.floor(value)
-                return { [item.externalName]: cleanvalue }
+                return { [item.externalName as SamplerID]: cleanvalue }
             })
             .reduce((acc, obj) => Object.assign(acc, obj), {})
     }
@@ -61,9 +61,8 @@ export abstract class APIBase implements IAPIBase {
         const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
 
         const userCard = { ...Characters.useUserCard.getState().card }
-        const userName = userCard.data?.name ?? ''
-
         const currentCard = { ...Characters.useCharacterCard.getState().card }
+        const userName = userCard.data?.name ?? ''
         const charName = currentCard.data?.name ?? ''
 
         const characterCache = Characters.useCharacterCard.getState().getCache(userName)
@@ -148,6 +147,14 @@ export abstract class APIBase implements IAPIBase {
         const userCard = { ...Characters.useUserCard.getState().card }
         const currentCard = { ...Characters.useCharacterCard.getState().card }
         const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
+
+        const userName = userCard.data?.name ?? ''
+        const charName = currentCard.data?.name ?? ''
+
+        const characterCache = Characters.useCharacterCard.getState().getCache(userName)
+        const userCache = Characters.useUserCard.getState().getCache(charName)
+        const instructCache = Instructs.useInstruct.getState().getCache(charName, userName)
+
         const buffer = Chats.useChat.getState().buffer
 
         // Logic here is that if the buffer is empty, this is not a regen, hence can popped
@@ -156,18 +163,25 @@ export abstract class APIBase implements IAPIBase {
         \n${userCard?.data?.description ?? ''}
         \n${currentCard?.data?.description ?? ''}`
 
-        let total_length = Llama3Tokenizer.encode(initial).length
+        let total_length =
+            instructCache.system_prompt_length +
+            characterCache.description_length +
+            userCache.description_length
         const payload = [{ role: 'system', content: replaceMacros(initial) }]
         const messageBuffer = []
+
+        let index = messages.length - 1
         for (const message of messages.reverse()) {
-            const len =
-                Llama3Tokenizer.encode(message.swipes[message.swipe_id].swipe).length + total_length
+            // special case for claude, prefill may be useful!
+
+            const len = Chats.useChat.getState().getTokenCount(index) + total_length
             if (len > max_length) break
             messageBuffer.push({
                 role: message.is_user ? 'user' : 'assistant',
                 content: replaceMacros(message.swipes[message.swipe_id].swipe),
             })
             total_length += len
+            index--
         }
         return [...payload, ...messageBuffer.reverse()]
     }
@@ -217,7 +231,7 @@ export abstract class APIBase implements IAPIBase {
                 es.close()
                 return
             }
-            const text = jsonreader(event.data)
+            const text = jsonreader(event.data) ?? ''
             const output = Chats.useChat.getState().buffer + text
             Chats.useChat.getState().setBuffer(output.replaceAll(replace, ''))
         })

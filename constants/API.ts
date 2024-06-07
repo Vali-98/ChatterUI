@@ -10,4 +10,5 @@ export const enum API {
     OPENROUTER = 'openrouter',
     OPENAI = 'openai',
     OLLAMA = 'ollama',
+    CLAUDE = 'claude',
 }

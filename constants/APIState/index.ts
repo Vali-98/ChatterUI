@@ -1,7 +1,9 @@
 import { API } from '@constants/API'
+import { useInference } from '@constants/Chat'
 import { Logger } from '@constants/Logger'
 
 import { APIBase } from './BaseAPI'
+import claudeAPI from './ClaudeAPI'
 import hordeAPI from './HordeAPI'
 import koboldAPI from './KoboldAPI'
 import localAPI from './LocalAPI'
@@ -15,7 +17,10 @@ import textCompletionAPI from './TextCompletionAPI'
 class UnimplementedAPI extends APIBase {
     inference = async () => {
         Logger.log('Unimplemented API', true)
-        this.stopGenerating()
+        setTimeout(() => this.stopGenerating(), 1000)
+        useInference.getState().setAbort(() => {
+            this.stopGenerating()
+        })
     }
 }
 
@@ -31,6 +36,7 @@ export const APIState: Record<API, APIBase> = {
     [API.OPENAI]: openaiAPI,
     [API.OPENROUTER]: openRouterAPI,
     [API.OLLAMA]: ollamaAPI,
+    [API.CLAUDE]: claudeAPI,
 
     //UNIMPLEMENTED
     [API.NOVELAI]: unimplementedAPI,
