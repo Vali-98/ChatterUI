@@ -13,11 +13,7 @@ export const enum Global {
     // CurrentChat = 'currentchat', // current chat filename, locates dir    == removed on db migration
     //Messages = 'messages', === removed on zustand migration
 
-    // EditedWindow = 'editedwindow', // exit editing window confirmation == never used
-
-    // App
-
-    GenerateDefaultInstructs = 'generatedefaultinstructs',
+    // EditedWindow = 'editedwindow', // exit editing window confirmation == never us
 
     // Processing
 

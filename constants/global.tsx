@@ -97,14 +97,6 @@ const loadChatOnInit = async () => {
 
 // runs every startup to clear some MMKV values
 
-const createDefaultInstructData = async () => {
-    await Instructs.generateInitialDefaults().then(() => {
-        const defaultid = 1
-        mmkv.set(Global.InstructID, JSON.stringify(defaultid))
-        Instructs.useInstruct.getState().load(defaultid)
-    })
-}
-
 const createDefaultUserData = async () => {
     await Characters.createCard('User', 'user').then((id: number) => {
         mmkv.set(Global.UserID, id)
@@ -195,34 +187,30 @@ export const initializeApp = async () => {
             Logger.log('Database is Invalid, this should not happen! Please report this occurence.')
         } else if (list?.length === 0) {
             Logger.log('No Instructs exist, creating default Instruct')
-            await createDefaultInstructData()
+            await createDefaultUserData()
         } else if (!list?.some((item) => item.id === userid)) {
             Logger.log('User ID does not exist in database, defaulting to oldest User')
             Characters.useUserCard.getState().setCard(list[0].id)
         } else Characters.useUserCard.getState().setCard(userid)
     }
-    if (!mmkv.getBoolean(Global.GenerateDefaultInstructs)) {
-        Logger.log('Default Instructs were not generated yet, now generating.')
-        await Instructs.generateInitialDefaults()
-    }
 
     const instructid = mmkv.getNumber(Global.InstructID)
     if (instructid === undefined) {
         Logger.log('Instruct ID is undefined, creating default Instruct')
-        await createDefaultInstructData()
+        const id = await Instructs.generateInitialDefaults()
+        mmkv.set(Global.InstructID, id ?? 1)
     } else {
         Instructs.Database.readList().then(async (list) => {
             if (!list) {
-                Logger.log(
-                    'Database is Invalid, this should not happen! Please report this occurence.'
-                )
+                Logger.log('Database Invalid, this should not happen! Please report this!')
             } else if (list?.length === 0) {
                 Logger.log('No Instructs exist, creating default Instruct')
-                await createDefaultInstructData()
+                const id = await Instructs.generateInitialDefaults()
+                mmkv.set(Global.InstructID, id ?? 1)
             } else if (!list?.some((item) => item.id === instructid)) {
                 Logger.log('Instruct ID does not exist in database, defaulting to oldest Instruct')
                 Instructs.useInstruct.getState().load(list[0].id)
-            } else Instructs.useInstruct.getState().load(instructid)
+            }
         })
     }
 

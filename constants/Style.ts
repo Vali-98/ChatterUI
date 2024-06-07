@@ -1,8 +1,10 @@
-import { create } from 'zustand'
-import { Logger } from './Logger'
 import { StyleSheet } from 'react-native'
-import { mmkv } from './mmkv'
+import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
+
 import { AppSettings } from './GlobalValues'
+import { Logger } from './Logger'
+import { mmkv, mmkvStorage } from './mmkv'
 
 type HSL = { h: number; s: number; l: number }
 
@@ -64,7 +66,7 @@ const createColor = (
     scheme: ColorScheme | undefined
 ): string => {
     const darkMode = scheme ? scheme === 'dark' : Style.useColorScheme.getState().darkMode
-    let { h, s, l } = hsl
+    const { h, s, l } = hsl
     if (!darkMode)
         switch (component) {
             case 'brand':
@@ -144,38 +146,43 @@ export namespace Style {
         return useColorScheme.getState().getColor(id)
     }
 
-    export const useColorScheme = create<ColorState>((set, get) => ({
-        darkMode: getDarkModeFromKV(),
-        colors: {
-            primary: {
-                h: getColorFromKV(),
-                s: 26,
-                l: 73,
-            },
-            accent: { h: 180, s: 80, l: 50 },
-            warning: { h: 50, s: 60, l: 50 },
-            destructive: { h: 5, s: 60, l: 50 },
-            confirm: { h: 140, s: 60, l: 50 },
-        },
-        setColor: (colors: ColorTypes) => set((state) => ({ ...state, colors: colors })),
-        getColor: (id: ColorId): string => {
-            const { name, component, scheme } = destructColorID(id)
+    export const useColorScheme = create<ColorState>()(
+        persist(
+            (set, get) => ({
+                darkMode: true,
+                colors: {
+                    primary: {
+                        h: 260,
+                        s: 26,
+                        l: 73,
+                    },
+                    accent: { h: 180, s: 80, l: 50 },
+                    warning: { h: 50, s: 60, l: 50 },
+                    destructive: { h: 5, s: 60, l: 50 },
+                    confirm: { h: 140, s: 60, l: 50 },
+                },
+                setColor: (colors: ColorTypes) => set((state) => ({ ...state, colors: colors })),
+                getColor: (id: ColorId): string => {
+                    const { name, component, scheme } = destructColorID(id)
 
-            return createColor(get().colors[name], component, scheme)
-        },
-        toggleDarkMode: () => {
-            const newMode = !get().darkMode
-            mmkv.set(AppSettings.DarkMode, newMode)
-            set((state) => ({ ...state, darkMode: newMode }))
-        },
-        setPrimary: (h: number, s: number, l: number) => {
-            mmkv.set(AppSettings.PrimaryHue, h)
-            set((state) => ({
-                ...state,
-                colors: { ...state.colors, primary: { h, s, l } },
-            }))
-        },
-    }))
+                    return createColor(get().colors[name], component, scheme)
+                },
+                toggleDarkMode: () => {
+                    const newMode = !get().darkMode
+                    mmkv.set(AppSettings.DarkMode, newMode)
+                    set((state) => ({ ...state, darkMode: newMode }))
+                },
+                setPrimary: (h: number, s: number, l: number) => {
+                    mmkv.set(AppSettings.PrimaryHue, h)
+                    set((state) => ({
+                        ...state,
+                        colors: { ...state.colors, primary: { h, s, l } },
+                    }))
+                },
+            }),
+            { name: 'color-storage', storage: createJSONStorage(() => mmkvStorage) }
+        )
+    )
 
     export const defaultBrandColor = { h: 270, s: 26, l: 73 }
 
