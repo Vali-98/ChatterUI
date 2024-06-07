@@ -90,6 +90,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 32769,
             default: 4098,
             step: 16,
+            precision: 0,
         },
     },
     [SamplerID.STREAMING]: {
@@ -111,6 +112,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 8192,
             default: 256,
             step: 1,
+            precision: 0,
         },
     },
     [SamplerID.TEMPERATURE]: {
@@ -183,6 +185,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 100,
             default: 100,
             step: 1,
+            precision: 0,
         },
     },
     [SamplerID.REPETITION_PENALTY]: {
@@ -219,7 +222,6 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 10,
             default: 1,
             step: 0.01,
-            precision: 1,
         },
     },
     [SamplerID.ENCODER_REPETITION_PENALTY]: {
@@ -268,6 +270,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 20,
             default: 0,
             step: 1,
+            precision: 0,
         },
     },
     [SamplerID.MIN_LENGTH]: {
@@ -280,6 +283,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 2048,
             default: 0,
             step: 1,
+            precision: 0,
         },
     },
     [SamplerID.SMOOTHING_FACTOR]: {
@@ -352,6 +356,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 2,
             default: 0,
             step: 1,
+            precision: 0,
         },
     },
     [SamplerID.MIROSTAT_TAU]: {
@@ -442,6 +447,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             min: -1,
             max: 1000000000,
             step: 1,
+            precision: 0,
         },
     },
     // THIS MAY BE AN ARRAY OBJECT
@@ -485,6 +491,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 20,
             default: 1,
             step: 1,
+            precision: 0,
         },
     },
     [SamplerID.EARLY_STOPPING]: {
