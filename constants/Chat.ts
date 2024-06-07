@@ -85,7 +85,7 @@ type AbortFunctionType = {
     setAbort: (fn: () => void) => void
 }
 
-export const useInference = create<AbortFunctionType>()((set) => ({
+export const useInference = create<AbortFunctionType>((set) => ({
     abortFunction: undefined,
     nowGenerating: false,
     startGenerating: () => set((state) => ({ ...state, nowGenerating: true })),
@@ -99,7 +99,7 @@ export const useInference = create<AbortFunctionType>()((set) => ({
 export namespace Chats {
     export namespace Database {}
 
-    export const useChat = create<ChatState>()((set, get: () => ChatState) => ({
+    export const useChat = create<ChatState>((set, get: () => ChatState) => ({
         data: undefined,
         buffer: '',
         startGenerating: () => {
