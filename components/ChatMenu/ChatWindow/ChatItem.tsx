@@ -1,4 +1,5 @@
 import AnimatedView from '@components/AnimatedView'
+import { useInference } from '@constants/Chat'
 import { View, StyleSheet } from 'react-native'
 
 import ChatBody from './ChatBody'
@@ -6,22 +7,14 @@ import ChatFrame from './ChatFrame'
 
 type ChatItemProps = {
     id: number
-    nowGenerating: boolean
     charId: number
-    userName: string
-    TTSenabled: boolean
     messagesLength: number
 }
 
-const ChatItem: React.FC<ChatItemProps> = ({
-    id,
-    nowGenerating,
-    charId,
-    userName,
-    TTSenabled,
-    messagesLength,
-}) => {
+const ChatItem: React.FC<ChatItemProps> = ({ id, charId, messagesLength }) => {
     const isLastMessage = id === messagesLength - 1
+    const nowGenerating = useInference((state) => state.nowGenerating)
+
     return (
         <AnimatedView dy={100} fade={0} fduration={200} tduration={400}>
             <View
@@ -32,8 +25,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                     charId={charId}
                     id={id}
                     nowGenerating={nowGenerating}
-                    isLast={isLastMessage}
-                    TTSenabled={TTSenabled}>
+                    isLast={isLastMessage}>
                     <ChatBody
                         nowGenerating={nowGenerating}
                         id={id}

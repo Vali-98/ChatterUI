@@ -202,7 +202,7 @@ const SamplerMenu = () => {
                                             (samplerItem.values.type === 'float' ||
                                                 samplerItem.values.type === 'integer') && (
                                                 <SliderItem
-                                                    key={index}
+                                                    key={item.samplerID}
                                                     varname={samplerItem.internalID}
                                                     body={currentPreset}
                                                     setValue={setCurrentPreset}
@@ -217,7 +217,7 @@ const SamplerMenu = () => {
                                     case 'checkbox':
                                         return (
                                             <CheckboxTitle
-                                                key={index}
+                                                key={item.samplerID}
                                                 varname={samplerItem.internalID}
                                                 body={currentPreset}
                                                 setValue={setCurrentPreset}
@@ -227,7 +227,7 @@ const SamplerMenu = () => {
                                     case 'textinput':
                                         return (
                                             <TextBox
-                                                key={index}
+                                                key={item.samplerID}
                                                 varname={samplerItem.internalID}
                                                 body={currentPreset}
                                                 setValue={setCurrentPreset}
