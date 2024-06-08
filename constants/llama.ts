@@ -4,8 +4,8 @@ import { Platform } from 'react-native'
 import DocumentPicker from 'react-native-document-picker'
 
 import { Global } from './GlobalValues'
-import { mmkv } from './mmkv'
 import { Logger } from './Logger'
+import { mmkv } from './mmkv'
 
 type CompletionTimings = {
     predicted_per_token_ms: number
