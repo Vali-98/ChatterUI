@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-sse/src/EventSource.js b/node_modules/react-native-sse/src/EventSource.js
-index 6a7b146..a2e0736 100644
+index 6a7b146..e048163 100644
 --- a/node_modules/react-native-sse/src/EventSource.js
 +++ b/node_modules/react-native-sse/src/EventSource.js
 @@ -36,7 +36,7 @@ class EventSource {
@@ -35,7 +35,15 @@ index 6a7b146..a2e0736 100644
        } else if (line.startsWith('id')) {
          id = line.replace(/id:?\s*/, '');
          if (id !== '') {
-@@ -231,13 +232,16 @@ class EventSource {
+@@ -224,19 +225,22 @@ class EventSource {
+         }
+       } else if (line === '') {
+         if (data.length > 0) {
+-          const eventType = type || 'message';
++          const eventType = type !== 'content_block_delta' &&  type || 'message';
+           const event = {
+             type: eventType,
+             data: data.join('\n'),
              url: this.url,
              lastEventId: this.lastEventId,
            };
@@ -45,21 +53,16 @@ index 6a7b146..a2e0736 100644
            data = [];
            type = undefined;
          }
--      }
 +      } else if(this.singleLine) {
 +        try {
 +          const e = JSON.parse(line)
 +          if (e?.model) data.push(line)
 +        } catch(e) {}
-+      } else console.log('Invalid SingleLine formatting!')
+       }
      }
    }
- 
-@@ -252,15 +256,25 @@ class EventSource {
-   }
- 
+@@ -254,13 +258,22 @@ class EventSource {
    _getLastDoubleNewlineIndex(response) {
-+    if(this.singleLine) return this._getLastSingleNewlineIndex(response)
      const doubleLineEndingCharacter = this.lineEndingCharacter + this.lineEndingCharacter;
      const lastIndex = response.lastIndexOf(doubleLineEndingCharacter);
 -    if (lastIndex === -1) {
