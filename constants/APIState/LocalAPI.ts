@@ -27,12 +27,15 @@ class LocalAPI extends APIBase {
     ]
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
+        const rep_pen = payloadFields?.['penalty_repeat']
         const localPreset: Llama.LlamaPreset = this.getObject(Global.LocalPreset)
         return {
             ...payloadFields,
+            penalize_nl: typeof rep_pen === 'number' && rep_pen > 1,
             n_threads: localPreset.threads,
             prompt: this.buildTextCompletionContext(localPreset.context_length),
             stop: this.constructStopSequence(),
+            emit_partial_completion: true,
         }
     }
     inference = async () => {
