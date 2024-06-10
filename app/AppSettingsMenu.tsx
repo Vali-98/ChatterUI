@@ -100,6 +100,8 @@ const AppSettingsMenu = () => {
     const [chatOnStartup, setChatOnStartup] = useMMKVBoolean(AppSettings.ChatOnStartup)
     const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)
     const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
+    const [sendOnEnter, setSendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
+
     return (
         <ScrollView style={styles.mainContainer}>
             <Stack.Screen options={{ title: 'App Settings' }} />
@@ -145,6 +147,13 @@ const AppSettingsMenu = () => {
                 onValueChange={setChatOnStartup}
             />
             <Text style={styles.subtitle}>Loads the most recent chat on startup</Text>
+
+            <SwitchComponent
+                title="Send on Enter"
+                value={sendOnEnter}
+                onValueChange={setSendOnEnter}
+            />
+            <Text style={styles.subtitle}>Submits messages when Enter is pressed</Text>
 
             <Text style={styles.sectionTitle}>Generation</Text>
 

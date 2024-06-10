@@ -78,6 +78,7 @@ const AppSettingsDefault: Record<AppSettings, boolean | number> = {
     [AppSettings.DarkMode]: true,
     [AppSettings.DevMode]: false,
     [AppSettings.PrimaryHue]: 270,
+    [AppSettings.SendOnEnter]: false,
 }
 
 const loadChatOnInit = async () => {
