@@ -1,6 +1,6 @@
 import { ColorId } from '@constants/Style'
 import { MaterialIcons } from '@expo/vector-icons'
-import { AppSettings, Chats, Style } from '@globals'
+import { Chats, Style } from '@globals'
 import { useState } from 'react'
 import {
     GestureResponderEvent,
@@ -11,14 +11,6 @@ import {
     View,
 } from 'react-native'
 import { TextInput } from 'react-native-gesture-handler'
-import { useMMKVBoolean } from 'react-native-mmkv'
-import Animated, {
-    Easing,
-    FadeIn,
-    FadeOut,
-    SlideInDown,
-    SlideOutDown,
-} from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 type EditorButtonProps = {
@@ -45,20 +37,7 @@ type FadeScreenProps = {
 }
 const FadeScreen: React.FC<FadeScreenProps> = ({ handleOverlayClick }) => {
     return (
-        <Animated.View
-            entering={FadeIn.duration(200)}
-            exiting={FadeOut.duration(200)}
-            style={styles.absolute}>
-            <TouchableOpacity
-                activeOpacity={1}
-                onPress={handleOverlayClick}
-                style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    ...styles.absolute,
-                    justifyContent: 'center',
-                }}
-            />
-        </Animated.View>
+        <TouchableOpacity activeOpacity={1} onPress={handleOverlayClick} style={styles.absolute} />
     )
 }
 
@@ -70,8 +49,6 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
         }))
     )
     const message = Chats.useChat((state) => state?.data?.messages?.[id])
-
-    const [animateEditor, setAnimateEditor] = useMMKVBoolean(AppSettings.AnimateEditor)
 
     const [placeholderText, setPlaceholderText] = useState(
         message?.swipes[message?.swipe_id]?.swipe ?? ''
@@ -96,61 +73,44 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
     }
 
     return (
-        <Modal
-            visible={editMode}
-            animationType="fade"
-            transparent
-            onRequestClose={handleClose}
-            style={{ flex: 1 }}>
-            <FadeScreen handleOverlayClick={handleOverlayClick} />
-            <View style={{ flex: 1 }} />
-            <Animated.View
-                style={styles.topText}
-                entering={
-                    animateEditor
-                        ? SlideInDown.duration(300).easing(Easing.out(Easing.quad))
-                        : undefined
-                }
-                exiting={
-                    animateEditor
-                        ? SlideOutDown.duration(300).easing(Easing.out(Easing.quad))
-                        : undefined
-                }>
-                <Text style={styles.nameText}>{message?.name}</Text>
-                <Text style={styles.timeText}>
-                    {message?.swipes[message.swipe_id].send_date.toLocaleTimeString()}
-                </Text>
-            </Animated.View>
-            <Animated.View
-                style={styles.editorContainer}
-                entering={
-                    animateEditor
-                        ? SlideInDown.duration(300).easing(Easing.out(Easing.quad))
-                        : undefined
-                }
-                exiting={
-                    animateEditor
-                        ? SlideOutDown.duration(300).easing(Easing.out(Easing.quad))
-                        : undefined
-                }>
-                <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                    <EditorButton
-                        name="delete"
-                        onPress={handleDeleteMessage}
-                        color="destructive-brand"
-                    />
-                    <TextInput
-                        autoFocus
-                        style={styles.messageInput}
-                        value={placeholderText}
-                        onChangeText={setPlaceholderText}
-                        textBreakStrategy="simple"
-                        multiline
-                    />
-                    <EditorButton name="check" onPress={handleEditMessage} color="primary-text1" />
+        <View>
+            <Modal
+                visible={editMode}
+                animationType="fade"
+                transparent
+                onRequestClose={handleClose}
+                style={{ flex: 1 }}>
+                <FadeScreen handleOverlayClick={handleOverlayClick} />
+                <View style={{ flex: 1 }} />
+                <View style={styles.topText}>
+                    <Text style={styles.nameText}>{message?.name}</Text>
+                    <Text style={styles.timeText}>
+                        {message?.swipes[message.swipe_id].send_date.toLocaleTimeString()}
+                    </Text>
                 </View>
-            </Animated.View>
-        </Modal>
+                <View style={styles.editorContainer}>
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                        <EditorButton
+                            name="delete"
+                            onPress={handleDeleteMessage}
+                            color="destructive-brand"
+                        />
+                        <TextInput
+                            style={styles.messageInput}
+                            value={placeholderText}
+                            onChangeText={setPlaceholderText}
+                            textBreakStrategy="simple"
+                            multiline
+                        />
+                        <EditorButton
+                            name="check"
+                            onPress={handleEditMessage}
+                            color="primary-text1"
+                        />
+                    </View>
+                </View>
+            </Modal>
+        </View>
     )
 }
 
@@ -161,6 +121,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: '100%',
         height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
 
     editorContainer: {
