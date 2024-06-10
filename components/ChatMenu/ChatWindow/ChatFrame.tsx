@@ -72,7 +72,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, id, nowGenerating, isLa
                 {deltaTime !== undefined && !message.is_user && id !== 0 && (
                     <Text style={styles.graytext}>{deltaTime}s</Text>
                 )}
-                {TTSenabled && <TTSMenu message={swipe.swipe} isLast={isLast} />}
+                {TTSenabled && <TTSMenu id={id} isLast={isLast} />}
             </View>
             <View style={{ flex: 1, flexDirection: 'column' }}>
                 <View style={{ flex: 1 }}>
