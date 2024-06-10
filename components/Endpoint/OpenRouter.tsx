@@ -87,7 +87,9 @@ const OpenRouter = () => {
                             setOpenRouterModel(item)
                         }}
                         {...Style.drawer.default}
-                        placeholder="Select Model"
+                        placeholder={
+                            modelList.length === 0 ? 'No Models Available' : 'Select Model'
+                        }
                     />
 
                     <TouchableOpacity

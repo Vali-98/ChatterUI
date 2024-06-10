@@ -22,8 +22,12 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
     api,
     buttonText = 'Test',
     apiFormat = (url: string) => {
-        const newurl = new URL('/v1/models', api)
-        return newurl.toString()
+        try {
+            const newurl = new URL('/v1/models', api)
+            return newurl.toString()
+        } catch (e) {
+            return ''
+        }
     },
     messageNeutral = 'Not Connected',
     messageError = 'Failed To Connect',
