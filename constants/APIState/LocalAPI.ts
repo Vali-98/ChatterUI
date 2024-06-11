@@ -1,8 +1,9 @@
 import { Chats, useInference } from '@constants/Chat'
-import { Global } from '@constants/GlobalValues'
+import { AppSettings, Global } from '@constants/GlobalValues'
 import { Logger } from '@constants/Logger'
 import { SamplerID } from '@constants/Samplers'
 import { Llama } from '@constants/llama'
+import { mmkv } from '@constants/mmkv'
 
 import { APIBase, APISampler } from './BaseAPI'
 
@@ -38,7 +39,25 @@ class LocalAPI extends APIBase {
             emit_partial_completion: true,
         }
     }
+
     inference = async () => {
+        if (!Llama.isModelLoaded(false) && mmkv.getBoolean(AppSettings.AutoLoadLocal)) {
+            const model = mmkv.getString(Global.LocalModel)
+            const params = this.getObject(Global.LocalPreset)
+            if (model && params) await Llama.loadModel(model, params)
+        }
+        if (!Llama.isModelLoaded()) {
+            Logger.log('No Model Loaded', true)
+        }
+
+        const loadKV =
+            mmkv.getBoolean(AppSettings.SaveLocalKV) && !mmkv.getBoolean(Global.LocalSessionLoaded)
+
+        if (loadKV) {
+            await Llama.loadKV()
+            mmkv.set(Global.LocalSessionLoaded, true)
+        }
+
         const replace = RegExp(
             this.constructReplaceStrings()
                 .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))

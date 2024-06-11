@@ -138,7 +138,6 @@ export abstract class APIBase implements IAPIBase {
         payload = replaceMacros(payload + message_acc)
         Logger.log(`Approximate Context Size: ${message_acc_length + payload_length} tokens`)
         Logger.log(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
-        console.log(mmkv.getBoolean(AppSettings.PrintContext))
         if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.log(payload)
 
         return payload
