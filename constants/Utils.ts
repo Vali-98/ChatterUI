@@ -1,6 +1,4 @@
 import { Characters } from './Characters'
-import { Global } from './GlobalValues'
-import { mmkv } from './mmkv'
 
 export const humanizedISO8601DateTime = (date = '') => {
     const baseDate = typeof date === 'number' ? new Date(date) : new Date()
@@ -36,7 +34,7 @@ type Rule = {
 }
 
 export const replaceMacros = (text: string) => {
-    if (text == undefined) return ''
+    if (text === undefined) return ''
     let newtext: string = text
     const charName = Characters.useCharacterCard.getState().card?.data.name
     const userName = Characters.useUserCard.getState().card?.data.name

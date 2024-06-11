@@ -78,6 +78,7 @@ export const enum Global {
     LocalModel = 'localmodel',
     LocalModelWeights = 'localdata',
     LocalPreset = 'localpreset',
+    LocalSessionLoaded = 'localsessionloaded',
 
     OpenRouterModel = 'openroutermodel',
     OpenRouterKey = 'openrouterkey',
@@ -115,4 +116,6 @@ export enum AppSettings {
     AutoLoadLocal = 'autoloadlocal',
     AutoScroll = 'autoscroll',
     SendOnEnter = 'sendonenter',
+    SaveLocalKV = 'savelocalkv',
+    PrintContext = 'printcontext',
 }

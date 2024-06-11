@@ -95,7 +95,9 @@ const importDB = async (uri: string, name: string) => {
 
 const AppSettingsMenu = () => {
     const router = useRouter()
-    const [animateEditor, setAnimateEditor] = useMMKVBoolean(AppSettings.AnimateEditor)
+    //const [animateEditor, setAnimateEditor] = useMMKVBoolean(AppSettings.AnimateEditor)
+    const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
+    const [printContext, setPrintContext] = useMMKVBoolean(AppSettings.PrintContext)
     const [firstMes, setFirstMes] = useMMKVBoolean(AppSettings.CreateFirstMes)
     const [chatOnStartup, setChatOnStartup] = useMMKVBoolean(AppSettings.ChatOnStartup)
     const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)
@@ -158,13 +160,27 @@ const AppSettingsMenu = () => {
             <Text style={styles.sectionTitle}>Generation</Text>
 
             <SwitchComponent
-                title="Load Local Model on Startup"
+                title="Load Local Model on Chat"
                 value={autoloadLocal}
                 onValueChange={setAutoloadLocal}
             />
             <Text style={styles.subtitle}>
-                Automatically loads most recently used local model on startup
+                Automatically loads most recently used local model when chatting
             </Text>
+
+            <SwitchComponent title="Save Local KV" value={saveKV} onValueChange={setSaveKV} />
+            <Text style={styles.subtitle}>
+                Saves the KV cache on generations, allowing you to continue sessions after closing
+                the app. You must use the same model for this to function properly. Be warned that
+                the KV cache file may be very big!
+            </Text>
+
+            <SwitchComponent
+                title="Print Context"
+                value={printContext}
+                onValueChange={setPrintContext}
+            />
+            <Text style={styles.subtitle}>Prints the generation context to logs for debugging</Text>
 
             <Text style={styles.sectionTitle}>Database Management</Text>
             <Text style={styles.subtitle}>

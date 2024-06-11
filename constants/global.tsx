@@ -79,6 +79,8 @@ const AppSettingsDefault: Record<AppSettings, boolean | number> = {
     [AppSettings.DevMode]: false,
     [AppSettings.PrimaryHue]: 270,
     [AppSettings.SendOnEnter]: false,
+    [AppSettings.SaveLocalKV]: false,
+    [AppSettings.PrintContext]: false,
 }
 
 const loadChatOnInit = async () => {
@@ -152,13 +154,7 @@ export const startupApp = () => {
         loadChatOnInit()
     }
 
-    if (mmkv.getBoolean(AppSettings.AutoLoadLocal)) {
-        const model = mmkv.getString(Global.LocalModel)
-        const api = mmkv.getString(Global.APIType)
-        if (model && api === API.LOCAL) {
-            Llama.loadModel(model)
-        }
-    }
+    mmkv.set(Global.LocalSessionLoaded, false)
 
     Logger.log('Resetting state values for startup.')
     SystemUI.setBackgroundColorAsync(Style.getColor('primary-surface1'))
