@@ -120,5 +120,13 @@ export namespace MarkdownStyle {
             padding: 5,
             flex: 1,
         },
+        blockQuoteSection: {
+            marginVertical: 2,
+        },
+        blockQuoteSectionBar: {
+            width: 3,
+            backgroundColor: Style.getColor('primary-brand'),
+            marginRight: 15,
+        },
     }
 }

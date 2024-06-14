@@ -1,8 +1,8 @@
 import { Chats, useInference } from '@constants/Chat'
 import { AppSettings, Global } from '@constants/GlobalValues'
+import { Llama } from '@constants/LlamaLocal'
 import { Logger } from '@constants/Logger'
 import { SamplerID } from '@constants/Samplers'
-import { Llama } from '@constants/llama'
 import { mmkv } from '@constants/mmkv'
 
 import { APIBase, APISampler } from './BaseAPI'

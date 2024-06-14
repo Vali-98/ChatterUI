@@ -50,7 +50,7 @@ const CharMenu = () => {
         })
     const getCharacterList = async () => {
         try {
-            const list = await Characters.getCardList('character')
+            const list = await Characters.db.query.cardList('character')
             setCharacterList(list)
         } catch (error) {
             Logger.log(`Could not retrieve characters.\n${error}`, true)
@@ -63,10 +63,10 @@ const CharMenu = () => {
         try {
             await setCurrentCard(charId)
             setNowLoading(true)
-            const returnedChatId = await Chats.getNewest(charId)
+            const returnedChatId = await Chats.db.query.chatNewest(charId)
             let chatId = returnedChatId
             if (!chatId) {
-                chatId = await Chats.createChat(charId)
+                chatId = await Chats.db.mutate.createChat(charId)
             }
             if (!chatId) {
                 Logger.log('Chat creation backup has failed! Please report.', true)
@@ -90,7 +90,7 @@ const CharMenu = () => {
             Logger.log('Name Cannot Be Empty!', true)
             return
         }
-        Characters.createCard(text).then(async (id) => {
+        Characters.db.mutate.createCard(text).then(async (id) => {
             await setCurrentCharacter(id, true)
         })
     }

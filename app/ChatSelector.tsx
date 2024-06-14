@@ -36,9 +36,9 @@ const ChatSelector = () => {
 
     const refreshfilenames = async () => {
         if (!charId) return
-        const list = await Chats.getList(charId)
+        const list = await Chats.db.query.chatList(charId)
         if (list.length === 0) {
-            await Chats.createChat(charId)
+            await Chats.db.mutate.createChat(charId)
             refreshfilenames()
             return
         }
@@ -61,10 +61,10 @@ const ChatSelector = () => {
                     await deleteChat(chatId)
                     RecentMessages.deleteEntry(chatId)
                     if (charId && currentChatId === chatId) {
-                        const returnedChatId = await Chats.getNewest(charId)
+                        const returnedChatId = await Chats.db.query.chatNewest(charId)
                         const chatId = returnedChatId
                             ? returnedChatId
-                            : await Chats.createChat(charId)
+                            : await Chats.db.mutate.createChat(charId)
                         chatId && (await loadChat(chatId))
                     }
                     refreshfilenames()
@@ -77,7 +77,7 @@ const ChatSelector = () => {
     const handleExportChat = async (chatId: number) => {
         saveStringExternal(
             `Chatlogs-${charName}-${chatId}`,
-            JSON.stringify(await Chats.readChat(chatId)),
+            JSON.stringify(await Chats.db.query.chat(chatId)),
             'application/json'
         ).catch((error) => {
             Logger.log(`Could not save file. ${error}`, true)
@@ -91,7 +91,7 @@ const ChatSelector = () => {
 
     const handleCreateChat = async () => {
         if (charId)
-            Chats.createChat(charId).then((filename) => {
+            Chats.db.mutate.createChat(charId).then((filename) => {
                 Logger.debug(`File created: ${filename}`)
                 if (filename) handleSelectChat(filename)
             })

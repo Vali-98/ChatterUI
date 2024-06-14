@@ -1,4 +1,4 @@
-import { Llama } from '@constants/llama'
+import { Llama } from '@constants/LlamaLocal'
 import { AppSettings, Global, Logger, Style } from '@globals'
 import { useEffect, useState } from 'react'
 import {

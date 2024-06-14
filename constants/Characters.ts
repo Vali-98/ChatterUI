@@ -1,5 +1,5 @@
 import { Buffer } from '@craftzdog/react-native-buffer'
-import { db } from '@db'
+import { db as database } from '@db'
 import axios from 'axios'
 import * as Base64 from 'base-64'
 import { characterGreetings, characterTags, characters, tags } from 'db/schema'
@@ -40,8 +40,8 @@ export namespace Characters {
             tokenCache: undefined,
             setCard: async (id: number) => {
                 let start = performance.now()
-                const card = await readCard(id)
-                Logger.debug(`[User] time for db query: ${performance.now() - start}`)
+                const card = await db.query.card(id)
+                Logger.debug(`[User] time for database query: ${performance.now() - start}`)
                 start = performance.now()
                 set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
                 Logger.debug(`[User] time for zustand set: ${performance.now() - start}`)
@@ -68,7 +68,7 @@ export namespace Characters {
                     return
                 }
                 const imageID = new Date().getTime()
-                await updateCardField('image_id', imageID, id)
+                await db.mutate.updateCardField('image_id', imageID, id)
                 await deleteImage(oldImageID)
                 await copyImage(sourceURI, imageID)
                 card.data.image_id = imageID
@@ -107,8 +107,8 @@ export namespace Characters {
             tokenCache: undefined,
             setCard: async (id: number) => {
                 let start = performance.now()
-                const card = await readCard(id)
-                Logger.debug(`[Characters] time for db query: ${performance.now() - start}`)
+                const card = await db.query.card(id)
+                Logger.debug(`[Characters] time for database query: ${performance.now() - start}`)
                 start = performance.now()
                 set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
 
@@ -157,107 +157,179 @@ export namespace Characters {
         })
     )
 
-    export const createCard = async (name: string, type: 'user' | 'character' = 'character') => {
-        const [{ id }, ..._] = await db
-            .insert(characters)
-            .values({ ...TavernCardV2(name), type: type })
-            .returning({ id: characters.id })
-        return id
-    }
+    export namespace db {
+        export namespace query {
+            export const card = async (charId: number): Promise<CharacterCardV2 | undefined> => {
+                const data = await database.query.characters.findFirst({
+                    where: eq(characters.id, charId),
+                    with: {
+                        tags: {
+                            columns: {
+                                character_id: false,
+                            },
+                            with: {
+                                tag: true,
+                            },
+                        },
+                        alternate_greetings: true,
+                    },
+                })
+                if (data)
+                    return {
+                        spec: 'chara_card_v2',
+                        spec_version: '2.0',
+                        data: {
+                            ...data,
+                            tags: data.tags.map((item) => item.tag.tag),
+                            alternate_greetings: data.alternate_greetings.map(
+                                (item) => item.greeting
+                            ),
+                        },
+                    }
+            }
 
-    export const readCard = async (charId: number): Promise<CharacterCardV2 | undefined> => {
-        const data = await db.query.characters.findFirst({
-            where: eq(characters.id, charId),
-            with: {
-                tags: {
+            export const cardList = async (type: 'character' | 'user') => {
+                const query = await database.query.characters.findMany({
                     columns: {
-                        character_id: false,
+                        id: true,
+                        name: true,
+                        image_id: true,
                     },
                     with: {
-                        tag: true,
+                        tags: {
+                            columns: {
+                                character_id: false,
+                            },
+                            with: {
+                                tag: true,
+                            },
+                        },
                     },
-                },
-                alternate_greetings: true,
-            },
-        })
-        if (data)
-            return {
-                spec: 'chara_card_v2',
-                spec_version: '2.0',
-                data: {
-                    ...data,
-                    tags: data.tags.map((item) => item.tag.tag),
-                    alternate_greetings: data.alternate_greetings.map((item) => item.greeting),
-                },
+                    where: (characters, { eq }) => eq(characters.type, type),
+                })
+                return query.map((item) => ({
+                    ...item,
+                    tags: item.tags.map((item) => item.tag.tag),
+                }))
             }
-    }
 
-    export const updateCard = async (card: CharacterCardV2, cardID: number) => {
-        await db
-            .update(characters)
-            .set({ description: card.data.description, first_mes: card.data.first_mes })
-            .where(eq(characters.id, cardID))
-    }
-
-    // TODO: Proper per field updates, though not that expensive
-    export const updateCardField = async (
-        field: keyof CharacterCardV2Data,
-        data: any,
-        charId: number
-    ) => {
-        if (field === 'tags') {
-            // find tags and update
-            return
+            export const cardExists = async (charId: number) => {
+                return await database.query.characters.findFirst({
+                    where: eq(characters.id, charId),
+                })
+            }
         }
-        if (field === 'alternate_greetings') {
-            // find greetings and update
-            return
-        }
-        await db
-            .update(characters)
-            .set({ [field]: data })
-            .where(eq(characters.id, charId))
-    }
 
-    export const deleteCard = async (charID: number) => {
-        const data = await db.query.characters.findFirst({
-            where: eq(characters.id, charID),
-            columns: { image_id: true },
-        })
-        if (data) deleteImage(data.image_id)
-        await db.delete(characters).where(eq(characters.id, charID))
-        await db
-            .delete(tags)
-            .where(
-                notInArray(tags.id, db.select({ tag_id: characterTags.tag_id }).from(characterTags))
-            )
-        if (charID === useCharacterCard.getState().id) useCharacterCard.getState().unloadCard()
+        export namespace mutate {
+            export const createCard = async (
+                name: string,
+                type: 'user' | 'character' = 'character'
+            ) => {
+                const [{ id }, ..._] = await database
+                    .insert(characters)
+                    .values({ ...TavernCardV2(name), type: type })
+                    .returning({ id: characters.id })
+                return id
+            }
+
+            export const updateCard = async (card: CharacterCardV2, cardID: number) => {
+                await database
+                    .update(characters)
+                    .set({ description: card.data.description, first_mes: card.data.first_mes })
+                    .where(eq(characters.id, cardID))
+            }
+
+            // TODO: Proper per field updates, though not that expensive
+            export const updateCardField = async (
+                field: keyof CharacterCardV2Data,
+                data: any,
+                charId: number
+            ) => {
+                if (field === 'tags') {
+                    // find tags and update
+                    return
+                }
+                if (field === 'alternate_greetings') {
+                    // find greetings and update
+                    return
+                }
+                await database
+                    .update(characters)
+                    .set({ [field]: data })
+                    .where(eq(characters.id, charId))
+            }
+
+            export const deleteCard = async (charID: number) => {
+                const data = await database.query.characters.findFirst({
+                    where: eq(characters.id, charID),
+                    columns: { image_id: true },
+                })
+                if (data) deleteImage(data.image_id)
+                await database.delete(characters).where(eq(characters.id, charID))
+                await database
+                    .delete(tags)
+                    .where(
+                        notInArray(
+                            tags.id,
+                            database.select({ tag_id: characterTags.tag_id }).from(characterTags)
+                        )
+                    )
+                if (charID === useCharacterCard.getState().id)
+                    useCharacterCard.getState().unloadCard()
+            }
+
+            export const createCharacter = async (card: CharacterCardV2, imageuri: string = '') => {
+                // TODO : Extract CharacterBook value to Lorebooks, CharacterLorebooks
+                const { data } = card
+                // provide warning ?
+                // if (data.character_book) { console.log(warn) }
+                const image_id = await database.transaction(async (tx) => {
+                    try {
+                        const [{ id, image_id }, ..._] = await tx
+                            .insert(characters)
+                            .values({
+                                type: 'character',
+                                ...data,
+                            })
+                            .returning({ id: characters.id, image_id: characters.image_id })
+
+                        const greetingdata = data.alternate_greetings.map((item) => ({
+                            character_id: id,
+                            greeting: item,
+                        }))
+                        if (greetingdata.length > 0)
+                            for (const greeting of greetingdata)
+                                await tx.insert(characterGreetings).values(greeting)
+
+                        if (data.tags.length !== 0) {
+                            const tagsdata = data.tags.map((tag) => ({ tag: tag }))
+                            for (const tag of tagsdata)
+                                await tx.insert(tags).values(tag).onConflictDoNothing()
+
+                            const tagids = (
+                                await tx.query.tags.findMany({
+                                    where: inArray(tags.tag, data.tags),
+                                })
+                            ).map((item) => ({
+                                character_id: id,
+                                tag_id: item.id,
+                            }))
+                            await tx.insert(characterTags).values(tagids).onConflictDoNothing()
+                        }
+                        return image_id
+                    } catch (error) {
+                        Logger.log(`Rolling back due to error: ` + error)
+                        tx.rollback()
+                        return undefined
+                    }
+                })
+                if (image_id) await copyImage(imageuri, image_id)
+            }
+        }
     }
 
     export const deleteImage = async (imageID: number) => {
         return FS.deleteAsync(getImageDir(imageID), { idempotent: true })
-    }
-
-    export const getCardList = async (type: 'character' | 'user') => {
-        const query = await db.query.characters.findMany({
-            columns: {
-                id: true,
-                name: true,
-                image_id: true,
-            },
-            with: {
-                tags: {
-                    columns: {
-                        character_id: false,
-                    },
-                    with: {
-                        tag: true,
-                    },
-                },
-            },
-            where: (characters, { eq }) => eq(characters.type, type),
-        })
-        return query.map((item) => ({ ...item, tags: item.tags.map((item) => item.tag.tag) }))
     }
 
     export const copyImage = async (uri: string, imageID: number) => {
@@ -265,52 +337,6 @@ export namespace Characters {
             from: uri,
             to: getImageDir(imageID),
         })
-    }
-
-    const createCharacter = async (card: CharacterCardV2, imageuri: string = '') => {
-        // TODO : Extract CharacterBook value to Lorebooks, CharacterLorebooks
-        const { data } = card
-        // provide warning ?
-        // if (data.character_book) { console.log(warn) }
-        const image_id = await db.transaction(async (tx) => {
-            try {
-                const [{ id, image_id }, ..._] = await tx
-                    .insert(characters)
-                    .values({
-                        type: 'character',
-                        ...data,
-                    })
-                    .returning({ id: characters.id, image_id: characters.image_id })
-
-                const greetingdata = data.alternate_greetings.map((item) => ({
-                    character_id: id,
-                    greeting: item,
-                }))
-                if (greetingdata.length > 0)
-                    for (const greeting of greetingdata)
-                        await tx.insert(characterGreetings).values(greeting)
-
-                if (data.tags.length !== 0) {
-                    const tagsdata = data.tags.map((tag) => ({ tag: tag }))
-                    for (const tag of tagsdata)
-                        await tx.insert(tags).values(tag).onConflictDoNothing()
-
-                    const tagids = (
-                        await tx.query.tags.findMany({ where: inArray(tags.tag, data.tags) })
-                    ).map((item) => ({
-                        character_id: id,
-                        tag_id: item.id,
-                    }))
-                    await tx.insert(characterTags).values(tagids).onConflictDoNothing()
-                }
-                return image_id
-            } catch (error) {
-                Logger.log(`Rolling back due to error: ` + error)
-                tx.rollback()
-                return undefined
-            }
-        })
-        if (image_id) await copyImage(imageuri, image_id)
     }
 
     export const createCharacterFromImage = async (uri: string) => {
@@ -335,7 +361,7 @@ export namespace Characters {
             Logger.log('Invalid Character ID', true)
             return
         }
-        return createCharacter(charactercard, uri)
+        return db.mutate.createCharacter(charactercard, uri)
     }
 
     export const importCharacterFromImage = async () => {
@@ -400,7 +426,7 @@ export namespace Characters {
         return FS.writeAsStringAsync(`${FS.cacheDirectory}image.png`, image, {
             encoding: FS.EncodingType.Base64,
         }).then(async () => {
-            return createCharacter(character, `${FS.cacheDirectory}image.png`)
+            return db.mutate.createCharacter(character, `${FS.cacheDirectory}image.png`)
         })
     }
 
@@ -441,26 +467,23 @@ export namespace Characters {
         return `${FS.documentDirectory}characters/${charId}.png`
     }
 
-    export const exists = async (charId: number) => {
-        return await db.query.characters.findFirst({ where: eq(characters.id, charId) })
+    export const debugDeleteTags = async () => {
+        const data = await database.delete(tags).all()
     }
 
-    export const debugDeleteTags = async () => {
-        const data = await db.delete(tags).all()
-    }
     export const debugCheckTags = async () => {
-        const data = await db.query.characterTags.findMany()
+        const data = await database.query.characterTags.findMany()
         console.log('CHARACTER TAGS:')
         console.log(data)
-        const tags = await db.query.tags.findMany()
+        const tags = await database.query.tags.findMany()
         console.log('TAGS:')
         console.log(tags)
     }
 
     export const debugDelete = async () => {
-        await db.delete(characters).all()
-        await db.delete(characterTags).all()
-        await db.delete(tags).all()
+        await database.delete(characters).all()
+        await database.delete(characterTags).all()
+        await database.delete(tags).all()
         const list = await FS.readDirectoryAsync(`${FS.documentDirectory}characters`)
         console.log(list)
         for (const file of list) {

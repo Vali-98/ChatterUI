@@ -1,4 +1,4 @@
-import { db } from '@db'
+import { db as database } from '@db'
 import { instructs } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import { create } from 'zustand'
@@ -126,13 +126,31 @@ type InstructTokenCache = {
 }
 
 export namespace Instructs {
+    export const defaultInstruct: InstructType = {
+        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prefix: '### Instruction: ',
+        system_suffix: '\n',
+        input_prefix: '### Instruction: ',
+        input_suffix: '\n',
+        output_prefix: '### Response: ',
+        output_suffix: '\n',
+        stop_sequence: '### Instruction',
+        user_alignment_message: '',
+        activation_regex: '',
+        wrap: false,
+        macro: false,
+        names: false,
+        names_force_groups: false,
+        name: 'Default',
+    }
+
     export const useInstruct = create<InstructState>()(
         persist(
             (set, get: () => InstructState) => ({
                 data: defaultInstructs[0],
                 tokenCache: undefined,
                 load: async (id: number) => {
-                    const data = await Database.read(id)
+                    const data = await db.query.instruct(id)
                     set((state) => ({ ...state, data: data, tokenCache: undefined }))
                     mmkv.set(Global.InstructID, id)
                 },
@@ -197,69 +215,51 @@ export namespace Instructs {
         )
     )
 
-    export namespace Database {
-        export const createDefault = async () => {
-            await create(defaultInstruct)
+    export namespace db {
+        export namespace query {
+            export const instruct = async (id: number): Promise<InstructType | undefined> => {
+                const instruct = await database.query.instructs.findFirst({
+                    where: eq(instructs.id, id),
+                })
+                return instruct
+            }
+
+            export const instructList = async (): Promise<InstructListItem[] | undefined> => {
+                return await database.query.instructs.findMany({
+                    columns: {
+                        id: true,
+                        name: true,
+                    },
+                })
+            }
         }
 
-        export const create = async (instruct: InstructType): Promise<number> => {
-            const { id, ...input } = instruct
-            const [{ newid }, ...rest] = await db
-                .insert(instructs)
-                .values(input)
-                .returning({ newid: instructs.id })
-            return newid
-        }
+        export namespace mutate {
+            export const createInstruct = async (instruct: InstructType): Promise<number> => {
+                const { id, ...input } = instruct
+                const [{ newid }, ...rest] = await database
+                    .insert(instructs)
+                    .values(input)
+                    .returning({ newid: instructs.id })
+                return newid
+            }
 
-        export const read = async (id: number): Promise<InstructType | undefined> => {
-            const instruct = await db.query.instructs.findFirst({
-                where: eq(instructs.id, id),
-            })
-            return instruct
-        }
+            export const updateInstruct = async (id: number, instruct: InstructType) => {
+                await database.update(instructs).set(instruct).where(eq(instructs.id, id))
+            }
 
-        export const update = async (id: number, instruct: InstructType) => {
-            await db.update(instructs).set(instruct).where(eq(instructs.id, id))
+            export const deleteInstruct = async (id: number) => {
+                await database.delete(instructs).where(eq(instructs.id, id))
+            }
         }
-
-        export const deleteEntry = async (id: number) => {
-            await db.delete(instructs).where(eq(instructs.id, id))
-        }
-
-        export const readList = async (): Promise<InstructListItem[] | undefined> => {
-            return await db.query.instructs.findMany({
-                columns: {
-                    id: true,
-                    name: true,
-                },
-            })
-        }
-    }
-
-    export const defaultInstruct: InstructType = {
-        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
-        system_prefix: '### Instruction: ',
-        system_suffix: '\n',
-        input_prefix: '### Instruction: ',
-        input_suffix: '\n',
-        output_prefix: '### Response: ',
-        output_suffix: '\n',
-        stop_sequence: '### Instruction',
-        user_alignment_message: '',
-        activation_regex: '',
-        wrap: false,
-        macro: false,
-        names: false,
-        names_force_groups: false,
-        name: 'Default',
     }
 
     export const generateInitialDefaults = async () => {
-        const list = await Database.readList()
+        const list = await db.query.instructList()
         let data = -1
         defaultInstructs.map(async (item) => {
             if (!list?.some((e) => e.name === item.name)) {
-                const newid = await Database.create(item)
+                const newid = await db.mutate.createInstruct(item)
                 if (data === -1) data = newid
             }
         })

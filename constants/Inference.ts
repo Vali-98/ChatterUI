@@ -9,9 +9,9 @@ import { API } from './API'
 import { APIState } from './APIState'
 import { Characters } from './Characters'
 import { Global } from './GlobalValues'
+import { Llama } from './LlamaLocal'
 import { Logger } from './Logger'
 import { Llama3Tokenizer } from './Tokenizer/tokenizer'
-import { Llama } from './llama'
 import { mmkv } from './mmkv'
 
 export const regenerateResponse = async () => {

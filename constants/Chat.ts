@@ -1,4 +1,4 @@
-import { db } from '@db'
+import { db as database } from '@db'
 import { chatEntries, chatSwipes, chats } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import * as FS from 'expo-file-system'
@@ -78,15 +78,17 @@ export interface ChatState {
 }
 
 type AbortFunctionType = {
-    abortFunction?: () => void
+    abortFunction: () => void
     nowGenerating: boolean
     startGenerating: () => void
     stopGenerating: () => void
     setAbort: (fn: () => void) => void
 }
 
-export const useInference = create<AbortFunctionType>((set) => ({
-    abortFunction: undefined,
+export const useInference = create<AbortFunctionType>((set, get) => ({
+    abortFunction: () => {
+        get().stopGenerating()
+    },
     nowGenerating: false,
     startGenerating: () => set((state) => ({ ...state, nowGenerating: true })),
     stopGenerating: () => set((state) => ({ ...state, nowGenerating: false })),
@@ -97,8 +99,6 @@ export const useInference = create<AbortFunctionType>((set) => ({
 }))
 
 export namespace Chats {
-    export namespace Database {}
-
     export const useChat = create<ChatState>((set, get: () => ChatState) => ({
         data: undefined,
         buffer: '',
@@ -120,8 +120,8 @@ export namespace Chats {
         setAbortFunction: (fn) => (get().abortFunction = fn),
         load: async (chatId: number) => {
             let start = performance.now()
-            const data = await readChat(chatId)
-            Logger.debug(`[Chats] time for db query: ${performance.now() - start}`)
+            const data = await db.query.chat(chatId)
+            Logger.debug(`[Chats] time for database query: ${performance.now() - start}`)
             start = performance.now()
             set((state: ChatState) => ({
                 ...state,
@@ -135,7 +135,7 @@ export namespace Chats {
         },
 
         delete: async (chatId: number) => {
-            await deleteChat(chatId)
+            await db.mutate.deleteChat(chatId)
             if (get().data?.id === chatId) get().reset()
         },
 
@@ -145,15 +145,13 @@ export namespace Chats {
                 data: undefined,
             })),
 
-        //save: async () => {},
-
         addEntry: async (name: string, is_user: boolean, message: string) => {
             const messages = get().data?.messages
             const chatId = get().data?.id
             if (!messages || !chatId) return
             const order = messages.length > 0 ? messages[messages.length - 1].order + 1 : 0
 
-            const entry = await createEntry(chatId, name, is_user, order, message)
+            const entry = await db.mutate.createEntry(chatId, name, is_user, order, message)
             if (entry) messages.push(entry)
             set((state) => ({
                 ...state,
@@ -166,7 +164,7 @@ export namespace Chats {
             const entryId = messages[index].id
             if (!entryId) return
 
-            await deleteChatEntry(entryId)
+            await db.mutate.deleteChatEntry(entryId)
 
             set((state) => ({
                 ...state,
@@ -186,7 +184,12 @@ export namespace Chats {
             if (!messages) return
             const chatSwipeId = messages[index]?.swipes[messages[index].swipe_id].id
             if (!chatSwipeId) return
-            const date = await updateChatSwipe(chatSwipeId, message, updateStarted, updateFinished)
+            const date = await db.mutate.updateChatSwipe(
+                chatSwipeId,
+                message,
+                updateStarted,
+                updateFinished
+            )
             messages[index].swipes[messages[index].swipe_id].swipe = message
             messages[index].swipes[messages[index].swipe_id].token_count = undefined
             if (updateFinished) messages[index].swipes[messages[index].swipe_id].gen_finished = date
@@ -215,7 +218,7 @@ export namespace Chats {
             }))
 
             const entryId = messages[index].id
-            await updateEntrySwipeId(entryId, target)
+            await db.mutate.updateEntrySwipeId(entryId, target)
 
             return false
         },
@@ -225,9 +228,9 @@ export namespace Chats {
             if (!messages) return
             const entryId = messages[index].id
 
-            const swipe = await createSwipe(entryId, '')
+            const swipe = await db.mutate.createSwipe(entryId, '')
             if (swipe) messages[index].swipes.push(swipe)
-            await updateEntrySwipeId(entryId, messages[index].swipes.length - 1)
+            await db.mutate.updateEntrySwipeId(entryId, messages[index].swipes.length - 1)
             messages[index].swipe_id = messages[index].swipes.length - 1
             set((state: ChatState) => ({
                 ...state,
@@ -283,149 +286,173 @@ export namespace Chats {
         },
     }))
 
-    export const getNewest = async (charId: number): Promise<number | undefined> => {
-        const chatIds = await db.query.chats.findMany({ where: eq(chats.character_id, charId) })
-        return chatIds?.[chatIds?.length - 1]?.id
-    }
-
-    export const getList = async (charId: number) => {
-        const chatIds = await db.query.chats.findMany({ where: eq(chats.character_id, charId) })
-        return chatIds
-    }
-
-    export const debugChatCount = async () => {
-        console.log(await FS.readDirectoryAsync(FS.documentDirectory + `characters`))
-
-        const chats = await db.query.chats.findMany()
-        console.log(chats.length)
-        const entries = await db.query.chatEntries.findMany()
-        console.log(entries.length)
-        const swipes = await db.query.chatSwipes.findMany()
-        console.log(swipes.length)
-    }
-
-    export const createChat = async (charId: number) => {
-        const card = { ...Characters.useCharacterCard.getState().card }
-        const charName = card?.data?.name
-
-        return await db.transaction(async (tx) => {
-            if (!card.data || !charName) return
-            const [{ chatId }, ..._] = await tx
-                .insert(chats)
-                .values({
-                    character_id: charId,
-                })
-                .returning({ chatId: chats.id })
-
-            // custom setting to not generate first mes
-            if (!mmkv.getBoolean(AppSettings.CreateFirstMes)) return chatId
-
-            const [{ entryId }, ...__] = await tx
-                .insert(chatEntries)
-                .values({
-                    chat_id: chatId,
-                    is_user: false,
-                    name: card.data.name,
-                    order: 0,
-                })
-                .returning({ entryId: chatEntries.id })
-
-            await tx.insert(chatSwipes).values({
-                entry_id: entryId,
-                swipe: replaceMacros(card.data.first_mes),
-            })
-
-            card.data.alternate_greetings.forEach(async (data) => {
-                await tx.insert(chatSwipes).values({
-                    entry_id: entryId,
-                    swipe: replaceMacros(data),
-                })
-            })
-
-            return chatId
-        })
-    }
-
-    export const createEntry = async (
-        chatId: number,
-        name: string,
-        isUser: boolean,
-        order: number,
-        message: string
-    ) => {
-        const [{ entryId }, ...__] = await db
-            .insert(chatEntries)
-            .values({
-                chat_id: chatId,
-                name: name,
-                is_user: isUser,
-                order: order,
-            })
-            .returning({ entryId: chatEntries.id })
-        await db.insert(chatSwipes).values({ swipe: replaceMacros(message), entry_id: entryId })
-        const entry = await db.query.chatEntries.findFirst({
-            where: eq(chatEntries.id, entryId),
-            with: { swipes: true },
-        })
-        return entry
-    }
-
-    export const createSwipe = async (entryId: number, message: string) => {
-        const [{ swipeId }, ...__] = await db
-            .insert(chatSwipes)
-            .values({
-                entry_id: entryId,
-                swipe: replaceMacros(message),
-            })
-            .returning({ swipeId: chatSwipes.id })
-        return await db.query.chatSwipes.findFirst({ where: eq(chatSwipes.id, swipeId) })
-    }
-
-    export const readChat = async (chatId: number): Promise<ChatData | undefined> => {
-        const chat = await db.query.chats.findFirst({
-            where: eq(chats.id, chatId),
-            with: {
-                messages: {
-                    orderBy: chatEntries.order,
+    export namespace db {
+        export namespace query {
+            export const chat = async (chatId: number): Promise<ChatData | undefined> => {
+                const chat = await database.query.chats.findFirst({
+                    where: eq(chats.id, chatId),
                     with: {
-                        swipes: true,
+                        messages: {
+                            orderBy: chatEntries.order,
+                            with: {
+                                swipes: true,
+                            },
+                        },
                     },
-                },
-            },
-        })
-        if (chat) return { ...chat }
-    }
+                })
+                if (chat) return { ...chat }
+            }
 
-    export const updateEntrySwipeId = async (entryId: number, swipeId: number) => {
-        await db.update(chatEntries).set({ swipe_id: swipeId }).where(eq(chatEntries.id, entryId))
-    }
+            export const chatNewest = async (charId: number): Promise<number | undefined> => {
+                const chatIds = await database.query.chats.findMany({
+                    where: eq(chats.character_id, charId),
+                })
+                return chatIds?.[chatIds?.length - 1]?.id
+            }
 
-    export const updateChatSwipe = async (
-        chatSwipeId: number,
-        message: string,
-        updateStarted: boolean,
-        updateFinished: boolean
-    ) => {
-        const date = new Date()
-        type UpdatedEntry = {
-            swipe: string
-            gen_started?: Date
-            gen_finished?: Date
+            export const chatList = async (charId: number) => {
+                const chatIds = await database.query.chats.findMany({
+                    where: eq(chats.character_id, charId),
+                })
+                return chatIds
+            }
+
+            export const chatExists = async (chatId: number) => {
+                return await database.query.chats.findFirst({ where: eq(chats.id, chatId) })
+            }
         }
+        export namespace mutate {
+            export const createChat = async (charId: number) => {
+                const card = { ...Characters.useCharacterCard.getState().card }
+                const charName = card?.data?.name
 
-        const data: UpdatedEntry = { swipe: message }
-        if (updateStarted) data.gen_started = date
-        if (updateFinished) data.gen_finished = date
-        await db.update(chatSwipes).set(data).where(eq(chatSwipes.id, chatSwipeId))
-        return date
-    }
+                return await database.transaction(async (tx) => {
+                    if (!card.data || !charName) return
+                    const [{ chatId }, ..._] = await tx
+                        .insert(chats)
+                        .values({
+                            character_id: charId,
+                        })
+                        .returning({ chatId: chats.id })
 
-    export const deleteChat = async (chatId: number) => {
-        await db.delete(chats).where(eq(chats.id, chatId))
-    }
+                    // custom setting to not generate first mes
+                    if (!mmkv.getBoolean(AppSettings.CreateFirstMes)) return chatId
 
-    export const deleteChatEntry = async (entryId: number) => {
-        await db.delete(chatEntries).where(eq(chatEntries.id, entryId))
+                    const [{ entryId }, ...__] = await tx
+                        .insert(chatEntries)
+                        .values({
+                            chat_id: chatId,
+                            is_user: false,
+                            name: card.data.name,
+                            order: 0,
+                        })
+                        .returning({ entryId: chatEntries.id })
+
+                    await tx.insert(chatSwipes).values({
+                        entry_id: entryId,
+                        swipe: replaceMacros(card.data.first_mes),
+                    })
+
+                    card.data.alternate_greetings.forEach(async (data) => {
+                        await tx.insert(chatSwipes).values({
+                            entry_id: entryId,
+                            swipe: replaceMacros(data),
+                        })
+                    })
+
+                    return chatId
+                })
+            }
+
+            export const createEntry = async (
+                chatId: number,
+                name: string,
+                isUser: boolean,
+                order: number,
+                message: string
+            ) => {
+                const [{ entryId }, ...__] = await database
+                    .insert(chatEntries)
+                    .values({
+                        chat_id: chatId,
+                        name: name,
+                        is_user: isUser,
+                        order: order,
+                    })
+                    .returning({ entryId: chatEntries.id })
+                await database
+                    .insert(chatSwipes)
+                    .values({ swipe: replaceMacros(message), entry_id: entryId })
+                const entry = await database.query.chatEntries.findFirst({
+                    where: eq(chatEntries.id, entryId),
+                    with: { swipes: true },
+                })
+                return entry
+            }
+
+            export const createSwipe = async (entryId: number, message: string) => {
+                const [{ swipeId }, ...__] = await database
+                    .insert(chatSwipes)
+                    .values({
+                        entry_id: entryId,
+                        swipe: replaceMacros(message),
+                    })
+                    .returning({ swipeId: chatSwipes.id })
+                return await database.query.chatSwipes.findFirst({
+                    where: eq(chatSwipes.id, swipeId),
+                })
+            }
+
+            export const readChat = async (chatId: number): Promise<ChatData | undefined> => {
+                const chat = await database.query.chats.findFirst({
+                    where: eq(chats.id, chatId),
+                    with: {
+                        messages: {
+                            orderBy: chatEntries.order,
+                            with: {
+                                swipes: true,
+                            },
+                        },
+                    },
+                })
+                if (chat) return { ...chat }
+            }
+
+            export const updateEntrySwipeId = async (entryId: number, swipeId: number) => {
+                await database
+                    .update(chatEntries)
+                    .set({ swipe_id: swipeId })
+                    .where(eq(chatEntries.id, entryId))
+            }
+
+            export const updateChatSwipe = async (
+                chatSwipeId: number,
+                message: string,
+                updateStarted: boolean,
+                updateFinished: boolean
+            ) => {
+                const date = new Date()
+                type UpdatedEntry = {
+                    swipe: string
+                    gen_started?: Date
+                    gen_finished?: Date
+                }
+
+                const data: UpdatedEntry = { swipe: message }
+                if (updateStarted) data.gen_started = date
+                if (updateFinished) data.gen_finished = date
+                await database.update(chatSwipes).set(data).where(eq(chatSwipes.id, chatSwipeId))
+                return date
+            }
+
+            export const deleteChat = async (chatId: number) => {
+                await database.delete(chats).where(eq(chats.id, chatId))
+            }
+
+            export const deleteChatEntry = async (entryId: number) => {
+                await database.delete(chatEntries).where(eq(chatEntries.id, entryId))
+            }
+        }
     }
 
     export const dummyEntry: ChatEntry = {
@@ -447,7 +474,14 @@ export namespace Chats {
         ],
     }
 
-    export const exists = async (chatId: number) => {
-        return await db.query.chats.findFirst({ where: eq(chats.id, chatId) })
+    export const debugChatCount = async () => {
+        console.log(await FS.readDirectoryAsync(FS.documentDirectory + `characters`))
+
+        const chats = await database.query.chats.findMany()
+        console.log(chats.length)
+        const entries = await database.query.chatEntries.findMany()
+        console.log(entries.length)
+        const swipes = await database.query.chatSwipes.findMany()
+        console.log(swipes.length)
     }
 }
