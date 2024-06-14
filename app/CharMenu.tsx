@@ -106,44 +106,6 @@ const CharMenu = () => {
                     options={{
                         headerRight: () => (
                             <View style={styles.headerButtonContainer}>
-                                {__DEV__ && (
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <TouchableOpacity
-                                            style={styles.headerButtonRight}
-                                            onPress={async () => {
-                                                await Characters.debugDeleteTags()
-                                            }}>
-                                            <FontAwesome
-                                                name="close"
-                                                size={28}
-                                                color={Style.getColor('primary-text1')}
-                                            />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={styles.headerButtonRight}
-                                            onPress={async () => {
-                                                await Chats.debugChatCount()
-                                            }}>
-                                            <FontAwesome
-                                                name="question"
-                                                size={28}
-                                                color={Style.getColor('primary-text1')}
-                                            />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={styles.headerButtonRight}
-                                            onPress={async () => {
-                                                await Characters.debugDelete()
-                                                getCharacterList()
-                                            }}>
-                                            <FontAwesome
-                                                name="trash"
-                                                size={28}
-                                                color={Style.getColor('primary-text1')}
-                                            />
-                                        </TouchableOpacity>
-                                    </View>
-                                )}
                                 <TouchableOpacity
                                     style={styles.headerButtonRight}
                                     onPress={async () => {

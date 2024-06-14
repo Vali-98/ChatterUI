@@ -466,30 +466,6 @@ export namespace Characters {
     export const getImageDir = (charId: number) => {
         return `${FS.documentDirectory}characters/${charId}.png`
     }
-
-    export const debugDeleteTags = async () => {
-        const data = await database.delete(tags).all()
-    }
-
-    export const debugCheckTags = async () => {
-        const data = await database.query.characterTags.findMany()
-        console.log('CHARACTER TAGS:')
-        console.log(data)
-        const tags = await database.query.tags.findMany()
-        console.log('TAGS:')
-        console.log(tags)
-    }
-
-    export const debugDelete = async () => {
-        await database.delete(characters).all()
-        await database.delete(characterTags).all()
-        await database.delete(tags).all()
-        const list = await FS.readDirectoryAsync(`${FS.documentDirectory}characters`)
-        console.log(list)
-        for (const file of list) {
-            await FS.deleteAsync(`${FS.documentDirectory}characters/${file}`)
-        }
-    }
 }
 
 export type CharacterCardV2Data = {

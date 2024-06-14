@@ -473,15 +473,4 @@ export namespace Chats {
             },
         ],
     }
-
-    export const debugChatCount = async () => {
-        console.log(await FS.readDirectoryAsync(FS.documentDirectory + `characters`))
-
-        const chats = await database.query.chats.findMany()
-        console.log(chats.length)
-        const entries = await database.query.chatEntries.findMany()
-        console.log(entries.length)
-        const swipes = await database.query.chatSwipes.findMany()
-        console.log(swipes.length)
-    }
 }
