@@ -96,7 +96,11 @@ export namespace Llama {
             })
     }
 
-    export const completion = async (params: CompletionParams, callback = (text: string) => {}) => {
+    export const completion = async (
+        params: CompletionParams,
+        callback = (text: string) => {},
+        completed = (text: string) => {}
+    ) => {
         if (llamaContext === undefined) {
             Logger.log('No Model Loaded', true)
             return
@@ -107,6 +111,7 @@ export namespace Llama {
                 callback(data.token)
             })
             .then(async ({ text, timings }: CompletionOutput) => {
+                completed(text)
                 Logger.log(`Completion Output:\n\n` + text)
                 Logger.log(textTimings(timings))
                 if (mmkv.getBoolean(AppSettings.SaveLocalKV)) {
