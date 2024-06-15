@@ -42,7 +42,7 @@ export namespace Llama {
     }
 
     let llamaContext: LlamaContext | void = undefined
-    let modelname = ''
+    let modelname: string | undefined = undefined
 
     export const loadModel = async (
         name: string,
@@ -70,7 +70,7 @@ export namespace Llama {
         if (llamaContext !== undefined) {
             Logger.log('Unloading current model', true)
             await llamaContext?.release()
-            modelname = ''
+            modelname = undefined
         }
 
         const params = {
@@ -175,7 +175,7 @@ export namespace Llama {
     export const unloadModel = async () => {
         Logger.log('Unloading Model', true)
         await llamaContext?.release()
-        modelname = ''
+        modelname = undefined
         llamaContext = undefined
         Logger.log('Model Unloaded', true)
     }

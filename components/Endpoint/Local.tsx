@@ -99,6 +99,10 @@ const Local = () => {
         setModelLoading(false)
     }
 
+    const disableLoad = modelList.length === 0 || loadedModel !== undefined
+    const disableUnload = modelList.length === 0 || loadedModel === undefined
+    const disableDelete = modelList.length === 0 || currentModel === undefined
+
     return (
         <View style={styles.mainContainer}>
             <Text style={styles.title}>Model</Text>
@@ -111,9 +115,9 @@ const Local = () => {
                     borderRadius: 4,
                     flexDirection: 'row',
                 }}>
-                <Text style={styles.subtitle}>Current Model : </Text>
+                <Text style={styles.subtitle}>Loaded Model : </Text>
                 <Text style={{ ...styles.subtitle, color: Style.getColor('primary-text1') }}>
-                    {loadedModel ?? 'None'}
+                    {loadedModel ? loadedModel : 'None'}
                 </Text>
             </View>
 
@@ -121,8 +125,12 @@ const Local = () => {
                 <Dropdown
                     value={currentModel}
                     data={dropdownValues}
+                    placeholder={
+                        modelList.length === 0 ? 'No Models. Try Importing Some.' : 'Select Model'
+                    }
                     labelField="name"
                     valueField="name"
+                    disable={modelList.length === 0}
                     onChange={(item) => setCurrentModel(item.name)}
                     {...Style.drawer.default}
                 />
@@ -133,43 +141,45 @@ const Local = () => {
             ) : (
                 <View style={{ flexDirection: 'row', marginTop: 8 }}>
                     <TouchableOpacity
-                        disabled={modelList.length === 0}
+                        disabled={disableLoad}
                         style={{
-                            ...(currentModel ? styles.textbutton : styles.disabletextbutton),
+                            ...(disableLoad ? styles.disabletextbutton : styles.textbutton),
                             marginRight: 8,
                         }}
                         onPress={handleLoad}>
                         <Text
                             style={{
-                                ...(currentModel ? styles.buttonlabel : styles.disablebuttonlabel),
+                                ...(disableLoad ? styles.disablebuttonlabel : styles.buttonlabel),
                             }}>
                             Load
                         </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
+                        disabled={disableUnload}
                         style={{
-                            ...(loadedModel ? styles.textbutton : styles.disabletextbutton),
+                            ...(disableUnload ? styles.disabletextbutton : styles.textbutton),
                             marginRight: 8,
                         }}
                         onPress={handleUnload}>
                         <Text
                             style={{
-                                ...(loadedModel ? styles.buttonlabel : styles.disablebuttonlabel),
+                                ...(disableUnload ? styles.disablebuttonlabel : styles.buttonlabel),
                             }}>
                             Unload
                         </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
+                        disabled={disableDelete}
                         style={{
-                            ...(currentModel ? styles.textbutton : styles.disabletextbutton),
+                            ...(disableDelete ? styles.disabletextbutton : styles.textbutton),
                             marginRight: 8,
                         }}
                         onPress={handleDelete}>
                         <Text
                             style={{
-                                ...(currentModel ? styles.buttonlabel : styles.disablebuttonlabel),
+                                ...(disableDelete ? styles.disablebuttonlabel : styles.buttonlabel),
                             }}>
                             Delete
                         </Text>
