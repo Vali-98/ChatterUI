@@ -1,3 +1,4 @@
+import { OpenAIModel } from '@components/Endpoint/OpenAI'
 import { Global } from '@constants/GlobalValues'
 import { Logger } from '@constants/Logger'
 import { SamplerID } from '@constants/Samplers'
@@ -38,10 +39,11 @@ class TextCompletionAPI extends APIBase {
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
         const length = payloadFields?.['max_context_length']
+        const model = this.getObject(Global.CompletionsModel) as OpenAIModel
 
         return {
             ...payloadFields,
-            model: this.getObject(Global.CompletionsModel),
+            model: model.id,
             samplerOrder: [6, 0, 1, 3, 4, 2, 5],
             prompt: this.buildTextCompletionContext(typeof length === 'number' ? length : 0),
             stop_sequence: this.constructStopSequence(),
@@ -50,7 +52,7 @@ class TextCompletionAPI extends APIBase {
     inference = async () => {
         const endpoint = this.getString(Global.CompletionsEndpoint)
         const key = this.getString(Global.CompletionsKey)
-        Logger.log(`Using endpoint: TGWUI`)
+        Logger.log(`Using endpoint: Text Completions`)
         this.readableStreamResponse(
             new URL('/v1/completions', endpoint).toString(),
             JSON.stringify(this.buildPayload()),
