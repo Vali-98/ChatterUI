@@ -6,9 +6,7 @@ import { APIBase, APISampler } from './BaseAPI'
 
 class OpenAIAPI extends APIBase {
     samplers: APISampler[] = [
-        { externalName: 'max_context_length', samplerID: SamplerID.CONTEXT_LENGTH },
         { externalName: 'max_tokens', samplerID: SamplerID.GENERATED_LENGTH },
-        { externalName: 'stream', samplerID: SamplerID.REPETITION_PENALTY },
         { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
         { externalName: 'presence_penalty', samplerID: SamplerID.PRESENCE_PENALTY },
         { externalName: 'frequency_penalty', samplerID: SamplerID.FREQUENCY_PENALTY },
@@ -25,6 +23,7 @@ class OpenAIAPI extends APIBase {
         return {
             ...payloadFields,
             model: openAIModel.id,
+            stream: true,
             messages: this.buildChatCompletionContext(length),
             stop: this.constructStopSequence(),
         }
