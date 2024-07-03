@@ -8,6 +8,13 @@
       "when": 1713404342936,
       "tag": "0000_sudden_blockbuster",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1719971104700,
+      "tag": "0001_yellow_squirrel_girl",
+      "breakpoints": true
     }
   ]
 }

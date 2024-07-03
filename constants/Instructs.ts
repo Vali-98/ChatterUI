@@ -27,6 +27,9 @@ const defaultInstructs: InstructType[] = [
         names: false,
         names_force_groups: false,
         name: 'Alpaca',
+        timestamp: false,
+        examples: true,
+        format_type: 0,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -44,6 +47,9 @@ const defaultInstructs: InstructType[] = [
         names: false,
         names_force_groups: false,
         name: 'Llama 3',
+        timestamp: false,
+        examples: true,
+        format_type: 0,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -61,6 +67,9 @@ const defaultInstructs: InstructType[] = [
         names: false,
         names_force_groups: false,
         name: 'ChatML',
+        timestamp: false,
+        examples: true,
+        format_type: 0,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -78,6 +87,9 @@ const defaultInstructs: InstructType[] = [
         names: false,
         names_force_groups: false,
         name: 'StableLM-Zephyr',
+        timestamp: false,
+        examples: true,
+        format_type: 0,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -95,8 +107,18 @@ const defaultInstructs: InstructType[] = [
         names: false,
         names_force_groups: false,
         name: 'phi3',
+        timestamp: false,
+        examples: true,
+        format_type: 0,
     },
 ]
+
+enum FormatType {
+    None,
+    PlainActionQuoteSpeech,
+    AsteriskActionPlainSpeech,
+    AsteriskActionQuoteSpeech,
+}
 
 type InstructState = {
     data: InstructType | undefined
@@ -142,6 +164,9 @@ export namespace Instructs {
         names: false,
         names_force_groups: false,
         name: 'Default',
+        timestamp: false,
+        examples: true,
+        format_type: 0,
     }
 
     export const useInstruct = create<InstructState>()(
@@ -211,6 +236,17 @@ export namespace Instructs {
                 name: 'instruct-storage',
                 storage: createJSONStorage(() => mmkvStorage),
                 partialize: (state) => ({ data: state.data }),
+                version: 1,
+                migrate: (persistedState: any, version) => {
+                    if (!version) {
+                        persistedState.timestamp = false
+                        persistedState.examples = true
+                        persistedState.format_type = 0
+                        Logger.log('[INSTRUCT] Migrated to v1')
+                    }
+
+                    return persistedState
+                },
             }
         )
     )
@@ -286,4 +322,8 @@ export type InstructType = {
     macro: boolean
     names: boolean
     names_force_groups: boolean
+
+    timestamp: boolean
+    examples: boolean
+    format_type: number
 }

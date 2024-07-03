@@ -111,25 +111,39 @@ export abstract class APIBase implements IAPIBase {
             }
 
             let message_shard = `${message.is_user ? currentInstruct.input_prefix : currentInstruct.output_prefix}`
-            if (currentInstruct.names) message_shard += message.name + ': '
-            message_shard += message.swipes[message.swipe_id].swipe
 
-            if (!is_last)
+            const swipe_data = message.swipes[message.swipe_id]
+
+            if (currentInstruct.timestamp)
+                message_shard += `[${swipe_data.send_date.toString().split(' ')[0]} ${swipe_data.send_date.toLocaleTimeString()}]\n`
+            if (currentInstruct.names) message_shard += message.name + ': '
+
+            message_shard += swipe_data.swipe
+
+            if (!is_last) {
                 message_shard += `${message.is_user ? currentInstruct.input_suffix : currentInstruct.output_suffix}`
-            is_last = false
+                is_last = false
+            }
 
             if (currentInstruct.wrap) {
                 message_shard += `\n`
             }
+
             message_acc_length += shard_length
             message_acc = message_shard + message_acc
             index--
         }
-        const examples = currentCard.data?.mes_example
-        if (examples) {
-            if (message_acc_length + payload_length + characterCache.examples_length < max_length) {
-                payload += examples
-                message_acc_length += characterCache.examples_length
+
+        if (currentInstruct.examples) {
+            const examples = currentCard.data?.mes_example
+            if (examples) {
+                if (
+                    message_acc_length + payload_length + characterCache.examples_length <
+                    max_length
+                ) {
+                    payload += examples
+                    message_acc_length += characterCache.examples_length
+                }
             }
         }
 

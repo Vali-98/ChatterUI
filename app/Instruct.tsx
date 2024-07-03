@@ -375,6 +375,20 @@ const Instruct = () => {
                                 setValue={setCurrentInstruct}
                                 multiline
                             />*/}
+
+                            <CheckboxTitle
+                                name="Use Examples"
+                                varname="examples"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                            />
+
+                            <CheckboxTitle
+                                name="Add Timestamp"
+                                varname="timestamp"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                            />
                         </View>
                     </ScrollView>
                 </SafeAreaView>
