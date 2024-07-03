@@ -102,33 +102,31 @@ const UserSelector = () => {
                                 />
 
                                 <Text style={styles.username}>{info.name}</Text>
-
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        Alert.alert(
-                                            `Delete Persona`,
-                                            `Are you sure you want to delete '${info.name}'?`,
-                                            [
-                                                { text: `Cancel`, style: `cancel` },
-                                                {
-                                                    text: `Confirm`,
-                                                    style: `destructive`,
-                                                    onPress: async () => {
-                                                        await Characters.db.mutate.deleteCard(
-                                                            info.id
-                                                        )
-                                                        loadUserList()
-                                                    },
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.secondaryButton}
+                                onPress={() => {
+                                    Alert.alert(
+                                        `Delete Persona`,
+                                        `Are you sure you want to delete '${info.name}'?`,
+                                        [
+                                            { text: `Cancel`, style: `cancel` },
+                                            {
+                                                text: `Confirm`,
+                                                style: `destructive`,
+                                                onPress: async () => {
+                                                    await Characters.db.mutate.deleteCard(info.id)
+                                                    loadUserList()
                                                 },
-                                            ]
-                                        )
-                                    }}>
-                                    <FontAwesome
-                                        size={28}
-                                        name="trash"
-                                        color={Style.getColor('primary-text1')}
-                                    />
-                                </TouchableOpacity>
+                                            },
+                                        ]
+                                    )
+                                }}>
+                                <FontAwesome
+                                    size={28}
+                                    name="trash"
+                                    color={Style.getColor('primary-text1')}
+                                />
                             </TouchableOpacity>
                         </View>
                     ))}
@@ -193,14 +191,18 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         borderRadius: 8,
-        paddingVertical: 8,
-        padding: 8,
         flex: 1,
+    },
+
+    secondaryButton: {
+        paddingHorizontal: 12,
+        paddingVertical: 22,
     },
 
     useritembutton: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
+        padding: 8,
     },
 })

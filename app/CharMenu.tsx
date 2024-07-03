@@ -198,49 +198,45 @@ const CharMenu = () => {
                                 fade={0}
                                 fduration={500}>
                                 <TouchableOpacity
-                                    style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                    }}
+                                    style={styles.longButton}
                                     disabled={nowLoading}
                                     onPress={() => setCurrentCharacter(character.id)}>
-                                    <View style={styles.longButton}>
-                                        <Image
-                                            source={{
-                                                uri: Characters.getImageDir(character.image_id),
-                                            }}
-                                            style={styles.avatar}
-                                        />
-                                        <View style={{ flex: 1 }}>
-                                            <Text style={styles.nametag}>{character.name}</Text>
-                                            <View
-                                                style={{
-                                                    paddingLeft: 16,
-                                                    flex: 1,
-                                                    flexDirection: 'row',
-                                                    flexWrap: 'wrap',
-                                                }}>
-                                                {character.tags.map((item, index) => (
-                                                    <Text
-                                                        style={{
-                                                            color: Style.getColor('primary-text2'),
-                                                            fontSize: 12,
-                                                            backgroundColor:
-                                                                Style.getColor('primary-surface4'),
-                                                            marginHorizontal: 2,
-                                                            marginVertical: 2,
-                                                            paddingHorizontal: 4,
-                                                            paddingVertical: 2,
-                                                            borderRadius: 4,
-                                                        }}
-                                                        key={index}>
-                                                        {item}
-                                                    </Text>
-                                                ))}
-                                            </View>
+                                    <Image
+                                        source={{
+                                            uri: Characters.getImageDir(character.image_id),
+                                        }}
+                                        style={styles.avatar}
+                                    />
+                                    <View>
+                                        <Text style={styles.nametag}>{character.name}</Text>
+                                        <View
+                                            style={{
+                                                paddingLeft: 16,
+                                                flex: 1,
+                                                flexDirection: 'row',
+                                                flexWrap: 'wrap',
+                                            }}>
+                                            {character.tags.map((item, index) => (
+                                                <Text
+                                                    style={{
+                                                        color: Style.getColor('primary-text2'),
+                                                        fontSize: 12,
+                                                        backgroundColor:
+                                                            Style.getColor('primary-surface4'),
+                                                        paddingHorizontal: 4,
+                                                        paddingVertical: 2,
+                                                        borderRadius: 4,
+                                                        rowGap: 2,
+                                                        columnGap: 4,
+                                                    }}
+                                                    key={index}>
+                                                    {item}
+                                                </Text>
+                                            ))}
                                         </View>
                                     </View>
+                                </TouchableOpacity>
+                                <View>
                                     {nowLoading && character.id === loadedCharId ? (
                                         <ActivityIndicator
                                             color={Style.getColor('primary-text2')}
@@ -249,6 +245,7 @@ const CharMenu = () => {
                                         />
                                     ) : (
                                         <TouchableOpacity
+                                            style={styles.secondaryButton}
                                             onPress={async () => {
                                                 setCurrentCharacter(character.id, true)
                                             }}
@@ -260,7 +257,7 @@ const CharMenu = () => {
                                             />
                                         </TouchableOpacity>
                                     )}
-                                </TouchableOpacity>
+                                </View>
                             </AnimatedView>
                         ))}
                     </ScrollView>
@@ -282,6 +279,7 @@ const styles = StyleSheet.create({
     longButton: {
         flexDirection: 'row',
         flex: 1,
+        padding: 8,
     },
 
     longButtonContainer: {
@@ -293,8 +291,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         borderRadius: 8,
-        paddingVertical: 8,
-        padding: 8,
         flex: 1,
     },
 
@@ -310,6 +306,11 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         padding: 8,
         flex: 1,
+    },
+
+    secondaryButton: {
+        paddingHorizontal: 8,
+        paddingVertical: 20,
     },
 
     avatar: {

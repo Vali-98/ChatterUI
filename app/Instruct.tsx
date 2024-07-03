@@ -398,7 +398,8 @@ const Instruct = () => {
                                 step={1}
                                 showInput={false}
                             />
-                            <Text style={{ color: Style.getColor('primary-text2') }}>
+                            <Text
+                                style={{ color: Style.getColor('primary-text2'), marginLeft: 16 }}>
                                 Mode: {currentInstruct.format_type} -
                                 {' ' +
                                     [
