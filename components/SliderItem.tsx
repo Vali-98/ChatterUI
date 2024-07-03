@@ -13,6 +13,7 @@ type SliderItemProps = {
     max?: number
     step?: number
     precision?: number
+    showInput?: boolean
 }
 
 const SliderItem: React.FC<SliderItemProps> = ({
@@ -25,6 +26,7 @@ const SliderItem: React.FC<SliderItemProps> = ({
     step = 0,
     precision = 0,
     onChange = undefined,
+    showInput = true,
 }) => {
     const clamp = (val: number) => Math.min(Math.max(parseFloat(val?.toFixed(2) ?? 0), min), max)
     const [textValue, setTextValue] = useState(body[varname]?.toFixed(precision))
@@ -68,15 +70,16 @@ const SliderItem: React.FC<SliderItemProps> = ({
                     maximumTrackTintColor={Style.getColor('primary-surface3')}
                     thumbTintColor={Style.getColor('primary-brand')}
                 />
-
-                <TextInput
-                    style={styles.textBox}
-                    value={textValue}
-                    onChangeText={setTextValue}
-                    onEndEditing={handleTextInputChange}
-                    onPressOut={handleTextInputChange}
-                    keyboardType="number-pad"
-                />
+                {showInput && (
+                    <TextInput
+                        style={styles.textBox}
+                        value={textValue}
+                        onChangeText={setTextValue}
+                        onEndEditing={handleTextInputChange}
+                        onPressOut={handleTextInputChange}
+                        keyboardType="number-pad"
+                    />
+                )}
             </View>
         </View>
     )

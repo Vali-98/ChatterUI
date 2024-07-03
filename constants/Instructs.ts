@@ -113,13 +113,6 @@ const defaultInstructs: InstructType[] = [
     },
 ]
 
-enum FormatType {
-    None,
-    PlainActionQuoteSpeech,
-    AsteriskActionPlainSpeech,
-    AsteriskActionQuoteSpeech,
-}
-
 type InstructState = {
     data: InstructType | undefined
     load: (id: number) => Promise<void>
