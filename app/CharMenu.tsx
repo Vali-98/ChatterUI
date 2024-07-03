@@ -303,13 +303,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         borderRadius: 8,
-        paddingVertical: 8,
-        padding: 8,
         flex: 1,
     },
 
     secondaryButton: {
-        paddingHorizontal: 8,
+        paddingHorizontal: 12,
         paddingVertical: 20,
     },
 
