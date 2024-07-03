@@ -1,6 +1,6 @@
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
+import { FontAwesome } from '@expo/vector-icons'
 import { Global, Logger, Style } from '@globals'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'

@@ -1,13 +1,14 @@
 import { Buffer } from '@craftzdog/react-native-buffer'
 import { db as database } from '@db'
 import axios from 'axios'
-import * as Base64 from 'base-64'
 import { characterGreetings, characterTags, characters, tags } from 'db/schema'
 import { eq, inArray, notInArray } from 'drizzle-orm'
+import { randomUUID } from 'expo-crypto'
 import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
 import { decode } from 'png-chunk-text'
 import extractChunks from 'png-chunks-extract'
+import { atob } from 'react-native-quick-base64'
 import { create } from 'zustand'
 
 import { Global } from './GlobalValues'
@@ -354,13 +355,21 @@ export namespace Characters {
             .map(function (chunk) {
                 return decode(chunk.data)
             })
-        const charactercard = JSON.parse(Base64.decode(textChunks[0].text))
-        const newname = charactercard?.data?.name ?? charactercard.name
-        Logger.log(`Creating new character: ${newname}`)
-        if (newname === 'Detailed Example Character' || charactercard === undefined) {
-            Logger.log('Invalid Character ID', true)
+
+        const charactercard = JSON.parse(atob(textChunks[0].text))
+
+        if (charactercard === undefined) {
+            Logger.log('No character was found.', true)
             return
         }
+        if (charactercard?.spec_version !== '2.0') {
+            Logger.log('Character card must be in V 2.0 format.', true)
+            return
+        }
+
+        const newname = charactercard?.data?.name ?? charactercard.name
+
+        Logger.log(`Creating new character: ${newname}`)
         return db.mutate.createCharacter(charactercard, uri)
     }
 
@@ -387,10 +396,11 @@ export namespace Characters {
             )
 
             const response = Buffer.from(res.data, 'base64').toString('base64')
-            return FS.writeAsStringAsync(`${FS.cacheDirectory}image.png`, response, {
+            const uuid = randomUUID()
+            return FS.writeAsStringAsync(`${FS.cacheDirectory}${uuid}.png`, response, {
                 encoding: FS.EncodingType.Base64,
             }).then(async () => {
-                return createCharacterFromImage(`${FS.cacheDirectory}image.png`)
+                return createCharacterFromImage(`${FS.cacheDirectory}${uuid}.png`)
             })
         } catch (error) {
             Logger.log(`Could not retreive card. ${error}`)
@@ -417,16 +427,16 @@ export namespace Characters {
 
         const { character } = await data.json()
 
-        const name = character.data.name
         const res = await fetch(character.data.avatar, {
             method: 'GET',
         })
         const buffer = await res.arrayBuffer()
         const image = Buffer.from(buffer).toString('base64')
-        return FS.writeAsStringAsync(`${FS.cacheDirectory}image.png`, image, {
+        const uuid = randomUUID()
+        return FS.writeAsStringAsync(`${FS.cacheDirectory}${uuid}.png`, image, {
             encoding: FS.EncodingType.Base64,
         }).then(async () => {
-            return db.mutate.createCharacter(character, `${FS.cacheDirectory}image.png`)
+            return db.mutate.createCharacter(character, `${FS.cacheDirectory}${uuid}.png`)
         })
     }
 
@@ -460,11 +470,11 @@ export namespace Characters {
         // Regex checks for format of [name][/][character]
         if (/^[^/]+\/[^/]+$/.test(text)) return importCharacterFromChub(text)
         if (uuidRegex.test(text)) return importCharacterFromPyg(text)
-        Logger.log(`Invalid input!`, true)
+        Logger.log(`URL not recognized`, true)
     }
 
-    export const getImageDir = (charId: number) => {
-        return `${FS.documentDirectory}characters/${charId}.png`
+    export const getImageDir = (imageId: number) => {
+        return `${FS.documentDirectory}characters/${imageId}.png`
     }
 }
 
