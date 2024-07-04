@@ -1,4 +1,4 @@
-import { Llama } from '@constants/LlamaLocal'
+import { Llama, LlamaPreset } from '@constants/LlamaLocal'
 import { AppSettings, Global, Logger, Style } from '@globals'
 import { useEffect, useState } from 'react'
 import {
@@ -16,6 +16,12 @@ import { useMMKVBoolean, useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { SliderItem } from '..'
 
 const Local = () => {
+    const { loadModel, unloadModel, modelName } = Llama.useLlama((state) => ({
+        loadModel: state.load,
+        unloadModel: state.unload,
+        modelName: state.modelname,
+    }))
+
     const [modelLoading, setModelLoading] = useState(false)
     const [modelList, setModelList] = useState<string[]>([])
     const dropdownValues = modelList.map((item) => {
@@ -23,12 +29,12 @@ const Local = () => {
     })
     const [currentModel, setCurrentModel] = useMMKVString(Global.LocalModel)
     const [downloadLink, setDownloadLink] = useState('')
-    const [preset, setPreset] = useMMKVObject<Llama.LlamaPreset>(Global.LocalPreset)
-    const [loadedModel, setLoadedModel] = useState(Llama.getModelname())
+    const [preset, setPreset] = useMMKVObject<LlamaPreset>(Global.LocalPreset)
+    const [loadedModel, setLoadedModel] = useState(modelName)
     const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
     const [kvSize, setKVSize] = useState<number>(-1)
     const getModels = async () => {
-        setModelList(await Llama.getModels())
+        setModelList(await Llama.getModelList())
     }
 
     useEffect(() => {
@@ -40,20 +46,20 @@ const Local = () => {
 
     const handleLoad = async () => {
         setModelLoading(true)
-        await Llama.loadModel(currentModel ?? '', preset).then(() => {
-            setLoadedModel(Llama.getModelname())
+        await loadModel(currentModel ?? '', preset).then(() => {
+            setLoadedModel(modelName)
         })
         setModelLoading(false)
         getModels()
     }
-
+    /*
     const handleLoadExternal = async () => {
         setModelLoading(true)
         await Llama.loadModel('', preset, false).then(() => {
             setLoadedModel(Llama.getModelname())
         })
         setModelLoading(false)
-    }
+    }*/
 
     const handleDelete = async () => {
         if (!(await Llama.modelExists(currentModel ?? ''))) {
@@ -70,7 +76,7 @@ const Local = () => {
                     Llama.deleteModel(currentModel ?? '')
                         .then(() => {
                             Logger.log('Model Deleted Successfully', true)
-                            setLoadedModel(Llama.getModelname())
+                            setLoadedModel(modelName)
                             getModels()
                         })
                         .catch(() => Logger.log('Could Not Delete Model', true))
@@ -80,8 +86,8 @@ const Local = () => {
     }
 
     const handleUnload = async () => {
-        await Llama.unloadModel()
-        setLoadedModel(Llama.getModelname())
+        await unloadModel()
+        setLoadedModel(modelName)
     }
 
     const handleDownload = () => {
