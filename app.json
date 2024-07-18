@@ -56,7 +56,7 @@
                         "largeHeap": true,
                         "usesCleartextTraffic": true,
                         "enableProguardInReleaseBuilds": true,
-                        "enableShrinkResourcesInReleaseBuilds": true,
+                        //"enableShrinkResourcesInReleaseBuilds": true,
                         "useLegacyPackaging": true,
                         "extraProguardRules": "-keep class com.rnllama.** { *; }"
                     }
