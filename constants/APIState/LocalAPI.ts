@@ -41,11 +41,14 @@ class LocalAPI extends APIBase {
     }
 
     inference = async () => {
-        const context = Llama.useLlama.getState().context
+        let context = Llama.useLlama.getState().context
         if (!context && mmkv.getBoolean(AppSettings.AutoLoadLocal)) {
             const model = mmkv.getString(Global.LocalModel)
             const params = this.getObject(Global.LocalPreset)
-            if (model && params) await Llama.useLlama.getState().load(model ?? '', params)
+            if (model && params) {
+                await Llama.useLlama.getState().load(model ?? '', params)
+                context = Llama.useLlama.getState().context
+            }
         }
 
         if (!context) {
