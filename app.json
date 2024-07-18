@@ -54,11 +54,11 @@
                 {
                     "android": {
                         "largeHeap": true,
-                        "usesCleartextTraffic": true,
-                        "enableProguardInReleaseBuilds": true,
+                        "usesCleartextTraffic": true
+                        //"enableProguardInReleaseBuilds": true,
                         //"enableShrinkResourcesInReleaseBuilds": true,
-                        "useLegacyPackaging": true,
-                        "extraProguardRules": "-keep class com.rnllama.** { *; }"
+                        //"useLegacyPackaging": true,
+                        //"extraProguardRules": "-keep class com.rnllama.** { *; }"
                     }
                 }
             ],
