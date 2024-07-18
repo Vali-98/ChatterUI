@@ -214,7 +214,7 @@ export const initializeApp = async () => {
 
 export const generateDefaultDirectories = async () => {
     // Removed: 'characters', 'instruct', 'persona',
-    const dirs = ['presets', 'lorebooks', 'models', 'appAssets']
+    const dirs = ['presets', 'lorebooks', 'models']
 
     dirs.map(async (dir: string) => {
         await FS.makeDirectoryAsync(`${FS.documentDirectory}${dir}`, {})
