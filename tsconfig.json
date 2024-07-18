@@ -21,10 +21,6 @@
         "constants/*.ts",
         ".expo/types/**/*.ts",
         "expo-env.d.ts",
-        "app/test.jsx",
-        "app/deprecated",
         "app/_layout.tsx",
-        "app/LorebookInfo/BookInfojs",
-        "app/PresetMenu.jsx",
     ],
 }

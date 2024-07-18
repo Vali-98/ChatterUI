@@ -1,8 +1,9 @@
 import AnimatedView from '@components/AnimatedView'
 import { CharacterCardV2 } from '@constants/Characters'
 import { RecentMessages } from '@constants/RecentMessages'
+import { Tokenizer } from '@constants/Tokenizer'
 import { FontAwesome } from '@expo/vector-icons'
-import { Characters, Llama3Tokenizer, Logger, Style } from '@globals'
+import { Characters, Logger, Style } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
 import { useState } from 'react'
@@ -30,7 +31,7 @@ const CharInfo = () => {
             charName: state.card?.data.name,
         }))
     )
-
+    const getTokenCount = Tokenizer.useTokenizer((state) => state.getTokenCount)
     const [characterCard, setCharacterCard] = useState<CharacterCardV2 | undefined>(currentCard)
 
     const imageDir = Characters.getImageDir(currentCard?.data.image_id ?? -1)
@@ -157,8 +158,7 @@ const CharInfo = () => {
 
                         <Text style={styles.boxText}>
                             Description Tokens:{' '}
-                            {characterCard?.data?.description !== undefined &&
-                                Llama3Tokenizer.encode(characterCard.data.description).length}
+                            {getTokenCount(characterCard?.data?.description ?? '')}
                         </Text>
 
                         <ScrollView
