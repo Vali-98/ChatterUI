@@ -1,7 +1,7 @@
 import { CompletionParams, ContextParams, LlamaContext, initLlama } from 'cui-llama.rn'
+import { getDocumentAsync } from 'expo-document-picker'
 import * as FS from 'expo-file-system'
 import { Platform } from 'react-native'
-import DocumentPicker from 'react-native-document-picker'
 import { create } from 'zustand'
 
 import { AppSettings, Global } from './GlobalValues'
@@ -411,27 +411,25 @@ export namespace Llama {
     }
 
     export const importModel = async () => {
-        return DocumentPicker.pickSingle()
-            .then(async (result: any) => {
-                if (DocumentPicker.isCancel(result)) return false
-                const name = result.name
-                Logger.log('Importing file...', true)
-                await FS.copyAsync({
-                    from: result.uri,
-                    to: `${model_dir}${name}`,
+        return getDocumentAsync({
+            type: 'application/octet-stream',
+            copyToCacheDirectory: false,
+        }).then(async (result) => {
+            if (result.canceled) return
+            const file = result.assets[0]
+            const name = file.name
+            Logger.log('Importing file...', true)
+            await FS.copyAsync({
+                from: file.uri,
+                to: `${model_dir}${name}`,
+            })
+                .then(() => {
+                    Logger.log('File Imported!', true)
                 })
-                    .then(() => {
-                        Logger.log('File Imported!', true)
-                    })
-                    .catch((error) => {
-                        Logger.log(`Import Failed: ${error.message}`, true)
-                    })
-
-                return false
-            })
-            .catch(() => {
-                Logger.log('No Model Chosen', true)
-            })
+                .catch((error) => {
+                    Logger.log(`Import Failed: ${error.message}`, true)
+                })
+        }).catch
     }
 
     export const getKVSizeMB = async () => {
