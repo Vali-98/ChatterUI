@@ -73,6 +73,7 @@ const Local = () => {
                     Llama.deleteModel(currentModel ?? '')
                         .then(() => {
                             Logger.log('Model Deleted Successfully', true)
+                            setCurrentModel(undefined)
                             getModels()
                         })
                         .catch(() => Logger.log('Could Not Delete Model', true))
@@ -94,9 +95,7 @@ const Local = () => {
 
     const handleImport = async () => {
         setModelLoading(true)
-        await Llama.importModel().then(() => {
-            getModels()
-        })
+        await Llama.importModel()
         await getModels()
         setModelLoading(false)
     }
