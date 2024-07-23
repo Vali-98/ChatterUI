@@ -1,7 +1,7 @@
 import AnimatedView from '@components/AnimatedView'
-import { APIState } from '@constants/APIState'
-import { SamplerPreset } from '@constants/Presets'
-import { SamplerID, Samplers } from '@constants/Samplers'
+import { APIState } from 'app/constants/APIState'
+import { SamplerPreset } from 'app/constants/Presets'
+import { SamplerID, Samplers } from 'app/constants/Samplers'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Presets, saveStringExternal, Logger, Style, API } from '@globals'
 import { Stack } from 'expo-router'
@@ -19,7 +19,7 @@ import { Dropdown } from 'react-native-element-dropdown'
 import { TextInput } from 'react-native-gesture-handler'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
-import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from '../components'
+import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from './components'
 
 type PresetLabel = {
     label: string

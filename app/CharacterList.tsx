@@ -25,7 +25,7 @@ type CharInfo = {
     tags: string[]
 }
 
-const CharMenu = () => {
+const CharacterList = () => {
     const router = useRouter()
     const { setCurrentCard, id } = Characters.useCharacterCard(
         useShallow((state) => ({
@@ -267,7 +267,7 @@ const CharMenu = () => {
     )
 }
 
-export default CharMenu
+export default CharacterList
 
 const styles = StyleSheet.create({
     mainContainer: {

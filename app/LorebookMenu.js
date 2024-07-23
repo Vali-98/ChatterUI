@@ -1,5 +1,5 @@
-import TextBoxModal from '@components/TextBoxModal'
-import { Lorebooks } from '@constants/Lorebooks'
+import TextBoxModal from 'app/components/TextBoxModal'
+import { Lorebooks } from 'app/constants/Lorebooks'
 import { FontAwesome } from '@expo/vector-icons'
 import { Stack, useRouter } from 'expo-router'
 import { Style } from '@globals'

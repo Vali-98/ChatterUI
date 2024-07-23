@@ -1,5 +1,5 @@
 import { AppSettings } from '@constants/GlobalValues'
-import { ColorId, Style } from '@constants/Style'
+import { ColorId, Style } from 'app/constants/Style'
 import { FontAwesome } from '@expo/vector-icons'
 import Slider from '@react-native-community/slider'
 import { reloadAppAsync } from 'expo'
