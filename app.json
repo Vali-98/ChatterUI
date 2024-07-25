@@ -5,12 +5,12 @@
         "version": "0.7.8",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
-        "scheme": "myapp",
+        "scheme": "chatterui",
         "userInterfaceStyle": "automatic",
         "splash": {
             "image": "./assets/images/splash.png",
             "resizeMode": "contain",
-            "backgroundColor": "#ffffff"
+            "backgroundColor": "#000000"
         },
         "assetBundlePatterns": ["**/*"],
         "ios": {
@@ -27,7 +27,12 @@
                 "resizeMode": "contain",
                 "backgroundColor": "#000000"
             },
-            "userInterfaceStyle": "dark"
+            "userInterfaceStyle": "dark",
+            "permissions": [
+                "android.permission.FOREGROUND_SERVICE",
+                "android.permission.WAKE_LOCK",
+                "android.permission.FOREGROUND_SERVICE_DATA_SYNC"
+            ]
         },
         "web": {
             "bundler": "metro",
@@ -62,7 +67,8 @@
                     }
                 }
             ],
-            "expo-font"
+            "expo-font",
+            "./bgactions.plugin.js"
         ],
         "experiments": {
             "typedRoutes": true

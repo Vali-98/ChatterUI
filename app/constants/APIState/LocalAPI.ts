@@ -1,9 +1,10 @@
-import { Chats, useInference } from 'app/constants/Chat'
 import { AppSettings, Global } from '@constants/GlobalValues'
+import { Chats, useInference } from 'app/constants/Chat'
 import { Llama, LlamaPreset } from 'app/constants/LlamaLocal'
 import { Logger } from 'app/constants/Logger'
-import { SamplerID } from 'app/constants/Samplers'
 import { mmkv } from 'app/constants/MMKV'
+import { SamplerID } from 'app/constants/Samplers'
+import BackgroundService from 'react-native-background-actions'
 
 import { APIBase, APISampler } from './BaseAPI'
 
@@ -88,16 +89,37 @@ class LocalAPI extends APIBase {
             if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.log(`Completion Output:\n${text}`)
         }
 
-        Llama.useLlama
-            .getState()
-            .completion(payload, outputStream, outputCompleted)
-            .then(() => {
-                this.stopGenerating()
-            })
-            .catch((error) => {
-                Logger.log(`Failed to generate locally: ${error}`, true)
-                this.stopGenerating()
-            })
+        const completionTask = async () => {
+            await Llama.useLlama
+                .getState()
+                .completion(payload, outputStream, outputCompleted)
+                .then(() => {
+                    this.stopGenerating()
+                })
+                .catch((error) => {
+                    Logger.log(`Failed to generate locally: ${error}`, true)
+                    this.stopGenerating()
+                })
+        }
+
+        const options = {
+            taskName: 'rn_llama_completion',
+            taskTitle: 'Running completion...',
+            taskDesc: 'ChatterUI is running a completion task',
+            taskIcon: {
+                name: 'ic_launcher',
+                type: 'mipmap',
+            },
+            color: '#403737',
+            linkingURI: 'chatterui://',
+            progressBar: {
+                max: 1,
+                value: 0,
+                indeterminate: true,
+            },
+        }
+
+        await BackgroundService.start(completionTask, options)
     }
 }
 

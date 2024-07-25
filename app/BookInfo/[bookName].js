@@ -1,10 +1,11 @@
-import { Lorebooks } from 'app/constants/Lorebooks'
 import { Style } from '@globals'
+import { FlashList } from '@shopify/flash-list'
+import { Lorebooks } from 'app/constants/Lorebooks'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
+
 import Entry from './Entry'
-import { FlashList } from '@shopify/flash-list'
 
 const LorebookInfo = () => {
     const { bookName } = useLocalSearchParams()
