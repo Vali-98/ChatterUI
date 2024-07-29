@@ -6,11 +6,11 @@ import { create } from 'zustand'
 import { Characters } from './Characters'
 import { AppSettings, Global } from './GlobalValues'
 import { Logger } from './Logger'
+import { mmkv } from './MMKV'
 import { RecentMessages } from './RecentMessages'
 import { convertToFormatInstruct } from './TextFormat'
 import { Tokenizer } from './Tokenizer'
 import { replaceMacros } from './Utils'
-import { mmkv } from './MMKV'
 
 export type ChatSwipe = {
     id: number
@@ -66,6 +66,7 @@ export interface ChatState {
     updateFromBuffer: () => Promise<void>
     insertLastToBuffer: () => void
     setRegenCache: () => void
+    getRegenCache: () => string
     stopGenerating: () => void
     startGenerating: () => void
     abortFunction: undefined | AbortFunction
@@ -278,6 +279,12 @@ export namespace Chats {
                 ...state,
                 data: state?.data ? { ...state.data, messages: messages } : state.data,
             }))
+        },
+        getRegenCache: () => {
+            const messages = get()?.data?.messages
+            const message = messages?.[messages.length - 1]
+            if (!messages || !message) return ''
+            return message.swipes[message.swipe_id].regen_cache ?? ''
         },
     }))
 
