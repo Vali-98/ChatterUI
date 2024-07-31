@@ -1,22 +1,14 @@
-import AnimatedView from '@components/AnimatedView'
 import TextBoxModal from '@components/TextBoxModal'
-import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons'
+import { FontAwesome, Ionicons } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
 import { useRouter, Stack, usePathname } from 'expo-router'
 import { useEffect, useState } from 'react'
-import {
-    SafeAreaView,
-    TouchableOpacity,
-    ScrollView,
-    Text,
-    Image,
-    StyleSheet,
-    View,
-    ActivityIndicator,
-} from 'react-native'
+import { SafeAreaView, TouchableOpacity, ScrollView, Text, StyleSheet, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
+
+import CharacterListing from './CharacterListing'
 
 type CharInfo = {
     name: string
@@ -27,7 +19,7 @@ type CharInfo = {
 
 const CharacterList = () => {
     const router = useRouter()
-    const { setCurrentCard, id } = Characters.useCharacterCard(
+    const { setCurrentCard } = Characters.useCharacterCard(
         useShallow((state) => ({
             setCurrentCard: state.setCard,
             id: state.id,
@@ -39,7 +31,6 @@ const CharacterList = () => {
     const [showNewChar, setShowNewChar] = useState<boolean>(false)
     const [showDownload, setShowDownload] = useState(false)
     const [nowLoading, setNowLoading] = useState(false)
-    const [loadedCharId, setLoadedCharId] = useState(id)
 
     const goBack = () => router.back()
 
@@ -48,6 +39,7 @@ const CharacterList = () => {
         .onEnd(() => {
             runOnJS(goBack)()
         })
+
     const getCharacterList = async () => {
         try {
             const list = await Characters.db.query.cardList('character')
@@ -58,7 +50,6 @@ const CharacterList = () => {
     }
     const setCurrentCharacter = async (charId: number, edit: boolean = false) => {
         if (nowLoading) return
-        setLoadedCharId(charId)
 
         try {
             await setCurrentCard(charId)
@@ -82,7 +73,6 @@ const CharacterList = () => {
             Logger.log(`Couldn't load character: ${error}`, true)
             setNowLoading(false)
         }
-        setLoadedCharId(-1)
     }
 
     const handleCreateCharacter = async (text: string) => {
@@ -104,6 +94,7 @@ const CharacterList = () => {
             <SafeAreaView style={styles.mainContainer}>
                 <Stack.Screen
                     options={{
+                        title: 'Characters',
                         headerRight: () => (
                             <View style={styles.headerButtonContainer}>
                                 <TouchableOpacity
@@ -186,79 +177,13 @@ const CharacterList = () => {
                 {characterList.length !== 0 && (
                     <ScrollView>
                         {characterList.map((character, index) => (
-                            <AnimatedView
-                                style={
-                                    character.id === loadedCharId
-                                        ? styles.longButtonSelectedContainer
-                                        : styles.longButtonContainer
-                                }
-                                key={index}
-                                dx={Math.min(500 + index * 200, 2000)}
-                                tduration={Math.min(500 + index * 100, 1000)}
-                                fade={0}
-                                fduration={500}>
-                                <TouchableOpacity
-                                    style={styles.longButton}
-                                    disabled={nowLoading}
-                                    onPress={() => setCurrentCharacter(character.id)}>
-                                    <Image
-                                        source={{
-                                            uri: Characters.getImageDir(character.image_id),
-                                        }}
-                                        style={styles.avatar}
-                                    />
-                                    <View>
-                                        <Text style={styles.nametag}>{character.name}</Text>
-                                        <View
-                                            style={{
-                                                paddingLeft: 16,
-                                                flex: 1,
-                                                flexDirection: 'row',
-                                                flexWrap: 'wrap',
-                                            }}>
-                                            {character.tags.map((item, index) => (
-                                                <Text
-                                                    style={{
-                                                        color: Style.getColor('primary-text2'),
-                                                        fontSize: 12,
-                                                        backgroundColor:
-                                                            Style.getColor('primary-surface4'),
-                                                        paddingHorizontal: 4,
-                                                        paddingVertical: 2,
-                                                        borderRadius: 4,
-                                                        rowGap: 2,
-                                                        columnGap: 4,
-                                                    }}
-                                                    key={index}>
-                                                    {item}
-                                                </Text>
-                                            ))}
-                                        </View>
-                                    </View>
-                                </TouchableOpacity>
-                                <View>
-                                    {nowLoading && character.id === loadedCharId ? (
-                                        <ActivityIndicator
-                                            color={Style.getColor('primary-text2')}
-                                            style={{ paddingLeft: 8 }}
-                                            size={28}
-                                        />
-                                    ) : (
-                                        <TouchableOpacity
-                                            style={styles.secondaryButton}
-                                            onPress={async () => {
-                                                setCurrentCharacter(character.id, true)
-                                            }}
-                                            disabled={nowLoading}>
-                                            <AntDesign
-                                                color={Style.getColor('primary-text2')}
-                                                name="idcard"
-                                                size={32}
-                                            />
-                                        </TouchableOpacity>
-                                    )}
-                                </View>
-                            </AnimatedView>
+                            <CharacterListing
+                                key={character.id}
+                                index={index}
+                                character={character}
+                                nowLoading={nowLoading}
+                                setNowLoading={setNowLoading}
+                            />
                         ))}
                     </ScrollView>
                 )}
@@ -274,61 +199,6 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         paddingHorizontal: 8,
         flex: 1,
-    },
-
-    longButton: {
-        flexDirection: 'row',
-        flex: 1,
-        padding: 8,
-    },
-
-    longButtonContainer: {
-        backgroundColor: Style.getColor('primary-surface1'),
-        borderColor: Style.getColor('primary-surface1'),
-        borderWidth: 2,
-        flexDirection: 'row',
-        marginBottom: 8,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderRadius: 8,
-        flex: 1,
-    },
-
-    longButtonSelectedContainer: {
-        backgroundColor: Style.getColor('primary-surface1'),
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 2,
-        flexDirection: 'row',
-        marginBottom: 8,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderRadius: 8,
-        flex: 1,
-    },
-
-    secondaryButton: {
-        paddingHorizontal: 12,
-        paddingVertical: 20,
-    },
-
-    avatar: {
-        width: 48,
-        height: 48,
-        borderRadius: 12,
-        margin: 4,
-        backgroundColor: Style.getColor('primary-surface2'),
-    },
-
-    nametag: {
-        fontSize: 16,
-        marginLeft: 20,
-        color: Style.getColor('primary-text1'),
-    },
-
-    subtag: {
-        fontSize: 16,
-        marginLeft: 20,
-        color: Style.getColor('primary-text2'),
     },
 
     headerButtonRight: {
