@@ -1,32 +1,18 @@
-import { Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons'
+import { Ionicons, FontAwesome } from '@expo/vector-icons'
 import { Logger, Style, Characters } from '@globals'
 import { Stack, useFocusEffect, useRouter } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
-import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, BackHandler } from 'react-native'
+import { View, SafeAreaView, TouchableOpacity, StyleSheet, BackHandler } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import {
-    Menu,
-    MenuTrigger,
-    MenuOptions,
-    MenuOption,
-    renderers,
-    MenuOptionsCustomStyle,
-} from 'react-native-popup-menu'
+import { Menu } from 'react-native-popup-menu'
 import Animated, { SlideInRight, runOnJS, Easing } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import ChatInput from './ChatInput'
 import { ChatWindow } from './ChatWindow/ChatWindow'
+import OptionsMenu from './OptionsMenu'
 import Recents from './Recents'
 import SettingsDrawer from './SettingsDrawer'
-
-const { SlideInMenu } = renderers
-
-type MenuData = {
-    callback: () => void
-    text: string
-    button: 'back' | 'edit' | 'paperclip'
-}
 
 const ChatMenu = () => {
     const router = useRouter()
@@ -82,7 +68,7 @@ const ChatMenu = () => {
 
     const goToChars = () => {
         if (showDrawer) setShowDrawer(false)
-        else router.push('/CharMenu')
+        else router.push('components/CharacterMenu/CharacterList')
     }
 
     const swipeDrawer = Gesture.Fling()
@@ -98,62 +84,6 @@ const ChatMenu = () => {
         })
 
     const gesture = Gesture.Exclusive(swipeDrawer, swipeChar)
-    const menuoptions: MenuData[] = [
-        {
-            callback: () => {
-                unloadCharacter()
-            },
-            text: 'Main Menu',
-            button: 'back',
-        },
-        {
-            callback: () => {
-                router.push('/CharInfo')
-            },
-            text: 'Edit Character',
-            button: 'edit',
-        },
-        {
-            callback: () => {
-                router.push('/ChatSelector')
-            },
-            text: 'Chat History',
-            button: 'paperclip',
-        },
-    ]
-
-    const modificationMenu = (
-        <Menu renderer={SlideInMenu} ref={menuRef}>
-            <MenuTrigger>
-                <Ionicons
-                    name="ellipsis-vertical-circle"
-                    style={styles.optionsButton}
-                    size={32}
-                    color={Style.getColor('primary-text2')}
-                />
-            </MenuTrigger>
-            <MenuOptions customStyles={menustyle}>
-                {menuoptions.map((item, index) => (
-                    <MenuOption key={index} onSelect={item.callback}>
-                        <View
-                            style={
-                                index === menuoptions.length - 1
-                                    ? styles.optionItemLast
-                                    : styles.optionItem
-                            }>
-                            <AntDesign
-                                style={{ minWidth: 25, marginLeft: 5 }}
-                                name={item.button}
-                                color={Style.getColor('primary-text2')}
-                                size={24}
-                            />
-                            <Text style={styles.optionText}>{item.text}</Text>
-                        </View>
-                    </MenuOption>
-                ))}
-            </MenuOptions>
-        </Menu>
-    )
 
     const headerViewRightSettings = (
         <Animated.View
@@ -219,7 +149,7 @@ const ChatMenu = () => {
                         <ChatWindow />
 
                         <View style={styles.inputContainer}>
-                            {modificationMenu}
+                            <OptionsMenu menuRef={menuRef} />
                             <ChatInput />
                         </View>
                     </View>
@@ -229,14 +159,6 @@ const ChatMenu = () => {
             </SafeAreaView>
         </GestureDetector>
     )
-}
-
-const menustyle: MenuOptionsCustomStyle = {
-    optionsContainer: {
-        backgroundColor: Style.getColor('primary-surface1'),
-        padding: 4,
-        borderRadius: 8,
-    },
 }
 
 const styles = StyleSheet.create({
@@ -267,24 +189,6 @@ const styles = StyleSheet.create({
 
     optionsButton: {
         paddingBottom: 6,
-    },
-
-    optionItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingBottom: 8,
-        borderBottomColor: Style.getColor('primary-surface3'),
-        borderBottomWidth: 1,
-    },
-
-    optionItemLast: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-
-    optionText: {
-        color: Style.getColor('primary-text1'),
-        marginLeft: 16,
     },
 
     headerButtonRight: {
