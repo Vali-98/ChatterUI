@@ -3,8 +3,10 @@ import { chatEntries, chatSwipes, chats } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import { create } from 'zustand'
 
+import { API } from './API'
 import { Characters } from './Characters'
 import { AppSettings, Global } from './GlobalValues'
+import { Llama } from './LlamaLocal'
 import { Logger } from './Logger'
 import { mmkv } from './MMKV'
 import { RecentMessages } from './RecentMessages'
@@ -241,9 +243,12 @@ export namespace Chats {
             const swipe_id = messages[index].swipe_id
             const cached_token_count = messages[index].swipes[swipe_id].token_count
             if (cached_token_count) return cached_token_count
-            const token_count = Tokenizer.useTokenizer
-                .getState()
-                .getTokenCount(messages[index].swipes[swipe_id].swipe)
+            const getTokenCount =
+                mmkv.getString(Global.APIType) === API.LOCAL
+                    ? Llama.useLlama.getState().tokenLength
+                    : Tokenizer.useTokenizer.getState().getTokenCount
+
+            const token_count = getTokenCount(messages[index].swipes[swipe_id].swipe)
             messages[index].swipes[swipe_id].token_count = token_count
             set((state: ChatState) => ({
                 ...state,

@@ -11,7 +11,9 @@ import extractChunks from 'png-chunks-extract'
 import { atob } from 'react-native-quick-base64'
 import { create } from 'zustand'
 
+import { API } from './API'
 import { Global } from './GlobalValues'
+import { Llama } from './LlamaLocal'
 import { Logger } from './Logger'
 import { mmkv } from './MMKV'
 import { Tokenizer } from './Tokenizer'
@@ -87,7 +89,11 @@ export namespace Characters {
                 }
             const description = replaceMacros(card.data.description)
             const examples = replaceMacros(card.data.mes_example)
-            const getTokenCount = Tokenizer.useTokenizer.getState().getTokenCount
+            const getTokenCount =
+                mmkv.getString(Global.APIType) === API.LOCAL
+                    ? Llama.useLlama.getState().tokenLength
+                    : Tokenizer.useTokenizer.getState().getTokenCount
+
             const newCache = {
                 otherName: userName,
                 description_length: getTokenCount(description),
@@ -143,7 +149,11 @@ export namespace Characters {
                 }
             const description = replaceMacros(card.data.description)
             const examples = replaceMacros(card.data.mes_example)
-            const getTokenCount = Tokenizer.useTokenizer.getState().getTokenCount
+            const getTokenCount =
+                mmkv.getString(Global.APIType) === API.LOCAL
+                    ? Llama.useLlama.getState().tokenLength
+                    : Tokenizer.useTokenizer.getState().getTokenCount
+
             const newCache = {
                 otherName: charName,
                 description_length: getTokenCount(description),

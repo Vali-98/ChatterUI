@@ -4,7 +4,9 @@ import { eq } from 'drizzle-orm'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
+import { API } from './API'
 import { Global } from './GlobalValues'
+import { Llama } from './LlamaLocal'
 import { Logger } from './Logger'
 import { mmkv, mmkvStorage } from './MMKV'
 import { Tokenizer } from './Tokenizer'
@@ -213,7 +215,11 @@ export namespace Instructs {
                             output_suffix_length: 0,
                             user_alignment_message_length: 0,
                         }
-                    const getTokenCount = Tokenizer.useTokenizer.getState().getTokenCount
+                    const getTokenCount =
+                        mmkv.getString(Global.APIType) === API.LOCAL
+                            ? Llama.useLlama.getState().tokenLength
+                            : Tokenizer.useTokenizer.getState().getTokenCount
+
                     const newCache: InstructTokenCache = {
                         charName: charName,
                         userName: userName,
