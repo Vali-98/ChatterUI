@@ -1,5 +1,5 @@
-import { Llama, LlamaPreset } from 'app/constants/LlamaLocal'
 import { AppSettings, Global, Logger, Style } from '@globals'
+import { Llama, LlamaPreset } from 'app/constants/LlamaLocal'
 import { useEffect, useState } from 'react'
 import {
     View,
@@ -227,7 +227,7 @@ const Local = () => {
                     varname="context_length"
                     min={512}
                     max={32768}
-                    step={32}
+                    step={512}
                 />
                 <SliderItem
                     name="Threads"
