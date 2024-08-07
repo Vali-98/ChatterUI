@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     },
 
     largeButtonText: {
-        fontSize: 16,
+        fontSize: 18,
         paddingVertical: 12,
         paddingLeft: 15,
         color: Style.getColor('primary-text1'),
