@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, TextInput } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
 import { Global, Color, API} from '@globals'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 const TGWUI = () => {
     
@@ -9,30 +10,17 @@ const TGWUI = () => {
 
     return (
         <View style={styles.mainContainer}>
-            <Text style={styles.title}>Blocking URL (currently not used)</Text>
-
-            <TextInput 
-                style={styles.input}
-                value={blockEnd}
-                onChangeText={(value) => {
-                    setBlockEnd(value)
-                }}
-                placeholder='eg. http://127.0.0.1:5000/api'
-                placeholderTextColor={Color.Offwhite}
-            />
-
-            <Text style={styles.title}>Streaming URL</Text>
-
+            
+            <Text style={styles.title}>Endpoint</Text>
             <TextInput 
                 style={styles.input}
                 value={streamEnd}
                 onChangeText={(value) => {
                     setStreamEnd(value)
                 }}
-                placeholder='eg. ws://127.0.0.1:5005/api/v1/stream'
+                placeholder='eg. https://127.0.0.1:5000'
                 placeholderTextColor={Color.Offwhite}
             />
-
             
         </View>
     )
