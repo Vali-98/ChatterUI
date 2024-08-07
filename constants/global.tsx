@@ -83,7 +83,9 @@ const AppSettingsDefault: Record<AppSettings, boolean | number> = {
 const loadChatOnInit = async () => {
     const entries: RecentEntry[] = JSON.parse(mmkv.getString(Global.RecentMessages) ?? '[]')
     if (entries.length === 0) return
-    const entry = entries[0]
+    const entry = entries.at(-1)
+    if (!entry) return
+
     if (!(await Characters.exists(entry.charId)) || !(await Chats.exists(entry.chatId))) {
         Logger.log('Character or Chat no longer exists', true)
         RecentMessages.deleteEntry(entry.chatId)
