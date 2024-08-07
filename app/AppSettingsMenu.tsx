@@ -192,7 +192,7 @@ export default AppSettingsMenu
 const styles = StyleSheet.create({
     mainContainer: {
         marginTop: 16,
-        marginHorizontal: 20,
+        paddingHorizontal: 20,
         paddingBottom: 20,
     },
 
