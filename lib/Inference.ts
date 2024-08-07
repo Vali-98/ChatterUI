@@ -1,4 +1,5 @@
 import { ChatEntry, Chats } from '@constants/Chat'
+import { InstructType } from '@constants/Instructs'
 import { replaceMacros } from '@constants/Utils'
 import llamaTokenizer from '@constants/tokenizer'
 import { mmkv, Global, API, hordeHeader, Llama, Logger } from '@globals'
@@ -152,6 +153,13 @@ const buildChatCompletionContext = (max_length: number) => {
     return payload
 }
 
+const constructStopSequence = (instruct: InstructType): Array<string> => {
+    const sequence: Array<string> = []
+    const sequence_array = instruct.stop_sequence.split(',').forEach((item) => sequence.push(item))
+    sequence.push(instruct.input_sequence)
+    return sequence
+}
+
 const instructReplaceMacro = () => {
     const instruct = getObject(Global.CurrentInstruct)
     Object.keys(instruct).forEach((key) => {
@@ -183,11 +191,7 @@ const constructKAIPayload = () => {
             parseInt(preset.seed) === -1
                 ? Math.floor(Math.random() * 999999)
                 : parseInt(preset.seed),
-        stop_sequence: [
-            '\n\n\n\n\n',
-            currentInstruct.input_sequence,
-            currentInstruct.stop_sequence,
-        ],
+        stop_sequence: constructStopSequence(currentInstruct),
         mirostat: parseInt(preset.mirostat_mode),
         mirostat_tau: parseFloat(preset.mirostat_tau),
         mirostat_eta: parseFloat(preset.mirostat_eta),
@@ -248,11 +252,7 @@ const constructHordePayload = async () => {
             typical: preset.typical,
             singleline: false,
             use_default_badwordsids: preset.ban_eos_token,
-            stop_sequence: [
-                '\n\n\n\n\n',
-                currentInstruct.input_sequence,
-                currentInstruct.stop_sequence,
-            ],
+            stop_sequence: constructStopSequence(currentInstruct),
             min_p: preset.min_p,
         },
         trusted_workers: false,
@@ -296,11 +296,7 @@ const constructTGWUIPayload = () => {
         truncation_length: parseInt(preset.truncation_length),
         ban_eos_token: preset.ban_eos_token,
         skip_special_tokens: preset.skip_special_tokens,
-        stopping_strings: [
-            '\n\n\n\n\n',
-            currentInstruct.input_sequence,
-            currentInstruct.stop_sequence,
-        ],
+        stopping_strings: constructStopSequence(currentInstruct),
         seed:
             preset?.seed === undefined || preset.seed === -1
                 ? Math.floor(Math.random() * 999999)
@@ -330,7 +326,7 @@ const constructMancerPayload = () => {
         stream: true,
         max_tokens: context_len,
         min_tokens: gen_len,
-        stop: ['\n\n\n\n\n', currentInstruct.input_sequence, currentInstruct.stop_sequence],
+        stop: constructStopSequence(currentInstruct),
         //"logit_bias": {},
         temperature: preset.temp,
         repetition_penalty: preset.rep_pen,
@@ -386,11 +382,7 @@ const constructLocalPayload = () => {
     return {
         prompt: buildContext(preset.max_length),
         grammar: preset.grammar ?? '',
-        stop: [
-            currentInstruct.input_sequence,
-            '\n\n\n\n\n',
-            currentInstruct.stop_sequence,
-        ],
+        stop: constructStopSequence(currentInstruct),
 
         n_predict: preset.genamt,
         n_threads: localPreset.threads,
@@ -424,7 +416,7 @@ const constructOpenRouterPayload = () => {
         presence_penalty: preset.presence_pen,
         response_format: 'text',
         seed: preset.seed,
-        stop: ['\n\n\n\n\n', currentInstruct.input_sequence, currentInstruct.stop_sequence],
+        stop: constructStopSequence(currentInstruct),
         stream: true,
         temperature: preset.temp,
         top_p: preset.top_p,
@@ -622,10 +614,24 @@ const openRouterResponseStream = async (setAbortFunction: AbortFunction) => {
     )
 }
 
+const constructReplaceStrings = (): Array<string> => {
+    const currentInstruct: InstructType = instructReplaceMacro()
+    const userName: string = mmkv.getString(Global.CurrentUser) ?? ''
+    const charName: string = mmkv.getString(Global.CurrentCharacter) ?? ''
+    const stops: Array<string> = constructStopSequence(currentInstruct)
+
+    const output: Array<string> = []
+
+    output.push(`${userName} :`)
+    output.push(`${charName} :`)
+    output.push(currentInstruct.input_sequence)
+    stops.forEach((item) => output.push(item))
+
+    return output
+}
+
 const localStreamResponse = async (setAbortFunction: AbortFunction) => {
-    const currentInstruct = JSON.parse(mmkv.getString(Global.CurrentInstruct) ?? '')
-    const userName = mmkv.getString(Global.CurrentUser)
-    const charName = mmkv.getString(Global.CurrentCharacter)
+    const replace = constructReplaceStrings()
 
     setAbortFunction((abortFunction) => async () => {
         Llama.stopCompletion().then(() => {
@@ -635,14 +641,9 @@ const localStreamResponse = async (setAbortFunction: AbortFunction) => {
 
     const payload = constructLocalPayload()
     Llama.completion(payload, (text: string) => {
-        const buffer = Chats.useChat.getState().buffer
-        const cleaned = (buffer + text)
-            .replaceAll(currentInstruct.input_sequence, ``)
-            .replaceAll(currentInstruct.output_sequence, ``)
-            .replaceAll(currentInstruct.stop_sequence, '')
-            .replaceAll(`${userName} :`, '')
-            .replaceAll(`${charName} :`, '')
-        Chats.useChat.getState().setBuffer(cleaned)
+        const output = Chats.useChat.getState().buffer + text
+        replace.forEach((item) => output.replaceAll(item, ''))
+        Chats.useChat.getState().setBuffer(output)
     })
         .then(() => {
             setValue(Global.NowGenerating, false)
@@ -662,9 +663,7 @@ const readableStreamResponse = async (
     abort_func = () => {},
     header = {}
 ) => {
-    const currentInstruct = JSON.parse(mmkv.getString(Global.CurrentInstruct) ?? '')
-    const userName = mmkv.getString(Global.CurrentUser)
-    const charName = mmkv.getString(Global.CurrentCharacter)
+    const replace = constructReplaceStrings()
 
     const es = new EventSource(endpoint, {
         method: 'POST',
@@ -690,14 +689,9 @@ const readableStreamResponse = async (
 
     es.addEventListener('message', (event) => {
         const text = jsonreader(event.data)
-        const buffer = Chats.useChat.getState().buffer
-        const cleaned = (buffer + text)
-            .replaceAll(currentInstruct.input_sequence, ``)
-            .replaceAll(currentInstruct.output_sequence, ``)
-            .replaceAll(currentInstruct.stop_sequence, '')
-            .replaceAll(`${userName} :`, '')
-            .replaceAll(`${charName} :`, '')
-        Chats.useChat.getState().setBuffer(cleaned)
+        const output = Chats.useChat.getState().buffer + text
+        replace.forEach((item) => output.replaceAll(item, ''))
+        Chats.useChat.getState().setBuffer(output)
     })
     es.addEventListener('error', (event) => {
         console.log(event)
