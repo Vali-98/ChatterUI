@@ -19,6 +19,7 @@ Built for the purpose of learning Javascript, so it might be a little rough arou
 - text-generation-webui
 - Mancer
 - Text Completion
+- Local using [llama.rn](https://github.com/mybigday/llama.rn)
 
 ### Building From Source
 Building from source has **not** been tested.
