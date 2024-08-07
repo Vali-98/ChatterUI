@@ -19,17 +19,19 @@ const Ollama = () => {
     }, [])
 
     const getModels = async () => {
-        const endpoint = new URL('api/tags', ollamaEndpoint)
-        const modelresults = await fetch(endpoint, {
-            method: 'GET',
-            headers: { accept: 'application/json' },
-        }).catch(() => {
-            Logger.log(`Could not get models.`, true)
-        })
-        if (!modelresults) return
-        const list = (await modelresults.json()).models
-        if (!list) return
-        setModelList(list)
+        try {
+            const endpoint = new URL('api/tags', ollamaEndpoint)
+            const modelresults = await fetch(endpoint, {
+                method: 'GET',
+                headers: { accept: 'application/json' },
+            }).catch(() => {
+                Logger.log(`Could not get models.`, true)
+            })
+            if (!modelresults) return
+            const list = (await modelresults.json()).models
+            if (!list) return
+            setModelList(list)
+        } catch (e) {}
     }
     useAutosave({
         data: ollamaEndpoint,
@@ -70,7 +72,9 @@ const Ollama = () => {
                             if (item.name === ollamaModel?.name) return
                             setOllamaModel(item)
                         }}
-                        placeholder="Select Model"
+                        placeholder={
+                            modelList.length === 0 ? 'No Models Available' : 'Select Model'
+                        }
                         {...Style.drawer.default}
                     />
                     <TouchableOpacity

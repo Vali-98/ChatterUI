@@ -83,7 +83,9 @@ const Mancer = () => {
                             if (item.name === mancerModel?.name) return
                             setMancerModel(item)
                         }}
-                        placeholder="Select Model"
+                        placeholder={
+                            modelList.length === 0 ? 'No Models Available' : 'Select Model'
+                        }
                         {...Style.drawer.default}
                     />
 
