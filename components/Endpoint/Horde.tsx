@@ -1,4 +1,4 @@
-import { hordeHeader } from '@constants/Inference'
+import { hordeHeader } from '@constants/APIState/HordeAPI'
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { Global, Logger, Style } from '@globals'
 import { useState, useEffect, useRef } from 'react'

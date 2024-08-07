@@ -6,6 +6,12 @@ import { nativeApplicationVersion } from 'expo-application'
 
 import { APIBase, APISampler } from './BaseAPI'
 
+export const hordeHeader = () => {
+    return {
+        'Client-Agent': `ChatterUI:${nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
+    }
+}
+
 class HordeAPI extends APIBase {
     samplers: APISampler[] = [
         { externalName: 'max_context_length', samplerID: SamplerID.CONTEXT_LENGTH },
@@ -174,12 +180,6 @@ class HordeAPI extends APIBase {
 
         Chats.useChat.getState().setBuffer(result.generations[0].text.replaceAll(replace, ''))
         this.stopGenerating()
-    }
-}
-
-export const hordeHeader = () => {
-    return {
-        'Client-Agent': `ChatterUI:${nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
     }
 }
 
