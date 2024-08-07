@@ -77,6 +77,7 @@ const Layout = () => {
         headerStyle: {backgroundColor: Color.Header},
         headerTitleStyle: {color: Color.Text},
         headerTintColor: Color.White,
+        contentStyle: {backgroundColor: Color.Background}
     }}>
        <Stack.Screen 
         name='index' 

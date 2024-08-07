@@ -18,7 +18,7 @@ const ChatWindow = ({messages}) => {
     useEffect(() => {
         if (!nowGenerating) scrollViewRef.current?.scrollToEnd()
     },[nowGenerating])
-    
+
     return (
             <KeyboardAvoidingView style ={styles.chatHistory} >
                 <ScrollView         

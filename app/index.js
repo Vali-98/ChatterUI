@@ -189,21 +189,22 @@ const Home = () => {
 				const mescontent = ((createnew )  ? chatCache + data : messages.at(-1).mes + data)
 				.replaceAll(currentInstruct.input_sequence, ``)
 				.replaceAll(currentInstruct.output_sequence, ``)
-				const newmessage = (createnew) ? createChatEntry(charName, false, "", APIType, 
-					(APIType === API.KAI) ? 'concedo/koboldcpp' : JSON.stringify(hordeModels)
+				const newmessage = (createnew) ? createChatEntry(charName, false, "", APIType, 'concedo/koboldcpp'
 				) : messages.at(-1)
 				newmessage.mes = mescontent
 				newmessage.swipes[newmessage.swipe_id] = mescontent
 				newmessage.gen_finished = humanizedISO8601DateTime()
 				newmessage.swipe_info[newmessage.swipe_id].gen_finished = humanizedISO8601DateTime()
-			return createnew ?	[...messages , newmessage] : [...messages.slice(0,-1), newmessage]
+				const finalized_messages = createnew ?	[...messages , newmessage] : [...messages.slice(0,-1), newmessage]
+				return finalized_messages
 			} catch (error) {
 				console.log("Couldnt write due to:" + error)
 				return messages 
 			} finally {
-				if(!save) return
-				console.log(`Saving chat`)
-				saveChatFile(messages, charName, currentChat)
+				if(save) {
+					console.log(`Saving chat`)
+					saveChatFile(messages, charName, currentChat)
+				} 
 			}
 		})		
 	}
@@ -224,7 +225,7 @@ const Home = () => {
 	const KAIresponse = () => {
 		console.log(`Using KAI`)
 		const controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), 5000);
+		const timeout = setTimeout(() => controller.abort(), 60000);
 		fetch(`${kaiendpoint}/api/extra/generate/stream`, {
 			reactNative: {textStreaming: true},
 			method: `POST`,
@@ -243,13 +244,9 @@ const Home = () => {
 				}
 				const text = new TextDecoder().decode(value)
 				let events = text.split('\n')
-				console.log(events)
-				if(events.length !== 2) {	
-					const data = 
-					((events.length === 4)? 
-						JSON.parse(events.at(1).substring(5)) : 
-						JSON.parse(events.at(0).substring(5))
-					).token
+				for(e of events)
+				if(e.startsWith('data')) {	
+					const data = JSON.parse(e.substring(5)).token
 					insertGeneratedMessage(data)	
 				}
 				return reader.read().then(processText)
@@ -300,8 +297,6 @@ const Home = () => {
 			return false
 		})
 	}
-
-
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
@@ -389,7 +384,6 @@ const Home = () => {
 						onChangeText={(text) => setNewMessage(text)}
 						multiline={true}
 					/>
-					
 
 					{ nowGenerating ?
 					<TouchableOpacity style={styles.sendButton} onPress={()=> {
@@ -428,11 +422,10 @@ const Home = () => {
 
 const styles = StyleSheet.create({
 	container: {
-		flex:1
+		flex:1,
 	},
 	safeArea: {
 		flex: 1,
-		backgroundColor: Color.Background
 	},
 
 	welcometext : {
