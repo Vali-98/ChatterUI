@@ -5,7 +5,7 @@ import { InferenceSession, Tensor } from 'onnxruntime-react-native'
 import * as FS from 'expo-file-system'
 import { Style } from '@globals'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
-import { PreTrainedTokenizer } from '@constants/Tokenizer/tokenizer'
+import { BertTokenizer } from 'bert-tokenizer'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { AppSettings } from '@constants/GlobalValues'
 const emotions = [
@@ -49,7 +49,9 @@ const classifier = () => {
     const [info, setInfo] = useState<infovalue[]>([])
     const [inputText, setInputText] = useState<string>('')
     const [timescore, settimescore] = useState<number>(0)
-    const RobertaTokenizer = useRef(PreTrainedTokenizer.from_pretrained('roberta')).current
+    const Tokenizer = useRef(
+        new BertTokenizer('this library is patched so this doesn not matter')
+    ).current
     const [devMode, setDevMode] = useMMKVBoolean(AppSettings.DevMode)
     const loadSession = async () => {
         const session = await InferenceSession.create(
@@ -66,7 +68,7 @@ const classifier = () => {
     const runClassifier = async () => {
         if (!session) return
 
-        const tokenized = (await RobertaTokenizer).encode(inputText)
+        const tokenized = Tokenizer.tokenize(inputText)
 
         const mask = new Array(tokenized.length).fill(1)
         const data = {
@@ -104,10 +106,10 @@ const classifier = () => {
                             style={styles.text}
                             onPress={() => {
                                 Linking.openURL(
-                                    'https://huggingface.co/Cohee/roberta-base-go_emotions-onnx'
+                                    'https://huggingface.co/Cohee/distilbert-base-uncased-go-emotions-onnx'
                                 )
                             }}>
-                            https://huggingface.co/Cohee/roberta-base-go_emotions-onnx
+                            https://huggingface.co/Cohee/distilbert-base-uncased-go-emotions-onnx
                         </Text>
                     </TouchableOpacity>
                 </View>
