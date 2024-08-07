@@ -66,7 +66,7 @@ const Presets = () => {
         />
 
         <Stack.Screen options={{
-                animation: `fade`,
+                animation: 'slide_from_left',
                 title: `Presets`
             }} />
         

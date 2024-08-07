@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     },
 
     userName : {
+        color: Color.Text,
         fontSize: 20,
         marginTop: 16,
         marginBottom: 8,
@@ -107,7 +108,9 @@ const styles = StyleSheet.create({
         height: 108,
         borderRadius: 54,
         margin: 4,
-        borderWidth: 1,
+        borderWidth: 2,
+        borderColor: Color.White,
+        backgroundColor: Color.DarkContainer,
     },
 
     userImage : {

@@ -77,10 +77,8 @@ export default ChatSelector
 
 const styles = StyleSheet.create({
     mainContainer: {
-        paddingVertical: 16,
         paddingHorizontal: 16,
         backgroundColor: Color.Background,
-        flex: 1,
     },
 
     chatname : {
@@ -93,7 +91,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 12,
         borderRadius: 8,
-        marginBottom: 8,
+        marginVertical: 4,
         backgroundColor: Color.DarkContainer,
     },
 
@@ -103,7 +101,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 12,
         borderRadius: 8,
-        marginBottom: 8,
+        marginVertical: 4,
         backgroundColor: Color.Container,
     },
 

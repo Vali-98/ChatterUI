@@ -44,7 +44,7 @@ const Instruct = () => {
             <Stack.Screen 
                 options={{
                 title:`Instruct`,
-                animation: `fade`,
+                animation: 'slide_from_left',
             }}/>
             
             <TextBoxModal 
