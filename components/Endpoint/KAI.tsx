@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     },
 
     input: {
-        color: Style.getColor('primary-text2'),
+        color: Style.getColor('primary-text1'),
         borderColor: Style.getColor('primary-brand'),
         borderWidth: 1,
         paddingVertical: 4,
