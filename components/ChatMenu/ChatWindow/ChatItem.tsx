@@ -115,6 +115,9 @@ const ChatItem: React.FC<ChatItemProps> = ({
                 duration: 200,
                 useNativeDriver: false,
             }).start()
+        } else if (nowGenerating && !mes) {
+            animatedHeight.setValue(0)
+            animatedHeight.stopAnimation()
         }
     }, [nowGenerating])
 
