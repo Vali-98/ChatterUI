@@ -109,7 +109,7 @@ const ChatMenu = () => {
                 <TouchableOpacity
                     style={styles.headerButtonRight}
                     onPress={() => {
-                        router.push('/CharMenu')
+                        goToChars()
                     }}>
                     <Ionicons name="person" size={28} color={Style.getColor('primary-text1')} />
                 </TouchableOpacity>
