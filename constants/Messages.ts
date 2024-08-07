@@ -1,37 +1,51 @@
 import { API } from './API'
 import { Global } from './GlobalValues'
+import { Instruct } from './Instructs'
 import { Logger } from './Logger'
 import { humanizedISO8601DateTime } from './Utils'
 import { mmkv } from './mmkv'
+import { create } from 'zustand'
 export namespace Messages {
     export const set = (data: Array<any>) => {
         mmkv.set(Global.Messages, JSON.stringify(data))
     }
 
-    export const insert = (data: string) => {
-        const messages = JSON.parse(mmkv.getString(Global.Messages) ?? ``)
-        const currentInstruct = JSON.parse(mmkv.getString(Global.CurrentInstruct) ?? '')
-        const userName = mmkv.getString(Global.CurrentUser)
-        const charName = mmkv.getString(Global.CurrentCharacter)
-        if (!messages || !currentInstruct || !charName || !userName) {
-            Logger.log(`Insertion Error`, true)
-            return
-        }
+    export const useBuffer = create((set) => ({
+        buffer: '',
+        setBuffer: (newBuffer: string) => set({ buffer: newBuffer }),
+        insertBuffer: (data: string) => set((state: any) => ({ buffer: state.buffer + data })),
+    }))
 
-        const mescontent = (messages.at(-1).mes + data)
-            .replaceAll(currentInstruct.input_sequence, ``)
-            .replaceAll(currentInstruct.output_sequence, ``)
-            .replaceAll(currentInstruct.stop_sequence, '')
-            .replaceAll(userName + ':', '')
-            .replaceAll(charName + ':', '')
-        const newmessage = messages.at(-1)
-        newmessage.mes = mescontent
-        newmessage.swipes[newmessage.swipe_id] = mescontent
-        newmessage.gen_finished = Date()
-        newmessage.swipe_info[newmessage.swipe_id].gen_finished = Date()
-        const finalized_messages = [...messages.slice(0, -1), newmessage]
-        mmkv.set(Global.Messages, JSON.stringify(finalized_messages))
-        return finalized_messages
+    export const insert = (
+        data: string,
+        charName: string,
+        userName: string,
+        currentInstruct: Instruct
+    ) => {
+        try {
+            const messages = JSON.parse(mmkv.getString(Global.Messages) ?? ``)
+            if (!messages || !currentInstruct || !charName || !userName) {
+                Logger.log(`Insertion Error`, true)
+                return
+            }
+
+            const mescontent = (messages.at(-1).mes + data)
+                .replaceAll(currentInstruct.input_sequence, ``)
+                .replaceAll(currentInstruct.output_sequence, ``)
+                .replaceAll(currentInstruct.stop_sequence, '')
+                .replaceAll(userName + ':', '')
+                .replaceAll(charName + ':', '')
+            const newmessage = messages.at(-1)
+            newmessage.mes = mescontent
+            newmessage.swipes[newmessage.swipe_id] = mescontent
+            newmessage.gen_finished = Date()
+            newmessage.swipe_info[newmessage.swipe_id].gen_finished = Date()
+            const finalized_messages = [...messages.slice(0, -1), newmessage]
+            mmkv.set(Global.Messages, JSON.stringify(finalized_messages))
+            return finalized_messages
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     export const createEntry = (name: string, is_user: boolean, message: string) => {
@@ -104,6 +118,12 @@ export namespace Messages {
         return insertEntry(charName ?? '', true, message)
     }
 
+    export const insertFromBuffer = () => {
+        //@ts-ignore
+        const buffer = useBuffer.getState().buffer
+        updateLastEntry(buffer)
+    }
+
     export const deleteEntry = (index: number, range: number = 1) => {
         const messages = JSON.parse(mmkv.getString(Global.Messages) ?? ``)
         if (!messages) return
@@ -115,6 +135,16 @@ export namespace Messages {
     export const updateEntry = (index: number, data: string) => {
         let messages = JSON.parse(mmkv.getString(Global.Messages) ?? ``)
         if (!messages) return
+        messages.at(index).mes = data
+        messages.at(index).swipes[messages.at(index).swipe_id] = data
+        mmkv.set(Global.Messages, JSON.stringify(messages))
+        return messages
+    }
+
+    export const updateLastEntry = (data: string) => {
+        let messages = JSON.parse(mmkv.getString(Global.Messages) ?? ``)
+        if (!messages) return
+        const index = messages.length - 1
         messages.at(index).mes = data
         messages.at(index).swipes[messages.at(index).swipe_id] = data
         mmkv.set(Global.Messages, JSON.stringify(messages))

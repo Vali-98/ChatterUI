@@ -19,10 +19,10 @@ import * as FS from 'expo-file-system'
 import TTSMenu from './TTS'
 // global chat property for editing
 
-const ChatItem = ({ id }) => {
+const ChatItemLast = ({ id }) => {
     // fade in anim
-    //const fadeAnim = useRef(new Animated.Value(0)).current
-    //const dyAnim = useRef(new Animated.Value(50)).current
+    const fadeAnim = useRef(new Animated.Value(0)).current
+    const dyAnim = useRef(new Animated.Value(50)).current
     // globals
     const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
@@ -34,8 +34,8 @@ const ChatItem = ({ id }) => {
     // local
     const [placeholderText, setPlaceholderText] = useState(message.mes)
     const [editMode, setEditMode] = useState(false)
+    const buffer = Messages.useBuffer((state) => state.buffer)
     // figure this  out
-    const buffer = ''
     const [imageExists, setImageExists] = useState(true)
     useEffect(() => {
         FS.readAsStringAsync(
@@ -52,7 +52,7 @@ const ChatItem = ({ id }) => {
         setEditMode(false)
     }, [nowGenerating])
 
-    /*useEffect(() => {
+    useEffect(() => {
         Animated.parallel([
             Animated.timing(fadeAnim, {
                 toValue: 1, // Target opacity 1 (fully visible)
@@ -66,7 +66,7 @@ const ChatItem = ({ id }) => {
                 easing: Easing.out(Easing.exp),
             }),
         ]).start()
-    }, [fadeAnim])*/
+    }, [fadeAnim])
 
     const markdownFormat = {
         em: {
@@ -122,11 +122,10 @@ const ChatItem = ({ id }) => {
 
     return (
         <Animated.View
-        /*style={{
+            style={{
                 opacity: fadeAnim,
                 transform: [{ translateY: dyAnim }],
-            }}*/
-        >
+            }}>
             <View
                 style={{
                     ...styles.chatItem,
@@ -261,7 +260,7 @@ const ChatItem = ({ id }) => {
     )
 }
 
-export { ChatItem }
+export { ChatItemLast }
 
 const styles = StyleSheet.create({
     chatItem: {
