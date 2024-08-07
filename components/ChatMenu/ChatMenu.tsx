@@ -1,6 +1,6 @@
 import { ChatWindow } from './ChatWindow/ChatWindow'
 import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons'
-import { Global, Chats, Logger, Style } from '@globals'
+import { Global, Chats, Logger, Style, Characters } from '@globals'
 import { generateResponse } from '@constants/Inference'
 import { Stack, useFocusEffect, useRouter } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
@@ -32,7 +32,14 @@ import Animated, { SlideInRight, runOnJS, Easing } from 'react-native-reanimated
 
 const ChatMenu = () => {
     const router = useRouter()
-    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+
+    const { charName, unloadCharacter } = Characters.useCharacterCard(
+        useShallow((state) => ({
+            charName: state?.card?.data.name,
+            unloadCharacter: state.unloadCard,
+        }))
+    )
+
     const [newMessage, setNewMessage] = useState<string>('')
     const [showDrawer, setDrawer] = useState<boolean>(false)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
@@ -58,8 +65,8 @@ const ChatMenu = () => {
             return true
         }
 
-        if (charName !== 'Welcome') {
-            setCharName('Welcome')
+        if (charName) {
+            unloadCharacter()
             Logger.debug('Returning to primary Menu')
             return true
         }
@@ -132,7 +139,7 @@ const ChatMenu = () => {
         },*/
         {
             callback: () => {
-                setCharName('Welcome')
+                unloadCharacter()
             },
             text: 'Main Menu',
             button: 'back',
@@ -272,7 +279,7 @@ const ChatMenu = () => {
                     }}
                 />
 
-                {charName === 'Welcome' ? (
+                {!charName ? (
                     <Recents />
                 ) : (
                     <View style={styles.container}>

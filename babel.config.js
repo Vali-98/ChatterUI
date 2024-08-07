@@ -3,6 +3,7 @@ module.exports = function (api) {
     return {
         presets: ['babel-preset-expo'],
         plugins: [
+            ['inline-import', { extensions: ['.sql'] }],
             // Required for expo-routerouter/
             'react-native-reanimated/plugin',
             [
@@ -17,6 +18,7 @@ module.exports = function (api) {
                         '@public': './public',
                         '@constants': './constants',
                         '@lib': './lib',
+                        '@db': './db/db',
                     },
                 },
             ],

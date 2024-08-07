@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1709808852644,
+      "tag": "0000_nervous_paibok",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,14 +1,14 @@
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { ReactNode, useEffect, useState } from 'react'
 import { ChatEntry } from '@constants/Chat'
-import { Users, Characters, Color, Style } from '@globals'
+import { Users, Characters, Style } from '@globals'
 import TTSMenu from './TTS'
 
 type ChatFrameProps = {
     children?: ReactNode
     message: ChatEntry
     userName: string
-    charName: string
+    charId: number
     TTSenabled: boolean
     id: number
     isLast?: boolean
@@ -18,14 +18,12 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
     children,
     message,
     userName,
-    charName,
+    charId,
     TTSenabled,
     id,
     isLast,
 }) => {
-    const imageDir = message.is_user
-        ? Users.getImageDir(userName)
-        : Characters.getImageDir(charName)
+    const imageDir = message.is_user ? Users.getImageDir(userName) : Characters.getImageDir(charId)
 
     const [imageSource, setImageSource] = useState({
         uri: imageDir,
@@ -34,9 +32,9 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
     useEffect(() => {
         const newdir = message.is_user
             ? Users.getImageDir(userName)
-            : Characters.getImageDir(charName)
+            : Characters.getImageDir(charId)
         setImageSource({ uri: newdir })
-    }, [charName])
+    }, [charId])
 
     const handleImageError = () => {
         setImageSource(require('@assets/user.png'))

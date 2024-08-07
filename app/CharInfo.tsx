@@ -1,8 +1,8 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Characters, Logger, LlamaTokenizer, Style } from '@globals'
+import { Characters, Logger, LlamaTokenizer, Style } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
     View,
     Text,
@@ -14,22 +14,27 @@ import {
     ScrollView,
     TextInput,
 } from 'react-native'
-import { useMMKVString, useMMKVObject } from 'react-native-mmkv'
 
 import { useAutosave } from 'react-autosave'
 import { CharacterCardV2 } from '@constants/Characters'
 import { RecentMessages } from '@constants/RecentMessages'
 import AnimatedView from '@components/AnimatedView'
+import { useShallow } from 'zustand/react/shallow'
 
 const CharInfo = () => {
     const router = useRouter()
-    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
-    const [currentCard, setCurrentCard] = useMMKVObject<CharacterCardV2>(
-        Global.CurrentCharacterCard
+    const { currentCard, setCurrentCard, charId, charName } = Characters.useCharacterCard(
+        useShallow((state) => ({
+            charId: state.id,
+            currentCard: state.card,
+            setCurrentCard: state.setCard,
+            charName: state.card?.data.name,
+        }))
     )
+
     const [characterCard, setCharacterCard] = useState<CharacterCardV2 | undefined>(currentCard)
 
-    const imageDir = Characters.getImageDir(charName ?? '')
+    const imageDir = Characters.getImageDir(charId ?? -1)
 
     const [imageSource, setImageSource] = useState({
         uri: imageDir,
@@ -39,12 +44,6 @@ const CharInfo = () => {
         setImageSource(require('@assets/user.png'))
     }
 
-    const loadcard = () => {
-        Characters.getCard(charName).then((data) => {
-            if (data) setCharacterCard(JSON.parse(data))
-        })
-    }
-
     const autosave = () => {
         if (!characterCard || charName === 'Welcome') return
         Logger.log(`Autosaved Card ${charName}`)
@@ -52,14 +51,11 @@ const CharInfo = () => {
     }
 
     const savecard = async () => {
-        return Characters.saveCard(charName, JSON.stringify(characterCard)).then(() => {
-            setCurrentCard(characterCard)
-        })
+        if (characterCard && charId)
+            return Characters.updateCard(characterCard, charId).then(() => {
+                setCurrentCard(charId)
+            })
     }
-
-    useEffect(() => {
-        loadcard()
-    }, [])
 
     useAutosave({
         data: characterCard,
@@ -77,8 +73,8 @@ const CharInfo = () => {
                     text: 'Confirm',
                     onPress: () => {
                         RecentMessages.deleteByCharacter(charName ?? '')
-                        Characters.deleteCard(charName)
-                        setCharName('Welcome')
+                        Characters.deleteCard(charId ?? -1)
+
                         router.back()
                     },
                     style: 'destructive',
@@ -93,8 +89,8 @@ const CharInfo = () => {
             copyToCacheDirectory: true,
             type: 'image/*',
         }).then((result: DocumentPicker.DocumentPickerResult) => {
-            if (result.canceled) return
-            Characters.copyImage(result.assets[0].uri, charName ?? '')
+            if (result.canceled || !charId) return
+            Characters.copyImage(result.assets[0].uri, charId)
         })
     }
 
@@ -108,7 +104,7 @@ const CharInfo = () => {
                                 <TouchableOpacity
                                     style={styles.button}
                                     onPress={() => {
-                                        savecard().then(() => loadcard())
+                                        savecard()
                                         Logger.log(`Character saved!`, true)
                                     }}>
                                     <FontAwesome

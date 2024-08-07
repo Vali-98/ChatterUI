@@ -7,4 +7,6 @@ const config = getDefaultConfig(__dirname, {
     isCSSEnabled: true,
 })
 
+config.resolver.sourceExts.push('sql')
+
 module.exports = config

@@ -11,9 +11,10 @@ import { Llama } from './llama'
 import axios from 'axios'
 import EventSource from 'react-native-sse'
 import * as Application from 'expo-application'
+import { Characters } from './Characters'
 
 export const regenerateResponse = async () => {
-    const charName = getString(Global.CurrentCharacter)
+    const charName = Characters.useCharacterCard.getState().card?.data.name
     const messageName = Chats.useChat.getState()?.data?.at(-1)?.name
     const messagesLength = Chats.useChat.getState()?.data?.length
     Logger.log('Regenerate Response')
@@ -115,11 +116,10 @@ const buildContext = (max_length: number) => {
     const delta = new Date().getTime()
     const currentInstruct = getObject(Global.CurrentInstruct)
     const userCard = getObject(Global.CurrentUserCard)
-    const currentCard = getObject(Global.CurrentCharacterCard)
-    const charName = getString(Global.CurrentCharacter)
+    const currentCard = { ...Characters.useCharacterCard.getState().card }
 
     const usercarddata = (userCard?.description ?? '').trim()
-    const charcarddata = (currentCard?.data?.description).trim()
+    const charcarddata = (currentCard?.data?.description ?? '').trim()
     let payload = ``
     if (currentInstruct.system_sequence_prefix) payload += currentInstruct.system_sequence_prefix
     if (currentInstruct.system_prompt) payload += `${currentInstruct.system_prompt}\n`
@@ -166,13 +166,12 @@ const buildContext = (max_length: number) => {
 const buildChatCompletionContext = (max_length: number) => {
     const messages = [...(Chats.useChat.getState().data ?? [])]
     const userCard = getObject(Global.CurrentUserCard)
-    const currentCard = getObject(Global.CurrentCharacterCard)
-    const charName = getString(Global.CurrentCharacter)
+    const currentCard = { ...Characters.useCharacterCard.getState().card }
     const currentInstruct = instructReplaceMacro()
 
     const initial = `${currentInstruct.system_sequence_prefix}
-    \n${userCard?.data?.description ?? userCard?.description ?? ''}
-    \n${currentCard?.description ?? currentCard?.data.description}\n`
+    \n${userCard?.data?.description ?? ''}
+    \n${currentCard?.data?.description ?? ''}\n`
     let total_length = LlamaTokenizer.encode(initial).length
     const payload = [{ role: 'system', content: replaceMacros(initial) }]
     for (const message of messages.reverse()) {
@@ -697,7 +696,7 @@ const openAIResponseStream = async (setAbortFunction: AbortFunction) => {
 const constructReplaceStrings = (): Array<string> => {
     const currentInstruct: InstructType = instructReplaceMacro()
     const userName: string = mmkv.getString(Global.CurrentUser) ?? ''
-    const charName: string = mmkv.getString(Global.CurrentCharacter) ?? ''
+    const charName: string = Characters.useCharacterCard.getState()?.card?.data?.name ?? ''
     const stops: Array<string> = constructStopSequence(currentInstruct)
 
     const output: Array<string> = []

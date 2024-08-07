@@ -4,7 +4,7 @@ import { humanizedISO8601DateTime, replaceMacros } from './Utils'
 import { mmkv } from './mmkv'
 import { create } from 'zustand'
 import * as FS from 'expo-file-system'
-import { CharacterCardV2 } from './Characters'
+import { CharacterCardV2, Characters } from './Characters'
 import { RecentMessages } from './RecentMessages'
 
 export type ChatExtra = {
@@ -344,13 +344,16 @@ export namespace Chats {
     }
 
     export const createChat = async (
-        charName: string,
+        charId: number,
         userName: string
     ): Promise<undefined | string> => {
         //for now use mmkv, change to zustand later
-        const cardstring = mmkv.getString(Global.CurrentCharacterCard)
-        if (!cardstring) return
-        const card: CharacterCardV2 = JSON.parse(cardstring)
+        // const cardstring = mmkv.getString(Global.CurrentCharacterCard)
+        // if (!cardstring) return
+
+        const card = { ...Characters.useCharacterCard.getState().card }
+        const charName = card?.data?.name
+        if (!card || !charName) return
         const metadata: ChatInfo = {
             charName: charName,
             userName: userName,
@@ -363,7 +366,6 @@ export namespace Chats {
                 objective: {},
             },
         }
-
         const swipes: Array<string> =
             card.data?.alternate_greetings && card.data.alternate_greetings.length > 0
                 ? card.data?.alternate_greetings.map((item) => replaceMacros(item))
@@ -371,7 +373,7 @@ export namespace Chats {
         const firstMessage: ChatEntry = createEntry(
             charName,
             false,
-            replaceMacros(card.data.first_mes),
+            replaceMacros(card?.data?.first_mes ?? ''),
             swipes
         )
 

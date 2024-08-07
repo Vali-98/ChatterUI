@@ -6,92 +6,227 @@ import * as FS from 'expo-file-system'
 import { decode } from 'png-chunk-text'
 import extractChunks from 'png-chunks-extract'
 import { Logger } from './Logger'
+import { db } from '@db'
+import { characterGreetings, characterTags, characters, tags } from 'db/schema'
+import { eq, inArray, notExists, notInArray } from 'drizzle-orm'
+import { create } from 'zustand'
+
+type CharacterCardState = {
+    card: CharacterCardV2 | undefined
+    id: number | undefined
+    setCard: (id: number) => Promise<string | undefined>
+    unloadCard: () => void
+}
 
 export namespace Characters {
-    export const createCard = async (charName: string) => {
-        return FS.makeDirectoryAsync(getDir(charName))
-            .then(() => {
-                return FS.makeDirectoryAsync(getChatDir(charName))
-            })
-            .then(() => {
-                return FS.writeAsStringAsync(
-                    getCardDir(charName),
-                    JSON.stringify(TavernCardV2(charName)),
-                    { encoding: FS.EncodingType.UTF8 }
-                )
-            })
+    export const useCharacterCard = create<CharacterCardState>(
+        (set, get: () => CharacterCardState) => ({
+            id: undefined,
+            card: undefined,
+            setCard: async (id: number) => {
+                const card = await readCard(id)
+                set((state) => ({ ...state, card: card, id: id }))
+                return card?.data.name
+            },
+            unloadCard: () => {
+                set((state) => ({ ...state, id: undefined, card: undefined }))
+            },
+        })
+    )
+
+    export const createCard = async (name: string) => {
+        const [{ id }, ..._] = await db
+            .insert(characters)
+            .values({ ...TavernCardV2(name), type: 'character' })
+            .returning({ id: characters.id })
+        // TEMP: Delete after chat migration
+        await FS.makeDirectoryAsync(`${FS.documentDirectory}characters/${name}`)
+        await FS.makeDirectoryAsync(`${FS.documentDirectory}characters/${name}/chats`)
+        return id
     }
 
-    export const getCard = async (charName: string | undefined) => {
-        if (charName)
-            return await FS.readAsStringAsync(getCardDir(charName), {
-                encoding: FS.EncodingType.UTF8,
-            })
+    export const readCard = async (charID: number): Promise<CharacterCardV2 | undefined> => {
+        const data = await db.query.characters.findFirst({
+            where: eq(characters.id, charID),
+            with: {
+                tags: {
+                    columns: {
+                        character_id: false,
+                    },
+                    with: {
+                        tag: true,
+                    },
+                },
+                alternate_greetings: true,
+            },
+        })
+        if (data)
+            return {
+                spec: 'chara_card_v2',
+                spec_version: '2.0',
+                data: {
+                    ...data,
+                    // @ts-expect-error
+                    tags: data.tags.map((item) => item.tag.tag),
+                    // @ts-expect-error,
+                    alternate_greetings: data.alternate_greetings.map((item) => item.greeting),
+                },
+            }
     }
 
-    export const saveCard = async (charName: string | undefined, data: string) => {
-        if (charName)
-            return await FS.writeAsStringAsync(getCardDir(charName), data, {
-                encoding: FS.EncodingType.UTF8,
-            })
+    export const updateCard = async (card: CharacterCardV2, charId: number) => {
+        // NOTE: ...card.data fails for some reason
+        await db
+            .update(characters)
+            .set({ description: card.data.description, first_mes: card.data.first_mes })
+            .where(eq(characters.id, charId))
     }
 
-    export const deleteCard = async (charName: string | undefined) => {
-        if (charName) return await FS.deleteAsync(getDir(charName))
+    export const updateCardField = async (field: string, data: any, charId: number) => {
+        if (field === 'tags') {
+            //
+            return
+        }
+        if (field === 'alternate_greetings') {
+            //
+            return
+        }
+        await db
+            .update(characters)
+            .set({ [field]: data })
+            .where(eq(characters.id, charId))
+    }
+
+    export const deleteCard = async (charID: number) => {
+        // TEMP: Delete after chat migration
+        const data = await db
+            .select({ name: characters.name })
+            .from(characters)
+            .where(eq(characters.id, charID))
+
+        await FS.deleteAsync(`${FS.documentDirectory}characters/${data[0].name}`, {
+            idempotent: true,
+        })
+        deleteImage(charID)
+        // ENDTEMP
+        await db.delete(characters).where(eq(characters.id, charID))
+        await db
+            .delete(tags)
+            .where(
+                notInArray(tags.id, db.select({ tag_id: characterTags.tag_id }).from(characterTags))
+            )
+        if (charID === useCharacterCard.getState().id) useCharacterCard.getState().unloadCard()
+    }
+
+    export const deleteImage = async (charID: number) => {
+        return FS.deleteAsync(getImageDir(charID), { idempotent: true })
     }
 
     export const getCardList = async () => {
-        return await FS.readDirectoryAsync(`${FS.documentDirectory}characters`)
+        const query = await db.query.characters.findMany({
+            columns: {
+                id: true,
+                name: true,
+            },
+            with: {
+                tags: {
+                    columns: {
+                        character_id: false,
+                    },
+                    with: {
+                        tag: true,
+                    },
+                },
+            },
+            where: (characters, { eq }) => eq(characters.type, 'character'),
+        })
+        //  ERROR CAUSE: Drizzle incorrect type definition above
+        //@ts-expect-error
+        return query.map((item) => ({ ...item, tags: item.tags.map((item) => item.tag.tag) }))
     }
 
-    export const copyImage = async (uri: string, charName: string) => {
-        if (charName)
-            FS.copyAsync({
-                from: uri,
-                to: getImageDir(charName),
-            })
+    export const copyImage = async (uri: string, charID: number) => {
+        await FS.copyAsync({
+            from: uri,
+            to: getImageDir(charID),
+        })
     }
 
-    const createCharacter = async (name: string, card: CharacterCardV2, imageuri: string = '') => {
-        await Characters.createCard(name)
-            .then(() => {
-                return Characters.saveCard(name, JSON.stringify(card))
-            })
-            .then(() => {
-                if (imageuri) return Characters.copyImage(imageuri, name)
-            })
-            .then(() => {
-                Logger.log(`Successfully Imported Character`, true)
-            })
-            .catch(() => {
-                Logger.log(`Failed to create card - Character might already exist.`, true)
-            })
+    const createCharacter = async (card: CharacterCardV2, imageuri: string = '') => {
+        // TEMP: Delete after chat migration
+        await FS.makeDirectoryAsync(`${FS.documentDirectory}characters/${card.data.name}`)
+        await FS.makeDirectoryAsync(`${FS.documentDirectory}characters/${card.data.name}/chats`)
+        // END TEMP
+        // TODO : Extract CharacterBook value to Lorebooks, CharacterLorebooks
+        const { data } = card
+        // provide warning ?
+        // if (data.character_book) { console.log(warn) }
+        const id = await db.transaction(async (tx) => {
+            try {
+                const [{ id }, ..._] = await tx
+                    .insert(characters)
+                    .values({
+                        type: 'character',
+                        ...data,
+                    })
+                    .returning({ id: characters.id })
+
+                // TODO: Insert Image
+
+                const greetingdata = data.alternate_greetings.map((item) => ({
+                    character_id: id,
+                    greeting: item,
+                }))
+                if (greetingdata.length > 0)
+                    for (const greeting of greetingdata)
+                        await tx.insert(characterGreetings).values(greeting)
+
+                if (data.tags.length !== 0) {
+                    const tagsdata = data.tags.map((tag) => ({ tag: tag }))
+                    for (const tag of tagsdata)
+                        await tx.insert(tags).values(tag).onConflictDoNothing()
+
+                    const tagids = (
+                        await tx.query.tags.findMany({ where: inArray(tags.tag, data.tags) })
+                    ).map((item) => ({
+                        character_id: id,
+                        tag_id: item.id,
+                    }))
+                    await tx.insert(characterTags).values(tagids).onConflictDoNothing()
+                }
+                return id
+            } catch (error) {
+                console.log(`Rolling back due to error: ` + error)
+                tx.rollback()
+                return undefined
+            }
+        })
+        if (id) await copyImage(imageuri, id)
     }
 
     export const createCharacterFromImage = async (uri: string) => {
-        return FS.readAsStringAsync(uri, { encoding: FS.EncodingType.Base64 })
-            .then(async (file) => {
-                const chunks = extractChunks(Buffer.from(file, 'base64'))
-                const textChunks = chunks
-                    .filter(function (chunk: any) {
-                        return chunk.name === 'tEXt'
-                    })
-                    .map(function (chunk) {
-                        return decode(chunk.data)
-                    })
-                const charactercard = JSON.parse(Base64.decode(textChunks[0].text))
-                const newname = charactercard?.data?.name ?? charactercard.name
-                Logger.log(`Creating new character: ${newname}`)
-                if (newname === 'Detailed Example Character' || charactercard === undefined) {
-                    Logger.log('Invalid Character ID', true)
-                    return
-                }
-                return createCharacter(newname, charactercard, uri)
+        const file = await FS.readAsStringAsync(uri, { encoding: FS.EncodingType.Base64 })
+        if (!file) {
+            Logger.log(`Failed to create card - Image could not be retrieved`, true)
+            return
+        }
+
+        const chunks = extractChunks(Buffer.from(file, 'base64'))
+        const textChunks = chunks
+            .filter(function (chunk: any) {
+                return chunk.name === 'tEXt'
             })
-            .catch((error) => {
-                Logger.log(`Failed to create card - Character might already exist?`, true)
-                Logger.log(error)
+            .map(function (chunk) {
+                return decode(chunk.data)
             })
+        const charactercard = JSON.parse(Base64.decode(textChunks[0].text))
+        const newname = charactercard?.data?.name ?? charactercard.name
+        Logger.log(`Creating new character: ${newname}`)
+        if (newname === 'Detailed Example Character' || charactercard === undefined) {
+            Logger.log('Invalid Character ID', true)
+            return
+        }
+        return createCharacter(charactercard, uri)
     }
 
     export const importCharacterFromImage = async () => {
@@ -106,9 +241,8 @@ export namespace Characters {
 
     export const importCharacterFromChub = async (character_id: string) => {
         Logger.log(`Importing character from Chub: ${character_id}`, true)
-        return axios
-            .create({ timeout: 10000 })
-            .post(
+        try {
+            const res = await axios.create({ timeout: 10000 }).post(
                 'https://api.chub.ai/api/characters/download',
                 {
                     format: 'tavern',
@@ -116,17 +250,16 @@ export namespace Characters {
                 },
                 { responseType: 'arraybuffer' }
             )
-            .then((res) => {
-                const response = Buffer.from(res.data, 'base64').toString('base64')
-                return FS.writeAsStringAsync(`${FS.cacheDirectory}image.png`, response, {
-                    encoding: FS.EncodingType.Base64,
-                }).then(async () => {
-                    return createCharacterFromImage(`${FS.cacheDirectory}image.png`)
-                })
+
+            const response = Buffer.from(res.data, 'base64').toString('base64')
+            return FS.writeAsStringAsync(`${FS.cacheDirectory}image.png`, response, {
+                encoding: FS.EncodingType.Base64,
+            }).then(async () => {
+                return createCharacterFromImage(`${FS.cacheDirectory}image.png`)
             })
-            .catch((error) => {
-                Logger.log(`Could not retreive card. ${error}`)
-            })
+        } catch (error) {
+            Logger.log(`Could not retreive card. ${error}`)
+        }
     }
 
     export const importCharacterFromPyg = async (character_id: string) => {
@@ -159,7 +292,7 @@ export namespace Characters {
         return FS.writeAsStringAsync(`${FS.cacheDirectory}image.png`, image, {
             encoding: FS.EncodingType.Base64,
         }).then(async () => {
-            return createCharacter(name, character, `${FS.cacheDirectory}image.png`)
+            return createCharacter(character, `${FS.cacheDirectory}image.png`)
         })
     }
 
@@ -194,26 +327,34 @@ export namespace Characters {
         Logger.log(`Invalid input!`, true)
     }
 
-    export const getChatDir = (charName: string) => {
-        return `${FS.documentDirectory}characters/${charName}/chats`
+    export const getImageDir = (charID: number) => {
+        return `${FS.documentDirectory}characters/${charID}.png`
     }
 
-    export const getCardDir = (charName: string) => {
-        return `${FS.documentDirectory}characters/${charName}/${charName}.json`
+    export const debugDeleteTags = async () => {
+        const data = await db.delete(tags).all()
+    }
+    export const debugCheckTags = async () => {
+        const data = await db.query.characterTags.findMany()
+        console.log('CHARACTER TAGS:')
+        console.log(data)
+        const tags = await db.query.tags.findMany()
+        console.log('TAGS:')
+        console.log(tags)
     }
 
-    export const getImageDir = (charName: string | undefined) => {
-        return charName ? `${FS.documentDirectory}characters/${charName}/${charName}.png` : ''
-    }
-
-    export const getDir = (charName: string) => {
-        return `${FS.documentDirectory}characters/${charName}`
-    }
-
-    export const exists = async (charName: string) => {
-        return FS.getInfoAsync(getDir(charName)).then((info) => {
-            return info.exists
-        })
+    export const debugDelete = async () => {
+        //const files = await FS.readDirectoryAsync(`${FS.documentDirectory}characters`)
+        //console.log(files)
+        //return
+        await db.delete(characters).all()
+        await db.delete(characterTags).all()
+        await db.delete(tags).all()
+        const list = await FS.readDirectoryAsync(`${FS.documentDirectory}characters`)
+        console.log(list)
+        for (const file of list) {
+            await FS.deleteAsync(`${FS.documentDirectory}characters/${file}`)
+        }
     }
 }
 
@@ -242,7 +383,7 @@ export type CharacterCardV2 = {
         system_prompt: string
         post_history_instructions: string
         alternate_greetings: Array<string>
-        character_book: string
+        //character_book: string
 
         // May 8th additions
         tags: Array<string>

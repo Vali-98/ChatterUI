@@ -10,7 +10,11 @@ import { useMMKVString } from 'react-native-mmkv'
 const ChatSelector = () => {
     const router = useRouter()
     const [chats, setChats] = useState<Array<string>>([])
-    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+    const { charName, charId } = Characters.useCharacterCard((state) => ({
+        charName: state.card?.data.name,
+        charId: state.id,
+    }))
+
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
 
     useEffect(() => {
@@ -26,7 +30,7 @@ const ChatSelector = () => {
     const refreshfilenames = async () => {
         const list = await Chats.getList(charName ?? '')
         if (list.length === 0) {
-            await Chats.createChat(charName ?? '', userName ?? '')
+            await Chats.createChat(charId ?? -1, userName ?? '')
             refreshfilenames()
             return
         }
@@ -50,7 +54,7 @@ const ChatSelector = () => {
                         RecentMessages.deleteEntry(chatname)
                         Chats.getNewest(charName ?? '').then(async (filename) => {
                             if (!filename)
-                                await Chats.createChat(charName ?? '', userName ?? '').then(
+                                await Chats.createChat(charId ?? -1, userName ?? '').then(
                                     async (filename) =>
                                         filename && (await loadChat(charName ?? '', filename))
                                 )
@@ -79,7 +83,7 @@ const ChatSelector = () => {
     }
 
     const handleCreateChat = async () => {
-        Chats.createChat(charName ?? '', userName ?? '').then((filename) => {
+        Chats.createChat(charId ?? -1, userName ?? '').then((filename) => {
             Logger.debug(`File created: ${filename}`)
             if (filename) handleSelectChat(filename)
         })
@@ -113,7 +117,7 @@ const ChatSelector = () => {
                                 : styles.longButtonContainer
                         }>
                         <Image
-                            source={{ uri: Characters.getImageDir(charName) }}
+                            source={{ uri: Characters.getImageDir(charId ?? -1) }}
                             style={styles.avatar}
                         />
                         <Text style={styles.chatname}>{filename.replace('.jsonl', '')}</Text>
