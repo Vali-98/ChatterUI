@@ -139,8 +139,21 @@ export namespace Characters {
     export const getDir = (charName: string) => {
         return `${FS.documentDirectory}characters/${charName}`
     }
+}
 
-    export type CharacterCard = {
+type CharacterCardV1 = {
+    name: string
+    description: string
+    personality: string
+    scenario: string
+    first_mes: string
+    mes_example: string
+}
+
+export type CharacterCardV2 = {
+    spec: string
+    spec_version: string
+    data: {
         name: string
         description: string
         personality: string
@@ -148,32 +161,20 @@ export namespace Characters {
         first_mes: string
         mes_example: string
 
-        spec: string
-        spec_version: string
-        data: {
-            name: string
-            description: string
-            personality: string
-            scenario: string
-            first_mes: string
-            mes_example: string
+        // New fields start here
+        creator_notes: string
+        system_prompt: string
+        post_history_instructions: string
+        alternate_greetings: Array<string>
+        character_book: string
 
-            // New fields start here
-            creator_notes: string
-            system_prompt: string
-            post_history_instructions: string
-            alternate_greetings: Array<string>
-            character_book: string
-
-            // May 8th additions
-            tags: Array<string>
-            creator: string
-            character_version: string
-            //extensions: {},
-        }
+        // May 8th additions
+        tags: Array<string>
+        creator: string
+        character_version: string
+        //extensions: {},
     }
 }
-
 const TavernCardV2 = (name: string) => {
     return {
         name: name,

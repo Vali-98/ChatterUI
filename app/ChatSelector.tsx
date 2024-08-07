@@ -1,5 +1,6 @@
+import ChatMenu from '@components/ChatMenu/ChatMenu'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Chats, Characters, saveStringExternal, Logger, Messages } from '@globals'
+import { Global, Color, Chats, Characters, saveStringExternal, Logger } from '@globals'
 import { useRouter, Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, View, Text, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native'
@@ -7,8 +8,7 @@ import { useMMKVString } from 'react-native-mmkv'
 
 const ChatSelector = () => {
     const router = useRouter()
-    const [chats, setChats] = useState([])
-    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
+    const [chats, setChats] = useState<Array<string>>([])
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
 
@@ -16,11 +16,23 @@ const ChatSelector = () => {
         refreshfilenames()
     }, [])
 
-    const refreshfilenames = () => {
-        Chats.getFileList(charName).then(setChats)
+    const { deleteChat, loadChat, currentChat } = Chats.useChat((state) => ({
+        deleteChat: state.delete,
+        loadChat: state.load,
+        currentChat: state.name,
+    }))
+
+    const refreshfilenames = async () => {
+        const list = await Chats.getList(charName ?? '')
+        if (list.length === 0) {
+            await Chats.createChat(charName ?? '', userName ?? '')
+            refreshfilenames()
+            return
+        }
+        setChats(list)
     }
 
-    const deleteChat = (chatname) => {
+    const handleDeleteChat = (chatname: string) => {
         Alert.alert(`Delete Chat`, `Are you sure you want to delete this chat file?`, [
             {
                 text: 'Cancel',
@@ -30,9 +42,13 @@ const ChatSelector = () => {
             {
                 text: 'Confirm',
                 onPress: () => {
-                    Chats.deleteFile(charName, chatname).then(() =>
-                        Chats.getNewest(charName).then((filename) => {
-                            setCurrentChat(filename)
+                    deleteChat(charName ?? '', chatname).then(() =>
+                        Chats.getNewest(charName ?? '').then(async (filename) => {
+                            if (!filename)
+                                await Chats.createChat(charName ?? '', userName ?? '').then(
+                                    async (filename) =>
+                                        filename && (await loadChat(charName ?? '', filename))
+                                )
                             refreshfilenames()
                         })
                     )
@@ -42,22 +58,26 @@ const ChatSelector = () => {
         ])
     }
 
-    const exportChat = async (chatname) => {
+    const handleExportChat = async (chatName: string) => {
         saveStringExternal(
-            chatname,
-            await Chats.getFile(charName, chatname),
+            chatName,
+            await Chats.getFileString(charName ?? '', chatName),
             'application/*'
         ).catch((error) => {
             Logger.log(`Could not save file. ${error}`, true)
         })
     }
 
-    const handleSelectChat = async (filename) => {
-        setCurrentChat(filename)
-        Chats.getFile(charName, filename).then((chat) => {
-            Messages.set(chat)
-        })
+    const handleSelectChat = async (chatName: string) => {
+        await loadChat(charName ?? '', chatName)
         router.back()
+    }
+
+    const handleCreateChat = async () => {
+        Chats.createChat(charName ?? '', userName ?? '').then((filename) => {
+            console.log(filename)
+            if (filename) handleSelectChat(filename)
+        })
     }
 
     return (
@@ -65,15 +85,8 @@ const ChatSelector = () => {
             <Stack.Screen
                 options={{
                     headerRight: () => (
-                        <View style={styles.headerButtonContainer}>
-                            <TouchableOpacity
-                                style={styles.headerButtonRight}
-                                onPress={() => {
-                                    // create new default chat from globals
-                                    Chats.createDefault(charName, userName).then((filename) =>
-                                        handleSelectChat(filename)
-                                    )
-                                }}>
+                        <View>
+                            <TouchableOpacity onPress={handleCreateChat}>
                                 <FontAwesome name="plus" size={28} color={Color.Button} />
                             </TouchableOpacity>
                         </View>
@@ -93,10 +106,14 @@ const ChatSelector = () => {
                     />
                     <Text style={styles.chatname}>{filename.replace('.jsonl', '')}</Text>
 
-                    <TouchableOpacity style={styles.button} onPress={() => exportChat(filename)}>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => handleExportChat(filename)}>
                         <FontAwesome name="download" size={32} color={Color.Button} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={() => deleteChat(filename)}>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => handleDeleteChat(filename)}>
                         <FontAwesome name="trash" size={32} color={Color.Button} />
                     </TouchableOpacity>
                 </TouchableOpacity>

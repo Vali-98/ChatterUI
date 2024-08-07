@@ -1,32 +1,30 @@
 import { StyleSheet, KeyboardAvoidingView, FlatList, ScrollView } from 'react-native'
 import { ChatItem } from './ChatItem'
-import { Color, Global } from '@globals'
+import { Chats, Color, Global } from '@globals'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useEffect, useRef } from 'react'
-import { ChatItemLast } from './ChatItemLast'
-const ChatWindow = ({ messages }) => {
+import { useShallow } from 'zustand/react/shallow'
+const ChatWindow = () => {
     // this solution will have to change once editing is enabled as updating the content will scroll
     const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     const flatListRef = useRef(null)
-
+    const messagesLength = Chats.useChat(useShallow((state) => state.data?.length)) ?? 0
     useEffect(() => {
         if (nowGenerating) flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 })
     }, [nowGenerating])
-
     const getItems = () => {
-        return messages
-            .slice(1)
-            .map((message, index) => ({
+        return Array(messagesLength)
+            .fill('')
+            .map((item, index) => ({
                 index: index,
-                message: message,
                 key: index,
             }))
             .reverse()
     }
 
     const renderItems = ({ item, index }) => {
-        if (index === 0) return <ChatItemLast id={item.index} message={item.message} />
-        return <ChatItem id={item.index} message={item.message} />
+        //if (index === 0) return <ChatItem id={item.index} />
+        return <ChatItem id={item.index} />
     }
 
     return (

@@ -19,34 +19,36 @@ import { useMMKVString, useMMKVObject } from 'react-native-mmkv'
 const CharMenu = () => {
     const router = useRouter()
 
-    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
+    //const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
-    const [messages, setMessages] = useMMKVObject(Global.Messages)
-    const [characterList, setCharacterList] = useState([])
-    const [showNewChar, setShowNewChar] = useState(false)
+    //const [messages, setMessages] = useMMKVObject(Global.Messages)
+    const [characterList, setCharacterList] = useState<Array<string>>([])
+    const [showNewChar, setShowNewChar] = useState<boolean>(false)
     const [showDownload, setShowDownload] = useState(false)
     const [nowLoading, setNowLoading] = useState(false)
 
+    const loadChat = Chats.useChat((state) => state.load)
+
     const getCharacterList = async () => {
         await Characters.getCardList()
-            .then((list) => {
+            .then((list: Array<string>) => {
                 setCharacterList(list)
             })
             .catch((error) => console.log(`Could not retrieve characters.\n${error}`))
     }
 
-    const setCurrentCharacter = async (character) => {
+    const setCurrentCharacter = async (character: string) => {
         if (nowLoading) return
         setNowLoading(true)
         setCharName(character)
+
         Chats.getNewest(character).then(async (filename) => {
-            setCurrentChat(filename)
-            await Chats.getFile(character, filename).then((newmessage) => {
-                setMessages(newmessage)
-            })
+            //setCurrentChat(filename)
+            if (!filename) return
+            await loadChat(character, filename)
             await Characters.getCard(character).then((data) => {
-                setCurrentCard(JSON.parse(data))
+                if (data) setCurrentCard(JSON.parse(data))
             })
             router.back()
         })
@@ -97,7 +99,7 @@ const CharMenu = () => {
                 onConfirm={(text) => {
                     Characters.createCard(text).then(() => {
                         setCharName(text)
-                        router.push('CharInfo')
+                        router.push(`/CharInfo`)
                         getCharacterList()
                     })
                 }}
@@ -113,7 +115,7 @@ const CharMenu = () => {
                 }
             />
 
-            <ScrollView style={styles.characterContainer}>
+            <ScrollView>
                 {characterList.map((character, index) => (
                     <TouchableOpacity
                         disabled={nowLoading}

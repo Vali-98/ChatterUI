@@ -3,7 +3,7 @@ export const enum Global {
 
     NowGenerating = 'nowgenerating', // generation signal
     EditedWindow = 'editedwindow', // exit editing window confirmation
-    Messages = 'messages',
+    //Messages = 'messages',
     Logs = 'logs',
     // Character
 
@@ -17,7 +17,7 @@ export const enum Global {
 
     // Chat
 
-    CurrentChat = 'currentchat', // current chat filename, locates dir
+    // CurrentChat = 'currentchat', // current chat filename, locates dir
 
     // Instruct
 
