@@ -44,10 +44,10 @@ npx expo run:android
 
 Requires Node.js and Android SDK. Expo uses EAS to build apps which requires a Linux environment.
 
-1. Rename the `eas.json.example` to `eas.json`.
-2. Modify `"ANDROID_SDK_ROOT"` to the directory of your Android SDK
-
-3. Clone the repo then run:
+1. Clone the repo.
+2. Rename the `eas.json.example` to `eas.json`.
+3. Modify `"ANDROID_SDK_ROOT"` to the directory of your Android SDK
+4. Run the following:
 
 ```
 npm install
