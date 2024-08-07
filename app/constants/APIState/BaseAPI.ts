@@ -109,8 +109,12 @@ export abstract class APIBase implements IAPIBase {
         const wrap_string = `\n`
         const wrap_length = currentInstruct.wrap ? tokenizer(wrap_string) : 0
 
+        // we use this to check if the first message is reached
+        // this is needed to check if examples should be added
+        let first_message_reached = false
+
         // we require lengths for names if use_names is enabled
-        for (const message of messages?.reverse() ?? []) {
+        for (const message of messages.reverse()) {
             const swipe_len = Chats.useChat.getState().getTokenCount(index)
             const swipe_data = message.swipes[message.swipe_id]
 
@@ -163,25 +167,24 @@ export abstract class APIBase implements IAPIBase {
                 message_shard += wrap_string
             }
 
+            first_message_reached = index === 0
+
             // ensure no more is_last checks after this
             is_last = false
-
             message_acc_length += shard_length
             message_acc = message_shard + message_acc
             index--
         }
 
-        if (currentInstruct.examples) {
-            const examples = currentCard.data?.mes_example
-            if (examples) {
-                if (
-                    message_acc_length + payload_length + characterCache.examples_length <
-                    max_length
-                ) {
-                    payload += examples
-                    message_acc_length += characterCache.examples_length
-                }
-            }
+        const examples = currentCard.data?.mes_example
+        if (
+            first_message_reached &&
+            currentInstruct.examples &&
+            examples &&
+            message_acc_length + payload_length + characterCache.examples_length < max_length
+        ) {
+            payload += examples
+            message_acc_length += characterCache.examples_length
         }
 
         payload += currentInstruct.system_suffix
