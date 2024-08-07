@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { Logger } from './Logger'
 import { StyleSheet } from 'react-native'
+import { mmkv } from './mmkv'
+import { AppSettings } from './GlobalValues'
 
 type HSL = { h: number; s: number; l: number }
 
@@ -125,7 +127,18 @@ export namespace Style {
     export const useColorScheme = create<ColorState>((set, get) => ({
         darkMode: true,
         colors: {
-            primary: { h: 270, s: 26, l: 73 },
+            primary: {
+                h: (() => {
+                    const primary = mmkv.getNumber(AppSettings.PrimaryHue)
+                    if (!primary) {
+                        mmkv.set(AppSettings.PrimaryHue, 270)
+                        return 270
+                    }
+                    return primary
+                })(),
+                s: 26,
+                l: 73,
+            },
             accent: { h: 180, s: 80, l: 50 },
             warning: { h: 50, s: 60, l: 50 },
             destructive: { h: 5, s: 60, l: 50 },
@@ -141,12 +154,15 @@ export namespace Style {
             set((state) => ({ ...state, darkMode: !get().darkMode }))
         },
         setPrimary: (h: number, s: number, l: number) => {
+            mmkv.set(AppSettings.PrimaryHue, h)
             set((state) => ({
                 ...state,
                 colors: { ...state.colors, primary: { h, s, l } },
             }))
         },
     }))
+
+    export const defaultBrandColor = { h: 270, s: 26, l: 73 }
 
     export const drawer = {
         default: {

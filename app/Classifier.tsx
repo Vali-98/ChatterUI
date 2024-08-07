@@ -1,12 +1,13 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import { InferenceSession, Tensor } from 'onnxruntime-react-native'
 
 import * as FS from 'expo-file-system'
-import { BertTokenizer } from 'bert-tokenizer'
 import { Style } from '@globals'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
-
+import { PreTrainedTokenizer } from '@constants/Tokenizer/tokenizer'
+import { useMMKVBoolean } from 'react-native-mmkv'
+import { AppSettings } from '@constants/GlobalValues'
 const emotions = [
     'admiration',
     'amusement',
@@ -48,14 +49,11 @@ const classifier = () => {
     const [info, setInfo] = useState<infovalue[]>([])
     const [inputText, setInputText] = useState<string>('')
     const [timescore, settimescore] = useState<number>(0)
-    const tokenizer = new BertTokenizer(
-        'this text doesnt matter, the src is modified to use the default value',
-        true
-    )
-
+    const RobertaTokenizer = useRef(PreTrainedTokenizer.from_pretrained('roberta')).current
+    const [devMode, setDevMode] = useMMKVBoolean(AppSettings.DevMode)
     const loadSession = async () => {
         const session = await InferenceSession.create(
-            `${FS.documentDirectory}models/classify/model_quantized.onnx`,
+            `${FS.documentDirectory}models/model_quantized.onnx`,
             { executionMode: 'parallel' }
         )
         setSession(session)
@@ -68,7 +66,7 @@ const classifier = () => {
     const runClassifier = async () => {
         if (!session) return
 
-        const tokenized = tokenizer.tokenize(inputText)
+        const tokenized = (await RobertaTokenizer).encode(inputText)
 
         const mask = new Array(tokenized.length).fill(1)
         const data = {
@@ -93,6 +91,27 @@ const classifier = () => {
     return (
         <ScrollView style={Style.view.mainContainer}>
             <Text style={styles.text}>Classifier</Text>
+            {devMode && (
+                <View>
+                    <Text style={styles.text}>
+                        To use this, We have a hacky solution: import model_quantized.onnx via the
+                        Local API (it isn't an LLM, but we reuse that folder). Then enter this pagea
+                        and it should work.
+                    </Text>
+                    <Text style={styles.text}>Get the model here:</Text>
+                    <TouchableOpacity>
+                        <Text
+                            style={styles.text}
+                            onPress={() => {
+                                Linking.openURL(
+                                    'https://huggingface.co/Cohee/roberta-base-go_emotions-onnx'
+                                )
+                            }}>
+                            https://huggingface.co/Cohee/roberta-base-go_emotions-onnx
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            )}
             <TextInput
                 multiline
                 numberOfLines={5}

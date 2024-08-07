@@ -3,12 +3,17 @@ import { ColorId, Style } from '@constants/Style'
 import Slider from '@react-native-community/slider'
 import { ScrollView } from 'react-native-gesture-handler'
 import { LlamaTokenizer } from '@globals'
+import { Stack } from 'expo-router'
+import { FontAwesome } from '@expo/vector-icons'
+import { useMMKVBoolean } from 'react-native-mmkv'
+import { AppSettings } from '@constants/GlobalValues'
 
 const ColorTest = () => {
     const { color, setPrimary } = Style.useColorScheme((state) => ({
         color: state.colors.primary,
         setPrimary: state.setPrimary,
     }))
+    const [devMode, setDevMode] = useMMKVBoolean(AppSettings.DevMode)
 
     const surfaces: ColorId[] = [
         'primary-surface1',
@@ -24,6 +29,27 @@ const ColorTest = () => {
     return (
         <ScrollView
             style={{ backgroundColor: Style.getColor('primary-surface1'), flex: 1, padding: 16 }}>
+            <Stack.Screen
+                options={{
+                    headerRight: () => (
+                        <TouchableOpacity
+                            onPress={() =>
+                                setPrimary(
+                                    Style.defaultBrandColor.h,
+                                    Style.defaultBrandColor.s,
+                                    Style.defaultBrandColor.l
+                                )
+                            }>
+                            <FontAwesome
+                                name="refresh"
+                                color={Style.getColor('primary-text1')}
+                                size={24}
+                            />
+                        </TouchableOpacity>
+                    ),
+                }}
+            />
+
             {/*<View style={{ alignItems: 'center', flexDirection: 'row' }}>
                 <Text style={{ color: Style.getColor('primary-text1') }}>Toggle Dark Mode</Text>
                 <Switch
@@ -36,6 +62,10 @@ const ColorTest = () => {
                     }}
                 />
                 </View>*/}
+
+            <Text style={{ color: Style.getColor('primary-text1'), marginBottom: 8 }}>
+                NOTE: App must restart to see changes
+            </Text>
             <View style={{ alignItems: 'center', flexDirection: 'row' }}>
                 <Text style={{ color: Style.getColor('primary-text1') }}>Hue: {color.h}</Text>
                 <Slider
@@ -53,38 +83,43 @@ const ColorTest = () => {
                 />
             </View>
 
-            <View style={{ alignItems: 'center', flexDirection: 'row' }}>
-                <Text style={{ color: Style.getColor('primary-text1') }}>Sat: {color.s}</Text>
-                <Slider
-                    minimumValue={0}
-                    maximumValue={100}
-                    style={{ flex: 1 }}
-                    step={1}
-                    value={color.s}
-                    onValueChange={(value) => {
-                        setPrimary(color.h, value, color.l)
-                    }}
-                    maximumTrackTintColor={Style.getColor('primary-surface2')}
-                    minimumTrackTintColor={Style.getColor('primary-brand')}
-                    thumbTintColor={Style.getColor('primary-brand')}
-                />
-            </View>
-            <View style={{ alignItems: 'center', flexDirection: 'row' }}>
-                <Text style={{ color: Style.getColor('primary-text1') }}>Lit: {color.l}</Text>
-                <Slider
-                    minimumValue={0}
-                    maximumValue={100}
-                    style={{ flex: 1 }}
-                    step={1}
-                    value={color.l}
-                    onValueChange={(value) => {
-                        setPrimary(color.h, color.s, value)
-                    }}
-                    maximumTrackTintColor={Style.getColor('primary-surface2')}
-                    minimumTrackTintColor={Style.getColor('primary-brand')}
-                    thumbTintColor={Style.getColor('primary-brand')}
-                />
-            </View>
+            {!devMode && (
+                <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+                    <Text style={{ color: Style.getColor('primary-text1') }}>Sat: {color.s}</Text>
+                    <Slider
+                        minimumValue={0}
+                        maximumValue={100}
+                        style={{ flex: 1 }}
+                        step={1}
+                        value={color.s}
+                        onValueChange={(value) => {
+                            setPrimary(color.h, value, color.l)
+                        }}
+                        maximumTrackTintColor={Style.getColor('primary-surface2')}
+                        minimumTrackTintColor={Style.getColor('primary-brand')}
+                        thumbTintColor={Style.getColor('primary-brand')}
+                    />
+                </View>
+            )}
+            {!devMode && (
+                <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+                    <Text style={{ color: Style.getColor('primary-text1') }}>Lit: {color.l}</Text>
+                    <Slider
+                        minimumValue={0}
+                        maximumValue={100}
+                        style={{ flex: 1 }}
+                        step={1}
+                        value={color.l}
+                        onValueChange={(value) => {
+                            setPrimary(color.h, color.s, value)
+                        }}
+                        maximumTrackTintColor={Style.getColor('primary-surface2')}
+                        minimumTrackTintColor={Style.getColor('primary-brand')}
+                        thumbTintColor={Style.getColor('primary-brand')}
+                    />
+                </View>
+            )}
+
             <View>
                 <View style={{ marginTop: 8 }}>
                     {surfaces.map((item, index) => (

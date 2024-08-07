@@ -20,6 +20,8 @@ import { AntDesign, FontAwesome } from '@expo/vector-icons'
 import { SetStateAction, useEffect, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import SupportButton from '@components/SupportButton'
+import { useMMKVBoolean } from 'react-native-mmkv'
+import { AppSettings } from '@constants/GlobalValues'
 type SettingsDrawerProps = {
     booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
 }
@@ -93,6 +95,8 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
             imageID: state.card?.data.image_id ?? 0,
         }))
     )
+
+    const [devMode, setDevMode] = useMMKVBoolean(AppSettings.DevMode)
 
     const [imageSource, setImageSource] = useState({
         uri: Characters.getImageDir(imageID),
@@ -198,9 +202,11 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                                     </View>
                                 </View>
                             </View>
-                            {(__DEV__ ? [...paths, ...paths_dev] : paths).map((item, index) => (
-                                <DrawerButton item={item} index={index} key={index} />
-                            ))}
+                            {(__DEV__ || devMode ? [...paths, ...paths_dev] : paths).map(
+                                (item, index) => (
+                                    <DrawerButton item={item} index={index} key={index} />
+                                )
+                            )}
 
                             <Text
                                 style={{
@@ -209,6 +215,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                                     marginTop: 8,
                                 }}>
                                 {__DEV__ && 'DEV BUILD\t'}
+                                {devMode && 'DEV MODE\t'}
                                 {'v' + require(`../../app.json`).expo.version}
                             </Text>
                         </View>
