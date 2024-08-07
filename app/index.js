@@ -252,11 +252,12 @@ const styles = StyleSheet.create({
 	inputContainer: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		paddingHorizontal: 16,
+		paddingHorizontal: 8,
 		paddingBottom: 16,
 	},
 	input: {
 		color: Color.White,
+		backgroundColor: Color.DarkContainer,
 		flex: 1,
 		borderWidth: 1,
 		borderColor: '#ccc',

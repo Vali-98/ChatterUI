@@ -1,7 +1,7 @@
 import { ScrollView, View, Text, StyleSheet, Image ,Alert } from 'react-native'
 import { useEffect, useState } from 'react'
 import { useMMKVString } from 'react-native-mmkv'
-import { Global, getCharacterImageDirectory, getChatFilenames, deleteChatFile, getNewestChatFilename}  from '@globals'
+import { Global, Color, getCharacterImageDirectory, getChatFilenames, deleteChatFile, getNewestChatFilename}  from '@globals'
 import { useRouter } from 'expo-router'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { FontAwesome } from '@expo/vector-icons'
@@ -29,8 +29,7 @@ const ChatSelector = () => {
 
 
     return (
-        
-        <ScrollView styles = {styles.chatlogs}>
+        <ScrollView style={styles.mainContainer}>
             {
                 chats.reverse().map((chat,index) => (
                     
@@ -45,7 +44,7 @@ const ChatSelector = () => {
                         <View style = {styles.chatinfo}>
                             
                             <Image source={{uri:getCharacterImageDirectory()}} style={styles.avatar}/>
-                            <Text>{chat}</Text>
+                            <Text style={styles.chatname}>{chat.replace('.jsonl', '')}</Text>
 
                         </View>
                         
@@ -66,63 +65,63 @@ const ChatSelector = () => {
                                         }))},
                                         style:'destructive'
                                     }])}}>
-                                <FontAwesome name='trash' size={32} />
+                                <FontAwesome name='trash' size={32} color={Color.White} />
                             </TouchableOpacity>
                         </TouchableOpacity>
             ))}
         </ScrollView>
-
     )
 }
 
 export default ChatSelector
 
 const styles = StyleSheet.create({
-    chatlogs: {
-        flexDirection: 'column',
+    mainContainer: {
+        paddingVertical: 16,
+        paddingHorizontal: 16,
+        backgroundColor: Color.Background,
         flex: 1,
+    },
+
+    chatname : {
+        color: Color.White,
     },
 
     chatlogitem: {
         flex:1,
         flexDirection: 'row',
-        alignContent:'flex-start',
-        margin:4, 
-        padding: 8,
-        borderWidth:1,
-        borderColor: '#000',
+        alignItems: 'center',
+        padding: 12,
         borderRadius: 8,
+        marginBottom: 8,
+        backgroundColor: Color.DarkContainer,
     },
 
     selectedchatlogitem: {
         flex:1,
         flexDirection: 'row',
-        alignContent:'flex-start',
-        margin:4, 
-        padding: 8,
-        borderWidth:3,
-        borderColor: '#ebe82f',
+        alignItems: 'center',
+        padding: 12,
         borderRadius: 8,
+        marginBottom: 8,
+        backgroundColor: Color.Container,
     },
 
 
     chatinfo: {
         flexDirection: 'row',
-        alignContent:'flex-start',
-        flex:0.98,
+        alignItems: 'center',
+        flex:1,
     },
 
     avatar: {
         width: 48,
         height: 48,
         borderRadius: 16,
-        marginBottom:4,
-        marginLeft: 4, 
-        marginRight: 8, 
+        marginRight: 8,
     },
 
     deleteIcon : { 
-        flex:0.1, 
-        paddingTop: 4,
+        marginRight: 8,
     }
 })

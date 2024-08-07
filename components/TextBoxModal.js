@@ -1,7 +1,7 @@
 import { View, Text, Modal, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import { useState, useEffect } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
-
+import { Color } from '@globals'
 const TextBoxModal = ({booleans: [showModal, setShowModal], onConfirm = (text) => {}}) => {
     const [text, setText] = useState('')
 
@@ -20,7 +20,7 @@ const TextBoxModal = ({booleans: [showModal, setShowModal], onConfirm = (text) =
 
         <View style={{backgroundColor: 'rgba(0, 0, 0, 0.5)', flex:1, justifyContent: 'center'}}>
         <View style={styles.modalview}>
-            <Text>Enter Name</Text>
+            <Text style={styles.title}>Enter Name</Text>
             <TextInput 
                 style={styles.input} 
                 value={text}
@@ -32,7 +32,7 @@ const TextBoxModal = ({booleans: [showModal, setShowModal], onConfirm = (text) =
                     style={styles.modalButton}
                     onPress={() => setShowModal(false)
                 }>
-                    <MaterialIcons name='close' size={28} color="#707070" />
+                    <MaterialIcons name='close' size={28} color={Color.White} />
                 </TouchableOpacity>
                 <TouchableOpacity 
                     style={styles.modalButton}
@@ -40,7 +40,7 @@ const TextBoxModal = ({booleans: [showModal, setShowModal], onConfirm = (text) =
                     onConfirm(text)
                     setShowModal(false)
                 }}>
-                <MaterialIcons name='check' size={28} color="#707070" />
+                <MaterialIcons name='check' size={28} color={Color.White} />
                 </TouchableOpacity>
             </View>    
             
@@ -53,10 +53,14 @@ const TextBoxModal = ({booleans: [showModal, setShowModal], onConfirm = (text) =
 export default TextBoxModal
 
 const styles = StyleSheet.create({
-   
+    title: {
+        color: Color.White,
+        marginBottom: 16,
+    },
+
     modalview: {
         margin: 20,
-        backgroundColor: 'white',
+        backgroundColor: Color.Background,
         borderRadius: 20,
         padding: 35,
         alignItems: 'center',
@@ -71,6 +75,7 @@ const styles = StyleSheet.create({
     },
 
     buttonContainer : {
+        paddingTop: 8,
         flexDirection: 'row',
         alignContent: 'space-around',
     },
@@ -80,10 +85,10 @@ const styles = StyleSheet.create({
     },
 
     input: {
-        minWidth: 200,
-		borderWidth: 1,
-		borderColor: '#ccc',
-		borderRadius: 12,
+        color: Color.White,
+        minWidth: 280,
+        backgroundColor: Color.DarkContainer,
+		borderRadius: 8,
 		paddingHorizontal: 8,
 		paddingVertical: 8,
         margin: 8,

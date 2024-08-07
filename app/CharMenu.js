@@ -13,8 +13,7 @@ import { useEffect, useState } from 'react'
 import {useRouter} from 'expo-router'
 import * as FS from 'expo-file-system'
 import { useMMKVString } from 'react-native-mmkv'
-import { Global, copyCharImage, createNewCharacter, saveCharacterCard } from '@globals'
-import { TextInput } from 'react-native-gesture-handler'
+import { Color, Global, copyCharImage, createNewCharacter, saveCharacterCard } from '@globals'
 import { Stack } from 'expo-router'
 import { FontAwesome, MaterialIcons} from '@expo/vector-icons'
 import * as DocumentPicker from 'expo-document-picker'
@@ -77,14 +76,14 @@ const CharMenu = () => {
 
     return (
 
-        <SafeAreaView>
+        <SafeAreaView style={styles.mainContainer}>
             <Stack.Screen options={{headerRight : () => 
             (<View style={styles.headerButtonContainer}>
                 
                 <TouchableOpacity style={styles.headerButtonRight} onPress={async () => {
                     setShowDownload(true)
                 }}>
-                <FontAwesome name='cloud-download' size={28} />
+                <FontAwesome name='cloud-download' size={28} color={Color.Button} />
                 </TouchableOpacity>
 
                <TouchableOpacity style={styles.headerButtonRight} onPress={() => {
@@ -93,13 +92,13 @@ const CharMenu = () => {
                         createCharacter(result.assets[0].uri)
                       })
                }}>
-               <FontAwesome name='upload' size={28} />
+               <FontAwesome name='upload' size={28} color={Color.Button} />
                </TouchableOpacity>
 
                <TouchableOpacity style={styles.headerButtonRight} onPress={async () => {
                    setShowNewChar(true)
                }}>
-               <FontAwesome name='pencil' size={28} />
+               <FontAwesome name='pencil' size={28} color={Color.Button} />
                </TouchableOpacity>
 
 
@@ -167,18 +166,20 @@ const CharMenu = () => {
 export default CharMenu
 
 const styles = StyleSheet.create({
-    characterContainer: {
-        margin:8,
+    mainContainer: {
+        paddingVertical: 16,
+        paddingHorizontal: 16,
+        backgroundColor: Color.Background,
+        flex: 1,
     },
 
     longButton: {
-        backgroundColor:'#e1e1e1',
+        backgroundColor:Color.Container,
         flexDirection:'row',
-        padding: 8,
+        padding: 12,
         borderRadius:8,
         alignItems: 'center',
-        borderColor: '#cccccc',
-        borderWidth: 1,
+        marginBottom: 8,
     },
 
     avatar : {
@@ -190,7 +191,8 @@ const styles = StyleSheet.create({
 
     nametag : {
         fontSize:16,
-        marginLeft: 20
+        marginLeft: 20,
+        color: Color.White,
     },
     
     modalview: {

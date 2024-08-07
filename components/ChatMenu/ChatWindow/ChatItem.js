@@ -150,6 +150,7 @@ const ChatItem = ({ message, id}) => {
                 :
                 <View style={styles.messageInput} >
                 <TextInput
+                    style ={{color:Color.White}}
                     value={placeholderText.trim('\n')} 
                     onChangeText={setPlaceholderText}        
                     textBreakStrategy='simple'
@@ -215,11 +216,9 @@ const styles = StyleSheet.create({
     },
 
     messageInput : {
-        backgroundColor:'#dfdfdf',
+        color: Color.White,
+        backgroundColor:Color.DarkContainer,
         borderRadius: 8,
-        borderColor: '#333',
-        borderWidth:1,
         padding:8,
-        
     }
 });
