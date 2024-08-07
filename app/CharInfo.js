@@ -103,7 +103,7 @@ const CharInfo = () => {
 
       <Text
         style={styles.boxText}
-      >Description    Tokens: {characterCard?.description && characterCard?.data.description !== undefined && llamaTokenizer.encode(characterCard.description).length}</Text>
+      >Description    Tokens: {(characterCard?.description ?? characterCard?.data?.description) !== undefined && llamaTokenizer.encode(characterCard.description).length}</Text>
      
       <ScrollView style={styles.inputContainer}>
       <TextInput 
@@ -115,7 +115,7 @@ const CharInfo = () => {
           else 
           setCharacterCard({...characterCard, description: mes })
         }}
-        value={characterCard.data?.description ?? characterCard?.description}
+        value={characterCard?.data?.description ?? characterCard?.description}
         numberOfLines={8}
       />
       </ScrollView>
@@ -131,7 +131,7 @@ const CharInfo = () => {
           else 
           setCharacterCard({...characterCard, first_mes: mes })
         }}
-        value={characterCard.data?.first_mes ?? characterCard?.first_mes}
+        value={characterCard?.data?.first_mes ?? characterCard?.first_mes}
         numberOfLines={8}
       />
       </ScrollView>

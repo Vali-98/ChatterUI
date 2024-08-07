@@ -400,13 +400,14 @@ export const createNewDefaultChat = (
             {encoding: FS.EncodingType.UTF8})
         .then( response => {
             let card = JSON.parse(response)
-            const newmessage = createNewChat(userName, charName, ( card.data.first_mes ?? card.first_mes ))
+            console.log(card)
+            const newmessage = createNewChat(userName, charName, ( card?.data.first_mes ?? card.first_mes ))
             return FS.writeAsStringAsync(
                 `${FS.documentDirectory}characters/${charName}/chats/${newmessage[0].create_date}.jsonl`, 
                 newmessage.map((item: any)=> JSON.stringify(item)).join('\u000d\u000a'),
                 {encoding:FS.EncodingType.UTF8}).then(
                     () => {return `${newmessage[0].create_date}.jsonl`})
-    }).catch(error => console.log(`Could not create new chat file.\n${error}`))
+    }).catch(error => console.log(`Could not create new chat file: ${error}`))
 }
 
 export const getNewestChatFilename = async (

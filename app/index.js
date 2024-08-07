@@ -92,7 +92,11 @@ const Home = () => {
 
 
 	const buildContext = (usedContext) => {
-		let payload = `${currentInstruct.input_sequence}\n${userCard?.description ?? ''}\n${currentInstruct.system_prompt}\n${currentCard.description}\n`
+		let payload = 
+		`${currentInstruct.input_sequence}
+		\n${userCard?.data?.description ?? userCard?.description ?? ''}
+		\n${currentInstruct.system_prompt}
+		\n${currentCard?.description}\n`
 		let message_acc = ``
 		for(const message of messages.slice(1)) {
 			let message_shard = `${message.name === charName ? currentInstruct.output_sequence : currentInstruct.input_sequence} ${message.mes}\n`
