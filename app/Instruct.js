@@ -96,7 +96,7 @@ const Instruct = () => {
                         ToastAndroid.show(`Cannot delete last Instruct preset.`, 2000)
                         return
                     }
-                    Alert.alert(`Delete Preset`, `Are you sure you want to delete \'${instructName}\'?`, 
+                    Alert.alert(`Delete Preset`, `Are you sure you want to delete  \'${instructName}\'?`, 
                         [
                             {text:`Cancel`, style: `cancel`},
                             {
@@ -150,6 +150,7 @@ const Instruct = () => {
                 lines={3}
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
+                multiline={true}
             />
 
             <View style={{flexDirection: 'row'}}>
@@ -158,12 +159,14 @@ const Instruct = () => {
                 varname='input_sequence'
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
+                multiline={true}
             />
             <TextBox 
                 name='Output Sequence'
                 varname= "output_sequence"
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
+                multiline={true}
             />
             </View>
             
@@ -173,12 +176,14 @@ const Instruct = () => {
                 varname='first_output_sequence'
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
+                multiline={true}
             />
             <TextBox 
                 name='Last Output Sequence'
                 varname= "last_output_sequence"
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
+                multiline={true}
             />
             </View>
 
@@ -188,12 +193,14 @@ const Instruct = () => {
                 varname='system_sequence_prefix'
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
+                multiline={true}
             />
             <TextBox 
                 name='System Sequence Suffix'
                 varname= "system_sequence_suffix"
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
+                multiline={true}
             />
             </View>
 
@@ -203,12 +210,14 @@ const Instruct = () => {
                 varname='stop_sequence'
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
+                multiline={true}
             />
             <TextBox 
                 name='Seperator Sequence'
                 varname= "separator_sequence"
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
+                multiline={true}
             />
         </View>
       
