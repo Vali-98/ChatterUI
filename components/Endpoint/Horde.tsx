@@ -88,7 +88,13 @@ const Horde = () => {
             </View>
 
             <View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 8 }}>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        paddingTop: 8,
+                        marginBottom: 8,
+                    }}>
                     <Text style={{ ...styles.title, marginRight: 4 }}>Models</Text>
                     <TouchableOpacity
                         style={styles.button}
@@ -98,7 +104,7 @@ const Horde = () => {
                         <MaterialIcons
                             name="refresh"
                             color={Style.getColor('primary-text1')}
-                            size={28}
+                            size={24}
                         />
                     </TouchableOpacity>
                 </View>
@@ -117,7 +123,20 @@ const Horde = () => {
                         setDropdownValues(item)
                     }}
                     {...Style.drawer.default}
-                    placeholder="Select Model"
+                    placeholderStyle={{
+                        color: Style.getColor(
+                            hordeModels && hordeModels?.length === 0
+                                ? 'primary-text2'
+                                : 'primary-text1'
+                        ),
+                    }}
+                    placeholder={
+                        hordeModels?.length === 0
+                            ? 'Select Model'
+                            : `Selected ${hordeModels?.length} ${
+                                  hordeModels && hordeModels?.length > 1 ? 'models' : 'model'
+                              }`
+                    }
                     renderSelectedItem={(item: HordeModel, unSelect) => (
                         <View style={styles.iteminfo}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -149,6 +168,9 @@ const Horde = () => {
                                     <Text style={{ color: Style.getColor('primary-text2') }}>
                                         ETA
                                     </Text>
+                                    <Text style={{ color: Style.getColor('primary-text2') }}>
+                                        Context Limit
+                                    </Text>
                                 </View>
                                 <View style={{ marginLeft: 8 }}>
                                     <Text style={{ color: Style.getColor('primary-text2') }}>
@@ -159,6 +181,9 @@ const Horde = () => {
                                     </Text>
                                     <Text style={{ color: Style.getColor('primary-text2') }}>
                                         : {item.eta}s
+                                    </Text>
+                                    <Text style={{ color: Style.getColor('primary-text2') }}>
+                                        {`: ${hordeWorkers && getContextSize(item, hordeWorkers)}`}
                                     </Text>
                                 </View>
                             </View>
@@ -273,4 +298,13 @@ type HordeWorker = {
     max_length: number
     max_context_length: number
     tokens_generated: number
+}
+
+const getContextSize = (item: HordeModel, workers: HordeWorker[]) => {
+    const size = workers
+        ?.filter((worker) => {
+            return worker.models.includes(item.name)
+        })
+        .reduce((acc, worker) => Math.min(acc, worker.max_context_length), Number.MAX_VALUE)
+    return size === Number.MAX_VALUE ? 'Unknown' : size
 }
