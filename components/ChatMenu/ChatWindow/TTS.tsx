@@ -42,7 +42,6 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
             (item, index) =>
                 index > 0 && filter.test(item) && finalchunks.push(chunks.at(index - 1) + item)
         )
-        console.log(finalchunks)
         Logger.debug('TTS started with ' + finalchunks.length + ' chunks')
         finalchunks.forEach((chunk, index) =>
             Speech.speak(chunk, {
