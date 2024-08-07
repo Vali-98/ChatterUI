@@ -154,8 +154,6 @@ export const startupApp = () => {
         loadChatOnInit()
     }
 
-    mmkv.set(Global.LocalSessionLoaded, false)
-
     Logger.log('Resetting state values for startup.')
     SystemUI.setBackgroundColorAsync(Style.getColor('primary-surface1'))
 }

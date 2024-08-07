@@ -3,7 +3,6 @@ import { CompletionParams, LlamaContext, initLlama } from 'llama.rn'
 import { Platform } from 'react-native'
 import DocumentPicker from 'react-native-document-picker'
 
-import { API } from './API'
 import { AppSettings, Global } from './GlobalValues'
 import { Logger } from './Logger'
 import { mmkv } from './mmkv'
@@ -82,6 +81,7 @@ export namespace Llama {
             n_gpu_layers: Platform.OS === 'ios' ? preset.gpu_layers : 0,
         }
 
+        mmkv.set(Global.LocalSessionLoaded, false)
         Logger.log(`Loading Model: ${newname}`, true)
         Logger.log(JSON.stringify(params))
 
@@ -97,48 +97,37 @@ export namespace Llama {
     }
 
     export const completion = async (params: CompletionParams, callback = (text: string) => {}) => {
-        if (!isModelLoaded()) {
-            if (!mmkv.getBoolean(AppSettings.AutoLoadLocal)) return
-            const model = mmkv.getString(Global.LocalModel)
-            const api = mmkv.getString(Global.APIType)
-            if (model && api === API.LOCAL) {
-                await Llama.loadModel(model)
-            }
-        }
         if (llamaContext === undefined) {
             Logger.log('No Model Loaded', true)
             return
         }
-        if (
-            mmkv.getBoolean(AppSettings.AutoLoadLocal) &&
-            !mmkv.getBoolean(Global.LocalSessionLoaded)
-        ) {
-            await Llama.loadKV()
-            mmkv.set(Global.LocalSessionLoaded, true)
-        }
 
         return llamaContext
-            ?.completion(params, (data: any) => {
+            .completion(params, (data: any) => {
                 callback(data.token)
             })
             .then(async ({ text, timings }: CompletionOutput) => {
                 Logger.log(`Completion Output:\n\n` + text)
-                const timingtext =
-                    `\n[Prompt Timings]` +
-                    `\nPrompt Per Token: ${timings.prompt_per_token_ms} ms/token` +
-                    `\nPrompt Per Second: ${timings.prompt_per_second?.toFixed(2) ?? 0} tokens/s` +
-                    `\nPrompt Time: ${(timings.prompt_ms / 1000).toFixed(2)}s` +
-                    `\nPrompt Tokens: ${timings.prompt_n} tokens` +
-                    `\n\n[Predicted Timings]` +
-                    `\nPredicted Per Token: ${timings.predicted_per_token_ms} ms/token` +
-                    `\nPredicted Per Second: ${timings.predicted_per_second?.toFixed(2) ?? 0} tokens/s` +
-                    `\nPrediction Time: ${(timings.predicted_ms / 1000).toFixed(2)}s` +
-                    `\nPredicted Tokens: ${timings.predicted_n} tokens`
-                Logger.log(timingtext)
+                Logger.log(textTimings(timings))
                 if (mmkv.getBoolean(AppSettings.SaveLocalKV)) {
                     await saveKV()
                 }
             })
+    }
+
+    const textTimings = (timings: CompletionTimings) => {
+        return (
+            `\n[Prompt Timings]` +
+            `\nPrompt Per Token: ${timings.prompt_per_token_ms} ms/token` +
+            `\nPrompt Per Second: ${timings.prompt_per_second?.toFixed(2) ?? 0} tokens/s` +
+            `\nPrompt Time: ${(timings.prompt_ms / 1000).toFixed(2)}s` +
+            `\nPrompt Tokens: ${timings.prompt_n} tokens` +
+            `\n\n[Predicted Timings]` +
+            `\nPredicted Per Token: ${timings.predicted_per_token_ms} ms/token` +
+            `\nPredicted Per Second: ${timings.predicted_per_second?.toFixed(2) ?? 0} tokens/s` +
+            `\nPrediction Time: ${(timings.predicted_ms / 1000).toFixed(2)}s` +
+            `\nPredicted Tokens: ${timings.predicted_n} tokens`
+        )
     }
 
     export const stopCompletion = async () => {
@@ -187,7 +176,7 @@ export namespace Llama {
     }
 
     export const deleteModel = async (name: string) => {
-        if (await !modelExists(name)) return
+        if (!(await modelExists(name))) return
         if (name === modelname) modelname = ''
         return await FS.deleteAsync(`${model_dir}${name}`)
     }
@@ -248,7 +237,7 @@ export namespace Llama {
         Logger.log(
             data === -1
                 ? 'Failed to save KV cache'
-                : `Saved KV in ${(performance.now() - now).toPrecision(2)}ms with ${data} tokens`
+                : `Saved KV in ${Math.floor(performance.now() - now)}ms with ${data} tokens`
         )
         Logger.log(`Current KV Size is: ${await getKVSizeMB()}MB`)
     }
