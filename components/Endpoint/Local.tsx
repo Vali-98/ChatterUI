@@ -30,7 +30,6 @@ const Local = () => {
     const [currentModel, setCurrentModel] = useMMKVString(Global.LocalModel)
     const [downloadLink, setDownloadLink] = useState('')
     const [preset, setPreset] = useMMKVObject<LlamaPreset>(Global.LocalPreset)
-    const [loadedModel, setLoadedModel] = useState(modelName)
     const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
     const [kvSize, setKVSize] = useState<number>(-1)
     const getModels = async () => {
@@ -46,9 +45,7 @@ const Local = () => {
 
     const handleLoad = async () => {
         setModelLoading(true)
-        await loadModel(currentModel ?? '', preset).then(() => {
-            setLoadedModel(modelName)
-        })
+        await loadModel(currentModel ?? '', preset)
         setModelLoading(false)
         getModels()
     }
@@ -76,7 +73,6 @@ const Local = () => {
                     Llama.deleteModel(currentModel ?? '')
                         .then(() => {
                             Logger.log('Model Deleted Successfully', true)
-                            setLoadedModel(modelName)
                             getModels()
                         })
                         .catch(() => Logger.log('Could Not Delete Model', true))
@@ -87,7 +83,6 @@ const Local = () => {
 
     const handleUnload = async () => {
         await unloadModel()
-        setLoadedModel(modelName)
     }
 
     const handleDownload = () => {
@@ -105,8 +100,8 @@ const Local = () => {
         setModelLoading(false)
     }
 
-    const disableLoad = modelList.length === 0 || loadedModel !== undefined
-    const disableUnload = modelList.length === 0 || loadedModel === undefined
+    const disableLoad = modelList.length === 0 || modelName !== undefined
+    const disableUnload = modelList.length === 0 || modelName === undefined
     const disableDelete = modelList.length === 0 || currentModel === undefined
 
     return (
@@ -123,7 +118,7 @@ const Local = () => {
                 }}>
                 <Text style={styles.subtitle}>Loaded Model : </Text>
                 <Text style={{ ...styles.subtitle, color: Style.getColor('primary-text1') }}>
-                    {loadedModel ? loadedModel : 'None'}
+                    {modelName ? modelName : 'None'}
                 </Text>
             </View>
 
