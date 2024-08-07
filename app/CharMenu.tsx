@@ -110,6 +110,7 @@ const CharMenu = () => {
 
             <TextBoxModal
                 booleans={[showNewChar, setShowNewChar]}
+                title="[Creating Character]  Enter Name Below"
                 onConfirm={(text) => {
                     Characters.createCard(text).then(() => {
                         setCharName(text)

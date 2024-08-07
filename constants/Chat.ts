@@ -229,23 +229,19 @@ export namespace Chats {
             const lastindex = data.length - 1
             const swipes = data[lastindex].swipes
             const swipe_id = data[lastindex].swipe_id
-            swipes[swipe_id] = get().buffer
+            const cleanedBuffer = get().buffer.trim()
+            swipes[swipe_id] = cleanedBuffer
 
             const swipe_info = data[lastindex].swipe_info
             swipe_info[swipe_id].gen_finished = new Date().toString()
 
             data[lastindex] = {
                 ...data[lastindex],
-                mes: get().buffer,
+                mes: cleanedBuffer,
                 gen_finished: new Date().toString(),
                 swipes: swipes,
                 swipe_info: swipe_info,
             }
-            /*
-            set((state: ChatState) => ({
-                ...state,
-                data: data,
-            }))*/
         },
         insertLastToBuffer: () =>
             set((state: ChatState) => ({ ...state, buffer: get()?.data?.at(-1)?.mes ?? '' })),
