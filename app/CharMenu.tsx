@@ -199,7 +199,6 @@ const CharMenu = () => {
                                 onPress={() => setCurrentCharacter(character.name)}>
                                 <View style={styles.longButton}>
                                     <Image
-                                        defaultSource={require('@assets/user.png')}
                                         source={{
                                             uri: Characters.getImageDir(character.name),
                                         }}
