@@ -3,7 +3,7 @@ import { Stack, useRouter} from 'expo-router'
 import { TouchableOpacity, View, StyleSheet} from 'react-native'
 import { useEffect } from 'react'
 import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import { Global, generateDefaultDirectories, createNewDefaultChat  } from '@globals'
+import { Global, generateDefaultDirectories, createNewDefaultChat, loadUserCard, createNewUser } from '@globals'
 import * as FS from 'expo-file-system'
 // init values should be here
 require('fastestsmallesttextencoderdecoder')
@@ -17,20 +17,28 @@ const Layout = () => {
 	const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
     const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
+    const [userCard, setUserCard] = useMMKVObject(Global.CurrentUserCard)
 
     // reset defaults
     useEffect(() => {
         
-		setCurrentChat('')
-        if(userName === undefined)
-            setUserName('User')
-        setCurrentCard(null)
 		setCharName('Welcome')
+		setCurrentChat('')
+        
+        setCurrentCard(null)
 		setNowGenerating(false)
 		console.log("Reset values")
 
-		FS.readDirectoryAsync(`${FS.documentDirectory}/characters`).catch(() => generateDefaultDirectories().catch(
-            () => console.log(`Could not generate default folders`)
+		FS.readDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => generateDefaultDirectories().then(() => {
+            createNewUser('User').then(() => {
+                loadUserCard('User').then(card => {
+                    setUserName('User')
+                    setUserCard(card)
+                })
+            })
+            
+        }).catch(
+            (error) => console.log(`Could not generate default folders. Reason: ${error}`)
         ))
 
         if(currentInstruct?.system_prompt === undefined)
@@ -171,8 +179,8 @@ const defaultPreset = () => {
 
 const defaultInstruct = () => {
     return {
-        "system_prompt": "",
-        "input_sequence": "",
-        "output_sequence": "",
+        "system_prompt": "Write {{char}}'s next reply in a roleplay chat between {{char}} and {{user}}.",
+        "input_sequence": "### Instruction: ",
+        "output_sequence": "### Response: ",
     }
 }

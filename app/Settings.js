@@ -1,5 +1,5 @@
 import { SafeAreaView, View, Text, Image, StyleSheet } from 'react-native'
-import { Global } from '@globals'
+import { Global, getUserImageDirectory } from '@globals'
 import React from 'react'
 import { useMMKVString } from 'react-native-mmkv'
 import { TouchableOpacity } from 'react-native-gesture-handler'
@@ -9,12 +9,15 @@ import { useRouter } from 'expo-router'
 const Settings = () => {
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const router = useRouter()
+
     return (
         <SafeAreaView style={styles.mainContainer}>
 
         <View style={styles.userContainer}> 
             
-            <Image style={styles.userImage} source={require('@assets/user.png')} />
+            <View style={styles.imageContainer}>    
+                <Image style={styles.userImage} source={{uri:getUserImageDirectory(userName)}} />
+            </View> 
             <View>
                 <Text style={styles.userName}>{userName}</Text>
                 <View style={styles.buttonContainer}>
@@ -80,11 +83,18 @@ const styles = StyleSheet.create({
         marginLeft: 12,
     },
 
+    imageContainer : {
+        width: 108,
+        height: 108,
+        borderRadius: 54,
+        margin: 4,
+        borderWidth: 1,
+    },
+
     userImage : {
         width: 108,
         height: 108,
         borderRadius: 54,
-        margin:4,
     },
 
     largeButtonContainer : {

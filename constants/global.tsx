@@ -24,24 +24,34 @@ export const enum Global {
 // generate default directories
 
 export const generateDefaultDirectories = async () => {
-    FS.makeDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => console.log(`Could not create characters folder.`))
-    FS.makeDirectoryAsync(`${FS.documentDirectory}persona`).catch(() => console.log(`Could not create personas folder.`))
-    FS.makeDirectoryAsync(`${FS.documentDirectory}preset`).catch(() => console.log(`Could not create presets folder.`))
-    FS.makeDirectoryAsync(`${FS.documentDirectory}instruct`).catch(() => console.log(`Could not create instruct folder.`))
-    createNewUser('User')    
+    return FS.makeDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => console.log(`Could not create characters folder.`)).then(
+        () => { return FS.makeDirectoryAsync(`${FS.documentDirectory}preset`).catch(() => console.log(`Could not create presets folder.`))}
+    ).then(
+        () => { return FS.makeDirectoryAsync(`${FS.documentDirectory}instruct`).catch(() => console.log(`Could not create instruct folder.`))}
+    ).then(
+        () => { return FS.makeDirectoryAsync(`${FS.documentDirectory}persona`).catch(() => console.log(`Could not create personas folder.`))}
+    )
+}
+
+export const resetUsers =  async () => {
+    return FS.deleteAsync(`${FS.documentDirectory}persona`).then(() => {
+        FS.makeDirectoryAsync(`${FS.documentDirectory}persona`).catch(() => console.log(`Could not create personas folder.`)).then(() => {
+            createNewUser('User')  
+        })
+    })
 }
 
 
 export const createNewUser = async (name : string) => {
     return FS.makeDirectoryAsync(`${FS.documentDirectory}persona/${name}`).then(() => {
         return FS.writeAsStringAsync(`${FS.documentDirectory}persona/${name}/${name}.json`, JSON.stringify({
-            description: ""
+            description: " "
         }), {encoding: FS.EncodingType.UTF8})
     }).catch(() => {console.log(`Could not create user.`)})
 
 }
 export const deleteUser = async (name : string) => {
-    return FS.deleteAsync(`${FS.documentDirectory}persona/${name}`)
+    return FS.deleteAsync( `${FS.documentDirectory}persona/${name}`)
 }
 
 export const loadUserCard = async (name : string) => {
@@ -74,6 +84,22 @@ export const createNewCharacter = async (
     })
 }
 
+
+export const saveUserCard = async (name : string, card : Object) => {
+    return FS.writeAsStringAsync(
+        `${FS.documentDirectory}persona/${name}/${name}.json`,
+        JSON.stringify(card),
+        {encoding: FS.EncodingType.UTF8}
+    )
+}
+
+export const copyUserImage = async (uri: string, name: string) => {
+
+    return FS.copyAsync({
+        from: uri,
+        to: getUserImageDirectory(name)
+    })
+}
 
 // returns filename of newly created file
 export const createNewDefaultChat = (
@@ -213,9 +239,9 @@ export const getUserFilenames = () => {
 }
 
 export const getUserImageDirectory = (
-    userName : string
+    name : string
 ) => {
-    return `${FS.documentDirectory}persona/${userName}/${userName}.png`
+    return `${FS.documentDirectory}persona/${name}/${name}.png`
 }
 
 // get chat file

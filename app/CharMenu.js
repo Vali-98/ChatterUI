@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
 import {useRouter} from 'expo-router'
 import * as FS from 'expo-file-system'
 import { useMMKVString } from 'react-native-mmkv'
-import { Global, copyCharImage, createNewCharacter, getCharacterImageDirectory, saveCharacterCard } from '@globals'
+import { Global, copyCharImage, createNewCharacter, createNewDefaultChat, saveCharacterCard } from '@globals'
 import { TextInput } from 'react-native-gesture-handler'
 import { Stack } from 'expo-router'
 import { FontAwesome, MaterialIcons} from '@expo/vector-icons'
@@ -56,6 +56,8 @@ const CharMenu = () => {
                 return saveCharacterCard(newname, JSON.stringify(charactercard))
             }).then(() => {
                 return copyCharImage(uri, newname)
+            }).then(() => {
+                return 
             }).then(() => {
                 ToastAndroid.show(`Successfully Imported Character`, ToastAndroid.SHORT)
                 getCharacterList()

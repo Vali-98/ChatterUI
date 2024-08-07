@@ -17,7 +17,7 @@ const Home = () => {
 	const [endpoint, setEndpoint] = useMMKVString(Global.Endpoint)
 	const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
 	const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
-
+	const [userCard, setUserCard] = useMMKVObject(Global.CurrentUserCard)
 	const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
 	const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
 	const [currentPreset, setCurrentPreset] = useMMKVObject(Global.CurrentPreset)
@@ -40,7 +40,7 @@ const Home = () => {
 	}, [charName])
 			
 	const constructPayload = () => {
-		let payload = `${currentInstruct.input_sequence}\n${currentInstruct.system_prompt}\n${currentCard.description}\n`
+		let payload = `${currentInstruct.input_sequence}\n${userCard.description}\n${currentInstruct.system_prompt}\n${currentCard.description}\n`
 		let message_acc = ``
 		for(const message of messages.slice(1)) {
 			let message_shard = `${message.name === charName ? currentInstruct.output_sequence : currentInstruct.input_sequence} ${message.mes}\n`
@@ -95,9 +95,10 @@ const Home = () => {
 	}, [currentChat])
 
 	const handleSend = () => {
-		if (newMessage.trim() === '') return;
-		const newMessageItem = createChatEntry(userName, true, newMessage)		
-		setMessages(messages => [...messages, newMessageItem])
+		if (newMessage.trim() !== ''){	
+			const newMessageItem = createChatEntry(userName, true, newMessage)		
+			setMessages(messages => [...messages, newMessageItem])
+		}
 		setNowGenerating(true)
 	};
 
@@ -105,11 +106,10 @@ const Home = () => {
 
 	const generateResponse = () => {
 		console.log(`Obtaining response from endpoint: ${endpoint}`)
-		if (newMessage === '')
-			return
 		setNewMessage(n => '');
 		console.log("Getting Response")
 		// handle swipe logic
+		const target_length = messages.length + 1
 		const getresponse = (api, write = false, body = "") => {
 			return axios.create({timeout:200}).post(api, body)
 			.then(response => {
@@ -122,7 +122,7 @@ const Home = () => {
 				}
 				setMessages(messages => {
 					try {
-						const createnew = (messages.at(-1).name === userName)	
+						const createnew = (messages.length < target_length)	
 						const mescontent = data
 						.replace(currentInstruct.input_sequence, ``)
 						.replace(currentInstruct.output_sequence, ``)
@@ -208,7 +208,13 @@ const Home = () => {
 					
 
 					{ nowGenerating ?
-					<ActivityIndicator size={30} style={styles.activity}/>
+					<TouchableOpacity style={styles.sendButton} onPress={()=> {
+						axios.post(`http://${endpoint}/api/extra/abort`).then(() => {	
+							setNowGenerating(false)
+						})	
+					}}>
+					<Text style={styles.sendButtonText}>Stop</Text>
+					</TouchableOpacity>
 						:
 					
 					<TouchableOpacity style={styles.sendButton} onPress={handleSend}>
