@@ -13,6 +13,7 @@ import * as DocumentPicker from 'expo-document-picker'
 const CharInfo = () => {
   const router = useRouter()
   const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+  const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
   const [characterCard, setCharacterCard] = useState({})
   
   // redo charactercard as CONTEXT
@@ -24,7 +25,9 @@ const CharInfo = () => {
   }
   
   const savecard = () => {
-    return Characters.saveCard(charName, JSON.stringify(characterCard))
+    return Characters.saveCard(charName, JSON.stringify(characterCard)).then(() => {
+      setCurrentCard(characterCard)
+    })
   }
 
   useEffect(() => {

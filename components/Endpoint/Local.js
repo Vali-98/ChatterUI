@@ -35,6 +35,15 @@ const Local = () => {
 		getModels()
 	}
 
+	const handleLoadExternal = async () => {
+		setModelLoading(true)
+		await Llama.loadModel('', preset, false)
+		.then(() => {
+			setLoadedModel(Llama.getModelname())
+		})
+		setModelLoading(false)
+	}
+
 	const handleDelete = async () => {
 		if(! await Llama.modelExists(currentModel)){
 			ToastAndroid.show('Model Does Not Exist!', ToastAndroid.SHORT)
@@ -48,6 +57,7 @@ const Local = () => {
 				onPress: () =>  {
 					Llama.deleteModel(currentModel).then(() => {
 						ToastAndroid.show('Model Deleted Successfully', ToastAndroid.SHORT)
+						setLoadedModel(Llama.getModelname())
 						getModels()
 					}).catch(() => ToastAndroid.show('Could Not Delete Model', ToastAndroid.SHORT))
 	
@@ -105,7 +115,7 @@ const Local = () => {
 		{modelLoading ?
 			<ActivityIndicator size='large' color={Color.White} />
 			:
-			<View style={{flexDirection: 'row'}}>
+			<View style={{flexDirection: 'row', overflowX:'true'}}>
 			<TouchableOpacity style={{...styles.textbutton, marginRight: 8}} onPress={handleLoad}> 
 				<Text style={{...styles.buttonlabel}}>Load</Text>
 			</TouchableOpacity>
@@ -123,6 +133,13 @@ const Local = () => {
 			</TouchableOpacity>
 		</View>}
 
+
+		{/*
+		// Loading without importing is crash prone, not recommended	
+		<TouchableOpacity style={{...styles.textbutton, marginRight: 8, marginTop: 8}} onPress={handleLoadExternal}> 
+			<Text style={styles.buttonlabel}>Load External Model [Warning: will freeze]</Text>
+		</TouchableOpacity> */}
+		
 		{/*
 		// Requires proper download manager, suggested to use IMPORT instead
 		<View style={{marginTop: 16}}>

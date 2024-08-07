@@ -43,6 +43,8 @@ const Home = () => {
 		
 	*/
 
+
+	// this use effect isnt needed at all, card can be set from charmenu 
 	useEffect(() => {
 		if (charName === 'Welcome' || charName === undefined) return
 		console.log(`Character changed to ${charName}`)

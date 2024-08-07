@@ -3,6 +3,7 @@ import * as FS from 'expo-file-system'
 import { ToastAndroid } from 'react-native';
 import { CompletionParams, LlamaContext, initLlama } from 'llama.rn'
 import DocumentPicker from 'react-native-document-picker'
+import { DocumentPickerResult, getDocumentAsync } from 'expo-document-picker';
 import { mmkv } from './mmkv';
 import { Global } from './GlobalValues';
 
@@ -20,15 +21,38 @@ export namespace Llama {
     var llamaContext : LlamaContext | void = undefined
     var modelname = ''
 
-    export const loadModel = async (name : string, preset = default_preset) => {
+    export const loadModel = async (name : string, preset = default_preset, usecache = true) => {
         
-        if(name == modelname) {
+        let newname = name
+        let dir = `${model_dir}${name}`
+        // if not using from cache, pick model and load it
+        if(!usecache)
+        newname = await getDocumentAsync().then(async (result : DocumentPickerResult) => {
+            if(result.canceled) return ''
+            let name = result.assets[0].name
+            console.log(`Picked file: ${name}`)
+            dir = result.assets[0].uri
+            console.log(dir)
+            return name
+        }).catch(() => {
+            console.log('Picking cancelled')
+            ToastAndroid.show('No Model Chosen', 2000)
+            return ''
+        })
+
+        if(newname == ''){
+            ToastAndroid.show('No Model Chosen', 2000)
+            console.log(`No model chosen, new name was blank!`)
+            return
+        }
+        
+        if(newname == modelname) {
             console.log('Model Already Loaded!')
             ToastAndroid.show('Model Already Loaded!', 2000)
             return
         }
         
-        if(! (await modelExists(name))) {
+        if(usecache && ! (await modelExists(name))) {
             console.log('Model does not exist!')
             ToastAndroid.show('Model Does Not Exit!', 2000)
             return
@@ -39,19 +63,20 @@ export namespace Llama {
             await llamaContext?.release()
             modelname = ''
         }
-        
-        ToastAndroid.show(`Loading Model: ${name}`, 2000)
-        console.log(`Loading Model: ${name}`)
-        const dir = `${model_dir}${name}`
+
         const params = {
             model: dir,
             n_ctx: preset.context_length,
             n_threads: preset.threads,
             n_batch: preset.batch,
         }
+
+        ToastAndroid.show(`Loading Model: ${newname}`, 2000)
+        console.log(`Loading Model: ${newname}`)
+
         console.log(params)
         llamaContext = await initLlama(params).then((ctx) => {
-            modelname = name
+            modelname = newname
             ToastAndroid.show('Model Loaded', 2000)
             console.log('Model loaded')
             return ctx
@@ -129,7 +154,8 @@ export namespace Llama {
     }
 
     export const deleteModel = async (name : string) => {
-        if(await modelExists(name))
+        if(await!modelExists(name)) return
+        if(name == modelname) modelname = ''
         return await FS.deleteAsync(`${model_dir}${name}`)
     }
 
