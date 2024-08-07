@@ -1,6 +1,7 @@
 import * as FS from 'expo-file-system'
 import {MMKV} from 'react-native-mmkv'
 import { createContext } from 'react'
+import * as DocumentPicker from 'expo-document-picker'
 
 const mmkv = new MMKV()
 
@@ -18,6 +19,7 @@ export const enum Global {
     Endpoint='endpoint',                // api endpoint 
     NowGenerating='nowgenerating',      // generation signal
     EditedWindow='editedwindow',        // exit editing window confirmation
+    PresetName='presetname',            // name of current preset
 }
 
 
@@ -33,13 +35,37 @@ export const generateDefaultDirectories = async () => {
     )
 }
 
-export const resetUsers =  async () => {
-    return FS.deleteAsync(`${FS.documentDirectory}persona`).then(() => {
-        FS.makeDirectoryAsync(`${FS.documentDirectory}persona`).catch(() => console.log(`Could not create personas folder.`)).then(() => {
-            createNewUser('User')  
-        })
+
+// presets
+
+export const loadPreset = async (name : string) => {
+    return FS.readAsStringAsync(`${FS.documentDirectory}preset/${name}.json`, {encoding: FS.EncodingType.UTF8})
+}
+
+export const writePreset = async (name : string, preset : Object) => {
+    return FS.writeAsStringAsync(`${FS.documentDirectory}preset/${name}.json`, JSON.stringify(preset), {encoding:FS.EncodingType.UTF8})
+}
+
+export const deletePreset = async (name : string ) => {
+    return FS.deleteAsync(`${FS.documentDirectory}preset/${name}.json`)
+}
+
+export const getPresetList = async () => {
+    return FS.readDirectoryAsync(`${FS.documentDirectory}preset`)
+}
+
+export const uploadPreset = async () => {
+    return DocumentPicker.getDocumentAsync({type:'application/json'}).then((result) => {
+        if(result.canceled) return
+        let name = result.assets[0].name.replace(`.json`, '')
+        return FS.copyAsync({
+            from: result.assets[0].uri, 
+            to: `${FS.documentDirectory}/preset/${name}.json`
+        }).then(() => {return name})
     })
 }
+
+// user
 
 
 export const createNewUser = async (name : string) => {

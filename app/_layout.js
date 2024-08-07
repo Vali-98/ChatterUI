@@ -3,7 +3,7 @@ import { Stack, useRouter} from 'expo-router'
 import { TouchableOpacity, View, StyleSheet} from 'react-native'
 import { useEffect } from 'react'
 import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import { Global, generateDefaultDirectories, createNewDefaultChat, loadUserCard, createNewUser } from '@globals'
+import { Global, generateDefaultDirectories, createNewDefaultChat, loadUserCard, createNewUser, writePreset } from '@globals'
 import * as FS from 'expo-file-system'
 // init values should be here
 require('fastestsmallesttextencoderdecoder')
@@ -19,6 +19,8 @@ const Layout = () => {
     const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
     const [userCard, setUserCard] = useMMKVObject(Global.CurrentUserCard)
 
+    const [presetName, setPresetName] = useMMKVString(Global.PresetName)
+
     // reset defaults
     useEffect(() => {
         
@@ -31,10 +33,18 @@ const Layout = () => {
 
 		FS.readDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => generateDefaultDirectories().then(() => {
             createNewUser('User').then(() => {
+                console.log(`Creating Default User`)
                 loadUserCard('User').then(card => {
                     setUserName('User')
                     setUserCard(card)
                 })
+
+                
+            })
+            writePreset(`Default`, defaultPreset()).then(() => {
+                console.log(`Creating Default Presets`)
+                setCurrentPreset(defaultPreset())
+                setPresetName(`Default`)
             })
             
         }).catch(
@@ -43,9 +53,6 @@ const Layout = () => {
 
         if(currentInstruct?.system_prompt === undefined)
             setCurrentInstruct(defaultInstruct())
-
-        if(currentPreset?.temp === undefined)
-            setCurrentPreset(defaultPreset())
 
 	}, []) 
 

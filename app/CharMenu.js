@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
 import {useRouter} from 'expo-router'
 import * as FS from 'expo-file-system'
 import { useMMKVString } from 'react-native-mmkv'
-import { Global, copyCharImage, createNewCharacter, createNewDefaultChat, saveCharacterCard } from '@globals'
+import { Global, copyCharImage, createNewCharacter, saveCharacterCard } from '@globals'
 import { TextInput } from 'react-native-gesture-handler'
 import { Stack } from 'expo-router'
 import { FontAwesome, MaterialIcons} from '@expo/vector-icons'
@@ -102,7 +102,7 @@ const CharMenu = () => {
                <TouchableOpacity style={styles.headerButtonRight} onPress={async () => {
                    setShowNewChar(true)
                }}>
-               <FontAwesome name='plus' size={28} />
+               <FontAwesome name='pencil' size={28} />
                </TouchableOpacity>
 
 
@@ -138,7 +138,7 @@ const CharMenu = () => {
                                 router.push('CharInfo')
                                 getCharacterList()
                             })
-                            
+
                             setShowNewChar(false)
                         }}>
                            <MaterialIcons name='check' size={28} color="#707070" />
@@ -157,9 +157,9 @@ const CharMenu = () => {
             >   
                 <View style={{backgroundColor: 'rgba(0, 0, 0, 0.5)', flex:1, justifyContent: 'center'}}>
                 <View style={styles.modalview}>
-                    <Text>Enter ID or Hyperlink</Text>
+                    <Text>Enter Card ID or URL</Text>
                     <TextInput 
-                        style={styles.input} 
+                        style={{...styles.input, width: '100%'}} 
                         value={downloadName}
                         onChangeText={setDownloadName}
                     />
@@ -185,12 +185,6 @@ const CharMenu = () => {
                                     responseType: 'arraybuffer'
                                 }
                                 ).then(async (res) => {
-                                    if(res.status !== 200){
-                                        ToastAndroid.show(`Invalid URL`, ToastAndroid.SHORT)
-                                        return
-                                    }
-                                    const response = Buffer.from(res.data, 'base64').toString('base64')
-                                    
                                     FS.writeAsStringAsync(
                                         `${FS.cacheDirectory}image.png`, 
                                         response, 
@@ -198,6 +192,9 @@ const CharMenu = () => {
                                             createCharacter(`${FS.cacheDirectory}image.png`)
                                     })
                                     
+                                }).catch((error) => {
+                                    console.log(`Could not retrieve card. ${error}`)
+                                    ToastAndroid.show(`Invalid ID or URL`, ToastAndroid.SHORT)
                                 })
                             setShowDownload(false)
                         }}>
