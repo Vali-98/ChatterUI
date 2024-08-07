@@ -237,36 +237,11 @@ const SamplerMenu = () => {
                                         )
                                     case 'custom':
                                     default:
-                                        if (item.samplerID === SamplerID.SEED) {
-                                            return (
-                                                <View style={{ paddingBottom: 8, flex: 1 }}>
-                                                    <Text
-                                                        style={{
-                                                            color: Style.getColor('primary-text1'),
-                                                        }}>
-                                                        Seed
-                                                    </Text>
-                                                    <TextInput
-                                                        key={item.samplerID}
-                                                        style={styles.input}
-                                                        value={currentPreset?.seed.toString()}
-                                                        onChangeText={(text) => {
-                                                            let data = -1
-                                                            try {
-                                                                data = parseFloat(text)
-                                                            } catch (e) {}
-                                                            if (currentPreset)
-                                                                setCurrentPreset({
-                                                                    ...currentPreset,
-                                                                    seed: data,
-                                                                })
-                                                        }}
-                                                    />
-                                                </View>
-                                            )
-                                        }
-
-                                        return <Text>Something Went Wrong!</Text>
+                                        return (
+                                            <Text style={styles.warningText}>
+                                                Invalid Sampler Field!
+                                            </Text>
+                                        )
                                 }
                             })}
                     </View>
@@ -311,6 +286,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         marginVertical: 8,
         marginHorizontal: 4,
+        borderRadius: 8,
+    },
+    warningText: {
+        color: Style.getColor('primary-text1'),
+        backgroundColor: Style.getColor('destructive-brand'),
+        padding: 8,
+        margin: 16,
         borderRadius: 8,
     },
 })

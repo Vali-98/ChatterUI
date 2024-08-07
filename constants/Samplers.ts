@@ -440,12 +440,12 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
     [SamplerID.SEED]: {
         internalID: SamplerID.SEED,
         friendlyName: 'Seed',
-        inputType: 'custom',
+        inputType: 'slider',
         values: {
             type: 'integer',
             default: -1,
             min: -1,
-            max: 1000000000,
+            max: 100000,
             step: 1,
             precision: 0,
         },
