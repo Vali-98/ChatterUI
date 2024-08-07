@@ -50,7 +50,7 @@ const Home = () => {
 
     const startInference = async () => {
         setNewMessage((message) => '')
-        generateResponse(setAbortFunction, () => {}, [])
+        generateResponse(setAbortFunction)
     }
 
     const handleSend = () => {

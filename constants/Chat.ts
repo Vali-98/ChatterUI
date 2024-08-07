@@ -1,6 +1,6 @@
 import { Global } from './GlobalValues'
 import { Logger } from './Logger'
-import { humanizedISO8601DateTime } from './Utils'
+import { humanizedISO8601DateTime, replaceMacros } from './Utils'
 import { mmkv } from './mmkv'
 import { create } from 'zustand'
 import * as FS from 'expo-file-system'
@@ -320,8 +320,15 @@ export namespace Chats {
         }
 
         const swipes: Array<string> =
-            card.data.alternate_greetings.length > 0 ? card.data.alternate_greetings : []
-        const firstMessage: ChatEntry = createEntry(charName, false, card.data.first_mes, swipes)
+            card.data.alternate_greetings.length > 0
+                ? card.data.alternate_greetings.map((item) => replaceMacros(item))
+                : []
+        const firstMessage: ChatEntry = createEntry(
+            charName,
+            false,
+            replaceMacros(card.data.first_mes),
+            swipes
+        )
 
         const output = `${JSON.stringify(metadata)}\u000d\u000a${JSON.stringify(firstMessage)}`
 

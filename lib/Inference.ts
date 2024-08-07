@@ -5,32 +5,32 @@ import { mmkv, Global, API, hordeHeader, Llama, Logger } from '@globals'
 import axios from 'axios'
 import EventSource from 'react-native-sse'
 
-export const generateResponse = async (setAbortFunction, insertGeneratedMessage, messages2) => {
+export const generateResponse = async (setAbortFunction: AbortFunction) => {
     console.log(`Obtaining response.`)
     const APIType = getString(Global.APIType)
     const messages = Chats.useChat.getState().data
     try {
         switch (APIType) {
             case API.KAI:
-                await KAIresponse(setAbortFunction, insertGeneratedMessage, messages)
+                await KAIresponse(setAbortFunction)
                 break
             case API.HORDE:
-                hordeResponse(setAbortFunction, insertGeneratedMessage, messages)
+                hordeResponse(setAbortFunction)
                 break
             case API.MANCER:
-                MancerResponseStream(setAbortFunction, insertGeneratedMessage, messages)
+                MancerResponseStream(setAbortFunction)
                 break
             case API.TGWUI:
-                TGWUIReponseStream(setAbortFunction, insertGeneratedMessage, messages)
+                TGWUIReponseStream(setAbortFunction)
                 break
             case API.COMPLETIONS:
-                CompletionsResponseStream(setAbortFunction, insertGeneratedMessage, messages)
+                CompletionsResponseStream(setAbortFunction)
                 break
             case API.LOCAL:
-                localStreamResponse(setAbortFunction, insertGeneratedMessage, messages)
+                localStreamResponse(setAbortFunction)
                 break
             case API.OPENROUTER:
-                openRouterResponseStream(setAbortFunction, insertGeneratedMessage, messages)
+                openRouterResponseStream(setAbortFunction)
                 break
             default:
                 setValue(Global.NowGenerating, false)
@@ -42,17 +42,19 @@ export const generateResponse = async (setAbortFunction, insertGeneratedMessage,
     }
 }
 
+type AbortFunction = (fn: (fn2: () => void) => () => void) => void
+
 // MMKV
 
-const getObject = (key) => {
+const getObject = (key: string) => {
     return JSON.parse(mmkv.getString(key) ?? '{}')
 }
 
-const getString = (key) => {
+const getString = (key: string) => {
     return mmkv.getString(key) ?? ''
 }
 
-const setValue = (key, value) => {
+const setValue = (key: string, value: any) => {
     mmkv.set(key, value)
 }
 
@@ -73,8 +75,9 @@ const stopGenerating = () => {
  *      - Output Sequence + Bot Response
  */
 
-const buildContext = (max_length, messages) => {
-    const delta = new Date()
+const buildContext = (max_length: number) => {
+    const messages = Chats.useChat.getState().data
+    const delta = new Date().getTime()
     const currentInstruct = getObject(Global.CurrentInstruct)
     const userCard = getObject(Global.CurrentUserCard)
     const currentCard = getObject(Global.CurrentCharacterCard)
@@ -95,7 +98,7 @@ const buildContext = (max_length, messages) => {
     let message_acc = ``
     const payload_length = llamaTokenizer.encode(payload).length
     let message_acc_length = llamaTokenizer.encode(message_acc).length
-    for (const message of messages.slice(1).reverse()) {
+    for (const message of messages?.slice(1)?.reverse() ?? []) {
         let message_shard = `${message.name === charName ? currentInstruct.output_sequence : currentInstruct.input_sequence}`
 
         if (currentInstruct.names) message_shard += message.name + ': '
@@ -111,7 +114,7 @@ const buildContext = (max_length, messages) => {
         message_acc_length += shard_length
         message_acc = message_shard + message_acc
     }
-    if (messages[messages.length - 1].name !== charName) {
+    if (messages?.[messages?.length - 1].name !== charName) {
         payload += message_acc + currentInstruct.output_sequence
         if (currentInstruct.names) payload += charName + ': '
     } else {
@@ -119,22 +122,12 @@ const buildContext = (max_length, messages) => {
     }
     payload = replaceMacros(payload)
     console.log(`Payload size: ${llamaTokenizer.encode(payload).length}`)
-    console.log(new Date() - delta, 'ms taken to build context')
+    console.log(`${new Date().getTime() - delta}ms taken to build context`)
     return payload
 }
 
-const buildContextAsync = (max_length, messages) => {
-    return new Promise((resolve, reject) => {
-        try {
-            const result = buildContext(max_length, messages)
-            resolve(result)
-        } catch (error) {
-            reject(error)
-        }
-    })
-}
-
-const buildChatCompletionContext = (max_length, messages) => {
+const buildChatCompletionContext = (max_length: number) => {
+    const messages = Chats.useChat.getState().data
     const userCard = getObject(Global.CurrentUserCard)
     const currentCard = getObject(Global.CurrentCharacterCard)
     const charName = getString(Global.CurrentCharacter)
@@ -147,7 +140,7 @@ const buildChatCompletionContext = (max_length, messages) => {
 
     const payload = [{ role: 'system', content: initial }]
 
-    for (const message of messages.slice(1).reverse()) {
+    for (const message of messages?.slice(1)?.reverse() ?? []) {
         const len = llamaTokenizer.encode(message.mes).length + total_length
         if (len > max_length) break
         payload.push({
@@ -169,12 +162,12 @@ const instructReplaceMacro = () => {
 
 // Payloads
 
-const constructKAIPayload = async (messages) => {
+const constructKAIPayload = () => {
     const preset = getObject(Global.PresetData)
     const currentInstruct = instructReplaceMacro()
 
     return {
-        prompt: await buildContextAsync(preset.max_length, messages),
+        prompt: buildContext(preset.max_length),
         max_context_length: parseInt(preset.max_length),
         max_length: parseInt(preset.genamt),
         rep_pen: parseFloat(preset.rep_pen),
@@ -206,27 +199,27 @@ const constructKAIPayload = async (messages) => {
     }
 }
 
-const constructHordePayload = async (messages) => {
+const constructHordePayload = async () => {
     const preset = getObject(Global.PresetData)
     const currentInstruct = instructReplaceMacro()
     const hordeModels = getObject(Global.HordeModels)
     const hordeWorkers = getObject(Global.HordeWorkers)
 
-    const usedModels = hordeModels.map((item) => {
+    const usedModels = hordeModels.map((item: any) => {
         return item.name
     })
-    const usedWorkers = hordeWorkers.filter((item) =>
-        item.models.some((model) => usedModels.includes(model))
+    const usedWorkers = hordeWorkers.filter((item: any) =>
+        item.models.some((model: any) => usedModels.includes(model))
     )
     const maxWorkerContext = Math.min.apply(
         null,
-        usedWorkers.map((item) => {
+        usedWorkers.map((item: any) => {
             return item.max_context_length
         })
     )
     const usedResponseLength = Math.min.apply(
         null,
-        usedWorkers.map((item) => {
+        usedWorkers.map((item: any) => {
             return item?.max_length
         })
     )
@@ -235,7 +228,7 @@ const constructHordePayload = async (messages) => {
     console.log('Max worker response length: ' + usedResponseLength)
     console.log('Models used: ' + usedModels)
     return {
-        prompt: await buildContextAsync(maxWorkerContext, messages),
+        prompt: buildContext(maxWorkerContext),
         params: {
             n: 1,
             frmtadsnsp: false,
@@ -271,12 +264,12 @@ const constructHordePayload = async (messages) => {
     }
 }
 
-const constructTGWUIPayload = async (messages) => {
+const constructTGWUIPayload = () => {
     const preset = getObject(Global.PresetData)
     const currentInstruct = instructReplaceMacro()
     return {
         stream: true,
-        prompt: await buildContextAsync(preset.max_length, messages),
+        prompt: buildContext(preset.max_length),
         max_tokens: parseInt(preset.genamt),
         do_sample: preset.do_sample,
         temperature: parseFloat(preset.temp),
@@ -308,11 +301,10 @@ const constructTGWUIPayload = async (messages) => {
             currentInstruct.input_sequence,
             currentInstruct.stop_sequence,
         ],
-        seed: parseInt(
+        seed:
             preset?.seed === undefined || preset.seed === -1
-                ? parseInt(Math.random() * 1000000)
-                : -1
-        ),
+                ? Math.floor(Math.random() * 999999)
+                : parseInt(preset.seed),
         guidance_scale: preset.guidance_scale,
         negative_prompt: preset.negative_prompt,
         temperature_last: parseFloat(preset.min_p) !== 1,
@@ -324,7 +316,7 @@ const constructTGWUIPayload = async (messages) => {
     }
 }
 
-const constructMancerPayload = async (messages) => {
+const constructMancerPayload = () => {
     const preset = getObject(Global.PresetData)
     const currentInstruct = instructReplaceMacro()
     const mancerModel = getObject(Global.MancerModel)
@@ -333,7 +325,7 @@ const constructMancerPayload = async (messages) => {
     const gen_len = Math.min(preset.genamt, mancerModel.limits.completion)
 
     return {
-        prompt: await buildContextAsync(context_len, messages),
+        prompt: buildContext(context_len),
         model: mancerModel.id,
         stream: true,
         max_tokens: context_len,
@@ -351,14 +343,14 @@ const constructMancerPayload = async (messages) => {
     }
 }
 
-const constructCompletionsPayload = async (messages) => {
+const constructCompletionsPayload = () => {
     const preset = getObject(Global.PresetData)
     const currentInstruct = instructReplaceMacro()
     return {
         stream: true,
         max_context_length: preset.max_length,
         max_tokens: preset.genamt,
-        prompt: await buildContextAsync(preset.max_length, messages),
+        prompt: buildContext(preset.max_length),
         rep_pen: preset.rep_pen,
         rep_pen_range: preset.rep_pen_range,
         rep_pen_slope: preset.rep_pen_slope,
@@ -375,11 +367,10 @@ const constructCompletionsPayload = async (messages) => {
         mirostat_eta: preset.mirostat_eta,
         grammar: preset.grammar,
         //"trim_stop" : true,
-        seed: parseInt(
+        seed:
             preset?.seed === undefined || preset.seed === -1
-                ? parseInt(Math.random() * 12000000)
-                : -1
-        ),
+                ? Math.floor(Math.random() * 999999)
+                : parseInt(preset.seed),
         sampler_order: [6, 0, 1, 3, 4, 2, 5],
         stop: ['\n\n\n\n\n', currentInstruct.input_sequence],
         frequency_penalty: preset.freq_pen,
@@ -388,12 +379,12 @@ const constructCompletionsPayload = async (messages) => {
     }
 }
 
-const constructLocalPayload = async (messages) => {
+const constructLocalPayload = () => {
     const preset = getObject(Global.PresetData)
     const currentInstruct = instructReplaceMacro()
     const localPreset = getObject(Global.LocalPreset)
     return {
-        prompt: await buildContextAsync(localPreset.context_length, messages),
+        prompt: buildContext(preset.max_length),
         grammar: preset.grammar ?? '',
         stop: [
             currentInstruct.input_sequence,
@@ -421,13 +412,13 @@ const constructLocalPayload = async (messages) => {
     }
 }
 
-const constructOpenRouterPayload = (messages) => {
+const constructOpenRouterPayload = () => {
     const openRouterModel = getObject(Global.OpenRouterModel)
     const currentInstruct = instructReplaceMacro()
     const preset = getObject(Global.PresetData)
 
     return {
-        messages: buildChatCompletionContext(openRouterModel.context_length, messages),
+        messages: buildChatCompletionContext(openRouterModel.context_length),
         model: openRouterModel.id,
         frequency_penalty: preset.freq_pen,
         max_tokens: preset.genamt,
@@ -444,16 +435,15 @@ const constructOpenRouterPayload = (messages) => {
 
 // Fetch Response
 
-const KAIresponse = async (setAbortFunction, insertGeneratedMessage, messages) => {
+const KAIresponse = async (setAbortFunction: AbortFunction) => {
     const kaiendpoint = getString(Global.KAIEndpoint)
     console.log(`Using KAI`)
 
     readableStreamResponse(
         `${kaiendpoint}/api/extra/generate/stream`,
-        JSON.stringify(await constructKAIPayload(messages)),
-        insertGeneratedMessage,
+        JSON.stringify(constructKAIPayload()),
         (item) => {
-            return JSON.parse(item.data).token
+            return JSON.parse(item).token
         },
         setAbortFunction,
         () => {
@@ -467,7 +457,7 @@ const KAIresponse = async (setAbortFunction, insertGeneratedMessage, messages) =
     )
 }
 
-const hordeResponse = async (setAbortFunction, insertGeneratedMessage, messages) => {
+const hordeResponse = async (setAbortFunction: AbortFunction) => {
     const hordeKey = getString(Global.HordeKey)
     const hordeModels = getObject(Global.HordeModels)
 
@@ -498,7 +488,7 @@ const hordeResponse = async (setAbortFunction, insertGeneratedMessage, messages)
 
     console.log(`Using Horde`)
 
-    const payload = await constructHordePayload(messages)
+    const payload = constructHordePayload()
 
     const request = await fetch(`https://stablehorde.net/api/v2/generate/text/async`, {
         method: 'POST',
@@ -559,25 +549,24 @@ const hordeResponse = async (setAbortFunction, insertGeneratedMessage, messages)
 
     if (aborted) return
 
-    insertGeneratedMessage(result.generations[0].text, true)
+    Chats.useChat.getState().setBuffer(result.generations[0].text)
     setValue(Global.NowGenerating, false)
 }
 
-const TGWUIReponseStream = async (setAbortFunction, insertGeneratedMessage, messages) => {
+const TGWUIReponseStream = async (setAbortFunction: AbortFunction) => {
     const endpoint = getString(Global.TGWUIStreamingEndpoint)
 
     readableStreamResponse(
         `${endpoint}/v1/completions`,
-        JSON.stringify(await constructTGWUIPayload(messages)),
-        insertGeneratedMessage,
+        JSON.stringify(constructTGWUIPayload()),
         (item) => {
-            return JSON.parse(item.substring(5)).choices[0].text
+            return JSON.parse(item).choices[0].text
         },
         setAbortFunction
     )
 }
 
-const MancerResponseStream = async (setAbortFunction, insertGeneratedMessage, messages) => {
+const MancerResponseStream = async (setAbortFunction: AbortFunction) => {
     const mancerKey = getString(Global.MancerKey)
     const mancerModel = getObject(Global.MancerModel)
 
@@ -595,11 +584,10 @@ const MancerResponseStream = async (setAbortFunction, insertGeneratedMessage, me
 
     readableStreamResponse(
         `https://neuro.mancer.tech/oai/v1/completions`,
-        JSON.stringify(await constructMancerPayload(messages)),
-        insertGeneratedMessage,
+        JSON.stringify(constructMancerPayload()),
         (item) => {
             if (item === 'data: [DONE]') return ''
-            return JSON.parse(item.substring(5)).choices[0].text
+            return JSON.parse(item).choices[0].text
         },
         setAbortFunction,
         () => {},
@@ -607,16 +595,14 @@ const MancerResponseStream = async (setAbortFunction, insertGeneratedMessage, me
     )
 }
 
-const CompletionsResponseStream = async (setAbortFunction, insertGeneratedMessage, messages) => {
+const CompletionsResponseStream = async (setAbortFunction: AbortFunction) => {
     const endpoint = getString(Global.CompletionsEndpoint)
 
     readableStreamResponse(
         `${endpoint}/v1/completions`,
-        JSON.stringify(await constructCompletionsPayload(messages)),
-        insertGeneratedMessage,
+        JSON.stringify(constructCompletionsPayload()),
         (item) => {
-            if (item === 'data: [DONE]') return ''
-            return JSON.parse(item.substring(5)).choices[0].text
+            return JSON.parse(item).choices[0].text
         },
         setAbortFunction,
         () => {},
@@ -624,14 +610,12 @@ const CompletionsResponseStream = async (setAbortFunction, insertGeneratedMessag
     )
 }
 
-const openRouterResponseStream = async (setAbortFunction, insertGeneratedMessage, messages) => {
+const openRouterResponseStream = async (setAbortFunction: AbortFunction) => {
     readableStreamResponse(
         'https://openrouter.ai/api/v1/chat/completions',
-        JSON.stringify(await constructOpenRouterPayload(messages)),
-        insertGeneratedMessage,
+        JSON.stringify(constructOpenRouterPayload()),
         (item) => {
-            if (item === 'data: [DONE]') return ''
-            return JSON.parse(item.substring(5)).choices[0]?.delta?.content ?? ''
+            return JSON.parse(item).choices[0]?.delta?.content ?? ''
         },
         setAbortFunction,
         () => {},
@@ -639,84 +623,28 @@ const openRouterResponseStream = async (setAbortFunction, insertGeneratedMessage
     )
 }
 
-const readableStreamResponse2 = async (
-    endpoint,
-    payload,
-    insertGeneratedMessage,
-    jsonreader,
-    setAbortFunction,
-    abort_func = () => {},
-    header = {}
-) => {
-    let aborted = false
+const localStreamResponse = async (setAbortFunction: AbortFunction) => {
+    const currentInstruct = JSON.parse(mmkv.getString(Global.CurrentInstruct) ?? '')
+    const userName = mmkv.getString(Global.CurrentUser)
+    const charName = mmkv.getString(Global.CurrentCharacter)
 
-    const controller = new AbortController()
-
-    setAbortFunction((abortFunction) => () => {
-        //controller.abort()
-        aborted = true
-        setValue(Global.NowGenerating, false)
-        abort_func()
-    })
-    const timeout = setTimeout(() => controller.abort(), 10000)
-
-    const decoder = new TextDecoder()
-
-    fetch(endpoint, {
-        reactNative: { textStreaming: true },
-        method: `POST`,
-        body: payload,
-        signal: controller.signal,
-        headers: {
-            accept: 'application/json',
-            'Content-Type': 'application/json',
-            ...header,
-        },
-    })
-        .then(async (response) => {
-            clearTimeout(timeout)
-            console.log(`Response status: ${response.status}`)
-            if (response.status !== 200) {
-                Logger.log(`Something went wrong. Error: ${response.status}`, true)
-            }
-            const reader = response.body.getReader()
-
-            return reader.read().then(function processText({ done, value }) {
-                if (done || aborted) {
-                    stopGenerating()
-                    insertGeneratedMessage('', true)
-                    console.log('Done')
-                    return
-                }
-                const text = decoder.decode(value)
-                const events = text.split('\n')
-                for (const e of events) {
-                    let datasum = ''
-                    if (e.startsWith('data')) {
-                        const data = jsonreader(e)
-                        datasum += data
-                    }
-                    if (datasum) insertGeneratedMessage(datasum)
-                }
-                return reader.read().then(processText)
-            })
-        })
-        .catch((error) => {
-            stopGenerating()
-            if (!aborted) Logger.log('Connection Lost...', true)
-            console.log('Response failed: ' + error)
-        })
-}
-
-const localStreamResponse = async (setAbortFunction, insertGeneratedMessage, messages) => {
     setAbortFunction((abortFunction) => async () => {
         Llama.stopCompletion().then(() => {
             setValue(Global.NowGenerating, false)
         })
     })
 
-    const payload = await constructLocalPayload(messages)
-    Llama.completion(payload, insertGeneratedMessage)
+    const payload = constructLocalPayload()
+    Llama.completion(payload, (text: string) => {
+        const buffer = Chats.useChat.getState().buffer
+        const cleaned = (buffer + text)
+            .replaceAll(currentInstruct.input_sequence, ``)
+            .replaceAll(currentInstruct.output_sequence, ``)
+            .replaceAll(currentInstruct.stop_sequence, '')
+            .replaceAll(`${userName} :`, '')
+            .replaceAll(`${charName} :`, '')
+        Chats.useChat.getState().setBuffer(cleaned)
+    })
         .then(() => {
             setValue(Global.NowGenerating, false)
         })
@@ -728,24 +656,17 @@ const localStreamResponse = async (setAbortFunction, insertGeneratedMessage, mes
 }
 
 const readableStreamResponse = async (
-    endpoint,
-    payload,
-    insertGeneratedMessage,
-    jsonreader,
-    setAbortFunction,
+    endpoint: string,
+    payload: Object,
+    jsonreader: (event: any) => string,
+    setAbortFunction: AbortFunction,
     abort_func = () => {},
     header = {}
 ) => {
     const currentInstruct = JSON.parse(mmkv.getString(Global.CurrentInstruct) ?? '')
     const userName = mmkv.getString(Global.CurrentUser)
     const charName = mmkv.getString(Global.CurrentCharacter)
-    const messages = Chats.useChat.getState().data
-    //Messages.useBuffer.getState().insertBuffer(messages.at(-1).mes)
 
-    //const message = messages.at(-1)
-    //const controller = new AbortController()
-
-    //const timeout = setTimeout(() => controller.abort(), 10000)
     const es = new EventSource(endpoint, {
         method: 'POST',
         body: payload,
@@ -769,14 +690,14 @@ const readableStreamResponse = async (
     })
 
     es.addEventListener('message', (event) => {
-        const text = jsonreader(event)
+        const text = jsonreader(event.data)
         const buffer = Chats.useChat.getState().buffer
         const cleaned = (buffer + text)
             .replaceAll(currentInstruct.input_sequence, ``)
             .replaceAll(currentInstruct.output_sequence, ``)
             .replaceAll(currentInstruct.stop_sequence, '')
-            .replaceAll(userName + ':', '')
-            .replaceAll(charName + ':', '')
+            .replaceAll(`${userName} :`, '')
+            .replaceAll(`${charName} :`, '')
         Chats.useChat.getState().setBuffer(cleaned)
     })
     es.addEventListener('error', (event) => {
