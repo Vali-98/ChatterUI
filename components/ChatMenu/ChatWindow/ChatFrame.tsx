@@ -21,18 +21,18 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
     TTSenabled,
     id,
 }) => {
-    const imageDir =
-        message.name === userName ? Users.getImageDir(userName) : Characters.getImageDir(charName)
+    const imageDir = message.is_user
+        ? Users.getImageDir(userName)
+        : Characters.getImageDir(charName)
 
     const [imageSource, setImageSource] = useState({
         uri: imageDir,
     })
 
     useEffect(() => {
-        const newdir =
-            message.name === userName
-                ? Users.getImageDir(userName)
-                : Characters.getImageDir(charName)
+        const newdir = message.is_user
+            ? Users.getImageDir(userName)
+            : Characters.getImageDir(charName)
         setImageSource({ uri: newdir })
     }, [charName])
 
@@ -55,7 +55,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
                     source={imageSource}
                 />
                 <Text style={styles.graytext}>#{id}</Text>
-                {deltaTime !== undefined && message.name === charName && (
+                {deltaTime !== undefined && !message.is_user && (
                     <Text style={styles.graytext}>{deltaTime}s</Text>
                 )}
                 {TTSenabled && <TTSMenu message={message.mes} />}
