@@ -19,6 +19,7 @@ type ColorComponent =
     | 'brand'
     | 'text1'
     | 'text2'
+    | 'text3'
     | 'surface1'
     | 'surface2'
     | 'surface3'
@@ -89,6 +90,8 @@ const createColor = (
             return getHSLString(h, 10, 85)
         case 'text2':
             return getHSLString(h, 5, 60)
+        case 'text3':
+            return getHSLString(h, 2, 30)
         case 'surface1':
             return getHSLString(h, 8, 9)
         case 'surface2':
