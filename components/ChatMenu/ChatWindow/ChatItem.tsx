@@ -57,6 +57,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
             saveChat: state.save,
         }))
     )
+
     const buffer = Chats.useChat((state) => (id === messagesLength - 1 ? state.buffer : ''))
 
     useEffect(() => {
@@ -87,13 +88,16 @@ const ChatItem: React.FC<ChatItemProps> = ({
             color: Color.Text,
         },
     }
+    const imageDir =
+        message.name === userName ? Users.getImageDir(userName) : Characters.getImageDir(charName)
 
     const [imageSource, setImageSource] = useState({
-        uri:
-            message.name === charName
-                ? Characters.getImageDir(charName)
-                : Users.getImageDir(userName),
+        uri: imageDir,
     })
+
+    useEffect(() => {
+        setImageSource({ uri: imageDir })
+    }, [charName])
 
     const handleImageError = () => {
         setImageSource(require('@assets/user.png'))
