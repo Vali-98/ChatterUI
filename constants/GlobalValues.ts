@@ -102,4 +102,7 @@ export enum GenerationSettings {
 export enum AppSettings {
     DevMode = 'devmode',
     PrimaryHue = 'primaryhue',
+    AnimateEditor = 'animateeditor',
+    CreateFirstMes = 'createfirstmes',
+    AutoScroll = 'autoscroll',
 }

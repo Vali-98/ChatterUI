@@ -7,7 +7,7 @@ import { Platform, StyleSheet } from 'react-native'
 import { API } from './API'
 import { Characters } from './Characters'
 import { Chats } from './Chat'
-import { Global } from './GlobalValues'
+import { Global, AppSettings } from './GlobalValues'
 import { Instructs } from './Instructs'
 import { Presets } from './Presets'
 import { humanizedISO8601DateTime } from './Utils'
@@ -24,6 +24,7 @@ export {
     Characters,
     Chats,
     Global,
+    AppSettings,
     API,
     Llama,
     humanizedISO8601DateTime,
@@ -119,6 +120,14 @@ export const startupApp = () => {
     // Init step, APIType is never null
     if (mmkv.getString(Global.APIType) === undefined) mmkv.set(Global.APIType, API.KAI)
 
+    if (mmkv.getBoolean(AppSettings.AutoScroll) === undefined)
+        mmkv.set(AppSettings.AutoScroll, true)
+
+    if (mmkv.getBoolean(AppSettings.AnimateEditor) === undefined)
+        mmkv.set(AppSettings.AnimateEditor, true)
+
+    if (mmkv.getBoolean(AppSettings.CreateFirstMes) === undefined)
+        mmkv.set(AppSettings.CreateFirstMes, true)
     // Init step
     Llama.setLlamaPreset()
     Logger.log('Resetting state values for startup.')

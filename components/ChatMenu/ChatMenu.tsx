@@ -162,7 +162,7 @@ const ChatMenu = () => {
             <TouchableOpacity
                 style={styles.headerButtonRight}
                 onPress={() => {
-                    Logger.log('Unimplemented', true)
+                    router.push('/AppSettingsMenu')
                 }}>
                 <FontAwesome name="cog" size={28} color={Style.getColor('primary-text1')} />
             </TouchableOpacity>
@@ -206,7 +206,7 @@ const ChatMenu = () => {
                 <Stack.Screen
                     options={{
                         title: '',
-                        headerRight: () => !showDrawer && headerViewRight,
+                        headerRight: () => (showDrawer ? headerViewRightSettings : headerViewRight),
                         headerLeft: () => headerViewLeft,
                     }}
                 />

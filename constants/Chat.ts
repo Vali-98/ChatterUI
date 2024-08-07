@@ -1,4 +1,4 @@
-import { Global } from './GlobalValues'
+import { AppSettings, Global } from './GlobalValues'
 import { Logger } from './Logger'
 import { replaceMacros } from './Utils'
 import { mmkv } from './mmkv'
@@ -314,6 +314,9 @@ export namespace Chats {
                     character_id: charId,
                 })
                 .returning({ chatId: chats.id })
+
+            // custom setting to not generate first mes
+            if (!mmkv.getBoolean(AppSettings.CreateFirstMes)) return chatId
 
             const [{ entryId }, ...__] = await tx
                 .insert(chatEntries)
