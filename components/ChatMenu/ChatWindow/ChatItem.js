@@ -228,7 +228,7 @@ const ChatItem = ({ message, id, scroll}) => {
             </View>
             
             {   ((id === messages?.length - 2 && message.name === messages[0].character_name  && message?.swipes != undefined && id != 0)
-                || (id === 0 && messages?.swipes != undefined && message?.swipes?.length != 1))
+                || (id === 0 && message?.swipes != undefined && message?.swipes?.length != 1))
                 && <View style={styles.swipesItem}>
                 {!nowGenerating &&
                 <TouchableOpacity onPress={() => {

@@ -4,20 +4,21 @@ import * as FS from 'expo-file-system'
 import { Global } from "./GlobalValues"
 import { API } from "./API"
 import { mmkv } from "./mmkv"
+import { replaceMacros } from "./Utils"
 
 export namespace Chats {
 
     const create = (userName : any, characterName : any, card  : any) => {
 
-        const initmessage : String = card?.data?.first_mes ?? card.first_mes
+        const initmessage : string = card?.data?.first_mes ?? card.first_mes
 
-        const newMessage : any = createEntry(characterName, false, initmessage)
+        const newMessage : any = createEntry(characterName, false, replaceMacros(initmessage))
 
         if(card?.data?.alternate_greetings != undefined && card.data.alternate_greetings.length != 0) {
             newMessage.swipes = []
             newMessage.swipe_info = []
             card.data.alternate_greetings.map((item : any) => {
-                newMessage.swipes.push(item)
+                newMessage.swipes.push(replaceMacros(item))
                 newMessage.swipe_info.push(
                     {
                         "send_date":humanizedISO8601DateTime(),
