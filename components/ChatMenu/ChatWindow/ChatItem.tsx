@@ -43,14 +43,8 @@ const ChatItem: React.FC<ChatItemProps> = ({
     const fadeAnim = useRef(new Animated.Value(0)).current
     const dyAnim = useRef(new Animated.Value(50)).current
     // globals
-    //const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
-    //const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
-    //const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-    //const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
-    //const [messages, setMessages] = useMMKVObject < Array<MessageEntry> | undefined>(Global.Messages)
-    //const message = messages?.at(id + 1)
-    // local
+
     const message: ChatEntry =
         Chats.useChat(useShallow((state) => state?.data?.[id])) ?? Chats.createEntry('', false, '')
     const messagesLength = Chats.useChat(useShallow((state) => state.data?.length)) ?? -1

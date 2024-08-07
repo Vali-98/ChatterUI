@@ -7,7 +7,7 @@ import axios from 'axios'
 import EventSource from 'react-native-sse'
 
 export const generateResponse = async (setAbortFunction: AbortFunction) => {
-    console.log(`Obtaining response.`)
+    Logger.log(`Obtaining response.`)
     const APIType = getString(Global.APIType)
     try {
         switch (APIType) {
@@ -36,7 +36,6 @@ export const generateResponse = async (setAbortFunction: AbortFunction) => {
                 setValue(Global.NowGenerating, false)
         }
     } catch (error) {
-        console.log(error)
         Logger.log(`Something went wrong: ${error}`, true)
         setValue(Global.NowGenerating, false)
     }
@@ -76,16 +75,15 @@ const stopGenerating = () => {
  */
 
 const buildContext = (max_length: number) => {
-    const messages = Chats.useChat.getState().data
+    const messages = [...(Chats.useChat.getState().data ?? [])]
     const delta = new Date().getTime()
     const currentInstruct = getObject(Global.CurrentInstruct)
     const userCard = getObject(Global.CurrentUserCard)
     const currentCard = getObject(Global.CurrentCharacterCard)
     const charName = getString(Global.CurrentCharacter)
 
-    const usercarddata = (userCard?.data?.description ?? userCard?.description ?? '').trim()
-    const charcarddata = (currentCard?.description ?? currentCard?.data.description).trim()
-
+    const usercarddata = (userCard?.description ?? '').trim()
+    const charcarddata = (currentCard?.data?.description).trim()
     let payload = ``
     if (currentInstruct.system_sequence_prefix) payload += currentInstruct.system_sequence_prefix
     if (currentInstruct.system_prompt) payload += `${currentInstruct.system_prompt}\n`
@@ -98,7 +96,7 @@ const buildContext = (max_length: number) => {
     let message_acc = ``
     const payload_length = llamaTokenizer.encode(payload).length
     let message_acc_length = llamaTokenizer.encode(message_acc).length
-    for (const message of messages?.slice(1)?.reverse() ?? []) {
+    for (const message of messages?.reverse() ?? []) {
         let message_shard = `${message.name === charName ? currentInstruct.output_sequence : currentInstruct.input_sequence}`
 
         if (currentInstruct.names) message_shard += message.name + ': '
@@ -108,21 +106,25 @@ const buildContext = (max_length: number) => {
 
         const shard_length = llamaTokenizer.encode(message_shard).length
         if (message_acc_length + payload_length + shard_length > max_length) {
-            //console.log(llamaTokenizer.encode(payload + message_acc).length > currentInstruct.max_length)
+            //Logger.log(llamaTokenizer.encode(payload + message_acc).length > currentInstruct.max_length)
             break
         }
         message_acc_length += shard_length
         message_acc = message_shard + message_acc
     }
-    if (messages?.[messages?.length - 1].name !== charName) {
-        payload += message_acc + currentInstruct.output_sequence
+
+    payload += message_acc
+    /*
+    if (messages?.at(-1)?.name === charName) {
+        payload += currentInstruct.output_sequence
         if (currentInstruct.names) payload += charName + ': '
     } else {
-        payload += message_acc
-    }
+        payload += currentInstruct.input_sequence
+        if (currentInstruct.names) payload += userCard.name + ': '
+    }*/
     payload = replaceMacros(payload)
-    console.log(`Payload size: ${llamaTokenizer.encode(payload).length}`)
-    console.log(`${new Date().getTime() - delta}ms taken to build context`)
+    Logger.log(`Payload size: ${llamaTokenizer.encode(payload).length}`)
+    Logger.log(`${new Date().getTime() - delta}ms taken to build context`)
     return payload
 }
 
@@ -140,7 +142,7 @@ const buildChatCompletionContext = (max_length: number) => {
 
     const payload = [{ role: 'system', content: replaceMacros(initial) }]
 
-    for (const message of messages?.slice(1)?.reverse() ?? []) {
+    for (const message of messages?.reverse() ?? []) {
         const len = llamaTokenizer.encode(message.mes).length + total_length
         if (len > max_length) break
         payload.push({
@@ -228,9 +230,9 @@ const constructHordePayload = async () => {
         })
     )
 
-    console.log('Max worker context length: ' + maxWorkerContext)
-    console.log('Max worker response length: ' + usedResponseLength)
-    console.log('Models used: ' + usedModels)
+    Logger.log('Max worker context length: ' + maxWorkerContext)
+    Logger.log('Max worker response length: ' + usedResponseLength)
+    Logger.log('Models used: ' + usedModels)
     return {
         prompt: buildContext(maxWorkerContext),
         params: {
@@ -428,7 +430,7 @@ const constructOpenRouterPayload = () => {
 
 const KAIresponse = async (setAbortFunction: AbortFunction) => {
     const kaiendpoint = getString(Global.KAIEndpoint)
-    console.log(`Using KAI`)
+    Logger.log(`Using endpoint: KAI`)
 
     readableStreamResponse(
         `${kaiendpoint}/api/extra/generate/stream`,
@@ -472,12 +474,12 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
                     'Content-Type': 'application/json',
                 },
             }).catch((error) => {
-                console.log(error)
+                Logger.log(error)
             })
         setValue(Global.NowGenerating, false)
     })
 
-    console.log(`Using Horde`)
+    Logger.log(`Using Horde`)
 
     const payload = constructHordePayload()
 
@@ -492,18 +494,17 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
         },
     })
     if (request.status === 401) {
-        console.log('Invalid API key!')
         Logger.log(`Invalid API Key`, true)
         setValue(Global.NowGenerating, false)
         return
     }
     if (request.status !== 202) {
         // TODO: switch case per error type
-        console.log(`Request failed.`)
+        Logger.log(`Request failed.`)
         setValue(Global.NowGenerating, false)
         const body = await request.json()
-        console.log(body.message)
-        for (const e of body.errors) console.log(e)
+        Logger.log(body.message)
+        for (const e of body.errors) Logger.log(e)
         return
     }
 
@@ -515,7 +516,7 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
         await new Promise((resolve) => setTimeout(resolve, 5000))
         if (aborted) return
 
-        console.log(`Checking...`)
+        Logger.log(`Checking...`)
         const response = await fetch(
             `https://stablehorde.net/api/v2/generate/text/status/${generation_id}`,
             {
@@ -529,9 +530,9 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
         )
 
         if (response.status === 400) {
-            console.log(`Response failed.`)
+            Logger.log(`Response failed.`)
             setValue(Global.NowGenerating, false)
-            console.log((await response.json())?.message)
+            Logger.log((await response.json())?.message)
             return
         }
 
@@ -567,7 +568,7 @@ const MancerResponseStream = async (setAbortFunction: AbortFunction) => {
     })
 
     if (check.status !== 200) {
-        console.log(await check.json())
+        Logger.log(await check.json())
         setValue(Global.NowGenerating, false)
         Logger.log(`Invalid Model or API key!`, true)
         return
@@ -630,7 +631,12 @@ const constructReplaceStrings = (): Array<string> => {
 }
 
 const localStreamResponse = async (setAbortFunction: AbortFunction) => {
-    const replace = constructReplaceStrings()
+    const replace = RegExp(
+        constructReplaceStrings()
+            .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+            .join(`|`),
+        'g'
+    )
 
     setAbortFunction((abortFunction) => async () => {
         Llama.stopCompletion().then(() => {
@@ -641,14 +647,12 @@ const localStreamResponse = async (setAbortFunction: AbortFunction) => {
     const payload = constructLocalPayload()
     Llama.completion(payload, (text: string) => {
         const output = Chats.useChat.getState().buffer + text
-        replace.forEach((item) => output.replaceAll(item, ''))
-        Chats.useChat.getState().setBuffer(output)
+        Chats.useChat.getState().setBuffer(output.replaceAll(replace, ''))
     })
         .then(() => {
             setValue(Global.NowGenerating, false)
         })
         .catch((error) => {
-            console.log(`Failed to generate locally: `, error)
             Logger.log(`Failed to generate locally: ${error}`, true)
             setValue(Global.NowGenerating, false)
         })
@@ -666,7 +670,12 @@ const readableStreamResponse = async (
     abort_func = () => {},
     header: KeyHeader = {}
 ) => {
-    const replace = constructReplaceStrings()
+    const replace = RegExp(
+        constructReplaceStrings()
+            .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+            .join(`|`),
+        'g'
+    )
 
     const es = new EventSource(endpoint, {
         method: 'POST',
@@ -681,7 +690,7 @@ const readableStreamResponse = async (
     })
 
     const closeStream = () => {
-        setValue(Global.NowGenerating, false)
+        stopGenerating()
         es.removeAllEventListeners()
         es.close()
     }
@@ -698,15 +707,14 @@ const readableStreamResponse = async (
         }
         const text = jsonreader(event.data)
         const output = Chats.useChat.getState().buffer + text
-        replace.forEach((item) => output.replaceAll(item, ''))
-        Chats.useChat.getState().setBuffer(output)
+        Chats.useChat.getState().setBuffer(output.replaceAll(replace, ''))
     })
 
     es.addEventListener('error', (event) => {
-        console.log(event)
+        Logger.log(`And error occured of type: ${event.type}`)
     })
     es.addEventListener('close', (event) => {
         closeStream()
-        console.log('EventSource closed')
+        Logger.log('EventSource closed')
     })
 }

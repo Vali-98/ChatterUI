@@ -26,7 +26,7 @@ const CharInfo = () => {
     const [currentCard, setCurrentCard] = useMMKVObject<CharacterCardV2>(
         Global.CurrentCharacterCard
     )
-    const [characterCard, setCharacterCard] = useState<CharacterCardV2 | undefined>(undefined)
+    const [characterCard, setCharacterCard] = useState<CharacterCardV2 | undefined>(currentCard)
 
     const loadcard = () => {
         Characters.getCard(charName).then((data) => {
@@ -133,8 +133,8 @@ const CharInfo = () => {
 
                     <Text style={styles.boxText}>
                         Description Tokens:{' '}
-                        {/*characterCard?.data?.description !== undefined &&
-                        llamaTokenizer.encode(characterCard.data.description).length*/}
+                        {characterCard?.data?.description !== undefined &&
+                            llamaTokenizer.encode(characterCard.data.description).length}
                     </Text>
 
                     <ScrollView style={styles.inputContainer}>

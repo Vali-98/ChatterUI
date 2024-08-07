@@ -78,7 +78,7 @@ const ChatSelector = () => {
 
     const handleCreateChat = async () => {
         Chats.createChat(charName ?? '', userName ?? '').then((filename) => {
-            console.log(filename)
+            Logger.debug(`File created: ${filename}`)
             if (filename) handleSelectChat(filename)
         })
     }

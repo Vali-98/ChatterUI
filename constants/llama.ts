@@ -40,12 +40,12 @@ export namespace Llama {
         newname = await DocumentPicker.pickSingle().then(async (result : DocumentPickerResponse) => {
             if(DocumentPicker.isCancel(result)) return ''
             let name = result.name
-            console.log(`Picked file: ${name}`)
+            Logger.log(`Picked file: ${name}`)
             dir = result.uri
-            console.log(dir)
+            Logger.log(dir)
             return name ?? ''
         }).catch(() => {
-            console.log('Picking cancelled')
+            Logger.log('Picking cancelled')
             Logger.log(`No Model Chosen`, true)
             return ''
         })
@@ -67,7 +67,7 @@ export namespace Llama {
         }
 
         if (llamaContext !== undefined) {
-            console.log('Unloading current model')
+            Logger.log('Unloading current model', true)
             await llamaContext?.release()
             modelname = ''
         }
@@ -96,18 +96,13 @@ export namespace Llama {
         /* session code fails atm
         await FS.getInfoAsync(`${model_dir}session.bin`).then((result) => {
             if (!result.exists) return;
-            console.log('Loading previous session');
+            Logger.log('Loading previous session');
             if (llamaContext) llamaContext.loadSession(result.uri);
         });
         */
     }
 
-    export const completion = async (
-        params: CompletionParams,
-        callback = (text: string) => {
-            console.log(text)
-        }
-    ) => {
+    export const completion = async (params: CompletionParams, callback = (text: string) => {}) => {
         if (!isModelLoaded()) return
         Logger.log('Completion Started with Prompt:')
         Logger.log(params.prompt)

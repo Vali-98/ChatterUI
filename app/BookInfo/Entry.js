@@ -1,13 +1,13 @@
 import CheckboxTitle from '@components/CheckboxTitle'
 import SliderItem from '@components/SliderItem'
 import { FontAwesome } from '@expo/vector-icons'
-import { Color } from '@globals'
+import { Color, Logger } from '@globals'
 import { useState, useRef } from 'react'
 import { Text, View, TouchableOpacity, TextInput, StyleSheet } from 'react-native'
 import Collapsible from 'react-native-collapsible'
 
 const Entry = ({ data, datakey, updateBook }) => {
-    console.log(datakey)
+    Logger.log(datakey)
     const previousdatakey = useRef(datakey)
     const [collapsed, setCollapsed] = useState(true)
     if (datakey !== previousdatakey.current) {

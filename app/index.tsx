@@ -1,6 +1,6 @@
 import { ChatWindow } from '@components/ChatMenu/ChatWindow/ChatWindow'
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Chats } from '@globals'
+import { Global, Color, Chats, Logger } from '@globals'
 import { generateResponse } from '@lib/Inference'
 import { Stack, useRouter } from 'expo-router'
 import { useState, useEffect } from 'react'
@@ -27,20 +27,22 @@ const Home = () => {
     const [abortFunction, setAbortFunction] = useState<undefined | Function>(undefined)
     const messagesLength = Chats.useChat(useShallow((state) => state?.data?.length)) ?? -1
 
-    const { updateFromBuffer, saveChat, insertEntry, deleteEntry, setBuffer } = Chats.useChat(
-        useShallow((state) => ({
-            updateFromBuffer: state.updateFromBuffer,
-            saveChat: state.save,
-            insertEntry: state.addEntry,
-            deleteEntry: state.deleteEntry,
-            setBuffer: state.setBuffer,
-        }))
-    )
+    const { updateFromBuffer, saveChat, insertEntry, deleteEntry, setBuffer, inserLastToBuffer } =
+        Chats.useChat(
+            useShallow((state) => ({
+                updateFromBuffer: state.updateFromBuffer,
+                saveChat: state.save,
+                insertEntry: state.addEntry,
+                deleteEntry: state.deleteEntry,
+                setBuffer: state.setBuffer,
+                inserLastToBuffer: state.insertLastToBuffer,
+            }))
+        )
 
     useEffect(() => {
         nowGenerating && startInference()
         if (!nowGenerating && charName !== 'Welcome' && messagesLength !== 0) {
-            console.log(`Saving chat`)
+            Logger.log(`Saving Chat`)
             updateFromBuffer()
             setBuffer('')
             saveChat()
@@ -59,12 +61,12 @@ const Home = () => {
     }
 
     const abortResponse = () => {
-        console.log(`Aborting Generation`)
+        Logger.log(`Aborting Generation`)
         if (abortFunction !== undefined) abortFunction()
     }
 
     const regenerateResponse = () => {
-        console.log('Regenerate Response')
+        Logger.log('Regenerate Response')
         if (charName && messagesLength !== 2) {
             deleteEntry(messagesLength - 1)
         }
@@ -73,7 +75,8 @@ const Home = () => {
     }
 
     const continueResponse = () => {
-        console.log(`Continuing Reponse`)
+        Logger.log(`Continuing Reponse`)
+        inserLastToBuffer()
         setNowGenerating(true)
     }
 

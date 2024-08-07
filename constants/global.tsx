@@ -93,7 +93,7 @@ export const saveStringExternal = async (
                     Logger.log(`File saved sucessfully`, true)
                 })
                 .catch((e) => {
-                    console.log(e)
+                    Logger.log(e)
                 })
         }
     } else if (Platform.OS === 'ios') Sharing.shareAsync(filename)
@@ -127,7 +127,7 @@ export const startupApp = () => {
         mmkv.set(Global.LorebookNames, JSON.stringify([]))
     if (mmkv.getString(Global.APIType) === undefined) mmkv.set(Global.APIType, API.KAI)
     Llama.setLlamaPreset()
-    console.log('Reset values')
+    Logger.log('Resetting state values for startup.')
     SystemUI.setBackgroundColorAsync(Color.Background)
 }
 
@@ -142,18 +142,18 @@ export const initializeApp = async () => {
             mmkv.set(Global.CurrentUser, Users.defaultUserName)
             mmkv.set(Global.CurrentUserCard, JSON.stringify(Users.defaultUserCard))
             Users.createUser(Users.defaultUserName)
-            console.log('Created default User')
+            Logger.log('Created default User')
         })
-        .catch((error) => console.log(`Could not generate default User. Reason: ${error}`))
+        .catch((error) => Logger.log(`Could not generate default User. Reason: ${error}`))
 
     await Presets.getFileList()
         .then((files) => {
             if (files.length > 0) return
             mmkv.set(Global.PresetData, JSON.stringify(Presets.defaultPreset()))
             Presets.saveFile('Default', Presets.defaultPreset())
-            console.log('Created default Preset')
+            Logger.log('Created default Preset')
         })
-        .catch((error) => console.log(`Could not generate default Preset. Reason: ${error}`))
+        .catch((error) => Logger.log(`Could not generate default Preset. Reason: ${error}`))
 
     await Instructs.getFileList()
         .then((files) => {
@@ -161,9 +161,9 @@ export const initializeApp = async () => {
             mmkv.set(Global.CurrentInstruct, JSON.stringify(Instructs.defaultInstruct()))
             mmkv.set(Global.InstructName, 'Default')
             Instructs.saveFile('Default', Instructs.defaultInstruct())
-            console.log('Created default Instruct')
+            Logger.log('Created default Instruct')
         })
-        .catch((error) => console.log(`Could not generate default Instruct. Reason: ${error}`))
+        .catch((error) => Logger.log(`Could not generate default Instruct. Reason: ${error}`))
 
     await migratePresets()
 }
@@ -173,7 +173,7 @@ export const generateDefaultDirectories = async () => {
 
     dirs.map(async (dir: string) => {
         await FS.makeDirectoryAsync(`${FS.documentDirectory}${dir}`, {})
-            .then(() => console.log(`Successfully made directory: ${dir}`))
+            .then(() => Logger.log(`Successfully made directory: ${dir}`))
             .catch(() => {})
     })
 }
@@ -185,7 +185,7 @@ export const migratePresets = async () => {
             // move all files
             // delete /kai /tgwui /novelai
             const dirs = ['/kai', '/tgwui', '/novelai']
-            console.log('Migrating old presets.')
+            Logger.log('Migrating old presets.')
             let count = 1
             dirs.map(
                 async (dir) =>
@@ -211,7 +211,7 @@ export const migratePresets = async () => {
                         }
                     )
             )
-            console.log('Migration successful.')
+            Logger.log('Migration successful.')
         })
         .catch(() => {})
 }
