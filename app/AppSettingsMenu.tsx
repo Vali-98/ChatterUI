@@ -107,8 +107,8 @@ const AppSettingsMenu = () => {
             <Stack.Screen options={{ title: 'App Settings' }} />
 
             <Text style={{ ...styles.sectionTitle, paddingTop: 0 }}>Style</Text>
-
-            <SwitchComponent
+            {/* Removed as this animation is buggy on Samsung devices, now defaults to no animation */}
+            {/*<SwitchComponent
                 title="Animate Editor"
                 value={animateEditor}
                 onValueChange={setAnimateEditor}
@@ -117,7 +117,7 @@ const AppSettingsMenu = () => {
             <Text style={styles.subtitle}>
                 This will skip the popup animation on the chat editor for compatibility on certain
                 devices. Enable if you are experience weird chat editor behavior
-            </Text>
+            </Text>*/}
 
             <TouchableOpacity
                 style={styles.button}
