@@ -59,7 +59,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                     <Text style={styles.title}>{title}</Text>
                     <View style={styles.inputContainer}>
                         <TextInput style={styles.input} value={text} onChangeText={setText} />
-                        {showPaste && (
+                        {showPaste && !text && (
                             <TouchableOpacity
                                 style={styles.inputButton}
                                 onPress={async () => {

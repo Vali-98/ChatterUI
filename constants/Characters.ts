@@ -393,8 +393,7 @@ export namespace Characters {
         const uuidRegex =
             /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
         const url = new URL(text)
-
-        if (url.hostname === 'pygmalion.chat') {
+        if (/pygmalion.chat/.test(url.hostname)) {
             const param = new URLSearchParams(text)
             let character_id = param.get('id')?.replaceAll(`"`, '')
             const path = url.pathname.replace('/character/', '')
@@ -407,7 +406,7 @@ export namespace Characters {
             }
         }
 
-        if (url.hostname === 'chub.ai') {
+        if (/chub.ai|characterhub.org/.test(url.hostname)) {
             const path = url.pathname.replace('/characters/', '')
             if (/^[^\/]+\/[^\/]+$/.test(path)) return importCharacterFromChub(path)
             else {
