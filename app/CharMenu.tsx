@@ -1,3 +1,4 @@
+import AnimatedView from '@components/AnimatedView'
 import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
 import { Color, Global, Characters, Chats, Logger } from '@globals'
@@ -73,93 +74,99 @@ const CharMenu = () => {
     }, [])
 
     return (
-        <SafeAreaView style={styles.mainContainer}>
-            <Stack.Screen
-                options={{
-                    headerRight: () => (
-                        <View style={styles.headerButtonContainer}>
-                            <TouchableOpacity
-                                style={styles.headerButtonRight}
-                                onPress={async () => {
-                                    setShowDownload(true)
-                                }}>
-                                <FontAwesome name="cloud-download" size={28} color={Color.Button} />
-                            </TouchableOpacity>
+        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+            <SafeAreaView style={styles.mainContainer}>
+                <Stack.Screen
+                    options={{
+                        headerRight: () => (
+                            <View style={styles.headerButtonContainer}>
+                                <TouchableOpacity
+                                    style={styles.headerButtonRight}
+                                    onPress={async () => {
+                                        setShowDownload(true)
+                                    }}>
+                                    <FontAwesome
+                                        name="cloud-download"
+                                        size={28}
+                                        color={Color.Button}
+                                    />
+                                </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={styles.headerButtonRight}
-                                onPress={() =>
-                                    Characters.importCharacterFromImage().then(async () => {
-                                        getCharacterList()
-                                    })
-                                }>
-                                <FontAwesome name="upload" size={28} color={Color.Button} />
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.headerButtonRight}
+                                    onPress={() =>
+                                        Characters.importCharacterFromImage().then(async () => {
+                                            getCharacterList()
+                                        })
+                                    }>
+                                    <FontAwesome name="upload" size={28} color={Color.Button} />
+                                </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={styles.headerButtonRight}
-                                onPress={async () => {
-                                    setShowNewChar(true)
-                                }}>
-                                <FontAwesome name="pencil" size={28} color={Color.Button} />
-                            </TouchableOpacity>
-                        </View>
-                    ),
-                }}
-            />
+                                <TouchableOpacity
+                                    style={styles.headerButtonRight}
+                                    onPress={async () => {
+                                        setShowNewChar(true)
+                                    }}>
+                                    <FontAwesome name="pencil" size={28} color={Color.Button} />
+                                </TouchableOpacity>
+                            </View>
+                        ),
+                    }}
+                />
 
-            <TextBoxModal
-                booleans={[showNewChar, setShowNewChar]}
-                title="[Creating Character]  Enter Name Below"
-                onConfirm={(text) => {
-                    Characters.createCard(text).then(async () => {
-                        if (!text) {
-                            Logger.log('Name Cannot Be Empty!', true)
-                            return
-                        }
-                        if (await Characters.exists(text)) {
-                            Logger.log('Character Name Already Exists', true)
-                            return
-                        }
+                <TextBoxModal
+                    booleans={[showNewChar, setShowNewChar]}
+                    title="[Creating Character]  Enter Name Below"
+                    onConfirm={(text) => {
+                        Characters.createCard(text).then(async () => {
+                            if (!text) {
+                                Logger.log('Name Cannot Be Empty!', true)
+                                return
+                            }
+                            if (await Characters.exists(text)) {
+                                Logger.log('Character Name Already Exists', true)
+                                return
+                            }
 
-                        setCharName(text)
-                        router.push(`/CharInfo`)
-                        getCharacterList()
-                    })
-                }}
-            />
+                            setCharName(text)
+                            router.push(`/CharInfo`)
+                            getCharacterList()
+                        })
+                    }}
+                />
 
-            <TextBoxModal
-                title="Enter Character Hub or Pygmalion Link"
-                booleans={[showDownload, setShowDownload]}
-                onConfirm={(text) =>
-                    Characters.importCharacterFromRemote(text).then(() => {
-                        getCharacterList()
-                    })
-                }
-            />
+                <TextBoxModal
+                    title="Enter Character Hub or Pygmalion Link"
+                    booleans={[showDownload, setShowDownload]}
+                    onConfirm={(text) =>
+                        Characters.importCharacterFromRemote(text).then(() => {
+                            getCharacterList()
+                        })
+                    }
+                />
 
-            <ScrollView>
-                {characterList.map((character, index) => (
-                    <TouchableOpacity
-                        disabled={nowLoading}
-                        style={styles.longButton}
-                        key={index}
-                        onPress={() => setCurrentCharacter(character)}>
-                        <Image
-                            source={{
-                                uri: `${FS.documentDirectory}characters/${character}/${character}.png`,
-                            }}
-                            style={styles.avatar}
-                        />
-                        <Text style={styles.nametag}>{character}</Text>
-                        {nowLoading && character == charName && (
-                            <ActivityIndicator color={Color.White} style={{ paddingLeft: 8 }} />
-                        )}
-                    </TouchableOpacity>
-                ))}
-            </ScrollView>
-        </SafeAreaView>
+                <ScrollView>
+                    {characterList.map((character, index) => (
+                        <TouchableOpacity
+                            disabled={nowLoading}
+                            style={styles.longButton}
+                            key={index}
+                            onPress={() => setCurrentCharacter(character)}>
+                            <Image
+                                source={{
+                                    uri: `${FS.documentDirectory}characters/${character}/${character}.png`,
+                                }}
+                                style={styles.avatar}
+                            />
+                            <Text style={styles.nametag}>{character}</Text>
+                            {nowLoading && character == charName && (
+                                <ActivityIndicator color={Color.White} style={{ paddingLeft: 8 }} />
+                            )}
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+            </SafeAreaView>
+        </AnimatedView>
     )
 }
 

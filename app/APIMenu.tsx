@@ -14,7 +14,7 @@ import { useEffect } from 'react'
 import { SafeAreaView, Text, StyleSheet, View, ScrollView } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVString } from 'react-native-mmkv'
-
+import AnimatedView from '@components/AnimatedView'
 const APIMenu = () => {
     const [APIType, setAPIType] = useMMKVString(Global.APIType)
     const apinames = [
@@ -34,48 +34,50 @@ const APIMenu = () => {
     }, [])
 
     return (
-        <SafeAreaView style={styles.mainContainer}>
-            <Stack.Screen
-                options={{
-                    title: `API`,
-                    animation: 'slide_from_left',
-                }}
-            />
-            <ScrollView>
-                <View style={styles.dropdownContainer}>
-                    <Text style={{ color: Color.Text, fontSize: 16 }}>Type</Text>
-                    <Dropdown
-                        value={APIType}
-                        style={styles.dropdownbox}
-                        selectedTextStyle={styles.selected}
-                        data={apinames}
-                        labelField="label"
-                        valueField="value"
-                        onChange={(item) => {
-                            if (item.value === APIType) return
-                            setAPIType(item.value)
-                        }}
-                        containerStyle={styles.dropdownbox}
-                        itemTextStyle={{ color: Color.Text }}
-                        itemContainerStyle={{
-                            backgroundColor: Color.DarkContainer,
-                            borderRadius: 8,
-                        }}
-                        activeColor={Color.Container}
-                        maxHeight={500}
-                        placeholderStyle={{ color: Color.Offwhite }}
-                    />
-                </View>
-                {APIType === API.KAI && <KAI />}
-                {APIType === API.HORDE && <Horde />}
-                {APIType === API.TGWUI && <TGWUI />}
-                {APIType === API.MANCER && <Mancer />}
-                {APIType === API.COMPLETIONS && <TextCompletions />}
-                {APIType === API.LOCAL && <Local />}
-                {APIType === API.OPENROUTER && <OpenRouter />}
-                {APIType === API.OPENAI && <OpenAI />}
-            </ScrollView>
-        </SafeAreaView>
+        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+            <SafeAreaView style={styles.mainContainer}>
+                <Stack.Screen
+                    options={{
+                        title: `API`,
+                        animation: 'fade',
+                    }}
+                />
+                <ScrollView>
+                    <View style={styles.dropdownContainer}>
+                        <Text style={{ color: Color.Text, fontSize: 16 }}>Type</Text>
+                        <Dropdown
+                            value={APIType}
+                            style={styles.dropdownbox}
+                            selectedTextStyle={styles.selected}
+                            data={apinames}
+                            labelField="label"
+                            valueField="value"
+                            onChange={(item) => {
+                                if (item.value === APIType) return
+                                setAPIType(item.value)
+                            }}
+                            containerStyle={styles.dropdownbox}
+                            itemTextStyle={{ color: Color.Text }}
+                            itemContainerStyle={{
+                                backgroundColor: Color.DarkContainer,
+                                borderRadius: 8,
+                            }}
+                            activeColor={Color.Container}
+                            maxHeight={500}
+                            placeholderStyle={{ color: Color.Offwhite }}
+                        />
+                    </View>
+                    {APIType === API.KAI && <KAI />}
+                    {APIType === API.HORDE && <Horde />}
+                    {APIType === API.TGWUI && <TGWUI />}
+                    {APIType === API.MANCER && <Mancer />}
+                    {APIType === API.COMPLETIONS && <TextCompletions />}
+                    {APIType === API.LOCAL && <Local />}
+                    {APIType === API.OPENROUTER && <OpenRouter />}
+                    {APIType === API.OPENAI && <OpenAI />}
+                </ScrollView>
+            </SafeAreaView>
+        </AnimatedView>
     )
 }
 

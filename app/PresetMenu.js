@@ -1,4 +1,5 @@
 import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from '@components'
+import AnimatedView from '@components/AnimatedView'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Presets, saveStringExternal, Logger } from '@globals'
 import { Stack } from 'expo-router'
@@ -188,161 +189,163 @@ const PresetMenu = () => {
     }, [])
 
     return (
-        <SafeAreaView style={{ backgroundColor: Color.Background }}>
-            <TextBoxModal
-                booleans={[showNewPreset, setShowNewPreset]}
-                onConfirm={(text) => {
-                    for (const item of presetList)
-                        if (item.label === text) {
-                            Logger.log(`Preset name already exists.`, true)
-                            return
-                        }
-
-                    Presets.saveFile(text, currentPreset).then(() => {
-                        Logger.log(`Preset created.`, true)
-                        loadPresetList(text)
-                        setPresetName((currentPreset) => text)
-                    })
-                }}
-            />
-
-            <Stack.Screen
-                options={{
-                    animation: 'slide_from_left',
-                    title: `Presets`,
-                }}
-            />
-
-            <View style={styles.dropdownContainer}>
-                <Dropdown
-                    value={presetName}
-                    data={presetList}
-                    valueField="label"
-                    labelField="label"
-                    onChange={(item) => {
-                        if (item.label === presetName) return
-                        setPresetName(item.label)
-                        Presets.loadFile(item.label).then((preset) => {
-                            setCurrentPreset(JSON.parse(preset))
-                        })
-                    }}
-                    style={styles.dropdownbox}
-                    selectedTextStyle={styles.selected}
-                    placeholderStyle={{ color: Color.Offwhite }}
-                />
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        Presets.saveFile(presetName, currentPreset).then(
-                            Logger.log(`Preset Updated!.`, true)
-                        )
-                    }}>
-                    <FontAwesome size={24} name="save" color={Color.Button} />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        if (presetList.length === 1) {
-                            Logger.log(`Cannot Delete Last Preset.`, true)
-                            return
-                        }
-                        Alert.alert(
-                            `Delete Preset`,
-                            `Are you sure you want to delete '${presetName}'?`,
-                            [
-                                { text: `Cancel`, style: `cancel` },
-                                {
-                                    text: `Confirm`,
-                                    style: `destructive`,
-                                    onPress: () => {
-                                        Presets.deleteFile(presetName).then(() => {
-                                            loadPresetList()
-                                        })
-                                    },
-                                },
-                            ]
-                        )
-                    }}>
-                    <FontAwesome size={24} name="trash" color={Color.Button} />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        Presets.uploadFile().then((name) => {
-                            if (name === undefined) {
+        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+            <SafeAreaView style={{ backgroundColor: Color.Background }}>
+                <TextBoxModal
+                    booleans={[showNewPreset, setShowNewPreset]}
+                    onConfirm={(text) => {
+                        for (const item of presetList)
+                            if (item.label === text) {
+                                Logger.log(`Preset name already exists.`, true)
                                 return
                             }
-                            Presets.loadFile(name).then((preset) => {
-                                setCurrentPreset(JSON.parse(preset))
-                                setPresetName(name)
-                                loadPresetList(name)
-                            })
+
+                        Presets.saveFile(text, currentPreset).then(() => {
+                            Logger.log(`Preset created.`, true)
+                            loadPresetList(text)
+                            setPresetName((currentPreset) => text)
                         })
-                    }}>
-                    <FontAwesome size={24} name="upload" color={Color.Button} />
-                </TouchableOpacity>
+                    }}
+                />
 
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={async () => {
-                        saveStringExternal(`${presetName}.json`, JSON.stringify(currentPreset))
-                    }}>
-                    <FontAwesome size={24} name="download" color={Color.Button} />
-                </TouchableOpacity>
+                <Stack.Screen
+                    options={{
+                        animation: 'fade',
+                        title: `Presets`,
+                    }}
+                />
 
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        setShowNewPreset(true)
-                    }}>
-                    <FontAwesome size={24} name="plus" color={Color.Button} />
-                </TouchableOpacity>
-            </View>
+                <View style={styles.dropdownContainer}>
+                    <Dropdown
+                        value={presetName}
+                        data={presetList}
+                        valueField="label"
+                        labelField="label"
+                        onChange={(item) => {
+                            if (item.label === presetName) return
+                            setPresetName(item.label)
+                            Presets.loadFile(item.label).then((preset) => {
+                                setCurrentPreset(JSON.parse(preset))
+                            })
+                        }}
+                        style={styles.dropdownbox}
+                        selectedTextStyle={styles.selected}
+                        placeholderStyle={{ color: Color.Offwhite }}
+                    />
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            Presets.saveFile(presetName, currentPreset).then(
+                                Logger.log(`Preset Updated!.`, true)
+                            )
+                        }}>
+                        <FontAwesome size={24} name="save" color={Color.Button} />
+                    </TouchableOpacity>
 
-            <ScrollView>
-                <View style={styles.mainContainer}>
-                    {Object.keys(presetData).map((item, index) => {
-                        if (!Presets.APIFields[APIType].includes(item)) return
-                        switch (presetData[item].type) {
-                            case SLIDER:
-                                return (
-                                    <SliderItem
-                                        key={index}
-                                        varname={item}
-                                        body={currentPreset}
-                                        setValue={setCurrentPreset}
-                                        {...presetData[item].data}
-                                    />
-                                )
-                            case CHECKBOX:
-                                return (
-                                    <CheckboxTitle
-                                        key={index}
-                                        varname={item}
-                                        body={currentPreset}
-                                        setValue={setCurrentPreset}
-                                        {...presetData[item].data}
-                                    />
-                                )
-                            case TEXTBOX:
-                                return (
-                                    <TextBox
-                                        key={index}
-                                        varname={item}
-                                        body={currentPreset}
-                                        setValue={setCurrentPreset}
-                                        {...presetData[item].data}
-                                    />
-                                )
-                            default:
-                                return <Text>Something Went Wrong!</Text>
-                        }
-                    })}
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            if (presetList.length === 1) {
+                                Logger.log(`Cannot Delete Last Preset.`, true)
+                                return
+                            }
+                            Alert.alert(
+                                `Delete Preset`,
+                                `Are you sure you want to delete '${presetName}'?`,
+                                [
+                                    { text: `Cancel`, style: `cancel` },
+                                    {
+                                        text: `Confirm`,
+                                        style: `destructive`,
+                                        onPress: () => {
+                                            Presets.deleteFile(presetName).then(() => {
+                                                loadPresetList()
+                                            })
+                                        },
+                                    },
+                                ]
+                            )
+                        }}>
+                        <FontAwesome size={24} name="trash" color={Color.Button} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            Presets.uploadFile().then((name) => {
+                                if (name === undefined) {
+                                    return
+                                }
+                                Presets.loadFile(name).then((preset) => {
+                                    setCurrentPreset(JSON.parse(preset))
+                                    setPresetName(name)
+                                    loadPresetList(name)
+                                })
+                            })
+                        }}>
+                        <FontAwesome size={24} name="upload" color={Color.Button} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={async () => {
+                            saveStringExternal(`${presetName}.json`, JSON.stringify(currentPreset))
+                        }}>
+                        <FontAwesome size={24} name="download" color={Color.Button} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            setShowNewPreset(true)
+                        }}>
+                        <FontAwesome size={24} name="plus" color={Color.Button} />
+                    </TouchableOpacity>
                 </View>
-            </ScrollView>
-        </SafeAreaView>
+
+                <ScrollView>
+                    <View style={styles.mainContainer}>
+                        {Object.keys(presetData).map((item, index) => {
+                            if (!Presets.APIFields[APIType].includes(item)) return
+                            switch (presetData[item].type) {
+                                case SLIDER:
+                                    return (
+                                        <SliderItem
+                                            key={index}
+                                            varname={item}
+                                            body={currentPreset}
+                                            setValue={setCurrentPreset}
+                                            {...presetData[item].data}
+                                        />
+                                    )
+                                case CHECKBOX:
+                                    return (
+                                        <CheckboxTitle
+                                            key={index}
+                                            varname={item}
+                                            body={currentPreset}
+                                            setValue={setCurrentPreset}
+                                            {...presetData[item].data}
+                                        />
+                                    )
+                                case TEXTBOX:
+                                    return (
+                                        <TextBox
+                                            key={index}
+                                            varname={item}
+                                            body={currentPreset}
+                                            setValue={setCurrentPreset}
+                                            {...presetData[item].data}
+                                        />
+                                    )
+                                default:
+                                    return <Text>Something Went Wrong!</Text>
+                            }
+                        })}
+                    </View>
+                </ScrollView>
+            </SafeAreaView>
+        </AnimatedView>
     )
 }
 

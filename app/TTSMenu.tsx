@@ -1,3 +1,4 @@
+import AnimatedView from '@components/AnimatedView'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Logger } from '@globals'
 import { Stack } from 'expo-router'
@@ -46,99 +47,101 @@ const TTSMenu = () => {
     }
 
     return (
-        <View style={styles.mainContainer}>
-            <Stack.Screen options={{ title: 'TTS' }} />
-            <View style={styles.enableContainer}>
-                <Text style={{ ...styles.title }}>Enable</Text>
-                <Switch
-                    trackColor={{ false: Color.Offwhite, true: '#f4f3f4' }}
-                    thumbColor={enableTTS ? '#f4f3f4' : Color.Offwhite}
-                    ios_backgroundColor="#3e3e3e"
-                    onValueChange={(value) => {
-                        if (value) {
-                            getVoices(true)
-                        }
-                        setEnableTTS(value)
-                    }}
-                    value={enableTTS}
-                />
-            </View>
-
-            <Text style={{ ...styles.title, marginTop: 8 }}>Language</Text>
-            <Text style={styles.subtitle}>Languages: {Object.keys(languageList).length}</Text>
-            <View style={{ marginTop: 8 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Dropdown
-                        value={lang}
-                        style={{ ...styles.dropdownbox, flex: 1 }}
-                        selectedTextStyle={styles.selected}
-                        data={languages}
-                        labelField="name"
-                        valueField="name"
-                        containerStyle={styles.dropdownbox}
-                        itemTextStyle={{ color: Color.Text }}
-                        itemContainerStyle={{
-                            backgroundColor: Color.DarkContainer,
-                            borderRadius: 8,
+        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+            <View style={styles.mainContainer}>
+                <Stack.Screen options={{ title: 'TTS', animation: 'fade' }} />
+                <View style={styles.enableContainer}>
+                    <Text style={{ ...styles.title }}>Enable</Text>
+                    <Switch
+                        trackColor={{ false: Color.Offwhite, true: '#f4f3f4' }}
+                        thumbColor={enableTTS ? '#f4f3f4' : Color.Offwhite}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={(value) => {
+                            if (value) {
+                                getVoices(true)
+                            }
+                            setEnableTTS(value)
                         }}
-                        activeColor={Color.Container}
-                        placeholderStyle={styles.selected}
-                        placeholder="Select Language"
-                        onChange={(item) => setLang(item.name)}
+                        value={enableTTS}
                     />
+                </View>
+
+                <Text style={{ ...styles.title, marginTop: 8 }}>Language</Text>
+                <Text style={styles.subtitle}>Languages: {Object.keys(languageList).length}</Text>
+                <View style={{ marginTop: 8 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Dropdown
+                            value={lang}
+                            style={{ ...styles.dropdownbox, flex: 1 }}
+                            selectedTextStyle={styles.selected}
+                            data={languages}
+                            labelField="name"
+                            valueField="name"
+                            containerStyle={styles.dropdownbox}
+                            itemTextStyle={{ color: Color.Text }}
+                            itemContainerStyle={{
+                                backgroundColor: Color.DarkContainer,
+                                borderRadius: 8,
+                            }}
+                            activeColor={Color.Container}
+                            placeholderStyle={styles.selected}
+                            placeholder="Select Language"
+                            onChange={(item) => setLang(item.name)}
+                        />
+                        <TouchableOpacity
+                            style={{ ...styles.button, marginLeft: 8 }}
+                            onPress={() => getVoices()}>
+                            <FontAwesome name="refresh" size={20} color={Color.White} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+                <Text style={{ ...styles.title, marginTop: 8 }}>Speaker</Text>
+                <Text style={styles.subtitle}>
+                    Speakers: {modelList.filter((item) => item.language === lang).length}
+                </Text>
+
+                <View style={{ marginTop: 8, marginBottom: 16 }}>
+                    {modelList.length !== 0 && (
+                        <Dropdown
+                            value={currentSpeaker?.identifier ?? ''}
+                            style={styles.dropdownbox}
+                            selectedTextStyle={styles.selected}
+                            data={languageList[lang]}
+                            labelField={'identifier'}
+                            valueField={'name'}
+                            containerStyle={styles.dropdownbox}
+                            itemTextStyle={{ color: Color.Text }}
+                            itemContainerStyle={{
+                                backgroundColor: Color.DarkContainer,
+                                borderRadius: 8,
+                            }}
+                            activeColor={Color.Container}
+                            placeholderStyle={styles.selected}
+                            placeholder="Select Speaker"
+                            onChange={(item) => setCurrentSpeaker(item)}
+                        />
+                    )}
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <TouchableOpacity
-                        style={{ ...styles.button, marginLeft: 8 }}
-                        onPress={() => getVoices()}>
-                        <FontAwesome name="refresh" size={20} color={Color.White} />
+                        onPress={() => {
+                            if (currentSpeaker === undefined) {
+                                Logger.log(`No Speaker Chosen`, true)
+                                return
+                            }
+                            Speech.speak('This is a test audio.', {
+                                language: currentSpeaker.language,
+                                voice: currentSpeaker.identifier,
+                            })
+                        }}
+                        style={{ ...styles.button, padding: 8, marginRight: 16 }}>
+                        <Text style={styles.buttonlabel}>Test</Text>
                     </TouchableOpacity>
+                    <Text style={styles.subtitle}>"This is a test audio."</Text>
                 </View>
             </View>
-
-            <Text style={{ ...styles.title, marginTop: 8 }}>Speaker</Text>
-            <Text style={styles.subtitle}>
-                Speakers: {modelList.filter((item) => item.language === lang).length}
-            </Text>
-
-            <View style={{ marginTop: 8, marginBottom: 16 }}>
-                {modelList.length !== 0 && (
-                    <Dropdown
-                        value={currentSpeaker?.identifier ?? ''}
-                        style={styles.dropdownbox}
-                        selectedTextStyle={styles.selected}
-                        data={languageList[lang]}
-                        labelField={'identifier'}
-                        valueField={'name'}
-                        containerStyle={styles.dropdownbox}
-                        itemTextStyle={{ color: Color.Text }}
-                        itemContainerStyle={{
-                            backgroundColor: Color.DarkContainer,
-                            borderRadius: 8,
-                        }}
-                        activeColor={Color.Container}
-                        placeholderStyle={styles.selected}
-                        placeholder="Select Speaker"
-                        onChange={(item) => setCurrentSpeaker(item)}
-                    />
-                )}
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <TouchableOpacity
-                    onPress={() => {
-                        if (currentSpeaker === undefined) {
-                            Logger.log(`No Speaker Chosen`, true)
-                            return
-                        }
-                        Speech.speak('This is a test audio.', {
-                            language: currentSpeaker.language,
-                            voice: currentSpeaker.identifier,
-                        })
-                    }}
-                    style={{ ...styles.button, padding: 8, marginRight: 16 }}>
-                    <Text style={styles.buttonlabel}>Test</Text>
-                </TouchableOpacity>
-                <Text style={styles.subtitle}>"This is a test audio."</Text>
-            </View>
-        </View>
+        </AnimatedView>
     )
 }
 

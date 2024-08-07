@@ -66,7 +66,7 @@ const Settings = () => {
                 {__DEV__ && (
                     <TouchableOpacity
                         style={styles.largeButton}
-                        onPress={() => router.push('/LorebookMenu')}>
+                        onPress={() => router.push('./LorebookMenu')}>
                         <Text style={styles.largeButtonText}>Lorebooks</Text>
                     </TouchableOpacity>
                 )}

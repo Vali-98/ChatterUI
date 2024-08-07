@@ -3,7 +3,7 @@ import { Color, Global, Logger, saveStringExternal } from '@globals'
 import { Stack } from 'expo-router'
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { useMMKVObject } from 'react-native-mmkv'
-
+import AnimatedView from '@components/AnimatedView'
 const Logs = () => {
     const [logs, setLogs] = useMMKVObject<Array<string>>(Global.Logs)
 
@@ -34,33 +34,36 @@ const Logs = () => {
     }
 
     return (
-        <View style={styles.container}>
-            <Stack.Screen
-                options={{
-                    headerRight: () => (
-                        <View style={{ flexDirection: 'row' }}>
-                            <TouchableOpacity
-                                style={{ marginRight: 30, marginTop: 12 }}
-                                onPress={handleFlushLogs}>
-                                <FontAwesome name="trash" size={28} color={Color.Button} />
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={{ marginRight: 20, marginTop: 12 }}
-                                onPress={handleExportLogs}>
-                                <FontAwesome name="download" size={28} color={Color.Button} />
-                            </TouchableOpacity>
-                        </View>
-                    ),
-                }}
-            />
-            <FlatList
-                inverted
-                windowSize={3}
-                data={logitems}
-                keyExtractor={(item) => `${item.key}`}
-                renderItem={({ item, index }) => <Text style={styles.entry}>{item.entry}</Text>}
-            />
-        </View>
+        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+            <View style={styles.container}>
+                <Stack.Screen
+                    options={{
+                        animation: 'fade',
+                        headerRight: () => (
+                            <View style={{ flexDirection: 'row' }}>
+                                <TouchableOpacity
+                                    style={{ marginRight: 30, marginTop: 12 }}
+                                    onPress={handleFlushLogs}>
+                                    <FontAwesome name="trash" size={28} color={Color.Button} />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={{ marginRight: 20, marginTop: 12 }}
+                                    onPress={handleExportLogs}>
+                                    <FontAwesome name="download" size={28} color={Color.Button} />
+                                </TouchableOpacity>
+                            </View>
+                        ),
+                    }}
+                />
+                <FlatList
+                    inverted
+                    windowSize={3}
+                    data={logitems}
+                    keyExtractor={(item) => `${item.key}`}
+                    renderItem={({ item, index }) => <Text style={styles.entry}>{item.entry}</Text>}
+                />
+            </View>
+        </AnimatedView>
     )
 }
 

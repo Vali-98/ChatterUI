@@ -1,3 +1,4 @@
+import AnimatedView from '@components/AnimatedView'
 import ChatMenu from '@components/ChatMenu/ChatMenu'
 import { RecentMessages } from '@constants/RecentMessages'
 import { FontAwesome } from '@expo/vector-icons'
@@ -86,44 +87,48 @@ const ChatSelector = () => {
     }
 
     return (
-        <ScrollView style={styles.mainContainer}>
-            <Stack.Screen
-                options={{
-                    headerRight: () => (
-                        <View>
-                            <TouchableOpacity onPress={handleCreateChat}>
-                                <FontAwesome name="plus" size={28} color={Color.Button} />
-                            </TouchableOpacity>
-                        </View>
-                    ),
-                }}
-            />
-            {chats.reverse().map((filename, index) => (
-                <TouchableOpacity
-                    key={index}
-                    onPress={() => handleSelectChat(filename)}
-                    style={
-                        filename === currentChat ? styles.selectedchatlogitem : styles.chatlogitem
-                    }>
-                    <Image
-                        source={{ uri: Characters.getImageDir(charName) }}
-                        style={styles.avatar}
-                    />
-                    <Text style={styles.chatname}>{filename.replace('.jsonl', '')}</Text>
+        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+            <ScrollView style={styles.mainContainer}>
+                <Stack.Screen
+                    options={{
+                        headerRight: () => (
+                            <View>
+                                <TouchableOpacity onPress={handleCreateChat}>
+                                    <FontAwesome name="plus" size={28} color={Color.Button} />
+                                </TouchableOpacity>
+                            </View>
+                        ),
+                    }}
+                />
+                {chats.reverse().map((filename, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        onPress={() => handleSelectChat(filename)}
+                        style={
+                            filename === currentChat
+                                ? styles.selectedchatlogitem
+                                : styles.chatlogitem
+                        }>
+                        <Image
+                            source={{ uri: Characters.getImageDir(charName) }}
+                            style={styles.avatar}
+                        />
+                        <Text style={styles.chatname}>{filename.replace('.jsonl', '')}</Text>
 
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => handleExportChat(filename)}>
-                        <FontAwesome name="download" size={32} color={Color.Button} />
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => handleExportChat(filename)}>
+                            <FontAwesome name="download" size={32} color={Color.Button} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => handleDeleteChat(filename)}>
+                            <FontAwesome name="trash" size={32} color={Color.Button} />
+                        </TouchableOpacity>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => handleDeleteChat(filename)}>
-                        <FontAwesome name="trash" size={32} color={Color.Button} />
-                    </TouchableOpacity>
-                </TouchableOpacity>
-            ))}
-        </ScrollView>
+                ))}
+            </ScrollView>
+        </AnimatedView>
     )
 }
 
@@ -131,6 +136,7 @@ export default ChatSelector
 
 const styles = StyleSheet.create({
     mainContainer: {
+        paddingVertical: 16,
         paddingHorizontal: 16,
         backgroundColor: Color.Background,
     },
