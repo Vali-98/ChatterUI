@@ -25,7 +25,6 @@ const CharMenu = () => {
     const [showDownload, setShowDownload] = useState(false)
 
     const getCharacterList = async () => {
-        console.log('test')
         await Characters.getCardList().then((list) => {
             setCharacterList(list)
         }).catch(error => console.log(`Could not retrieve characters.\n${error}`))

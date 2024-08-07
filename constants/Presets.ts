@@ -33,7 +33,7 @@ export const APIFields : Object = {
     'grammar'],
     [API.LOCAL] : ['genamt', 'rep_pen', 'rep_pen_range', 'temp', 
     'top_a', 'top_k', 'top_p', 'freq_pen', 'tfs', 'typical', 'presence_pen',
-    'mirostat_mode', 'mirostat_tau', 'mirostat_eta', 'grammar', "min_p"],
+    'mirostat_mode', 'mirostat_tau', 'mirostat_eta', 'grammar', "min_p", "seed"],
     [API.OPENROUTER] : ["freq_pen", "genamt", "presence_pen", "seed", "temp", 
     "top_p", "top_k",  ],
 }
