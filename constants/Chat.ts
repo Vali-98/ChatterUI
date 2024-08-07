@@ -124,7 +124,7 @@ export namespace Chats {
 
             set((state: ChatState) => ({
                 ...state,
-                data: [...(state.data ? state.data : []), entry],
+                data: state.data ? [...state.data, entry] : [entry],
             }))
         },
 

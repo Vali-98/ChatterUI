@@ -31,7 +31,6 @@ const ChatWindow = () => {
     }
 
     const renderItems = ({ item, index }: { item: ListItem; index: number }) => {
-        //if (index === 0) return <ChatItem id={item.index} />
         return (
             <ChatItem
                 id={item.index}
