@@ -52,7 +52,13 @@ const Home = () => {
 			}
 			message_acc += message_shard
 		}
-		payload += message_acc + ((chatCache === '')? currentInstruct.output_sequence : '')
+		if (chatCache === '') {
+			payload += message_acc + currentInstruct.output_sequence
+		}
+		else {
+			payload += message_acc.trim('\n')
+		}
+
 		return {
 			"prompt": payload.replace(`{{char}}`, charName).replace(`{{user}}`,userName),
 			"use_story": false,
@@ -121,6 +127,8 @@ const Home = () => {
 				} catch {
 					data = JSON.parse(`${response.data}}`).results[0].text
 				}
+				if(data === '') return
+
 				setMessages(messages => {
 					try {
 						const createnew = (messages.length < targetLength)	
@@ -210,6 +218,19 @@ const Home = () => {
 								/>
 					</MenuTrigger>
 					<MenuOptions customStyles={styles.optionMenu}>
+						
+						<MenuOption onSelect={() => {
+							console.log(`Aborting Generation`)
+							axios.post(`http://${endpoint}/api/extra/abort`).then(() => {	
+							setNowGenerating(false)
+						})	
+						}}>
+						<View style={styles.optionItem}>
+							<Ionicons name='stop' color={Color.Button} size={24}/>
+							<Text style={styles.optionText} >Stop</Text>
+						</View>
+						</MenuOption>
+
 						<MenuOption onSelect={() => {
 							console.log(`Continuing Reponse`)
 							setTargetLength(messages.length + (messages.at(-1).name === charName)? 0 : 1)
@@ -240,6 +261,7 @@ const Home = () => {
 							<Text style={styles.optionText} >Regenerate</Text>
 						</View>
 						</MenuOption>
+						
 					</MenuOptions>
 				</Menu>
 
@@ -347,14 +369,6 @@ const styles = StyleSheet.create({
 });
 
 export default Home;
-
-
-const createNewChat = (userName, characterName, initmessage) => {
-	return [
-		{"user_name":userName,"character_name":characterName,"create_date":humanizedISO8601DateTime(),"chat_metadata":{"note_prompt":"","note_interval":1,"note_position":1,"note_depth":4,"objective":{"currentObjectiveId":0,"taskTree":{"id":0,"description":"","completed":false,"parentId":"","children":[]},"checkFrequency":"3","chatDepth":"2","hideTasks":false,"prompts":{"createTask":"Pause your roleplay and generate a list of tasks to complete an objective. Your next response must be formatted as a numbered list of plain text entries. Do not include anything but the numbered list. The list must be prioritized in the order that tasks must be completed.\n\nThe objective that you must make a numbered task list for is: [{{objective}}].\nThe tasks created should take into account the character traits of {{char}}. These tasks may or may not involve {{user}} directly. Be sure to include the objective as the final task.\n\nGiven an example objective of 'Make me a four course dinner', here is an example output:\n1. Determine what the courses will be\n2. Find recipes for each course\n3. Go shopping for supplies with {{user}}\n4. Cook the food\n5. Get {{user}} to set the table\n6. Serve the food\n7. Enjoy eating the meal with {{user}}\n    ","checkTaskCompleted":"Pause your roleplay. Determine if this task is completed: [{{task}}].\nTo do this, examine the most recent messages. Your response must only contain either true or false, nothing other words.\nExample output:\ntrue\n    ","currentTask":"Your current task is [{{task}}]. Balance existing roleplay with completing this task."}}}},
-		{"name":characterName,"is_user":false,"send_date":humanizedISO8601DateTime(),"mes":initmessage},
-	]
-}
 
 const createChatEntry = (name, is_user, message) => {
 	return {
