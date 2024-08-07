@@ -1,50 +1,39 @@
-import { useEffect, useRef } from 'react'
-import { ScrollView, StyleSheet, KeyboardAvoidingView, Text, VirtualizedList } from 'react-native'
-import { useMMKVBoolean, useMMKVListener } from 'react-native-mmkv'
-
+import { StyleSheet, KeyboardAvoidingView, FlatList } from 'react-native'
 import { ChatItem } from './ChatItem'
 import { Color, Global } from '@globals'
+import { useMMKVBoolean } from 'react-native-mmkv'
+import { useEffect, useRef } from 'react'
 
 const ChatWindow = ({ messages }) => {
-    const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     // this solution will have to change once editing is enabled as updating the content will scroll
-    const scrollViewRef = useRef(null)
-    useMMKVListener((key) => {
-        if (key === Global.CurrentCharacter || key === Global.CurrentChat)
-            scrollViewRef.current?.scrollToEnd()
-    })
+    const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
+    const flatListRef = useRef(null)
+
     useEffect(() => {
-        if (!nowGenerating) scrollViewRef.current?.scrollToEnd()
+        if (nowGenerating) flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 })
     }, [nowGenerating])
 
-    const getitemcount = () => {
-        return messages.length ? messages?.length - 1 : 0
+    const getItems = () => {
+        return messages
+            .slice(1)
+            .map((message, index) => ({
+                index: index,
+                message: message,
+                key: message.send_date,
+            }))
+            .reverse()
     }
-    const getitems = (_data, index) => {
-        return {
-            index: index,
-            message: messages.at(index + 1),
-            key: messages.at(index + 1).send_date,
-        }
-    }
-
     return (
         <KeyboardAvoidingView style={styles.chatHistory}>
-            <VirtualizedList
-                showsVerticalScrollIndicator={false}
-                getItemCount={getitemcount}
-                onScrollToIndexFailed={() => {}}
-                onContentSizeChange={() => scrollViewRef?.current?.scrollToEnd()}
-                ref={scrollViewRef}
-                initialNumToRender={0}
-                initialScrollIndex={getitemcount() - 1 > -1 ? getitemcount() - 1 : 0}
-                style={{ flex: 1, padding: 4 }}
-                getItem={getitems}
-                keyExtractor={(item) => item.key}
+            <FlatList
+                ref={flatListRef}
+                inverted
                 windowSize={2}
-                renderItem={(item) => (
-                    <ChatItem index={item.index} id={item.index} message={item.message} />
-                )}></VirtualizedList>
+                data={getItems()}
+                keyExtractor={(item) => item.key}
+                renderItem={({ item, index }) => (
+                    <ChatItem id={item.index} message={item.message} />
+                )}></FlatList>
         </KeyboardAvoidingView>
     )
 }

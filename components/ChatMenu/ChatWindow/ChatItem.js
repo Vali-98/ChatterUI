@@ -1,6 +1,5 @@
 import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 import { Global, Color, Chats, Characters, Users, Messages } from '@globals'
-import * as FS from 'expo-file-system'
 import React, { useRef, useEffect, useState } from 'react'
 import {
     View,
@@ -20,7 +19,7 @@ import SimpleMarkdown from 'simple-markdown'
 import TTSMenu from './TTS'
 // global chat property for editing
 
-const ChatItem = ({ id, scroll }) => {
+const ChatItem = ({ id }) => {
     // fade in anim
     const fadeAnim = useRef(new Animated.Value(0)).current
     const dyAnim = useRef(new Animated.Value(50)).current
@@ -30,11 +29,9 @@ const ChatItem = ({ id, scroll }) => {
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
-
-    // drilled
     const [messages, setMessages] = useMMKVObject(Global.Messages)
-    // local
     const message = messages?.at(id + 1)
+    // local
     const [placeholderText, setPlaceholderText] = useState(message.mes)
     const [editMode, setEditMode] = useState(false)
     // figure this  out
