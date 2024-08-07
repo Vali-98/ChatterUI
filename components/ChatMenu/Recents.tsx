@@ -46,7 +46,11 @@ const Recents = () => {
                         <Text style={styles.title}>Recent</Text>
                         {!noRecents && (
                             <TouchableOpacity style={styles.button} onPress={RecentMessages.flush}>
-                                <Text style={{ color: Style.getColor('primary-text2') }}>
+                                <Text
+                                    style={{
+                                        color: Style.getColor('primary-text2'),
+                                        fontSize: 16,
+                                    }}>
                                     Clear All
                                 </Text>
                             </TouchableOpacity>
@@ -134,6 +138,7 @@ const styles = StyleSheet.create({
     title: {
         color: Style.getColor('primary-text1'),
         fontSize: 20,
+        marginLeft: 8,
     },
 
     subtitle: {
@@ -144,8 +149,8 @@ const styles = StyleSheet.create({
     button: {
         padding: 4,
         paddingHorizontal: 8,
-        borderColor: Style.getColor('primary-surface3'),
-        borderWidth: 2,
+        //borderColor: Style.getColor('primary-surface3'),
+        //borderWidth: 2,
         borderRadius: 4,
         marginLeft: 12,
     },
@@ -163,6 +168,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         shadowColor: Style.getColor('primary-shadow'),
         elevation: 12,
+        marginLeft: 12,
     },
 
     textContainer: {
