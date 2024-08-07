@@ -149,6 +149,7 @@ export namespace Style {
         default: {
             placeholderStyle: { color: Style.getColor('primary-text2') },
             containerStyle: {
+                backgroundColor: Style.getColor('primary-surface2'),
                 borderWidth: 0,
                 shadowColor: Style.getColor('primary-shadow'),
                 elevation: 4,
