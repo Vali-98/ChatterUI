@@ -98,12 +98,9 @@ const UserSelector = () => {
                     ToastAndroid.show(`Persona already exists.`, ToastAndroid.SHORT)
                     return
                 }
-                createNewUser(text).then(() => {
-                    loadUserCard(text).then(() => {      
-                        setUserName(text)
-                        router.back()
-                    })
-                })
+                Users.createUser(text)
+                .then(async () => { return Users.loadFile(text)})
+                .then((card) => { setUserName(text) ; setUserCard(card) ; router.back()})
             }}
         />
 

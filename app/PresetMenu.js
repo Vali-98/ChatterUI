@@ -231,14 +231,6 @@ const styles = StyleSheet.create({
         paddingBottom: 150,
     },
 
-    grammarbox : {
-        backgroundColor: Color.DarkContainer,
-        paddingVertical: 8,
-        paddingHorizontal: 8,
-        marginVertical:8,
-        textAlignVertical: `top`,
-    },
-
     dropdownContainer: {
         marginHorizontal: 16,
         marginTop: 16,
@@ -246,7 +238,7 @@ const styles = StyleSheet.create({
         paddingBottom: 12,
         alignItems: 'center',
     },
-
+    
     dropdownbox : {
         flex:1,
         paddingHorizontal: 8,

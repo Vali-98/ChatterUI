@@ -144,7 +144,7 @@ const Instruct = () => {
             <View style={{paddingVertical:20, paddingHorizontal: 16, paddingBottom: 150}}>
             
             <TextBox 
-                text='System Sequence'
+                name='System Sequence'
                 varname="system_prompt"
                 lines={3}
                 body={currentInstruct}
@@ -153,13 +153,13 @@ const Instruct = () => {
 
             <View style={{flexDirection: 'row'}}>
             <TextBox 
-                text='Input Sequence'
+                name='Input Sequence'
                 varname='input_sequence'
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
             />
             <TextBox 
-                text='Output Sequence'
+                name='Output Sequence'
                 varname= "output_sequence"
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
@@ -168,13 +168,13 @@ const Instruct = () => {
             
             <View style={{flexDirection: 'row'}}>
             <TextBox 
-                text='First Output Sequence'
+                name='First Output Sequence'
                 varname='first_output_sequence'
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
             />
             <TextBox 
-                text='Last Output Sequence'
+                name='Last Output Sequence'
                 varname= "last_output_sequence"
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
@@ -183,13 +183,13 @@ const Instruct = () => {
 
             <View style={{flexDirection: 'row'}}>
             <TextBox 
-                text='System Sequence Suffix'
+                name='System Sequence Suffix'
                 varname='system_sequence_prefix'
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
             />
             <TextBox 
-                text='System Sequence Suffix'
+                name='System Sequence Suffix'
                 varname= "system_sequence_suffix"
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
@@ -198,13 +198,13 @@ const Instruct = () => {
 
             <View style={{flexDirection: 'row'}}>
             <TextBox 
-                text='Stop Sequence'
+                name='Stop Sequence'
                 varname='stop_sequence'
                 body={currentInstruct}
                 setValue={setCurrentInstruct}
             />
             <TextBox 
-                text='Seperator Sequence'
+                name='Seperator Sequence'
                 varname= "separator_sequence"
                 body={currentInstruct}
                 setValue={setCurrentInstruct}

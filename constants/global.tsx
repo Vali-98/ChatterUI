@@ -100,6 +100,10 @@ export const startupApp = async () => {
     mmkv.set(Global.NowGenerating, false)
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
     mmkv.set(Global.HordeModels, JSON.stringify([]))
+    const lnames = mmkv.getString(Global.LorebookNames)
+    if(lnames == undefined)
+        mmkv.set(Global.LorebookNames, JSON.stringify([]))
+
     console.log("Reset values")
     SystemUI.setBackgroundColorAsync(Color.Background)
 }
@@ -107,8 +111,8 @@ export const startupApp = async () => {
 // creates default dirs and default objects
 
 export const initializeApp = async () => {
-
-    await FS.readDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => generateDefaultDirectories().then(() => {
+    await generateDefaultDirectories()
+    await FS.readDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => {
         mmkv.set(Global.APIType, API.KAI)
         Users.createUser('User').then(() => {
             console.log(`Creating Default User`)
@@ -130,7 +134,7 @@ export const initializeApp = async () => {
         
     }).catch(
         (error) => console.log(`Could not generate default folders. Reason: ${error}`)
-    ))
+    )
 
     await migratePresets()
     
@@ -138,12 +142,13 @@ export const initializeApp = async () => {
 
 export const generateDefaultDirectories = async () => {
 
-    const dirs = ['characters', 'presets', 'instruct', 'persona']
+    const dirs = ['characters', 'presets', 'instruct', 'persona', 'lorebooks']
 
     dirs.map(async (dir : string)  => {
-        await FS.makeDirectoryAsync(`${FS.documentDirectory}${dir}`).catch(() => console.log(`Failed to make directory: ${dir}`))
+        await FS.makeDirectoryAsync(`${FS.documentDirectory}${dir}`, {})
+        .then(() => console.log(`Successfully made directory: ${dir}`))
+        .catch(() => {})
     })
-
 }
 
 // Migrate seperated presets from 0.4.2 to unified presets
