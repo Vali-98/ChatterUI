@@ -149,10 +149,11 @@ const Home = () => {
 		console.log(`Obtaining response.`)
 		setNewMessage(n => '')
 
-		fetch(`${endpoint}/api/extra/generate/stream`, {
+		fetchWithTimeout(`${endpoint}/api/extra/generate/stream`, {
 			reactNative: {textStreaming: true},
 			method: `POST`,
 			body: JSON.stringify(constructPayload()),
+			timeout: 1000,
 		}, {})
 		.then((response) => {
 			const reader = response.body.getReader()
@@ -215,7 +216,7 @@ const Home = () => {
 						
 						<MenuOption onSelect={() => {
 							console.log(`Aborting Generation`)
-							axios.post(`${endpoint}/api/extra/abort`).then(() => {	
+							axios.create({timeout: 1000}).post(`${endpoint}/api/extra/abort`).then(() => {	
 							setNowGenerating(false)
 						})	
 						}}>
@@ -271,7 +272,7 @@ const Home = () => {
 
 					{ nowGenerating ?
 					<TouchableOpacity style={styles.sendButton} onPress={()=> {
-						axios.post(`${endpoint}/api/extra/abort`).then(() => {	
+						axios.create({timeout: 1000}).post(`${endpoint}/api/extra/abort`).then(() => {	
 							setNowGenerating(false)
 						})	
 					}}>
@@ -399,3 +400,19 @@ function humanizedISO8601DateTime(date) {
     let HumanizedDateTime = (humanYear + "-" + humanMonth + "-" + humanDate + " @" + humanHour + "h " + humanMinute + "m " + humanSecond + "s " + humanMillisecond + "ms");
     return HumanizedDateTime;
 };
+
+
+async function fetchWithTimeout(resource, options = {}) {
+	const { timeout = 200 } = options;
+	
+	const controller = new AbortController();
+	const id = setTimeout(() => controller.abort(), timeout);
+  
+	const response = await fetch(resource, {
+	  ...options,
+	  signal: controller.signal  
+	});
+	clearTimeout(id);
+  
+	return response;
+  }
