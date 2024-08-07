@@ -140,8 +140,8 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
         return (
             <View style={styles.absolute}>
                 <Animated.View
-                    entering={FadeIn.duration(200)}
-                    exiting={FadeOut.duration(200)}
+                    entering={FadeIn.duration(300)}
+                    exiting={FadeOut.duration(500)}
                     style={styles.absolute}>
                     <TouchableOpacity
                         activeOpacity={1}
@@ -164,7 +164,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                         elevation: 20,
                     }}
                     entering={SlideInLeft.duration(300).easing(Easing.out(Easing.quad))}
-                    exiting={SlideOutLeft.duration(300).easing(Easing.out(Easing.quad))}>
+                    exiting={SlideOutLeft.duration(500).easing(Easing.out(Easing.quad))}>
                     <View style={{ justifyContent: 'space-between', flex: 1 }}>
                         <View>
                             <View style={styles.userContainer}>
