@@ -7,6 +7,7 @@ import { Global, generateDefaultDirectories, createNewDefaultChat,
     loadUserCard, createNewUser, writePreset,  writeInstruct, Color, resetEncryption
 } from '@globals'
 import { MenuProvider } from 'react-native-popup-menu';
+import * as SystemUI from 'expo-system-ui'
 
 import * as FS from 'expo-file-system'
 
@@ -42,6 +43,7 @@ const Layout = () => {
         setHordeModels([])
         
         console.log("Reset values")
+        SystemUI.setBackgroundColorAsync(Color.Background)
 
 		FS.readDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => generateDefaultDirectories().then(() => {
             

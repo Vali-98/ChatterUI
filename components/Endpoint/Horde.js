@@ -113,13 +113,22 @@ const Horde = () => {
                         <Text style={{color:Color.Text, flex: 1, fontSize: 16}}>{item.name}</Text>
                         <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
                             <MaterialIcons name='delete' color={Color.Button} size={28} />
-                        </TouchableOpacity>
-                        
+                        </TouchableOpacity>    
+                    </View>
+
+                    <View style={{flexDirection: 'row'}}>
+                        <View>
+                        <Text style={{color:Color.Offwhite}}>Workers</Text>
+                        <Text style={{color:Color.Offwhite}}>Performance</Text>
+                        <Text style={{color:Color.Offwhite}}>ETA</Text>
+                        </View>
+                        <View style={{marginLeft: 8}}>
+                        <Text style={{color:Color.Offwhite}}>:    {item.count}</Text>
+                        <Text style={{color:Color.Offwhite}}>:    {item.performance}</Text>
+                        <Text style={{color:Color.Offwhite}}>:    {item.eta}s</Text>
+                        </View>
                     </View>
                     
-                    <Text style={{color:Color.Offwhite}}>Workers: {'\t\t\t\t\t' + item.count}</Text>
-                    <Text style={{color:Color.Offwhite}}>Performance: {'\t' + item.performance}</Text>
-                    <Text style={{color:Color.Offwhite}}>ETA: {item.eta}s</Text>
                     </View>
                 )}
             />
