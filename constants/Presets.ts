@@ -5,12 +5,28 @@ import { API } from './API'
 
 export namespace Presets {
 
-export const APIFields : any = {
-    [API.KAI] : [],
-    [API.TGWUI] : [],
-    [API.HORDE] : [],
-    [API.MANCER] : [],
-    [API.COMPLETIONS] : []
+export const APIFields : Object = {
+    [API.KAI] : ['max_length', 'genamt', 'rep_pen', 'rep_pen_range', 
+    'rep_pen_slope', 'temp', 'tfs', 'top_a', 'top_k', 'top_p', 
+    'min_p', 'typical', 'single_line', 'seed', 'mirostat_mode',
+    'mirostat_tau', 'mirostat_eta', 'grammar'],
+    [API.TGWUI] : ['max_length', 'genamt', 'rep_pen', 'rep_pen_range', 
+    'rep_pen_slope', 'temp', 'tfs', 'top_a', 'top_k', 'top_p', 
+    'min_p', 'typical', 'single_line', 'seed', 'mirostat_mode',
+    'mirostat_tau', 'mirostat_eta', 'grammar', 'epsilon_cutoff',
+    'eta_cutoff', 'min_length', 'no_repeat_ngram_size', 'num_beams',
+    'penalty_alpha', 'length_penalty', 'early_stopping', 'add_bos_token',
+    'truncation_length', 'ban_eos_token', 'skip_special_tokens', 'freq_pen', 
+    'presence_pen'],
+    [API.HORDE] : ['max_length', 'genamt', 'rep_pen', 'rep_pen_range', 
+    'rep_pen_slope', 'temp', 'tfs', 'top_a', 'top_k', 'top_p', 'ban_eos_token',
+    'typical', 'single_line'],
+    [API.MANCER] : ['max_length', 'genamt', 'rep_pen', 'temp', 
+    'top_a', 'top_k', 'top_p', 'freq_pen', 'presence_pen'],
+    [API.COMPLETIONS] : ['max_length', 'genamt', 'rep_pen', 'temp', 'tfs',
+    'top_a', 'top_k', 'top_p', 'min_p','freq_pen', 'presence_pen', 'seed', 
+    'typical', 'ban_eos_tokens', 'mirostat_mode', 'mirostat_tau', 'mirostat_eta',
+    'grammar']
 }
 
 

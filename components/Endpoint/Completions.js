@@ -1,15 +1,46 @@
-import { View, Text, StyleSheet, TextInput } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native'
+import { useState } from 'react'
 import { useMMKVString } from 'react-native-mmkv'
 import { Global, Color} from '@globals'
+import { FontAwesome } from '@expo/vector-icons'
 
 const Completions = () => {
     
     const [endpoint, setEndpoint] = useMMKVString(Global.CompletionsEndpoint)
-
+    const [completionsKey, setCompletionsKey] = useMMKVString(Global.CompletionsKey)
+    const [keyInput, setKeyInput] = useState('')
     return (
         <View style={styles.mainContainer}>
             
+            <Text style={styles.title}>API Key</Text>
+            <Text style={styles.subtitle}>Key will not be shown</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <TextInput 
+                style={styles.input}
+                value={keyInput}
+                onChangeText={(value) => {
+                    setKeyInput(value)
+                }}
+                placeholder='Press save to confirm key'
+                placeholderTextColor={Color.Offwhite}
+                secureTextEntry
+            />
+            <TouchableOpacity style={styles.button} onPress={() => {
+                if(keyInput === '') {
+                    ToastAndroid.show('No key entered!', 2000)
+                    return
+                }
+                setCompletionsKey(keyInput)
+                setKeyInput('')
+                ToastAndroid.show('Key saved!', 2000)
+            }}></TouchableOpacity>
+            <TouchableOpacity>
+                <FontAwesome name='save' color={Color.Button} size={28} />
+            </TouchableOpacity>
+            </View>
+
             <Text style={styles.title}>Endpoint</Text>
+            <Text style={styles.subtitle}>This endpoint should be cross compatible with many different services.</Text>
             <TextInput 
                 style={styles.input}
                 value={endpoint}
@@ -34,10 +65,16 @@ const styles = StyleSheet.create({
     },
 
     title : {
-        color: Color.Text
+        color: Color.Text,
+        fontSize: 20,
+    },
+    
+    subtitle : {
+        color: Color.Offwhite
     },
 
     input: {
+        flex: 1,
         color: Color.Text,
         backgroundColor: Color.DarkContainer,
         paddingVertical: 4,
@@ -46,5 +83,10 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
 
-   
+    button : {
+        padding:5,
+        backgroundColor: Color.DarkContainer,
+        borderRadius: 4,
+        marginLeft: 8,
+    },
 })

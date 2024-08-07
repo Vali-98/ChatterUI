@@ -14,7 +14,7 @@ const APIMenu = () => {
         {label: 'Horde', value: API.HORDE },
         {label: 'Text Generation Web UI', value: API.TGWUI},
         {label: 'Mancer', value:API.MANCER},
-        {label: 'Chat Completions', value: API.COMPLETIONS}
+        {label: 'Text Completions', value: API.COMPLETIONS}
         //{label: 'NovelAI', value:API.NOVELAI},
     ]
     

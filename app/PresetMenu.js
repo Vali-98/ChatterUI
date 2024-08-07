@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert  } from 'react-native'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
-import { Global, Color, Presets, saveStringExternal} from '@globals'
+import { Global, Color, Presets, saveStringExternal, API} from '@globals'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { Dropdown } from 'react-native-element-dropdown'
 import { FontAwesome } from '@expo/vector-icons'
@@ -17,12 +17,11 @@ const TEXTBOX = 'textbox'
 
 const PresetMenu = () => {
 
-
+    const [APIType, setAPIType] = useMMKVString(Global.APIType)
     const [presetName, setPresetName] = useMMKVString(Global.PresetName)
     const [currentPreset, setCurrentPreset] = useMMKVObject(Global.PresetData)
     const [presetList, setPresetList] = useState([])
     const [showNewPreset, setShowNewPreset] = useState(false)
-    
     
     const presetData = {
         max_length: {type: SLIDER,  data : {name: 'Context Size', step: 16, min: 1024, max:8192}},
@@ -183,6 +182,7 @@ const PresetMenu = () => {
              
         <View style={styles.mainContainer}> 
             {Object.keys(presetData).map((item, index) => {
+                if(!Presets.APIFields[APIType].includes(item)) return
                 switch(presetData[item].type){
                     case SLIDER: 
                         return (
