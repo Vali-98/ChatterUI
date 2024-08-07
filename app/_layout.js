@@ -10,7 +10,7 @@ const Layout = () => {
     useEffect(() => {
         initializeApp().then(() => startupApp())
 	}, []) 
-
+    
     return (
     <MenuProvider>
     <Stack screenOptions={{
@@ -50,4 +50,3 @@ const Layout = () => {
 }
 
 export default Layout;
-

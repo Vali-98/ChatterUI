@@ -9,8 +9,6 @@ import { useEffect } from 'react'
 import { ToastAndroid } from 'react-native'
 import { TextBoxModal, SliderItem, TextBox, CheckboxTitle} from '@components'
 
-
-
 const SLIDER  = 'slider'
 const CHECKBOX = 'checbox'
 const TEXTBOX = 'textbox'

@@ -108,7 +108,6 @@ const Home = () => {
 		console.log(`Aborting Generation`)
 		if(abortFunction !== undefined)
 		abortFunction()
-		setNowGenerating(false)
 	}
 
 	const regenerateResponse = () => {

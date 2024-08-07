@@ -4,7 +4,7 @@ import { useMMKVString } from 'react-native-mmkv'
 import { Global, Color} from '@globals'
 import { FontAwesome } from '@expo/vector-icons'
 
-const Completions = () => {
+const TextCompletions = () => {
     
     const [endpoint, setEndpoint] = useMMKVString(Global.CompletionsEndpoint)
     const [completionsKey, setCompletionsKey] = useMMKVString(Global.CompletionsKey)
@@ -18,9 +18,7 @@ const Completions = () => {
             <TextInput 
                 style={styles.input}
                 value={keyInput}
-                onChangeText={(value) => {
-                    setKeyInput(value)
-                }}
+                onChangeText={setKeyInput}
                 placeholder='Press save to confirm key'
                 placeholderTextColor={Color.Offwhite}
                 secureTextEntry
@@ -55,7 +53,7 @@ const Completions = () => {
     )
 }
 
-export default Completions
+export default TextCompletions
 
 const styles = StyleSheet.create({
     mainContainer : {

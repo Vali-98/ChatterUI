@@ -5,5 +5,6 @@ export const enum API {
     MANCER = 'mancer',
     NOVELAI = 'novel',
     APHRODITE = 'aphrodite',
-    COMPLETIONS = 'completions'
+    COMPLETIONS = 'completions',
+    LOCAL = 'local',
 }

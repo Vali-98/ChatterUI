@@ -4,7 +4,7 @@ import { useMMKVString } from 'react-native-mmkv'
 import { Global, Color, API } from '@globals'
 import { useEffect } from 'react'
 import { Dropdown } from 'react-native-element-dropdown'
-import { KAI, Horde, TGWUI, Mancer, Completions } from '@components/Endpoint'
+import { KAI, Horde, TGWUI, Mancer, TextCompletions, Local } from '@components/Endpoint'
 import { ScrollView } from 'react-native-gesture-handler'
 const APIMenu = () => {
 
@@ -14,7 +14,8 @@ const APIMenu = () => {
         {label: 'Horde', value: API.HORDE },
         {label: 'Text Generation Web UI', value: API.TGWUI},
         {label: 'Mancer', value:API.MANCER},
-        {label: 'Text Completions', value: API.COMPLETIONS}
+        {label: 'Text Completions', value: API.COMPLETIONS},
+        {label: 'Local', value: API.LOCAL},
         //{label: 'NovelAI', value:API.NOVELAI},
     ]
     
@@ -50,11 +51,12 @@ const APIMenu = () => {
                 activeColor={Color.Container}
             />
             </View>
-            {(APIType === API.KAI) && <KAI/>}
-            {(APIType === API.HORDE) && <Horde/>}
-            {(APIType === API.TGWUI) && <TGWUI/>}
-            {(APIType === API.MANCER) && <Mancer/>}
-            {(APIType === API.COMPLETIONS) && <Completions/>}
+            {APIType === API.KAI && <KAI/>}
+            {APIType === API.HORDE && <Horde/>}
+            {APIType === API.TGWUI && <TGWUI/>}
+            {APIType === API.MANCER && <Mancer/>}
+            {APIType === API.COMPLETIONS && <TextCompletions/>}
+            {APIType === API.LOCAL && <Local />}
         </ScrollView>
         </SafeAreaView>
     )

@@ -56,4 +56,10 @@ export const enum Global {
 
     CompletionsEndpoint = 'completionsendpoint',
     CompletionsKey = 'completionskey',
+    
+    // Local
+
+    LocalModel = 'localmodel',
+    LocalModelWeights = 'localdata',
+    LocalPreset = 'localpreset',
 }

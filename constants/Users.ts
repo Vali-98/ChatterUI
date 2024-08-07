@@ -8,6 +8,8 @@ export namespace Users {
         description: "",
     }
 
+    
+
     export const createUser = async (name : string) => {
         return FS.makeDirectoryAsync(`${FS.documentDirectory}persona/${name}`).then(() => {
             return FS.writeAsStringAsync(`${FS.documentDirectory}persona/${name}/${name}.json`, JSON.stringify(defaultUserCard), {encoding: FS.EncodingType.UTF8})
