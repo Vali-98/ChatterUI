@@ -9,18 +9,18 @@ Simple frontend for LLMs built using react-native.
 
 ***This app is highly experimental, expect to lose your chat histories on updates.***
 
-### What is it?
-A frontend for managing chat files and character cards similar to projects like TavernAI / SillyTavern.
-Built for the purpose of learning Javascript, so it may be a little rough around the edges.
+### What Is ChatterUI?
+ChatterUI frontend for managing chat files and character cards similar to projects like TavernAI / SillyTavern.
+Built for the purpose of learning Javascript, so it might be a little rough around the edges.
 
 ### Supported Backends
 - KoboldAI
 - AI Horde
 - text-generation-webui
 - Mancer
-- Text Completions
+- Text Completion
 
-### Building from source.
+### Building From Source
 Building from source has **not** been tested.
 Requires Node.js and Android SDK. Expo uses EAS to build apps which requires a Linux environment. Release APKs are built in WSL.
 ```
