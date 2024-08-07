@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableHighlight } from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
 import { Color, Logger } from '@globals'
 import React from 'react'
@@ -39,24 +39,32 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, id }) => {
 
     return (
         <View style={styles.swipesItem}>
-            <TouchableOpacity
+            <TouchableHighlight
+                style={styles.swipeButton}
                 onPress={handleSwipeLeft}
                 disabled={nowGenerating || message.swipe_id === 0}>
                 <AntDesign
                     name="left"
                     size={20}
-                    color={message.swipe_id === 0 ? Color.ButtonDisabled : Color.Button}
+                    color={
+                        message.swipe_id === 0 || nowGenerating
+                            ? Color.ButtonDisabled
+                            : Color.Button
+                    }
                 />
-            </TouchableOpacity>
+            </TouchableHighlight>
 
             {id !== 0 && (
-                <TouchableOpacity onPress={regenerateResponse} disabled={nowGenerating}>
+                <TouchableHighlight
+                    onPress={regenerateResponse}
+                    disabled={nowGenerating}
+                    style={styles.swipeButton}>
                     <AntDesign
                         name="retweet"
                         size={20}
                         color={nowGenerating ? Color.ButtonDisabled : Color.Button}
                     />
-                </TouchableOpacity>
+                </TouchableHighlight>
             )}
 
             <Text style={styles.swipeText}>
@@ -64,16 +72,20 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, id }) => {
             </Text>
 
             {id !== 0 && (
-                <TouchableOpacity onPress={continueResponse} disabled={nowGenerating}>
+                <TouchableHighlight
+                    onPress={continueResponse}
+                    disabled={nowGenerating}
+                    style={styles.swipeButton}>
                     <AntDesign
                         name="forward"
                         size={20}
                         color={nowGenerating ? Color.ButtonDisabled : Color.Button}
                     />
-                </TouchableOpacity>
+                </TouchableHighlight>
             )}
 
-            <TouchableOpacity
+            <TouchableHighlight
+                style={styles.swipeButton}
                 onPress={handleSwipeRight}
                 disabled={nowGenerating || isLastAltGreeting}>
                 <AntDesign
@@ -81,7 +93,7 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, id }) => {
                     size={20}
                     color={isLastAltGreeting || nowGenerating ? Color.ButtonDisabled : Color.Button}
                 />
-            </TouchableOpacity>
+            </TouchableHighlight>
         </View>
     )
 }
@@ -91,17 +103,23 @@ export default Swipes
 const styles = StyleSheet.create({
     swipesItem: {
         flexDirection: 'row',
-        marginVertical: 8,
-        marginHorizontal: 8,
+        paddingVertical: 2,
+        paddingHorizontal: 1,
         justifyContent: 'space-between',
+        flex: 1,
     },
 
     swipeText: {
         color: Color.Text,
+        borderRadius: 20,
+        paddingVertical: 6,
     },
 
-    swipeTextContainer: {
+    swipeButton: {
+        borderRadius: 20,
         alignItems: 'center',
-        flex: 1,
+        margin: 2,
+        paddingHorizontal: 24,
+        paddingVertical: 4,
     },
 })
