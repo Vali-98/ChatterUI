@@ -15,7 +15,7 @@ import Markdown from 'react-native-markdown-package'
 import { useMMKVBoolean, useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import AnimatedEllipsis from 'rn-animated-ellipsis'
 import SimpleMarkdown from 'simple-markdown'
-
+import * as FS from 'expo-file-system'
 import TTSMenu from './TTS'
 // global chat property for editing
 
@@ -35,8 +35,8 @@ const ChatItem = ({ id }) => {
     const [placeholderText, setPlaceholderText] = useState(message.mes)
     const [editMode, setEditMode] = useState(false)
     // figure this  out
-    //const [imageExists, setImageExists] = useState(true)
-    /*useEffect(() => {
+    const [imageExists, setImageExists] = useState(true)
+    useEffect(() => {
         FS.readAsStringAsync(
             message.name === charName
                 ? Characters.getImageDir(charName)
@@ -45,7 +45,7 @@ const ChatItem = ({ id }) => {
             .then(() => setImageExists(true))
             .catch(() => setImageExists(false))
         setPlaceholderText(messages.at(id + 1).mes)
-    }, [message])*/
+    }, [message])
 
     useEffect(() => {
         setEditMode(false)
@@ -138,9 +138,11 @@ const ChatItem = ({ id }) => {
                     <Image
                         style={styles.avatar}
                         source={
-                            message.name === charName
-                                ? { uri: Characters.getImageDir(charName) }
-                                : { uri: Users.getImageDir(userName) }
+                            imageExists
+                                ? message.name === charName
+                                    ? { uri: Characters.getImageDir(charName) }
+                                    : { uri: Users.getImageDir(userName) }
+                                : require('@assets/user.png')
                         }
                     />
                     <Text style={styles.graytext}>#{id}</Text>
@@ -189,7 +191,10 @@ const ChatItem = ({ id }) => {
                     </View>
 
                     {!editMode ? (
-                        message.name === charName && message.mes === '' && nowGenerating ? (
+                        message.name === charName &&
+                        message.mes === '' &&
+                        nowGenerating &&
+                        id === messages.length - 2 ? (
                             <View style={{ ...styles.messageTextContainer, padding: 5 }}>
                                 <AnimatedEllipsis style={{ color: Color.White, fontSize: 20 }} />
                             </View>

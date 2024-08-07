@@ -28,7 +28,7 @@ const ChatWindow = ({ messages }) => {
             <FlatList
                 ref={flatListRef}
                 inverted
-                windowSize={2}
+                windowSize={3}
                 data={getItems()}
                 keyExtractor={(item) => item.key}
                 renderItem={({ item, index }) => (
