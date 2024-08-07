@@ -45,8 +45,8 @@ export const generateResponse = async () => {
     const data = performance.now()
     const APIType = getString(Global.APIType)
     const apiState = APIState?.[APIType as API]
-    if (APIType === API.LOCAL) await localStreamResponse(useInference.getState().setAbort)
-    else if (apiState) await apiState.inference()
+    //if (APIType === API.LOCAL) await localStreamResponse(useInference.getState().setAbort)
+    if (apiState) await apiState.inference()
     else {
         Logger.log('An invalid API was somehow chosen, this is bad!', true)
     }

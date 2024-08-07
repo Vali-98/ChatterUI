@@ -142,6 +142,10 @@ export namespace Llama {
             })
     }
 
+    export const getDetails = () => {
+        if (llamaContext) return llamaContext.model
+    }
+
     export const getModels = async () => {
         return await FS.readDirectoryAsync(model_dir)
     }
