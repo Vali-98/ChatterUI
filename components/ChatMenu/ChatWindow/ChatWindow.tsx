@@ -1,3 +1,4 @@
+import { useInference } from '@constants/Chat'
 import { AppSettings, Characters, Chats, Global } from '@globals'
 import { StyleSheet, FlatList } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -11,15 +12,18 @@ type ListItem = {
 }
 
 const ChatWindow = () => {
+    'use no memo'
     const charId = Characters.useCharacterCard(useShallow((state) => state?.id))
-    const messagesLength = Chats.useChat(useShallow((state) => state?.data?.messages?.length)) ?? -1
-    const messages = Chats.useChat((state) => state.data?.messages)
+    const { messages } = Chats.useChat((state) => ({
+        messages: state.data?.messages ?? [],
+    }))
+    const messagesLength = messages?.length ?? -1
     const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
 
     const getItems = (): ListItem[] => {
         const list: ListItem[] = []
-        messages?.map((item, index) => list.push({ index: index, key: item.id.toString() }))
-        return list.reverse() ?? []
+        messages.map((item, index) => list.push({ index: index, key: item.id.toString() }))
+        return list.reverse()
     }
 
     const renderItems = ({ item, index }: { item: ListItem; index: number }) => {
