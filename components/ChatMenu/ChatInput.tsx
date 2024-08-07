@@ -1,12 +1,16 @@
 import { useInference } from '@constants/Chat'
 import { generateResponse } from '@constants/Inference'
 import { MaterialIcons } from '@expo/vector-icons'
-import { Characters, Chats, Logger, Style } from '@globals'
+import { AppSettings, Characters, Chats, Logger, Style } from '@globals'
 import React, { useState } from 'react'
 import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
 const ChatInput = () => {
+    'use no memo'
+    const [sendOnEnter, setSendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
+
     const { insertEntry } = Chats.useChat((state) => ({
         insertEntry: state.addEntry,
     }))
@@ -49,6 +53,8 @@ const ChatInput = () => {
                 value={newMessage}
                 onChangeText={(text) => setNewMessage(text)}
                 multiline
+                blurOnSubmit={sendOnEnter}
+                onSubmitEditing={sendOnEnter ? handleSend : undefined}
             />
 
             {nowGenerating ? (

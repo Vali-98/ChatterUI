@@ -114,4 +114,5 @@ export enum AppSettings {
     ChatOnStartup = 'chatonstartup',
     AutoLoadLocal = 'autoloadlocal',
     AutoScroll = 'autoscroll',
+    SendOnEnter = 'sendonenter',
 }
