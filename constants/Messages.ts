@@ -160,7 +160,7 @@ export namespace Messages {
             gen_finished: Date(),
             extra: messages.at(id).extra,
         })
-        messages.at(id).send_date = humanizedISO8601DateTime()
+        //messages.at(id).send_date = humanizedISO8601DateTime()
         messages.at(id).gen_started = Date()
         messages.at(id).gen_finished = Date()
         messages.at(id).swipe_id = messages.at(id).swipe_id + 1

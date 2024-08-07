@@ -52,8 +52,8 @@ const Home = () => {
 
     const regenerateResponse = () => {
         console.log('Regenerate Response')
-        const len = messages.length
-        if (messages.at(-1)?.name === charName) {
+        console.log(messages.length)
+        if (messages.at(-1)?.name === charName && messages.length !== 2) {
             setMessages(messages.slice(0, -1))
         }
         Messages.insertCharacterEntry()
