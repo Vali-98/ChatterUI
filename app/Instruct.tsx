@@ -244,28 +244,28 @@ const Instruct = () => {
                                 />
                             </View>
                             {/* Unused Sequences
-                    <View style={{ flexDirection: 'row' }}>
-                        <TextBox
-                            name="First Output Sequence"
-                            varname="first_output_sequence"
-                            body={currentInstruct}
-                            setValue={setCurrentInstruct}
-                            multiline
-                        />
-                        <TextBox
-                            name="Last Output Sequence"
-                            varname="last_output_sequence"
-                            body={currentInstruct}
-                            setValue={setCurrentInstruct}
-                            multiline
-                        />
-                    </View>
-                    */}
+                            <View style={{ flexDirection: 'row' }}>
+                                <TextBox
+                                    name="First Output Sequence"
+                                    varname="first_output_sequence"
+                                    body={currentInstruct}
+                                    setValue={setCurrentInstruct}
+                                    multiline
+                                />
+                                <TextBox
+                                    name="Last Output Sequence"
+                                    varname="last_output_sequence"
+                                    body={currentInstruct}
+                                    setValue={setCurrentInstruct}
+                                    multiline
+                                />
+                            </View>
+                            */}
 
                             <View style={{ flexDirection: 'row' }}>
                                 <TextBox
                                     name="System Prefix"
-                                    varname="system__prefix"
+                                    varname="system_prefix"
                                     body={currentInstruct}
                                     setValue={setCurrentInstruct}
                                     multiline
@@ -304,13 +304,13 @@ const Instruct = () => {
                             />
 
                             {/* @TODO: Macros are always replaced - people may want this to be changed
-                    <CheckboxTitle
-                        name="Replace Macro In Sequences"
-                        varname="macro"
-                        body={currentInstruct}
-                        setValue={setCurrentInstruct}
-                    />
-                    */}
+                            <CheckboxTitle
+                                name="Replace Macro In Sequences"
+                                varname="macro"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                            />
+                            */}
 
                             <CheckboxTitle
                                 name="Include Names"
@@ -320,31 +320,31 @@ const Instruct = () => {
                             />
 
                             {/*  Groups are not implemented - leftover from ST
-                    <CheckboxTitle
-                        name="Force for Groups and Personas"
-                        varname="names_force_groups"
-                        body={currentInstruct}
-                        setValue={setCurrentInstruct}
-                    />
-                    */}
+                            <CheckboxTitle
+                                name="Force for Groups and Personas"
+                                varname="names_force_groups"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                            />
+                            */}
 
                             {/* Activates Instruct when model is loaded with specific name that matches regex
                     
-                    <TextBox
-                        name="Activation Regex"
-                        varname="activation_regex"
-                        body={currentInstruct}
-                        setValue={setCurrentInstruct}
-                />*/}
+                            <TextBox
+                                name="Activation Regex"
+                                varname="activation_regex"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                            />*/}
 
                             {/*    User Alignment Messages may be needed in future, might be removed on CCv3
-                <TextBox
-                                    name="User Alignment"
-                                    varname="user_alignment_message"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />*/}
+                            <TextBox
+                                name="User Alignment"
+                                varname="user_alignment_message"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />*/}
                         </View>
                     </ScrollView>
                 </SafeAreaView>
