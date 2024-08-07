@@ -75,7 +75,7 @@ const ChatText: React.FC<ChatTextProps> = ({ showEllipsis, nowGenerating, id, is
             <Markdown
                 onLayout={handleContentSizeChange}
                 style={styles.messageText}
-                rules={{ ...MarkdownStyle.Rules }}
+                rules={{ rules: MarkdownStyle.Rules }}
                 styles={MarkdownStyle.Format}>
                 {nowGenerating && isLastMessage ? buffer.trim() : mes.trim()}
             </Markdown>
