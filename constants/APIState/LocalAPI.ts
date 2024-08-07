@@ -1,6 +1,6 @@
 import { Chats, useInference } from '@constants/Chat'
 import { AppSettings, Global } from '@constants/GlobalValues'
-import { Llama } from '@constants/LlamaLocal'
+import { Llama, LlamaPreset } from '@constants/LlamaLocal'
 import { Logger } from '@constants/Logger'
 import { SamplerID } from '@constants/Samplers'
 import { mmkv } from '@constants/mmkv'
@@ -29,7 +29,7 @@ class LocalAPI extends APIBase {
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
         const rep_pen = payloadFields?.['penalty_repeat']
-        const localPreset: Llama.LlamaPreset = this.getObject(Global.LocalPreset)
+        const localPreset: LlamaPreset = this.getObject(Global.LocalPreset)
         return {
             ...payloadFields,
             penalize_nl: typeof rep_pen === 'number' && rep_pen > 1,
@@ -41,13 +41,15 @@ class LocalAPI extends APIBase {
     }
 
     inference = async () => {
-        if (!Llama.isModelLoaded(false) && mmkv.getBoolean(AppSettings.AutoLoadLocal)) {
+        const context = Llama.useLlama.getState().context
+        if (!context && mmkv.getBoolean(AppSettings.AutoLoadLocal)) {
             const model = mmkv.getString(Global.LocalModel)
             const params = this.getObject(Global.LocalPreset)
-            if (model && params) await Llama.loadModel(model, params)
+            if (model && params) await Llama.useLlama.getState().load(model ?? '', params)
         }
 
-        if (!Llama.isModelLoaded()) {
+        if (!context) {
+            Logger.log('No Model Loaded', true)
             this.stopGenerating()
             return
         }
@@ -56,7 +58,7 @@ class LocalAPI extends APIBase {
             mmkv.getBoolean(AppSettings.SaveLocalKV) && !mmkv.getBoolean(Global.LocalSessionLoaded)
 
         if (loadKV) {
-            await Llama.loadKV()
+            await Llama.useLlama.getState().loadKV()
             mmkv.set(Global.LocalSessionLoaded, true)
         }
 
@@ -68,7 +70,7 @@ class LocalAPI extends APIBase {
         )
 
         useInference.getState().setAbort(async () => {
-            Llama.stopCompletion()
+            await Llama.useLlama.getState().stopCompletion()
         })
 
         const payload = this.buildPayload()
@@ -80,9 +82,12 @@ class LocalAPI extends APIBase {
 
         const outputCompleted = (text: string) => {
             Chats.useChat.getState().setBuffer(text.replaceAll(replace, ''))
+            if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.log(`Completion Output:\n${text}`)
         }
 
-        Llama.completion(payload, outputStream, outputCompleted)
+        Llama.useLlama
+            .getState()
+            .completion(payload, outputStream, outputCompleted)
             .then(() => {
                 this.stopGenerating()
             })
