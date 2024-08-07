@@ -30,12 +30,15 @@ class LocalAPI extends APIBase {
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
         const rep_pen = payloadFields?.['penalty_repeat']
+        const n_predict =
+            (typeof payloadFields?.['n_predict'] === 'number' && payloadFields?.['n_predict']) || 0
+
         const localPreset: LlamaPreset = this.getObject(Global.LocalPreset)
         return {
             ...payloadFields,
             penalize_nl: typeof rep_pen === 'number' && rep_pen > 1,
             n_threads: localPreset.threads,
-            prompt: this.buildTextCompletionContext(localPreset.context_length),
+            prompt: this.buildTextCompletionContext(localPreset.context_length - n_predict),
             stop: this.constructStopSequence(),
             emit_partial_completion: true,
         }
