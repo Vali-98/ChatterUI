@@ -50,14 +50,23 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
     const handleImageError = () => {
         setImageSource(require('@assets/user.png'))
     }
-    const deltaTime = Math.round(
-        Math.max(
-            0,
-            ((nowGenerating && isLast ? new Date().getTime() : swipe.gen_finished.getTime()) -
-                swipe.gen_started.getTime()) /
-                1000
+
+    const getDeltaTime = () =>
+        Math.round(
+            Math.max(
+                0,
+                ((nowGenerating && isLast ? new Date().getTime() : swipe.gen_finished.getTime()) -
+                    swipe.gen_started.getTime()) /
+                    1000
+            )
         )
-    )
+
+    const [deltaTime, setDeltaTime] = useState(getDeltaTime())
+
+    useEffect(() => {
+        setDeltaTime(getDeltaTime())
+    }, [nowGenerating])
+
     // TODO: Change TTS to take id and simply retrieve that data on TTS as needed
     return (
         <View style={{ flexDirection: 'row' }}>
