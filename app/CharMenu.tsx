@@ -2,7 +2,7 @@ import AnimatedView from '@components/AnimatedView'
 import TextBoxModal from '@components/TextBoxModal'
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons'
 import { Global, Characters, Chats, Logger, Style } from '@globals'
-import { useRouter, Stack } from 'expo-router'
+import { useRouter, Stack, usePathname } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
     SafeAreaView,
@@ -108,7 +108,7 @@ const CharMenu = () => {
 
     useEffect(() => {
         getCharacterList()
-    }, [])
+    }, [usePathname()])
 
     if (characterList.length === 0)
         return (
