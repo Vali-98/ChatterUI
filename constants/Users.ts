@@ -11,6 +11,8 @@ export namespace Users {
     
     }
     
+    
+
     export const deleteFile = async (name : string) => {
         return FS.deleteAsync( `${FS.documentDirectory}persona/${name}`)
     }

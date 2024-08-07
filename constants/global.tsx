@@ -112,7 +112,9 @@ export const startupApp = async () => {
 
 export const initializeApp = async () => {
     await generateDefaultDirectories()
-    await FS.readDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => {
+    await FS.readDirectoryAsync(`${FS.documentDirectory}`).then((files) => {
+        
+        if(files.length != 0 ) return
         mmkv.set(Global.APIType, API.KAI)
         Users.createUser('User').then(() => {
             console.log(`Creating Default User`)

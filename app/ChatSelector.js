@@ -12,11 +12,12 @@ const ChatSelector = () => {
     const [chats, setChats] = useState([])
     const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     
     useEffect(() => {
         refreshfilenames()
     },[])
-
+    
     const refreshfilenames = () => {
         Chats.getFileList(charName).then(setChats)
     }
