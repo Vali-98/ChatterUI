@@ -46,7 +46,7 @@ const Home = () => {
 	// TODO : Use this to save instead 
 	useEffect(() => {
 		nowGenerating && startInference()
-		if(!nowGenerating && currentChat !== '') {
+		if(!nowGenerating && currentChat !== '' && charName !== 'Welcome' && messages.length !== 0) {
 			console.log(`Saving chat`)
 			saveChatFile(messages, charName, currentChat)
 		}
@@ -78,7 +78,7 @@ const Home = () => {
 		setNowGenerating(true)
 	}
 
-	const insertGeneratedMessage = (data, save=false) => {
+	const insertGeneratedMessage = (data) => {
 		setMessages(messages => {
 			try {
 				const createnew = (messages.length < targetLength)
@@ -88,8 +88,10 @@ const Home = () => {
 				const newmessage = (createnew) ? createChatEntry(charName, false, "") : messages.at(-1)
 				newmessage.mes = mescontent
 				newmessage.swipes[newmessage.swipe_id] = mescontent
-				newmessage.gen_finished = humanizedISO8601DateTime()
-				newmessage.swipe_info[newmessage.swipe_id].gen_finished = humanizedISO8601DateTime()
+				console.log(Date() + ' ' + newmessage.gen_started)
+				newmessage.gen_finished =  Date()
+				newmessage.swipe_info[newmessage.swipe_id].gen_finished = Date()
+				console.log(newmessage.gen_finished + ' ' + newmessage.gen_started)
 				const finalized_messages = createnew ?	[...messages , newmessage] : [...messages.slice(0,-1), newmessage]
 				return finalized_messages
 			} catch (error) {

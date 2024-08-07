@@ -437,7 +437,7 @@ export const getChatFile = async (
 ) => {
     return await FS.readAsStringAsync(getChatFileDirectory(charName, chatfilename),{encoding:FS.EncodingType.UTF8}).then((file) => {
         return file.split('\u000d\u000a').map(row => JSON.parse(row))
-    }).catch(() => console.log(`Couldn't load chat file ${chatfilename} for ${charName}`))
+    }).catch((error) => console.log(`Couldn't load chat file ${chatfilename} for ${charName}: ${error}`))
 }
 
 export const deleteChatFile = async (
@@ -465,6 +465,7 @@ export const saveChatFile = async (
         messages.map((item)=> JSON.stringify(item)).join('\u000d\u000a'),
         {encoding:FS.EncodingType.UTF8}).catch(error => console.log(`Could not save file! ${error}`))
 }
+
 
 // DIRS - should be removed
 export const createChatEntry = (name : string, is_user : string, message : string) => {
@@ -499,8 +500,8 @@ export const createChatEntry = (name : string, is_user : string, message : strin
 		"mes":message,
 		// metadata
 		"send_date": humanizedISO8601DateTime(),
-		// gen_started
-		// gen_finished
+		"gen_started" : new Date(),
+		"gen_finished" : new Date(),
 		"extra":{"api":api,"model":model},
 		"swipe_id":0,
 		"swipes":[message],
@@ -509,6 +510,8 @@ export const createChatEntry = (name : string, is_user : string, message : strin
 			{	
 				"send_date": humanizedISO8601DateTime(),
 				"extra":{"api":api,"model":model},
+                "gen_started" : new Date(),
+		        "gen_finished" : new Date(),
 			},
 		],
 	}

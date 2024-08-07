@@ -1,7 +1,6 @@
 import {
-    View, Text, StyleSheet, Image, Animated, Easing, 
+    View, Text, StyleSheet, Image, Animated, Easing, TextInput, TouchableWithoutFeedback,  TouchableOpacity
 } from 'react-native'
-import { TextInput, TouchableOpacity } from 'react-native-gesture-handler'
 import { useRef, useEffect, useState, useContext} from 'react'
 import { AntDesign, MaterialIcons} from '@expo/vector-icons'
 import {  Global, Color, MessageContext, saveChatFile, getCharacterImageDirectory, getUserImageDirectory, humanizedISO8601DateTime } from '@globals'
@@ -57,7 +56,6 @@ const ChatItem = ({ message, id, scroll}) => {
             }),
         ]).start();
     }, [fadeAnim])
-
     // logic for multi part chat content if swipe exists
     // note, swipes: [mes1, mes2] swipe_no: 1
     // Note: Show edit buttons if global prop is inactive
@@ -71,13 +69,20 @@ const ChatItem = ({ message, id, scroll}) => {
         >
             <View style={styles.chatItem}>
 
-            
+            <View style={{alignItems: 'center'}}>
                 <Image style={styles.avatar} source={
                     (message.name === charName)?
                     ((imageExists)? {uri:getCharacterImageDirectory(charName)} : require('@assets/user.png'))
                     :
                     ((imageExists)? {uri:getUserImageDirectory(userName)} : require('@assets/user.png'))
-                    } />
+                } />
+                <Text style={styles.graytext}>#{id}</Text>
+                {(message?.gen_started !== undefined && message?.gen_finished !== undefined && message.name === charName)
+                    &&
+                <Text style={styles.graytext}>{((new Date(message.gen_finished) - new Date(message.gen_started))/1000).toFixed(0)}s</Text>
+                }
+            </View>
+                
             
             
             <View style={{flex:1}}>
@@ -88,7 +93,7 @@ const ChatItem = ({ message, id, scroll}) => {
 
                 { 
                 (!nowGenerating) &&
-                (editMode) ? 
+                (editMode) && 
                     (<View style={{flexDirection:'row'}} >
                         {id !== 0 && <TouchableOpacity style= {styles.editButton} onPress={() => {
                             setMessages(messages => {
@@ -127,21 +132,15 @@ const ChatItem = ({ message, id, scroll}) => {
                             <MaterialIcons name='close' size={28} color={Color.Button} /> 
                         </TouchableOpacity>
                     </View>)
-                    : 
-                    (<View >
-                        <TouchableOpacity style={styles.editButton} onPress={() => {
-                            setEditMode(true)
-                            setPlaceholderText(messages.at(id + 1).mes)
-                            }}>
-                            <MaterialIcons name='edit' size={28} color={Color.Button} />
-                        </TouchableOpacity>
-                    </View>)
+                   
                 }
                 
             </View>
 
             {!editMode?
-                <View style={styles.messageTextContainer}>
+                <TouchableOpacity style={styles.messageTextContainer} activeOpacity={0.7}
+                    onLongPress={() => setEditMode(true)}
+                >
                     <Markdown
                         style={styles.messageText}
                         styles={{
@@ -161,7 +160,7 @@ const ChatItem = ({ message, id, scroll}) => {
                     >
                     {message.mes.trim(`\n`)}
                     </Markdown>
-                </View>
+                </TouchableOpacity  >
                 :
                 <View style={styles.messageInput} >
                 <TextInput
@@ -187,9 +186,14 @@ const ChatItem = ({ message, id, scroll}) => {
                     if(message.swipe_id === 0) return
                     setMessages(messages => {
                         let newmessages = messages
-                        let swipeid = messages.at(id + 1).swipe_id
-                        newmessages.at(id + 1).mes = message.swipes.at(swipeid - 1)
-                        newmessages.at(id + 1).swipe_id = swipeid - 1
+                        let swipeid = messages.at(id + 1).swipe_id - 1
+                        newmessages.at(id + 1).mes = messages.at(id + 1).swipes.at(swipeid)
+                        newmessages.at(id + 1).extra = messages.at(id + 1).swipe_info.at(swipeid).extra
+                        newmessages.at(id + 1).send_date = messages.at(id + 1).swipe_info.at(swipeid).send_date
+                        newmessages.at(id + 1).gen_started = messages.at(id + 1).swipe_info.at(swipeid).gen_started
+                        newmessages.at(id + 1).gen_finished = messages.at(id + 1).swipe_info.at(swipeid).gen_finished
+
+                        newmessages.at(id + 1).swipe_id = swipeid
                         saveChatFile(newmessages)
                         return newmessages
                     })
@@ -210,9 +214,16 @@ const ChatItem = ({ message, id, scroll}) => {
                     if(message.swipe_id < messages.at(id + 1).swipes.length - 1){
                         setMessages(messages => {
                             let newmessages = messages
-                            let swipeid = messages.at(id + 1).swipe_id
-                            newmessages.at(id + 1).mes = messages.at(id + 1).swipes.at(swipeid + 1)
-                            newmessages.at(id + 1).swipe_id = swipeid + 1
+                            let swipeid = messages.at(id + 1).swipe_id + 1
+                            newmessages.at(id + 1).mes = messages.at(id + 1).swipes.at(swipeid)
+                            newmessages.at(id + 1).extra = messages.at(id + 1).swipe_info.at(swipeid).extra
+                            newmessages.at(id + 1).send_date = messages.at(id + 1).swipe_info.at(swipeid).send_date
+                            newmessages.at(id + 1).gen_started = messages.at(id + 1).swipe_info.at(swipeid).gen_started
+                            newmessages.at(id + 1).gen_finished = messages.at(id + 1).swipe_info.at(swipeid).gen_finished
+
+                            newmessages.at(id + 1).swipe_id = swipeid
+
+
                             saveChatFile(newmessages)
                             return newmessages
                         })
@@ -228,7 +239,7 @@ const ChatItem = ({ message, id, scroll}) => {
                         newmessages.at(id + 1).swipe_info.push(
                         {
                             "send_date":humanizedISO8601DateTime(),
-                            "gen_started":humanizedISO8601DateTime(),
+                            "gen_started":new Date(),
                             "gen_finished":"",
                             "extra":{"api":"kobold","model":"concedo/koboldcpp"}
                         })
@@ -259,8 +270,8 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         paddingVertical: 12,
         paddingHorizontal: 8,
-        borderColor: Color.Offwhite,
-        borderBottomWidth: 1,
+        //borderColor: Color.Offwhite,
+        //borderBottomWidth: 1,
     },
 
     messageText: {
@@ -307,6 +318,11 @@ const styles = StyleSheet.create({
     swipeTextContainer : {
         alignItems: 'center',
         flex:1,
+    },
+
+    graytext : {
+        color: Color.Offwhite,
+        paddingTop: 4,
     }
 });
 
