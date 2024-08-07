@@ -687,9 +687,7 @@ const localStreamResponse = async (setAbortFunction: AbortFunction) => {
     )
 
     setAbortFunction(async () => {
-        Llama.stopCompletion().then(() => {
-            stopGenerating()
-        })
+        Llama.stopCompletion()
     })
 
     const payload = constructLocalPayload()
