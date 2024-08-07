@@ -3,25 +3,32 @@ import {
 } from 'react-native'
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler'
 import { useRef, useEffect, useState, useContext} from 'react'
-import { MaterialIcons} from '@expo/vector-icons'
-import {  Global, Color, MessageContext, saveChatFile, getCharacterImageDirectory, getUserImageDirectory } from '@globals'
+import { AntDesign, MaterialIcons} from '@expo/vector-icons'
+import {  Global, Color, MessageContext, saveChatFile, getCharacterImageDirectory, getUserImageDirectory, humanizedISO8601DateTime } from '@globals'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 import Markdown from 'react-native-markdown-package'
 import * as FS from 'expo-file-system'
 // global chat property for editing
 
-const ChatItem = ({ message, id}) => {
+const ChatItem = ({ message, id, scroll}) => {
     // fade in anim
     const fadeAnim = useRef(new Animated.Value(0)).current
     const dyAnim = useRef(new Animated.Value(50)).current
-    const [messages, setMessages] = useContext(MessageContext)
-    const [placeholderText, setPlaceholderText] = useState(message.mes)
-    const [editMode, setEditMode] = useState(false)
+    
+    // globals
     const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
-    // figure this shit out
-    const [imageExists, setImageExists] = useState(true)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    
+    // drilled
+    const [messages, setMessages, setTargetLength, setChatCache] = useContext(MessageContext)
+    
+    // local
+    const [placeholderText, setPlaceholderText] = useState(message.mes)
+    const [editMode, setEditMode] = useState(false)
+    // figure this  out
+    const [imageExists, setImageExists] = useState(true)
+
 
     useEffect(() => {
         FS.readAsStringAsync((message.name === charName) ? getCharacterImageDirectory(charName) : getUserImageDirectory(userName)).then(
@@ -29,7 +36,8 @@ const ChatItem = ({ message, id}) => {
         ).catch(
             () => setImageExists(false)
         )
-    }, [message.mes])
+        setPlaceholderText(messages.at(id + 1).mes)
+    }, [message])
  
 
     useEffect(() => {
@@ -72,7 +80,7 @@ const ChatItem = ({ message, id}) => {
             
             <View style={{flex:1}}>
 
-                <View style={{flexDirection:'row', alignItems:'flex-end', marginBottom: 8}}>
+            <View style={{flexDirection:'row', alignItems:'flex-end', marginBottom: 8}}>
                 <Text style={{fontSize: 16, color: Color.Text}}>{message.name}   </Text>
                 <Text style={{fontSize: 10, color: Color.Text, flex: 1}}>{message.send_date}</Text>
 
@@ -96,12 +104,13 @@ const ChatItem = ({ message, id}) => {
                             // update content of file THEN => 
                             setMessages(messages => {
                                 let newmessages = messages
+
                                 newmessages.at(id + 1).mes = placeholderText
                                 if(newmessages.swipes !== undefined)
                                     newmessages.at(id + 1).swipes[newmessages.at(id + 1).swipe_id] = placeholderText
                                 saveChatFile(newmessages)
                                 return newmessages
-                                })
+                            })
                             setEditMode(editMode => false)
                             }}>
                             <MaterialIcons name='check' size={28} color={Color.Button} />
@@ -120,7 +129,7 @@ const ChatItem = ({ message, id}) => {
                     (<View >
                         <TouchableOpacity style={styles.editButton} onPress={() => {
                             setEditMode(true)
-                            setPlaceholderText(message.mes)
+                            setPlaceholderText(messages.at(id + 1).mes)
                             }}>
                             <MaterialIcons name='edit' size={28} color={Color.Button} />
                         </TouchableOpacity>
@@ -161,6 +170,75 @@ const ChatItem = ({ message, id}) => {
             </View>
             </View>
             
+            {(id === messages?.length - 2) 
+                && id !== 0 // remove once alternatives added 
+                && message.name === messages[0].character_name 
+                && <View style={styles.swipesItem}>
+                {!nowGenerating &&
+                <TouchableOpacity onPress={() => {
+                    // go previous if not first
+                    if(message.swipe_id === 0) return
+                    setMessages(messages => {
+                        let newmessages = messages
+                        let swipeid = messages.at(id + 1).swipe_id
+                        newmessages.at(id + 1).mes = message.swipes.at(swipeid - 1)
+                        newmessages.at(id + 1).swipe_id = swipeid - 1
+                        saveChatFile(newmessages)
+                        return newmessages
+                    })
+                    setPlaceholderText(message.swipes.at(message.swipe_id  - 1))
+                    scroll.current?.scrollToEnd()
+                }}>
+                    <AntDesign name='left' size={20} color={Color.Button} />
+                </TouchableOpacity>}
+                <View style={styles.swipeTextContainer}>
+                    <Text style={styles.swipeText}>
+                    {message.swipe_id + 1} / {message.swipes.length}
+                    </Text>
+                </View>
+
+                {!nowGenerating &&
+                <TouchableOpacity onPress={() => {
+                    
+                    if(message.swipe_id < messages.at(id + 1).swipes.length - 1){
+                        setMessages(messages => {
+                            let newmessages = messages
+                            let swipeid = messages.at(id + 1).swipe_id
+                            newmessages.at(id + 1).mes = messages.at(id + 1).swipes.at(swipeid + 1)
+                            newmessages.at(id + 1).swipe_id = swipeid + 1
+                            saveChatFile(newmessages)
+                            return newmessages
+                        })
+                        setPlaceholderText(message.swipes.at(message.swipe_id + 1))
+                        scroll.current?.scrollToEnd()
+                        return
+                    }
+                    
+                    setMessages( (messages) => {
+                        let newmessages = messages
+                        newmessages.at(id + 1).mes = ""
+                        newmessages.at(id + 1).swipes.push(``)
+                        newmessages.at(id + 1).swipe_info.push(
+                        {
+                            "send_date":humanizedISO8601DateTime(),
+                            "gen_started":humanizedISO8601DateTime(),
+                            "gen_finished":"",
+                            "extra":{"api":"kobold","model":"concedo/koboldcpp"}
+                        })
+                        newmessages.at(id + 1).swipe_id = newmessages.at(id + 1).swipe_id + 1
+                        saveChatFile(newmessages).then(() => {
+                            setChatCache(``)
+                            setTargetLength(messages.length)
+                            setNowGenerating(true)
+                        })
+                        return newmessages
+                    })
+                    
+                }}>
+                    <AntDesign name='right' size={20} color={Color.Button} />
+                </TouchableOpacity>}
+                </View>}
+
         </Animated.View>
 
     );
@@ -200,7 +278,7 @@ const styles = StyleSheet.create({
     },
 
     editButton : {
-        marginRight:2,
+        marginRight:12,
     },
 
     messageInput : {
@@ -208,5 +286,20 @@ const styles = StyleSheet.create({
         backgroundColor:Color.DarkContainer,
         borderRadius: 8,
         padding:8,
+    },
+
+    swipesItem : {
+        flexDirection: 'row', 
+        marginVertical: 8, 
+        marginHorizontal: 8,
+    },
+
+    swipeText: {
+        color: Color.Text,
+    },
+
+    swipeTextContainer : {
+        alignItems: 'center',
+        flex:1,
     }
 });

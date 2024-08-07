@@ -206,7 +206,7 @@ const Home = () => {
 			</View>
 			
 			:
-			<MessageContext.Provider value={ [messages, setMessages]}>
+			<MessageContext.Provider value={ [messages, setMessages, setTargetLength, setChatCache]}>
 			<View style={styles.container}>
 				
 				<ChatWindow messages={messages} />
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		paddingHorizontal: 8,
-		paddingBottom: 16,
+		paddingVertical: 8,
 	},
 	input: {
 		color: Color.Text,
