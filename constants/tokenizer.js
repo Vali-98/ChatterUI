@@ -1,3 +1,6 @@
+/* eslint-disable no-throw-literal */
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 /**
  * MIT LICENSE
  *
@@ -12,9 +15,8 @@
  */
 
 import { polyfill as polyfillBase64 } from 'react-native-polyfill-globals/src/base64';
-polyfillBase64();
-
 import { polyfill as polyfillTextEncoding } from 'react-native-polyfill-globals/src/encoding';
+polyfillBase64();
 polyfillTextEncoding();
 
 const llamaTokenizer = {};
@@ -118,7 +120,7 @@ class PriorityQueue {
         return this._heap.length;
     }
     isEmpty() {
-        return this.size() == 0;
+        return this.size() === 0;
     }
     peek() {
         return this._heap[0];
@@ -174,7 +176,7 @@ class PriorityQueue {
             (this._left(node) < this.size() && this._greater(this._left(node), node)) ||
             (this._right(node) < this.size() && this._greater(this._right(node), node))
         ) {
-            let maxChild =
+            const maxChild =
                 this._right(node) < this.size() &&
                 this._greater(this._right(node), this._left(node))
                     ? this._right(node)

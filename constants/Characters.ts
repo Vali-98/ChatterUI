@@ -1,11 +1,11 @@
-import * as FS from 'expo-file-system';
-import extractChunks from 'png-chunks-extract';
-import { decode } from 'png-chunk-text';
 import { Buffer } from '@craftzdog/react-native-buffer';
-import * as Base64 from 'base-64';
-import { ToastAndroid } from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
 import axios from 'axios';
+import * as Base64 from 'base-64';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FS from 'expo-file-system';
+import { decode } from 'png-chunk-text';
+import extractChunks from 'png-chunks-extract';
+import { ToastAndroid } from 'react-native';
 
 export namespace Characters {
     export const createCard = async (charName: string) => {
@@ -144,7 +144,7 @@ export namespace Characters {
 
 const TavernCardV2 = (name: string) => {
     return {
-        name: name,
+        name,
         description: '',
         personality: '',
         scenario: '',
@@ -154,7 +154,7 @@ const TavernCardV2 = (name: string) => {
         spec: 'chara_card_v2',
         spec_version: '2.0',
         data: {
-            name: name,
+            name,
             description: '',
             personality: '',
             scenario: '',

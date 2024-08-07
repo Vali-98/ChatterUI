@@ -1,6 +1,6 @@
-import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { Global, Color } from '@globals';
 import { useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { useMMKVString } from 'react-native-mmkv';
 
 const KAI = () => {

@@ -1,14 +1,3 @@
-import {
-    View,
-    Text,
-    StyleSheet,
-    Image,
-    Animated,
-    Easing,
-    TextInput,
-    TouchableOpacity,
-} from 'react-native';
-import { useRef, useEffect, useState, useContext } from 'react';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import {
     Global,
@@ -19,13 +8,24 @@ import {
     Users,
     humanizedISO8601DateTime,
 } from '@globals';
-import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv';
-import SimpleMarkdown from 'simple-markdown';
-import Markdown from 'react-native-markdown-package';
 import * as FS from 'expo-file-system';
-import React from 'react';
-import TTSMenu from './TTS';
+import React, { useRef, useEffect, useState, useContext } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Image,
+    Animated,
+    Easing,
+    TextInput,
+    TouchableOpacity,
+} from 'react-native';
+import Markdown from 'react-native-markdown-package';
+import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv';
 import AnimatedEllipsis from 'rn-animated-ellipsis';
+import SimpleMarkdown from 'simple-markdown';
+
+import TTSMenu from './TTS';
 // global chat property for editing
 
 const ChatItem = ({ message, id, scroll }) => {
@@ -92,8 +92,8 @@ const ChatItem = ({ message, id, scroll }) => {
         },
     };
 
-    let swapMessage = (n) => {
-        let newmessages = Array.from(messages);
+    const swapMessage = (n) => {
+        const newmessages = Array.from(messages);
 
         const swipeid = message.swipe_id + n;
         newmessages.at(id + 1).mes = messages.at(id + 1).swipes.at(swipeid);
@@ -109,7 +109,7 @@ const ChatItem = ({ message, id, scroll }) => {
     };
 
     const generateSwipe = () => {
-        let newmessages = messages;
+        const newmessages = messages;
         newmessages.at(id + 1).mes = '';
         newmessages.at(id + 1).swipes.push(``);
         newmessages.at(id + 1).swipe_info.push({
@@ -136,14 +136,14 @@ const ChatItem = ({ message, id, scroll }) => {
             swapMessage(n);
             return;
         }
-        if (id == 0) return;
+        if (id === 0) return;
         generateSwipe();
         scroll.current?.scrollToEnd();
     };
 
     const handleEditMessage = () => {
         setMessages((messages) => {
-            let newmessages = messages;
+            const newmessages = messages;
 
             newmessages.at(id + 1).mes = placeholderText;
             if (newmessages.swipes !== undefined)
@@ -156,7 +156,7 @@ const ChatItem = ({ message, id, scroll }) => {
 
     const handleDeleteMessage = () => {
         setMessages((messages) => {
-            let newmessages = messages.slice();
+            const newmessages = messages.slice();
             newmessages.splice(id + 1, 1);
             Chats.saveFile(newmessages, charName, currentChat);
             return newmessages;
@@ -251,7 +251,7 @@ const ChatItem = ({ message, id, scroll }) => {
                     </View>
 
                     {!editMode ? (
-                        message.name == charName && message.mes == '' && nowGenerating ? (
+                        message.name === charName && message.mes === '' && nowGenerating ? (
                             <View style={{ ...styles.messageTextContainer, padding: 5 }}>
                                 <AnimatedEllipsis style={{ color: Color.White, fontSize: 20 }} />
                             </View>
@@ -285,9 +285,9 @@ const ChatItem = ({ message, id, scroll }) => {
 
             {((id === messages?.length - 2 &&
                 message.name === messages[0].character_name &&
-                message?.swipes != undefined &&
-                id != 0) ||
-                (id === 0 && message?.swipes != undefined && message?.swipes?.length != 1)) && (
+                message?.swipes !== undefined &&
+                id !== 0) ||
+                (id === 0 && message?.swipes !== undefined && message?.swipes?.length !== 1)) && (
                 <View style={styles.swipesItem}>
                     {!nowGenerating && (
                         <TouchableOpacity
@@ -382,15 +382,15 @@ const styles = StyleSheet.create({
 const speechStyle = { color: Color.TextQuote };
 const speech = {
     order: SimpleMarkdown.defaultRules.em.order + 0.6,
-    match: function (source, state, lookbehind) {
+    match(source, state, lookbehind) {
         return /^"([\s\S]+?)"(?!")/.exec(source);
     },
-    parse: function (capture, parse, state) {
+    parse(capture, parse, state) {
         return {
             content: parse(capture[1], state),
         };
     },
-    react: function (node, output, { ...state }) {
+    react(node, output, { ...state }) {
         state.withinText = true;
         state.style = {
             ...(state.style || {}),
@@ -402,9 +402,9 @@ const speech = {
                 key: state.key,
                 style: speechStyle,
             },
-            `\"`,
+            `"`,
             output(node.content, state),
-            `\"`
+            `"`
         );
     },
     html: undefined,

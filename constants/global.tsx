@@ -1,20 +1,20 @@
+import * as Application from 'expo-application';
+import * as Crypto from 'expo-crypto';
 import * as FS from 'expo-file-system';
+import * as SystemUI from 'expo-system-ui';
 import { createContext } from 'react';
 import { ToastAndroid, StyleSheet } from 'react-native';
-import * as Crypto from 'expo-crypto';
-import * as Application from 'expo-application';
-import * as SystemUI from 'expo-system-ui';
 
-import { Presets } from './Presets';
-import { Instructs } from './Instructs';
-import { Users } from './Users';
+import { API } from './API';
 import { Characters } from './Characters';
 import { Chats } from './Chats';
 import { Global } from './GlobalValues';
-import { API } from './API';
-import { mmkv } from './mmkv';
+import { Instructs } from './Instructs';
+import { Presets } from './Presets';
+import { Users } from './Users';
 import { humanizedISO8601DateTime } from './Utils';
 import { Llama } from './llama';
+import { mmkv } from './mmkv';
 
 export {
     mmkv,
@@ -83,7 +83,7 @@ export const saveStringExternal = async (
 ) => {
     const permissions = await FS.StorageAccessFramework.requestDirectoryPermissionsAsync();
     if (permissions.granted) {
-        let directoryUri = permissions.directoryUri;
+        const directoryUri = permissions.directoryUri;
         await FS.StorageAccessFramework.createFileAsync(directoryUri, filename, mimetype)
             .then(async (fileUri) => {
                 await FS.writeAsStringAsync(fileUri, filedata, {
@@ -115,9 +115,9 @@ export const startupApp = () => {
     mmkv.set(Global.HordeWorkers, JSON.stringify([]));
     mmkv.set(Global.HordeModels, JSON.stringify([]));
     mmkv.set(Global.LocalModelWeights, JSON.stringify({}));
-    if (mmkv.getString(Global.LorebookNames) == undefined)
+    if (mmkv.getString(Global.LorebookNames) === undefined)
         mmkv.set(Global.LorebookNames, JSON.stringify([]));
-    if (mmkv.getString(Global.APIType) == undefined) mmkv.set(Global.APIType, API.KAI);
+    if (mmkv.getString(Global.APIType) === undefined) mmkv.set(Global.APIType, API.KAI);
     Llama.setLlamaPreset();
     console.log('Reset values');
     SystemUI.setBackgroundColorAsync(Color.Background);
@@ -183,7 +183,7 @@ export const migratePresets = async () => {
                 async (dir) =>
                     await FS.readDirectoryAsync(`${FS.documentDirectory}presets${dir}`).then(
                         async (files) => {
-                            let names: any = [];
+                            const names: any = [];
                             files.map(async (file) => {
                                 if (names.includes(file)) {
                                     await FS.copyAsync({

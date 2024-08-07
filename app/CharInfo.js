@@ -1,3 +1,10 @@
+import TextBoxModal from '@components/TextBoxModal';
+import llamaTokenizer from '@constants/tokenizer';
+import { FontAwesome } from '@expo/vector-icons';
+import { Global, Color, Characters } from '@globals';
+import * as DocumentPicker from 'expo-document-picker';
+import { Stack, useRouter } from 'expo-router';
+import { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -10,16 +17,7 @@ import {
     ScrollView,
     TextInput,
 } from 'react-native';
-import { useState } from 'react';
-
-import { Global, Color, Characters } from '@globals';
 import { useMMKVString, useMMKVObject } from 'react-native-mmkv';
-import { useEffect } from 'react';
-import { FontAwesome } from '@expo/vector-icons';
-import llamaTokenizer from '@constants/tokenizer';
-import { Stack, useRouter } from 'expo-router';
-import * as DocumentPicker from 'expo-document-picker';
-import TextBoxModal from '@components/TextBoxModal';
 
 const CharInfo = () => {
     const router = useRouter();
@@ -239,7 +237,7 @@ const styles = StyleSheet.create({
 
 export default CharInfo;
 
-let string = '';
+const string = '';
 const TavernCardV1 = {
     name: string,
     description: string,

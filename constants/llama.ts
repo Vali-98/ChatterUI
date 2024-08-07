@@ -1,10 +1,10 @@
 import * as FS from 'expo-file-system';
-
-import { ToastAndroid } from 'react-native';
 import { CompletionParams, LlamaContext, initLlama } from 'llama.rn';
-import DocumentPicker, { DocumentPickerResponse } from 'react-native-document-picker';
-import { mmkv } from './mmkv';
+import { ToastAndroid } from 'react-native';
+import DocumentPicker from 'react-native-document-picker';
+
 import { Global } from './GlobalValues';
+import { mmkv } from './mmkv';
 
 export namespace Llama {
     const model_dir = `${FS.documentDirectory}models/`;
@@ -16,12 +16,12 @@ export namespace Llama {
         batch: 512,
     };
 
-    var llamaContext: LlamaContext | void = undefined;
-    var modelname = '';
+    let llamaContext: LlamaContext | void = undefined;
+    let modelname = '';
 
     export const loadModel = async (name: string, preset = default_preset, usecache = true) => {
-        let newname = name;
-        let dir = `${model_dir}${name}`;
+        const newname = name;
+        const dir = `${model_dir}${name}`;
         // if not using from cache, pick model and load it
         /*
         if(!usecache)
@@ -39,13 +39,13 @@ export namespace Llama {
         })
         */
 
-        if (newname == '') {
+        if (newname === '') {
             ToastAndroid.show('No Model Chosen', 2000);
             console.log(`No model chosen, new name was blank!`);
             return;
         }
 
-        if (newname == modelname) {
+        if (newname === modelname) {
             console.log('Model Already Loaded!');
             ToastAndroid.show('Model Already Loaded!', 2000);
             return;
@@ -57,7 +57,7 @@ export namespace Llama {
             return;
         }
 
-        if (llamaContext != undefined) {
+        if (llamaContext !== undefined) {
             console.log('Unloading current model');
             await llamaContext?.release();
             modelname = '';
@@ -85,13 +85,14 @@ export namespace Llama {
                 console.log(`Couldn't load model! Reason: ${error}`);
                 ToastAndroid.show('Could Not Load Model!', 2000);
             });
-        return;
-        // session code fails atm
+
+        /* session code fails atm
         await FS.getInfoAsync(`${model_dir}session.bin`).then((result) => {
             if (!result.exists) return;
             console.log('Loading previous session');
             if (llamaContext) llamaContext.loadSession(result.uri);
         });
+        */
     };
 
     export const completion = async (
@@ -102,7 +103,7 @@ export namespace Llama {
     ) => {
         if (!isModelLoaded()) return;
         console.log('Completion begin.');
-        if (llamaContext == undefined) return;
+        if (llamaContext === undefined) return;
         return llamaContext
             ?.completion(prompt, (data: any) => {
                 callback(data.token);
@@ -159,7 +160,7 @@ export namespace Llama {
 
     export const deleteModel = async (name: string) => {
         if (await !modelExists(name)) return;
-        if (name == modelname) modelname = '';
+        if (name === modelname) modelname = '';
         return await FS.deleteAsync(`${model_dir}${name}`);
     };
 
@@ -167,7 +168,7 @@ export namespace Llama {
         return DocumentPicker.pickSingle()
             .then(async (result: any) => {
                 if (DocumentPicker.isCancel(result)) return false;
-                let name = result.name;
+                const name = result.name;
                 ToastAndroid.show('Importing file', ToastAndroid.SHORT);
                 console.log('Importing file...');
                 await FS.copyAsync({
@@ -196,11 +197,11 @@ export namespace Llama {
     };
 
     export const isModelLoaded = (showmessage = true) => {
-        if (showmessage && llamaContext == undefined) {
+        if (showmessage && llamaContext === undefined) {
             ToastAndroid.show('No Model Loaded', 2000);
             console.log('No Model Loaded');
         }
-        return llamaContext != undefined;
+        return llamaContext !== undefined;
     };
 
     export const getModelname = () => {
@@ -209,6 +210,6 @@ export namespace Llama {
 
     export const setLlamaPreset = () => {
         const presets = mmkv.getString(Global.LocalPreset);
-        if (presets == undefined) mmkv.set(Global.LocalPreset, JSON.stringify(default_preset));
+        if (presets === undefined) mmkv.set(Global.LocalPreset, JSON.stringify(default_preset));
     };
 }

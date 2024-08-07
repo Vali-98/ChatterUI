@@ -1,3 +1,8 @@
+import TextBoxModal from '@components/TextBoxModal';
+import { FontAwesome } from '@expo/vector-icons';
+import { Global, Color, Users } from '@globals';
+import { Stack, useRouter } from 'expo-router';
+import { useState, useEffect } from 'react';
 import {
     SafeAreaView,
     View,
@@ -9,13 +14,7 @@ import {
     Alert,
     ToastAndroid,
 } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
-import { useState, useEffect } from 'react';
-import { Global, Color, Users } from '@globals';
 import { useMMKVString } from 'react-native-mmkv';
-import { FontAwesome } from '@expo/vector-icons';
-
-import TextBoxModal from '@components/TextBoxModal';
 
 const UserSelector = () => {
     const router = useRouter();
@@ -101,7 +100,7 @@ const UserSelector = () => {
                                 onPress={() => {
                                     Alert.alert(
                                         `Delete Persona`,
-                                        `Are you sure you want to delete \'${name}\'?`,
+                                        `Are you sure you want to delete '${name}'?`,
                                         [
                                             { text: `Cancel`, style: `cancel` },
                                             {
@@ -157,7 +156,6 @@ const styles = StyleSheet.create({
     avatar: {
         width: 48,
         height: 48,
-        borderRadius: 16,
         marginRight: 8,
         borderRadius: 24,
     },

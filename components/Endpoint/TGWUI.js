@@ -1,6 +1,6 @@
+import { Global, Color } from '@globals';
 import { View, Text, StyleSheet, TextInput } from 'react-native';
 import { useMMKVString } from 'react-native-mmkv';
-import { Global, Color } from '@globals';
 
 const TGWUI = () => {
     const [streamEnd, setStreamEnd] = useMMKVString(Global.TGWUIStreamingEndpoint);

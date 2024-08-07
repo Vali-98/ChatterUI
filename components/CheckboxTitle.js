@@ -1,6 +1,6 @@
-import { View, Text } from 'react-native';
-import CheckBox from '@react-native-community/checkbox';
 import { Color } from '@globals';
+import CheckBox from '@react-native-community/checkbox';
+import { View, Text } from 'react-native';
 
 const CheckboxTitle = ({ name, body, varname, setValue }) => {
     return (

@@ -20,16 +20,12 @@ const Settings = () => {
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={() => {
-                                router.push('UserInfo');
-                            }}>
+                            onPress={() => router.push('UserInfo')}>
                             <FontAwesome size={20} name="edit" color={Color.Button} />
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={() => {
-                                router.push('UserSelector');
-                            }}>
+                            onPress={() => router.push('UserSelector')}>
                             <FontAwesome size={20} name="th-list" color={Color.Button} />
                         </TouchableOpacity>
                     </View>

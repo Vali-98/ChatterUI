@@ -1,3 +1,8 @@
+import { FontAwesome } from '@expo/vector-icons';
+import { Global, Color, Users } from '@globals';
+import * as DocumentPicker from 'expo-document-picker';
+import { Stack, useRouter } from 'expo-router';
+import React from 'react';
 import {
     SafeAreaView,
     View,
@@ -7,12 +12,7 @@ import {
     StyleSheet,
     TextInput,
 } from 'react-native';
-import React from 'react';
-import { Stack, useRouter } from 'expo-router';
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
-import { Global, Color, Users } from '@globals';
-import { FontAwesome } from '@expo/vector-icons';
-import * as DocumentPicker from 'expo-document-picker';
 
 const UserInfo = () => {
     const router = useRouter();

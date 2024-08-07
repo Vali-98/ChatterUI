@@ -1,5 +1,5 @@
-import * as FS from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
+import * as FS from 'expo-file-system';
 import { ToastAndroid } from 'react-native';
 
 export namespace Instructs {
@@ -9,7 +9,7 @@ export namespace Instructs {
         });
     };
 
-    export const saveFile = async (name: string, preset: Object) => {
+    export const saveFile = async (name: string, preset: object) => {
         return FS.writeAsStringAsync(
             `${FS.documentDirectory}instruct/${name}.json`,
             JSON.stringify(preset),
@@ -28,7 +28,7 @@ export namespace Instructs {
     export const uploadFile = async () => {
         return DocumentPicker.getDocumentAsync({ type: 'application/json' }).then((result) => {
             if (result.canceled) return;
-            let name = result.assets[0].name.replace(`.json`, '');
+            const name = result.assets[0].name.replace(`.json`, '');
             return FS.copyAsync({
                 from: result.assets[0].uri,
                 to: `${FS.documentDirectory}/instruct/${name}.json`,
@@ -39,9 +39,9 @@ export namespace Instructs {
                     });
                 })
                 .then((file) => {
-                    let filekeys = Object.keys(JSON.parse(file));
-                    let correctkeys = Object.keys(defaultInstruct());
-                    let samekeys = filekeys.every((element, index) => {
+                    const filekeys = Object.keys(JSON.parse(file));
+                    const correctkeys = Object.keys(defaultInstruct());
+                    const samekeys = filekeys.every((element, index) => {
                         return element === correctkeys[index];
                     });
                     if (!samekeys) {

@@ -1,10 +1,10 @@
 //@ts-ignore
-import { humanizedISO8601DateTime } from './Utils';
 import * as FS from 'expo-file-system';
-import { Global } from './GlobalValues';
+
 import { API } from './API';
+import { Global } from './GlobalValues';
+import { humanizedISO8601DateTime, replaceMacros } from './Utils';
 import { mmkv } from './mmkv';
-import { replaceMacros } from './Utils';
 
 export namespace Chats {
     const create = (userName: any, characterName: any, card: any) => {
@@ -13,8 +13,8 @@ export namespace Chats {
         const newMessage: any = createEntry(characterName, false, replaceMacros(initmessage));
 
         if (
-            card?.data?.alternate_greetings != undefined &&
-            card.data.alternate_greetings.length != 0
+            card?.data?.alternate_greetings !== undefined &&
+            card.data.alternate_greetings.length !== 0
         ) {
             newMessage.swipes = [];
             newMessage.swipe_info = [];
@@ -75,7 +75,7 @@ export namespace Chats {
             { encoding: FS.EncodingType.UTF8 }
         )
             .then((response) => {
-                let card = JSON.parse(response);
+                const card = JSON.parse(response);
                 const newmessage = create(userName, charName, card);
 
                 return FS.writeAsStringAsync(
@@ -90,7 +90,7 @@ export namespace Chats {
     };
 
     export const getNewest = async (charName: string) => {
-        let chats = await getFileList(charName);
+        const chats = await getFileList(charName);
         return chats.length === 0
             ? await createDefault(charName, mmkv.getString(Global.CurrentUser) ?? '')
             : chats.at(-1);
@@ -126,8 +126,8 @@ export namespace Chats {
     };
 
     export const saveFile = async (messages: string[], charName: string, currentChat: string) => {
-        let _charName = charName === '' ? mmkv.getString(Global.CurrentCharacter) : charName;
-        let _currentChat = currentChat === '' ? mmkv.getString(Global.CurrentChat) : currentChat;
+        //const _charName = charName === '' ? mmkv.getString(Global.CurrentCharacter) : charName;
+        //const _currentChat = currentChat === '' ? mmkv.getString(Global.CurrentChat) : currentChat;
 
         FS.writeAsStringAsync(
             getFileDir(charName, currentChat),
@@ -136,7 +136,7 @@ export namespace Chats {
         ).catch((error) => console.log(`Could not save file! ${error}`));
     };
 
-    export const createEntry = (name: String, is_user: boolean, message: String) => {
+    export const createEntry = (name: string, is_user: boolean, message: string) => {
         let api: any = 'unknown';
         let model: any = 'unknown';
         const apitype = mmkv.getString(Global.APIType);
@@ -163,21 +163,21 @@ export namespace Chats {
 
         return {
             // important stuff
-            name: name,
-            is_user: is_user,
+            name,
+            is_user,
             mes: message,
             // metadata
             send_date: humanizedISO8601DateTime(),
             gen_started: new Date(),
             gen_finished: new Date(),
-            extra: { api: api, model: model },
+            extra: { api, model },
             swipe_id: 0,
             swipes: [message],
             swipe_info: [
                 // metadata
                 {
                     send_date: humanizedISO8601DateTime(),
-                    extra: { api: api, model: model },
+                    extra: { api, model },
                     gen_started: new Date(),
                     gen_finished: new Date(),
                 },

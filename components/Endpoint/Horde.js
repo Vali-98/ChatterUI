@@ -1,10 +1,9 @@
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Global, Color, hordeHeader } from '@globals';
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
-import { useState, useEffect } from 'react';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import { ToastAndroid } from 'react-native';
+import { Global, Color, hordeHeader } from '@globals';
+import { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ToastAndroid } from 'react-native';
 import { MultiSelect } from 'react-native-element-dropdown';
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
 
 const Horde = () => {
     const [hordeKey, setHordeKey] = useMMKVString(Global.HordeKey);
@@ -99,8 +98,8 @@ const Horde = () => {
                     style={styles.dropdownbox}
                     selectedTextStyle={styles.selected}
                     data={modelList}
-                    labelField={'name'}
-                    valueField={'name'}
+                    labelField="name"
+                    valueField="name"
                     onChange={(item) => {
                         setHordeModels(
                             modelList.filter((value) => {
@@ -155,8 +154,10 @@ export default Horde;
 
 const styles = StyleSheet.create({
     mainContainer: {
-        marginVertical: 16,
         paddingVertical: 16,
+        paddingHorizontal: 20,
+        backgroundColor: Color.Background,
+        flex: 1,
     },
 
     title: {
@@ -183,13 +184,6 @@ const styles = StyleSheet.create({
         backgroundColor: Color.DarkContainer,
         borderRadius: 4,
         marginLeft: 8,
-    },
-
-    mainContainer: {
-        paddingVertical: 16,
-        paddingHorizontal: 20,
-        backgroundColor: Color.Background,
-        flex: 1,
     },
 
     dropdownContainer: {

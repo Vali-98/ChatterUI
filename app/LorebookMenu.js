@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import TextBoxModal from '@components/TextBoxModal';
+import { Lorebooks } from '@constants/Lorebooks';
+import { FontAwesome } from '@expo/vector-icons';
+import { Color } from '@globals';
 import { Stack, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Lorebooks } from '@constants/Lorebooks';
-import { Color } from '@globals';
-import { FontAwesome } from '@expo/vector-icons';
-import TextBoxModal from '@components/TextBoxModal';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 
 const LorebookMenu = () => {
     const router = useRouter();

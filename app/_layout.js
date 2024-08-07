@@ -1,6 +1,6 @@
+import { Color, initializeApp, startupApp } from '@globals';
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Color, initializeApp, startupApp } from '@globals';
 import { MenuProvider } from 'react-native-popup-menu';
 
 // init values should be here
