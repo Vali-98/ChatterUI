@@ -116,39 +116,45 @@ const ChatSelector = () => {
                     }}
                 />
                 {chats.reverse().map((item, index) => (
-                    <TouchableOpacity
+                    <View
                         key={index}
-                        onPress={() => handleSelectChat(item.id)}
                         style={
                             item.id === currentChatId
                                 ? styles.longButtonSelectedContainer
                                 : styles.longButtonContainer
                         }>
-                        <Image
-                            source={{ uri: Characters.getImageDir(imageId ?? -1) }}
-                            style={styles.avatar}
-                        />
-                        <Text style={styles.chatname}>{item.createDate.toLocaleTimeString()}</Text>
-
                         <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => handleExportChat(item.id)}>
-                            <FontAwesome
-                                name="download"
-                                size={32}
-                                color={Style.getColor('primary-text1')}
+                            style={styles.selectorButton}
+                            onPress={() => handleSelectChat(item.id)}>
+                            <Image
+                                source={{ uri: Characters.getImageDir(imageId ?? -1) }}
+                                style={styles.avatar}
                             />
+                            <Text style={styles.chatname}>
+                                {item.createDate.toLocaleTimeString()}
+                            </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => handleDeleteChat(item.id)}>
-                            <FontAwesome
-                                name="trash"
-                                size={32}
-                                color={Style.getColor('primary-text1')}
-                            />
-                        </TouchableOpacity>
-                    </TouchableOpacity>
+                        <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => handleExportChat(item.id)}>
+                                <FontAwesome
+                                    name="download"
+                                    size={32}
+                                    color={Style.getColor('primary-text1')}
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => handleDeleteChat(item.id)}>
+                                <FontAwesome
+                                    name="trash"
+                                    size={32}
+                                    color={Style.getColor('primary-text1')}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 ))}
             </ScrollView>
         </AnimatedView>
@@ -166,6 +172,11 @@ const styles = StyleSheet.create({
     chatname: {
         color: Style.getColor('primary-text2'),
         marginLeft: 8,
+    },
+
+    selectorButton: {
+        flexDirection: 'row',
+        padding: 8,
         flex: 1,
     },
 
@@ -178,8 +189,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         borderRadius: 8,
-        paddingVertical: 8,
-        padding: 8,
         flex: 1,
     },
 
@@ -192,8 +201,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         borderRadius: 8,
-        paddingVertical: 8,
-        padding: 8,
         flex: 1,
     },
 
@@ -206,7 +213,7 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        marginRight: 8,
-        marginLeft: 16,
+        paddingHorizontal: 12,
+        paddingVertical: 20,
     },
 })

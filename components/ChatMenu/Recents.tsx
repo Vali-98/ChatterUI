@@ -61,7 +61,9 @@ const Recents = () => {
                     )}
                     {showRecents &&
                         [...recentMessages].reverse()?.map((item, index) => (
-                            <View key={index} style={{ flexDirection: 'row' }}>
+                            <View
+                                key={index}
+                                style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <TouchableOpacity
                                     style={styles.longButton}
                                     onPress={async () => {
@@ -73,14 +75,15 @@ const Recents = () => {
                                             {item.lastModified}
                                         </Text>
                                     </View>
-                                    <TouchableOpacity
-                                        onPress={() => RecentMessages.deleteEntry(item.chatId)}>
-                                        <FontAwesome
-                                            color={Style.getColor('primary-text2')}
-                                            name="trash"
-                                            size={28}
-                                        />
-                                    </TouchableOpacity>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.secondaryButton}
+                                    onPress={() => RecentMessages.deleteEntry(item.chatId)}>
+                                    <FontAwesome
+                                        color={Style.getColor('primary-text2')}
+                                        name="trash"
+                                        size={28}
+                                    />
                                 </TouchableOpacity>
                             </View>
                         ))}
@@ -111,7 +114,6 @@ const Recents = () => {
 const styles = StyleSheet.create({
     welcometext: {
         justifyContent: 'center',
-
         fontSize: 20,
         color: Style.getColor('primary-text1'),
     },
@@ -148,13 +150,15 @@ const styles = StyleSheet.create({
         marginLeft: 12,
     },
 
+    secondaryButton: {
+        paddingHorizontal: 16,
+        paddingVertical: 18,
+    },
+
     longButton: {
         alignItems: 'center',
         flex: 1,
-        backgroundColor: Style.getColor('primary-surface3'),
         flexDirection: 'row',
-        paddingHorizontal: 12,
-        borderRadius: 8,
         marginVertical: 4,
         justifyContent: 'space-between',
         shadowColor: Style.getColor('primary-shadow'),
