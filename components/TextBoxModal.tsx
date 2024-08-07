@@ -2,7 +2,14 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { Color } from '@globals'
 import { useState, useEffect } from 'react'
 import { View, Text, Modal, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
-const TextBoxModal = ({
+
+type TextBoxModalProps = {
+    booleans: [boolean, (b: boolean) => void]
+    onConfirm: (text: string) => void
+    title: string
+}
+
+const TextBoxModal: React.FC<TextBoxModalProps> = ({
     booleans: [showModal, setShowModal],
     onConfirm = (text) => {},
     title = 'Enter Name',

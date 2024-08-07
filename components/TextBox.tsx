@@ -1,7 +1,17 @@
 import { Color } from '@globals'
-import { View, Text, StyleSheet, TextInput } from 'react-native'
+import { View, Text, StyleSheet, TextInput, KeyboardTypeOptions } from 'react-native'
 
-const TextBox = ({
+type TextBoxProps = {
+    name: string
+    body: any
+    varname: string
+    setValue: (item: any) => {}
+    lines: number
+    keyboardType: KeyboardTypeOptions
+    multiline: boolean
+}
+
+const TextBox: React.FC<TextBoxProps> = ({
     name,
     body,
     varname,

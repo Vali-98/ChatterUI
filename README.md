@@ -5,7 +5,7 @@
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/charsmenu.png" width="150" > 
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/optionsmenu.png" width="150" > 
 </div>
-Simple frontend for LLMs built using react-native.
+Simple frontend for LLMs built in react-native.
 
 **_This app is highly experimental, expect to lose your chat histories on updates._**
 
@@ -28,12 +28,16 @@ Built for the purpose of learning Javascript, so it might be a little rough arou
 ### Building From Source
 
 Building from source has **not** been tested.
-Requires Node.js and Android SDK. Expo uses EAS to build apps which requires a Linux environment. Release APKs are built in WSL.
+Requires Node.js and Android SDK. Expo uses EAS to build apps which requires a Linux environment.
 
 ```
 npm install
 eas build --platform android --local
 ```
+
+### IOS
+
+Currently untested as I do not own proper devices to run it. Assistance here would be greatly appreciated!
 
 ### Fix For Text Streaming in Development
 

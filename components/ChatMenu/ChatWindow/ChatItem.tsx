@@ -1,5 +1,5 @@
 import { AntDesign, MaterialIcons } from '@expo/vector-icons'
-import { Global, Color, Chats, Characters, Users } from '@globals'
+import { Color, Chats, Characters, Users } from '@globals'
 import React, { useRef, useEffect, useState } from 'react'
 import {
     View,
@@ -10,7 +10,6 @@ import {
     Easing,
     TextInput,
     TouchableOpacity,
-    ImageBackground,
 } from 'react-native'
 //@ts-ignore
 import Markdown from 'react-native-markdown-package'
@@ -131,6 +130,17 @@ const ChatItem: React.FC<ChatItemProps> = ({
         (Date.parse(message.gen_finished) - Date.parse(message.gen_started)) / 1000
     )
 
+    const [imageSource, setImageSource] = useState({
+        uri:
+            message.name === charName
+                ? Characters.getImageDir(charName)
+                : Users.getImageDir(userName),
+    })
+
+    const handleImageError = () => {
+        setImageSource(require('@assets/user.png'))
+    }
+
     return (
         <Animated.View
             style={{
@@ -145,20 +155,13 @@ const ChatItem: React.FC<ChatItemProps> = ({
                         : {}),
                 }}>
                 <View style={{ alignItems: 'center' }}>
-                    <ImageBackground
-                        imageStyle={styles.avatar}
-                        style={styles.avatarBackgroundView}
-                        source={require('@assets/user.png')}>
-                        <Image
-                            style={styles.avatar}
-                            source={{
-                                uri:
-                                    message.name === charName
-                                        ? Characters.getImageDir(charName)
-                                        : Users.getImageDir(userName),
-                            }}
-                        />
-                    </ImageBackground>
+                    <Image
+                        onError={(error) => {
+                            handleImageError()
+                        }}
+                        style={styles.avatar}
+                        source={imageSource}
+                    />
                     <Text style={styles.graytext}>#{id}</Text>
                     {message?.gen_started !== undefined &&
                         message?.gen_finished !== undefined &&
@@ -176,7 +179,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                         <Text style={{ fontSize: 10, color: Color.Text }}>{message.send_date}</Text>
 
                         {!nowGenerating && editMode && (
-                            <View style={{ flexDirection: 'row' }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                 {id !== 0 && (
                                     <TouchableOpacity
                                         style={styles.editButton}
@@ -188,18 +191,27 @@ const ChatItem: React.FC<ChatItemProps> = ({
                                         />
                                     </TouchableOpacity>
                                 )}
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity
+                                        style={styles.editButton}
+                                        onPress={handleEditMessage}>
+                                        <MaterialIcons
+                                            name="check"
+                                            size={28}
+                                            color={Color.Button}
+                                        />
+                                    </TouchableOpacity>
 
-                                <TouchableOpacity
-                                    style={styles.editButton}
-                                    onPress={handleEditMessage}>
-                                    <MaterialIcons name="check" size={28} color={Color.Button} />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                    style={styles.editButton}
-                                    onPress={handleDisableEdit}>
-                                    <MaterialIcons name="close" size={28} color={Color.Button} />
-                                </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.editButton}
+                                        onPress={handleDisableEdit}>
+                                        <MaterialIcons
+                                            name="close"
+                                            size={28}
+                                            color={Color.Button}
+                                        />
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         )}
                     </View>
@@ -300,9 +312,6 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 16,
-    },
-
-    avatarBackgroundView: {
         marginBottom: 4,
         marginLeft: 4,
         marginRight: 8,
