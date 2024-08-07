@@ -19,11 +19,12 @@ import { useRouter } from 'expo-router'
 import { AntDesign, FontAwesome } from '@expo/vector-icons'
 import { SetStateAction, useEffect, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
+import SupportButton from '@components/SupportButton'
 type SettingsDrawerProps = {
     booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
 }
 
-type Icon = 'barschart' | 'profile' | 'link' | 'sound' | 'codesquareo'
+type Icon = 'barschart' | 'profile' | 'link' | 'sound' | 'codesquareo' | 'infocirlceo'
 
 type ButtonData = {
     name: string
@@ -56,6 +57,11 @@ const paths: Array<ButtonData> = [
         name: 'Logs',
         path: '/Logs',
         icon: 'codesquareo',
+    },
+    {
+        name: 'About',
+        path: '/About',
+        icon: 'infocirlceo',
     },
 ]
 
@@ -206,31 +212,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                                 {'v' + require(`../../app.json`).expo.version}
                             </Text>
                         </View>
-                        <TouchableOpacity
-                            onPress={() => {
-                                Linking.openURL('https://ko-fi.com/vali98')
-                            }}
-                            style={{
-                                alignSelf: 'center',
-                                marginBottom: 16,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                borderColor: Style.getColor('primary-brand'),
-                                padding: 8,
-                                paddingHorizontal: 16,
-                                borderWidth: 1,
-                                borderRadius: 16,
-                            }}>
-                            <Text
-                                style={{ color: Style.getColor('primary-text2'), paddingRight: 4 }}>
-                                Support ChatterUI
-                            </Text>
-                            <FontAwesome
-                                name="coffee"
-                                size={16}
-                                color={Style.getColor('primary-text1')}
-                            />
-                        </TouchableOpacity>
+                        <SupportButton />
                     </View>
                 </Animated.View>
             </View>
