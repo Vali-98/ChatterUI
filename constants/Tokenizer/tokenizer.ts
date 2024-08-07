@@ -1,11 +1,5 @@
 import { Tensor } from 'onnxruntime-react-native'
-//@ts-ignore
-import { polyfill as polyfillBase64 } from 'react-native-polyfill-globals/src/base64'
-//@ts-ignore
-import { polyfill as polyfillTextEncoding } from 'react-native-polyfill-globals/src/encoding'
 
-polyfillBase64()
-polyfillTextEncoding()
 const PUNCTUATION_REGEX = '\\p{P}\\u0021-\\u002F\\u003A-\\u0040\\u005B-\\u0060\\u007B-\\u007E'
 const PROBLEMATIC_REGEX_MAP = new Map([
     // This uses the case insensitive group modifier, which is not supported in JavaScript.
@@ -397,7 +391,12 @@ export class PreTrainedTokenizer extends Callable {
     _default_chat_template = `{% for message in messages %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}`
     _tokenizer_config: any
     normalizer: BertNormalizer | null
-    pre_tokenizer: ByteLevelPreTokenizer | PreTokenizerSequence | SplitPreTokenizer | null
+    pre_tokenizer:
+        | ByteLevelPreTokenizer
+        | PreTokenizerSequence
+        | SplitPreTokenizer
+        | MetaspacePreTokenizer
+        | null
 
     post_processor: any
     decoder: ByteLevelDecoder | null
@@ -829,7 +828,7 @@ export class PreTrainedTokenizer extends Callable {
                               })
                             : [x]
 
-                    const tokens = this.model.call(sectionTokens)
+                    const tokens = this.model._call(sectionTokens)
 
                     return tokens
                 }
@@ -860,7 +859,7 @@ export class PreTrainedTokenizer extends Callable {
         const tokens2 = this._encode_text(text_pair)
 
         const combinedTokens = this.post_processor
-            ? this.post_processor.call(tokens, tokens2, { add_special_tokens })
+            ? this.post_processor._call(tokens, tokens2, { add_special_tokens })
             : { tokens: mergeArrays(tokens ?? [], tokens2 ?? []) }
 
         const input_ids = this.model.convert_tokens_to_ids(combinedTokens.tokens)
@@ -926,7 +925,7 @@ export class PreTrainedTokenizer extends Callable {
      * @throws {Error} If `token_ids` is not a non-empty array of integers.
      */
     /*
-    decode(token_ids, decode_args = {}) {
+    decode(token_ids: number[], decode_args = {}) {
         if (token_ids instanceof Tensor) {
             token_ids = prepareTensorForDecode(token_ids)
         }
@@ -940,7 +939,7 @@ export class PreTrainedTokenizer extends Callable {
         }
 
         return this.decode_single(token_ids, decode_args)
-    }
+    } */
 
     /**
      * Decode a single list of token ids to a string.
@@ -952,10 +951,13 @@ export class PreTrainedTokenizer extends Callable {
      * @returns {string} The decoded string
      */
     /*
-    decode_single(token_ids, { skip_special_tokens = false, clean_up_tokenization_spaces = null }) {
+    decode_single(
+        token_ids: number[],
+        { skip_special_tokens = false, clean_up_tokenization_spaces = null }
+    ) {
         let tokens = this.model.convert_ids_to_tokens(token_ids)
         if (skip_special_tokens) {
-            tokens = tokens.filter((x) => !this.special_tokens.includes(x))
+            tokens = tokens.filter((x: any) => !this.special_tokens.includes(x))
         }
 
         // If `this.decoder` is null, we just join tokens with a space:
@@ -978,8 +980,8 @@ export class PreTrainedTokenizer extends Callable {
         }
 
         return decoded
-    }
-
+    }*/
+    /*
     get default_chat_template() {
         if (!this._warned_about_chat_template) {
             console.warn(
@@ -1144,6 +1146,57 @@ function fuse(arr: any[], value: any, mapping: any) {
     }
 
     return fused
+}
+const SPIECE_UNDERLINE = '▁'
+export class LlamaTokenizer extends PreTrainedTokenizer {
+    use_default_system_prompt: any
+    constructor(tokenizerJSON: any, tokenizerConfig: any) {
+        super(tokenizerJSON, tokenizerConfig)
+        this.use_default_system_prompt = tokenizerConfig.use_default_system_prompt ?? false
+
+        this.legacy = tokenizerConfig.legacy ?? true
+        if (!this.legacy) {
+            // See https://github.com/huggingface/transformers/pull/24565 for more information
+            this.normalizer = null
+            this.pre_tokenizer = new MetaspacePreTokenizer({
+                replacement: SPIECE_UNDERLINE,
+                add_prefix_space: true,
+                prepend_scheme: 'first',
+            })
+        }
+    }
+
+    /**
+     * Helper function to handle legacy encoding of SPM tokenizers.
+     * Adapted from https://github.com/huggingface/transformers/blob/e6dcf8abd6f65bb4b6dfc1831b20d9ba49ce00e2/src/transformers/models/t5/tokenization_t5.py#L374-L387
+     * @param {string} text The text to encode.
+     * @returns {string[]} The encoded tokens.
+     */
+    _encode_text(text: string) {
+        if (text === null) return null
+
+        if (this.legacy || text.length === 0) {
+            return super._encode_text(text)
+        }
+
+        let tokens: any = super._encode_text(
+            SPIECE_UNDERLINE + text.replaceAll(SPIECE_UNDERLINE, ' ')
+        )
+        if (
+            tokens.length > 1 &&
+            tokens[0] === SPIECE_UNDERLINE &&
+            this.special_tokens.includes(tokens[1])
+        ) {
+            tokens = tokens.slice(1)
+        }
+        return tokens
+    }
+    /*
+    get default_chat_template() {
+        return super.default_chat_template
+            .replaceAll('USE_DEFAULT_PROMPT', this.use_default_system_prompt ? 'true' : 'false')
+            .replaceAll('DEFAULT_SYSTEM_MESSAGE', this.DEFAULT_SYSTEM_PROMPT.replaceAll("\n", "\\n").replaceAll("'", "\\'"));
+    }*/
 }
 
 class Normalizer extends Callable {
@@ -1436,7 +1489,8 @@ class PreTokenizerSequence extends PreTokenizer {
      */
     constructor(config: any) {
         super()
-        this.tokenizers = config.pretokenizers.map((x: any) => PreTokenizer.fromConfig(x))
+        const pretokenizers = config.pretokenizers.filter((item: any) => item.type !== 'Split')
+        this.tokenizers = pretokenizers.map((x: any) => PreTokenizer.fromConfig(x))
     }
 
     /**
@@ -1448,9 +1502,8 @@ class PreTokenizerSequence extends PreTokenizer {
     pre_tokenize_text(text: string, options: any) {
         // Use reduce to apply each tokenizer to the text
         return this.tokenizers.reduce(
-            (preTokenizedText: string, tokenizer: any) => {
-                return tokenizer.pre_tokenize(preTokenizedText, options)
-            },
+            (preTokenizedText: string, tokenizer: any) =>
+                tokenizer.pre_tokenize(preTokenizedText, options),
             [text]
         )
     }
@@ -1520,7 +1573,8 @@ class ByteLevelPreTokenizer extends PreTokenizer {
 }
 
 class SplitPreTokenizer extends PreTokenizer {
-    [x: string]: any
+    config: any
+    pattern: RegExp | null
     /**
      * @param {Object} config The configuration options for the pre-tokenizer.
      * @param {Object} config.pattern The pattern used to split the text. Can be a string or a regex object.
@@ -1621,7 +1675,7 @@ export class TokenizerModel extends Callable {
      * @param {string[]} tokens The tokens to encode.
      * @returns {string[]} The encoded token IDs.
      */
-    call(tokens: any) {
+    _call(tokens: any) {
         let ids = this.encode(tokens)
         if (this.fuse_unk) {
             // Fuse unknown tokens
@@ -1957,7 +2011,7 @@ class PostProcessor extends Callable {
      * @param {...*} args Additional arguments required by the post-processing logic.
      * @returns {PostProcessedOutput} The post-processed tokens.
      */
-    call(tokens: any, ...args: any) {
+    _call(tokens: any, ...args: any) {
         return this.post_process(tokens, ...args)
     }
 }
@@ -2062,6 +2116,56 @@ class PostProcessorSequence extends PostProcessor {
     }
 }
 
+class MetaspacePreTokenizer extends PreTokenizer {
+    addPrefixSpace: any
+    replacement: any
+    strRep: any
+    prepend_scheme: any
+    /**
+     * @param {Object} config The configuration object for the MetaspacePreTokenizer.
+     * @param {boolean} config.add_prefix_space Whether to add a prefix space to the first token.
+     * @param {string} config.replacement The character to replace spaces with.
+     * @param {string} [config.str_rep=config.replacement] An optional string representation of the replacement character.
+     * @param {'first'|'never'|'always'} [config.prepend_scheme='always'] The metaspace prepending scheme.
+     */
+    constructor(config: any) {
+        super()
+
+        this.addPrefixSpace = config.add_prefix_space
+        this.replacement = config.replacement
+        this.strRep = config.str_rep || this.replacement
+        this.prepend_scheme = config.prepend_scheme ?? 'always'
+    }
+
+    /**
+     * This method takes a string, replaces spaces with the replacement character,
+     * adds a prefix space if requested, and returns a new list of tokens.
+     * @param {string} text The text to pre-tokenize.
+     * @param {Object} [options] The options for the pre-tokenization.
+     * @param {number} [options.section_index] The index of the section to pre-tokenize.
+     * @returns {string[]} A new list of pre-tokenized tokens.
+     */
+    pre_tokenize_text(text: string, { section_index = undefined } = {}) {
+        let normalized = text.replaceAll(' ', this.strRep)
+
+        if (
+            // We add a prefix space if:
+            //  (1) The addPrefixSpace option is enabled and the normalized
+            //      token does not already start with the replacement character.
+            this.addPrefixSpace &&
+            !normalized.startsWith(this.replacement) &&
+            // and (2) either:
+            //  (a) prepend_scheme is 'always'
+            //  (b) prepend_scheme is 'first' and this is the first section
+            (this.prepend_scheme === 'always' ||
+                (this.prepend_scheme === 'first' && section_index === 0))
+        ) {
+            normalized = this.strRep + normalized
+        }
+        return [normalized]
+    }
+}
+
 class TemplateProcessing extends PostProcessor {
     single: any
     pair: any
@@ -2084,7 +2188,7 @@ class TemplateProcessing extends PostProcessor {
      * @param {string[]} [tokens_pair=null] The list of tokens for the second sequence (optional).
      * @returns {PostProcessedOutput} An object containing the list of tokens with the special tokens replaced with actual tokens.
      */
-    post_process(tokens: number[], tokens_pair = null, { add_special_tokens = true } = {}) {
+    post_process(tokens: string[], tokens_pair = null, { add_special_tokens = true } = {}) {
         const type = tokens_pair === null ? this.single : this.pair
 
         let processedTokens = []
@@ -2103,7 +2207,7 @@ class TemplateProcessing extends PostProcessor {
                     processedTokens = mergeArrays(processedTokens, tokens_pair)
                     types = mergeArrays(
                         types,
-                        //@ts-ignore
+                        //@ts-expect-error
                         new Array(tokens_pair.length).fill(item.Sequence.type_id)
                     )
                 }
@@ -2215,10 +2319,10 @@ class ByteLevelDecoder extends Decoder {
         super(config)
 
         this.byte_decoder = UNICODE_TO_BYTES
-        this.text_decoder = new TextDecoder('utf-8', {
+        /*this.text_decoder = new TextDecoder('utf-8', {
             fatal: false,
             ignoreBOM: true,
-        })
+        })*/
 
         this.end_of_word_suffix = null
     }
@@ -2278,4 +2382,4 @@ function loadTokenizer(name: string, { ...stuff }) {
         return [require('./Llama3/tokenizer.json'), require('./Llama3/tokenizer_config.json')]
 }
 
-export const Llama3Tokenizer = PreTrainedTokenizer.from_pretrained('llama3')
+export const Llama3Tokenizer = LlamaTokenizer.from_pretrained('llama3')
