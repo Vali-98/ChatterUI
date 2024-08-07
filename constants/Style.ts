@@ -63,27 +63,31 @@ const createColor = (
     component: ColorComponent,
     scheme: ColorScheme | undefined
 ): string => {
-    //const darkMode = scheme ? scheme === 'dark' : Style.useColorScheme.getState().darkMode
+    const darkMode = scheme ? scheme === 'dark' : Style.useColorScheme.getState().darkMode
     let { h, s, l } = hsl
-    /*  LIGHT MODE CURRENTLY UNSUPPORTED
-    switch (component) {
-        case 'brand':
-            return getHSLString(h, s, l)
-        case 'text1':
-            return getHSLString(h, s, 10)
-        case 'text2':
-            return getHSLString(h, 30, 30)
-        case 'surface1':
-            return getHSLString(h, 25, 90)
-        case 'surface1':
-            return getHSLString(h, 20, 99)
-        case 'surface2':
-            return getHSLString(h, 20, 92)
-        case 'surface3':
-            return getHSLString(h, 20, 85)
-        case 'shadow':
-            return getHSLString(h, 10, l / 5)
-    }*/
+    if (!darkMode)
+        switch (component) {
+            case 'brand':
+                return getHSLString(h, s, l)
+            case 'text1':
+                return getHSLString(h, s, 10)
+            case 'text2':
+                return getHSLString(h, 30, 30)
+            case 'text3':
+                return getHSLString(h, 2, 30)
+            case 'surface1':
+                return getHSLString(h, 25, 90)
+            case 'surface1':
+                return getHSLString(h, 20, 99)
+            case 'surface2':
+                return getHSLString(h, 20, 92)
+            case 'surface3':
+                return getHSLString(h, 20, 85)
+            case 'surface4':
+                return getHSLString(h, 14, 25)
+            case 'shadow':
+                return getHSLString(h, 10, l / 5)
+        }
 
     switch (component) {
         case 'brand':

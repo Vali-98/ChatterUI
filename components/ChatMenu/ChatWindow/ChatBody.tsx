@@ -6,6 +6,7 @@ import { Chats, Style } from '@globals'
 import React from 'react'
 import Editor from './Editor'
 import ChatText from './ChatText'
+import EditorModal from './EditorModal'
 
 type ChatTextProps = {
     id: number
@@ -27,16 +28,15 @@ const ChatBody: React.FC<ChatTextProps> = ({ id, nowGenerating, messagesLength }
         setEditMode(!nowGenerating)
     }
 
-    const showEditor = editMode && !nowGenerating
     const showEllipsis = !message.is_user && isLastMessage && nowGenerating
     const isNewChat = messagesLength === 1
     const hasSwipes = message?.swipes?.length > 1
-    const showSwipe = !message.is_user && isLastMessage && (hasSwipes || !isNewChat) && !showEditor
+    const showSwipe = !message.is_user && isLastMessage && (hasSwipes || !isNewChat)
 
     return (
         <View>
-            {showEditor && (
-                <Editor
+            {editMode && (
+                <EditorModal
                     id={id}
                     isLastMessage={isLastMessage}
                     setEditMode={setEditMode}
@@ -44,20 +44,19 @@ const ChatBody: React.FC<ChatTextProps> = ({ id, nowGenerating, messagesLength }
                 />
             )}
 
-            {!showEditor && (
-                <TouchableOpacity
-                    style={styles.messageTextContainer}
-                    activeOpacity={0.7}
-                    onLongPress={handleEnableEdit}>
-                    <ChatText
-                        showEllipsis={showEllipsis}
-                        nowGenerating={nowGenerating}
-                        id={id}
-                        isLastMessage={isLastMessage}
-                    />
-                </TouchableOpacity>
-            )}
-            {!showEditor && showSwipe && (
+            <TouchableOpacity
+                style={styles.messageTextContainer}
+                activeOpacity={0.7}
+                onLongPress={handleEnableEdit}>
+                <ChatText
+                    showEllipsis={showEllipsis}
+                    nowGenerating={nowGenerating}
+                    id={id}
+                    isLastMessage={isLastMessage}
+                />
+            </TouchableOpacity>
+
+            {showSwipe && (
                 <Swipes index={id} nowGenerating={nowGenerating} isGreeting={isGreeting} />
             )}
         </View>
