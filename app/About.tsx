@@ -14,15 +14,10 @@ const About = () => {
 
     const updateCounter = () => {
         if (devMode) return
-        if (counter === 7) {
+        if (counter === 6) {
             Logger.log(`You have enabled dev mode.`, true)
             setDevMode(true)
-        } else if (counter < 7 && counter > 3)
-            Logger.log(
-                `You are ${7 - counter} step${7 - counter === 1 ? '' : 's'} away from entering dev mode.`,
-                true,
-                100
-            )
+        }
         setCounter(counter + 1)
     }
 
@@ -36,13 +31,28 @@ const About = () => {
                     headerRight: () => <View></View>,
                 }}
             />
-            <TouchableOpacity activeOpacity={100} onPress={updateCounter}>
+            <TouchableOpacity activeOpacity={0.8} onPress={updateCounter}>
                 <Image source={require('../assets/images/icon.png')} style={styles.icon} />
             </TouchableOpacity>
             <Text style={styles.titleText}>ChatterUI</Text>
             <Text style={styles.subtitleText}>
                 Version {version} {devMode && '[DEV MODE]'}
             </Text>
+            {devMode && (
+                <TouchableOpacity
+                    style={{
+                        ...styles.supportButton,
+                        marginTop: 24,
+                        borderColor: Style.getColor('destructive-brand'),
+                    }}
+                    onPress={() => {
+                        setCounter(0)
+                        setDevMode(false)
+                        Logger.log('Dev mode disabled')
+                    }}>
+                    <Text style={styles.supportText}>Disable Dev Mode</Text>
+                </TouchableOpacity>
+            )}
             <Text style={styles.body}>
                 ChatterUI is a free and open-source application developed by Vali98
             </Text>
@@ -63,22 +73,6 @@ const About = () => {
                 <Text style={styles.supportText}>Github Repository</Text>
                 <FontAwesome name="github" size={20} color={Style.getColor('primary-text1')} />
             </TouchableOpacity>
-
-            {devMode && (
-                <TouchableOpacity
-                    style={{
-                        ...styles.supportButton,
-                        marginTop: 24,
-                        borderColor: Style.getColor('destructive-brand'),
-                    }}
-                    onPress={() => {
-                        setCounter(0)
-                        setDevMode(false)
-                        Logger.log('Dev mode disabled')
-                    }}>
-                    <Text style={styles.supportText}>Disable Dev Mode</Text>
-                </TouchableOpacity>
-            )}
         </View>
     )
 }
