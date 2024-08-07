@@ -192,7 +192,7 @@ const buildContext = (max_length: number) => {
 
     payload = replaceMacros(payload)
     Logger.log(`Payload size: ${LlamaTokenizer.encode(payload).length}`)
-    Logger.log(`${(performance.now() - delta).toPrecision(8)}ms taken to build context`)
+    Logger.log(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
     return payload
 }
 
