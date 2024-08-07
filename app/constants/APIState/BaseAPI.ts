@@ -1,11 +1,11 @@
+import { AppSettings, Global } from '@constants/GlobalValues'
 import { Characters } from 'app/constants/Characters'
 import { Chats, useInference } from 'app/constants/Chat'
-import { AppSettings, Global } from '@constants/GlobalValues'
 import { InstructType, Instructs } from 'app/constants/Instructs'
 import { Logger } from 'app/constants/Logger'
+import { mmkv } from 'app/constants/MMKV'
 import { SamplerPreset } from 'app/constants/Presets'
 import { replaceMacros } from 'app/constants/Utils'
-import { mmkv } from 'app/constants/MMKV'
 import EventSource from 'react-native-sse'
 
 import { SamplerID, Samplers } from '../Samplers'
@@ -122,8 +122,9 @@ export abstract class APIBase implements IAPIBase {
 
             if (!is_last) {
                 message_shard += `${message.is_user ? currentInstruct.input_suffix : currentInstruct.output_suffix}`
-                is_last = false
             }
+            // ensure no more is_last checks after this
+            is_last = false
 
             if (currentInstruct.wrap) {
                 message_shard += `\n`
