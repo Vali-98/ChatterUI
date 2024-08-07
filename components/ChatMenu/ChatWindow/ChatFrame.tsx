@@ -1,34 +1,28 @@
 import { Chats } from '@constants/Chat'
-import { Characters, Style } from '@globals'
+import { Characters, Global, Style } from '@globals'
 import { ReactNode, useEffect, useState } from 'react'
 import { View, Text, Image, StyleSheet } from 'react-native'
+import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
 import TTSMenu from './TTS'
 
 type ChatFrameProps = {
     children?: ReactNode
-    TTSenabled: boolean
     id: number
     charId: number
     nowGenerating: boolean
     isLast?: boolean
 }
 
-const ChatFrame: React.FC<ChatFrameProps> = ({
-    children,
-    TTSenabled,
-    id,
-    nowGenerating,
-    isLast,
-}) => {
-    const { message, buffer } = Chats.useChat(
+const ChatFrame: React.FC<ChatFrameProps> = ({ children, id, nowGenerating, isLast }) => {
+    const { message } = Chats.useChat(
         useShallow((state) => ({
             message: state?.data?.messages?.[id] ?? Chats.dummyEntry,
-            buffer: state.buffer,
         }))
     )
 
+    const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
     const charImageId = Characters.useCharacterCard((state) => state.card?.data.image_id) ?? 0
     const userImageId = Characters.useUserCard((state) => state.card?.data.image_id) ?? 0
 
@@ -51,14 +45,16 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
         setImageSource(require('@assets/user.png'))
     }
 
-    const deltaTime = Math.round(
-        Math.max(
-            0,
-            ((nowGenerating && isLast ? new Date().getTime() : swipe.gen_finished.getTime()) -
-                swipe.gen_started.getTime()) /
-                1000
+    const getDeltaTime = () =>
+        Math.round(
+            Math.max(
+                0,
+                ((nowGenerating && isLast ? new Date().getTime() : swipe.gen_finished.getTime()) -
+                    swipe.gen_started.getTime()) /
+                    1000
+            )
         )
-    )
+    const deltaTime = getDeltaTime()
 
     // TODO: Change TTS to take id and simply retrieve that data on TTS as needed
     return (

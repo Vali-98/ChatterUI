@@ -1,6 +1,4 @@
-import { useInference } from '@constants/Chat'
 import { AppSettings, Characters, Chats, Global } from '@globals'
-import { useRef } from 'react'
 import { StyleSheet, FlatList } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
@@ -9,45 +7,28 @@ import { ChatItem } from './ChatItem'
 
 type ListItem = {
     index: number
-    key: number
+    key: string
 }
 
 const ChatWindow = () => {
-    const nowGenerating = useInference((state) => state.nowGenerating)
-
     const charId = Characters.useCharacterCard(useShallow((state) => state?.id))
-
-    const { userName } = Characters.useUserCard((state) => ({ userName: state.card?.data.name }))
-    const flatListRef = useRef<FlatList>(null)
-    const messagesLength = Chats.useChat((state) => state?.data?.messages?.length) ?? -1
-    const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
+    const messagesLength = Chats.useChat(useShallow((state) => state?.data?.messages?.length)) ?? -1
+    const messages = Chats.useChat((state) => state.data?.messages)
     const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
 
     const getItems = (): ListItem[] => {
-        const arr: ListItem[] = []
-        for (let i = 0; i < messagesLength; i++) {
-            arr.push({ index: i, key: i })
-        }
-        return arr.reverse()
+        const list: ListItem[] = []
+        messages?.map((item, index) => list.push({ index: index, key: item.id.toString() }))
+        return list.reverse() ?? []
     }
 
     const renderItems = ({ item, index }: { item: ListItem; index: number }) => {
-        return (
-            <ChatItem
-                messagesLength={messagesLength}
-                id={item.index}
-                nowGenerating={nowGenerating ?? false}
-                charId={charId ?? -1}
-                userName={userName ?? ''}
-                TTSenabled={TTSenabled ?? false}
-            />
-        )
+        return <ChatItem messagesLength={messagesLength} id={item.index} charId={charId ?? -1} />
     }
 
     return (
         <FlatList
             style={styles.chatHistory}
-            ref={flatListRef}
             maintainVisibleContentPosition={
                 autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
             }
@@ -56,7 +37,7 @@ const ChatWindow = () => {
             inverted
             windowSize={2}
             data={getItems()}
-            keyExtractor={(item) => item.key.toString()}
+            keyExtractor={(item) => item.key}
             renderItem={renderItems}
         />
     )

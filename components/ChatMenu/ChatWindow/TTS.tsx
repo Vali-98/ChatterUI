@@ -15,7 +15,6 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
     const [isSpeaking, setIsSpeaking] = useState<boolean>(false)
     const [currentSpeaker, setCurrentSpeaker] = useMMKVObject<Speech.Voice>(Global.TTSSpeaker)
     const [autoTTS, setAutoTTS] = useMMKVBoolean(Global.TTSAuto)
-
     const [start, setStart] = useMMKVBoolean(Global.TTSAutoStart)
     const nowGenerating = useInference((state) => state.nowGenerating)
 
@@ -37,7 +36,7 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
         if (await Speech.isSpeakingAsync()) await Speech.stop()
         setIsSpeaking(true)
         const filter = /([!?.,*"])/
-        const filteredchunks: Array<string> = []
+        const filteredchunks: string[] = []
         const chunks = message.split(filter)
         chunks.forEach((item, index) => {
             if (!filter.test(item) && item) return filteredchunks.push(item)
