@@ -69,6 +69,22 @@ const CharMenu = () => {
             })
     }
 
+    const handleCreateCharacter = async (text: string) => {
+        if (!text) {
+            Logger.log('Name Cannot Be Empty!', true)
+            return
+        }
+        if (await Characters.exists(text)) {
+            Logger.log('Character Name Already Exists', true)
+            return
+        }
+        Characters.createCard(text).then(async () => {
+            setCharName(text)
+            router.push(`/CharInfo`)
+            getCharacterList()
+        })
+    }
+
     useEffect(() => {
         getCharacterList()
     }, [])
@@ -117,22 +133,7 @@ const CharMenu = () => {
                 <TextBoxModal
                     booleans={[showNewChar, setShowNewChar]}
                     title="[Creating Character]  Enter Name Below"
-                    onConfirm={(text) => {
-                        Characters.createCard(text).then(async () => {
-                            if (!text) {
-                                Logger.log('Name Cannot Be Empty!', true)
-                                return
-                            }
-                            if (await Characters.exists(text)) {
-                                Logger.log('Character Name Already Exists', true)
-                                return
-                            }
-
-                            setCharName(text)
-                            router.push(`/CharInfo`)
-                            getCharacterList()
-                        })
-                    }}
+                    onConfirm={handleCreateCharacter}
                 />
 
                 <TextBoxModal
