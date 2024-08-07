@@ -1,17 +1,17 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Color, Chats } from '@globals'
-import React, { useRef, useEffect, useState } from 'react'
-import { View, Text, StyleSheet, Animated, Easing, TextInput, TouchableOpacity } from 'react-native'
+import React, { useState } from 'react'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 //@ts-ignore
 import Markdown from 'react-native-markdown-package'
 //@ts-ignore
 import AnimatedEllipsis from 'rn-animated-ellipsis'
 import SimpleMarkdown from 'simple-markdown'
 import { ChatEntry } from '@constants/Chat'
-// global chat property for editing
 import { useShallow } from 'zustand/react/shallow'
 import Swipes from './Swipes'
 import ChatFrame from './ChatFrame'
+import AnimatedView from '@components/AnimatedView'
 
 type ChatItemProps = {
     id: number
@@ -28,15 +28,9 @@ const ChatItem: React.FC<ChatItemProps> = ({
     userName,
     TTSenabled,
 }) => {
-    // fade in anim
-    // globals
-
     const message: ChatEntry =
         Chats.useChat(useShallow((state) => state?.data?.[id])) ?? Chats.createEntry('', false, '')
     const messagesLength = Chats.useChat(useShallow((state) => state.data?.length)) ?? -1
-
-    const fadeAnim = useRef(new Animated.Value(0)).current
-    const dyAnim = useRef(new Animated.Value(50)).current
 
     const [placeholderText, setPlaceholderText] = useState(message.mes)
     const [editMode, setEditMode] = useState(false)
@@ -50,22 +44,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
     )
 
     const buffer = Chats.useChat((state) => (id === messagesLength - 1 ? state.buffer : ''))
-
-    useEffect(() => {
-        Animated.parallel([
-            Animated.timing(fadeAnim, {
-                toValue: 1, // Target opacity 1 (fully visible)
-                duration: 200, // Duration in milliseconds
-                useNativeDriver: true, // To improve performance
-            }),
-            Animated.timing(dyAnim, {
-                toValue: 0, // Target translateY 0 (no translation)
-                duration: 400,
-                useNativeDriver: true,
-                easing: Easing.out(Easing.exp),
-            }),
-        ]).start()
-    }, [])
 
     const handleEditMessage = () => {
         updateChat(id, placeholderText)
@@ -108,11 +86,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
     )
 
     return (
-        <Animated.View
-            style={{
-                opacity: fadeAnim,
-                transform: [{ translateY: dyAnim }],
-            }}>
+        <AnimatedView dy={100} fade={0} fduration={200} tduration={400}>
             <View
                 style={{
                     ...styles.chatItem,
@@ -178,7 +152,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
             </View>
 
             {showSwipe && <Swipes message={message} id={id} nowGenerating={nowGenerating} />}
-        </Animated.View>
+        </AnimatedView>
     )
 }
 
