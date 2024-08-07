@@ -45,11 +45,16 @@ const Recents = () => {
                         <Text style={styles.title}>Recent</Text>
                         {!noRecents && (
                             <TouchableOpacity style={styles.button} onPress={RecentMessages.flush}>
-                                <FontAwesome
-                                    size={20}
-                                    name="trash"
-                                    color={Style.getColor('primary-text1')}
-                                />
+                                {/*
+                                    <FontAwesome
+                                        size={20}
+                                        name="trash"
+                                        color={Style.getColor('primary-text1')}
+                                    />
+                        */}
+                                <Text style={{ color: Style.getColor('primary-text2') }}>
+                                    Clear All
+                                </Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -75,11 +80,10 @@ const Recents = () => {
                                         </Text>
                                     </View>
                                     <TouchableOpacity
-                                        style={{ marginTop: 8 }}
                                         onPress={() => RecentMessages.deleteEntry(item.chatId)}>
                                         <FontAwesome
                                             color={Style.getColor('primary-text2')}
-                                            name="close"
+                                            name="trash"
                                             size={28}
                                         />
                                     </TouchableOpacity>
@@ -151,6 +155,7 @@ const styles = StyleSheet.create({
     },
 
     longButton: {
+        alignItems: 'center',
         flex: 1,
         backgroundColor: Style.getColor('primary-surface3'),
         flexDirection: 'row',
