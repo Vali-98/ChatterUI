@@ -14,6 +14,7 @@ export const enum Global {
     CurrentInstruct='currentinstruct',  // note: use Object ? - stores instruct
     CurrentCharacterCard='charcard',    // note: use Object ? - stores charactercard
     CurrentUser='currentuser',          // current username, locates dir
+    CurrentUserCard='usercard',         // note: use Object ? - stores usercard
     Endpoint='endpoint',                // api endpoint 
     NowGenerating='nowgenerating',      // generation signal
     EditedWindow='editedwindow',        // exit editing window confirmation
@@ -27,6 +28,24 @@ export const generateDefaultDirectories = async () => {
     FS.makeDirectoryAsync(`${FS.documentDirectory}persona`).catch(() => console.log(`Could not create personas folder.`))
     FS.makeDirectoryAsync(`${FS.documentDirectory}preset`).catch(() => console.log(`Could not create presets folder.`))
     FS.makeDirectoryAsync(`${FS.documentDirectory}instruct`).catch(() => console.log(`Could not create instruct folder.`))
+    createNewUser('User')    
+}
+
+
+export const createNewUser = async (name : string) => {
+    return FS.makeDirectoryAsync(`${FS.documentDirectory}persona/${name}`).then(() => {
+        return FS.writeAsStringAsync(`${FS.documentDirectory}persona/${name}/${name}.json`, JSON.stringify({
+            description: ""
+        }), {encoding: FS.EncodingType.UTF8})
+    }).catch(() => {console.log(`Could not create user.`)})
+
+}
+export const deleteUser = async (name : string) => {
+    return FS.deleteAsync(`${FS.documentDirectory}persona/${name}`)
+}
+
+export const loadUserCard = async (name : string) => {
+    return FS.readAsStringAsync(`${FS.documentDirectory}persona/${name}/${name}.json`, {encoding: FS.EncodingType.UTF8})
 }
 
 //////// IMPORTANT: rework all default values to '' and set after
@@ -185,6 +204,18 @@ export const getChatFilenames = async (
     .then((response : any) => {
         return response
     })
+}
+
+// get user filenames
+
+export const getUserFilenames = () => {
+    return FS.readDirectoryAsync(`${FS.documentDirectory}persona`)
+}
+
+export const getUserImageDirectory = (
+    userName : string
+) => {
+    return `${FS.documentDirectory}persona/${userName}/${userName}.png`
 }
 
 // get chat file

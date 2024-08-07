@@ -69,6 +69,66 @@ const ChatItem = ({ message, id}) => {
                     require('@assets/user.png')
                     } />
             
+            
+            <View style={{flex:1}}>
+
+                <View style={{flexDirection:'row', alignItems:'flex-end', marginBottom: 8}}>
+                <Text style={{fontSize: 16,}}>{message.name}   </Text>
+                <Text style={{fontSize: 10, flex: 1}}>{message.send_date}</Text>
+
+                { 
+                (!nowGenerating) &&
+                (editMode) ? 
+                    (<View style={{flexDirection:'row'}} >
+                        {id !== 0 && <TouchableOpacity style= {styles.editButton} onPress={() => {
+                            setMessages(messages => {
+                                let newmessages = messages.slice()
+                                newmessages.splice(id + 1, 1)
+                                saveChatFile(newmessages)
+                                return newmessages
+                            })
+                            setEditMode(editMode => false)
+                        }}>
+                            <MaterialIcons name='delete' size={28} color="#707070" />
+                        </TouchableOpacity>}
+
+                        <TouchableOpacity style={styles.editButton} onPress={() => {
+                            // update content of file THEN => 
+                            setMessages(messages => {
+                                let newmessages = messages
+                                newmessages.at(id + 1).mes = placeholderText
+                                if(newmessages.swipes !== undefined)
+                                    newmessages.at(id + 1).swipes[newmessages.at(id + 1).swipe_id] = placeholderText
+                                saveChatFile(newmessages)
+                                return newmessages
+                                })
+                            setEditMode(editMode => false)
+                            }}>
+                            <MaterialIcons name='check' size={28} color="#707070" />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.editButton} onPress={() => {
+                            
+                            // update content of file THEN => 
+                            setPlaceholderText(message.mes)
+                            setEditMode(editMode => false)
+                            }}>
+                            <MaterialIcons name='close' size={28} color="#707070" />
+                        </TouchableOpacity>
+                    </View>)
+                    : 
+                    (<View >
+                        <TouchableOpacity style={styles.editButton} onPress={() => {
+                            setEditMode(true)
+                            setPlaceholderText(message.mes)
+                            }}>
+                            <MaterialIcons name='edit' size={28} color="#707070" />
+                        </TouchableOpacity>
+                    </View>)
+                }
+                
+            </View>
+
             {!editMode?
                 <View style={styles.messageTextContainer}>
                     <Markdown 
@@ -84,8 +144,7 @@ const ChatItem = ({ message, id}) => {
                     </Markdown>
                 </View>
                 :
-                <View 
-                style={styles.messageInput}  >
+                <View style={styles.messageInput}  >
                 <TextInput
                     value={placeholderText.trim('\n')} 
                     onChangeText={setPlaceholderText}        
@@ -95,61 +154,7 @@ const ChatItem = ({ message, id}) => {
                 />
                 </View>
             }
-
-            
-            { 
-            (!nowGenerating) ?
-            (editMode) ? 
-                (<View style={{flexDirection:'column'}}>
-                    
-                    <TouchableOpacity style={styles.editButton} onPress={() => {
-                        
-                        // update content of file THEN => 
-                        setPlaceholderText(message.mes)
-                        setEditMode(editMode => false)
-                        }}>
-                        <MaterialIcons name='close' size={28} color="#707070" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.editButton} onPress={() => {
-                        
-                        // update content of file THEN => 
-                        setMessages(messages => {
-                            let newmessages = messages
-                            newmessages.at(id + 1).mes = placeholderText
-                            if(newmessages.swipes !== undefined)
-                                newmessages.at(id + 1).swipes[newmessages.at(id + 1).swipe_id] = placeholderText
-                            saveChatFile(newmessages)
-                            return newmessages
-                            })
-                        setEditMode(editMode => false)
-                        }}>
-                        <MaterialIcons name='check' size={28} color="#707070" />
-                    </TouchableOpacity>
-
-                     {id !== 0 && <TouchableOpacity style= {styles.editButton} onPress={() => {
-                        setMessages(messages => {
-                            let newmessages = messages.slice()
-                            newmessages.splice(id + 1, 1)
-                            saveChatFile(newmessages)
-                            return newmessages
-                        })
-                        
-                        setEditMode(editMode => false)
-                    }}>
-                        <MaterialIcons name='delete' size={28} color="#707070" />
-                    </TouchableOpacity>}
-                </View>)
-                 : 
-                 (<View >
-                    <TouchableOpacity style={styles.editButton} onPress={() => {
-                        setEditMode(true)
-                        setPlaceholderText(message.mes)
-                        }}>
-                        <MaterialIcons name='edit' size={28} color="#707070" />
-                    </TouchableOpacity>
-                </View>)
-                : (<></>)
-            }
+            </View>
             </View>
             
         </Animated.View>
@@ -164,8 +169,11 @@ const styles = StyleSheet.create({
     chatItem: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        marginBottom: 4,
+        paddingBottom: 8,
         marginTop:6,
+        marginRight: 8,
+        borderColor: '#ddd',
+        borderBottomWidth: 1,
     },
 
     userMessage: {
@@ -185,7 +193,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#e1e1e1',
         padding: 8,
         borderRadius: 8,
-        width: '75%',
+        flex: 1,
         textAlignVertical:'center',
     },
 
@@ -199,11 +207,10 @@ const styles = StyleSheet.create({
     },
 
     editButton : {
-        marginBottom:6,
+        marginRight:2,
     },
 
     messageInput : {
-        width: '75%',
         backgroundColor:'#dfdfdf',
         borderRadius: 8,
         borderColor: '#333',

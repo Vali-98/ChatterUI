@@ -5,7 +5,6 @@ import { useEffect } from 'react'
 import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 import { Global, generateDefaultDirectories, createNewDefaultChat  } from '@globals'
 import * as FS from 'expo-file-system'
-import {Asset} from 'expo-asset'
 // init values should be here
 require('fastestsmallesttextencoderdecoder')
 const Layout = () => {
@@ -23,7 +22,8 @@ const Layout = () => {
     useEffect(() => {
         
 		setCurrentChat('')
-        setUserName('User')
+        if(userName === undefined)
+            setUserName('User')
         setCurrentCard(null)
 		setCharName('Welcome')
 		setNowGenerating(false)
@@ -109,7 +109,7 @@ const Layout = () => {
                         animation:'slide_from_left',
                         headerShown: 'false'
         }} />
-        </Stack> 
+    </Stack> 
     );
     
 }

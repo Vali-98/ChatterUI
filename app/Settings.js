@@ -18,10 +18,10 @@ const Settings = () => {
             <View>
                 <Text style={styles.userName}>{userName}</Text>
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.button}>
+                    <TouchableOpacity style={styles.button} onPress={() => {router.push('UserInfo')}}>
                         <FontAwesome size={20} name='edit'/>
                     </TouchableOpacity>
-                    <TouchableOpacity  style={styles.button}>
+                    <TouchableOpacity  style={styles.button} onPress={() => {router.push('UserSelector')}}>
                         <FontAwesome size={20} name='th-list' />
                     </TouchableOpacity>
                 </View>

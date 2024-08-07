@@ -97,6 +97,7 @@ const CharMenu = () => {
 
 
            </View>),}} />
+           
             <Modal
                 visible={showNewChar}
                 transparent
