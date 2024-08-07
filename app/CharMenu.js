@@ -50,7 +50,6 @@ const CharMenu = () => {
                 return decode(chunk.data)
                 })
             const charactercard = JSON.parse(Base64.decode(textChunks[0].text))
-            console.log(charactercard)
             const newname = charactercard?.data?.name ?? charactercard.name
             console.log(`Creating new character: ${newname}`)
             if(newname === 'Detailed Example Character' || charactercard === undefined){

@@ -1,7 +1,7 @@
-import { ScrollView, View, Text, StyleSheet, Image ,Alert } from 'react-native'
+import { ScrollView, View, Text, StyleSheet, Image ,Alert, ToastAndroid } from 'react-native'
 import { useEffect, useState } from 'react'
 import { useMMKVString } from 'react-native-mmkv'
-import { Global, Color, getCharacterImageDirectory, getChatFilenames, deleteChatFile, getNewestChatFilename}  from '@globals'
+import { Global, Color, getCharacterImageDirectory, getChatFilenames, deleteChatFile, getNewestChatFilename, saveStringExternal, getChatFile}  from '@globals'
 import { useRouter } from 'expo-router'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { FontAwesome } from '@expo/vector-icons'
@@ -61,7 +61,16 @@ const ChatSelector = () => {
                 <Image source={{uri:getCharacterImageDirectory()}} style={styles.avatar}/>
                 <Text style={styles.chatname}>{chat.replace('.jsonl', '')}</Text>
            
-                <TouchableOpacity style={styles.button} onPress={() => deleteChat(chat)}>
+                <TouchableOpacity style={styles.button} onPress={async () => {
+                    saveStringExternal(
+                        chat,
+                        await getChatFile(charName, chat),
+                        "application/*"
+                    ).catch((error) => {
+                        ToastAndroid.show(`Could not save file.`, 2000)
+                        console.log(error)
+                    })
+                }}>
                     <FontAwesome name='download' size={32} color={Color.Button} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => deleteChat(chat)}>
