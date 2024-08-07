@@ -11,6 +11,7 @@ import { Global, Color, getChatFile,getNewestChatFilename , MessageContext, save
 import llamaTokenizer from '@constants/tokenizer'
 import { MaterialIcons } from '@expo/vector-icons'
 
+
 const Home = () => {
 
 	const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
