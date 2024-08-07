@@ -100,9 +100,11 @@ export const startupApp = async () => {
     mmkv.set(Global.NowGenerating, false)
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
     mmkv.set(Global.HordeModels, JSON.stringify([]))
-    const lnames = mmkv.getString(Global.LorebookNames)
-    if(lnames == undefined)
+
+    if(mmkv.getString(Global.LorebookNames) == undefined)
         mmkv.set(Global.LorebookNames, JSON.stringify([]))
+    if(mmkv.getString(Global.APIType) == undefined)
+        mmkv.set(Global.APIType, API.KAI)
 
     console.log("Reset values")
     SystemUI.setBackgroundColorAsync(Color.Background)
@@ -112,34 +114,37 @@ export const startupApp = async () => {
 
 export const initializeApp = async () => {
     await generateDefaultDirectories()
-    await FS.readDirectoryAsync(`${FS.documentDirectory}`).then((files) => {
-        
-        if(files.length != 0 ) return
-        mmkv.set(Global.APIType, API.KAI)
-        Users.createUser('User').then(() => {
-            console.log(`Creating Default User`)
-            Users.loadFile('User').then(card => {
-                mmkv.set(Global.CurrentUser, 'User')
-                mmkv.set(Global.CurrentCharacterCard, card)
-               
-            })
-        })
-        mmkv.set(Global.PresetData, JSON.stringify(Presets.defaultPreset()))
-        Presets.saveFile('Default', Presets.defaultPreset())
 
-        Instructs.saveFile('Default', Instructs.defaultInstruct()).then(() => {
-            console.log(`Creating Default Instruct`)
-            //@ts-ignore
-            mmkv.set(Global.CurrentInstruct, JSON.stringify(Instructs.defaultInstruct()))
-            mmkv.set(Global.InstructName, 'Default')
-        })
-        
+    await Users.getFileList().then(files => {
+        if(files.length > 0) return
+        mmkv.set(Global.CurrentUser, Users.defaultUserName)
+        mmkv.set(Global.CurrentUserCard, JSON.stringify(Users.defaultUserCard))
+        Users.createUser(Users.defaultUserName)
+        console.log('Created default User')
     }).catch(
-        (error) => console.log(`Could not generate default folders. Reason: ${error}`)
+        (error) => console.log(`Could not generate default User. Reason: ${error}`)
     )
 
-    await migratePresets()
-    
+    await Presets.getFileList().then(files => {
+        if(files.length > 0) return
+        mmkv.set(Global.PresetData, JSON.stringify(Presets.defaultPreset()))
+        Presets.saveFile('Default', Presets.defaultPreset())
+        console.log('Created default Preset')
+    }).catch(
+        (error) => console.log(`Could not generate default Preset. Reason: ${error}`)
+    )
+
+    await Instructs.getFileList().then(files => {
+        if(files.length > 0) return
+        mmkv.set(Global.CurrentInstruct, JSON.stringify(Instructs.defaultInstruct()))
+        mmkv.set(Global.InstructName, 'Default')
+        Instructs.saveFile('Default', Instructs.defaultInstruct())
+        console.log('Created default Instruct')
+    }).catch(
+        (error) => console.log(`Could not generate default Instruct. Reason: ${error}`)
+    )
+
+    await migratePresets()    
 }
 
 export const generateDefaultDirectories = async () => {

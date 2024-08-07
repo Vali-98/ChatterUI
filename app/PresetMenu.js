@@ -132,7 +132,7 @@ const PresetMenu = () => {
             <TouchableOpacity style={styles.button} 
                 onPress={() => {
                     if(presetList.length === 1) {
-                        ToastAndroid.show(`Cannot delete last preset`, 2000)
+                        ToastAndroid.show(`Cannot delete last Preset`, 2000)
                         return
                     }
                     Alert.alert(`Delete Preset`, `Are you sure you want to delete \'${presetName}\'?`, 

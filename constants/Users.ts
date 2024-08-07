@@ -2,17 +2,19 @@ import * as FS from 'expo-file-system'
 
 export namespace Users {
 
+    export const defaultUserName = 'User'
+
+    export const defaultUserCard = {
+        description: "",
+    }
+
     export const createUser = async (name : string) => {
         return FS.makeDirectoryAsync(`${FS.documentDirectory}persona/${name}`).then(() => {
-            return FS.writeAsStringAsync(`${FS.documentDirectory}persona/${name}/${name}.json`, JSON.stringify({
-                description: " "
-            }), {encoding: FS.EncodingType.UTF8})
+            return FS.writeAsStringAsync(`${FS.documentDirectory}persona/${name}/${name}.json`, JSON.stringify(defaultUserCard), {encoding: FS.EncodingType.UTF8})
         }).catch(() => {console.log(`Could not create user.`)})
     
     }
     
-    
-
     export const deleteFile = async (name : string) => {
         return FS.deleteAsync( `${FS.documentDirectory}persona/${name}`)
     }
