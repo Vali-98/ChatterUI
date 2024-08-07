@@ -3,7 +3,7 @@ import { Stack, useRouter} from 'expo-router'
 import { TouchableOpacity, View, StyleSheet} from 'react-native'
 import { useEffect } from 'react'
 import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import { Global, Color, Chats, generateDefaultDirectories, createDefaultPresets, Users,  Instruct, Presets } from '@globals'
+import { Global, Color, Chats, generateDefaultDirectories, migratePresets, Users,  Instruct, Presets } from '@globals'
 import { MenuProvider } from 'react-native-popup-menu';
 import * as SystemUI from 'expo-system-ui'
 
@@ -52,7 +52,7 @@ const Layout = () => {
         setPreset(Presets.defaultPreset())
         console.log("Reset values")
         SystemUI.setBackgroundColorAsync(Color.Background)
-
+        migratePresets()
         // replace this entire call with specific to each field
         
 		FS.readDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => generateDefaultDirectories().then(() => {

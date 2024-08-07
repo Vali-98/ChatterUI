@@ -6,9 +6,9 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { FontAwesome } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 
+
 const Settings = () => {
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-    const [apiType, setAPIType] = useMMKVString(Global.APIType)
     const router = useRouter()
 
     return (
@@ -33,11 +33,7 @@ const Settings = () => {
 
         <View style={styles.largeButtonContainer}>
             <TouchableOpacity style={styles.largeButton} onPress={() => {
-                /*if(apiType === API.KAI || apiType === API.HORDE)
-                    router.push("PresetsKAI")
-                if(apiType === API.MANCER || apiType === API.TGWUI)
-                    router.push("PresetsTGWUI")*/
-                router.push("/Presets")
+                router.push("/PresetMenu")
             }} >
                 <Text style={styles.largeButtonText}>Presets</Text>
             </TouchableOpacity>
@@ -48,8 +44,6 @@ const Settings = () => {
                 <Text style={styles.largeButtonText}>API</Text>
             </TouchableOpacity>
         </View>
-
-
         </SafeAreaView>
     )
 }

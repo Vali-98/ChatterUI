@@ -1,9 +1,18 @@
 import * as FS from 'expo-file-system'
 import * as DocumentPicker from 'expo-document-picker'
 import { ToastAndroid } from 'react-native'
-
+import { API } from './API'
 
 export namespace Presets {
+
+export const APIFields : any = {
+    [API.KAI] : [],
+    [API.TGWUI] : [],
+    [API.HORDE] : [],
+    [API.MANCER] : [],
+    [API.COMPLETIONS] : []
+}
+
 
 export const defaultPreset = () => {
     return {
@@ -17,7 +26,6 @@ export const defaultPreset = () => {
         "typical" : 0.01,
         "single_line" : false,
         "sampler_order" : [6,0,1,3,4,2,5],
-        "use_default_badwordsids" : false,
         "seed": -1,
 
         //
@@ -27,6 +35,7 @@ export const defaultPreset = () => {
         "typical_p": 1,
         "rep_pen": 1.1,
         "rep_pen_range": 0,
+        "rep_pen_slope": 1,
         "no_repeat_ngram_size": 20,
         "penalty_alpha": 0,
         "num_beams": 1,
