@@ -119,7 +119,7 @@ const defaultInstructs: InstructType[] = [
         input_suffix: '<end_of_turn>\n',
         output_prefix: '<start_of_turn>model',
         output_suffix: '<end_of_turn>\n',
-        stop_sequence: '<end_of_turn>\n',
+        stop_sequence: '<end_of_turn>',
         user_alignment_message: '',
         activation_regex: '',
         wrap: false,
