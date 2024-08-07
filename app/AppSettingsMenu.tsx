@@ -1,3 +1,4 @@
+import { rawdb } from '@db'
 import { Style, AppSettings, Logger } from '@globals'
 import { reloadAppAsync } from 'expo'
 import { getDocumentAsync } from 'expo-document-picker'
@@ -68,12 +69,12 @@ const exportDB = async () => {
 }
 
 const importDB = async (uri: string, name: string) => {
-    await deleteAsync(`${documentDirectory}SQLite/db.db`).catch(() => {
-        Logger.debug('Somehow the db is already deleted')
-    })
-
     const copyDB = async () => {
+        rawdb.closeSync()
         await exportDB()
+        await deleteAsync(`${documentDirectory}SQLite/db.db`).catch(() => {
+            Logger.debug('Somehow the db is already deleted')
+        })
         await copyAsync({
             from: uri,
             to: `${documentDirectory}SQLite/db.db`,
