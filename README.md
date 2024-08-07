@@ -23,6 +23,7 @@ Built for the purpose of learning Javascript, so it might be a little rough arou
 -   Text Completion
 -   Local using [llama.rn](https://github.com/mybigday/llama.rn)
 -   Open Router
+-   OpenAI
 
 ### Building From Source
 
