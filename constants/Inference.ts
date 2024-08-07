@@ -409,7 +409,7 @@ const constructCompletionsPayload = () => {
         temperature: preset.temp,
         tfs: preset.tfs,
         top_a: preset.top_a,
-        top_k: preset.top_k,
+        top_k: Math.round(preset.top_k),
         top_p: preset.top_p,
         min_p: preset.min_p,
         typical: preset.typical,
@@ -417,7 +417,7 @@ const constructCompletionsPayload = () => {
         mirostat_mode: preset.mirostat_mode,
         mirostat_tau: preset.mirostat_tau,
         mirostat_eta: preset.mirostat_eta,
-        grammar: preset.grammar,
+        grammar: preset.grammar_string,
         //"trim_stop" : true,
         seed:
             preset?.seed === undefined || preset.seed === -1
