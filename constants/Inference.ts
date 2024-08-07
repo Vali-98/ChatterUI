@@ -746,17 +746,18 @@ const openAIResponseStream = async (setAbortFunction: AbortFunction) => {
 
 const constructReplaceStrings = (): Array<string> => {
     const currentInstruct: InstructType = Instructs.useInstruct.getState().replacedMacros()
-    const userName = Characters.useCharacterCard.getState().card?.data.name ?? ''
-    const charName: string = Characters.useCharacterCard.getState()?.card?.data?.name ?? ''
+    // default stop strings defined instructs
     const stops: Array<string> = constructStopSequence(currentInstruct)
-
+    // additional stop strings based on context configuration
     const output: Array<string> = []
 
-    output.push(`${userName} :`)
-    output.push(`${charName} :`)
-    stops.forEach((item) => output.push(item))
-
-    return output
+    if (currentInstruct.names) {
+        const userName = Characters.useCharacterCard.getState().card?.data.name ?? ''
+        const charName: string = Characters.useCharacterCard.getState()?.card?.data?.name ?? ''
+        output.push(`${userName} :`)
+        output.push(`${charName} :`)
+    }
+    return [...stops, ...output]
 }
 
 const localStreamResponse = async (setAbortFunction: AbortFunction) => {
