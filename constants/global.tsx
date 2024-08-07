@@ -108,6 +108,8 @@ export const startupApp = () => {
 export const initializeApp = async () => {
     await generateDefaultDirectories()
 
+    //TODO: DB User defaults
+
     await Users.getFileList()
         .then((files) => {
             if (files.length > 0) return
@@ -126,18 +128,6 @@ export const initializeApp = async () => {
             Logger.log('Created default Preset')
         })
         .catch((error) => Logger.log(`Could not generate default Preset. Reason: ${error}`))
-
-    /*
-    await Instructs.getFileList()
-        .then((files) => {
-            if (files.length > 0) return
-            mmkv.set(Global.CurrentInstruct, JSON.stringify(Instructs.defaultInstruct()))
-            mmkv.set(Global.InstructName, 'Default')
-            Instructs.saveFile('Default', Instructs.defaultInstruct())
-            Logger.log('Created default Instruct')
-        })
-        .catch((error) => Logger.log(`Could not generate default Instruct. Reason: ${error}`))*/
-    // TODO: New init script
 
     const instructid = mmkv.getNumber(Global.InstructID)
     if (instructid === undefined) {
@@ -161,7 +151,8 @@ export const initializeApp = async () => {
 }
 
 export const generateDefaultDirectories = async () => {
-    const dirs = ['characters', 'presets', 'instruct', 'persona', 'lorebooks', 'models']
+    // Removed: 'characters', 'instruct', 'persona',
+    const dirs = ['presets', 'lorebooks', 'models']
 
     dirs.map(async (dir: string) => {
         await FS.makeDirectoryAsync(`${FS.documentDirectory}${dir}`, {})

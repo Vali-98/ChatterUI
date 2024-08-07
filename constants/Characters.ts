@@ -20,6 +20,27 @@ type CharacterCardState = {
 }
 
 export namespace Characters {
+    export const useUserCard = create<CharacterCardState>((set, get: () => CharacterCardState) => ({
+        id: undefined,
+        card: undefined,
+        setCard: async (id: number) => {
+            let start = performance.now()
+            const card = await readCard(id)
+            Logger.debug(`[User] time for db query: ${performance.now() - start}`)
+            start = performance.now()
+            set((state) => ({ ...state, card: card, id: id }))
+
+            Logger.debug(`[User] time for zustand set: ${performance.now() - start}`)
+            return card?.data.name
+        },
+        unloadCard: () => {
+            set((state) => ({ ...state, id: undefined, card: undefined }))
+        },
+        getImage: () => {
+            return getImageDir(get().card?.data.image_id ?? 0)
+        },
+    }))
+
     export const useCharacterCard = create<CharacterCardState>(
         (set, get: () => CharacterCardState) => ({
             id: undefined,
@@ -120,7 +141,7 @@ export namespace Characters {
         return FS.deleteAsync(getImageDir(charID), { idempotent: true })
     }
 
-    export const getCardList = async () => {
+    export const getCardList = async (type: 'character' | 'user') => {
         const query = await db.query.characters.findMany({
             columns: {
                 id: true,
@@ -137,7 +158,7 @@ export namespace Characters {
                     },
                 },
             },
-            where: (characters, { eq }) => eq(characters.type, 'character'),
+            where: (characters, { eq }) => eq(characters.type, type),
         })
         return query.map((item) => ({ ...item, tags: item.tags.map((item) => item.tag.tag) }))
     }
