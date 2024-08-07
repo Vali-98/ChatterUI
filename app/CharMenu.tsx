@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
         height: 48,
         borderRadius: 12,
         margin: 4,
-        backgroundColor: 'gray',
+        backgroundColor: Style.getColor('primary-surface2'),
     },
 
     nametag: {
