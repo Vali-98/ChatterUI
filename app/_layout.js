@@ -4,7 +4,7 @@ import { TouchableOpacity, View, StyleSheet} from 'react-native'
 import { useEffect } from 'react'
 import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 import { Global, generateDefaultDirectories, createNewDefaultChat, 
-    loadUserCard, createNewUser, writePreset,  writeInstruct, Color
+    loadUserCard, createNewUser, writePreset,  writeInstruct, Color, resetEncryption
 } from '@globals'
 import { MenuProvider } from 'react-native-popup-menu';
 
@@ -28,17 +28,23 @@ const Layout = () => {
     const [instructName, setInstructName] = useMMKVObject(Global.InstructName)
     const [presetName, setPresetName] = useMMKVString(Global.PresetName)
 
+    const [hordeModels, setHordeModels] = useMMKVObject(Global.HordeModels)
+    const [hordeWorkers, setHordeWorkers] = useMMKVObject(Global.HordeWorkers)
+
+
     // reset defaults
     useEffect(() => {
-        
 		setCharName('Welcome')
 		setCurrentChat('')
-        
         setCurrentCard(null)
 		setNowGenerating(false)
-		console.log("Reset values")
+        setHordeWorkers([])
+        setHordeModels([])
+        
+        console.log("Reset values")
 
 		FS.readDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => generateDefaultDirectories().then(() => {
+            
             createNewUser('User').then(() => {
                 console.log(`Creating Default User`)
                 loadUserCard('User').then(card => {
@@ -62,6 +68,7 @@ const Layout = () => {
         }).catch(
             (error) => console.log(`Could not generate default folders. Reason: ${error}`)
         ))
+        
 	}, []) 
 
     return (
