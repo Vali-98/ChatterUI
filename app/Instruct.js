@@ -2,19 +2,10 @@ import CheckboxTitle from '@components/CheckboxTitle'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Instructs, saveStringExternal } from '@globals'
+import { Global, Color, Instructs, saveStringExternal, Logger } from '@globals'
 import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
-import {
-    View,
-    Text,
-    SafeAreaView,
-    TouchableOpacity,
-    StyleSheet,
-    ToastAndroid,
-    Alert,
-    ScrollView,
-} from 'react-native'
+import { View, SafeAreaView, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
@@ -61,12 +52,12 @@ const Instruct = () => {
                 booleans={[showNewInstruct, setShowNewInstruct]}
                 onConfirm={(text) => {
                     if (instructList.some((item) => item.label === text)) {
-                        ToastAndroid.show(`Preset name already exists.`, 2000)
+                        Logger.log(`Preset name already exists.`, true)
                         return
                     }
 
                     Instructs.saveFile(text, { ...currentInstruct, name: text }).then(() => {
-                        ToastAndroid.show(`Preset created.`, 2000)
+                        Logger.log(`Preset created.`, true)
                         setInstructName(text)
                         loadInstructList(text)
                     })
@@ -94,7 +85,7 @@ const Instruct = () => {
                     style={styles.button}
                     onPress={() => {
                         Instructs.saveFile(instructName, currentInstruct).then(
-                            ToastAndroid.show(`Preset Updated!`, 2000)
+                            Logger.log(`Preset Updated!`, true)
                         )
                     }}>
                     <FontAwesome size={24} name="save" color={Color.Button} />
@@ -104,7 +95,7 @@ const Instruct = () => {
                     style={styles.button}
                     onPress={() => {
                         if (instructList.length === 1) {
-                            ToastAndroid.show(`Cannot delete last Instruct preset.`, 2000)
+                            Logger.log(`Cannot delete last Instruct preset.`, true)
                             return
                         }
                         Alert.alert(

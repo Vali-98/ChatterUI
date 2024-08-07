@@ -3,7 +3,7 @@ import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Chats, Characters, MessageContext } from '@globals'
 import { generateResponse } from '@lib/Inference'
 import { Stack, useRouter } from 'expo-router'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, Text, TextInput, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native'
 import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu'
@@ -60,7 +60,6 @@ const Home = () => {
     }, [currentChat])
 
     // triggers generation when set true
-    // TODO : Use this to save instead
     useEffect(() => {
         nowGenerating && startInference()
 

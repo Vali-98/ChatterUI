@@ -1,8 +1,8 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color } from '@globals'
+import { Global, Color, Logger } from '@globals'
 import * as Speech from 'expo-speech'
 import { useState } from 'react'
-import { View, TouchableOpacity, ToastAndroid } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import { useMMKVObject } from 'react-native-mmkv'
 
 const TTS = ({ message }) => {
@@ -23,7 +23,7 @@ const TTS = ({ message }) => {
                 <TouchableOpacity
                     onPress={async () => {
                         if (currentSpeaker === undefined) {
-                            ToastAndroid.show('No Speaker Chosen', 2000)
+                            Logger.log(`No Speaker Chosen`, 2000)
                             return
                         }
                         setIsSpeaking(true)

@@ -53,7 +53,6 @@ const Layout = () => {
                         name="Settings"
                         options={{
                             animation: 'slide_from_left',
-                            headerShown: 'false',
                         }}
                     />
                 </Stack>

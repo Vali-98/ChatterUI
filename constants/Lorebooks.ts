@@ -1,6 +1,6 @@
 import * as FS from 'expo-file-system'
 import * as DocumentPicker from 'expo-document-picker'
-import { ToastAndroid } from 'react-native'
+import { Logger } from './Logger'
 
 export namespace Lorebooks {
     type Entry = {
@@ -63,7 +63,7 @@ export namespace Lorebooks {
     export const uploadFile = async () => {
         return DocumentPicker.getDocumentAsync({ type: ['application/*'] }).then((result: any) => {
             if (result.canceled || !result.assets[0].name.endsWith('json')) {
-                ToastAndroid.show(`Invalid File Type!`, 3000)
+                Logger.log(`Invalid File Type!`, true)
                 return
             }
             let name = result.assets[0].name.replace(`.json`, '').replace('.settings', '')
@@ -79,12 +79,11 @@ export namespace Lorebooks {
                 .then(async (file) => {
                     // fix here
                     await JSON.parse(file)
-                    ToastAndroid.show('Lorebook added!', 2000)
+                    Logger.log('Lorebook Ddded!', true)
                     return name
                 })
                 .catch((error) => {
-                    console.log(error)
-                    ToastAndroid.show(error.message, 2000)
+                    Logger.log(`Failed to Load: ${error.message}`, true)
                 })
         })
     }

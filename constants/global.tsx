@@ -3,7 +3,7 @@ import * as Crypto from 'expo-crypto'
 import * as FS from 'expo-file-system'
 import * as SystemUI from 'expo-system-ui'
 import { createContext } from 'react'
-import { ToastAndroid, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 
 import { API } from './API'
 import { Characters } from './Characters'
@@ -15,7 +15,7 @@ import { Users } from './Users'
 import { humanizedISO8601DateTime } from './Utils'
 import { Llama } from './llama'
 import { mmkv } from './mmkv'
-
+import { Logger } from './Logger'
 export {
     mmkv,
     Presets,
@@ -27,6 +27,7 @@ export {
     API,
     Llama,
     humanizedISO8601DateTime,
+    Logger,
 }
 
 export const MessageContext = createContext([])
@@ -89,7 +90,7 @@ export const saveStringExternal = async (
                 await FS.writeAsStringAsync(fileUri, filedata, {
                     encoding: FS.EncodingType.UTF8,
                 })
-                ToastAndroid.show(`File saved sucessfully`, 2000)
+                Logger.log(`File saved sucessfully`, true)
             })
             .catch((e) => {
                 console.log(e)
@@ -115,6 +116,7 @@ export const startupApp = () => {
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
     mmkv.set(Global.HordeModels, JSON.stringify([]))
     mmkv.set(Global.LocalModelWeights, JSON.stringify({}))
+    if (mmkv.getString(Global.Logs) === undefined) mmkv.set(Global.Logs, JSON.stringify([]))
     if (mmkv.getString(Global.LorebookNames) === undefined)
         mmkv.set(Global.LorebookNames, JSON.stringify([]))
     if (mmkv.getString(Global.APIType) === undefined) mmkv.set(Global.APIType, API.KAI)

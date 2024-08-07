@@ -1,6 +1,6 @@
 import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Users } from '@globals'
+import { Global, Color, Users, Logger } from '@globals'
 import { Stack, useRouter } from 'expo-router'
 import { useState, useEffect } from 'react'
 import {
@@ -12,7 +12,6 @@ import {
     Image,
     ScrollView,
     Alert,
-    ToastAndroid,
 } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
 
@@ -125,7 +124,7 @@ const UserSelector = () => {
                 booleans={[showNewUser, setShowNewUser]}
                 onConfirm={(text) => {
                     if (userList.includes(text)) {
-                        ToastAndroid.show(`Persona already exists.`, ToastAndroid.SHORT)
+                        Logger.log(`Persona Already Exists`, true)
                         return
                     }
                     Users.createUser(text)

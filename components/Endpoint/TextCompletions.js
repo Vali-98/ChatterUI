@@ -1,7 +1,7 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color } from '@globals'
+import { Global, Color, Logger } from '@globals'
 import { useState } from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
 
 const TextCompletions = () => {
@@ -25,12 +25,12 @@ const TextCompletions = () => {
                     style={styles.button}
                     onPress={() => {
                         if (keyInput === '') {
-                            ToastAndroid.show('No key entered!', 2000)
+                            Logger.log('No key entered!', true)
                             return
                         }
                         setCompletionsKey(keyInput)
                         setKeyInput('')
-                        ToastAndroid.show('Key saved!', 2000)
+                        Logger.log('Key saved!', true)
                     }}
                 />
                 <TouchableOpacity>

@@ -1,19 +1,17 @@
 import { Llama } from '@constants/llama'
-import { Color, Global } from '@globals'
+import { Color, Global, Logger } from '@globals'
 import { useEffect, useState } from 'react'
 import {
     View,
     Text,
     StyleSheet,
     TouchableOpacity,
-    TextInput,
-    ToastAndroid,
     Alert,
     ActivityIndicator,
+    Platform,
 } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
-
 import { SliderItem } from '..'
 
 const Local = () => {
@@ -54,7 +52,7 @@ const Local = () => {
 
     const handleDelete = async () => {
         if (!(await Llama.modelExists(currentModel))) {
-            ToastAndroid.show('Model Does Not Exist!', ToastAndroid.SHORT)
+            Logger.log(`Model Does Not Exist!`, true)
             return
         }
 
@@ -66,13 +64,11 @@ const Local = () => {
                 onPress: () => {
                     Llama.deleteModel(currentModel)
                         .then(() => {
-                            ToastAndroid.show('Model Deleted Successfully', ToastAndroid.SHORT)
+                            Logger.log('Model Deleted Successfully', true)
                             setLoadedModel(Llama.getModelname())
                             getModels()
                         })
-                        .catch(() =>
-                            ToastAndroid.show('Could Not Delete Model', ToastAndroid.SHORT)
-                        )
+                        .catch(() => Logger.log('Could Not Delete Model', true))
                 },
             },
         ])
@@ -222,17 +218,17 @@ const Local = () => {
                     step={1}
                 />
 
-                {/* RNLlama does not support Android GPUs yet, modify when ready
-		<SliderItem
-			name='GPU Layers'
-			body={preset}
-			setValue={setPreset}
-			varname={"gpu_layers"}
-			min={0}
-			max={100}
-			step={1}
-		/>
-		*/}
+                {Platform.OS == 'ios' && (
+                    <SliderItem
+                        name="GPU Layers"
+                        body={preset}
+                        setValue={setPreset}
+                        varname={'gpu_layers'}
+                        min={0}
+                        max={100}
+                        step={1}
+                    />
+                )}
             </View>
         </View>
     )

@@ -1,8 +1,8 @@
 import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
-import { ToastAndroid } from 'react-native'
 
 import { API } from './API'
+import { Logger } from './Logger'
 
 export namespace Presets {
     const presetdir = `${FS.documentDirectory}presets/`
@@ -231,7 +231,7 @@ export namespace Presets {
                 (!result.assets[0].name.endsWith('json') &&
                     !result.assets[0].name.endsWith('settings'))
             ) {
-                ToastAndroid.show(`Invalid File Type!`, 3000)
+                Logger.log(`Invalid File Type!`, true)
                 return
             }
             const name = result.assets[0].name.replace(`.json`, '').replace('.settings', '')
@@ -250,7 +250,7 @@ export namespace Presets {
                 })
                 .catch((error) => {
                     console.log(error)
-                    ToastAndroid.show(error.message, 2000)
+                    Logger.log(`Upload Failed: ${error.message}`, true)
                 })
         })
     }

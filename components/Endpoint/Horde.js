@@ -1,7 +1,7 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
-import { Global, Color, hordeHeader } from '@globals'
+import { Global, Color, hordeHeader, Logger } from '@globals'
 import { useState, useEffect } from 'react'
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ToastAndroid } from 'react-native'
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import { MultiSelect } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
@@ -23,7 +23,7 @@ const Horde = () => {
             method: 'GET',
             headers: { ...hordeHeader() },
         }).catch(() => {
-            ToastAndroid.show(`Could not connect to horde.`, 2000)
+            Logger.log(`Could not connect to horde`, true)
             return []
         })
         const list = await modelresults.json()
@@ -39,7 +39,7 @@ const Horde = () => {
             method: 'GET',
             ...hordeHeader(),
         }).catch(() => {
-            ToastAndroid.show(`Could not connect to horde.`, 2000)
+            Logger.log(`Could not connect to horde`, true)
             return []
         })
         const workerlist = await workerresults.json()
@@ -70,12 +70,12 @@ const Horde = () => {
                     style={styles.button}
                     onPress={() => {
                         if (keyInput === '') {
-                            ToastAndroid.show('No key entered!', 2000)
+                            Logger.log(`No API Key provided!`, true)
                             return
                         }
                         setHordeKey(keyInput)
                         setKeyInput('')
-                        ToastAndroid.show('Key saved!', 2000)
+                        Logger.log(`Key Saved!`, true)
                     }}>
                     <FontAwesome name="save" color={Color.Button} size={28} />
                 </TouchableOpacity>
