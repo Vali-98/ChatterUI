@@ -72,10 +72,17 @@ class LocalAPI extends APIBase {
         })
 
         const payload = this.buildPayload()
-        Llama.completion(payload, (text: string) => {
+
+        const outputStream = (text: string) => {
             const output = Chats.useChat.getState().buffer + text
             Chats.useChat.getState().setBuffer(output.replaceAll(replace, ''))
-        })
+        }
+
+        const outputCompleted = (text: string) => {
+            Chats.useChat.getState().setBuffer(text.replaceAll(replace, ''))
+        }
+
+        Llama.completion(payload, outputStream, outputCompleted)
             .then(() => {
                 this.stopGenerating()
             })
