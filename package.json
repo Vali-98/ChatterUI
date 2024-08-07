@@ -22,6 +22,7 @@
     "axios": "^1.5.0",
     "babel-plugin-module-resolver": "^5.0.0",
     "base-64": "^1.0.0",
+    "dicer": "^0.3.1",
     "eas-cli": "^5.4.0",
     "expo": "~49.0.11",
     "expo-application": "~5.3.0",
@@ -41,6 +42,7 @@
     "png-chunk-text": "^1.0.0",
     "png-chunks-extract": "^1.0.0",
     "react": "18.2.0",
+    "react-devtools-core": "^5.0.0",
     "react-dom": "18.2.0",
     "react-native": "0.72.6",
     "react-native-element-dropdown": "^2.10.0",
@@ -54,6 +56,7 @@
     "react-native-safe-area-context": "4.6.3",
     "react-native-screens": "~3.22.0",
     "react-native-web": "~0.19.6",
+    "semver": "^7.5.4",
     "undefined": "web-streams-polyfill/ponyfill/es6"
   },
   "devDependencies": {
