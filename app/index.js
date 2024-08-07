@@ -28,7 +28,7 @@ const Home = () => {
 
 	// load character chat upon character change
 	useEffect(() => {
-		if (charName === 'Welcome') return
+		if (charName === 'Welcome' || charName === undefined) return
 		console.log(`Character changed to ${charName}`)
 		getNewestChatFilename(charName).then(
 			filename => setCurrentChat(filename)
@@ -85,7 +85,7 @@ const Home = () => {
 
 	// load character upon currentChat changing 
 	useEffect(() => {	
-		if(currentChat === '' || charName === 'Welcome') {
+		if(currentChat === '' || charName === 'Welcome' || charName === undefined) {
 			return
 		}
 		console.log("Now reading " + currentChat + " for " + charName)
