@@ -3,7 +3,7 @@ import { FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Users } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
-import React from 'react'
+import { useState } from 'react'
 import {
     SafeAreaView,
     View,
@@ -20,6 +20,16 @@ const UserInfo = () => {
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const [userCard, setUserCard] = useMMKVObject<UserCard>(Global.CurrentUserCard)
 
+    const imageDir = Users.getImageDir(userName ?? '')
+
+    const [imageSource, setImageSource] = useState({
+        uri: imageDir,
+    })
+
+    const handleImageError = () => {
+        setImageSource(require('@assets/user.png'))
+    }
+
     const saveCard = () => {
         if (userName && userCard) Users.saveFile(userName, userCard)
     }
@@ -29,17 +39,12 @@ const UserInfo = () => {
             <Stack.Screen
                 options={{
                     title: 'Edit User',
-                    animation: 'none',
+                    animation: 'fade',
                 }}
             />
 
             <View style={styles.userContainer}>
-                <View style={styles.imageContainer}>
-                    <Image
-                        style={styles.userImage}
-                        source={{ uri: Users.getImageDir(userName ?? '') }}
-                    />
-                </View>
+                <Image style={styles.userImage} source={imageSource} onError={handleImageError} />
                 <View>
                     <Text style={styles.userName}>{userName}</Text>
                     <View style={styles.buttonContainer}>
@@ -96,7 +101,8 @@ const styles = StyleSheet.create({
     userContainer: {
         flexDirection: 'row',
         marginBottom: 40,
-        margin: 16,
+        marginTop: 40,
+        marginHorizontal: 16,
     },
 
     buttonContainer: {
@@ -118,20 +124,10 @@ const styles = StyleSheet.create({
         marginLeft: 12,
     },
 
-    imageContainer: {
-        width: 108,
-        height: 108,
-        borderRadius: 54,
-        margin: 4,
-        borderWidth: 2,
-        borderColor: Color.White,
-        backgroundColor: Color.DarkContainer,
-    },
-
     userImage: {
-        width: 108,
-        height: 108,
-        borderRadius: 54,
+        width: 80,
+        height: 80,
+        borderRadius: 20,
     },
 
     inputarea: {
