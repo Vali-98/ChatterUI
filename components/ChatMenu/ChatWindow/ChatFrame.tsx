@@ -38,7 +38,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
             ? Users.getImageDir(userName)
             : Characters.useCharacterCard.getState().getImage()
         setImageSource({ uri: newdir })
-    }, [charId])
+    }, [id, charId, userName])
 
     const handleImageError = () => {
         setImageSource(require('@assets/user.png'))
