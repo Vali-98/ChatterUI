@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native'
 import { Global , Color } from '@globals'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FontAwesome } from '@expo/vector-icons'
 import { Dropdown } from 'react-native-element-dropdown'
 
@@ -14,7 +14,7 @@ const OpenRouter = () => {
 
     const [modelList, setModelList] = useState([])
 
-	const getModels = async () => {
+	const getModels = useCallback(async () => {
         const modelresults = await fetch("https://openrouter.ai/api/v1/models", {
             method: 'GET',
             headers: { accept: 'application/json'}
@@ -24,7 +24,7 @@ const OpenRouter = () => {
         })
         const list = (await modelresults.json()).data
         setModelList(list)
-    }
+    }, [modelList])
 
 	useEffect(() => {
         getModels()
