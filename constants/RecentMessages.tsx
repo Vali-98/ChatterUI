@@ -13,7 +13,7 @@ const entryLimit = 5
 export namespace RecentMessages {
     export const insertEntry = (charName: string, charId: number, chatId: number) => {
         const data = mmkv.getString(Global.RecentMessages)
-        let entries: Array<RecentEntry> = []
+        let entries: RecentEntry[] = []
         if (data) entries = JSON.parse(data)
 
         const index = entries.findIndex((item) => item.chatId === chatId)
@@ -35,7 +35,7 @@ export namespace RecentMessages {
 
     export const deleteEntry = (chatId: number) => {
         const data = mmkv.getString(Global.RecentMessages)
-        let entries: Array<RecentEntry> = []
+        let entries: RecentEntry[] = []
         if (data) entries = JSON.parse(data)
         const index = entries.findIndex((item) => item.chatId === chatId)
         if (index !== -1) entries.splice(index, 1)
@@ -44,7 +44,7 @@ export namespace RecentMessages {
 
     export const deleteByCharacter = (charName: string) => {
         const data = mmkv.getString(Global.RecentMessages)
-        let entries: Array<RecentEntry> = []
+        let entries: RecentEntry[] = []
         if (data) entries = JSON.parse(data)
         const cleaned = entries.filter((item) => item.charName !== charName)
         mmkv.set(Global.RecentMessages, JSON.stringify(cleaned))

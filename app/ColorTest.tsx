@@ -1,17 +1,21 @@
-import { View, Text, TouchableOpacity } from 'react-native'
-import { ColorId, Style } from '@constants/Style'
-import Slider from '@react-native-community/slider'
-import { ScrollView } from 'react-native-gesture-handler'
-import { LlamaTokenizer } from '@globals'
-import { Stack } from 'expo-router'
-import { FontAwesome } from '@expo/vector-icons'
-import { useMMKVBoolean } from 'react-native-mmkv'
 import { AppSettings } from '@constants/GlobalValues'
+import { ColorId, Style } from '@constants/Style'
+import { FontAwesome } from '@expo/vector-icons'
+import { LlamaTokenizer } from '@globals'
+import Slider from '@react-native-community/slider'
+import { reloadAppAsync } from 'expo'
+import { Stack } from 'expo-router'
+import { useState } from 'react'
+import { View, Text, TouchableOpacity, Switch } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { useMMKVBoolean } from 'react-native-mmkv'
 
 const ColorTest = () => {
-    const { color, setPrimary } = Style.useColorScheme((state) => ({
+    const { color, setPrimary, toggleDarkMode, darkMode } = Style.useColorScheme((state) => ({
         color: state.colors.primary,
         setPrimary: state.setPrimary,
+        toggleDarkMode: state.toggleDarkMode,
+        darkMode: state.darkMode,
     }))
     const [devMode, setDevMode] = useMMKVBoolean(AppSettings.DevMode)
 
@@ -26,9 +30,9 @@ const ColorTest = () => {
     const lorem1 =
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. '
 
+    const [edited, setEdited] = useState(false)
     return (
-        <ScrollView
-            style={{ backgroundColor: Style.getColor('primary-surface1'), flex: 1, padding: 16 }}>
+        <View style={{ backgroundColor: Style.getColor('primary-surface1'), flex: 1, padding: 16 }}>
             <Stack.Screen
                 options={{
                     headerRight: () => (
@@ -50,31 +54,34 @@ const ColorTest = () => {
                 }}
             />
 
-            {/*<View style={{ alignItems: 'center', flexDirection: 'row' }}>
-                <Text style={{ color: Style.getColor('primary-text1') }}>Toggle Dark Mode</Text>
+            <View style={{ alignItems: 'center', flexDirection: 'row', marginVertical: 8 }}>
                 <Switch
                     value={darkMode}
-                    onValueChange={toggleDarkMode}
+                    onValueChange={(value) => {
+                        setEdited(true)
+                        toggleDarkMode()
+                    }}
                     thumbColor={Style.getColor(darkMode ? 'primary-brand' : 'primary-surface1')}
                     trackColor={{
                         true: Style.getColor('primary-surface3'),
                         false: Style.getColor('primary-surface3'),
                     }}
                 />
-                </View>*/}
 
-            <Text style={{ color: Style.getColor('primary-text1'), marginBottom: 8 }}>
-                NOTE: App must restart to see changes
-            </Text>
+                <Text style={{ color: Style.getColor('primary-text1') }}>
+                    Toggle Dark Mode [ VERY EXPERIMENTAL ]
+                </Text>
+            </View>
             <View style={{ alignItems: 'center', flexDirection: 'row' }}>
                 <Text style={{ color: Style.getColor('primary-text1') }}>Hue: {color.h}</Text>
                 <Slider
-                    minimumValue={0}
+                    minimumValue={1}
                     maximumValue={360}
                     style={{ flex: 1 }}
                     step={1}
                     value={color.h}
                     onValueChange={(value) => {
+                        setEdited(true)
                         setPrimary(value, color.s, color.l)
                     }}
                     maximumTrackTintColor={Style.getColor('primary-surface2')}
@@ -119,8 +126,29 @@ const ColorTest = () => {
                     />
                 </View>
             )}
+            {edited && (
+                <View>
+                    <Text style={{ color: Style.getColor('destructive-brand'), marginTop: 8 }}>
+                        Restart ChatterUI to apply changes!
+                    </Text>
+                    <TouchableOpacity
+                        style={{
+                            marginVertical: 8,
+                            borderColor: Style.getColor('primary-brand'),
+                            borderRadius: 4,
+                            paddingVertical: 8,
+                            paddingHorizontal: 16,
+                            borderWidth: 1,
+                        }}
+                        onPress={() => {
+                            reloadAppAsync()
+                        }}>
+                        <Text style={{ color: Style.getColor('primary-text1') }}>Restart Now</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
 
-            <View>
+            <ScrollView>
                 <View style={{ marginTop: 8 }}>
                     {surfaces.map((item, index) => (
                         <TouchableOpacity
@@ -198,10 +226,23 @@ const ColorTest = () => {
                             Text 2
                         </Text>
                         <Text style={{ color: Style.getColor('primary-text2') }}>{lorem1}</Text>
+                        <Text
+                            style={{
+                                marginTop: 12,
+                                fontSize: 16,
+                                color: Style.getColor('primary-text3'),
+                                borderColor: Style.getColor('primary-surface3'),
+                                borderBottomWidth: 1,
+                                padding: 2,
+                                marginBottom: 2,
+                            }}>
+                            Text 3
+                        </Text>
+                        <Text style={{ color: Style.getColor('primary-text3') }}>{lorem1}</Text>
                     </View>
                 </View>
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </View>
     )
 }
 

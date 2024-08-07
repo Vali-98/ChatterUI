@@ -17,7 +17,7 @@ const OpenAI = () => {
     const [openAIKey, setOpenAIKey] = useMMKVString(Global.OpenAIKey)
     const [keyInput, setKeyInput] = useState<string>('')
 
-    const [modelList, setModelList] = useState<Array<OpenAIModel>>([])
+    const [modelList, setModelList] = useState<OpenAIModel[]>([])
 
     const getModels = async () => {
         const modelresults = await fetch(`https://api.openai.com/v1/models`, {

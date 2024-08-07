@@ -1,10 +1,10 @@
-import { StyleSheet, Animated, Easing, LayoutChangeEvent } from 'react-native'
+import { Chats, Style, MarkdownStyle } from '@globals'
 import React, { useEffect, useRef } from 'react'
-//@ts-expect-error
-import AnimatedEllipsis from 'rn-animated-ellipsis'
+import { StyleSheet, Animated, Easing, LayoutChangeEvent } from 'react-native'
 //@ts-expect-error
 import Markdown from 'react-native-markdown-package'
-import { Chats, Style, MarkdownStyle } from '@globals'
+//@ts-expect-error
+import AnimatedEllipsis from 'rn-animated-ellipsis'
 import { useShallow } from 'zustand/react/shallow'
 
 type ChatTextProps = {
@@ -68,7 +68,7 @@ const ChatText: React.FC<ChatTextProps> = ({ showEllipsis, nowGenerating, id, is
     return (
         <Animated.View
             style={{
-                height: animatedHeight,
+                height: __DEV__ ? 'auto' : animatedHeight, // this is a dev due to height animations being
                 overflow: 'scroll',
             }}>
             {showEllipsis && buffer === '' && (

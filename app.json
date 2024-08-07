@@ -49,7 +49,8 @@
                         "useLegacyPackaging": true
                     }
                 }
-            ]
+            ],
+            "expo-font"
         ],
         "experiments": {
             "typedRoutes": true
@@ -64,3 +65,4 @@
         }
     }
 }
+

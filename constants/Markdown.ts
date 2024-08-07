@@ -43,13 +43,24 @@ export namespace MarkdownStyle {
             color: Style.getColor('primary-text1'),
         },
         list: {
-            color: Style.getColor('primary-text1'),
+            //color: Style.getColor('primary-text1'),
+            flex: 1,
+            paddingBottom: 8,
         },
         inlineCode: {
             color: Style.getColor('primary-text2'),
             backgroundColor: Style.getColor('primary-surface2'),
             padding: 16,
             borderRadius: 4,
+        },
+        listItemText: {
+            color: Style.getColor('primary-text2'),
+        },
+        listItemBullet: {
+            color: Style.getColor('primary-text2'),
+        },
+        listItemNumber: {
+            color: Style.getColor('primary-text2'),
         },
     }
 }

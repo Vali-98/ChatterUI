@@ -101,6 +101,7 @@ export enum GenerationSettings {
 
 export enum AppSettings {
     DevMode = 'devmode',
+    DarkMode = 'darkmode',
     PrimaryHue = 'primaryhue',
     AnimateEditor = 'animateeditor',
     CreateFirstMes = 'createfirstmes',

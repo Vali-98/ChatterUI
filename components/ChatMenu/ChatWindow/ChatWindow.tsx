@@ -1,10 +1,11 @@
-import { StyleSheet, FlatList } from 'react-native'
-import { ChatItem } from './ChatItem'
-import { Characters, Chats, Global } from '@globals'
-import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
-import { useEffect, useRef } from 'react'
-import { useShallow } from 'zustand/react/shallow'
 import { useInference } from '@constants/Chat'
+import { Characters, Chats, Global } from '@globals'
+import { useEffect, useRef } from 'react'
+import { StyleSheet, FlatList } from 'react-native'
+import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
+import { useShallow } from 'zustand/react/shallow'
+
+import { ChatItem } from './ChatItem'
 
 type ListItem = {
     index: number
@@ -21,11 +22,11 @@ const ChatWindow = () => {
     const messagesLength = Chats.useChat((state) => state?.data?.messages?.length) ?? -1
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (nowGenerating) flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 })
-    }, [nowGenerating])
-    const getItems = (): Array<ListItem> => {
-        const arr: Array<ListItem> = []
+    }, [nowGenerating])*/
+    const getItems = (): ListItem[] => {
+        const arr: ListItem[] = []
         for (let i = 0; i < messagesLength; i++) {
             arr.push({ index: i, key: i })
         }
@@ -49,7 +50,7 @@ const ChatWindow = () => {
         <FlatList
             style={styles.chatHistory}
             ref={flatListRef}
-            keyboardShouldPersistTaps={'handled'}
+            keyboardShouldPersistTaps="handled"
             removeClippedSubviews={false}
             inverted
             windowSize={2}

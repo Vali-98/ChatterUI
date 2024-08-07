@@ -112,6 +112,24 @@ const createColor = (
     return 'red'
 }
 
+const getColorFromKV = () => {
+    const primary = mmkv.getNumber(AppSettings.PrimaryHue)
+    if (!primary) {
+        mmkv.set(AppSettings.PrimaryHue, 270)
+        return 270
+    }
+    return primary
+}
+
+const getDarkModeFromKV = () => {
+    const darkMode = mmkv.getBoolean(AppSettings.DarkMode)
+    if (!darkMode) {
+        mmkv.set(AppSettings.DarkMode, true)
+        return true
+    }
+    return darkMode
+}
+
 export namespace Style {
     type ColorState = {
         colors: ColorTypes
@@ -127,17 +145,10 @@ export namespace Style {
     }
 
     export const useColorScheme = create<ColorState>((set, get) => ({
-        darkMode: true,
+        darkMode: getDarkModeFromKV(),
         colors: {
             primary: {
-                h: (() => {
-                    const primary = mmkv.getNumber(AppSettings.PrimaryHue)
-                    if (!primary) {
-                        mmkv.set(AppSettings.PrimaryHue, 270)
-                        return 270
-                    }
-                    return primary
-                })(),
+                h: getColorFromKV(),
                 s: 26,
                 l: 73,
             },
@@ -153,7 +164,9 @@ export namespace Style {
             return createColor(get().colors[name], component, scheme)
         },
         toggleDarkMode: () => {
-            set((state) => ({ ...state, darkMode: !get().darkMode }))
+            const newMode = !get().darkMode
+            mmkv.set(AppSettings.DarkMode, newMode)
+            set((state) => ({ ...state, darkMode: newMode }))
         },
         setPrimary: (h: number, s: number, l: number) => {
             mmkv.set(AppSettings.PrimaryHue, h)

@@ -1,7 +1,8 @@
-import { View, StyleSheet } from 'react-native'
-import ChatFrame from './ChatFrame'
 import AnimatedView from '@components/AnimatedView'
+import { View, StyleSheet } from 'react-native'
+
 import ChatBody from './ChatBody'
+import ChatFrame from './ChatFrame'
 
 type ChatItemProps = {
     id: number

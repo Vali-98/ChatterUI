@@ -5,6 +5,7 @@ import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
 import { decode } from 'png-chunk-text'
 import extractChunks from 'png-chunks-extract'
+
 import { Logger } from './Logger'
 
 /**
@@ -182,7 +183,7 @@ export namespace CharactersOld {
 
         if (url.hostname === 'chub.ai') {
             const path = url.pathname.replace('/characters/', '')
-            if (/^[^\/]+\/[^\/]+$/.test(path)) return importCharacterFromChub(path)
+            if (/^[^/]+\/[^/]+$/.test(path)) return importCharacterFromChub(path)
             else {
                 Logger.log(`Failed to get id from Chub URL`, true)
                 return
@@ -190,7 +191,7 @@ export namespace CharactersOld {
         }
 
         // Regex checks for format of [name][/][character]
-        if (/^[^\/]+\/[^\/]+$/.test(text)) return importCharacterFromChub(text)
+        if (/^[^/]+\/[^/]+$/.test(text)) return importCharacterFromChub(text)
         // UUID standard RFC 4122, only used by pyg for now
         const uuidRegex =
             /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
@@ -245,11 +246,11 @@ export type CharacterCardV2 = {
         creator_notes: string
         system_prompt: string
         post_history_instructions: string
-        alternate_greetings: Array<string>
+        alternate_greetings: string[]
         character_book: string
 
         // May 8th additions
-        tags: Array<string>
+        tags: string[]
         creator: string
         character_version: string
         //extensions: {},

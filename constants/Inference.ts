@@ -1,16 +1,17 @@
 import { Chats, useInference } from '@constants/Chat'
 import { InstructType, Instructs } from '@constants/Instructs'
 import { replaceMacros } from '@constants/Utils'
-import { LlamaTokenizer } from './tokenizer'
-import { Logger } from './Logger'
-import { API } from './API'
-import { Global } from './GlobalValues'
-import { mmkv } from './mmkv'
-import { Llama } from './llama'
 import axios from 'axios'
-import EventSource from 'react-native-sse'
 import * as Application from 'expo-application'
+import EventSource from 'react-native-sse'
+
+import { API } from './API'
 import { Characters } from './Characters'
+import { Global } from './GlobalValues'
+import { Logger } from './Logger'
+import { Llama } from './llama'
+import { mmkv } from './mmkv'
+import { LlamaTokenizer } from './tokenizer'
 
 export const regenerateResponse = async () => {
     const charName = Characters.useCharacterCard.getState().card?.data.name
@@ -249,8 +250,8 @@ const buildChatCompletionContext = (max_length: number) => {
     return [...payload, ...messageBuffer.reverse()]
 }
 
-const constructStopSequence = (instruct: InstructType): Array<string> => {
-    const sequence: Array<string> = []
+const constructStopSequence = (instruct: InstructType): string[] => {
+    const sequence: string[] = []
     if (instruct.stop_sequence !== '')
         instruct.stop_sequence.split(',').forEach((item) => item !== '' && sequence.push(item))
     return sequence
@@ -752,12 +753,12 @@ const openAIResponseStream = async (setAbortFunction: AbortFunction) => {
     )
 }
 
-const constructReplaceStrings = (): Array<string> => {
+const constructReplaceStrings = (): string[] => {
     const currentInstruct: InstructType = Instructs.useInstruct.getState().replacedMacros()
     // default stop strings defined instructs
-    const stops: Array<string> = constructStopSequence(currentInstruct)
+    const stops: string[] = constructStopSequence(currentInstruct)
     // additional stop strings based on context configuration
-    const output: Array<string> = []
+    const output: string[] = []
 
     if (currentInstruct.names) {
         const userName = Characters.useCharacterCard.getState().card?.data.name ?? ''
@@ -800,7 +801,7 @@ type KeyHeader = {
 
 const readableStreamResponse = async (
     endpoint: string,
-    payload: Object,
+    payload: string,
     jsonreader: (event: any) => string,
     setAbortFunction: AbortFunction,
     abort_func = () => {},

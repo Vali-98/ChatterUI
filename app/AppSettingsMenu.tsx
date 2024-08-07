@@ -1,8 +1,12 @@
-import { StyleSheet, Text, View, Switch } from 'react-native'
-import React from 'react'
-import { Style, AppSettings } from '@globals'
-import { useMMKVBoolean } from 'react-native-mmkv'
+import { Style, AppSettings, Logger } from '@globals'
+import { reloadAppAsync } from 'expo'
+import { getDocumentAsync } from 'expo-document-picker'
+import { documentDirectory, copyAsync, deleteAsync } from 'expo-file-system'
 import { Stack } from 'expo-router'
+import React from 'react'
+import { StyleSheet, Text, View, Switch, TouchableOpacity, Alert } from 'react-native'
+import ReactNativeBlobUtil from 'react-native-blob-util'
+import { useMMKVBoolean } from 'react-native-mmkv'
 
 type SwitchComponentProps = {
     title: string
@@ -36,9 +40,33 @@ const SwitchComponent: React.FC<SwitchComponentProps> = ({ title, value, onValue
     )
 }
 
+const WarningAlert = (title: string, description: string, onPress: () => void) => {
+    Alert.alert(title, description, [
+        { text: `Cancel`, style: `cancel` },
+        {
+            text: `Confirm`,
+            style: `destructive`,
+            onPress: onPress,
+        },
+    ])
+}
+
 const AppSettingsMenu = () => {
     const [animateEditor, setAnimateEditor] = useMMKVBoolean(AppSettings.AnimateEditor)
     const [firstMes, setFirstMes] = useMMKVBoolean(AppSettings.CreateFirstMes)
+
+    const importDB = async (uri: string) => {
+        await deleteAsync(`${documentDirectory}SQLite/db.db`)
+        console.log(uri)
+
+        await copyAsync({
+            from: uri,
+            to: `${documentDirectory}SQLite/db.db`,
+        }).then(() => {
+            Logger.log('Copy Successful, Restarting now.')
+            reloadAppAsync()
+        })
+    }
 
     return (
         <View style={styles.mainContainer}>
@@ -54,6 +82,39 @@ const AppSettingsMenu = () => {
                 value={firstMes}
                 onValueChange={setFirstMes}
             />
+
+            <TouchableOpacity
+                style={styles.button}
+                onPress={async () => {
+                    ReactNativeBlobUtil.MediaCollection.copyToMediaStore(
+                        {
+                            name: 'db.db',
+                            parentFolder: '',
+                            mimeType: 'application/x-sqlite3',
+                        },
+                        'Download',
+                        `${documentDirectory}SQLite/db.db`
+                    ).then(() => {
+                        Logger.log('Download Successful!', true)
+                    })
+                }}>
+                <Text style={styles.buttonText}>Export Database</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={styles.button}
+                onPress={async () => {
+                    getDocumentAsync({ type: ['application/*'] }).then(async (result) => {
+                        if (result.canceled) return
+                        WarningAlert(
+                            `Import Database`,
+                            `Are you sure you want to import this database? This may will destroy the current database!\nApp will restart automatically`,
+                            () => importDB(result.assets[0].uri)
+                        )
+                    })
+                }}>
+                <Text style={styles.buttonText}>Import Database</Text>
+            </TouchableOpacity>
         </View>
     )
 }
@@ -65,5 +126,17 @@ const styles = StyleSheet.create({
         marginVertical: 16,
         paddingVertical: 16,
         paddingHorizontal: 20,
+    },
+
+    button: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        backgroundColor: Style.getColor('primary-surface3'),
+        borderRadius: 8,
+        marginVertical: 8,
+    },
+
+    buttonText: {
+        color: Style.getColor('primary-text1'),
     },
 })

@@ -1,9 +1,9 @@
-import { ChatWindow } from './ChatWindow/ChatWindow'
 import { Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons'
 import { Logger, Style, Characters } from '@globals'
 import { Stack, useFocusEffect, useRouter } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
 import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, BackHandler } from 'react-native'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import {
     Menu,
     MenuTrigger,
@@ -12,13 +12,15 @@ import {
     renderers,
     MenuOptionsCustomStyle,
 } from 'react-native-popup-menu'
-const { SlideInMenu } = renderers
+import Animated, { SlideInRight, runOnJS, Easing } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
+
+import ChatInput from './ChatInput'
+import { ChatWindow } from './ChatWindow/ChatWindow'
 import Recents from './Recents'
 import SettingsDrawer from './SettingsDrawer'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import Animated, { SlideInRight, runOnJS, Easing } from 'react-native-reanimated'
-import ChatInput from './ChatInput'
+
+const { SlideInMenu } = renderers
 
 type MenuData = {
     callback: () => void
@@ -28,7 +30,6 @@ type MenuData = {
 
 const ChatMenu = () => {
     const router = useRouter()
-
     const { charName, unloadCharacter } = Characters.useCharacterCard(
         useShallow((state) => ({
             charName: state?.card?.data.name,
@@ -75,6 +76,7 @@ const ChatMenu = () => {
             return () => {
                 BackHandler.removeEventListener('hardwareBackPress', backAction)
             }
+            // eslint-disable-next-line react-compiler/react-compiler
         }, [charName, showDrawer, menuRef.current?.isOpen()])
     )
 
@@ -96,8 +98,7 @@ const ChatMenu = () => {
         })
 
     const gesture = Gesture.Exclusive(swipeDrawer, swipeChar)
-
-    const menuoptions: Array<MenuData> = [
+    const menuoptions: MenuData[] = [
         {
             callback: () => {
                 unloadCharacter()

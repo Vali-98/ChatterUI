@@ -2,6 +2,7 @@ import { Global, Style } from '@globals'
 import { useEffect } from 'react'
 import { View, Text, TextInput, StyleSheet } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
+
 import HeartbeatButton from './HeartbeatButton'
 
 const KAI = () => {

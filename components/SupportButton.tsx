@@ -1,7 +1,7 @@
-import { StyleSheet, Text, TouchableOpacity, Linking } from 'react-native'
-import React from 'react'
 import { FontAwesome } from '@expo/vector-icons'
 import { Style } from '@globals'
+import React from 'react'
+import { StyleSheet, Text, TouchableOpacity, Linking } from 'react-native'
 
 const SupportButton = () => {
     return (

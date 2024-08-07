@@ -7,7 +7,7 @@ type CheckboxTitleProps = {
     body: any
     varname: string
     setValue: (item: any) => void
-    onChange?: undefined | ((item: any) => {})
+    onChange?: undefined | ((item: any) => void)
 }
 
 const CheckboxTitle: React.FC<CheckboxTitleProps> = ({

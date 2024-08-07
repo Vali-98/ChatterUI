@@ -392,10 +392,6 @@ const styles = StyleSheet.create({
         color: Style.getColor('primary-text1'),
     },
 
-    selected: {
-        color: Style.getColor('primary-text1'),
-    },
-
     button: {
         padding: 5,
         borderRadius: 4,

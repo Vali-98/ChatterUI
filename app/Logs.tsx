@@ -1,12 +1,13 @@
+import AnimatedView from '@components/AnimatedView'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Logger, Style, saveStringExternal } from '@globals'
+import { FlashList } from '@shopify/flash-list'
 import { Stack } from 'expo-router'
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native'
-import { FlashList } from '@shopify/flash-list'
 import { useMMKVObject } from 'react-native-mmkv'
-import AnimatedView from '@components/AnimatedView'
+
 const Logs = () => {
-    const [logs, setLogs] = useMMKVObject<Array<string>>(Global.Logs)
+    const [logs, setLogs] = useMMKVObject<string[]>(Global.Logs)
 
     const logitems = logs?.reverse().map((item, index) => ({ entry: item, key: index })) ?? []
 

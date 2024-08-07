@@ -1,17 +1,17 @@
+import { hordeHeader } from '@constants/Inference'
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { Global, Logger, Style } from '@globals'
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import { MultiSelect } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
-import { hordeHeader } from '@constants/Inference'
 
 const Horde = () => {
     const [hordeKey, setHordeKey] = useMMKVString(Global.HordeKey)
-    const [hordeModels, setHordeModels] = useMMKVObject<Array<HordeModel>>(Global.HordeModels)
-    const [hordeWorkers, setHordeWorkers] = useMMKVObject<Array<HordeWorker>>(Global.HordeWorkers)
+    const [hordeModels, setHordeModels] = useMMKVObject<HordeModel[]>(Global.HordeModels)
+    const [hordeWorkers, setHordeWorkers] = useMMKVObject<HordeWorker[]>(Global.HordeWorkers)
 
-    const [dropdownValues, setDropdownValues] = useState<Array<string>>(
+    const [dropdownValues, setDropdownValues] = useState<string[]>(
         hordeModels?.map((item) => {
             return item.name
         }) ?? []
@@ -256,8 +256,8 @@ type HordeWorker = {
     flagged: boolean
     suspicious: number
     uncompleted_jobs: number
-    models: Array<string>
-    forms: Array<string>
+    models: string[]
+    forms: string[]
     team: {
         name: string
         id: string

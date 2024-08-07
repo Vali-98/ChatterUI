@@ -1,3 +1,8 @@
+import AnimatedView from '@components/AnimatedView'
+import { RecentEntry, RecentMessages } from '@constants/RecentMessages'
+import { FontAwesome, Ionicons } from '@expo/vector-icons'
+import { Characters, Chats, Global, Logger, Style } from '@globals'
+import { useState } from 'react'
 import {
     View,
     Text,
@@ -6,17 +11,10 @@ import {
     TouchableOpacity,
     ActivityIndicator,
 } from 'react-native'
-import { useState } from 'react'
 import { useMMKVObject } from 'react-native-mmkv'
-import { Characters, Chats, Global, Logger, Style } from '@globals'
-import { RecentEntry, RecentMessages } from '@constants/RecentMessages'
-import { FontAwesome, Ionicons } from '@expo/vector-icons'
-import AnimatedView from '@components/AnimatedView'
 
 const Recents = () => {
-    const [recentMessages, setRecentMessages] = useMMKVObject<Array<RecentEntry>>(
-        Global.RecentMessages
-    )
+    const [recentMessages, setRecentMessages] = useMMKVObject<RecentEntry[]>(Global.RecentMessages)
 
     const setCurrentCard = Characters.useCharacterCard((state) => state.setCard)
 
@@ -61,7 +59,7 @@ const Recents = () => {
                     {nowLoading && (
                         <ActivityIndicator
                             color={Style.getColor('primary-text2')}
-                            size={'large'}
+                            size="large"
                             style={{ marginRight: 24 }}
                         />
                     )}

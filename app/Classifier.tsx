@@ -1,13 +1,12 @@
-import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
-import { InferenceSession, Tensor } from 'onnxruntime-react-native'
-
-import * as FS from 'expo-file-system'
-import { Style } from '@globals'
-import { ScrollView, TextInput } from 'react-native-gesture-handler'
-import { BertTokenizer } from 'bert-tokenizer'
-import { useMMKVBoolean } from 'react-native-mmkv'
 import { AppSettings } from '@constants/GlobalValues'
+import { Style } from '@globals'
+import { BertTokenizer } from 'bert-tokenizer'
+import * as FS from 'expo-file-system'
+import { InferenceSession, Tensor } from 'onnxruntime-react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native'
+import { ScrollView, TextInput } from 'react-native-gesture-handler'
+import { useMMKVBoolean } from 'react-native-mmkv'
 const emotions = [
     'admiration',
     'amusement',
@@ -44,7 +43,7 @@ type infovalue = {
     value: number
 }
 
-const classifier = () => {
+const Classifier = () => {
     const [session, setSession] = useState<InferenceSession | undefined>(undefined)
     const [info, setInfo] = useState<infovalue[]>([])
     const [inputText, setInputText] = useState<string>('')
@@ -61,7 +60,7 @@ const classifier = () => {
         setSession(session)
     }
 
-    useEffect(() => {
+    React.useEffect(() => {
         loadSession()
     }, [])
 
@@ -119,7 +118,8 @@ const classifier = () => {
                 numberOfLines={5}
                 style={styles.input}
                 value={inputText}
-                onChangeText={setInputText}></TextInput>
+                onChangeText={setInputText}
+            />
             <TouchableOpacity
                 style={{ ...styles.input, alignItems: 'center', padding: 4 }}
                 onPress={runClassifier}>
@@ -166,4 +166,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default classifier
+export default Classifier

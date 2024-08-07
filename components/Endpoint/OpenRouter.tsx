@@ -23,7 +23,7 @@ const OpenRouter = () => {
     const [openRouterKey, setOpenRouterKey] = useMMKVString(Global.OpenRouterKey)
     const [keyInput, setKeyInput] = useState('')
 
-    const [modelList, setModelList] = useState<Array<OpenRouterModel>>([])
+    const [modelList, setModelList] = useState<OpenRouterModel[]>([])
 
     const getModels = useCallback(async () => {
         const modelresults = await fetch('https://openrouter.ai/api/v1/models', {

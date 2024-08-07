@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, TouchableHighlight } from 'react-native'
+import { Chats } from '@constants/Chat'
+import { continueResponse, generateResponse, regenerateResponse } from '@constants/Inference'
 import { AntDesign } from '@expo/vector-icons'
 import { Style } from '@globals'
 import React from 'react'
-import { Chats } from '@constants/Chat'
+import { View, Text, StyleSheet, TouchableHighlight } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
-import { continueResponse, generateResponse, regenerateResponse } from '@constants/Inference'
 
 type SwipesProps = {
     nowGenerating: boolean

@@ -8,7 +8,7 @@ import { StyleSheet, Text, TouchableOpacity, View, Switch } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 
-function groupBy(array: Array<any>, key: string) {
+function groupBy(array: any[], key: string) {
     if (array.length === 0) return []
     return array.reduce((result, obj) => {
         const keyValue = obj[key]
@@ -21,7 +21,7 @@ function groupBy(array: Array<any>, key: string) {
 }
 
 type LanguageListItem = {
-    [key: string]: Array<Speech.Voice>
+    [key: string]: Speech.Voice[]
 }
 
 const TTSMenu = () => {
@@ -29,7 +29,7 @@ const TTSMenu = () => {
     const [enableTTS, setEnableTTS] = useMMKVBoolean(Global.TTSEnable)
     const [autoTTS, setAutoTTS] = useMMKVBoolean(Global.TTSAuto)
     const [lang, setLang] = useState(currentSpeaker?.language ?? 'en-US')
-    const [modelList, setModelList] = useState<Array<Speech.Voice>>([])
+    const [modelList, setModelList] = useState<Speech.Voice[]>([])
     const languageList: LanguageListItem = groupBy(modelList, 'language')
 
     const languages = Object.keys(languageList)
@@ -43,7 +43,7 @@ const TTSMenu = () => {
     }, [])
 
     const getVoices = (value = false) => {
-        if (enableTTS || value)
+        if (enableTTS ?? value)
             Speech.getAvailableVoicesAsync().then((list) => setModelList((current) => list))
     }
 
@@ -131,8 +131,8 @@ const TTSMenu = () => {
                                 <Dropdown
                                     value={currentSpeaker?.identifier ?? ''}
                                     data={languageList[lang]}
-                                    labelField={'identifier'}
-                                    valueField={'name'}
+                                    labelField="identifier"
+                                    valueField="name"
                                     placeholder="Select Speaker"
                                     onChange={(item) => setCurrentSpeaker(item)}
                                     {...Style.drawer.default}

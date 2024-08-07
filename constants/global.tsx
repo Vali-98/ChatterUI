@@ -1,7 +1,7 @@
 import * as Crypto from 'expo-crypto'
 import * as FS from 'expo-file-system'
-import * as SystemUI from 'expo-system-ui'
 import * as Sharing from 'expo-sharing'
+import * as SystemUI from 'expo-system-ui'
 import { Platform, StyleSheet } from 'react-native'
 
 import { API } from './API'
@@ -9,14 +9,14 @@ import { Characters } from './Characters'
 import { Chats } from './Chat'
 import { Global, AppSettings } from './GlobalValues'
 import { Instructs } from './Instructs'
+import { Logger } from './Logger'
+import { MarkdownStyle } from './Markdown'
 import { Presets } from './Presets'
+import { Style } from './Style'
 import { humanizedISO8601DateTime } from './Utils'
 import { Llama } from './llama'
 import { mmkv } from './mmkv'
-import { Logger } from './Logger'
 import { LlamaTokenizer } from './tokenizer'
-import { Style } from './Style'
-import { MarkdownStyle } from './Markdown'
 export {
     mmkv,
     Presets,
@@ -49,7 +49,8 @@ export const resetEncryption = (value = 0) => {
 export const saveStringExternal = async (
     filename: string,
     filedata: string,
-    mimetype = 'application/json'
+    mimetype: 'application/x-sqlite3' | 'application/json' | string = 'application/json',
+    encoding: 'utf8' | 'base64' = 'utf8'
 ) => {
     if (Platform.OS === 'android') {
         const permissions = await FS.StorageAccessFramework.requestDirectoryPermissionsAsync()
@@ -58,7 +59,7 @@ export const saveStringExternal = async (
             await FS.StorageAccessFramework.createFileAsync(directoryUri, filename, mimetype)
                 .then(async (fileUri) => {
                     await FS.writeAsStringAsync(fileUri, filedata, {
-                        encoding: FS.EncodingType.UTF8,
+                        encoding,
                     })
                     Logger.log(`File saved sucessfully`, true)
                 })
