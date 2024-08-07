@@ -1,72 +1,80 @@
-import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
-import { Global,  Color, API, Users } from '@globals'
-import React from 'react'
-import { useMMKVString } from 'react-native-mmkv'
-import { FontAwesome } from '@expo/vector-icons'
-import { useRouter } from 'expo-router'
-
+import { Global, Color, Users } from '@globals';
+import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { useMMKVString } from 'react-native-mmkv';
+import { FontAwesome } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 const Settings = () => {
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-    const router = useRouter()
+    const [userName, setUserName] = useMMKVString(Global.CurrentUser);
+    const router = useRouter();
 
     return (
         <SafeAreaView style={styles.mainContainer}>
-        <View style={styles.userContainer}> 
-            <View style={styles.imageContainer}>    
-                <Image style={styles.userImage} source={{uri:Users.getImageDir(userName)}} />
-            </View> 
-            <View>
-                <Text style={styles.userName}>{userName}</Text>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.button} onPress={() => {router.push('UserInfo')}}>
-                        <FontAwesome size={20} name='edit'color={Color.Button} />
-                    </TouchableOpacity>
-                    <TouchableOpacity  style={styles.button} onPress={() => {router.push('UserSelector')}}>
-                        <FontAwesome size={20} name='th-list' color={Color.Button} />
-                    </TouchableOpacity>
+            <View style={styles.userContainer}>
+                <View style={styles.imageContainer}>
+                    <Image style={styles.userImage} source={{ uri: Users.getImageDir(userName) }} />
+                </View>
+                <View>
+                    <Text style={styles.userName}>{userName}</Text>
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => {
+                                router.push('UserInfo');
+                            }}>
+                            <FontAwesome size={20} name="edit" color={Color.Button} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => {
+                                router.push('UserSelector');
+                            }}>
+                            <FontAwesome size={20} name="th-list" color={Color.Button} />
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
 
-        </View>
-
-        <View style={styles.largeButtonContainer}>
-            <TouchableOpacity style={styles.largeButton} onPress={() => {
-                router.push("/PresetMenu")
-            }} >
-                <Text style={styles.largeButtonText}>Presets</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.largeButton} onPress={() => router.push("Instruct")}>
-                <Text style={styles.largeButtonText}>Instruct</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.largeButton} onPress={() => router.push("APIMenu")}>
-                <Text style={styles.largeButtonText}>API</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.largeButton} onPress={() => router.push("TTSMenu")}>
-                <Text style={styles.largeButtonText}>TTS</Text>
-            </TouchableOpacity>
-        </View>
+            <View style={styles.largeButtonContainer}>
+                <TouchableOpacity
+                    style={styles.largeButton}
+                    onPress={() => {
+                        router.push('/PresetMenu');
+                    }}>
+                    <Text style={styles.largeButtonText}>Presets</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.largeButton}
+                    onPress={() => router.push('Instruct')}>
+                    <Text style={styles.largeButtonText}>Instruct</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.largeButton} onPress={() => router.push('APIMenu')}>
+                    <Text style={styles.largeButtonText}>API</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.largeButton} onPress={() => router.push('TTSMenu')}>
+                    <Text style={styles.largeButtonText}>TTS</Text>
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
-    )
-}
+    );
+};
 
-export default Settings
-
-
+export default Settings;
 
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
         backgroundColor: Color.Background,
     },
-    
+
     userContainer: {
-        flexDirection:'row',
+        flexDirection: 'row',
         marginBottom: 40,
         margin: 16,
     },
 
-    buttonContainer : {
+    buttonContainer: {
         flexDirection: 'row',
         marginLeft: 12,
     },
@@ -78,7 +86,7 @@ const styles = StyleSheet.create({
         padding: 8,
     },
 
-    userName : {
+    userName: {
         fontSize: 20,
         marginTop: 16,
         marginBottom: 8,
@@ -86,7 +94,7 @@ const styles = StyleSheet.create({
         color: Color.Text,
     },
 
-    imageContainer : {
+    imageContainer: {
         width: 108,
         height: 108,
         borderRadius: 54,
@@ -96,28 +104,27 @@ const styles = StyleSheet.create({
         backgroundColor: Color.DarkContainer,
     },
 
-    userImage : {
+    userImage: {
         width: 108,
         height: 108,
         borderRadius: 54,
     },
 
-    largeButtonContainer : {
-        borderTopWidth:1,
+    largeButtonContainer: {
+        borderTopWidth: 1,
         borderColor: Color.Offwhite,
     },
 
-    largeButtonText : {
+    largeButtonText: {
         fontSize: 20,
         paddingVertical: 12,
         paddingLeft: 30,
-        color:Color.Text,
+        color: Color.Text,
     },
 
-    largeButton : {
-        borderBottomWidth:1,
+    largeButton: {
+        borderBottomWidth: 1,
         fontSize: 20,
         borderColor: Color.Offwhite,
     },
-
-})
+});

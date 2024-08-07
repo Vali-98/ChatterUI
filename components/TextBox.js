@@ -1,38 +1,47 @@
-import { View, Text, StyleSheet, TextInput } from 'react-native'
-import React from 'react'
-import { Color } from '@globals'
+import { Color } from '@globals';
+import { View, Text, StyleSheet, TextInput } from 'react-native';
 
-const TextBox = ({name, body, varname, setValue, lines = 1, keyboardType='default', multiline = false}) => {
-
+const TextBox = ({
+    name,
+    body,
+    varname,
+    setValue,
+    lines = 1,
+    keyboardType = 'default',
+    multiline = false,
+}) => {
     return (
         <View style={styles.mainContainer}>
             <Text style={styles.title}>{name}</Text>
-            <TextInput 
+            <TextInput
                 multiline={lines > 1 || multiline}
                 numberOfLines={lines}
-                style={{...styles.input, textAlignVertical: (lines > 1)? `top` : `center`}}
+                style={{
+                    ...styles.input,
+                    textAlignVertical: lines > 1 ? `top` : `center`,
+                }}
                 value={body[varname]?.toString() ?? ''}
                 onChangeText={(value) => {
-                    setValue({...body, [varname]:value})
+                    setValue({ ...body, [varname]: value });
                 }}
-                placeholder='----'
+                placeholder="----"
                 placeholderTextColor={Color.TextItalic}
                 keyboardType={keyboardType}
             />
         </View>
-    )
-}
+    );
+};
 
-export default TextBox
+export default TextBox;
 
 const styles = StyleSheet.create({
     mainContainer: {
         paddingBottom: 8,
-        flex:1,
+        flex: 1,
     },
 
-    title : {
-        color: Color.Text
+    title: {
+        color: Color.Text,
     },
 
     input: {
@@ -40,8 +49,8 @@ const styles = StyleSheet.create({
         backgroundColor: Color.DarkContainer,
         paddingVertical: 4,
         paddingHorizontal: 8,
-        marginVertical:8,
+        marginVertical: 8,
         marginHorizontal: 4,
         borderRadius: 8,
     },
-})
+});

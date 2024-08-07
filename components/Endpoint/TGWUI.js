@@ -1,40 +1,37 @@
-import { View, Text, StyleSheet, TextInput } from 'react-native'
-import { useMMKVString } from 'react-native-mmkv'
-import { Global, Color} from '@globals'
+import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { useMMKVString } from 'react-native-mmkv';
+import { Global, Color } from '@globals';
 
 const TGWUI = () => {
-    
-    const [streamEnd, setStreamEnd] = useMMKVString(Global.TGWUIStreamingEndpoint)
+    const [streamEnd, setStreamEnd] = useMMKVString(Global.TGWUIStreamingEndpoint);
 
     return (
         <View style={styles.mainContainer}>
-            
             <Text style={styles.title}>Endpoint</Text>
-            <TextInput 
+            <TextInput
                 style={styles.input}
                 value={streamEnd}
                 onChangeText={(value) => {
-                    setStreamEnd(value)
+                    setStreamEnd(value);
                 }}
-                placeholder='eg. https://127.0.0.1:5000'
+                placeholder="eg. https://127.0.0.1:5000"
                 placeholderTextColor={Color.Offwhite}
             />
-            
         </View>
-    )
-}
+    );
+};
 
-export default TGWUI
+export default TGWUI;
 
 const styles = StyleSheet.create({
-    mainContainer : {
-        marginVertical:16,
-        paddingVertical:16, 
-        paddingHorizontal:20,
+    mainContainer: {
+        marginVertical: 16,
+        paddingVertical: 16,
+        paddingHorizontal: 20,
     },
 
-    title : {
-        color: Color.Text
+    title: {
+        color: Color.Text,
     },
 
     input: {
@@ -42,9 +39,7 @@ const styles = StyleSheet.create({
         backgroundColor: Color.DarkContainer,
         paddingVertical: 4,
         paddingHorizontal: 8,
-        marginVertical:8,
+        marginVertical: 8,
         borderRadius: 8,
     },
-
-   
-})
+});
