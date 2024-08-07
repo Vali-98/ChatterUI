@@ -23,18 +23,18 @@ const llamaTokenizer = {
     encode: (string) => {
         return string
     },
+    runTests: () => {},
+}
+
+const getMergeIdentifierString = (firstTokenId, secondTokenId) => {
+    return llamaTokenizer.vocabById[firstTokenId] + ' ' + llamaTokenizer.vocabById[secondTokenId]
 }
 
 if (typeof window !== 'undefined') {
     window.llamaTokenizer = llamaTokenizer
 }
-
-const base64decode = function (encodedString) {
+const base64decode = (encodedString) => {
     return atob(encodedString)
-}
-
-const getMergeIdentifierString = function (firstTokenId, secondTokenId) {
-    return llamaTokenizer.vocabById[firstTokenId] + ' ' + llamaTokenizer.vocabById[secondTokenId]
 }
 
 const decompressMerges = function (merges_binary) {
