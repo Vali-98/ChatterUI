@@ -2,11 +2,19 @@ import { Chats } from '@constants/Chat'
 import { InstructType } from '@constants/Instructs'
 import { replaceMacros } from '@constants/Utils'
 import llamaTokenizer from '@constants/tokenizer'
-import { mmkv, Global, API, hordeHeader, Llama, Logger } from '@globals'
+//import { mmkv, Global, API, hordeHeader, Llama, Logger } from '@globals'
+import { Logger } from './Logger'
+import { API } from './API'
+import { Global } from './GlobalValues'
+import { mmkv } from './mmkv'
+import { Llama } from './llama'
 import axios from 'axios'
 import EventSource from 'react-native-sse'
+import * as Application from 'expo-application'
 
-export const generateResponse = async (setAbortFunction: AbortFunction) => {
+export const generateResponse = async () => {
+    Chats.useChat.getState().startGenerating()
+    const setAbortFunction = Chats.useChat.getState().setAbortFunction
     Logger.log(`Obtaining response.`)
     const APIType = getString(Global.APIType)
     try {
@@ -36,16 +44,16 @@ export const generateResponse = async (setAbortFunction: AbortFunction) => {
                 openAIResponseStream(setAbortFunction)
                 break
             default:
-                setValue(Global.NowGenerating, false)
+                stopGenerating()
                 Logger.log('Default inference case reached, this should never happen!', true)
         }
     } catch (error) {
         Logger.log(`Something went wrong: ${error}`, true)
-        setValue(Global.NowGenerating, false)
+        stopGenerating()
     }
 }
 
-type AbortFunction = (fn: (fn2: () => void) => () => void) => void
+type AbortFunction = (fn: () => void) => void
 
 // MMKV
 
@@ -57,12 +65,14 @@ const getString = (key: string) => {
     return mmkv.getString(key) ?? ''
 }
 
-const setValue = (key: string, value: any) => {
-    mmkv.set(key, value)
+const stopGenerating = () => {
+    Chats.useChat.getState().stopGenerating()
 }
 
-const stopGenerating = () => {
-    setValue(Global.NowGenerating, false)
+export const hordeHeader = () => {
+    return {
+        'Client-Agent': `ChatterUI:${Application.nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
+    }
 }
 
 // Context
@@ -486,11 +496,11 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
 
     if (hordeModels.length === 0) {
         Logger.log(`No Models Selected`, true)
-        setValue(Global.NowGenerating, false)
+        stopGenerating()
         return
     }
 
-    setAbortFunction((abortFunction) => () => {
+    setAbortFunction(() => {
         aborted = true
         if (generation_id !== null)
             fetch(`https://stablehorde.net/api/v2/generate/text/status/${generation_id}`, {
@@ -503,7 +513,7 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
             }).catch((error) => {
                 Logger.log(error)
             })
-        setValue(Global.NowGenerating, false)
+        stopGenerating()
     })
 
     Logger.log(`Using Horde`)
@@ -522,13 +532,13 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
     })
     if (request.status === 401) {
         Logger.log(`Invalid API Key`, true)
-        setValue(Global.NowGenerating, false)
+        stopGenerating()
         return
     }
     if (request.status !== 202) {
         // TODO: switch case per error type
         Logger.log(`Request failed.`)
-        setValue(Global.NowGenerating, false)
+        stopGenerating()
         const body = await request.json()
         Logger.log(body.message)
         for (const e of body.errors) Logger.log(e)
@@ -558,7 +568,7 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
 
         if (response.status === 400) {
             Logger.log(`Response failed.`)
-            setValue(Global.NowGenerating, false)
+            stopGenerating()
             Logger.log((await response.json())?.message)
             return
         }
@@ -569,7 +579,7 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
     if (aborted) return
 
     Chats.useChat.getState().setBuffer(result.generations[0].text)
-    setValue(Global.NowGenerating, false)
+    stopGenerating()
 }
 
 const TGWUIReponseStream = async (setAbortFunction: AbortFunction) => {
@@ -596,7 +606,7 @@ const MancerResponseStream = async (setAbortFunction: AbortFunction) => {
 
     if (check.status !== 200) {
         Logger.log(await check.json())
-        setValue(Global.NowGenerating, false)
+        stopGenerating()
         Logger.log(`Invalid Model or API key!`, true)
         return
     }
@@ -678,9 +688,9 @@ const localStreamResponse = async (setAbortFunction: AbortFunction) => {
         'g'
     )
 
-    setAbortFunction((abortFunction) => async () => {
+    setAbortFunction(async () => {
         Llama.stopCompletion().then(() => {
-            setValue(Global.NowGenerating, false)
+            stopGenerating()
         })
     })
 
@@ -690,11 +700,11 @@ const localStreamResponse = async (setAbortFunction: AbortFunction) => {
         Chats.useChat.getState().setBuffer(output.replaceAll(replace, ''))
     })
         .then(() => {
-            setValue(Global.NowGenerating, false)
+            stopGenerating()
         })
         .catch((error) => {
             Logger.log(`Failed to generate locally: ${error}`, true)
-            setValue(Global.NowGenerating, false)
+            stopGenerating()
         })
 }
 
@@ -735,7 +745,7 @@ const readableStreamResponse = async (
         es.close()
     }
 
-    setAbortFunction((abortFunction) => () => {
+    setAbortFunction(() => {
         closeStream()
         abort_func()
     })

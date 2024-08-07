@@ -1,4 +1,3 @@
-import * as Application from 'expo-application'
 import * as Crypto from 'expo-crypto'
 import * as FS from 'expo-file-system'
 import * as SystemUI from 'expo-system-ui'
@@ -16,7 +15,6 @@ import { humanizedISO8601DateTime } from './Utils'
 import { Llama } from './llama'
 import { mmkv } from './mmkv'
 import { Logger } from './Logger'
-
 export {
     mmkv,
     Presets,
@@ -101,19 +99,12 @@ export const saveStringExternal = async (
 
 // HEADER FOR REQUESTS
 
-export const hordeHeader = () => {
-    return {
-        'Client-Agent': `ChatterUI:${Application.nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
-    }
-}
-
 // runs every startup to clear some MMKV values
 
 export const startupApp = () => {
     mmkv.set(Global.CurrentCharacter, 'Welcome')
     //mmkv.set(Global.CurrentChat, '')
     mmkv.set(Global.CurrentCharacterCard, JSON.stringify(`{}`))
-    mmkv.set(Global.NowGenerating, false)
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
     mmkv.set(Global.HordeModels, JSON.stringify([]))
     mmkv.set(Global.LocalModelWeights, JSON.stringify({}))
