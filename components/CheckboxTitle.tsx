@@ -1,4 +1,4 @@
-import { Color } from '@globals'
+import { Color, Style } from '@globals'
 import CheckBox from '@react-native-community/checkbox'
 import { View, Text } from 'react-native'
 
@@ -20,7 +20,10 @@ const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
     return (
         <View style={{ flexDirection: `row`, alignItems: `center`, paddingVertical: 4 }}>
             <CheckBox
-                tintColors={{ false: Color.White, true: Color.White }}
+                tintColors={{
+                    false: Style.getColor('primary-brand'),
+                    true: Style.getColor('primary-brand'),
+                }}
                 onFillColor={Color.White}
                 onCheckColor={Color.White}
                 value={body[varname]}

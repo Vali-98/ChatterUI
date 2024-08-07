@@ -2,7 +2,6 @@ import {
     Text,
     GestureResponderEvent,
     TouchableOpacity,
-    Modal,
     StyleSheet,
     View,
     Image,
@@ -10,15 +9,14 @@ import {
 import Animated, {
     SlideInLeft,
     Easing,
-    SlideOutRight,
     SlideOutLeft,
     FadeIn,
     FadeOut,
 } from 'react-native-reanimated'
-import { Color, Global, Users } from '@globals'
-import { usePathname, useRouter } from 'expo-router'
+import { Global, Style, Users } from '@globals'
+import { useRouter } from 'expo-router'
 import { useMMKVString } from 'react-native-mmkv'
-import { FontAwesome } from '@expo/vector-icons'
+import { AntDesign, FontAwesome } from '@expo/vector-icons'
 import { SetStateAction, useState } from 'react'
 type SettingsDrawerProps = {
     booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
@@ -45,33 +43,78 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
         router.navigate(route)
     }
 
+    type Icon = 'barschart' | 'profile' | 'link' | 'sound' | 'codesquareo'
+
     type ButtonData = {
         name: string
         path: `/${string}`
+        icon?: Icon
     }
 
     const paths: Array<ButtonData> = [
         {
             name: 'Sampler',
             path: '/PresetMenu',
+            icon: 'barschart',
         },
         {
             name: 'Instruct',
             path: '/Instruct',
+            icon: 'profile',
         },
         {
             name: 'API',
             path: '/APIMenu',
+            icon: 'link',
         },
         {
             name: 'TTS',
             path: '/TTSMenu',
+            icon: 'sound',
         },
         {
             name: 'Logs',
             path: '/Logs',
+            icon: 'codesquareo',
         },
     ]
+
+    const paths_dev: Array<ButtonData> = [
+        {
+            name: '[DEV] Lorebooks',
+            path: '/LorebookMenu',
+        },
+        {
+            name: '[DEV] COLOR TEST',
+            path: '/ColorTest',
+        },
+    ]
+
+    type DrawerButtonProps = {
+        item: ButtonData
+        index: number
+    }
+
+    const DrawerButton = ({ item, index }: DrawerButtonProps) => (
+        <Animated.View
+            key={index}
+            entering={SlideInLeft.duration(500 + index * 30)
+                .withInitialValues({ originX: index * -150 + -400 })
+                .easing(Easing.out(Easing.exp))}>
+            <TouchableOpacity
+                style={styles.largeButton}
+                onPress={() => {
+                    handlePush(item.path)
+                }}>
+                <AntDesign
+                    size={28}
+                    name={item.icon ?? 'question'}
+                    color={Style.getColor('primary-text2')}
+                />
+                <Text style={styles.largeButtonText}>{item.name}</Text>
+            </TouchableOpacity>
+        </Animated.View>
+    )
 
     if (showModal)
         return (
@@ -79,7 +122,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                 <Animated.View
                     entering={FadeIn.duration(200)}
                     exiting={FadeOut.duration(200)}
-                    style={styles.absolute}>
+                    style={{ ...styles.absolute, borderTopWidth: 3 }}>
                     <TouchableOpacity
                         activeOpacity={1}
                         onPress={handleOverlayClick}
@@ -93,9 +136,12 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
 
                 <Animated.View
                     style={{
-                        backgroundColor: Color.Background,
+                        backgroundColor: Style.getColor('primary-surface1'),
                         ...styles.absolute,
                         width: '70%',
+                        shadowColor: Style.getColor('primary-shadow'),
+                        borderTopWidth: 3,
+                        elevation: 20,
                     }}
                     entering={SlideInLeft.duration(300).easing(Easing.out(Easing.quad))}
                     exiting={SlideOutLeft.duration(300).easing(Easing.out(Easing.quad))}>
@@ -111,41 +157,39 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                                 <TouchableOpacity
                                     style={styles.button}
                                     onPress={() => handlePush('/UserInfo')}>
-                                    <FontAwesome size={20} name="edit" color={Color.Button} />
+                                    <FontAwesome
+                                        size={20}
+                                        name="edit"
+                                        color={Style.getColor('primary-text1')}
+                                    />
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.button}
                                     onPress={() => handlePush('/UserSelector')}>
-                                    <FontAwesome size={20} name="th-list" color={Color.Button} />
+                                    <FontAwesome
+                                        size={20}
+                                        name="th-list"
+                                        color={Style.getColor('primary-text1')}
+                                    />
                                 </TouchableOpacity>
                             </View>
                         </View>
                     </View>
                     {paths.map((item, index) => (
-                        <Animated.View
-                            key={index}
-                            entering={SlideInLeft.duration(500 + index * 30)
-                                .withInitialValues({ originX: index * -150 + -400 })
-                                .easing(Easing.out(Easing.exp))}>
-                            <TouchableOpacity
-                                style={styles.firstlargeButton}
-                                onPress={() => {
-                                    handlePush(item.path)
-                                }}>
-                                <Text style={styles.largeButtonText}>{item.name}</Text>
-                            </TouchableOpacity>
-                        </Animated.View>
+                        <DrawerButton item={item} index={index} key={index} />
                     ))}
 
-                    {__DEV__ && (
-                        <TouchableOpacity
-                            style={styles.largeButton}
-                            onPress={() => handlePush('./LorebookMenu')}>
-                            <Text style={styles.largeButtonText}>[DEV] Lorebooks</Text>
-                        </TouchableOpacity>
-                    )}
+                    {__DEV__ &&
+                        paths_dev.map((item, index) => (
+                            <DrawerButton item={item} index={index} key={index} />
+                        ))}
 
-                    <Text style={{ alignSelf: 'center', color: Color.Offwhite, marginTop: 8 }}>
+                    <Text
+                        style={{
+                            alignSelf: 'center',
+                            color: Style.getColor('primary-text2'),
+                            marginTop: 8,
+                        }}>
                         {__DEV__ && 'DEV BUILD\t'}
                         {'v' + require(`../../app.json`).expo.version}
                     </Text>
@@ -163,16 +207,11 @@ const styles = StyleSheet.create({
         height: '100%',
     },
 
-    mainContainer: {
-        flex: 1,
-        backgroundColor: Color.Background,
-    },
-
     userContainer: {
         flexDirection: 'row',
-        marginBottom: 40,
-        marginTop: 40,
-        margin: 16,
+        paddingBottom: 24,
+        paddingTop: 40,
+        padding: 16,
     },
 
     buttonContainer: {
@@ -181,7 +220,8 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        backgroundColor: Color.DarkContainer,
+        borderColor: Style.getColor('primary-surface3'),
+        borderWidth: 2,
         marginRight: 10,
         borderRadius: 4,
         padding: 8,
@@ -189,48 +229,30 @@ const styles = StyleSheet.create({
 
     userName: {
         fontSize: 20,
-        marginTop: 16,
+        marginTop: 4,
         marginBottom: 8,
         marginLeft: 12,
-        color: Color.Text,
-    },
-
-    imageContainer: {
-        width: 108,
-        height: 108,
-        borderRadius: 27,
-        margin: 4,
-        borderWidth: 2,
+        color: Style.getColor('primary-text1'),
     },
 
     userImage: {
         width: 80,
         height: 80,
         borderRadius: 20,
-    },
-
-    largeButtonContainer: {
-        borderTopWidth: 1,
-        borderColor: Color.Offwhite,
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 2,
     },
 
     largeButtonText: {
         fontSize: 20,
         paddingVertical: 12,
-        paddingLeft: 30,
-        color: Color.Text,
+        paddingLeft: 15,
+        color: Style.getColor('primary-text1'),
     },
 
     largeButton: {
-        borderBottomWidth: 1,
-        fontSize: 20,
-        borderColor: Color.Container,
-    },
-
-    firstlargeButton: {
-        borderBottomWidth: 1,
-        borderTopWidth: 1,
-        fontSize: 20,
-        borderColor: Color.Container,
+        paddingLeft: 15,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
 })

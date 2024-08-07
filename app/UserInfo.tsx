@@ -1,6 +1,6 @@
 import { UserCard } from '@constants/Users'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Users } from '@globals'
+import { Global, Style, Users } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
 import { useState } from 'react'
@@ -54,7 +54,11 @@ const UserInfo = () => {
                                 saveCard()
                                 router.back()
                             }}>
-                            <FontAwesome size={20} name="check" color={Color.Button} />
+                            <FontAwesome
+                                size={20}
+                                name="check"
+                                color={Style.getColor('primary-text1')}
+                            />
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.button}
@@ -67,13 +71,17 @@ const UserInfo = () => {
                                     if (userName) Users.copyImage(result.assets[0].uri, userName)
                                 })
                             }}>
-                            <FontAwesome size={20} name="upload" color={Color.Button} />
+                            <FontAwesome
+                                size={20}
+                                name="upload"
+                                color={Style.getColor('primary-text1')}
+                            />
                         </TouchableOpacity>
                     </View>
                 </View>
             </View>
             <View style={styles.inputarea}>
-                <Text style={{ color: Color.Text }}>Description</Text>
+                <Text style={{ color: Style.getColor('primary-text2') }}>Description</Text>
                 <TextInput
                     style={styles.input}
                     multiline
@@ -83,7 +91,7 @@ const UserInfo = () => {
                         if (userCard) setUserCard({ ...userCard, description: text })
                     }}
                     placeholder="----"
-                    placeholderTextColor={Color.Offwhite}
+                    placeholderTextColor={Style.getColor('primary-text2')}
                 />
             </View>
         </SafeAreaView>
@@ -94,7 +102,6 @@ export default UserInfo
 
 const styles = StyleSheet.create({
     mainContainer: {
-        backgroundColor: Color.Background,
         flex: 1,
     },
 
@@ -111,15 +118,16 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        backgroundColor: Color.DarkContainer,
         marginRight: 10,
         padding: 8,
+        borderRadius: 8,
+        borderColor: Style.getColor('primary-surface3'),
+        borderWidth: 1,
     },
 
     userName: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         fontSize: 20,
-        marginTop: 16,
         marginBottom: 8,
         marginLeft: 12,
     },
@@ -128,6 +136,8 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 20,
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 2,
     },
 
     inputarea: {
@@ -136,11 +146,12 @@ const styles = StyleSheet.create({
     },
 
     input: {
+        color: Style.getColor('primary-text1'),
         marginTop: 12,
-        color: Color.Text,
-        backgroundColor: Color.DarkContainer,
         textAlignVertical: 'top',
-        paddingVertical: 8,
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
+        padding: 8,
         borderRadius: 8,
     },
 })

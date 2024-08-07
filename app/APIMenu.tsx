@@ -8,7 +8,7 @@ import {
     OpenRouter,
     OpenAI,
 } from '@components/Endpoint'
-import { Global, Color, API } from '@globals'
+import { Global, API, Style } from '@globals'
 import { Stack } from 'expo-router'
 import { useEffect } from 'react'
 import { SafeAreaView, Text, StyleSheet, View, ScrollView } from 'react-native'
@@ -44,11 +44,16 @@ const APIMenu = () => {
                 />
                 <ScrollView>
                     <View style={styles.dropdownContainer}>
-                        <Text style={{ color: Color.Text, fontSize: 16 }}>Type</Text>
+                        <Text
+                            style={{
+                                color: Style.getColor('primary-text1'),
+                                fontSize: 16,
+                                marginBottom: 8,
+                            }}>
+                            Type
+                        </Text>
                         <Dropdown
                             value={APIType}
-                            style={styles.dropdownbox}
-                            selectedTextStyle={styles.selected}
                             data={apinames}
                             labelField="label"
                             valueField="value"
@@ -56,15 +61,24 @@ const APIMenu = () => {
                                 if (item.value === APIType) return
                                 setAPIType(item.value)
                             }}
-                            containerStyle={styles.dropdownbox}
-                            itemTextStyle={{ color: Color.Text }}
+                            maxHeight={500}
+                            placeholderStyle={{ color: Style.getColor('primary-text2') }}
+                            containerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
                             itemContainerStyle={{
-                                backgroundColor: Color.DarkContainer,
+                                backgroundColor: Style.getColor('primary-surface2'),
+                            }}
+                            itemTextStyle={{ color: Style.getColor('primary-text1') }}
+                            activeColor={Style.getColor('primary-surface4')}
+                            selectedTextStyle={{
+                                color: Style.getColor('primary-text1'),
+                            }}
+                            style={{
+                                backgroundColor: Style.getColor('primary-surface3'),
+                                paddingHorizontal: 8,
+                                paddingVertical: 2,
+                                marginVertical: 8,
                                 borderRadius: 8,
                             }}
-                            activeColor={Color.Container}
-                            maxHeight={500}
-                            placeholderStyle={{ color: Color.Offwhite }}
                         />
                     </View>
                     {APIType === API.KAI && <KAI />}
@@ -85,7 +99,6 @@ export default APIMenu
 
 const styles = StyleSheet.create({
     mainContainer: {
-        backgroundColor: Color.Background,
         flex: 1,
     },
 
@@ -95,14 +108,14 @@ const styles = StyleSheet.create({
     },
 
     dropdownbox: {
+        backgroundColor: Style.getColor('primary-surface3'),
         paddingHorizontal: 8,
         paddingVertical: 2,
         marginVertical: 8,
-        backgroundColor: Color.DarkContainer,
         borderRadius: 8,
     },
 
     selected: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 })

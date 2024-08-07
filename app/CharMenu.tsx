@@ -1,8 +1,7 @@
 import AnimatedView from '@components/AnimatedView'
 import TextBoxModal from '@components/TextBoxModal'
-import { FontAwesome } from '@expo/vector-icons'
-import { Color, Global, Characters, Chats, Logger } from '@globals'
-import * as FS from 'expo-file-system'
+import { AntDesign, FontAwesome } from '@expo/vector-icons'
+import { Global, Characters, Chats, Logger, Style } from '@globals'
 import { useRouter, Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
@@ -27,7 +26,13 @@ const CharMenu = () => {
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     //const [messages, setMessages] = useMMKVObject(Global.Messages)
-    const [characterList, setCharacterList] = useState<Array<string>>([])
+
+    type CharInfo = {
+        name: string
+        n: number
+    }
+
+    const [characterList, setCharacterList] = useState<Array<CharInfo>>([])
     const [showNewChar, setShowNewChar] = useState<boolean>(false)
     const [showDownload, setShowDownload] = useState(false)
     const [nowLoading, setNowLoading] = useState(false)
@@ -41,16 +46,20 @@ const CharMenu = () => {
         .onEnd(() => {
             runOnJS(goBack)()
         })
-
     const getCharacterList = async () => {
         await Characters.getCardList()
-            .then((list: Array<string>) => {
-                setCharacterList(list)
+            .then(async (list: Array<string>) => {
+                const data: Array<CharInfo> = []
+                for (const name of list) {
+                    const n = await await Chats.getNumber(name)
+                    data.push({ name: name, n: n })
+                }
+                setCharacterList(data)
             })
             .catch((error) => Logger.log(`Could not retrieve characters.\n${error}`, true))
     }
 
-    const setCurrentCharacter = async (character: string) => {
+    const setCurrentCharacter = async (character: string, edit: boolean = false) => {
         if (nowLoading) return
         setNowLoading(true)
         setCharName(character)
@@ -71,7 +80,9 @@ const CharMenu = () => {
                 }
                 await loadChat(character, file)
 
-                router.back()
+                setNowLoading(false)
+                if (edit) router.push('/CharInfo')
+                else router.back()
             })
             .catch((error: any) => {
                 Logger.log(`Couldn't load character: ${error}`, true)
@@ -114,7 +125,7 @@ const CharMenu = () => {
                                     <FontAwesome
                                         name="cloud-download"
                                         size={28}
-                                        color={Color.Button}
+                                        color={Style.getColor('primary-text1')}
                                     />
                                 </TouchableOpacity>
 
@@ -125,7 +136,11 @@ const CharMenu = () => {
                                             getCharacterList()
                                         })
                                     }>
-                                    <FontAwesome name="upload" size={28} color={Color.Button} />
+                                    <FontAwesome
+                                        name="upload"
+                                        size={28}
+                                        color={Style.getColor('primary-text1')}
+                                    />
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
@@ -133,7 +148,11 @@ const CharMenu = () => {
                                     onPress={async () => {
                                         setShowNewChar(true)
                                     }}>
-                                    <FontAwesome name="pencil" size={28} color={Color.Button} />
+                                    <FontAwesome
+                                        name="pencil"
+                                        size={28}
+                                        color={Style.getColor('primary-text1')}
+                                    />
                                 </TouchableOpacity>
                             </View>
                         ),
@@ -160,28 +179,52 @@ const CharMenu = () => {
                 <ScrollView>
                     {characterList.map((character, index) => (
                         <AnimatedView
+                            style={
+                                character.name === charName
+                                    ? styles.longButtonSelectedContainer
+                                    : styles.longButtonContainer
+                            }
                             key={index}
                             dx={Math.min(500 + index * 200, 2000)}
                             tduration={Math.min(500 + index * 100, 1000)}
                             fade={0}
-                            fduration={500}
-                            style={{ flex: 1 }}>
+                            fduration={500}>
                             <TouchableOpacity
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                }}
                                 disabled={nowLoading}
-                                style={styles.longButton}
-                                onPress={() => setCurrentCharacter(character)}>
-                                <Image
-                                    source={{
-                                        uri: `${FS.documentDirectory}characters/${character}/${character}.png`,
-                                    }}
-                                    style={styles.avatar}
-                                />
-                                <Text style={styles.nametag}>{character}</Text>
-                                {nowLoading && character == charName && (
-                                    <ActivityIndicator
-                                        color={Color.White}
-                                        style={{ paddingLeft: 8 }}
+                                onPress={() => setCurrentCharacter(character.name)}>
+                                <View style={styles.longButton}>
+                                    <Image
+                                        defaultSource={require('@assets/user.png')}
+                                        source={{
+                                            uri: Characters.getImageDir(character.name),
+                                        }}
+                                        style={styles.avatar}
                                     />
+                                    <View>
+                                        <Text style={styles.nametag}>{character.name}</Text>
+                                        <Text style={styles.subtag}>Chats: {character.n}</Text>
+                                    </View>
+                                </View>
+                                {nowLoading && character.name == charName ? (
+                                    <ActivityIndicator
+                                        color={Style.getColor('primary-text2')}
+                                        style={{ paddingLeft: 8 }}
+                                        size={28}
+                                    />
+                                ) : (
+                                    <TouchableOpacity
+                                        onPress={() => setCurrentCharacter(character.name, true)}>
+                                        <AntDesign
+                                            color={Style.getColor('primary-text2')}
+                                            name="idcard"
+                                            size={32}
+                                        />
+                                    </TouchableOpacity>
                                 )}
                             </TouchableOpacity>
                         </AnimatedView>
@@ -197,31 +240,61 @@ export default CharMenu
 const styles = StyleSheet.create({
     mainContainer: {
         paddingVertical: 16,
-        paddingHorizontal: 16,
-        backgroundColor: Color.Background,
+        paddingHorizontal: 8,
         flex: 1,
     },
 
     longButton: {
-        backgroundColor: Color.Container,
         flexDirection: 'row',
-        padding: 12,
-        borderRadius: 8,
+        flex: 1,
+    },
+
+    longButtonContainer: {
+        backgroundColor: Style.getColor('primary-surface1'),
+        borderColor: Style.getColor('primary-surface1'),
+        borderWidth: 2,
+        flexDirection: 'row',
+        marginBottom: 8,
+        justifyContent: 'space-between',
         alignItems: 'center',
-        marginVertical: 4,
+        borderRadius: 8,
+        paddingVertical: 8,
+        padding: 8,
+        flex: 1,
+    },
+
+    longButtonSelectedContainer: {
+        backgroundColor: Style.getColor('primary-surface1'),
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 2,
+        flexDirection: 'row',
+        marginBottom: 8,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderRadius: 8,
+        paddingVertical: 8,
+        padding: 8,
+        flex: 1,
     },
 
     avatar: {
         width: 48,
         height: 48,
-        borderRadius: 24,
+        borderRadius: 12,
         margin: 4,
+        backgroundColor: 'gray',
     },
 
     nametag: {
         fontSize: 16,
         marginLeft: 20,
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
+    },
+
+    subtag: {
+        fontSize: 16,
+        marginLeft: 20,
+        color: Style.getColor('primary-text2'),
     },
 
     headerButtonRight: {
@@ -231,15 +304,5 @@ const styles = StyleSheet.create({
 
     headerButtonContainer: {
         flexDirection: 'row',
-    },
-
-    input: {
-        minWidth: 200,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 12,
-        paddingHorizontal: 8,
-        paddingVertical: 8,
-        margin: 8,
     },
 })

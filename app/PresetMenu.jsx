@@ -1,7 +1,7 @@
 import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from '@components'
 import AnimatedView from '@components/AnimatedView'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Presets, saveStringExternal, Logger } from '@globals'
+import { Global, Presets, saveStringExternal, Logger, Style } from '@globals'
 import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
 import {
@@ -190,10 +190,15 @@ const PresetMenu = () => {
 
     return (
         <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
-            <SafeAreaView style={{ backgroundColor: Color.Background }}>
+            <SafeAreaView>
                 <TextBoxModal
                     booleans={[showNewPreset, setShowNewPreset]}
                     onConfirm={(text) => {
+                        if (text === '') {
+                            Logger.log(`Preset name cannot be empty`, true)
+                            return
+                        }
+
                         for (const item of presetList)
                             if (item.label === text) {
                                 Logger.log(`Preset name already exists.`, true)
@@ -230,7 +235,13 @@ const PresetMenu = () => {
                         }}
                         style={styles.dropdownbox}
                         selectedTextStyle={styles.selected}
-                        placeholderStyle={{ color: Color.Offwhite }}
+                        placeholderStyle={{ color: Style.getColor('primary-text1') }}
+                        containerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
+                        itemContainerStyle={{
+                            backgroundColor: Style.getColor('primary-surface2'),
+                        }}
+                        itemTextStyle={{ color: Style.getColor('primary-text1') }}
+                        activeColor={Style.getColor('primary-surface4')}
                     />
                     <TouchableOpacity
                         style={styles.button}
@@ -239,7 +250,11 @@ const PresetMenu = () => {
                                 Logger.log(`Preset Updated!.`, true)
                             )
                         }}>
-                        <FontAwesome size={24} name="save" color={Color.Button} />
+                        <FontAwesome
+                            size={24}
+                            name="save"
+                            color={Style.getColor('primary-text1')}
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -266,7 +281,11 @@ const PresetMenu = () => {
                                 ]
                             )
                         }}>
-                        <FontAwesome size={24} name="trash" color={Color.Button} />
+                        <FontAwesome
+                            size={24}
+                            name="trash"
+                            color={Style.getColor('primary-text1')}
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -283,7 +302,11 @@ const PresetMenu = () => {
                                 })
                             })
                         }}>
-                        <FontAwesome size={24} name="upload" color={Color.Button} />
+                        <FontAwesome
+                            size={24}
+                            name="upload"
+                            color={Style.getColor('primary-text1')}
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -291,7 +314,11 @@ const PresetMenu = () => {
                         onPress={async () => {
                             saveStringExternal(`${presetName}.json`, JSON.stringify(currentPreset))
                         }}>
-                        <FontAwesome size={24} name="download" color={Color.Button} />
+                        <FontAwesome
+                            size={24}
+                            name="download"
+                            color={Style.getColor('primary-text1')}
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -299,7 +326,11 @@ const PresetMenu = () => {
                         onPress={() => {
                             setShowNewPreset(true)
                         }}>
-                        <FontAwesome size={24} name="plus" color={Color.Button} />
+                        <FontAwesome
+                            size={24}
+                            name="plus"
+                            color={Style.getColor('primary-text1')}
+                        />
                     </TouchableOpacity>
                 </View>
 
@@ -365,20 +396,27 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
+    selected: {
+        color: Style.getColor('primary-text1'),
+    },
+
     dropdownbox: {
-        flex: 1,
+        backgroundColor: Style.getColor('primary-surface3'),
         paddingHorizontal: 8,
-        backgroundColor: Color.DarkContainer,
+        paddingVertical: 2,
+        marginVertical: 8,
         borderRadius: 8,
+        flex: 1,
     },
 
     selected: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 
     button: {
         padding: 5,
-        backgroundColor: Color.DarkContainer,
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         borderRadius: 4,
         marginLeft: 8,
     },

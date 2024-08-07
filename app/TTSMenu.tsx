@@ -1,6 +1,6 @@
 import AnimatedView from '@components/AnimatedView'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Logger } from '@globals'
+import { Global, Logger, Style } from '@globals'
 import { Stack } from 'expo-router'
 import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'
@@ -54,8 +54,15 @@ const TTSMenu = () => {
                 <View style={styles.enableContainer}>
                     <Text style={{ ...styles.title }}>Enable</Text>
                     <Switch
-                        trackColor={{ false: Color.Offwhite, true: '#f4f3f4' }}
-                        thumbColor={enableTTS ? '#f4f3f4' : Color.Offwhite}
+                        trackColor={{
+                            false: Style.getColor('primary-surface1'),
+                            true: Style.getColor('primary-surface3'),
+                        }}
+                        thumbColor={
+                            enableTTS
+                                ? Style.getColor('primary-brand')
+                                : Style.getColor('primary-surface3')
+                        }
                         ios_backgroundColor="#3e3e3e"
                         onValueChange={(value) => {
                             if (value) {
@@ -71,8 +78,15 @@ const TTSMenu = () => {
                         <View style={styles.enableContainer}>
                             <Text style={{ ...styles.title }}>Automatically TTS On Inference</Text>
                             <Switch
-                                trackColor={{ false: Color.Offwhite, true: '#f4f3f4' }}
-                                thumbColor={enableTTS ? '#f4f3f4' : Color.Offwhite}
+                                trackColor={{
+                                    false: Style.getColor('primary-surface1'),
+                                    true: Style.getColor('primary-surface3'),
+                                }}
+                                thumbColor={
+                                    autoTTS
+                                        ? Style.getColor('primary-brand')
+                                        : Style.getColor('primary-surface3')
+                                }
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={(value) => {
                                     setAutoTTS(value)
@@ -93,21 +107,26 @@ const TTSMenu = () => {
                                     data={languages}
                                     labelField="name"
                                     valueField="name"
-                                    containerStyle={styles.dropdownbox}
-                                    itemTextStyle={{ color: Color.Text }}
-                                    itemContainerStyle={{
-                                        backgroundColor: Color.DarkContainer,
-                                        borderRadius: 8,
-                                    }}
-                                    activeColor={Color.Container}
-                                    placeholderStyle={styles.selected}
                                     placeholder="Select Language"
                                     onChange={(item) => setLang(item.name)}
+                                    placeholderStyle={{ color: Style.getColor('primary-text2') }}
+                                    containerStyle={{
+                                        backgroundColor: Style.getColor('primary-surface2'),
+                                    }}
+                                    itemContainerStyle={{
+                                        backgroundColor: Style.getColor('primary-surface2'),
+                                    }}
+                                    itemTextStyle={{ color: Style.getColor('primary-text1') }}
+                                    activeColor={Style.getColor('primary-surface4')}
                                 />
                                 <TouchableOpacity
                                     style={{ ...styles.button, marginLeft: 8 }}
                                     onPress={() => getVoices()}>
-                                    <FontAwesome name="refresh" size={20} color={Color.White} />
+                                    <FontAwesome
+                                        name="refresh"
+                                        size={20}
+                                        color={Style.getColor('primary-text1')}
+                                    />
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -126,16 +145,17 @@ const TTSMenu = () => {
                                     data={languageList[lang]}
                                     labelField={'identifier'}
                                     valueField={'name'}
-                                    containerStyle={styles.dropdownbox}
-                                    itemTextStyle={{ color: Color.Text }}
-                                    itemContainerStyle={{
-                                        backgroundColor: Color.DarkContainer,
-                                        borderRadius: 8,
-                                    }}
-                                    activeColor={Color.Container}
-                                    placeholderStyle={styles.selected}
                                     placeholder="Select Speaker"
                                     onChange={(item) => setCurrentSpeaker(item)}
+                                    placeholderStyle={{ color: Style.getColor('primary-text2') }}
+                                    containerStyle={{
+                                        backgroundColor: Style.getColor('primary-surface2'),
+                                    }}
+                                    itemContainerStyle={{
+                                        backgroundColor: Style.getColor('primary-surface2'),
+                                    }}
+                                    itemTextStyle={{ color: Style.getColor('primary-text1') }}
+                                    activeColor={Style.getColor('primary-surface4')}
                                 />
                             )}
                         </View>
@@ -151,7 +171,12 @@ const TTSMenu = () => {
                                         voice: currentSpeaker.identifier,
                                     })
                                 }}
-                                style={{ ...styles.button, padding: 8, marginRight: 16 }}>
+                                style={{
+                                    ...styles.button,
+                                    padding: 8,
+                                    marginRight: 16,
+                                    paddingHorizontal: 12,
+                                }}>
                                 <Text style={styles.buttonlabel}>Test</Text>
                             </TouchableOpacity>
                             <Text style={styles.subtitle}>"This is a test audio."</Text>
@@ -173,23 +198,22 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         fontSize: 16,
     },
 
     subtitle: {
-        color: Color.Offwhite,
+        color: Style.getColor('primary-text2'),
     },
 
     buttonlabel: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         fontSize: 16,
     },
 
     input: {
         flex: 1,
-        color: Color.Text,
-        backgroundColor: Color.DarkContainer,
+        color: Style.getColor('primary-text1'),
         paddingVertical: 4,
         paddingHorizontal: 8,
         marginVertical: 8,
@@ -199,13 +223,13 @@ const styles = StyleSheet.create({
 
     button: {
         padding: 6,
-        backgroundColor: Color.DarkContainer,
         borderRadius: 4,
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
     },
 
     textbutton: {
         padding: 8,
-        backgroundColor: Color.DarkContainer,
         borderRadius: 4,
     },
 
@@ -214,15 +238,15 @@ const styles = StyleSheet.create({
     },
 
     dropdownbox: {
+        backgroundColor: Style.getColor('primary-surface3'),
         paddingHorizontal: 8,
         paddingVertical: 2,
         marginVertical: 8,
-        backgroundColor: Color.DarkContainer,
         borderRadius: 8,
     },
 
     selected: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 
     enableContainer: {
@@ -230,7 +254,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20,
         justifyContent: 'space-between',
-        backgroundColor: Color.Container,
+        backgroundColor: Style.getColor('primary-surface2'),
         borderRadius: 16,
         padding: 16,
     },

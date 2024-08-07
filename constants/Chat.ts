@@ -294,6 +294,17 @@ export namespace Chats {
         return filelist?.[filelist?.length - 1]
     }
 
+    export const getNumber = async (charName: string): Promise<number> => {
+        return await FS.readDirectoryAsync(getChatDir(charName))
+            .then((result) => {
+                return result.length
+            })
+            .catch((error) => {
+                Logger.log('Could not get Chat list: ' + error, true)
+                return 0
+            })
+    }
+
     export const getList = async (charName: string): Promise<string[]> => {
         return await FS.readDirectoryAsync(getChatDir(charName)).catch((error) => {
             Logger.log('Could not get Chat list: ' + error, true)

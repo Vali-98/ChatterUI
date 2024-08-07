@@ -1,4 +1,4 @@
-import { Color } from '@globals'
+import { Style } from '@globals'
 import Slider from '@react-native-community/slider'
 import { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, TextInput } from 'react-native'
@@ -64,9 +64,9 @@ const SliderItem: React.FC<SliderItemProps> = ({
                     maximumValue={max}
                     value={body[varname]}
                     onValueChange={handleSliderChange}
-                    minimumTrackTintColor={Color.White}
-                    maximumTrackTintColor={Color.Offwhite}
-                    thumbTintColor={Color.White}
+                    minimumTrackTintColor={Style.getColor('primary-brand')}
+                    maximumTrackTintColor={Style.getColor('primary-surface3')}
+                    thumbTintColor={Style.getColor('primary-brand')}
                 />
 
                 <TextInput
@@ -86,7 +86,7 @@ export default SliderItem
 
 const styles = StyleSheet.create({
     itemName: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 
     sliderContainer: {
@@ -99,8 +99,8 @@ const styles = StyleSheet.create({
     },
 
     textBox: {
-        backgroundColor: Color.DarkContainer,
-        color: Color.White,
+        borderColor: Style.getColor('primary-brand'),
+        color: Style.getColor('primary-text1'),
         borderWidth: 1,
         borderRadius: 12,
         flex: 1.5,

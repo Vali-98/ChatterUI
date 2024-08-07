@@ -1,6 +1,6 @@
 import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Users, Logger } from '@globals'
+import { Global, Users, Logger, Style } from '@globals'
 import { Stack, useRouter } from 'expo-router'
 import { useState, useEffect } from 'react'
 import {
@@ -62,7 +62,11 @@ const UserSelector = () => {
                                         onPress={() => {
                                             setShowNewUser(true)
                                         }}>
-                                        <FontAwesome size={28} name="plus" color={Color.Button} />
+                                        <FontAwesome
+                                            size={28}
+                                            name="plus"
+                                            color={Style.getColor('primary-text1')}
+                                        />
                                     </TouchableOpacity>
                                 </View>
                             )
@@ -76,8 +80,8 @@ const UserSelector = () => {
                             key={index}
                             style={
                                 name === userName
-                                    ? { ...styles.useritem, backgroundColor: Color.Container }
-                                    : styles.useritem
+                                    ? styles.longButtonSelectedContainer
+                                    : styles.longButtonContainer
                             }>
                             <TouchableOpacity
                                 style={styles.useritembutton}
@@ -94,7 +98,7 @@ const UserSelector = () => {
                                     style={styles.avatar}
                                 />
 
-                                <Text style={{ flex: 1, color: Color.Text }}>{name}</Text>
+                                <Text style={styles.username}>{name}</Text>
 
                                 <TouchableOpacity
                                     onPress={() => {
@@ -114,7 +118,11 @@ const UserSelector = () => {
                                             ]
                                         )
                                     }}>
-                                    <FontAwesome size={28} name="trash" color={Color.Button} />
+                                    <FontAwesome
+                                        size={28}
+                                        name="trash"
+                                        color={Style.getColor('primary-text1')}
+                                    />
                                 </TouchableOpacity>
                             </TouchableOpacity>
                         </View>
@@ -149,30 +157,50 @@ export default UserSelector
 const styles = StyleSheet.create({
     mainContainer: {
         paddingVertical: 16,
-        paddingHorizontal: 16,
-        backgroundColor: Color.Background,
-        flex: 1,
+        paddingHorizontal: 8,
     },
 
     avatar: {
         width: 48,
         height: 48,
-        marginRight: 8,
-        borderRadius: 24,
+        borderRadius: 12,
+        margin: 4,
+        backgroundColor: Style.getColor('primary-surface2'),
     },
 
     username: {
-        marginLeft: 8,
+        marginLeft: 12,
+        fontSize: 16,
+        flex: 1,
+        color: Style.getColor('primary-text1'),
     },
 
-    useritem: {
-        flex: 1,
+    longButtonContainer: {
+        backgroundColor: Style.getColor('primary-surface1'),
+        borderColor: Style.getColor('primary-surface1'),
+        borderWidth: 2,
         flexDirection: 'row',
-        alignItems: 'center',
-        padding: 12,
-        borderRadius: 8,
         marginBottom: 8,
-        backgroundColor: Color.DarkContainer,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderRadius: 8,
+        paddingVertical: 8,
+        padding: 8,
+        flex: 1,
+    },
+
+    longButtonSelectedContainer: {
+        backgroundColor: Style.getColor('primary-surface1'),
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 2,
+        flexDirection: 'row',
+        marginBottom: 8,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderRadius: 8,
+        paddingVertical: 8,
+        padding: 8,
+        flex: 1,
     },
 
     useritembutton: {

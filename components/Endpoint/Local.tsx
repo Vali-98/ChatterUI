@@ -1,5 +1,5 @@
 import { Llama } from '@constants/llama'
-import { Color, Global, Logger } from '@globals'
+import { Global, Logger, Style } from '@globals'
 import { useEffect, useState } from 'react'
 import {
     View,
@@ -101,13 +101,13 @@ const Local = () => {
             <View
                 style={{
                     marginTop: 16,
-                    backgroundColor: Color.Container,
+                    backgroundColor: Style.getColor('primary-surface2'),
                     padding: 4,
                     borderRadius: 4,
                     flexDirection: 'row',
                 }}>
                 <Text style={styles.subtitle}>Current Model : </Text>
-                <Text style={{ ...styles.subtitle, color: Color.Text }}>
+                <Text style={{ ...styles.subtitle, color: Style.getColor('primary-text1') }}>
                     {loadedModel === undefined ? 'None' : loadedModel}
                 </Text>
             </View>
@@ -115,28 +115,34 @@ const Local = () => {
             <View style={{ marginTop: 8 }}>
                 <Dropdown
                     value={currentModel}
-                    style={styles.dropdownbox}
-                    selectedTextStyle={styles.selected}
                     data={dropdownValues}
                     labelField="name"
                     valueField="name"
-                    containerStyle={styles.dropdownbox}
-                    itemTextStyle={{ color: Color.Text }}
+                    onChange={(item) => setCurrentModel(item.name)}
+                    placeholderStyle={{ color: Style.getColor('primary-text2') }}
+                    containerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
                     itemContainerStyle={{
-                        backgroundColor: Color.DarkContainer,
+                        backgroundColor: Style.getColor('primary-surface2'),
+                    }}
+                    itemTextStyle={{ color: Style.getColor('primary-text1') }}
+                    activeColor={Style.getColor('primary-surface4')}
+                    selectedTextStyle={{
+                        color: Style.getColor('primary-text1'),
+                    }}
+                    style={{
+                        backgroundColor: Style.getColor('primary-surface3'),
+                        paddingHorizontal: 8,
+                        paddingVertical: 2,
+                        marginVertical: 8,
                         borderRadius: 8,
                     }}
-                    activeColor={Color.Container}
-                    placeholderStyle={styles.selected}
-                    placeholder="Select Model"
-                    onChange={(item) => setCurrentModel(item.name)}
                 />
             </View>
 
             {modelLoading ? (
-                <ActivityIndicator size="large" color={Color.White} />
+                <ActivityIndicator size="large" color={Style.getColor('primary-text1')} />
             ) : (
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{ flexDirection: 'row', marginTop: 8 }}>
                     <TouchableOpacity
                         style={{ ...styles.textbutton, marginRight: 8 }}
                         onPress={handleLoad}>
@@ -244,23 +250,22 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         fontSize: 16,
     },
 
     subtitle: {
-        color: Color.Offwhite,
+        color: Style.getColor('primary-text2'),
     },
 
     buttonlabel: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         fontSize: 16,
     },
 
     input: {
         flex: 1,
-        color: Color.Text,
-        backgroundColor: Color.DarkContainer,
+        color: Style.getColor('primary-text1'),
         paddingVertical: 4,
         paddingHorizontal: 8,
         marginVertical: 8,
@@ -268,16 +273,11 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
 
-    button: {
-        padding: 6,
-        backgroundColor: Color.DarkContainer,
-        borderRadius: 4,
-    },
-
     textbutton: {
         padding: 8,
-        backgroundColor: Color.DarkContainer,
         borderRadius: 4,
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
     },
 
     dropdownContainer: {
@@ -288,11 +288,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 2,
         marginVertical: 8,
-        backgroundColor: Color.DarkContainer,
         borderRadius: 8,
     },
 
     selected: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 })

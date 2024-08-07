@@ -1,4 +1,4 @@
-import { Global, Color } from '@globals'
+import { Global, Style } from '@globals'
 import { useEffect } from 'react'
 import { View, Text, TextInput, StyleSheet } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
@@ -20,7 +20,7 @@ const KAI = () => {
                     setKAIEndpoint(value)
                 }}
                 placeholder="eg. http://127.0.0.1:5000"
-                placeholderTextColor={Color.Offwhite}
+                placeholderTextColor={Style.getColor('primary-text2')}
             />
         </View>
     )
@@ -36,12 +36,13 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 
     input: {
-        color: Color.Text,
-        backgroundColor: Color.DarkContainer,
+        color: Style.getColor('primary-text2'),
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         paddingVertical: 4,
         paddingHorizontal: 8,
         marginVertical: 8,

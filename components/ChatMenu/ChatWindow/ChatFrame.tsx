@@ -1,7 +1,7 @@
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { ReactNode, useEffect, useState } from 'react'
 import { ChatEntry } from '@constants/Chat'
-import { Users, Characters, Color } from '@globals'
+import { Users, Characters, Color, Style } from '@globals'
 import TTSMenu from './TTS'
 
 type ChatFrameProps = {
@@ -65,10 +65,17 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
             <View style={{ flex: 1, flexDirection: 'column' }}>
                 <View style={{ flex: 1 }}>
                     <View style={{ marginBottom: 8 }}>
-                        <Text style={{ fontSize: 16, color: Color.Text, marginRight: 4 }}>
+                        <Text
+                            style={{
+                                fontSize: 16,
+                                color: Style.getColor('primary-text1'),
+                                marginRight: 4,
+                            }}>
                             {message.name}
                         </Text>
-                        <Text style={{ fontSize: 10, color: Color.Text }}>{message.send_date}</Text>
+                        <Text style={{ fontSize: 10, color: Style.getColor('primary-text2') }}>
+                            {message.send_date}
+                        </Text>
                     </View>
                 </View>
                 {children}
@@ -90,7 +97,7 @@ const styles = StyleSheet.create({
     },
 
     graytext: {
-        color: Color.Offwhite,
+        color: Style.getColor('primary-text2'),
         paddingTop: 4,
     },
 })

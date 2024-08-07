@@ -1,5 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Characters, Logger, LlamaTokenizer } from '@globals'
+import { Global, Characters, Logger, LlamaTokenizer, Style } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
 import { useState, useEffect } from 'react'
@@ -88,6 +88,16 @@ const CharInfo = () => {
         )
     }
 
+    const handleImportImage = () => {
+        DocumentPicker.getDocumentAsync({
+            copyToCacheDirectory: true,
+            type: 'image/*',
+        }).then((result: DocumentPicker.DocumentPickerResult) => {
+            if (result.canceled) return
+            Characters.copyImage(result.assets[0].uri, charName ?? '')
+        })
+    }
+
     return (
         <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
             <SafeAreaView style={styles.mainContainer}>
@@ -101,11 +111,19 @@ const CharInfo = () => {
                                         savecard().then(() => loadcard())
                                         Logger.log(`Character saved!`, true)
                                     }}>
-                                    <FontAwesome name="save" size={28} color={Color.Button} />
+                                    <FontAwesome
+                                        name="save"
+                                        size={28}
+                                        color={Style.getColor('primary-text1')}
+                                    />
                                 </TouchableOpacity>
 
                                 <TouchableOpacity style={styles.button} onPress={deleteCard}>
-                                    <FontAwesome name="trash" size={28} color={Color.Button} />
+                                    <FontAwesome
+                                        name="trash"
+                                        size={28}
+                                        color={Style.getColor('primary-text1')}
+                                    />
                                 </TouchableOpacity>
                             </View>
                         ),
@@ -121,27 +139,22 @@ const CharInfo = () => {
                             />
 
                             <View style={styles.characterHeaderInfo}>
-                                <Text style={{ fontSize: 20, marginBottom: 12, color: Color.Text }}>
+                                <Text
+                                    style={{
+                                        fontSize: 20,
+                                        color: Style.getColor('primary-text1'),
+                                    }}>
                                     {charName}
                                 </Text>
                                 <View style={styles.buttonContainer}>
                                     <TouchableOpacity
                                         style={styles.foregroundButton}
-                                        onPress={() => {
-                                            DocumentPicker.getDocumentAsync({
-                                                copyToCacheDirectory: true,
-                                                type: 'image/*',
-                                            }).then(
-                                                (result: DocumentPicker.DocumentPickerResult) => {
-                                                    if (result.canceled) return
-                                                    Characters.copyImage(
-                                                        result.assets[0].uri,
-                                                        charName ?? ''
-                                                    )
-                                                }
-                                            )
-                                        }}>
-                                        <FontAwesome name="upload" size={20} color={Color.Button} />
+                                        onPress={handleImportImage}>
+                                        <FontAwesome
+                                            name="upload"
+                                            size={20}
+                                            color={Style.getColor('primary-text1')}
+                                        />
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -193,9 +206,8 @@ const CharInfo = () => {
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        paddingHorizontal: 12,
-        paddingVertical: 20,
-        backgroundColor: Color.Background,
+        paddingHorizontal: 16,
+        paddingVertical: 16,
     },
 
     button: {
@@ -204,13 +216,14 @@ const styles = StyleSheet.create({
 
     characterHeader: {
         alignContent: 'flex-start',
+        padding: 16,
+        borderRadius: 16,
         flexDirection: 'row',
-        marginLeft: 8,
+        alignItems: 'center',
     },
 
     characterHeaderInfo: {
         marginLeft: 12,
-        marginBottom: 12,
     },
 
     buttonContainer: {
@@ -220,76 +233,39 @@ const styles = StyleSheet.create({
     },
 
     foregroundButton: {
-        backgroundColor: Color.DarkContainer,
+        backgroundColor: Style.getColor('primary-surface1'),
         padding: 8,
         borderRadius: 4,
     },
 
     avatar: {
-        width: 64,
-        height: 64,
-        borderRadius: 16,
-        marginBottom: 4,
-        marginLeft: 4,
-        marginRight: 8,
+        width: 80,
+        height: 80,
+        borderRadius: 20,
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 2,
     },
 
     inputContainer: {
-        backgroundColor: Color.DarkContainer,
+        backgroundColor: Style.getColor('primary-surface1'),
+        borderColor: Style.getColor('primary-brand'),
         borderRadius: 8,
+        borderWidth: 1,
         paddingHorizontal: 8,
         maxHeight: 160,
     },
 
     boxText: {
-        color: Color.Text,
+        color: Style.getColor('primary-text2'),
         paddingTop: 16,
         paddingBottom: 8,
     },
 
     input: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         textAlignVertical: 'top',
         paddingVertical: 8,
     },
 })
 
 export default CharInfo
-
-const string = ''
-const TavernCardV1 = {
-    name: string,
-    description: string,
-    personality: string,
-    scenario: string,
-    first_mes: string,
-    mes_example: string,
-}
-
-const TavernCardV2 = () => {
-    return {
-        spec: 'chara_card_v2',
-        spec_version: '2.0',
-        data: {
-            name: '',
-            description: '',
-            personality: '',
-            scenario: '',
-            first_mes: '',
-            mes_example: '',
-
-            // New fields start here
-            creator_notes: '',
-            system_prompt: '',
-            post_history_instructions: '',
-            alternate_greetings: [],
-            character_book: '',
-
-            // May 8th additions
-            tags: [],
-            creator: '',
-            character_version: '',
-            extensions: {},
-        },
-    }
-}

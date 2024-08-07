@@ -1,5 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Logger } from '@globals'
+import { Global, Style, Logger } from '@globals'
 import { useCallback, useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
@@ -55,7 +55,7 @@ const OpenRouter = () => {
                         setKeyInput(value)
                     }}
                     placeholder="Press save to confirm key"
-                    placeholderTextColor={Color.Offwhite}
+                    placeholderTextColor={Style.getColor('primary-text2')}
                     secureTextEntry
                 />
                 <TouchableOpacity
@@ -69,12 +69,12 @@ const OpenRouter = () => {
                         setKeyInput('')
                         Logger.log('Key saved!', true)
                     }}>
-                    <FontAwesome name="save" color={Color.Button} size={28} />
+                    <FontAwesome name="save" color={Style.getColor('primary-text1')} size={28} />
                 </TouchableOpacity>
             </View>
 
             <View style={styles.dropdownContainer}>
-                <Text style={{ color: Color.Text, fontSize: 16 }}>Model</Text>
+                <Text style={{ color: Style.getColor('primary-text1'), fontSize: 16 }}>Model</Text>
                 <Dropdown
                     value={openRouterModel}
                     data={modelList}
@@ -84,16 +84,24 @@ const OpenRouter = () => {
                         if (item.id === openRouterModel?.id) return
                         setOpenRouterModel(item)
                     }}
-                    style={styles.dropdownbox}
-                    selectedTextStyle={styles.selected}
-                    containerStyle={styles.dropdownbox}
-                    itemTextStyle={{ color: Color.Text }}
+                    placeholderStyle={{ color: Style.getColor('primary-text2') }}
+                    containerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
                     itemContainerStyle={{
-                        backgroundColor: Color.DarkContainer,
+                        backgroundColor: Style.getColor('primary-surface2'),
+                    }}
+                    itemTextStyle={{ color: Style.getColor('primary-text1') }}
+                    activeColor={Style.getColor('primary-surface4')}
+                    selectedTextStyle={{
+                        color: Style.getColor('primary-text1'),
+                    }}
+                    style={{
+                        backgroundColor: Style.getColor('primary-surface3'),
+                        paddingHorizontal: 8,
+                        paddingVertical: 2,
+                        marginVertical: 8,
                         borderRadius: 8,
                     }}
-                    activeColor={Color.Container}
-                    placeholderStyle={{ color: Color.Offwhite }}
+                    placeholder="Select Model"
                 />
             </View>
 
@@ -102,34 +110,44 @@ const OpenRouter = () => {
                     <Text style={{ ...styles.title, marginBottom: 8 }}>{openRouterModel.id}</Text>
                     <View style={{ flexDirection: 'row' }}>
                         <View>
-                            <Text style={{ color: Color.Offwhite }}>Context Size</Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
+                                Context Size
+                            </Text>
                             {openRouterModel.per_request_limits && (
                                 <View>
-                                    <Text style={{ color: Color.Offwhite }}>Completion Tokens</Text>
-                                    <Text style={{ color: Color.Offwhite }}>Prompt Tokens</Text>
+                                    <Text style={{ color: Style.getColor('primary-text2') }}>
+                                        Completion Tokens
+                                    </Text>
+                                    <Text style={{ color: Style.getColor('primary-text2') }}>
+                                        Prompt Tokens
+                                    </Text>
                                 </View>
                             )}
-                            <Text style={{ color: Color.Offwhite }}>Completion Cost</Text>
-                            <Text style={{ color: Color.Offwhite }}>Prompt Cost</Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
+                                Completion Cost
+                            </Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
+                                Prompt Cost
+                            </Text>
                         </View>
                         <View style={{ marginLeft: 8 }}>
-                            <Text style={{ color: Color.Offwhite }}>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
                                 : {openRouterModel.context_length}
                             </Text>
                             {openRouterModel.per_request_limits && (
                                 <View>
-                                    <Text style={{ color: Color.Offwhite }}>
+                                    <Text style={{ color: Style.getColor('primary-text2') }}>
                                         : {openRouterModel.per_request_limits.prompt_tokens}
                                     </Text>
-                                    <Text style={{ color: Color.Offwhite }}>
+                                    <Text style={{ color: Style.getColor('primary-text2') }}>
                                         : {openRouterModel.per_request_limits.completion_tokens}
                                     </Text>
                                 </View>
                             )}
-                            <Text style={{ color: Color.Offwhite }}>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
                                 : {openRouterModel.pricing.completion}
                             </Text>
-                            <Text style={{ color: Color.Offwhite }}>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
                                 : {openRouterModel.pricing.prompt}
                             </Text>
                         </View>
@@ -150,18 +168,19 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         fontSize: 20,
     },
 
     subtitle: {
-        color: Color.Offwhite,
+        color: Style.getColor('primary-text2'),
     },
 
     input: {
         flex: 1,
-        color: Color.Text,
-        backgroundColor: Color.DarkContainer,
+        color: Style.getColor('primary-text2'),
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         paddingVertical: 4,
         paddingHorizontal: 8,
         marginVertical: 8,
@@ -170,7 +189,8 @@ const styles = StyleSheet.create({
 
     button: {
         padding: 5,
-        backgroundColor: Color.DarkContainer,
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         borderRadius: 4,
         marginLeft: 8,
     },
@@ -179,21 +199,9 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
 
-    dropdownbox: {
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        marginVertical: 8,
-        backgroundColor: Color.DarkContainer,
-        borderRadius: 8,
-    },
-
-    selected: {
-        color: Color.Text,
-    },
-
     modelInfo: {
         borderRadius: 8,
-        backgroundColor: Color.Container,
+        backgroundColor: Style.getColor('primary-surface2'),
         flex: 1,
         padding: 16,
         marginTop: 12,

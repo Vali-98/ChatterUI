@@ -1,5 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Color, Global, Logger, saveStringExternal } from '@globals'
+import { Global, Logger, Style, saveStringExternal } from '@globals'
 import { Stack } from 'expo-router'
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { useMMKVObject } from 'react-native-mmkv'
@@ -44,12 +44,20 @@ const Logs = () => {
                                 <TouchableOpacity
                                     style={{ marginRight: 30, marginTop: 12 }}
                                     onPress={handleFlushLogs}>
-                                    <FontAwesome name="trash" size={28} color={Color.Button} />
+                                    <FontAwesome
+                                        name="trash"
+                                        size={28}
+                                        color={Style.getColor('primary-text1')}
+                                    />
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={{ marginRight: 20, marginTop: 12 }}
                                     onPress={handleExportLogs}>
-                                    <FontAwesome name="download" size={28} color={Color.Button} />
+                                    <FontAwesome
+                                        name="download"
+                                        size={28}
+                                        color={Style.getColor('primary-text1')}
+                                    />
                                 </TouchableOpacity>
                             </View>
                         ),
@@ -71,12 +79,14 @@ export default Logs
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: Color.Black,
+        backgroundColor: 'black',
+        borderColor: Style.getColor('primary-brand'),
+        borderWidth: 1,
         margin: 16,
         padding: 16,
         borderRadius: 16,
     },
     entry: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 })
