@@ -2,7 +2,7 @@ import { db, rawdb } from '@db'
 import { Style, initializeApp, startupApp } from '@globals'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
-import { Stack } from 'expo-router'
+import { SplashScreen, Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { View, Text } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -15,6 +15,8 @@ const DevDB = () => {
     return <></>
 }
 
+SplashScreen.preventAutoHideAsync()
+
 const Layout = () => {
     const [firstRender, setFirstRender] = useState<boolean>(true)
     const { success, error } = useMigrations(db, migrations)
@@ -26,6 +28,10 @@ const Layout = () => {
         setFirstRender(false)
     }, [])
 
+    useEffect(() => {
+        if (success) SplashScreen.hideAsync()
+    }, [success])
+
     if (error)
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -35,16 +41,7 @@ const Layout = () => {
             </View>
         )
 
-    if (!success)
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ color: Style.getColor('primary-text1'), fontSize: 16 }}>
-                    Loading Database...
-                </Text>
-            </View>
-        )
-
-    if (!firstRender)
+    if (!firstRender && success)
         return (
             <GestureHandlerRootView style={{ flex: 1 }}>
                 {__DEV__ && <DevDB />}
