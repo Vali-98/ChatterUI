@@ -34,6 +34,21 @@ npm install
 eas build --platform android --local
 ```
 
+### Fix For Text Streaming in Development
+
+ReactNativeFlipper causes streaming to break on Android development builds. To fix this, navigate to:
+
+`android/app/src/main/java/com/Vali98/ChatterUI/MainApplication.kt`
+
+Then comment out the following:
+
+```
+if (BuildConfig.DEBUG) {
+    // hacky fix for: https://github.com/react-native-community/fetch
+    // ReactNativeFlipper.initializeFlipper(this, reactNativeHost.reactInstanceManager)
+}
+```
+
 ### Roadmap
 
 -   NovelAI support
