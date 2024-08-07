@@ -37,6 +37,7 @@ const ChatWindow = () => {
     const renderItems = ({ item, index }: { item: ListItem; index: number }) => {
         return (
             <ChatItem
+                messagesLength={messagesLength}
                 id={item.index}
                 nowGenerating={nowGenerating ?? false}
                 charId={charId ?? -1}
