@@ -49,7 +49,7 @@
                         "usesCleartextTraffic": true,
                         "enableProguardInReleaseBuilds": true,
                         "enableShrinkResourcesInReleaseBuilds": true,
-                        //"useLegacyPackaging": true,
+                        "useLegacyPackaging": true,
                         "extraProguardRules": "-keep class com.rnllama.** { *; }"
                     }
                 }
