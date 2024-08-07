@@ -184,8 +184,8 @@ const Local = () => {
                     body={preset}
                     setValue={setPreset}
                     varname="context_length"
-                    min={32}
-                    max={8096}
+                    min={512}
+                    max={32768}
                     step={32}
                 />
                 <SliderItem
