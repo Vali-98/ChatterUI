@@ -18,7 +18,7 @@ class LocalAPI extends APIBase {
         { externalName: 'mirostat', samplerID: SamplerID.MIROSTAT_MODE },
         { externalName: 'mirostat_tau', samplerID: SamplerID.MIROSTAT_TAU },
         { externalName: 'mirostat_eta', samplerID: SamplerID.MIROSTAT_ETA },
-        //{ externalName: 'grammar', samplerID: SamplerID.GRAMMAR_STRING },
+        { externalName: 'grammar', samplerID: SamplerID.GRAMMAR_STRING },
         { externalName: 'penalty_last_n', samplerID: SamplerID.REPETITION_PENALTY_RANGE },
         { externalName: 'penalty_repeat', samplerID: SamplerID.REPETITION_PENALTY },
         { externalName: 'penalty_present', samplerID: SamplerID.PRESENCE_PENALTY },
