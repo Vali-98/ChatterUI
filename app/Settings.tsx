@@ -13,19 +13,22 @@ const Settings = () => {
         <SafeAreaView style={styles.mainContainer}>
             <View style={styles.userContainer}>
                 <View style={styles.imageContainer}>
-                    <Image style={styles.userImage} source={{ uri: Users.getImageDir(userName) }} />
+                    <Image
+                        style={styles.userImage}
+                        source={{ uri: Users.getImageDir(userName ?? '') }}
+                    />
                 </View>
                 <View>
                     <Text style={styles.userName}>{userName}</Text>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={() => router.push('UserInfo')}>
+                            onPress={() => router.push('/UserInfo')}>
                             <FontAwesome size={20} name="edit" color={Color.Button} />
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={() => router.push('UserSelector')}>
+                            onPress={() => router.push('/UserSelector')}>
                             <FontAwesome size={20} name="th-list" color={Color.Button} />
                         </TouchableOpacity>
                     </View>
@@ -42,23 +45,27 @@ const Settings = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.largeButton}
-                    onPress={() => router.push('Instruct')}>
+                    onPress={() => router.push('/Instruct')}>
                     <Text style={styles.largeButtonText}>Instruct</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.largeButton} onPress={() => router.push('APIMenu')}>
+                <TouchableOpacity
+                    style={styles.largeButton}
+                    onPress={() => router.push('/APIMenu')}>
                     <Text style={styles.largeButtonText}>API</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.largeButton} onPress={() => router.push('TTSMenu')}>
+                <TouchableOpacity
+                    style={styles.largeButton}
+                    onPress={() => router.push('/TTSMenu')}>
                     <Text style={styles.largeButtonText}>TTS</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.largeButton} onPress={() => router.push('Logs')}>
+                <TouchableOpacity style={styles.largeButton} onPress={() => router.push('/Logs')}>
                     <Text style={styles.largeButtonText}>Logs</Text>
                 </TouchableOpacity>
 
                 {__DEV__ && (
                     <TouchableOpacity
                         style={styles.largeButton}
-                        onPress={() => router.push('LorebookMenu')}>
+                        onPress={() => router.push('/LorebookMenu')}>
                         <Text style={styles.largeButtonText}>Lorebooks</Text>
                     </TouchableOpacity>
                 )}

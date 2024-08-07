@@ -5,11 +5,12 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react
 import { useMMKVObject } from 'react-native-mmkv'
 
 const Logs = () => {
-    const [logs, setLogs] = useMMKVObject(Global.Logs)
+    const [logs, setLogs] = useMMKVObject<Array<string>>(Global.Logs)
 
-    const logitems = logs.reverse().map((item, index) => ({ entry: item, key: index }))
+    const logitems = logs?.reverse().map((item, index) => ({ entry: item, key: index })) ?? []
 
     const handleExportLogs = () => {
+        if (!logs) return
         const data = logs.join('\n')
         saveStringExternal('logs.txt', data, 'text/plain')
     }
@@ -56,7 +57,7 @@ const Logs = () => {
                 inverted
                 windowSize={3}
                 data={logitems}
-                keyExtractor={(item) => item.key}
+                keyExtractor={(item) => `${item.key}`}
                 renderItem={({ item, index }) => <Text style={styles.entry}>{item.entry}</Text>}
             />
         </View>

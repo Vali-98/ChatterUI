@@ -9,27 +9,35 @@ import { View, SafeAreaView, TouchableOpacity, StyleSheet, Alert, ScrollView } f
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { useAutosave } from 'react-autosave'
+import { InstructType } from '@constants/Instructs'
+
+type InstructListItem = {
+    label: string
+    value: number
+}
 
 const Instruct = () => {
     const [instructName, setInstructName] = useMMKVString(Global.InstructName)
-    const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
-    const [instructList, setInstructList] = useState([])
-    const [selectedItem, setSelectedItem] = useState(null)
-    const [showNewInstruct, setShowNewInstruct] = useState(false)
+    const [currentInstruct, setCurrentInstruct] = useMMKVObject<InstructType>(
+        Global.CurrentInstruct
+    )
+    const [instructList, setInstructList] = useState<Array<InstructListItem>>([])
+    const [selectedItem, setSelectedItem] = useState<InstructListItem | undefined>(undefined)
+    const [showNewInstruct, setShowNewInstruct] = useState<boolean>(false)
 
-    const loadInstructList = (name) => {
+    const loadInstructList = (name: string = '') => {
         Instructs.getFileList().then((list) => {
-            const mainlist = list.map((item, index) => {
+            const mainlist = list.map((item, index): InstructListItem => {
                 return { label: item.replace(`.json`, ''), value: index }
             })
             setInstructList(mainlist)
             for (const item of mainlist) {
                 if (item.label.replace(`.json`, '') === name) {
-                    setSelectedItem(item.value)
+                    setSelectedItem(item)
                     return
                 }
             }
-            setSelectedItem(0)
+            setSelectedItem(undefined)
             Instructs.loadFile(list[0].replace(`.json`, '')).then((instruct) => {
                 setCurrentInstruct(JSON.parse(instruct))
             })
@@ -37,11 +45,14 @@ const Instruct = () => {
     }
 
     useEffect(() => {
-        loadInstructList(instructName)
+        if (instructName) loadInstructList(instructName)
     }, [])
 
-    handleSaveInstruct = (log) => {
-        Instructs.saveFile(instructName, currentInstruct).then(Logger.log(`Instruct Updated!`, log))
+    const handleSaveInstruct = (log: boolean) => {
+        if (currentInstruct && instructName)
+            Instructs.saveFile(instructName, currentInstruct).then(() =>
+                Logger.log(`Instruct Updated!`, log)
+            )
     }
 
     useAutosave({ data: currentInstruct, onSave: () => handleSaveInstruct(false), interval: 3000 })
@@ -62,6 +73,7 @@ const Instruct = () => {
                         Logger.log(`Preset name already exists.`, true)
                         return
                     }
+                    if (!currentInstruct) return
 
                     Instructs.saveFile(text, { ...currentInstruct, name: text }).then(() => {
                         Logger.log(`Preset created.`, true)
@@ -73,7 +85,7 @@ const Instruct = () => {
 
             <View style={styles.dropdownContainer}>
                 <Dropdown
-                    value={selectedItem}
+                    value={selectedItem ?? ''}
                     style={styles.dropdownbox}
                     data={instructList}
                     selectedTextStyle={styles.selected}
@@ -112,6 +124,7 @@ const Instruct = () => {
                                     text: `Confirm`,
                                     style: `destructive`,
                                     onPress: () => {
+                                        if (!instructName) return
                                         Instructs.deleteFile(instructName).then(() => {
                                             loadInstructList()
                                         })
@@ -143,7 +156,8 @@ const Instruct = () => {
                 <TouchableOpacity
                     style={styles.button}
                     onPress={async () => {
-                        saveStringExternal(instructName, JSON.stringify(currentInstruct))
+                        if (instructName)
+                            saveStringExternal(instructName, JSON.stringify(currentInstruct))
                     }}>
                     <FontAwesome size={24} name="download" color={Color.Button} />
                 </TouchableOpacity>

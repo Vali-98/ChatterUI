@@ -18,40 +18,43 @@ import {
 import { useMMKVString, useMMKVObject } from 'react-native-mmkv'
 
 import { useAutosave } from 'react-autosave'
+import { CharacterCardV2 } from '@constants/Characters'
 
 const CharInfo = () => {
     const router = useRouter()
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
-    const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
-    const [characterCard, setCharacterCard] = useState({})
+    const [currentCard, setCurrentCard] = useMMKVObject<CharacterCardV2>(
+        Global.CurrentCharacterCard
+    )
+    const [characterCard, setCharacterCard] = useState<CharacterCardV2 | undefined>(undefined)
 
     const loadcard = () => {
         Characters.getCard(charName).then((data) => {
-            setCharacterCard(JSON.parse(data))
+            if (data) setCharacterCard(JSON.parse(data))
         })
     }
 
     const autosave = () => {
+        if (!characterCard) return
         Logger.log(`Autosaved Card ${charName}`)
         savecard()
     }
 
-    const savecard = async (data) => {
+    const savecard = async () => {
         return Characters.saveCard(charName, JSON.stringify(characterCard)).then(() => {
             setCurrentCard(characterCard)
         })
     }
 
-    if (characterCard)
-        useAutosave({
-            data: characterCard,
-            onSave: autosave,
-            interval: 3000,
-        })
-
     useEffect(() => {
         loadcard()
     }, [])
+
+    useAutosave({
+        data: characterCard,
+        onSave: autosave,
+        interval: 3000,
+    })
 
     const deleteCard = () => {
         Alert.alert(
@@ -95,88 +98,85 @@ const CharInfo = () => {
                     ),
                 }}
             />
+            {characterCard && (
+                <ScrollView>
+                    <View style={styles.characterHeader}>
+                        <Image
+                            source={{ uri: Characters.getImageDir(charName) }}
+                            style={styles.avatar}
+                        />
 
-            <ScrollView>
-                <View style={styles.characterHeader}>
-                    <Image
-                        source={{ uri: Characters.getImageDir(charName) }}
-                        style={styles.avatar}
-                    />
-
-                    <View style={styles.characterHeaderInfo}>
-                        <Text style={{ fontSize: 20, marginBottom: 12, color: Color.Text }}>
-                            {charName}
-                        </Text>
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity
-                                style={styles.foregroundButton}
-                                onPress={() => {
-                                    DocumentPicker.getDocumentAsync({
-                                        copyToCacheDirectory: true,
-                                        type: 'image/*',
-                                    }).then((result) => {
-                                        if (result.canceled) return
-                                        Characters.copyImage(result.assets[0].uri, charName)
-                                    })
-                                }}>
-                                <FontAwesome name="upload" size={20} color={Color.Button} />
-                            </TouchableOpacity>
+                        <View style={styles.characterHeaderInfo}>
+                            <Text style={{ fontSize: 20, marginBottom: 12, color: Color.Text }}>
+                                {charName}
+                            </Text>
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity
+                                    style={styles.foregroundButton}
+                                    onPress={() => {
+                                        DocumentPicker.getDocumentAsync({
+                                            copyToCacheDirectory: true,
+                                            type: 'image/*',
+                                        }).then((result: DocumentPicker.DocumentPickerResult) => {
+                                            if (result.canceled) return
+                                            Characters.copyImage(
+                                                result.assets[0].uri,
+                                                charName ?? ''
+                                            )
+                                        })
+                                    }}>
+                                    <FontAwesome name="upload" size={20} color={Color.Button} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
-                </View>
 
-                <Text style={styles.boxText}>
-                    Description Tokens:{' '}
-                    {(characterCard?.description ?? characterCard?.data?.description) !==
-                        undefined &&
-                        llamaTokenizer.encode(
-                            characterCard?.description ?? characterCard.data.description
-                        ).length}
-                </Text>
+                    <Text style={styles.boxText}>
+                        Description Tokens:{' '}
+                        {/*characterCard?.data?.description !== undefined &&
+                        llamaTokenizer.encode(characterCard.data.description).length*/}
+                    </Text>
 
-                <ScrollView style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        multiline
-                        onChangeText={(mes) => {
-                            if (
-                                characterCard.spec !== undefined &&
-                                characterCard.spec === 'chara_card_v2'
-                            )
-                                setCharacterCard({
-                                    ...characterCard,
-                                    description: mes,
-                                    data: { ...characterCard.data, description: mes },
-                                })
-                            else setCharacterCard({ ...characterCard, description: mes })
-                        }}
-                        value={characterCard?.data?.description ?? characterCard?.description}
-                        numberOfLines={8}
-                    />
+                    <ScrollView style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            multiline
+                            onChangeText={(mes) => {
+                                if (
+                                    characterCard?.spec !== undefined &&
+                                    characterCard?.spec === 'chara_card_v2'
+                                )
+                                    setCharacterCard({
+                                        ...characterCard,
+                                        data: { ...characterCard.data, description: mes },
+                                    })
+                            }}
+                            value={characterCard?.data?.description}
+                            numberOfLines={8}
+                        />
+                    </ScrollView>
+
+                    <Text style={styles.boxText}>First Message</Text>
+                    <ScrollView style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            multiline
+                            onChangeText={(mes) => {
+                                if (
+                                    characterCard?.spec !== undefined &&
+                                    characterCard?.spec === 'chara_card_v2'
+                                )
+                                    setCharacterCard({
+                                        ...characterCard,
+                                        data: { ...characterCard.data, first_mes: mes },
+                                    })
+                            }}
+                            value={characterCard?.data?.first_mes}
+                            numberOfLines={8}
+                        />
+                    </ScrollView>
                 </ScrollView>
-
-                <Text style={styles.boxText}>First Message</Text>
-                <ScrollView style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        multiline
-                        onChangeText={(mes) => {
-                            if (
-                                characterCard.spec !== undefined &&
-                                characterCard.spec === 'chara_card_v2'
-                            )
-                                setCharacterCard({
-                                    ...characterCard,
-                                    first_mes: mes,
-                                    data: { ...characterCard.data, first_mes: mes },
-                                })
-                            else setCharacterCard({ ...characterCard, first_mes: mes })
-                        }}
-                        value={characterCard?.data?.first_mes ?? characterCard?.first_mes}
-                        numberOfLines={8}
-                    />
-                </ScrollView>
-            </ScrollView>
+            )}
         </SafeAreaView>
     )
 }

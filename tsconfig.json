@@ -22,7 +22,7 @@
         "expo-env.d.ts",
         "app/test.jsx",
         "app/deprecated",
-        "app/_layout.js",
+        "app/_layout.tsx",
         "app/LorebookInfo/BookInfojs",
     ],
 }

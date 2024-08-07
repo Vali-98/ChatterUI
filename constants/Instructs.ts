@@ -9,7 +9,7 @@ export namespace Instructs {
         })
     }
 
-    export const saveFile = async (name: string, preset: object) => {
+    export const saveFile = async (name: string, preset: InstructType) => {
         return FS.writeAsStringAsync(
             `${FS.documentDirectory}instruct/${name}.json`,
             JSON.stringify(preset),
@@ -56,7 +56,7 @@ export namespace Instructs {
         })
     }
 
-    export const defaultInstruct = (): Instruct => {
+    export const defaultInstruct = (): InstructType => {
         return {
             system_prompt:
                 "Write {{char}}'s next reply in a roleplay chat between {{char}} and {{user}}.",
@@ -78,7 +78,7 @@ export namespace Instructs {
     }
 }
 
-export type Instruct = {
+export type InstructType = {
     system_prompt: string
     input_sequence: string
     output_sequence: string
