@@ -1,13 +1,13 @@
 import { db as database } from '@db'
 import { chatEntries, chatSwipes, chats } from 'db/schema'
 import { eq } from 'drizzle-orm'
-import * as FS from 'expo-file-system'
 import { create } from 'zustand'
 
 import { Characters } from './Characters'
 import { AppSettings, Global } from './GlobalValues'
 import { Logger } from './Logger'
 import { RecentMessages } from './RecentMessages'
+import { convertToFormatInstruct } from './TextFormat'
 import { Llama3Tokenizer } from './Tokenizer/tokenizer'
 import { replaceMacros } from './Utils'
 import { mmkv } from './mmkv'
@@ -317,10 +317,10 @@ export namespace Chats {
             }
         }
         export namespace mutate {
+            //TODO : refactor this, the requirement to pull charID is not needed, no error handling either
             export const createChat = async (charId: number) => {
                 const card = { ...Characters.useCharacterCard.getState().card }
                 const charName = card?.data?.name
-
                 return await database.transaction(async (tx) => {
                     if (!card.data || !charName) return
                     const [{ chatId }, ..._] = await tx
@@ -345,13 +345,13 @@ export namespace Chats {
 
                     await tx.insert(chatSwipes).values({
                         entry_id: entryId,
-                        swipe: replaceMacros(card.data.first_mes),
+                        swipe: convertToFormatInstruct(replaceMacros(card.data.first_mes)),
                     })
 
                     card.data.alternate_greetings.forEach(async (data) => {
                         await tx.insert(chatSwipes).values({
                             entry_id: entryId,
-                            swipe: replaceMacros(data),
+                            swipe: convertToFormatInstruct(replaceMacros(data)),
                         })
                     })
 

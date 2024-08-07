@@ -1,14 +1,24 @@
 import AnimatedView from '@components/AnimatedView'
 import CheckboxTitle from '@components/CheckboxTitle'
+import SliderItem from '@components/SliderItem'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
 import { InstructListItem } from '@constants/Instructs'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Instructs, saveStringExternal, Logger, Style } from '@globals'
+import Slider from '@react-native-community/slider'
 import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
 import { useAutosave } from 'react-autosave'
-import { View, SafeAreaView, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native'
+import {
+    View,
+    SafeAreaView,
+    TouchableOpacity,
+    StyleSheet,
+    Alert,
+    ScrollView,
+    Text,
+} from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVNumber } from 'react-native-mmkv'
 
@@ -240,7 +250,6 @@ const Instruct = () => {
                                 setValue={setCurrentInstruct}
                                 multiline
                             />
-
                             <View style={{ flexDirection: 'row' }}>
                                 <TextBox
                                     name="System Prefix"
@@ -257,7 +266,6 @@ const Instruct = () => {
                                     multiline
                                 />
                             </View>
-
                             <View style={{ flexDirection: 'row' }}>
                                 <TextBox
                                     name="Input Prefix"
@@ -308,7 +316,6 @@ const Instruct = () => {
                                 />
                             </View>
                             */}
-
                             <View style={{ flexDirection: 'row' }}>
                                 <TextBox
                                     name="Stop Sequence"
@@ -325,14 +332,12 @@ const Instruct = () => {
                                     multiline
                                 />*/}
                             </View>
-
                             <CheckboxTitle
                                 name="Wrap Sequence with Newline"
                                 varname="wrap"
                                 body={currentInstruct}
                                 setValue={setCurrentInstruct}
                             />
-
                             {/* @TODO: Macros are always replaced - people may want this to be changed
                             <CheckboxTitle
                                 name="Replace Macro In Sequences"
@@ -341,14 +346,12 @@ const Instruct = () => {
                                 setValue={setCurrentInstruct}
                             />
                             */}
-
                             <CheckboxTitle
                                 name="Include Names"
                                 varname="names"
                                 body={currentInstruct}
                                 setValue={setCurrentInstruct}
                             />
-
                             {/*  Groups are not implemented - leftover from ST
                             <CheckboxTitle
                                 name="Force for Groups and Personas"
@@ -357,7 +360,6 @@ const Instruct = () => {
                                 setValue={setCurrentInstruct}
                             />
                             */}
-
                             {/* Activates Instruct when model is loaded with specific name that matches regex
                     
                             <TextBox
@@ -366,7 +368,6 @@ const Instruct = () => {
                                 body={currentInstruct}
                                 setValue={setCurrentInstruct}
                             />*/}
-
                             {/*    User Alignment Messages may be needed in future, might be removed on CCv3
                             <TextBox
                                 name="User Alignment"
@@ -375,20 +376,38 @@ const Instruct = () => {
                                 setValue={setCurrentInstruct}
                                 multiline
                             />*/}
-
                             <CheckboxTitle
                                 name="Use Examples"
                                 varname="examples"
                                 body={currentInstruct}
                                 setValue={setCurrentInstruct}
                             />
-
                             <CheckboxTitle
                                 name="Add Timestamp"
                                 varname="timestamp"
                                 body={currentInstruct}
                                 setValue={setCurrentInstruct}
                             />
+                            <SliderItem
+                                name="Autoformat New Chats"
+                                varname="format_type"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                min={0}
+                                max={3}
+                                step={1}
+                                showInput={false}
+                            />
+                            <Text style={{ color: Style.getColor('primary-text2') }}>
+                                Mode: {currentInstruct.format_type} -
+                                {' ' +
+                                    [
+                                        'Autoformatting Disabled',
+                                        'Plain Action, Quote Speech',
+                                        'Asterisk Action, Plain Speech',
+                                        'Asterisk Action, Quote Speech',
+                                    ][currentInstruct.format_type]}
+                            </Text>
                         </View>
                     </ScrollView>
                 </SafeAreaView>

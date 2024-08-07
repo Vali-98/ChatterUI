@@ -36,11 +36,11 @@ type Rule = {
 export const replaceMacros = (text: string) => {
     if (text === undefined) return ''
     let newtext: string = text
-    const charName = Characters.useCharacterCard.getState().card?.data.name
-    const userName = Characters.useUserCard.getState().card?.data.name
+    const charName = Characters.useCharacterCard.getState().card?.data.name ?? ''
+    const userName = Characters.useUserCard.getState().card?.data.name ?? ''
     const rules: Rule[] = [
-        { macro: '{{user}}', value: userName ?? '' },
-        { macro: '{{char}}', value: charName ?? '' },
+        { macro: '{{user}}', value: userName },
+        { macro: '{{char}}', value: charName },
     ]
     for (const rule of rules) newtext = newtext.replaceAll(rule.macro, rule.value)
     return newtext
