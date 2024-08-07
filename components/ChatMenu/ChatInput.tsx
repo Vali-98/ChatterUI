@@ -1,19 +1,20 @@
 import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
-import { Characters, Chats, Global, Logger, Style } from '@globals'
+import { Characters, Chats, Logger, Style } from '@globals'
 import { useShallow } from 'zustand/react/shallow'
 import { MaterialIcons } from '@expo/vector-icons'
-import { generateResponse } from '@constants/Inference'
-import { useMMKVString } from 'react-native-mmkv'
+import { generateResponse, useInference } from '@constants/Inference'
 
 const ChatInput = () => {
-    const { insertEntry, nowGenerating, abortFunction } = Chats.useChat(
-        useShallow((state) => ({
-            insertEntry: state.addEntry,
-            nowGenerating: state.nowGenerating,
-            abortFunction: state.abortFunction,
-        }))
-    )
+    const { insertEntry } = Chats.useChat((state) => ({
+        insertEntry: state.addEntry,
+    }))
+
+    const { abortFunction, nowGenerating } = useInference((state) => ({
+        abortFunction: state.abortFunction,
+
+        nowGenerating: state.nowGenerating,
+    }))
 
     const { charName } = Characters.useCharacterCard(
         useShallow((state) => ({
@@ -29,7 +30,8 @@ const ChatInput = () => {
 
     const abortResponse = async () => {
         Logger.log(`Aborting Generation`)
-        if (abortFunction !== undefined) abortFunction()
+        const abortFunction = useInference.getState().abortFunction
+        if (abortFunction) abortFunction()
     }
 
     const handleSend = async () => {

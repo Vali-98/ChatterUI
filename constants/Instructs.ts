@@ -179,9 +179,9 @@ export type InstructType = {
     output_prefix: string
     output_suffix: string
     stop_sequence: string
-    user_alignment_message: string
     activation_regex: string
 
+    user_alignment_message: string
     wrap: boolean
     macro: boolean
     names: boolean

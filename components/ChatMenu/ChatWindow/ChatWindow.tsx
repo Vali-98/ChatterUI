@@ -4,6 +4,7 @@ import { Characters, Chats, Global } from '@globals'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 import { useEffect, useRef } from 'react'
 import { useShallow } from 'zustand/react/shallow'
+import { useInference } from '@constants/Chat'
 
 type ListItem = {
     index: number
@@ -11,11 +12,8 @@ type ListItem = {
 }
 
 const ChatWindow = () => {
-    const { nowGenerating } = Chats.useChat(
-        useShallow((state) => ({
-            nowGenerating: state.nowGenerating,
-        }))
-    )
+    const nowGenerating = useInference((state) => state.nowGenerating)
+
     const charId = Characters.useCharacterCard(useShallow((state) => state?.id))
 
     const { userName } = Characters.useUserCard((state) => ({ userName: state.card?.data.name }))

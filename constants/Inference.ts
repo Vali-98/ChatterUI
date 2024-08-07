@@ -1,4 +1,4 @@
-import { Chats } from '@constants/Chat'
+import { Chats, useInference } from '@constants/Chat'
 import { InstructType, Instructs } from '@constants/Instructs'
 import { replaceMacros } from '@constants/Utils'
 import { LlamaTokenizer } from './tokenizer'
@@ -15,13 +15,13 @@ import { Characters } from './Characters'
 
 export const regenerateResponse = async () => {
     const charName = Characters.useCharacterCard.getState().card?.data.name
-    const messageName = Chats.useChat.getState()?.data?.messages?.at(-1)?.name ?? ''
     const messagesLength = Chats.useChat.getState()?.data?.messages?.length ?? -1
+    const message = Chats.useChat.getState()?.data?.messages?.[messagesLength]
+
     Logger.log('Regenerate Response')
-    if (messageName == charName && messagesLength && messagesLength !== 1) {
-        await Chats.useChat.getState().deleteEntry(messagesLength - 1)
-    }
-    await Chats.useChat.getState().addEntry(charName ?? '', false, '')
+    if (!message?.is_user && messagesLength && messagesLength !== 1) {
+        await Chats.useChat.getState().updateEntry(messagesLength - 1, '', true, true)
+    } else await Chats.useChat.getState().addEntry(charName ?? '', true, '')
     generateResponse()
 }
 
@@ -32,13 +32,17 @@ export const continueResponse = () => {
 }
 
 export const generateResponse = async () => {
-    if (Chats.useChat.getState().nowGenerating) {
+    console.log('Nowgen is ', useInference.getState().nowGenerating)
+    if (useInference.getState().nowGenerating) {
         Logger.log('Generation already in progress', true)
         return
     }
     Chats.useChat.getState().startGenerating()
-    const setAbortFunction = Chats.useChat.getState().setAbortFunction
+
+    console.log('Nowgen is ', useInference.getState().nowGenerating)
     Logger.log(`Obtaining response.`)
+    const data = performance.now()
+    const setAbortFunction = useInference.getState().setAbort
     const APIType = getString(Global.APIType)
     try {
         switch (APIType) {
@@ -74,6 +78,7 @@ export const generateResponse = async () => {
         Logger.log(`Something went wrong: ${error}`, true)
         stopGenerating()
     }
+    Logger.debug(`Time taken for generateResponse(): ${(performance.now() - data).toFixed(2)}ms`)
 }
 
 type AbortFunction = (fn: () => void) => void
@@ -551,7 +556,7 @@ const KAIresponse = async (setAbortFunction: AbortFunction) => {
                 .create({ timeout: 1000 })
                 .post(new URL('/api/extra/abort', endpoint).toString())
                 .catch(() => {
-                    Logger.log(`Abort Failed`, true)
+                    Logger.log(`Abort signal failed`)
                 })
         }
     )
@@ -815,12 +820,14 @@ const readableStreamResponse = async (
     })
 
     const closeStream = () => {
+        Logger.debug('Running close stream')
         stopGenerating()
         es.removeAllEventListeners()
         es.close()
     }
 
-    setAbortFunction(() => {
+    useInference.getState().setAbort(async () => {
+        Logger.debug('Running abort')
         closeStream()
         abort_func()
     })
@@ -847,3 +854,4 @@ const readableStreamResponse = async (
         Logger.log('EventSource closed')
     })
 }
+export { useInference }

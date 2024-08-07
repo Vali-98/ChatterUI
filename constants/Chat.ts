@@ -94,7 +94,12 @@ export interface ChatState {
     delete: (chatId: number) => Promise<void>
     //save: () => Promise<void>
     addEntry: (name: string, is_user: boolean, message: string) => Promise<void>
-    updateEntry: (index: number, message: string, updateTime?: boolean) => Promise<void>
+    updateEntry: (
+        index: number,
+        message: string,
+        updateTime?: boolean,
+        resetTime?: boolean
+    ) => Promise<void>
     deleteEntry: (index: number) => Promise<void>
     reset: () => void
     swipe: (index: number, direction: number) => Promise<boolean>
@@ -104,25 +109,42 @@ export interface ChatState {
     insertBuffer: (data: string) => void
     updateFromBuffer: () => Promise<void>
     insertLastToBuffer: () => void
-    nowGenerating: boolean
     stopGenerating: () => void
     startGenerating: () => void
     abortFunction: undefined | AbortFunction
     setAbortFunction: SetAbortFunction
 }
 
+type AbortFunctionType = {
+    abortFunction?: () => void
+    nowGenerating: boolean
+    startGenerating: () => void
+    stopGenerating: () => void
+    setAbort: (fn: () => void) => void
+}
+
+export const useInference = create<AbortFunctionType>((set) => ({
+    abortFunction: undefined,
+    nowGenerating: false,
+    startGenerating: () => set((state) => ({ ...state, nowGenerating: true })),
+    stopGenerating: () => set((state) => ({ ...state, nowGenerating: false })),
+    setAbort: (fn) => {
+        Logger.debug('Setting abort function')
+        set((state) => ({ ...state, abortFunction: fn }))
+    },
+}))
+
 export namespace Chats {
-    export namespace database {}
+    export namespace Database {}
 
     export const useChat = create<ChatState>((set, get: () => ChatState) => ({
         data: undefined,
         buffer: '',
-        nowGenerating: false,
         startGenerating: () => {
-            get().nowGenerating = true
+            useInference.getState().startGenerating()
         },
         stopGenerating: async () => {
-            get().nowGenerating = false
+            useInference.getState().stopGenerating()
             Logger.log(`Saving Chat`)
             await get().updateFromBuffer()
             get().setBuffer('')
@@ -133,7 +155,7 @@ export namespace Chats {
             }
         },
         abortFunction: undefined,
-        setAbortFunction: (fn) => set((state) => ({ ...state, abortFunction: fn })),
+        setAbortFunction: (fn) => (get().abortFunction = fn),
         load: async (chatId: number) => {
             let start = performance.now()
             const data = await readChat(chatId)
@@ -193,15 +215,21 @@ export namespace Chats {
             }))
         },
 
-        updateEntry: async (index: number, message: string, updateTime = true) => {
+        updateEntry: async (
+            index: number,
+            message: string,
+            updateFinished: boolean = true,
+            updateStarted: boolean = false
+        ) => {
             const messages = get()?.data?.messages
             if (!messages) return
             const chatSwipeId = messages[index]?.swipes[messages[index].swipe_id].id
             if (!chatSwipeId) return
-            const date = await updateChatSwipe(chatSwipeId, message)
+            const date = await updateChatSwipe(chatSwipeId, message, updateStarted, updateFinished)
             messages[index].swipes[messages[index].swipe_id].swipe = message
             messages[index].swipes[messages[index].swipe_id].token_count = undefined
-            if (updateTime) messages[index].swipes[messages[index].swipe_id].gen_finished = date
+            if (updateFinished) messages[index].swipes[messages[index].swipe_id].gen_finished = date
+            if (updateStarted) messages[index].swipes[messages[index].swipe_id].gen_started = date
             set((state) => ({
                 ...state,
                 data: state?.data ? { ...state.data, messages: messages } : state.data,
@@ -395,12 +423,23 @@ export namespace Chats {
         await db.update(chatEntries).set({ swipe_id: swipeId }).where(eq(chatEntries.id, entryId))
     }
 
-    export const updateChatSwipe = async (chatSwipeId: number, message: string) => {
+    export const updateChatSwipe = async (
+        chatSwipeId: number,
+        message: string,
+        updateStarted: boolean,
+        updateFinished: boolean
+    ) => {
         const date = new Date()
-        await db
-            .update(chatSwipes)
-            .set({ swipe: message, gen_finished: date })
-            .where(eq(chatSwipes.id, chatSwipeId))
+        type UpdatedEntry = {
+            swipe: string
+            gen_started?: Date
+            gen_finished?: Date
+        }
+
+        const data: UpdatedEntry = { swipe: message }
+        if (updateStarted) data.gen_started = date
+        if (updateFinished) data.gen_finished = date
+        await db.update(chatSwipes).set(data).where(eq(chatSwipes.id, chatSwipeId))
         return date
     }
 
