@@ -46,8 +46,10 @@ class LocalAPI extends APIBase {
             const params = this.getObject(Global.LocalPreset)
             if (model && params) await Llama.loadModel(model, params)
         }
+
         if (!Llama.isModelLoaded()) {
-            Logger.log('No Model Loaded', true)
+            this.stopGenerating()
+            return
         }
 
         const loadKV =
