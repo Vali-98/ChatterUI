@@ -37,7 +37,8 @@ const detectFormat = (input: string): Formats => {
                     !asteriskMatches ||
                     (asteriskMatches && !asteriskMatches[0].includes(quoteMatch))
                 ) {
-                    if (quoteMatch.replace(/"/g, '').split(' ').length > 1) {
+                    const clean = quoteMatch.replace(/"/g, '')
+                    if (clean.split(' ').length > 1 || /[.!?]$/.test(clean)) {
                         return Formats.AsteriskActionQuoteSpeech
                     }
                 }
@@ -53,9 +54,11 @@ const destructString = (input: string, format: Formats): TextData[] => {
 
     switch (format) {
         case Formats.PlainActionQuoteSpeech: {
-            const parts = input.split(/(".*?")/).filter(Boolean)
+            const parts = input.split(/(".*?"|\n+)/g).filter(Boolean)
             for (const part of parts) {
-                if (part.startsWith('"') && part.endsWith('"')) {
+                if (!part.trim()) {
+                    textData.push({ type: 'none', content: part })
+                } else if (part.startsWith('"') && part.endsWith('"')) {
                     const clean = part.replaceAll('"', '')
                     const cleanarr = clean.split(' ')
                     if (cleanarr.length > 1 || /[.!?]$/.test(clean))
@@ -75,7 +78,7 @@ const destructString = (input: string, format: Formats): TextData[] => {
                         type: part.includes('*') ? 'action' : 'speech',
                         content: part.replace(/\*/g, '').trim(),
                     })
-                } else {
+                } else if (part.includes('\n')) {
                     textData.push({
                         type: 'none',
                         content: part,
@@ -86,12 +89,13 @@ const destructString = (input: string, format: Formats): TextData[] => {
         }
         case Formats.AsteriskActionQuoteSpeech: {
             const parts = input.split(/(\*.*?\*|"[^"]*")/).filter(Boolean)
+
             for (const part of parts) {
                 if (part.startsWith('*') && part.endsWith('*')) {
                     textData.push({ type: 'action', content: part.slice(1, -1).trim() })
                 } else if (part.startsWith('"') && part.endsWith('"')) {
                     textData.push({ type: 'speech', content: part.slice(1, -1).trim() })
-                } else {
+                } else if (part.includes('\n')) {
                     textData.push({ type: 'none', content: part })
                 }
             }
