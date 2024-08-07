@@ -7,4 +7,5 @@ export const enum API {
     APHRODITE = 'aphrodite',
     COMPLETIONS = 'completions',
     LOCAL = 'local',
+    OPENROUTER = 'openrouter',
 }

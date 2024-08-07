@@ -3,11 +3,9 @@ import { Color, Global } from '@globals'
 import { useEffect, useState } from 'react'
 import { Llama } from '@constants/llama'
 import { Dropdown } from 'react-native-element-dropdown'
-import { FontAwesome } from '@expo/vector-icons'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { ActivityIndicator } from 'react-native'
 import { SliderItem } from '..'
-import { getDocumentAsync } from 'expo-document-picker'
 
 const Local = () => {
   
@@ -29,7 +27,8 @@ const Local = () => {
 
 	const handleLoad = async () => {
 		setModelLoading(true)
-		await Llama.loadModel(currentModel, preset).then(() => {
+		await Llama.loadModel(currentModel, preset)
+		.then(() => {
 			setLoadedModel(Llama.getModelname())
 		})
 		setModelLoading(false)
@@ -174,7 +173,7 @@ const Local = () => {
 			step={1}
 		/>
 
-		{/*
+		{
 		// RNLlama does not support Android GPUs yet, modify when ready
 		<SliderItem
 			name='GPU Layers'
@@ -184,7 +183,7 @@ const Local = () => {
 			min={0}
 			max={100}
 			step={1}
-		/>*/}
+		/>}
 		</View>
 		
     </View>

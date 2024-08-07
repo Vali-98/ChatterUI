@@ -62,4 +62,7 @@ export const enum Global {
     LocalModel = 'localmodel',
     LocalModelWeights = 'localdata',
     LocalPreset = 'localpreset',
+
+    OpenRouterModel = 'openroutermodel',
+    OpenRouterKey = 'openrouterkey'
 }

@@ -6,7 +6,6 @@ import DocumentPicker from 'react-native-document-picker'
 import { mmkv } from './mmkv';
 import { Global } from './GlobalValues';
 
-
 export namespace Llama {
     
     const model_dir = `${FS.documentDirectory}models/`
@@ -28,12 +27,6 @@ export namespace Llama {
             ToastAndroid.show('Model Already Loaded!', 2000)
             return
         }
-
-        if(llamaContext != undefined){
-            console.log('Unloading current model')
-            await llamaContext?.release()
-            modelname = ''
-        }
         
         if(! (await modelExists(name))) {
             console.log('Model does not exist!')
@@ -41,7 +34,12 @@ export namespace Llama {
             return
         }
        
-        let error = false
+        if(llamaContext != undefined){
+            console.log('Unloading current model')
+            await llamaContext?.release()
+            modelname = ''
+        }
+        
         ToastAndroid.show(`Loading Model: ${name}`, 2000)
         console.log(`Loading Model: ${name}`)
         const dir = `${model_dir}${name}`
