@@ -1,6 +1,6 @@
 import { Style } from './Style'
 import React from 'react'
-import { Text } from 'react-native'
+import { Platform, Text } from 'react-native'
 import SimpleMarkdown from 'simple-markdown'
 
 export namespace MarkdownStyle {
@@ -42,25 +42,77 @@ export namespace MarkdownStyle {
         text: {
             color: Style.getColor('primary-text1'),
         },
+
+        //List
         list: {
             //color: Style.getColor('primary-text1'),
             flex: 1,
             paddingBottom: 8,
         },
-        inlineCode: {
-            color: Style.getColor('primary-text2'),
-            backgroundColor: Style.getColor('primary-surface2'),
-            padding: 16,
-            borderRadius: 4,
-        },
         listItemText: {
             color: Style.getColor('primary-text2'),
         },
         listItemBullet: {
-            color: Style.getColor('primary-text2'),
+            color: Style.getColor('primary-text3'),
         },
         listItemNumber: {
+            color: Style.getColor('primary-text3'),
+        },
+
+        inlineCode: {
+            fontFamily: Platform.OS === 'ios' ? 'Courier' : 'Monospace',
+            color: Style.getColor('primary-text3'),
+            backgroundColor: Style.getColor('primary-surface2'),
+            borderColor: Style.getColor('primary-brand'),
+            paddingHorizontal: 8,
+            paddingVertical: 4,
+            borderWidth: 1,
+            borderRadius: 4,
+        },
+        // CODE
+        codeBlock: {
+            fontFamily: Platform.OS === 'ios' ? 'Courier' : 'Monospace',
+            backgroundColor: Style.getColor('primary-surface2'),
             color: Style.getColor('primary-text2'),
+            borderColor: Style.getColor('primary-surface4'),
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            borderWidth: 1,
+            borderRadius: 8,
+        },
+        autolink: {
+            color: Style.getColor('primary-brand'),
+        },
+
+        // TABLES
+
+        table: {
+            borderWidth: 1,
+            borderColor: Style.getColor('primary-brand'),
+            borderRadius: 3,
+        },
+        tableHeader: {
+            backgroundColor: Style.getColor('primary-surface3'),
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+        },
+        tableHeaderCell: {
+            color: Style.getColor('primary-text1'),
+            fontWeight: 'bold',
+            padding: 5,
+        },
+        tableRow: {
+            borderBottomWidth: 1,
+            borderColor: Style.getColor('primary-surface4'),
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+        },
+        tableRowLast: {
+            borderColor: 'transparent',
+        },
+        tableRowCell: {
+            padding: 5,
+            flex: 1,
         },
     }
 }
