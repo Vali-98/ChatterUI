@@ -40,7 +40,8 @@ const ChatItem = ({ message, id, scroll}) => {
         )
         setPlaceholderText(messages.at(id + 1).mes)
     }, [message])
- 
+    
+    useEffect(() => {setPlaceholderText(message)}, [nowGenerating])
 
     useEffect(() => {
         Animated.parallel([
@@ -140,7 +141,7 @@ const ChatItem = ({ message, id, scroll}) => {
 
             {!editMode?
                 <TouchableOpacity style={styles.messageTextContainer} activeOpacity={0.7}
-                    onLongPress={() => setEditMode(true)}
+                    onLongPress={() => setEditMode(!nowGenerating)}
                 >
                     <Markdown
                         style={styles.messageText}

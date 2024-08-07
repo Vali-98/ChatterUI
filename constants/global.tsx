@@ -3,6 +3,7 @@ import { createContext } from 'react'
 import { ToastAndroid, StyleSheet } from 'react-native'
 import * as Crypto from 'expo-crypto';
 import * as Application from 'expo-application'
+import * as SystemUI from 'expo-system-ui'
 
 import { Presets } from './Presets'
 import { Instructs } from './Instructs'
@@ -63,12 +64,6 @@ export const resetEncryption = (value = 0) => {
     mmkv.recrypt(Crypto.getRandomBytes(16).toString())
 }
 
-export const resetValues = () => {
-    mmkv.set(Global.CurrentCharacter, 'Welcome')
-    mmkv.set(Global.CurrentChat, '')
-    mmkv.set(Global.NowGenerating, false)
-}
-
 // Exports a string to external storage, supports json
 
 export const saveStringExternal = async (
@@ -108,6 +103,47 @@ export const generateDefaultDirectories = async () => {
 
 }
 
+export const startupApp = async () => {
+    mmkv.set(Global.CurrentCharacter, 'Welcome')
+    mmkv.set(Global.CurrentChat, '')
+    mmkv.set(Global.CurrentCharacterCard, JSON.stringify(`{}`))
+    mmkv.set(Global.NowGenerating, false)
+    mmkv.set(Global.HordeWorkers, JSON.stringify([]))
+    mmkv.set(Global.HordeModels, JSON.stringify([]))
+    console.log("Reset values")
+    SystemUI.setBackgroundColorAsync(Color.Background)
+}
+
+export const initializeApp = async () => {
+
+    await FS.readDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => generateDefaultDirectories().then(() => {
+        mmkv.set(Global.APIType, API.KAI)
+        Users.createUser('User').then(() => {
+            console.log(`Creating Default User`)
+            Users.loadFile('User').then(card => {
+                mmkv.set(Global.CurrentUser, 'User')
+                mmkv.set(Global.CurrentCharacterCard, card)
+               
+            })
+        })
+        mmkv.set(Global.PresetData, JSON.stringify(Presets.defaultPreset()))
+        Presets.saveFile('Default', Presets.defaultPreset())
+
+        Instructs.saveFile('Default', Instructs.defaultInstruct()).then(() => {
+            console.log(`Creating Default Instruct`)
+            //@ts-ignore
+            mmkv.set(Global.CurrentInstruct, JSON.stringify(Instructs.defaultInstruct()))
+            mmkv.set(Global.InstructName, 'Default')
+        })
+        
+    }).catch(
+        (error) => console.log(`Could not generate default folders. Reason: ${error}`)
+    ))
+
+    await migratePresets()
+    
+}
+
 
 // FORMATS
 
@@ -118,7 +154,7 @@ export const generateDefaultDirectories = async () => {
 // Migrate seperated presets from 0.4.2 to unified presets
 export const migratePresets = async () => {
        
-    FS.readDirectoryAsync(`${FS.documentDirectory}presets/kai`).then(async () => {
+    return FS.readDirectoryAsync(`${FS.documentDirectory}presets/kai`).then(async () => {
         // move all files
         // delete /kai /tgwui /novelai
         const dirs = ['/kai', '/tgwui', '/novelai']
