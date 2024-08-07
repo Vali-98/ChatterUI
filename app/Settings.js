@@ -54,6 +54,12 @@ const Settings = () => {
                 <TouchableOpacity style={styles.largeButton} onPress={() => router.push('Logs')}>
                     <Text style={styles.largeButtonText}>Logs</Text>
                 </TouchableOpacity>
+
+                {/*<TouchableOpacity
+                    style={styles.largeButton}
+                    onPress={() => router.push('LorebookMenu')}>
+                    <Text style={styles.largeButtonText}>Lorebooks</Text>
+                </TouchableOpacity> */}
             </View>
         </SafeAreaView>
     )

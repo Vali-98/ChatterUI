@@ -2,7 +2,7 @@ import CheckboxTitle from '@components/CheckboxTitle'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Color, Instructs, saveStringExternal, Logger } from '@globals'
+import { Global, Color, Instructs, saveStringExternal, Logger, useAutosave } from '@globals'
 import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
 import { View, SafeAreaView, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native'
@@ -38,6 +38,12 @@ const Instruct = () => {
     useEffect(() => {
         loadInstructList(instructName)
     }, [])
+
+    handleSaveInstruct = (log) => {
+        Instructs.saveFile(instructName, currentInstruct).then(Logger.log(`Instruct Updated!`, log))
+    }
+
+    useAutosave({ data: currentInstruct, onSave: () => handleSaveInstruct(false), interval: 3000 })
 
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -84,9 +90,7 @@ const Instruct = () => {
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => {
-                        Instructs.saveFile(instructName, currentInstruct).then(
-                            Logger.log(`Preset Updated!`, true)
-                        )
+                        handleSaveInstruct(true)
                     }}>
                     <FontAwesome size={24} name="save" color={Color.Button} />
                 </TouchableOpacity>
