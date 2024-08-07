@@ -108,7 +108,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
     }
 
     const handleContentSizeChange = (event: LayoutChangeEvent) => {
-        if (!isLastMessage) return
         const newheight = event.nativeEvent.layout.height
         const oveflowPadding = 12
         if (height.current === newheight) return
@@ -117,7 +116,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
     }
 
     useEffect(() => {
-        if (!nowGenerating && height) {
+        if (!nowGenerating && height.current !== -1) {
             handleAnimateHeight(height.current)
         } else if (nowGenerating && !mes) {
             // NOTE: this assumes that mes is empty due to a swipe and may break, but unlikely
