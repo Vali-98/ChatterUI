@@ -2,7 +2,7 @@ import * as Crypto from 'expo-crypto'
 import * as FS from 'expo-file-system'
 import * as Sharing from 'expo-sharing'
 import * as SystemUI from 'expo-system-ui'
-import { Platform, StyleSheet } from 'react-native'
+import { Platform } from 'react-native'
 
 import { API } from './API'
 import { Characters } from './Characters'
@@ -12,6 +12,7 @@ import { Instructs } from './Instructs'
 import { Logger } from './Logger'
 import { MarkdownStyle } from './Markdown'
 import { Presets } from './Presets'
+import { RecentEntry, RecentMessages } from './RecentMessages'
 import { Style } from './Style'
 import { Llama3Tokenizer } from './Tokenizer/tokenizer'
 import { humanizedISO8601DateTime } from './Utils'
@@ -33,8 +34,6 @@ export {
     MarkdownStyle,
     Llama3Tokenizer,
 }
-
-export const GlobalStyle = StyleSheet.create({})
 
 // GENERAL FUNCTIONS
 
@@ -68,6 +67,30 @@ export const saveStringExternal = async (
                 })
         }
     } else if (Platform.OS === 'ios') Sharing.shareAsync(filename)
+}
+
+const AppSettingsDefault: Record<AppSettings, boolean | number> = {
+    [AppSettings.AnimateEditor]: true,
+    [AppSettings.AutoLoadLocal]: false,
+    [AppSettings.AutoScroll]: true,
+    [AppSettings.ChatOnStartup]: false,
+    [AppSettings.CreateFirstMes]: true,
+    [AppSettings.DarkMode]: true,
+    [AppSettings.DevMode]: false,
+    [AppSettings.PrimaryHue]: 270,
+}
+
+const loadChatOnInit = async () => {
+    const entries: RecentEntry[] = JSON.parse(mmkv.getString(Global.RecentMessages) ?? '[]')
+    if (entries.length === 0) return
+    const entry = entries[0]
+    if (!(await Characters.exists(entry.charId)) || !(await Chats.exists(entry.chatId))) {
+        Logger.log('Character or Chat no longer exists', true)
+        RecentMessages.deleteEntry(entry.chatId)
+        return
+    }
+    await Characters.useCharacterCard.getState().setCard(entry.charId)
+    await Chats.useChat.getState().load(entry.chatId)
 }
 
 // runs every startup to clear some MMKV values
@@ -120,16 +143,28 @@ export const startupApp = () => {
     // Init step, APIType is never null
     if (mmkv.getString(Global.APIType) === undefined) mmkv.set(Global.APIType, API.KAI)
 
-    if (mmkv.getBoolean(AppSettings.AutoScroll) === undefined)
-        mmkv.set(AppSettings.AutoScroll, true)
-
-    if (mmkv.getBoolean(AppSettings.AnimateEditor) === undefined)
-        mmkv.set(AppSettings.AnimateEditor, true)
-
-    if (mmkv.getBoolean(AppSettings.CreateFirstMes) === undefined)
-        mmkv.set(AppSettings.CreateFirstMes, true)
+    Object.keys(AppSettingsDefault).map((item) => {
+        const data =
+            typeof AppSettingsDefault[item as AppSettings] === 'boolean'
+                ? mmkv.getBoolean(item)
+                : mmkv.getNumber(item)
+        if (data === undefined) mmkv.set(item, AppSettingsDefault[item as AppSettings])
+    })
     // Init step
     Llama.setLlamaPreset()
+
+    if (mmkv.getBoolean(AppSettings.ChatOnStartup)) {
+        loadChatOnInit()
+    }
+
+    if (mmkv.getBoolean(AppSettings.AutoLoadLocal)) {
+        const model = mmkv.getString(Global.LocalModel)
+        const api = mmkv.getString(Global.APIType)
+        if (model && api === API.LOCAL) {
+            Llama.loadModel(model)
+        }
+    }
+
     Logger.log('Resetting state values for startup.')
     SystemUI.setBackgroundColorAsync(Style.getColor('primary-surface1'))
 }
