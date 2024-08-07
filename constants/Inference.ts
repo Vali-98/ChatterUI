@@ -178,20 +178,20 @@ const buildContext = (max_length: number) => {
         index--
     }
 
-    const examples = Characters.useCharacterCard.getState()?.card?.data.mes_example
+    const examples = currentCard.data?.mes_example
     if (examples) {
         const examples_length = LlamaTokenizer.encode(examples).length
         if (message_acc_length + payload_length + examples_length < max_length) {
             payload += examples
+            message_acc_length += examples_length
         }
     }
 
     if (currentInstruct.system_suffix) payload += ' ' + currentInstruct.system_suffix
+    payload = replaceMacros(payload + message_acc)
 
-    payload += message_acc
-
-    payload = replaceMacros(payload)
-    Logger.log(`Payload size: ${LlamaTokenizer.encode(payload).length}`)
+    //Logger.log(`Payload size: ${LlamaTokenizer.encode(payload).length}`)
+    Logger.log(`Approximate Payload Size: ${message_acc_length + payload_length}`)
     Logger.log(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
     return payload
 }
