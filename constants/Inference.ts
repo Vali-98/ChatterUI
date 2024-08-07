@@ -703,7 +703,7 @@ const CompletionsResponseStream = async (setAbortFunction: AbortFunction) => {
         JSON.stringify(constructCompletionsPayload()),
         (item) => {
             const output = JSON.parse(item)
-            return output?.choices?.[0]?.text ?? output.content
+            return output?.choices?.[0]?.text ?? output?.content ?? ''
         },
         setAbortFunction,
         () => {},
@@ -825,6 +825,7 @@ const readableStreamResponse = async (
             es.close()
             return
         }
+        console.log(event.data)
         const text = jsonreader(event.data)
         const output = Chats.useChat.getState().buffer + text
         Chats.useChat.getState().setBuffer(output.replaceAll(replace, ''))
