@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     input: {
         color: Style.getColor('primary-text1'),
         backgroundColor: Style.getColor('primary-surface1'),
-        borderColor: Style.getColor('primary-brand'),
+        borderColor: Style.getColor('primary-surface4'),
         borderWidth: 1,
         paddingVertical: 4,
         paddingHorizontal: 8,

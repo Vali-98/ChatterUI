@@ -239,17 +239,15 @@ const speech = {
     },
     html: undefined,
 }
-const text = Style.getColor('primary-text1')
-const offtext = Style.getColor('primary-text2')
 const markdownFormat = {
     em: {
-        color: text,
+        color: Style.getColor('primary-text2'),
         fontStyle: 'italic',
     },
     text: {
-        color: offtext,
+        color: Style.getColor('primary-text1'),
     },
     list: {
-        color: offtext,
+        color: Style.getColor('primary-text1'),
     },
 }

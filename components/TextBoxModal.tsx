@@ -1,4 +1,4 @@
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
+import { FontAwesome } from '@expo/vector-icons'
 import { Style } from '@globals'
 import { useState, useEffect } from 'react'
 import {
@@ -76,25 +76,17 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
-                            style={styles.modalButton}
+                            style={styles.cancelButton}
                             onPress={() => setShowModal(false)}>
-                            <MaterialIcons
-                                name="close"
-                                size={28}
-                                color={Style.getColor('primary-text1')}
-                            />
+                            <Text style={{ color: Style.getColor('primary-text1') }}>Cancel</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={styles.modalButton}
+                            style={styles.confirmButton}
                             onPress={() => {
                                 onConfirm(text)
                                 setShowModal(false)
                             }}>
-                            <MaterialIcons
-                                name="check"
-                                size={28}
-                                color={Style.getColor('primary-text1')}
-                            />
+                            <Text style={{ color: Style.getColor('primary-text1') }}>Confirm</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -113,7 +105,7 @@ const styles = StyleSheet.create({
 
     modalview: {
         margin: 20,
-        backgroundColor: Style.getColor('primary-surface2'),
+        backgroundColor: Style.getColor('primary-surface1'),
         borderRadius: 20,
         padding: 35,
         alignItems: 'center',
@@ -130,16 +122,33 @@ const styles = StyleSheet.create({
     buttonContainer: {
         paddingTop: 8,
         flexDirection: 'row',
-        alignContent: 'space-around',
+        alignItems: 'center',
     },
 
-    modalButton: {
-        marginHorizontal: 30,
+    confirmButton: {
+        backgroundColor: Style.getColor('primary-surface4'),
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+        borderRadius: 8,
+    },
+
+    cancelButton: {
+        marginLeft: 70,
+        marginRight: 20,
+        borderColor: Style.getColor('primary-surface4'),
+        borderWidth: 1,
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+        borderRadius: 8,
     },
 
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        borderColor: Style.getColor('primary-surface4'),
+        borderWidth: 1,
+        borderRadius: 8,
+        marginBottom: 8,
     },
 
     input: {
@@ -148,7 +157,7 @@ const styles = StyleSheet.create({
         flex: 1,
         borderRadius: 8,
         paddingHorizontal: 8,
-        paddingVertical: 8,
+        paddingVertical: 2,
         margin: 8,
     },
 
