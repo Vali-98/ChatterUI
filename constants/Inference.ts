@@ -12,6 +12,24 @@ import axios from 'axios'
 import EventSource from 'react-native-sse'
 import * as Application from 'expo-application'
 
+export const regenerateResponse = async () => {
+    const charName = getString(Global.CurrentCharacter)
+    const messageName = Chats.useChat.getState()?.data?.at(-1)?.name
+    const messagesLength = Chats.useChat.getState()?.data?.length
+    Logger.log('Regenerate Response')
+    if (messageName == charName && messagesLength && messagesLength !== 1) {
+        Chats.useChat.getState().deleteEntry(messagesLength - 1)
+    }
+    Chats.useChat.getState().addEntry(charName ?? '', false, '')
+    generateResponse()
+}
+
+export const continueResponse = () => {
+    Logger.log(`Continuing Response`)
+    Chats.useChat.getState().insertLastToBuffer()
+    generateResponse()
+}
+
 export const generateResponse = async () => {
     Chats.useChat.getState().startGenerating()
     const setAbortFunction = Chats.useChat.getState().setAbortFunction

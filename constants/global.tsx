@@ -44,6 +44,7 @@ export const enum Color {
     DarkContainer = '#111',
     Offwhite = '#888',
     Button = '#ddd',
+    ButtonDisabled = '#353535',
     TextWhite = '#fff',
     TextBlack = '#000',
 }

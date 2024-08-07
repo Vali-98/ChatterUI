@@ -15,7 +15,9 @@ import {
     View,
     ActivityIndicator,
 } from 'react-native'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { useMMKVString, useMMKVObject } from 'react-native-mmkv'
+import { runOnJS } from 'react-native-reanimated'
 
 const CharMenu = () => {
     const router = useRouter()
@@ -31,6 +33,14 @@ const CharMenu = () => {
     const [nowLoading, setNowLoading] = useState(false)
 
     const loadChat = Chats.useChat((state) => state.load)
+
+    const goBack = () => router.back()
+
+    const gesture = Gesture.Fling()
+        .direction(1)
+        .onEnd(() => {
+            runOnJS(goBack)()
+        })
 
     const getCharacterList = async () => {
         await Characters.getCardList()
@@ -90,7 +100,7 @@ const CharMenu = () => {
     }, [])
 
     return (
-        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+        <GestureDetector gesture={gesture}>
             <SafeAreaView style={styles.mainContainer}>
                 <Stack.Screen
                     options={{
@@ -144,30 +154,41 @@ const CharMenu = () => {
                             getCharacterList()
                         })
                     }
+                    showPaste={true}
                 />
 
                 <ScrollView>
                     {characterList.map((character, index) => (
-                        <TouchableOpacity
-                            disabled={nowLoading}
-                            style={styles.longButton}
+                        <AnimatedView
                             key={index}
-                            onPress={() => setCurrentCharacter(character)}>
-                            <Image
-                                source={{
-                                    uri: `${FS.documentDirectory}characters/${character}/${character}.png`,
-                                }}
-                                style={styles.avatar}
-                            />
-                            <Text style={styles.nametag}>{character}</Text>
-                            {nowLoading && character == charName && (
-                                <ActivityIndicator color={Color.White} style={{ paddingLeft: 8 }} />
-                            )}
-                        </TouchableOpacity>
+                            dx={Math.min(500 + index * 200, 2000)}
+                            tduration={Math.min(500 + index * 100, 1000)}
+                            fade={0}
+                            fduration={500}
+                            style={{ flex: 1 }}>
+                            <TouchableOpacity
+                                disabled={nowLoading}
+                                style={styles.longButton}
+                                onPress={() => setCurrentCharacter(character)}>
+                                <Image
+                                    source={{
+                                        uri: `${FS.documentDirectory}characters/${character}/${character}.png`,
+                                    }}
+                                    style={styles.avatar}
+                                />
+                                <Text style={styles.nametag}>{character}</Text>
+                                {nowLoading && character == charName && (
+                                    <ActivityIndicator
+                                        color={Color.White}
+                                        style={{ paddingLeft: 8 }}
+                                    />
+                                )}
+                            </TouchableOpacity>
+                        </AnimatedView>
                     ))}
                 </ScrollView>
             </SafeAreaView>
-        </AnimatedView>
+        </GestureDetector>
     )
 }
 

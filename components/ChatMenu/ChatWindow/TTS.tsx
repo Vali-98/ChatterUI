@@ -19,7 +19,7 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
     const nowGenerating = Chats.useChat((state) => state.nowGenerating)
 
     useEffect(() => {
-        if (nowGenerating) handleStopSpeaking()
+        if (nowGenerating && isSpeaking) handleStopSpeaking()
     }, [nowGenerating])
 
     useEffect(() => {

@@ -1,10 +1,10 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
-import { Color } from '@globals'
+import { Color, Logger } from '@globals'
 import React from 'react'
 import { ChatEntry, Chats } from '@constants/Chat'
 import { useShallow } from 'zustand/react/shallow'
-import { generateResponse } from '@constants/Inference'
+import { continueResponse, generateResponse, regenerateResponse } from '@constants/Inference'
 
 type SwipesProps = {
     message: ChatEntry
@@ -35,28 +35,53 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, id }) => {
         }
     }
 
+    const isLastAltGreeting = id === 0 && message.swipe_id === message.swipes.length - 1
+
     return (
         <View style={styles.swipesItem}>
-            {!nowGenerating && (
-                <TouchableOpacity onPress={handleSwipeLeft} disabled={message.swipe_id === 0}>
+            <TouchableOpacity
+                onPress={handleSwipeLeft}
+                disabled={nowGenerating || message.swipe_id === 0}>
+                <AntDesign
+                    name="left"
+                    size={20}
+                    color={message.swipe_id === 0 ? Color.ButtonDisabled : Color.Button}
+                />
+            </TouchableOpacity>
+
+            {id !== 0 && (
+                <TouchableOpacity onPress={regenerateResponse} disabled={nowGenerating}>
                     <AntDesign
-                        name="left"
+                        name="retweet"
                         size={20}
-                        color={message.swipe_id === 0 ? Color.Offwhite : Color.Button}
+                        color={nowGenerating ? Color.ButtonDisabled : Color.Button}
                     />
                 </TouchableOpacity>
             )}
-            <View style={styles.swipeTextContainer}>
-                <Text style={styles.swipeText}>
-                    {message.swipe_id + 1} / {message.swipes.length}
-                </Text>
-            </View>
 
-            {!nowGenerating && (
-                <TouchableOpacity onPress={handleSwipeRight}>
-                    <AntDesign name="right" size={20} color={Color.Button} />
+            <Text style={styles.swipeText}>
+                {message.swipe_id + 1} / {message.swipes.length}
+            </Text>
+
+            {id !== 0 && (
+                <TouchableOpacity onPress={continueResponse} disabled={nowGenerating}>
+                    <AntDesign
+                        name="forward"
+                        size={20}
+                        color={nowGenerating ? Color.ButtonDisabled : Color.Button}
+                    />
                 </TouchableOpacity>
             )}
+
+            <TouchableOpacity
+                onPress={handleSwipeRight}
+                disabled={nowGenerating || isLastAltGreeting}>
+                <AntDesign
+                    name="right"
+                    size={20}
+                    color={isLastAltGreeting || nowGenerating ? Color.ButtonDisabled : Color.Button}
+                />
+            </TouchableOpacity>
         </View>
     )
 }
@@ -68,6 +93,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginVertical: 8,
         marginHorizontal: 8,
+        justifyContent: 'space-between',
     },
 
     swipeText: {
