@@ -9,6 +9,7 @@ import SimpleMarkdown from 'simple-markdown'
 import Markdown from 'react-native-markdown-package'
 import * as FS from 'expo-file-system'
 import React from 'react'
+import TTSMenu from './TTS'
 // global chat property for editing
 
 const ChatItem = ({ message, id, scroll}) => {
@@ -21,7 +22,7 @@ const ChatItem = ({ message, id, scroll}) => {
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
-
+    const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
     // drilled
     const [messages, setMessages, setTargetLength] = useContext(MessageContext)
     
@@ -83,6 +84,7 @@ const ChatItem = ({ message, id, scroll}) => {
                     &&
                 <Text style={styles.graytext}>{((new Date(message.gen_finished) - new Date(message.gen_started))/1000).toFixed(0)}s</Text>
                 }
+                {TTSenabled && <TTSMenu message={message.mes}/>}
             </View>
                 
             
