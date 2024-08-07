@@ -2,7 +2,7 @@
     "expo": {
         "name": "ChatterUI",
         "slug": "ChatterUI",
-        "version": "0.7.2",
+        "version": "0.7.3",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
         "scheme": "myapp",
