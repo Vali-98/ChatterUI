@@ -22,6 +22,7 @@ import { ChatEntry } from '@constants/Chat'
 import { useShallow } from 'zustand/react/shallow'
 import { generateResponse } from '@constants/Inference'
 import Swipes from './Swipes'
+import ChatFrame from './ChatFrame'
 
 type ChatItemProps = {
     id: number
@@ -76,33 +77,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
         ]).start()
     }, [])
 
-    const markdownFormat = {
-        em: {
-            color: Color.TextItalic,
-            fontStyle: 'italic',
-        },
-        text: {
-            color: Color.Text,
-        },
-        list: {
-            color: Color.Text,
-        },
-    }
-    const imageDir =
-        message.name === userName ? Users.getImageDir(userName) : Characters.getImageDir(charName)
-
-    const [imageSource, setImageSource] = useState({
-        uri: imageDir,
-    })
-
-    useEffect(() => {
-        setImageSource({ uri: imageDir })
-    }, [charName])
-
-    const handleImageError = () => {
-        setImageSource(require('@assets/user.png'))
-    }
-
     const handleEditMessage = () => {
         updateChat(id, placeholderText)
         saveChat()
@@ -124,14 +98,24 @@ const ChatItem: React.FC<ChatItemProps> = ({
         setEditMode((editMode) => false)
     }
 
-    const deltaTime = Math.max(
-        0,
-        (Date.parse(message.gen_finished) - Date.parse(message.gen_started)) / 1000
-    )
-
     const isFirstWithSwipes = id === 0 && message.swipes.length > 1 && messagesLength === 1
     const isLastMessage = id === messagesLength - 1
     const showSwipe = message.name === charName && (isFirstWithSwipes || isLastMessage)
+
+    const showEditor = editMode && !nowGenerating
+    const showEllipsis =
+        message.name === charName && buffer === '' && id === messagesLength - 1 && nowGenerating
+
+    type EditorProps = {
+        name: 'delete' | 'check' | 'close'
+        onPress: () => void
+    }
+
+    const EditorButton = ({ name, onPress }: EditorProps) => (
+        <TouchableOpacity style={styles.editButton} onPress={onPress}>
+            <MaterialIcons name={name} size={28} color={Color.Button} />
+        </TouchableOpacity>
+    )
 
     return (
         <Animated.View
@@ -146,101 +130,61 @@ const ChatItem: React.FC<ChatItemProps> = ({
                         ? { borderBottomWidth: 1, borderColor: Color.Offwhite }
                         : {}),
                 }}>
-                <View style={{ alignItems: 'center' }}>
-                    <Image
-                        onError={(error) => {
-                            handleImageError()
-                        }}
-                        style={styles.avatar}
-                        source={imageSource}
-                    />
-                    <Text style={styles.graytext}>#{id}</Text>
-                    {deltaTime !== undefined && message.name === charName && (
-                        <Text style={styles.graytext}>{deltaTime}s</Text>
-                    )}
-                    {TTSenabled && <TTSMenu message={message.mes} />}
-                </View>
-
-                <View style={{ flex: 1 }}>
-                    <View style={{ marginBottom: 8 }}>
-                        <Text style={{ fontSize: 16, color: Color.Text, marginRight: 4 }}>
-                            {message.name}
-                        </Text>
-                        <Text style={{ fontSize: 10, color: Color.Text }}>{message.send_date}</Text>
-
-                        {!nowGenerating && editMode && (
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                {id !== 0 && (
-                                    <TouchableOpacity
-                                        style={styles.editButton}
-                                        onPress={handleDeleteMessage}>
-                                        <MaterialIcons
-                                            name="delete"
-                                            size={28}
-                                            color={Color.Button}
-                                        />
-                                    </TouchableOpacity>
-                                )}
-                                <View style={{ flexDirection: 'row' }}>
-                                    <TouchableOpacity
-                                        style={styles.editButton}
-                                        onPress={handleEditMessage}>
-                                        <MaterialIcons
-                                            name="check"
-                                            size={28}
-                                            color={Color.Button}
-                                        />
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                        style={styles.editButton}
-                                        onPress={handleDisableEdit}>
-                                        <MaterialIcons
-                                            name="close"
-                                            size={28}
-                                            color={Color.Button}
-                                        />
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        )}
-                    </View>
-
-                    {!editMode || nowGenerating ? (
-                        message.name === charName &&
-                        buffer === '' &&
-                        nowGenerating &&
-                        id === messagesLength - 1 ? (
-                            <View style={{ ...styles.messageTextContainer, padding: 5 }}>
-                                <AnimatedEllipsis style={{ color: Color.White, fontSize: 20 }} />
-                            </View>
-                        ) : (
-                            <TouchableOpacity
-                                style={styles.messageTextContainer}
-                                activeOpacity={0.7}
-                                onLongPress={handleEnableEdit}>
-                                <Markdown
-                                    style={styles.messageText}
-                                    styles={markdownFormat}
-                                    rules={{ speech }}>
-                                    {nowGenerating && id === messagesLength - 1
-                                        ? buffer.trim()
-                                        : message.mes.trim()}
-                                </Markdown>
-                            </TouchableOpacity>
-                        )
-                    ) : (
-                        <View style={styles.messageInput}>
-                            <TextInput
-                                style={{ color: Color.Text }}
-                                value={placeholderText}
-                                onChangeText={setPlaceholderText}
-                                textBreakStrategy="simple"
-                                multiline
-                            />
+                <ChatFrame
+                    charName={charName}
+                    userName={userName}
+                    message={message}
+                    id={id}
+                    TTSenabled={TTSenabled}>
+                    {showEllipsis && (
+                        <View style={{ ...styles.messageTextContainer, padding: 5 }}>
+                            <AnimatedEllipsis style={{ color: Color.White, fontSize: 20 }} />
                         </View>
                     )}
-                </View>
+
+                    {showEditor && (
+                        <View>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                {id !== 0 && (
+                                    <EditorButton name="delete" onPress={handleDeleteMessage} />
+                                )}
+                                <View
+                                    style={{
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                    }}>
+                                    <EditorButton name="check" onPress={handleEditMessage} />
+                                    <EditorButton name="close" onPress={handleDisableEdit} />
+                                </View>
+                            </View>
+                            <View style={styles.messageInput}>
+                                <TextInput
+                                    style={{ color: Color.Text }}
+                                    value={placeholderText}
+                                    onChangeText={setPlaceholderText}
+                                    textBreakStrategy="simple"
+                                    multiline
+                                />
+                            </View>
+                        </View>
+                    )}
+
+                    {!showEditor && !showEllipsis && (
+                        <TouchableOpacity
+                            style={styles.messageTextContainer}
+                            activeOpacity={0.7}
+                            onLongPress={handleEnableEdit}>
+                            <Markdown
+                                style={styles.messageText}
+                                styles={markdownFormat}
+                                rules={{ speech }}>
+                                {nowGenerating && id === messagesLength - 1
+                                    ? buffer.trim()
+                                    : message.mes.trim()}
+                            </Markdown>
+                        </TouchableOpacity>
+                    )}
+                </ChatFrame>
             </View>
 
             {showSwipe && <Swipes message={message} id={id} nowGenerating={nowGenerating} />}
@@ -324,4 +268,17 @@ const speech = {
         )
     },
     html: undefined,
+}
+
+const markdownFormat = {
+    em: {
+        color: Color.TextItalic,
+        fontStyle: 'italic',
+    },
+    text: {
+        color: Color.Text,
+    },
+    list: {
+        color: Color.Text,
+    },
 }
