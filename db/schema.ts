@@ -144,29 +144,6 @@ export const swipesRelations = relations(chatSwipes, ({ one }) => ({
 
 // INSTRUCT
 
-/*export const instructs = sqliteTable('instructs', {
-    id: integer('id', { mode: 'number' }).primaryKey(),
-    name: text('name').notNull(),
-
-    system_prompt: text('system_prompt').notNull(),
-
-    input_sequence: text('input_sequence').notNull(),
-    output_sequence: text('output_sequence').notNull(),
-
-    first_output_sequence: text('first_output_sequence').notNull(),
-    system_sequence_prefix: text('system_sequence_prefix').notNull(),
-
-    stop_sequence: text('stop_sequence').notNull(),
-    separator_sequence: text('separator_sequence').notNull(),
-
-    activation_regex: text('activation_regex').notNull(),
-
-    wrap: integer('wrap', { mode: 'boolean' }).notNull(),
-    macro: integer('macro', { mode: 'boolean' }).notNull(),
-    names: integer('names', { mode: 'boolean' }).notNull(),
-    names_force_groups: integer('names_force_groups', { mode: 'boolean' }).notNull(),
-})*/
-
 export const instructs = sqliteTable('instructs', {
     id: integer('id', { mode: 'number' }).primaryKey(),
     name: text('name').notNull(),
@@ -185,6 +162,11 @@ export const instructs = sqliteTable('instructs', {
     macro: integer('macro', { mode: 'boolean' }).notNull(),
     names: integer('names', { mode: 'boolean' }).notNull(),
     names_force_groups: integer('names_force_groups', { mode: 'boolean' }).notNull(),
+
+    // Additions 3/7/2024, v3
+    timestamp: integer('timestamp', { mode: 'boolean' }).notNull().default(false),
+    examples: integer('examples', { mode: 'boolean' }).notNull().default(true),
+    format_type: integer('format_type').notNull().default(0),
 })
 
 // LOREBOOKS
