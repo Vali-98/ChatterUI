@@ -225,6 +225,17 @@ const PresetsKAI = () => {
         />
 
         <SliderItem 
+            name="Min P" 
+            varname="min_p" 
+            min={0}
+            max={1}
+            precision={2}
+            step={0.05}
+            setValue={setCurrentPreset}  
+            body={currentPreset}
+        />
+
+        <SliderItem 
             name="Typical Sampling" 
             varname="typical" 
             min={0}
