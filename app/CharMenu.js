@@ -53,6 +53,7 @@ const CharMenu = () => {
                 })
             const charactercard = JSON.parse(Base64.decode(textChunks[0].text))
             const newname = charactercard?.data?.name ?? charactercard.name
+            console.log(`Creating new character: ${newname}`)
             if(newname === 'Detailed Example Character'){
                 ToastAndroid.show('Invalid Character ID', 2000)
                 return
@@ -173,17 +174,17 @@ const CharMenu = () => {
                         <TouchableOpacity 
                             style={styles.modalButton}
                             onPress={async () => {
+                                console.log(downloadName)
                             axios.post(
                                 'https://api.chub.ai/api/characters/download', 
-                                JSON.stringify({
+                                {
                                     "format" : "tavern",
                                     "fullPath" : downloadName
-                                }),
+                                },
                                 {
                                     responseType: 'arraybuffer'
                                 }
                                 ).then(async (res) => {
-                                    console.log(res.data)
                                     if(res.status !== 200){
                                         ToastAndroid.show(`Invalid URL`, ToastAndroid.SHORT)
                                         return
