@@ -142,14 +142,10 @@ const CharInfo = () => {
                             style={styles.input}
                             multiline
                             onChangeText={(mes) => {
-                                if (
-                                    characterCard?.spec !== undefined &&
-                                    characterCard?.spec === 'chara_card_v2'
-                                )
-                                    setCharacterCard({
-                                        ...characterCard,
-                                        data: { ...characterCard.data, description: mes },
-                                    })
+                                setCharacterCard({
+                                    ...characterCard,
+                                    data: { ...characterCard.data, description: mes },
+                                })
                             }}
                             value={characterCard?.data?.description}
                             numberOfLines={8}

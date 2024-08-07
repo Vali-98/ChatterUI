@@ -55,7 +55,7 @@ const PresetMenu = () => {
             type: SLIDER,
             data: { name: 'Repetition Penalty Range', min: 1, max: 4096 },
         },
-        rep_pen_slope: {
+        /*rep_pen_slope: {
             type: SLIDER,
             data: {
                 name: 'Repetition Penalty Slope',
@@ -63,7 +63,7 @@ const PresetMenu = () => {
                 min: 1.0,
                 max: 10.0,
             },
-        },
+        },*/
         encoder_rep_pen: {
             type: SLIDER,
             data: {

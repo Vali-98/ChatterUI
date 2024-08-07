@@ -120,7 +120,7 @@ const CharMenu = () => {
             />
 
             <TextBoxModal
-                title="Enter Character Hub Link"
+                title="Enter Character Hub or Pygmalion Link"
                 booleans={[showDownload, setShowDownload]}
                 onConfirm={(text) =>
                     Characters.importCharacterFromRemote(text).then(() => {
