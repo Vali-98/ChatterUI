@@ -9,7 +9,7 @@ const TGWUI = () => {
 
     return (
         <View style={styles.mainContainer}>
-            <Text style={styles.title}>Endpoint</Text>
+            <Text style={styles.title}>Blocking URL (currently not used)</Text>
 
             <TextInput 
                 style={styles.input}
@@ -21,7 +21,7 @@ const TGWUI = () => {
                 placeholderTextColor={Color.Offwhite}
             />
 
-            <Text style={styles.title}>Endpoint</Text>
+            <Text style={styles.title}>Streaming URL</Text>
 
             <TextInput 
                 style={styles.input}

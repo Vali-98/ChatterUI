@@ -273,17 +273,22 @@ const Home = () => {
 	const generateResponse = () => {
 		console.log(`Obtaining response.`)
 		setNewMessage(n => '')
-		switch(APIType) {
-			case API.KAI:
-				KAIresponse()
-				break
-			case API.HORDE:
-				hordeResponse()
-				break
-			case API.MANCER:
-			case API.TGWUI:
-				TGWUIReponseStream()
-				break
+		try {
+			switch(APIType) {
+				case API.KAI:
+					KAIresponse()
+					break
+				case API.HORDE:
+					hordeResponse()
+					break
+				case API.MANCER:
+				case API.TGWUI:
+					TGWUIReponseStream()
+					break
+			}
+		} catch (error) {
+			console.log(error)
+			ToastAndroid.show(`Something went wrong.`, 3000)
 		}
 	}
 
@@ -331,9 +336,8 @@ const Home = () => {
 			setNowGenerating(false)
 			if(!aborted)
 				ToastAndroid.show('Connection Lost...', ToastAndroid.SHORT)
-			console.log('Something went wrong.' + error)
+			console.log('KAI Response failed: ' + error)
 		})
-
 	}
 
 	const hordeResponse = async () => {
@@ -504,76 +508,66 @@ const Home = () => {
 		}
 	}
 
+	const abortResponse = () => {
+		console.log(`Aborting Generation`)
+		abortFunction()
+	}
+
+	const regenerateResponse = () => {
+		console.log('Regenerate Response')
+		const len = messages.length
+		if(messages.at(-1)?.name === charName){
+			setMessages(messages.slice(0,-1))
+			setTargetLength(len)
+		} else setTargetLength(len+ 1)
+		setChatCache('')
+		setNowGenerating(true)
+	}
+
+	const continueResponse = () => {
+		console.log(`Continuing Reponse`)
+		setTargetLength(messages.length + (messages.at(-1).name === charName)? 0 : 1)
+		if(messages.at(-1).name === charName) {
+			setChatCache(messages.at(-1).mes)
+			setTargetLength(messages.length)
+		} else setTargetLength(messages.length + 1)
+		setNowGenerating(true)
+	}
+
+	const menuoptions = [
+		{callback: abortResponse, text: "Stop", button: "stop"},
+		{callback: continueResponse, text: "Continue", button: "arrow-forward"},
+		{callback: regenerateResponse, text: "Regenerate", button: "reload"},
+	]
+
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			
 			{ (charName === 'Welcome') ?
-			<View>
-				<Text style={styles.welcometext}> 
-					Select A Character To Get Started!
-				</Text>
-			</View>
-			
+			<View><Text style={styles.welcometext}> 
+				Select A Character To Get Started!
+			</Text></View>		
 			:
 			<MessageContext.Provider value={ [messages, setMessages, setTargetLength, setChatCache]}>
-			<View style={styles.container}>
+			<View style={styles.container}>			
 				
 				<ChatWindow messages={messages} />
+
 				<View style={styles.inputContainer}>
-				<Menu >
-					<MenuTrigger >
-							<MaterialIcons 
-								name='menu' 
-								style={styles.optionsButton} 
-								size={36} 
-								color={Color.Button}
-								/>
-					</MenuTrigger>
+				
+				<Menu>
+				<MenuTrigger >
+					<MaterialIcons name='menu' style={styles.optionsButton} size={36} color={Color.Button} />
+				</MenuTrigger>
 					<MenuOptions customStyles={styles.optionMenu}>
-						
-						<MenuOption onSelect={() => {
-							console.log(`Aborting Generation`)
-							abortFunction()
-							if(APIType === API.HORDE)
-									setNowGenerating(false)
-						}}>
-						<View style={styles.optionItem}>
-							<Ionicons name='stop' color={Color.Button} size={24}/>
-							<Text style={styles.optionText} >Stop</Text>
-						</View>
-						</MenuOption>
-
-						<MenuOption onSelect={() => {
-							console.log(`Continuing Reponse`)
-							setTargetLength(messages.length + (messages.at(-1).name === charName)? 0 : 1)
-							if(messages.at(-1).name === charName) {
-								setChatCache(messages.at(-1).mes)
-								setTargetLength(messages.length)
-							} else setTargetLength(messages.length + 1)
-
-							setNowGenerating(true)
-						}}>
-						<View style={styles.optionItem}>
-							<Ionicons name='arrow-forward' color={Color.Button} size={24}/>
-							<Text style={styles.optionText} >Continue</Text>
-						</View>
-						</MenuOption>
-						<MenuOption onSelect={() => {
-							console.log('Regenerate Response')
-							const len = messages.length
-							if(messages.at(-1)?.name === charName){
-								setMessages(messages.slice(0,-1))
-								setTargetLength(len)
-							} else setTargetLength(len+ 1)
-							setChatCache('')
-							setNowGenerating(true)
-						}}>
-						<View style={styles.optionItemLast}>
-							<Ionicons name='reload' color={Color.Button} size={24}/>
-							<Text style={styles.optionText} >Regenerate</Text>
-						</View>
-						</MenuOption>
-						
+						{menuoptions.map((item, index) => (
+							<MenuOption key={index} onSelect={item.callback}>
+							<View style={(index === menuoptions.length - 1)? styles.optionItemLast : styles.optionItem}>
+								<Ionicons name={item.button} color={Color.Button} size={24}/>
+								<Text style={styles.optionText} >{item.text}</Text>
+							</View>
+							</MenuOption>
+						))}						
 					</MenuOptions>
 				</Menu>
 
@@ -587,21 +581,10 @@ const Home = () => {
 					/>
 
 					{ nowGenerating ?
-					<TouchableOpacity style={styles.sendButton} onPress={()=> {
-						console.log(`Aborting Generation`)
-						abortFunction()
-
-						if(APIType === API.HORDE){
-								
-								setNowGenerating(false)
-							}
-						if(APIType === API.TGWUI)
-							setNowGenerating(false)
-					}}>
+					<TouchableOpacity style={styles.sendButton} onPress={abortResponse}>
 						<MaterialIcons name='stop' color={Color.Button} size={30}/>
 					</TouchableOpacity>
 						:
-					
 					<TouchableOpacity style={styles.sendButton} onPress={handleSend}>
 						<MaterialIcons name='send' color={Color.Button} size={30}/>
 					</TouchableOpacity>

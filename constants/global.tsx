@@ -8,10 +8,6 @@ import * as Application from 'expo-application'
 const mmkv = new MMKV()
 export const MessageContext = createContext([])
 
-export const resetEncryption = (value = 0) => {
-    mmkv.recrypt(Crypto.getRandomBytes(16).toString())
-}
-
 export const enum Color {
     Header= '#1e1e1e',
     Background = '#222',
@@ -104,16 +100,31 @@ export const GlobalStyle = StyleSheet.create({
     
 })
 
-// general downloader
+// GENERAL FUNCTIONS
+
+// reencrypts mmkv cache, may not be useful
+
+export const resetEncryption = (value = 0) => {
+    mmkv.recrypt(Crypto.getRandomBytes(16).toString())
+}
+
+export const resetValues = () => {
+    mmkv.set(Global.CurrentCharacter, 'Welcome')
+    mmkv.set(Global.CurrentChat, '')
+    mmkv.set(Global.NowGenerating, false)
+}
+
+// Exports a string to external storage, supports json
 
 export const saveStringExternal = async (
     filename : string,
     filedata : string,
+    mimetype = "application/json"
 ) => {
     const permissions = await FS.StorageAccessFramework.requestDirectoryPermissionsAsync();
     if (permissions.granted) {
         let directoryUri = permissions.directoryUri
-        await FS.StorageAccessFramework.createFileAsync(directoryUri, filename, "application/json")
+        await FS.StorageAccessFramework.createFileAsync(directoryUri, filename, mimetype)
         .then(async(fileUri) => {
             await FS.writeAsStringAsync(fileUri, filedata, { encoding: FS.EncodingType.UTF8 })
             ToastAndroid.show(`File saved sucessfully`, 2000)
@@ -124,13 +135,13 @@ export const saveStringExternal = async (
     }
 } 
 
-// horde
+// HEADER FOR REQUESTS
 
 export const hordeHeader = () => {
     return { "Client-Agent":`ChatterUI:${Application.nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`} 
 }
 
-// generate default directories
+// DEFAULT DIRECTORIES
 
 export const generateDefaultDirectories = async () => {
     return FS.makeDirectoryAsync(`${FS.documentDirectory}characters`).catch(() => console.log(`Could not create characters folder.`)).then(
@@ -148,7 +159,7 @@ export const generateDefaultDirectories = async () => {
     )
 }
 
-// default presets
+// DEFAULT PRESETS
 
 export const createDefaultPresets = async () => {
     console.log('Creating Default Presets')
@@ -157,8 +168,7 @@ export const createDefaultPresets = async () => {
     await writePreset(`Default`, defaultPresetNovelAI(), 'novelai')
 }
 
-
-// presets
+// PRESETS
 
 const apiType = () => {
     let type : string = 'kai'
@@ -217,7 +227,7 @@ export const uploadPreset = async (api = apiType()) => {
     })
 }
 
-// instruct
+// INSTRUCT
 
 export const loadInstruct = async (name : string) => {
     return FS.readAsStringAsync(`${FS.documentDirectory}instruct/${name}.json`, {encoding: FS.EncodingType.UTF8})
@@ -259,8 +269,7 @@ export const uploadInstruct = async () => {
     })
 }
 
-
-// user
+// USERS
 
 export const createNewUser = async (name : string) => {
     return FS.makeDirectoryAsync(`${FS.documentDirectory}persona/${name}`).then(() => {
@@ -270,6 +279,7 @@ export const createNewUser = async (name : string) => {
     }).catch(() => {console.log(`Could not create user.`)})
 
 }
+
 export const deleteUser = async (name : string) => {
     return FS.deleteAsync( `${FS.documentDirectory}persona/${name}`)
 }
@@ -277,33 +287,6 @@ export const deleteUser = async (name : string) => {
 export const loadUserCard = async (name : string) => {
     return FS.readAsStringAsync(`${FS.documentDirectory}persona/${name}/${name}.json`, {encoding: FS.EncodingType.UTF8})
 }
-
-//////// IMPORTANT: rework all default values to '' and set after
-
-// reset values to default upon first load
-
-export const resetValues = () => {
-    mmkv.set(Global.CurrentCharacter, 'Welcome')
-    mmkv.set(Global.CurrentChat, '')
-    mmkv.set(Global.NowGenerating, false)
-}
-
-//
-
-export const createNewCharacter = async (
-    charName : string
-) => {
-    return FS.makeDirectoryAsync(`${FS.documentDirectory}characters/${charName}`)
-    .then(() => {
-        return FS.makeDirectoryAsync(`${FS.documentDirectory}characters/${charName}/chats`)
-    }).then(() => {
-        return FS.writeAsStringAsync(
-            `${FS.documentDirectory}characters/${charName}/${charName}.json`, 
-            JSON.stringify(TavernCardV2(charName)),
-            {encoding: FS.EncodingType.UTF8})
-    })
-}
-
 
 export const saveUserCard = async (name : string, card : Object) => {
     return FS.writeAsStringAsync(
@@ -321,29 +304,66 @@ export const copyUserImage = async (uri: string, name: string) => {
     })
 }
 
-// returns filename of newly created file
-export const createNewDefaultChat = (
-        charName = mmkv.getString(Global.CurrentCharacter) , 
-        userName = mmkv.getString(Global.CurrentUser)
-    ) => {
-    console.log(`Creating new chat for character: ${charName} and user: ${userName}`)
-    if(charName === 'Welcome')
-        return
-
-    return FS.readAsStringAsync(
-        `${FS.documentDirectory}characters/${charName}/${charName}.json`, 
-        {encoding: FS.EncodingType.UTF8})
-    .then( response => {
-        let card = JSON.parse(response)
-        const newmessage = createNewChat(userName, charName, ( card.data.first_mes ?? card.first_mes ))
-        return FS.writeAsStringAsync(
-            `${FS.documentDirectory}characters/${charName}/chats/${newmessage[0].create_date}.jsonl`, 
-            newmessage.map((item: any)=> JSON.stringify(item)).join('\u000d\u000a'),
-            {encoding:FS.EncodingType.UTF8}).then(
-                () => {return `${newmessage[0].create_date}.jsonl`
-                })
-    }).catch(error => console.log(`Could not create new chat file.\n${error}`))
+export const getUserFilenames = () => {
+    return FS.readDirectoryAsync(`${FS.documentDirectory}persona`)
 }
+
+export const getUserImageDirectory = (
+    name : string
+) => {
+    return `${FS.documentDirectory}persona/${name}/${name}.png`
+}
+
+// CHARACTERS
+
+export const createNewCharacter = async (
+    charName : string
+) => {
+    return FS.makeDirectoryAsync(`${FS.documentDirectory}characters/${charName}`)
+    .then(() => {
+        return FS.makeDirectoryAsync(`${FS.documentDirectory}characters/${charName}/chats`)
+    }).then(() => {
+        return FS.writeAsStringAsync(
+            `${FS.documentDirectory}characters/${charName}/${charName}.json`, 
+            JSON.stringify(TavernCardV2(charName)),
+            {encoding: FS.EncodingType.UTF8})
+    })
+}
+
+export const getCharacterCard = async (
+    charName = mmkv.getString(Global.CurrentCharacter)
+) => {
+    return await FS.readAsStringAsync(getCharacterCardDirectory(charName), {encoding: FS.EncodingType.UTF8})
+}
+
+export const saveCharacterCard = async (
+    charName = mmkv.getString(Global.CurrentCharacter) ,
+    data : string
+) => {
+    return await FS.writeAsStringAsync(getCharacterCardDirectory(charName), data,  {encoding: FS.EncodingType.UTF8})
+}
+
+export const deleteCharacter = async (
+    charName = mmkv.getString(Global.CurrentCharacter)
+) => {
+    return await FS.deleteAsync(getCharacterDirectory(charName))
+}
+
+export const getCharacterList = async () => {
+    return await FS.readDirectoryAsync(`${FS.documentDirectory}characters`)
+}
+
+export const copyCharImage = async (
+    uri: string,
+    charName = mmkv.getString(Global.CurrentCharacter) 
+) => {
+    FS.copyAsync({
+        from: uri,
+        to: getCharacterImageDirectory(charName)
+    })
+}
+
+// CHATS
 
 const createNewChat = (userName : any, characterName : any, initmessage : any) => {
 	return [
@@ -356,9 +376,81 @@ const createNewChat = (userName : any, characterName : any, initmessage : any) =
 	]
 }
 
+export const createNewDefaultChat = (
+    charName = mmkv.getString(Global.CurrentCharacter) , 
+    userName = mmkv.getString(Global.CurrentUser)
+    ) => {
+        console.log(`Creating new chat for character: ${charName} and user: ${userName}`)
+        if(charName === 'Welcome')
+            return
 
+        return FS.readAsStringAsync(
+            `${FS.documentDirectory}characters/${charName}/${charName}.json`, 
+            {encoding: FS.EncodingType.UTF8})
+        .then( response => {
+            let card = JSON.parse(response)
+            const newmessage = createNewChat(userName, charName, ( card.data.first_mes ?? card.first_mes ))
+            return FS.writeAsStringAsync(
+                `${FS.documentDirectory}characters/${charName}/chats/${newmessage[0].create_date}.jsonl`, 
+                newmessage.map((item: any)=> JSON.stringify(item)).join('\u000d\u000a'),
+                {encoding:FS.EncodingType.UTF8}).then(
+                    () => {return `${newmessage[0].create_date}.jsonl`})
+    }).catch(error => console.log(`Could not create new chat file.\n${error}`))
+}
 
-// dirs
+export const getNewestChatFilename = async (
+    charName = mmkv.getString(Global.CurrentCharacter)
+) => {
+    let chats = await getChatFilenames(charName)
+    return (chats.length === 0) ? await createNewDefaultChat(charName) : chats.at(-1)
+}
+
+export const getChatFilenames = async (
+    charName = mmkv.getString(Global.CurrentCharacter)
+) => {
+
+    return await FS.readDirectoryAsync(getChatDirectory(charName)).catch(() => console.log(`Failed to get chat directory of ${charName}`))
+    .then((response : any) => {
+        return response
+    })
+}
+
+export const getChatFile = async (
+    charName = mmkv.getString(Global.CurrentCharacter),
+    chatfilename = mmkv.getString(Global.CurrentChat)
+) => {
+    return await FS.readAsStringAsync(getChatFileDirectory(charName, chatfilename),{encoding:FS.EncodingType.UTF8}).then((file) => {
+        return file.split('\u000d\u000a').map(row => JSON.parse(row))
+    }).catch(() => console.log(`Couldn't load chat file ${chatfilename} for ${charName}`))
+}
+
+export const deleteChatFile = async (
+    charName = mmkv.getString(Global.CurrentCharacter),
+    chatfilename = mmkv.getString(Global.CurrentChat)
+) => {
+    return await FS.deleteAsync(getChatFileDirectory(charName, chatfilename)).then(() => {
+        return getChatFilenames(charName).then(files => {
+            if (files.length === 0)
+                return createNewDefaultChat(charName)
+        })
+    })
+}
+
+export const saveChatFile = async (
+    messages : string[],
+    charName = '',
+    currentChat = ''
+) => {
+    let _charName = (charName === '') ? mmkv.getString(Global.CurrentCharacter) : charName
+    let _currentChat = (currentChat === '')? mmkv.getString(Global.CurrentChat) : currentChat
+    
+    FS.writeAsStringAsync(
+        `${FS.documentDirectory}characters/${_charName}/chats/${_currentChat}`, 
+        messages.map((item)=> JSON.stringify(item)).join('\u000d\u000a'),
+        {encoding:FS.EncodingType.UTF8}).catch(error => console.log(`Could not save file! ${error}`))
+}
+
+// DIRS - should be removed
 
 export const getChatFileDirectory = (
     charName = mmkv.getString(Global.CurrentCharacter),
@@ -391,113 +483,7 @@ export const getCharacterDirectory = (
     return `${FS.documentDirectory}characters/${charName}`
 }
 
-// get chat filenames
-
-export const getNewestChatFilename = async (
-    charName = mmkv.getString(Global.CurrentCharacter)
-) => {
-    let chats = await getChatFilenames(charName)
-    return (chats.length === 0) ? await createNewDefaultChat(charName) : chats.at(-1)
-}
-
-export const getChatFilenames = async (
-    charName = mmkv.getString(Global.CurrentCharacter)
-) => {
-
-    return await FS.readDirectoryAsync(getChatDirectory(charName)).catch(() => console.log(`Failed to get chat directory of ${charName}`))
-    .then((response : any) => {
-        return response
-    })
-}
-
-// get user filenames
-
-export const getUserFilenames = () => {
-    return FS.readDirectoryAsync(`${FS.documentDirectory}persona`)
-}
-
-export const getUserImageDirectory = (
-    name : string
-) => {
-    return `${FS.documentDirectory}persona/${name}/${name}.png`
-}
-
-// get chat file
-
-export const getChatFile = async (
-    charName = mmkv.getString(Global.CurrentCharacter),
-    chatfilename = mmkv.getString(Global.CurrentChat)
-) => {
-    return await FS.readAsStringAsync(getChatFileDirectory(charName, chatfilename),{encoding:FS.EncodingType.UTF8}).then((file) => {
-        return file.split('\u000d\u000a').map(row => JSON.parse(row))
-    }).catch(() => console.log(`Couldn't load chat file ${chatfilename} for ${charName}`))
-}
-
-export const deleteChatFile = async (
-    charName = mmkv.getString(Global.CurrentCharacter),
-    chatfilename = mmkv.getString(Global.CurrentChat)
-) => {
-    return await FS.deleteAsync(getChatFileDirectory(charName, chatfilename)).then(() => {
-        return getChatFilenames(charName).then(files => {
-            if (files.length === 0)
-                return createNewDefaultChat(charName)
-        })
-    })
-}
-
-// save chat file
-
-export const saveChatFile = async (
-    messages : string[],
-    charName = '',
-    currentChat = ''
-) => {
-    let _charName = (charName === '') ? mmkv.getString(Global.CurrentCharacter) : charName
-    let _currentChat = (currentChat === '')? mmkv.getString(Global.CurrentChat) : currentChat
-    
-    FS.writeAsStringAsync(
-        `${FS.documentDirectory}characters/${_charName}/chats/${_currentChat}`, 
-        messages.map((item)=> JSON.stringify(item)).join('\u000d\u000a'),
-        {encoding:FS.EncodingType.UTF8}).catch(error => console.log(`Could not save file! ${error}`))
-}
-
-// get character card
-
-export const getCharacterCard = async (
-    charName = mmkv.getString(Global.CurrentCharacter)
-) => {
-    return await FS.readAsStringAsync(getCharacterCardDirectory(charName), {encoding: FS.EncodingType.UTF8})
-}
-
-// save character card  
-
-export const saveCharacterCard = async (
-    charName = mmkv.getString(Global.CurrentCharacter) ,
-    data : string
-) => {
-    return await FS.writeAsStringAsync(getCharacterCardDirectory(charName), data,  {encoding: FS.EncodingType.UTF8})
-}
-
-export const deleteCharacter = async (
-    charName = mmkv.getString(Global.CurrentCharacter)
-) => {
-    return await FS.deleteAsync(getCharacterDirectory(charName))
-}
-
-export const getCharacterList = async () => {
-    return await FS.readDirectoryAsync(`${FS.documentDirectory}characters`)
-}
-
-export const copyCharImage = async (
-    uri: string,
-    charName = mmkv.getString(Global.CurrentCharacter) 
-) => {
-    FS.copyAsync({
-        from: uri,
-        to: getCharacterImageDirectory(charName)
-    })
-}
-
+// FORMATS
 
 const TavernCardV2 = (name : string) => { 
     return {
@@ -546,7 +532,6 @@ export const humanizedISO8601DateTime = (date: string = '') => {
     let HumanizedDateTime = (humanYear + "-" + humanMonth + "-" + humanDate + " @" + humanHour + "h " + humanMinute + "m " + humanSecond + "s " + humanMillisecond + "ms");
     return HumanizedDateTime;
 }
-
 
 export const defaultPresetKAI = () => {
     return {

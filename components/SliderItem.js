@@ -5,10 +5,10 @@ import { Color } from '@globals'
 const SliderItem = ({name, body, varname, setValue, min=0, max=1, step=0, precision=0}) => {
 
     const clamp = (val) => Math.min(Math.max(parseFloat(val?.toFixed(2) ?? 0), min), max)
-    const [textValue, setTextValue] = useState(body[varname].toFixed(precision))
+    const [textValue, setTextValue] = useState(body[varname]?.toFixed(precision))
 
     useEffect(() => {
-        setTextValue(body[varname].toFixed(precision))
+        setTextValue(body[varname]?.toFixed(precision))
     }, [body])
 
     return (
