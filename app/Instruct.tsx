@@ -61,7 +61,7 @@ const Instruct = () => {
                     text: `Confirm`,
                     style: `destructive`,
                     onPress: async () => {
-                        await Instructs.generateInitialDefaults(true)
+                        await Instructs.generateInitialDefaults()
                         loadInstructList()
                     },
                 },
