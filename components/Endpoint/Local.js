@@ -191,7 +191,7 @@ const Local = () => {
 		/>
 
 		{
-		// RNLlama does not support Android GPUs yet, modify when ready
+		/* RNLlama does not support Android GPUs yet, modify when ready
 		<SliderItem
 			name='GPU Layers'
 			body={preset}
@@ -200,7 +200,10 @@ const Local = () => {
 			min={0}
 			max={100}
 			step={1}
-		/>}
+		/>
+		*/
+		}
+		
 		</View>
 		
     </View>
