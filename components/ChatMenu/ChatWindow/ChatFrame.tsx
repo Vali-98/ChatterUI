@@ -86,7 +86,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, id, nowGenerating, isLa
                             {message.name}
                         </Text>
                         <Text style={{ fontSize: 10, color: Style.getColor('primary-text2') }}>
-                            {swipe.send_date.toLocaleTimeString()}
+                            {swipe.gen_finished.toLocaleTimeString()}
                         </Text>
                     </View>
                 </View>
