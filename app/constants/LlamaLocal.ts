@@ -193,15 +193,19 @@ export namespace Llama {
     const textTimings = (timings: CompletionTimings) => {
         return (
             `\n[Prompt Timings]` +
-            `\nPrompt Per Token: ${timings.prompt_per_token_ms} ms/token` +
-            `\nPrompt Per Second: ${timings.prompt_per_second?.toFixed(2) ?? 0} tokens/s` +
-            `\nPrompt Time: ${(timings.prompt_ms / 1000).toFixed(2)}s` +
-            `\nPrompt Tokens: ${timings.prompt_n} tokens` +
+            (timings.prompt_n > 0
+                ? `\nPrompt Per Token: ${timings.prompt_per_token_ms} ms/token` +
+                  `\nPrompt Per Second: ${timings.prompt_per_second?.toFixed(2) ?? 0} tokens/s` +
+                  `\nPrompt Time: ${(timings.prompt_ms / 1000).toFixed(2)}s` +
+                  `\nPrompt Tokens: ${timings.prompt_n} tokens`
+                : '\nNo Tokens Processed') +
             `\n\n[Predicted Timings]` +
-            `\nPredicted Per Token: ${timings.predicted_per_token_ms} ms/token` +
-            `\nPredicted Per Second: ${timings.predicted_per_second?.toFixed(2) ?? 0} tokens/s` +
-            `\nPrediction Time: ${(timings.predicted_ms / 1000).toFixed(2)}s` +
-            `\nPredicted Tokens: ${timings.predicted_n} tokens`
+            (timings.predicted_n > 0
+                ? `\nPredicted Per Token: ${timings.predicted_per_token_ms} ms/token` +
+                  `\nPredicted Per Second: ${timings.predicted_per_second?.toFixed(2) ?? 0} tokens/s` +
+                  `\nPrediction Time: ${(timings.predicted_ms / 1000).toFixed(2)}s` +
+                  `\nPredicted Tokens: ${timings.predicted_n} tokens\n`
+                : '\nNo Tokens Generated')
         )
     }
 

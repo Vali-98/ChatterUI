@@ -59,6 +59,7 @@
     "react-autosave": "^0.4.4",
     "react-compiler-runtime": "file:./lib/react-compiler-runtime",
     "react-native": "0.74.3",
+    "react-native-background-actions": "^4.0.1",
     "react-native-blob-util": "^0.19.9",
     "react-native-collapsible": "^1.6.1",
     "react-native-element-dropdown": "^2.10.0",
