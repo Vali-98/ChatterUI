@@ -18,7 +18,7 @@ const ChatWindow = () => {
     )
     const charId = Characters.useCharacterCard(useShallow((state) => state?.id))
 
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    const { userName } = Characters.useUserCard((state) => ({ userName: state.card?.data.name }))
     const flatListRef = useRef<FlatList>(null)
     const messagesLength = Chats.useChat((state) => state?.data?.messages?.length) ?? -1
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)

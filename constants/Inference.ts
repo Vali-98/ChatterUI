@@ -128,15 +128,16 @@ const buildContext = (max_length: number) => {
 
     const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
 
-    const userCard = getObject(Global.CurrentUserCard)
-    const userName = getString(Global.CurrentUser)
+    const userCard = { ...Characters.useCharacterCard.getState().card }
+    const userName = userCard.data?.name ?? ''
+
     const currentCard = { ...Characters.useCharacterCard.getState().card }
     const characterCache = Characters.useCharacterCard.getState().getCache(userName)
 
     const instructCache = Instructs.useInstruct
         .getState()
         .getCache(currentCard.data?.name ?? '', userName)
-    const user_card_data = (userCard?.description ?? '').trim()
+    const user_card_data = (userCard?.data?.description ?? '').trim()
     const char_card_data = (currentCard?.data?.description ?? '').trim()
 
     let payload = ``
@@ -216,7 +217,7 @@ const buildContext = (max_length: number) => {
 
 const buildChatCompletionContext = (max_length: number) => {
     const messages = [...(Chats.useChat.getState().data?.messages ?? [])]
-    const userCard = getObject(Global.CurrentUserCard)
+    const userCard = { ...Characters.useCharacterCard.getState().card }
     const currentCard = { ...Characters.useCharacterCard.getState().card }
     const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
 
@@ -742,7 +743,7 @@ const openAIResponseStream = async (setAbortFunction: AbortFunction) => {
 
 const constructReplaceStrings = (): Array<string> => {
     const currentInstruct: InstructType = Instructs.useInstruct.getState().replacedMacros()
-    const userName: string = mmkv.getString(Global.CurrentUser) ?? ''
+    const userName = Characters.useCharacterCard.getState().card?.data.name ?? ''
     const charName: string = Characters.useCharacterCard.getState()?.card?.data?.name ?? ''
     const stops: Array<string> = constructStopSequence(currentInstruct)
 

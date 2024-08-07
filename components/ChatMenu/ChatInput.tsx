@@ -21,8 +21,11 @@ const ChatInput = () => {
         }))
     )
 
+    const { userName } = Characters.useUserCard(
+        useShallow((state) => ({ userName: state.card?.data.name }))
+    )
+
     const [newMessage, setNewMessage] = useState<string>('')
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
 
     const abortResponse = async () => {
         Logger.log(`Aborting Generation`)

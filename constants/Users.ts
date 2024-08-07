@@ -1,3 +1,7 @@
+// DEPRECATED //
+
+// This file is no longer in use since the migration to SQL and unification of User and Character cards
+
 import * as FS from 'expo-file-system'
 import { Logger } from './Logger'
 

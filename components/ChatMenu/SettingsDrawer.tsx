@@ -13,11 +13,11 @@ import Animated, {
     FadeIn,
     FadeOut,
 } from 'react-native-reanimated'
-import { Global, Style, Users } from '@globals'
+import { Characters, Style } from '@globals'
 import { useRouter } from 'expo-router'
-import { useMMKVString } from 'react-native-mmkv'
 import { AntDesign, FontAwesome } from '@expo/vector-icons'
-import { SetStateAction, useState } from 'react'
+import { SetStateAction, useEffect, useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 type SettingsDrawerProps = {
     booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
 }
@@ -80,12 +80,22 @@ type DrawerButtonProps = {
 
 const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, setShowModal] }) => {
     const router = useRouter()
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-    const imageDir = Users.getImageDir(userName ?? '')
+    const { userName, imageID } = Characters.useUserCard(
+        useShallow((state) => ({
+            userName: state.card?.data.name,
+            imageID: state.card?.data.image_id ?? 0,
+        }))
+    )
 
     const [imageSource, setImageSource] = useState({
-        uri: imageDir,
+        uri: Characters.getImageDir(imageID),
     })
+
+    useEffect(() => {
+        setImageSource({
+            uri: Characters.getImageDir(imageID),
+        })
+    }, [imageID])
 
     const handleImageError = () => {
         setImageSource(require('@assets/user.png'))

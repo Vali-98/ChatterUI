@@ -29,7 +29,6 @@ const ChatBody: React.FC<ChatTextProps> = ({ id, nowGenerating, messagesLength }
 
     const showEditor = editMode && !nowGenerating
     const showEllipsis = !message.is_user && isLastMessage && nowGenerating
-
     const isNewChat = messagesLength === 1
     const hasSwipes = message?.swipes?.length > 1
     const showSwipe = !message.is_user && isLastMessage && (hasSwipes || !isNewChat) && !showEditor
