@@ -403,8 +403,7 @@ export const createNewDefaultChat = (
             {encoding: FS.EncodingType.UTF8})
         .then( response => {
             let card = JSON.parse(response)
-            console.log(card)
-            const newmessage = createNewChat(userName, charName, ( card?.data.first_mes ?? card.first_mes ))
+            const newmessage = createNewChat(userName, charName, ( card?.data?.first_mes ?? card.first_mes ))
             return FS.writeAsStringAsync(
                 `${FS.documentDirectory}characters/${charName}/chats/${newmessage[0].create_date}.jsonl`, 
                 newmessage.map((item: any)=> JSON.stringify(item)).join('\u000d\u000a'),
