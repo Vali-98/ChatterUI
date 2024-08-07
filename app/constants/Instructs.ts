@@ -6,9 +6,9 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { Global } from './GlobalValues'
 import { Logger } from './Logger'
+import { mmkv, mmkvStorage } from './MMKV'
 import { Tokenizer } from './Tokenizer'
 import { replaceMacros } from './Utils'
-import { mmkv, mmkvStorage } from './MMKV'
 
 const defaultInstructs: InstructType[] = [
     {
@@ -107,6 +107,26 @@ const defaultInstructs: InstructType[] = [
         names: false,
         names_force_groups: false,
         name: 'phi3',
+        timestamp: false,
+        examples: true,
+        format_type: 0,
+    },
+    {
+        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prefix: '<|start_of_turn|>user\n',
+        system_suffix: '<|end_of_turn|>\n',
+        input_prefix: '<|start_of_turn|>user\n',
+        input_suffix: '<|end_of_turn|>\n',
+        output_prefix: '<|start_of_turn|>model',
+        output_suffix: '<|end_of_turn|>\n',
+        stop_sequence: '<|end_of_turn|>\n',
+        user_alignment_message: '',
+        activation_regex: '',
+        wrap: false,
+        macro: false,
+        names: false,
+        names_force_groups: false,
+        name: 'Gemma 2',
         timestamp: false,
         examples: true,
         format_type: 0,
