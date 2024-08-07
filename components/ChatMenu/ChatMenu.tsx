@@ -1,7 +1,7 @@
 import { ChatWindow } from './ChatWindow/ChatWindow'
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Chats, Logger } from '@globals'
-import { continueResponse, generateResponse, regenerateResponse } from '@constants/Inference'
+import { generateResponse } from '@constants/Inference'
 import { Stack, useFocusEffect, useRouter } from 'expo-router'
 import { useCallback, useState } from 'react'
 import {
