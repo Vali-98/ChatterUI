@@ -25,7 +25,6 @@ import {
 const { SlideInMenu } = renderers
 import { useShallow } from 'zustand/react/shallow'
 import Recents from './Recents'
-import AnimatedView from '@components/AnimatedView'
 import SettingsDrawer from './SettingsDrawer'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { SlideInRight, runOnJS, Easing } from 'react-native-reanimated'
