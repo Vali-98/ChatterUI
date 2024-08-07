@@ -194,6 +194,7 @@ const Instruct = () => {
                         />
                     </View>
 
+                    {/* Unused Sequences
                     <View style={{ flexDirection: 'row' }}>
                         <TextBox
                             name="First Output Sequence"
@@ -210,6 +211,7 @@ const Instruct = () => {
                             multiline
                         />
                     </View>
+                    */}
 
                     <View style={{ flexDirection: 'row' }}>
                         <TextBox
@@ -252,12 +254,14 @@ const Instruct = () => {
                         setValue={setCurrentInstruct}
                     />
 
+                    {/* @TODO: Macros are always replaced - people may want this to be changed
                     <CheckboxTitle
                         name="Replace Macro In Sequences"
                         varname="macro"
                         body={currentInstruct}
                         setValue={setCurrentInstruct}
                     />
+                    */}
 
                     <CheckboxTitle
                         name="Include Names"
@@ -266,12 +270,14 @@ const Instruct = () => {
                         setValue={setCurrentInstruct}
                     />
 
+                    {/*  Groups are not implemented - leftover from ST
                     <CheckboxTitle
                         name="Force for Groups and Personas"
                         varname="names_force_groups"
                         body={currentInstruct}
                         setValue={setCurrentInstruct}
                     />
+                    */}
 
                     <TextBox
                         name="Activation Regex"
