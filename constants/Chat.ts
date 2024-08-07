@@ -1,12 +1,15 @@
 import { Global } from './GlobalValues'
 import { Logger } from './Logger'
-import { humanizedISO8601DateTime, replaceMacros } from './Utils'
+import { replaceMacros } from './Utils'
 import { mmkv } from './mmkv'
 import { create } from 'zustand'
-import * as FS from 'expo-file-system'
-import { CharacterCardV2, Characters } from './Characters'
+import { Characters } from './Characters'
 import { RecentMessages } from './RecentMessages'
+import { db } from '@db'
+import { chatEntries, chatSwipes, chats } from 'db/schema'
+import { eq } from 'drizzle-orm'
 
+/*
 export type ChatExtra = {
     api: string
     model: string
@@ -45,32 +48,58 @@ export type ChatInfo = {
     userName: string
     charName: string
     createDate: string
-    chat_metadata: ChatMetadata
+    //chat_metadata: ChatMetadata
+}*/
+
+export type ChatSwipe = {
+    id: number
+    entry_id: number
+    swipe: string
+    send_date: Date
+    gen_started: Date
+    gen_finished: Date
 }
 
-type ChatDataArray = [ChatInfo, ...ChatEntry[]]
+export type ChatEntry = {
+    id: number
+    chat_id: number
+    name: string
+    is_user: boolean
+    order: number
+    swipe_id: number
+    swipes: Array<ChatSwipe>
+}
+
+export type ChatData = {
+    id: number
+    createDate: Date
+    character_id: number
+    messages: Array<ChatEntry>
+}
+
+//type ChatDataArray = [ChatInfo, ...ChatEntry[]]
 
 type AbortFunction = () => void
 
 type SetAbortFunction = (fn: AbortFunction) => void
 
 export interface ChatState {
-    name: string | undefined
-    metadata: ChatInfo | undefined
-    data: Array<ChatEntry> | undefined
+    //id: number | undefined
+    //metadata: ChatInfo | undefined
+    data: ChatData | undefined
     buffer: string
-    load: (charName: string, chatName: string) => Promise<void>
-    delete: (charName: string, chatName: string) => Promise<void>
-    save: () => Promise<void>
-    addEntry: (name: string, is_user: boolean, message: string) => void
-    updateEntry: (id: number, message: string) => void
-    deleteEntry: (id: number) => void
+    load: (chatId: number) => Promise<void>
+    delete: (chatId: number) => Promise<void>
+    //save: () => Promise<void>
+    addEntry: (name: string, is_user: boolean, message: string) => Promise<void>
+    updateEntry: (index: number, message: string) => Promise<void>
+    deleteEntry: (index: number) => Promise<void>
     reset: () => void
-    swipe: (id: number, direction: number) => boolean
-    addSwipe: () => void
+    swipe: (id: number, direction: number) => Promise<boolean>
+    addSwipe: () => Promise<void>
     setBuffer: (data: string) => void
     insertBuffer: (data: string) => void
-    updateFromBuffer: () => void
+    updateFromBuffer: () => Promise<void>
     insertLastToBuffer: () => void
     nowGenerating: boolean
     stopGenerating: () => void
@@ -81,148 +110,134 @@ export interface ChatState {
 
 export namespace Chats {
     export const useChat = create<ChatState>((set, get: () => ChatState) => ({
-        name: undefined,
-        metadata: undefined,
         data: undefined,
         buffer: '',
         nowGenerating: false,
         startGenerating: () => {
             get().nowGenerating = true
         },
-        stopGenerating: () => {
+        stopGenerating: async () => {
             get().nowGenerating = false
             Logger.log(`Saving Chat`)
-            get().updateFromBuffer()
+            await get().updateFromBuffer()
             get().setBuffer('')
-            get()
-                .save()
-                .then(() => {
-                    // AUTO TTS
-                    if (mmkv.getBoolean(Global.TTSEnable) && mmkv.getBoolean(Global.TTSAuto)) {
-                        Logger.log(`Automatically using TTS`)
-                        mmkv.set(Global.TTSAutoStart, JSON.stringify(true))
-                    }
-                })
+
+            if (mmkv.getBoolean(Global.TTSEnable) && mmkv.getBoolean(Global.TTSAuto)) {
+                Logger.log(`Automatically using TTS`)
+                mmkv.set(Global.TTSAutoStart, JSON.stringify(true))
+            }
         },
         abortFunction: undefined,
         setAbortFunction: (fn) => set((state) => ({ ...state, abortFunction: fn })),
-        load: async (charName: string, chatName: string) => {
-            const chatlist = await getFileObject(charName, chatName)
-            if (!chatlist) return
-
-            const meta = chatlist[0]
+        load: async (chatId: number) => {
+            const data = await readChat(chatId)
             set((state: ChatState) => ({
                 ...state,
-                metadata: meta as ChatInfo,
-                data: chatlist.slice(1) as [ChatEntry],
-                name: chatName,
-                charName: charName,
+                data: data,
             }))
-            RecentMessages.insertEntry(charName, chatName)
+            // TODO : Add recents
+            const charName = Characters.useCharacterCard.getState().card?.data.name
+            const charId = Characters.useCharacterCard.getState().id
+            if (charName && charId) RecentMessages.insertEntry(charName, charId, chatId)
         },
 
-        delete: async (charName: string, chatName: string) => {
-            await FS.deleteAsync(getChatFileDir(charName, chatName)).catch((error) => {
-                Logger.log('Failed to delete: ' + error, true)
-            })
-            if (get().name === chatName) get().reset()
+        delete: async (chatId: number) => {
+            await deleteChat(chatId)
+            if (get().data?.id === chatId) get().reset()
         },
 
         reset: () =>
             set((state: ChatState) => ({
                 ...state,
-                metadata: undefined,
                 data: undefined,
-                name: undefined,
-                charName: undefined,
             })),
 
-        save: async () => {
-            const output: string = [get().metadata, ...(get()?.data ?? [])]
-                .map((item) => JSON.stringify(item))
-                .join('\u000d\u000a')
-            const charName: string = get()?.metadata?.charName ?? ''
-            const chatName: string = get().name ?? ''
-            if (charName && chatName)
-                return FS.writeAsStringAsync(getChatFileDir(charName, chatName), output).catch(
-                    (error) => {
-                        Logger.log('Failed to save: ' + error, true)
-                    }
-                )
-        },
+        //save: async () => {},
 
-        addEntry: (name: string, is_user: boolean, message: string) => {
-            const entry = createEntry(name, is_user, message)
+        addEntry: async (name: string, is_user: boolean, message: string) => {
+            // CHATTODO
+            const messages = get().data?.messages
+            const chatId = get().data?.id
+            if (!messages || !chatId) return
+            const order = messages[messages.length - 1].order + 1
 
-            set((state: ChatState) => ({
+            const entry = await createEntry(chatId, name, is_user, order, message)
+            if (entry) messages.push(entry)
+            set((state) => ({
                 ...state,
-                data: state.data ? [...state.data, entry] : [entry],
+                data: state?.data ? { ...state.data, messages: messages } : state.data,
             }))
         },
 
-        deleteEntry: (id: number) =>
-            set((state: ChatState) => ({
-                ...state,
-                data: state.data?.filter((item: ChatEntry, index, number) => index !== id) ?? [],
-            })),
+        deleteEntry: async (index: number) => {
+            const messages = get().data?.messages
+            if (!messages) return
+            const entryId = messages[index].id
+            if (!entryId) return
 
-        updateEntry: (id: number, message: string) => {
-            const data = get().data
-            if (!data) return
-            data[id].mes = message
-            data[id].swipes[data[id].swipe_id] = message
-            //set((state: ChatState) => ({ ...state, data: data }))
+            await deleteChatEntry(entryId)
+
+            set((state) => ({
+                ...state,
+                data: state?.data
+                    ? { ...state.data, messages: messages.filter((item, ind) => ind != index) }
+                    : state.data,
+            }))
+        },
+
+        updateEntry: async (index: number, message: string) => {
+            const messages = get().data?.messages
+            if (!messages) return
+            const chatSwipeId = messages[index].swipes[messages[index].swipe_id].id
+            if (!chatSwipeId) return
+
+            await updateChatSwipe(chatSwipeId, message)
+
+            messages[index].swipes[messages[index].swipe_id].swipe = message
+            set((state) => ({
+                ...state,
+                data: state?.data ? { ...state.data, messages: messages } : state.data,
+            }))
         },
 
         // returns true if overflowing right swipe, used to trigger generate
-        swipe: (id: number, direction: number) => {
-            const message = get()?.data?.[id]
+        swipe: async (index: number, direction: number) => {
+            // CHATTODO
+            const messages = get()?.data?.messages
+            if (!messages) return false
 
-            if (!message) return false
-
-            const target = message.swipe_id + direction
-            const limit = message.swipes.length - 1
+            const swipe_id = messages[index].swipe_id
+            const target = swipe_id + direction
+            const limit = messages[index].swipes.length - 1
 
             if (target < 0) return false
             if (target > limit) return true
-
-            const new_swipe: string = message.swipes.at(target) ?? ''
-            const new_info = message.swipe_info.at(target)
-            const newmessage: ChatEntry = {
-                ...message,
-                mes: new_swipe,
-                ...new_info,
-                swipe_id: target,
-            }
-
-            set((state: ChatState) => ({
+            messages[index].swipe_id = target
+            set((state) => ({
                 ...state,
-                data:
-                    state.data?.map((item: ChatEntry, index: number) =>
-                        id === index ? newmessage : item
-                    ) ?? [],
+                data: state?.data ? { ...state.data, messages: messages } : state.data,
             }))
+
+            const entryId = messages[index].id
+            await updateEntrySwipeId(entryId, target)
 
             return false
         },
 
-        addSwipe: () => {
-            let data = get().data
-            if (!data) return
-            const index = data?.length - 1
+        addSwipe: async () => {
+            // CHATTODO
+            let messages = get().data?.messages
+            if (!messages) return
+            const index = messages?.length - 1
             if (!index) return
+            const entryId = messages[index].id
 
-            data[index] = {
-                ...data[index],
-                mes: '',
-                swipes: [...data[index].swipes, ''],
-                swipe_info: [...data[index].swipe_info, defaultSwipeInfo()],
-                gen_started: Date(),
-                gen_finished: Date(),
-                swipe_id: data[index].swipe_id + 1,
-            }
-
-            //set((state: ChatState) => ({ ...state, data: data }))
+            const swipe = await createSwipe(entryId, '')
+            if (swipe) messages[index].swipes.push(swipe)
+            await updateEntrySwipeId(entryId, messages[index].swipes.length - 1)
+            //if(get().data)
+            //get().data.messages = messages
+            set((state: ChatState) => ({ ...state }))
         },
 
         setBuffer: (newBuffer: string) =>
@@ -231,37 +246,216 @@ export namespace Chats {
         insertBuffer: (data: string) =>
             set((state: ChatState) => ({ ...state, buffer: state.buffer + data })),
 
-        updateFromBuffer: () => {
-            const data = get()?.data
-            if (!data) return
-            const lastindex = data.length - 1
-            const swipes = data[lastindex].swipes
-            const swipe_id = data[lastindex].swipe_id
-            const cleanedBuffer = get().buffer.trim()
-
-            swipes[swipe_id] = cleanedBuffer
-
-            const swipe_info = data[lastindex].swipe_info
-            swipe_info[swipe_id].gen_finished = new Date().toString()
-
-            data[lastindex] = {
-                ...data[lastindex],
-                mes: cleanedBuffer,
-                gen_finished: new Date().toString(),
-                swipes: swipes,
-                swipe_info: swipe_info,
-            }
+        updateFromBuffer: async () => {
+            const messages = get().data?.messages
+            if (!messages) return
+            const index = messages.length - 1
+            await get().updateEntry(index, get().buffer)
         },
-        insertLastToBuffer: () =>
-            set((state: ChatState) => ({ ...state, buffer: get()?.data?.at(-1)?.mes ?? '' })),
+        insertLastToBuffer: () => {
+            const message = get()?.data?.messages.at(-1)
+            if (!message) return
+            const mes = message.swipes[message.swipe_id].swipe
+
+            set((state: ChatState) => ({ ...state, buffer: mes }))
+        },
+        // CHATTODO
     }))
 
-    const getChatFileDir = (charName: string, chatfilename: string): string => {
+    export const getNewest = async (charId: number): Promise<number | undefined> => {
+        const chatIds = await db.query.chats.findMany({ where: eq(chats.character_id, charId) })
+        return chatIds?.[chatIds?.length - 1]?.id
+    }
+
+    export const getList = async (charId: number) => {
+        const chatIds = await db.query.chats.findMany({ where: eq(chats.character_id, charId) })
+        return chatIds
+    }
+
+    export const debugChatCount = async () => {
+        const chats = await db.query.chats.findMany()
+        console.log(chats.length)
+        const entries = await db.query.chatEntries.findMany()
+        console.log(entries.length)
+        const swipes = await db.query.chatSwipes.findMany()
+        console.log(swipes.length)
+    }
+
+    export const createChat = async (charId: number) => {
+        const card = { ...Characters.useCharacterCard.getState().card }
+        const charName = card?.data?.name
+
+        return await db.transaction(async (tx) => {
+            if (!card.data || !charName) return
+            const [{ chatId }, ..._] = await tx
+                .insert(chats)
+                .values({
+                    character_id: charId,
+                })
+                .returning({ chatId: chats.id })
+
+            const [{ entryId }, ...__] = await tx
+                .insert(chatEntries)
+                .values({
+                    chat_id: chatId,
+                    is_user: false,
+                    name: card.data.name,
+                    order: 0,
+                })
+                .returning({ entryId: chatEntries.id })
+
+            await tx.insert(chatSwipes).values({
+                entry_id: entryId,
+                swipe: replaceMacros(card.data.first_mes),
+            })
+
+            for (const i in card.data.alternate_greetings) {
+                await tx.insert(chatSwipes).values({
+                    entry_id: entryId,
+                    swipe: replaceMacros(card.data.alternate_greetings[i]),
+                })
+            }
+
+            return chatId
+        })
+    }
+
+    export const createEntry = async (
+        chatId: number,
+        name: string,
+        isUser: boolean,
+        order: number,
+        message: string
+    ) => {
+        const [{ entryId }, ...__] = await db
+            .insert(chatEntries)
+            .values({
+                chat_id: chatId,
+                name: name,
+                is_user: isUser,
+                order: order,
+            })
+            .returning({ entryId: chatEntries.id })
+        await db.insert(chatSwipes).values({ swipe: replaceMacros(message), entry_id: entryId })
+        const entry = await db.query.chatEntries.findFirst({
+            where: eq(chatEntries.id, entryId),
+            with: { swipes: true },
+        })
+        return entry
+    }
+
+    export const createSwipe = async (entryId: number, message: string) => {
+        const [{ swipeId }, ...__] = await db
+            .insert(chatSwipes)
+            .values({
+                entry_id: entryId,
+                swipe: replaceMacros(message),
+            })
+            .returning({ swipeId: chatSwipes.id })
+        return await db.query.chatSwipes.findFirst({ where: eq(chatSwipes.id, swipeId) })
+    }
+
+    export const readChat = async (chatId: number): Promise<ChatData | undefined> => {
+        const chat = await db.query.chats.findFirst({
+            where: eq(chats.id, chatId),
+            with: {
+                messages: {
+                    orderBy: chatEntries.order,
+                    with: {
+                        swipes: true,
+                    },
+                },
+            },
+        })
+        return chat
+    }
+
+    export const insertSwipeDB = async (entryId: number) => {
+        await db.insert(chatSwipes).values({
+            entry_id: entryId,
+        })
+    }
+
+    export const updateEntrySwipeId = async (entryId: number, swipeId: number) => {}
+
+    export const updateChatSwipe = async (chatSwipeId: number, message: string) => {
+        await db
+            .update(chatSwipes)
+            .set({ swipe: message, gen_finished: new Date() })
+            .where(eq(chatSwipes.id, chatSwipeId))
+    }
+
+    export const deleteChat = async (chatId: number) => {
+        await db.delete(chats).where(eq(chats.id, chatId))
+    }
+
+    export const deleteChatEntry = async (entryId: number) => {
+        await db.delete(chatEntries).where(eq(chatEntries.id, entryId))
+    }
+
+    export const dummyEntry: ChatEntry = {
+        id: 0,
+        chat_id: -1,
+        name: '',
+        is_user: false,
+        order: -1,
+        swipe_id: 0,
+        swipes: [
+            {
+                id: -1,
+                entry_id: -1,
+                swipe: '',
+                send_date: new Date(),
+                gen_started: new Date(),
+                gen_finished: new Date(),
+            },
+        ],
+    }
+
+    export const exists = async (chatId: number) => {
+        return await db.query.chats.findFirst({ where: eq(chats.id, chatId) })
+    }
+
+    /*
+     export const getNumber = async (charName: string): Promise<number> => {
+        return await FS.readDirectoryAsync(getChatDir(charName))
+            .then((result) => {
+                return result.length
+            })
+            .catch((error) => {
+                Logger.log('Could not get Chat list: ' + error, true)
+                return 0
+            })
+    }
+
+    export const getList = async (charName: string): Promise<string[]> => {
+        return await FS.readDirectoryAsync(getChatDir(charName)).catch((error) => {
+            Logger.log('Could not get Chat list: ' + error, true)
+            return []
+        })
+    }
+
+
+    export const getNewestOld = async (charName: string): Promise<string | undefined> => {
+        const filelist = await FS.readDirectoryAsync(getChatDir(charName))
+        return filelist?.[filelist?.length - 1]
+    }
+
+
+      const getChatFileDir = (charName: string, chatfilename: string): string => {
         return `${FS.documentDirectory}characters/${charName}/chats/${chatfilename}`
     }
 
     const getChatDir = (charName: string): string => {
         return `${FS.documentDirectory}characters/${charName}/chats`
+    }
+
+    export const getFileString = async (charName: string, chatName: string): Promise<any> => {
+        return await FS.readAsStringAsync(getChatFileDir(charName, chatName), {
+            encoding: FS.EncodingType.UTF8,
+        }).catch((error) => {
+            Logger.log('Failed to get string: ' + error, true)
+        })
     }
 
     export const getFileObject = async (
@@ -282,35 +476,6 @@ export namespace Chats {
                 return undefined
             })
     }
-    export const getFileString = async (charName: string, chatName: string): Promise<any> => {
-        return await FS.readAsStringAsync(getChatFileDir(charName, chatName), {
-            encoding: FS.EncodingType.UTF8,
-        }).catch((error) => {
-            Logger.log('Failed to get string: ' + error, true)
-        })
-    }
-    export const getNewest = async (charName: string): Promise<string | undefined> => {
-        const filelist = await FS.readDirectoryAsync(getChatDir(charName))
-        return filelist?.[filelist?.length - 1]
-    }
-
-    export const getNumber = async (charName: string): Promise<number> => {
-        return await FS.readDirectoryAsync(getChatDir(charName))
-            .then((result) => {
-                return result.length
-            })
-            .catch((error) => {
-                Logger.log('Could not get Chat list: ' + error, true)
-                return 0
-            })
-    }
-
-    export const getList = async (charName: string): Promise<string[]> => {
-        return await FS.readDirectoryAsync(getChatDir(charName)).catch((error) => {
-            Logger.log('Could not get Chat list: ' + error, true)
-            return []
-        })
-    }
 
     const defaultExtra = (): ChatExtra => ({
         api: mmkv.getString(Global.APIType) ?? 'undefined',
@@ -323,27 +488,7 @@ export namespace Chats {
         gen_started: new Date().toString(),
         extra: defaultExtra(),
     })
-
-    export const createEntry = (
-        name: string,
-        is_user: boolean,
-        message: string,
-        swipes: Array<string> = []
-    ): ChatEntry => {
-        const swipesize = swipes.length + 1
-
-        return {
-            name: name,
-            is_user: is_user,
-            mes: message,
-            ...defaultSwipeInfo(),
-            swipe_id: 0,
-            swipes: [message, ...swipes],
-            swipe_info: new Array(swipesize).fill(defaultSwipeInfo()),
-        }
-    }
-
-    export const createChat = async (
+    export const createChatOld = async (
         charId: number,
         userName: string
     ): Promise<undefined | string> => {
@@ -392,4 +537,25 @@ export namespace Chats {
     export const exists = async (charName: string, chatName: string) => {
         return FS.getInfoAsync(getChatFileDir(charName, chatName)).then((info) => info.exists)
     }
+    
+      export const createEntryOld = (
+        name: string,
+        is_user: boolean,
+        message: string,
+        swipes: Array<string> = []
+    ): ChatEntry => {
+        const swipesize = swipes.length + 1
+
+        return {
+            name: name,
+            is_user: is_user,
+            mes: message,
+            ...defaultSwipeInfo(),
+            swipe_id: 0,
+            swipes: [message, ...swipes],
+            swipe_info: new Array(swipesize).fill(defaultSwipeInfo()),
+        }
+    }
+    
+    */
 }

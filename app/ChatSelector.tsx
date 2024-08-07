@@ -7,9 +7,15 @@ import { useEffect, useState } from 'react'
 import { ScrollView, View, Text, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
 
+type ListItem = {
+    id: number
+    character_id: number
+    createDate: Date
+}
+
 const ChatSelector = () => {
     const router = useRouter()
-    const [chats, setChats] = useState<Array<string>>([])
+    const [chats, setChats] = useState<Array<ListItem>>([])
     const { charName, charId } = Characters.useCharacterCard((state) => ({
         charName: state.card?.data.name,
         charId: state.id,
@@ -21,26 +27,27 @@ const ChatSelector = () => {
         refreshfilenames()
     }, [])
 
-    const { deleteChat, loadChat, currentChat } = Chats.useChat((state) => ({
+    const { deleteChat, loadChat, currentChatId } = Chats.useChat((state) => ({
         deleteChat: state.delete,
         loadChat: state.load,
-        currentChat: state.name,
+        currentChatId: state.data?.id,
     }))
 
     const refreshfilenames = async () => {
-        const list = await Chats.getList(charName ?? '')
+        if (!charId) return
+        const list = await Chats.getList(charId)
         if (list.length === 0) {
-            await Chats.createChat(charId ?? -1, userName ?? '')
+            await Chats.createChat(charId)
             refreshfilenames()
             return
         }
-        if (charName && currentChat && !list.includes(currentChat)) {
-            loadChat(charName, list[0])
+        if (charName && currentChatId && !list.some((item) => item.id === currentChatId)) {
+            loadChat(list[0].id)
         }
         setChats(list)
     }
 
-    const handleDeleteChat = (chatname: string) => {
+    const handleDeleteChat = (chatId: number) => {
         Alert.alert(`Delete Chat`, `Are you sure you want to delete this chat file?`, [
             {
                 text: 'Cancel',
@@ -50,16 +57,17 @@ const ChatSelector = () => {
             {
                 text: 'Confirm',
                 onPress: () => {
-                    deleteChat(charName ?? '', chatname).then(() => {
-                        RecentMessages.deleteEntry(chatname)
-                        Chats.getNewest(charName ?? '').then(async (filename) => {
-                            if (!filename)
-                                await Chats.createChat(charId ?? -1, userName ?? '').then(
-                                    async (filename) =>
-                                        filename && (await loadChat(charName ?? '', filename))
-                                )
-                            refreshfilenames()
-                        })
+                    deleteChat(chatId).then(async () => {
+                        RecentMessages.deleteEntry(chatId)
+                        if (charId && !currentChatId) {
+                            const returnedChatId = await Chats.getNewest(charId)
+                            const chatId = returnedChatId
+                                ? returnedChatId
+                                : await Chats.createChat(charId)
+                            chatId && (await loadChat(chatId))
+                        }
+
+                        refreshfilenames()
                     })
                 },
                 style: 'destructive',
@@ -67,26 +75,27 @@ const ChatSelector = () => {
         ])
     }
 
-    const handleExportChat = async (chatName: string) => {
+    const handleExportChat = async (chatId: number) => {
         saveStringExternal(
-            chatName,
-            await Chats.getFileString(charName ?? '', chatName),
+            `Chatlogs-${charName}-${chatId}`,
+            JSON.stringify(await Chats.readChat(chatId)),
             'application/*'
         ).catch((error) => {
             Logger.log(`Could not save file. ${error}`, true)
         })
     }
 
-    const handleSelectChat = async (chatName: string) => {
-        await loadChat(charName ?? '', chatName)
+    const handleSelectChat = async (chatId: number) => {
+        await loadChat(chatId)
         router.back()
     }
 
     const handleCreateChat = async () => {
-        Chats.createChat(charId ?? -1, userName ?? '').then((filename) => {
-            Logger.debug(`File created: ${filename}`)
-            if (filename) handleSelectChat(filename)
-        })
+        if (charId)
+            Chats.createChat(charId).then((filename) => {
+                Logger.debug(`File created: ${filename}`)
+                if (filename) handleSelectChat(filename)
+            })
     }
 
     return (
@@ -107,12 +116,12 @@ const ChatSelector = () => {
                         ),
                     }}
                 />
-                {chats.reverse().map((filename, index) => (
+                {chats.reverse().map((item, index) => (
                     <TouchableOpacity
                         key={index}
-                        onPress={() => handleSelectChat(filename)}
+                        onPress={() => handleSelectChat(item.id)}
                         style={
-                            filename === currentChat
+                            item.id === currentChatId
                                 ? styles.longButtonSelectedContainer
                                 : styles.longButtonContainer
                         }>
@@ -120,11 +129,11 @@ const ChatSelector = () => {
                             source={{ uri: Characters.getImageDir(charId ?? -1) }}
                             style={styles.avatar}
                         />
-                        <Text style={styles.chatname}>{filename.replace('.jsonl', '')}</Text>
+                        <Text style={styles.chatname}>{item.createDate.toLocaleTimeString()}</Text>
 
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={() => handleExportChat(filename)}>
+                            onPress={() => handleExportChat(item.id)}>
                             <FontAwesome
                                 name="download"
                                 size={32}
@@ -133,7 +142,7 @@ const ChatSelector = () => {
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={() => handleDeleteChat(filename)}>
+                            onPress={() => handleDeleteChat(item.id)}>
                             <FontAwesome
                                 name="trash"
                                 size={32}

@@ -38,27 +38,30 @@ CREATE TABLE `characters` (
 );
 --> statement-breakpoint
 CREATE TABLE `chat_entries` (
-	`id` integer NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`chat_id` integer NOT NULL,
 	`is_user` integer NOT NULL,
 	`name` text NOT NULL,
+	`order` integer NOT NULL,
 	`swipe_id` integer DEFAULT 0,
-	FOREIGN KEY (`id`) REFERENCES `chats`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`chat_id`) REFERENCES `chats`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `chat_swipes` (
-	`id` integer NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`entry_id` integer NOT NULL,
 	`swipe` text DEFAULT '' NOT NULL,
 	`send_date` integer NOT NULL,
 	`gen_started` integer NOT NULL,
 	`gen_finished` integer NOT NULL,
-	FOREIGN KEY (`id`) REFERENCES `chat_entries`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`entry_id`) REFERENCES `chat_entries`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `chats` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`create_date` integer NOT NULL,
 	`character_id` integer NOT NULL,
-	FOREIGN KEY (`character_id`) REFERENCES `characters`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`character_id`) REFERENCES `characters`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `instructs` (
@@ -79,7 +82,8 @@ CREATE TABLE `instructs` (
 );
 --> statement-breakpoint
 CREATE TABLE `lorebook_entries` (
-	`id` integer NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`lorebook_id` integer NOT NULL,
 	`keys` text NOT NULL,
 	`content` text NOT NULL,
 	`enable` integer DEFAULT true,
@@ -87,7 +91,7 @@ CREATE TABLE `lorebook_entries` (
 	`case_sensitive` integer DEFAULT true,
 	`name` text NOT NULL,
 	`priority` integer DEFAULT 100,
-	FOREIGN KEY (`id`) REFERENCES `lorebooks`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`lorebook_id`) REFERENCES `lorebooks`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `lorebooks` (

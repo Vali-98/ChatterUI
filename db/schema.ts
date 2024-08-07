@@ -50,20 +50,18 @@ export const characterTags = sqliteTable(
     }
 )
 
-export const characterGreetingRelations = relations(characters, ({ many }) => ({
+export const characterRelations = relations(characters, ({ many }) => ({
     alternate_greetings: many(characterGreetings),
+    tags: many(characterTags),
+    lorebooks: many(characterLorebooks),
 }))
 
-export const greetingsToCharacterRelations = relations(characterGreetings, ({ one }) => ({
+export const greetingsRelations = relations(characterGreetings, ({ one }) => ({
     character_id: one(characters, {
         fields: [characterGreetings.character_id],
         references: [characters.id],
     }),
 }))
-
-/*export const characterTagsToCharacterRelations = relations(characterTags, ({ one }) => ({
-    
-}))*/
 
 export const characterTagsRelations = relations(characterTags, ({ one }) => ({
     tag: one(tags, {
@@ -76,11 +74,7 @@ export const characterTagsRelations = relations(characterTags, ({ one }) => ({
     }),
 }))
 
-export const characterToCharacterTagRelations = relations(characters, ({ many }) => ({
-    tags: many(characterTags),
-}))
-
-export const tagToCharacterTagsRelations = relations(tags, ({ many }) => ({
+export const tagsRelations = relations(tags, ({ many }) => ({
     characters: many(characterTags),
 }))
 
@@ -93,38 +87,23 @@ export const chats = sqliteTable('chats', {
         .$defaultFn(() => new Date()),
     character_id: integer('character_id', { mode: 'number' })
         .notNull()
-        .references(() => characters.id),
+        .references(() => characters.id, { onDelete: 'cascade' }),
 })
 
 export const chatEntries = sqliteTable('chat_entries', {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    chat_id: integer('id', { mode: 'number' })
+    chat_id: integer('chat_id', { mode: 'number' })
         .notNull()
         .references(() => chats.id, { onDelete: 'cascade' }),
     is_user: integer('is_user', { mode: 'boolean' }).notNull(),
     name: text('name').notNull(),
-    /* Stored in chat_swipes, reconstruct for use in state
-    mes: text('mes').notNull().default(''),
-
-    send_date: integer('send_date', { mode: 'timestamp' })
-        .notNull()
-        .$defaultFn(() => new Date()),
-
-    gen_started: integer('gen_started', { mode: 'timestamp' })
-        .notNull()
-        .$defaultFn(() => new Date()),
-
-    gen_finished: integer('gen_finished', { mode: 'timestamp' })
-        .notNull()
-        .$defaultFn(() => new Date()),
-    */
-
-    swipe_id: integer('swipe_id', { mode: 'number' }).default(0),
+    order: integer('order').notNull(),
+    swipe_id: integer('swipe_id', { mode: 'number' }).default(0).notNull(),
 })
 
 export const chatSwipes = sqliteTable('chat_swipes', {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    entry_id: integer('id', { mode: 'number' })
+    entry_id: integer('entry_id', { mode: 'number' })
         .notNull()
         .references(() => chatEntries.id, { onDelete: 'cascade' }),
     swipe: text('swipe').notNull().default(''),
@@ -142,22 +121,19 @@ export const chatSwipes = sqliteTable('chat_swipes', {
         .$defaultFn(() => new Date()),
 })
 
-export const chatsToEntriesRelations = relations(chats, ({ many }) => ({
+export const chatsRelations = relations(chats, ({ many }) => ({
     messages: many(chatEntries),
 }))
 
-export const chatEntriesToSwipeRelations = relations(chatEntries, ({ many }) => ({
-    swipes: many(chatSwipes),
-}))
-
-export const entriesToChatRelations = relations(chatEntries, ({ one }) => ({
+export const chatEntriesRelations = relations(chatEntries, ({ one, many }) => ({
     chat: one(chats, {
         fields: [chatEntries.chat_id],
         references: [chats.id],
     }),
+    swipes: many(chatSwipes),
 }))
 
-export const swipesToEntriesRelations = relations(chatSwipes, ({ one }) => ({
+export const swipesRelations = relations(chatSwipes, ({ one }) => ({
     entry: one(chatEntries, {
         fields: [chatSwipes.entry_id],
         references: [chatEntries.id],
@@ -202,7 +178,7 @@ export const lorebooks = sqliteTable('lorebooks', {
 
 export const lorebookEntries = sqliteTable('lorebook_entries', {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    lorebook_id: integer('id', { mode: 'number' })
+    lorebook_id: integer('lorebook_id', { mode: 'number' })
         .notNull()
         .references(() => lorebooks.id, { onDelete: 'cascade' }),
     keys: text('keys').notNull(),
@@ -214,17 +190,6 @@ export const lorebookEntries = sqliteTable('lorebook_entries', {
     name: text('name').notNull(),
     priority: integer('priority').default(100),
 })
-
-export const lorebooksToEntriesRelations = relations(lorebooks, ({ many }) => ({
-    entries: many(lorebookEntries),
-}))
-
-export const entriesToLorebooksRelations = relations(lorebookEntries, ({ one }) => ({
-    lorebook: one(lorebooks, {
-        fields: [lorebookEntries.lorebook_id],
-        references: [lorebooks.id],
-    }),
-}))
 
 export const characterLorebooks = sqliteTable(
     'character_lorebooks',
@@ -241,22 +206,23 @@ export const characterLorebooks = sqliteTable(
     }
 )
 
-export const charactersToCharacterLorebooksRelations = relations(characters, ({ many }) => ({
+export const lorebooksRelations = relations(lorebooks, ({ many }) => ({
+    entries: many(lorebookEntries),
     lorebooks: many(characterLorebooks),
 }))
 
-export const lorebooksToCharacterorebooksRelations = relations(lorebooks, ({ many }) => ({
-    lorebooks: many(characterLorebooks),
+export const lorebookEntriesRelations = relations(lorebookEntries, ({ one }) => ({
+    lorebook: one(lorebooks, {
+        fields: [lorebookEntries.lorebook_id],
+        references: [lorebooks.id],
+    }),
 }))
 
-export const characterLorebooksToCharactersRelations = relations(characterLorebooks, ({ one }) => ({
+export const characterLorebooksRelations = relations(characterLorebooks, ({ one }) => ({
     character: one(characters, {
         fields: [characterLorebooks.character_id],
         references: [characters.id],
     }),
-}))
-
-export const characterLorebooksToLorebookRelations = relations(characterLorebooks, ({ one }) => ({
     lorebook: one(lorebooks, {
         fields: [characterLorebooks.lorebook_id],
         references: [lorebooks.id],

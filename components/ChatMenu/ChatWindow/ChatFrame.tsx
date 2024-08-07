@@ -24,7 +24,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
     isLast,
 }) => {
     const imageDir = message.is_user ? Users.getImageDir(userName) : Characters.getImageDir(charId)
-
+    const swipe = message.swipes[message.swipe_id]
     const [imageSource, setImageSource] = useState({
         uri: imageDir,
     })
@@ -42,7 +42,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
 
     const deltaTime = Math.max(
         0,
-        (Date.parse(message.gen_finished) - Date.parse(message.gen_started)) / 1000
+        (swipe.gen_finished.getTime() - swipe.gen_started.getTime()) / 1000
     )
     return (
         <View style={{ flexDirection: 'row' }}>
@@ -58,7 +58,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
                 {deltaTime !== undefined && !message.is_user && id !== 0 && (
                     <Text style={styles.graytext}>{deltaTime}s</Text>
                 )}
-                {TTSenabled && <TTSMenu message={message.mes} isLast={isLast} />}
+                {TTSenabled && <TTSMenu message={swipe.swipe} isLast={isLast} />}
             </View>
             <View style={{ flex: 1, flexDirection: 'column' }}>
                 <View style={{ flex: 1 }}>
@@ -72,7 +72,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
                             {message.name}
                         </Text>
                         <Text style={{ fontSize: 10, color: Style.getColor('primary-text2') }}>
-                            {message.send_date}
+                            {swipe.send_date.toLocaleTimeString()}
                         </Text>
                     </View>
                 </View>

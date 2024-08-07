@@ -27,10 +27,9 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, id }) => {
     }
 
     const handleSwipeRight = async () => {
-        const atLimit = swipeChat(id, 1)
-        await saveChat()
+        const atLimit = await swipeChat(id, 1)
         if (atLimit && id !== 0) {
-            addSwipe()
+            await addSwipe()
             generateResponse()
         }
     }

@@ -39,9 +39,6 @@ export namespace Characters {
             .insert(characters)
             .values({ ...TavernCardV2(name), type: 'character' })
             .returning({ id: characters.id })
-        // TEMP: Delete after chat migration
-        await FS.makeDirectoryAsync(`${FS.documentDirectory}characters/${name}`)
-        await FS.makeDirectoryAsync(`${FS.documentDirectory}characters/${name}/chats`)
         return id
     }
 
@@ -66,9 +63,7 @@ export namespace Characters {
                 spec_version: '2.0',
                 data: {
                     ...data,
-                    // @ts-expect-error
                     tags: data.tags.map((item) => item.tag.tag),
-                    // @ts-expect-error,
                     alternate_greetings: data.alternate_greetings.map((item) => item.greeting),
                 },
             }
@@ -98,17 +93,7 @@ export namespace Characters {
     }
 
     export const deleteCard = async (charID: number) => {
-        // TEMP: Delete after chat migration
-        const data = await db
-            .select({ name: characters.name })
-            .from(characters)
-            .where(eq(characters.id, charID))
-
-        await FS.deleteAsync(`${FS.documentDirectory}characters/${data[0].name}`, {
-            idempotent: true,
-        })
         deleteImage(charID)
-        // ENDTEMP
         await db.delete(characters).where(eq(characters.id, charID))
         await db
             .delete(tags)
@@ -141,7 +126,6 @@ export namespace Characters {
             where: (characters, { eq }) => eq(characters.type, 'character'),
         })
         //  ERROR CAUSE: Drizzle incorrect type definition above
-        //@ts-expect-error
         return query.map((item) => ({ ...item, tags: item.tags.map((item) => item.tag.tag) }))
     }
 
@@ -153,10 +137,6 @@ export namespace Characters {
     }
 
     const createCharacter = async (card: CharacterCardV2, imageuri: string = '') => {
-        // TEMP: Delete after chat migration
-        await FS.makeDirectoryAsync(`${FS.documentDirectory}characters/${card.data.name}`)
-        await FS.makeDirectoryAsync(`${FS.documentDirectory}characters/${card.data.name}/chats`)
-        // END TEMP
         // TODO : Extract CharacterBook value to Lorebooks, CharacterLorebooks
         const { data } = card
         // provide warning ?
@@ -170,8 +150,6 @@ export namespace Characters {
                         ...data,
                     })
                     .returning({ id: characters.id })
-
-                // TODO: Insert Image
 
                 const greetingdata = data.alternate_greetings.map((item) => ({
                     character_id: id,
@@ -196,7 +174,7 @@ export namespace Characters {
                 }
                 return id
             } catch (error) {
-                console.log(`Rolling back due to error: ` + error)
+                Logger.log(`Rolling back due to error: ` + error)
                 tx.rollback()
                 return undefined
             }
@@ -327,8 +305,12 @@ export namespace Characters {
         Logger.log(`Invalid input!`, true)
     }
 
-    export const getImageDir = (charID: number) => {
-        return `${FS.documentDirectory}characters/${charID}.png`
+    export const getImageDir = (charId: number) => {
+        return `${FS.documentDirectory}characters/${charId}.png`
+    }
+
+    export const exists = async (charId: number) => {
+        return await db.query.characters.findFirst({ where: eq(characters.id, charId) })
     }
 
     export const debugDeleteTags = async () => {
@@ -344,9 +326,6 @@ export namespace Characters {
     }
 
     export const debugDelete = async () => {
-        //const files = await FS.readDirectoryAsync(`${FS.documentDirectory}characters`)
-        //console.log(files)
-        //return
         await db.delete(characters).all()
         await db.delete(characterTags).all()
         await db.delete(tags).all()

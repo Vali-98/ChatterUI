@@ -15,13 +15,13 @@ import { Characters } from './Characters'
 
 export const regenerateResponse = async () => {
     const charName = Characters.useCharacterCard.getState().card?.data.name
-    const messageName = Chats.useChat.getState()?.data?.at(-1)?.name
-    const messagesLength = Chats.useChat.getState()?.data?.length
+    const messageName = Chats.useChat.getState()?.data?.messages.at(-1)?.name
+    const messagesLength = Chats.useChat.getState()?.data?.messages.length
     Logger.log('Regenerate Response')
     if (messageName == charName && messagesLength && messagesLength !== 1) {
-        Chats.useChat.getState().deleteEntry(messagesLength - 1)
+        await Chats.useChat.getState().deleteEntry(messagesLength - 1)
     }
-    Chats.useChat.getState().addEntry(charName ?? '', false, '')
+    await Chats.useChat.getState().addEntry(charName ?? '', false, '')
     generateResponse()
 }
 
@@ -112,7 +112,7 @@ export const hordeHeader = () => {
  */
 
 const buildContext = (max_length: number) => {
-    const messages = [...(Chats.useChat.getState().data ?? [])]
+    const messages = [...(Chats.useChat.getState().data?.messages ?? [])]
     const delta = new Date().getTime()
     const currentInstruct = getObject(Global.CurrentInstruct)
     const userCard = getObject(Global.CurrentUserCard)
@@ -136,7 +136,7 @@ const buildContext = (max_length: number) => {
         let message_shard = `${message.is_user ? currentInstruct.input_sequence : currentInstruct.output_sequence}`
 
         if (currentInstruct.names) message_shard += message.name + ': '
-        message_shard += message.mes
+        message_shard += message.swipes[message.swipe_id].swipe
         if (currentInstruct.separator_sequence) message_shard += currentInstruct.separator_sequence
         message_shard += currentInstruct.wrap ? `\n` : ' '
 
@@ -164,7 +164,7 @@ const buildContext = (max_length: number) => {
 }
 
 const buildChatCompletionContext = (max_length: number) => {
-    const messages = [...(Chats.useChat.getState().data ?? [])]
+    const messages = [...(Chats.useChat.getState().data?.messages ?? [])]
     const userCard = getObject(Global.CurrentUserCard)
     const currentCard = { ...Characters.useCharacterCard.getState().card }
     const currentInstruct = instructReplaceMacro()
@@ -175,11 +175,12 @@ const buildChatCompletionContext = (max_length: number) => {
     let total_length = LlamaTokenizer.encode(initial).length
     const payload = [{ role: 'system', content: replaceMacros(initial) }]
     for (const message of messages.reverse()) {
-        const len = LlamaTokenizer.encode(message.mes).length + total_length
+        const len =
+            LlamaTokenizer.encode(message.swipes[message.swipe_id].swipe).length + total_length
         if (len > max_length) break
         payload.push({
             role: message.is_user ? 'user' : 'assistant',
-            content: replaceMacros(message.mes),
+            content: replaceMacros(message.swipes[message.swipe_id].swipe),
         })
         total_length += len
     }

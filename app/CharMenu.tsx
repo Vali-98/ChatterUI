@@ -65,31 +65,28 @@ const CharMenu = () => {
 
     const setCurrentCharacter = async (charId: number, edit: boolean = false) => {
         if (nowLoading) return
-        setNowLoading(true)
-        const charName = await setCurrentCard(charId)
-        if (charName)
-            Chats.getNewest(charName)
-                .then(async (filename) => {
-                    //setCurrentChat(filename)
+        try {
+            setNowLoading(true)
+            const charName = await setCurrentCard(charId)
+            if (!charName) return
+            const returnedChatId = await Chats.getNewest(charId)
+            let chatId = returnedChatId
+            if (!chatId) {
+                chatId = await Chats.createChat(charId)
+            }
+            if (!chatId) {
+                Logger.log('Chat creation backup has failed! Please report.', true)
+                return
+            }
+            await loadChat(chatId)
 
-                    let file = filename
-                    if (!file) {
-                        file = await Chats.createChat(charId, userName ?? '')
-                    }
-                    if (!file) {
-                        Logger.log('Chat creation backup has failed! Please report.', true)
-                        return
-                    }
-                    await loadChat(charName, file)
-
-                    setNowLoading(false)
-                    if (edit) router.push('/CharInfo')
-                    else router.back()
-                })
-                .catch((error: any) => {
-                    Logger.log(`Couldn't load character: ${error}`, true)
-                    setNowLoading(false)
-                })
+            setNowLoading(false)
+            if (edit) router.push('/CharInfo')
+            else router.back()
+        } catch (error) {
+            Logger.log(`Couldn't load character: ${error}`, true)
+            setNowLoading(false)
+        }
     }
 
     const handleCreateCharacter = async (text: string) => {
@@ -131,7 +128,7 @@ const CharMenu = () => {
                                         <TouchableOpacity
                                             style={styles.headerButtonRight}
                                             onPress={async () => {
-                                                await Characters.debugCheckTags()
+                                                await Chats.debugChatCount()
                                             }}>
                                             <FontAwesome
                                                 name="question"

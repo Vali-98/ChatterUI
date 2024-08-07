@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "28a962a7-f51e-4620-b7e5-ff78910be2e2",
+  "id": "b2939fe9-b273-42b5-8f08-b86b6e3dd4de",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "character_greetings": {
@@ -281,6 +281,13 @@
         "id": {
           "name": "id",
           "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "chat_id": {
+          "name": "chat_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -299,6 +306,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "swipe_id": {
           "name": "swipe_id",
           "type": "integer",
@@ -310,12 +324,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "chat_entries_id_chats_id_fk": {
-          "name": "chat_entries_id_chats_id_fk",
+        "chat_entries_chat_id_chats_id_fk": {
+          "name": "chat_entries_chat_id_chats_id_fk",
           "tableFrom": "chat_entries",
           "tableTo": "chats",
           "columnsFrom": [
-            "id"
+            "chat_id"
           ],
           "columnsTo": [
             "id"
@@ -332,6 +346,13 @@
       "columns": {
         "id": {
           "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "entry_id": {
+          "name": "entry_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -369,12 +390,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "chat_swipes_id_chat_entries_id_fk": {
-          "name": "chat_swipes_id_chat_entries_id_fk",
+        "chat_swipes_entry_id_chat_entries_id_fk": {
+          "name": "chat_swipes_entry_id_chat_entries_id_fk",
           "tableFrom": "chat_swipes",
           "tableTo": "chat_entries",
           "columnsFrom": [
-            "id"
+            "entry_id"
           ],
           "columnsTo": [
             "id"
@@ -423,7 +444,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -543,6 +564,13 @@
         "id": {
           "name": "id",
           "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "lorebook_id": {
+          "name": "lorebook_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -603,12 +631,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "lorebook_entries_id_lorebooks_id_fk": {
-          "name": "lorebook_entries_id_lorebooks_id_fk",
+        "lorebook_entries_lorebook_id_lorebooks_id_fk": {
+          "name": "lorebook_entries_lorebook_id_lorebooks_id_fk",
           "tableFrom": "lorebook_entries",
           "tableTo": "lorebooks",
           "columnsFrom": [
-            "id"
+            "lorebook_id"
           ],
           "columnsTo": [
             "id"
