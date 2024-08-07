@@ -226,6 +226,7 @@ export namespace Presets {
         ],
         [API.NOVELAI]: [],
         [API.APHRODITE]: [],
+        [API.CLAUDE]: [],
     }
 
     export const defaultPreset = () => {
@@ -285,7 +286,10 @@ export namespace Presets {
         const targetPreset: any = defaultPreset()
         const defaultKeys = Object.keys(targetPreset)
         let samekeys = true
-        defaultKeys.map((key: any) => {
+        defaultKeys.map((key) => {
+            if (key === 'seed' && typeof preset[key] === 'string')
+                preset[key] = parseInt(preset[key])
+
             if (existingKeys.includes(key)) return
             preset[key] = targetPreset[key]
             samekeys = false
