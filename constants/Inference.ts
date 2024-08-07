@@ -113,22 +113,27 @@ export const hordeHeader = () => {
  *      - Input Prefix + User Response + Input Suffix
  *      - Output Prefix + Bot Response + Output Suffix
  *      - Repeat
+ *
+ *  NOTE: Instruct formatting cannot be cached due to possibly using user and character names.
+ *  Consider having a system capable of listening to changes in User / Character to update
+ *  cached Instructs
  */
 
 const buildContext = (max_length: number) => {
+    const delta = performance.now()
     const messages = [...(Chats.useChat.getState().data?.messages ?? [])]
-    const delta = new Date().getTime()
+
     const currentInstruct = instructReplaceMacro()
     const userCard = getObject(Global.CurrentUserCard)
     const currentCard = { ...Characters.useCharacterCard.getState().card }
 
-    const usercarddata = (userCard?.description ?? '').trim()
-    const charcarddata = (currentCard?.data?.description ?? '').trim()
+    const user_card_data = (userCard?.description ?? '').trim()
+    const char_card_data = (currentCard?.data?.description ?? '').trim()
     let payload = ``
     if (currentInstruct.system_prefix) payload += currentInstruct.system_prefix
     if (currentInstruct.system_prompt) payload += `${currentInstruct.system_prompt}\n`
-    if (usercarddata) payload += usercarddata + '\n'
-    if (charcarddata) payload += charcarddata + '\n'
+    if (user_card_data) payload += user_card_data + '\n'
+    if (char_card_data) payload += char_card_data + '\n'
     // suffix must be delayed for example messages
     const payload_length =
         LlamaTokenizer.encode(payload).length + currentInstruct.system_suffix
@@ -137,21 +142,40 @@ const buildContext = (max_length: number) => {
 
     let message_acc = ``
     let message_acc_length = LlamaTokenizer.encode(message_acc).length
-    for (const message of messages?.reverse() ?? []) {
-        let message_shard = `${message.is_user ? currentInstruct.input_prefix : currentInstruct.output_prefix}`
-        if (currentInstruct.names) message_shard += message.name + ': '
-        message_shard += message.swipes[message.swipe_id].swipe
-        //if (currentInstruct.separator_sequence) message_shard += currentInstruct.separator_sequence
-        if (message.swipes[message.swipe_id].swipe)
-            message_shard += `${message.is_user ? currentInstruct.input_suffix : currentInstruct.output_suffix}`
-        message_shard += currentInstruct.wrap ? `\n` : ' '
 
-        const shard_length = LlamaTokenizer.encode(message_shard).length
+    const input_prefix_length = LlamaTokenizer.encode(currentInstruct.input_prefix).length
+    const input_suffix_length = LlamaTokenizer.encode(currentInstruct.input_suffix).length
+    const output_prefix_length = LlamaTokenizer.encode(currentInstruct.output_prefix).length
+    const output_suffix_length = LlamaTokenizer.encode(currentInstruct.output_suffix).length
+
+    let is_last = true
+    let index = messages.length - 1
+    for (const message of messages?.reverse() ?? []) {
+        const swipe_len = message.swipes[message.swipe_id].swipe
+            ? Chats.useChat.getState().getTokenCount(index)
+            : 0
+        // for last message, we want to skip the end token to allow the LLM to generate
+        const instruct_len = message.is_user
+            ? input_prefix_length + (is_last ? 0 : input_suffix_length)
+            : output_prefix_length + (is_last ? 0 : output_suffix_length)
+        const shard_length = swipe_len + instruct_len
         if (message_acc_length + payload_length + shard_length > max_length) {
             break
         }
+
+        let message_shard = `${message.is_user ? currentInstruct.input_prefix : currentInstruct.output_prefix}`
+        if (currentInstruct.names) message_shard += message.name + ': '
+        message_shard += message.swipes[message.swipe_id].swipe
+
+        if (!is_last)
+            message_shard += `${message.is_user ? currentInstruct.input_suffix : currentInstruct.output_suffix}`
+        else is_last = false
+
+        message_shard += currentInstruct.wrap ? `\n` : ' '
+
         message_acc_length += shard_length
         message_acc = message_shard + message_acc
+        index--
     }
 
     const examples = Characters.useCharacterCard.getState()?.card?.data.mes_example
@@ -168,7 +192,7 @@ const buildContext = (max_length: number) => {
 
     payload = replaceMacros(payload)
     Logger.log(`Payload size: ${LlamaTokenizer.encode(payload).length}`)
-    Logger.log(`${new Date().getTime() - delta}ms taken to build context`)
+    Logger.log(`${(performance.now() - delta).toPrecision(8)}ms taken to build context`)
     return payload
 }
 
