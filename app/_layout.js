@@ -148,7 +148,7 @@ const Layout = () => {
                          (<View style={styles.headerButtonContainer}>
                             <TouchableOpacity style={styles.headerButtonRight} onPress={() => {
                                 // create new default chat from globals
-                                Chats.createNewDefaultChat(charName).then( response =>
+                                Chats.createDefault(charName, userName).then( response =>
                                     setCurrentChat(response)
                                 )
                                 router.back()

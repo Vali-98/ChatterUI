@@ -16,7 +16,6 @@ import { humanizedISO8601DateTime } from './Utils';
 
 export { mmkv, Presets, Instructs, Users, Characters, Chats, Global, API, humanizedISO8601DateTime }
 
-
 export const MessageContext = createContext([])
 
 /*

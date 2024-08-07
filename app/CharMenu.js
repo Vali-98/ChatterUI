@@ -115,6 +115,7 @@ const CharMenu = () => {
             />
 
             <TextBoxModal 
+                title={"Enter Character Hub Link"}
                 booleans={[showDownload, setShowDownload]}
                 onConfirm={(text)=> {
                     axios.create({timeout: 1000}).post(

@@ -14,6 +14,7 @@ Built for the purpose of learning Javascript, so it may be a little rough around
 - AI Horde
 - text-generation-webui
 - Mancer
+- Text Completions
 
 ### Building from source.
 Building from source has **not** been tested.
