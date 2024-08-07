@@ -32,14 +32,11 @@ export const continueResponse = () => {
 }
 
 export const generateResponse = async () => {
-    console.log('Nowgen is ', useInference.getState().nowGenerating)
     if (useInference.getState().nowGenerating) {
         Logger.log('Generation already in progress', true)
         return
     }
     Chats.useChat.getState().startGenerating()
-
-    console.log('Nowgen is ', useInference.getState().nowGenerating)
     Logger.log(`Obtaining response.`)
     const data = performance.now()
     const setAbortFunction = useInference.getState().setAbort
@@ -133,7 +130,7 @@ const buildContext = (max_length: number) => {
 
     const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
 
-    const userCard = { ...Characters.useCharacterCard.getState().card }
+    const userCard = { ...Characters.useUserCard.getState().card }
     const userName = userCard.data?.name ?? ''
 
     const currentCard = { ...Characters.useCharacterCard.getState().card }
@@ -145,9 +142,9 @@ const buildContext = (max_length: number) => {
 
     const user_card_data = (userCard?.data?.description ?? '').trim()
     const char_card_data = (currentCard?.data?.description ?? '').trim()
-
     let payload = ``
-    let payload_length = 0
+    // set suffix length as its always added
+    let payload_length = instructCache.system_suffix_length * token_mult
     if (currentInstruct.system_prefix) {
         payload += currentInstruct.system_prefix
         payload_length += instructCache.system_prefix_length * token_mult
@@ -210,7 +207,7 @@ const buildContext = (max_length: number) => {
 
     if (currentInstruct.system_suffix) {
         payload += ' ' + currentInstruct.system_suffix
-        message_acc_length += instructCache.system_suffix_length * token_mult
+        //message_acc_length += instructCache.system_suffix_length * token_mult
     }
     payload = replaceMacros(payload + message_acc)
     //Logger.log(`Payload size: ${LlamaTokenizer.encode(payload).length}`)
