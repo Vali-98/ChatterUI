@@ -2,7 +2,6 @@
   "name": "chatterui",
   "main": "expo-router/entry",
   "version": "0.7.6",
-  "onnxruntimeExtensionsEnabled": "true",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -55,7 +54,6 @@
     "expo-sqlite": "~14.0.4",
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
-    "onnxruntime-react-native": "^1.17.3",
     "png-chunk-text": "^1.0.0",
     "png-chunks-extract": "^1.0.0",
     "react": "18.2.0",
@@ -64,7 +62,6 @@
     "react-native": "0.74.3",
     "react-native-blob-util": "^0.19.9",
     "react-native-collapsible": "^1.6.1",
-    "react-native-document-picker": "^9.1.0",
     "react-native-element-dropdown": "^2.10.0",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-markdown-package": "^1.8.2",
