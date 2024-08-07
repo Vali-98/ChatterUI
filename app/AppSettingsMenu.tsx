@@ -182,6 +182,7 @@ const AppSettingsMenu = () => {
                 }}>
                 <Text style={styles.buttonText}>Import Database</Text>
             </TouchableOpacity>
+            <View style={{ paddingVertical: 60 }} />
         </ScrollView>
     )
 }
@@ -190,9 +191,9 @@ export default AppSettingsMenu
 
 const styles = StyleSheet.create({
     mainContainer: {
-        marginVertical: 16,
-        paddingVertical: 16,
-        paddingHorizontal: 20,
+        marginTop: 16,
+        marginHorizontal: 20,
+        paddingBottom: 20,
     },
 
     button: {
