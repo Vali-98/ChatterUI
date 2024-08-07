@@ -2,9 +2,9 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { Chats, Style } from '@globals'
 import React, { useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
-//@ts-ignore
+//@ts-expect-error
 import Markdown from 'react-native-markdown-package'
-//@ts-ignore
+//@ts-expect-error
 import AnimatedEllipsis from 'rn-animated-ellipsis'
 import SimpleMarkdown from 'simple-markdown'
 import { ChatEntry } from '@constants/Chat'
@@ -25,15 +25,15 @@ const ChatItem: React.FC<ChatItemProps> = ({ id, nowGenerating, charId, userName
     const message =
         Chats.useChat(useShallow((state) => state?.data?.messages?.[id])) ?? Chats.dummyEntry
 
-    const messagesLength = Chats.useChat(useShallow((state) => state?.data?.messages?.length)) ?? -1
     const mes = message.swipes[message.swipe_id].swipe ?? ''
     const [placeholderText, setPlaceholderText] = useState(mes)
     const [editMode, setEditMode] = useState(false)
 
-    const { updateChat, deleteChat } = Chats.useChat(
+    const { updateChat, deleteChat, messagesLength } = Chats.useChat(
         useShallow((state) => ({
             updateChat: state.updateEntry,
             deleteChat: state.deleteEntry,
+            messagesLength: state?.data?.messages?.length ?? -1,
         }))
     )
     const buffer = Chats.useChat((state) => (id === messagesLength - 1 ? state.buffer : ''))

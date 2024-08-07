@@ -77,8 +77,6 @@ export const startupApp = () => {
     Chats.useChat.getState().reset()
     Characters.useCharacterCard.getState().unloadCard()
 
-    //mmkv.set(Global.CurrentCharacter, 'Welcome')
-    //mmkv.set(Global.CurrentCharacterCard, JSON.stringify(`{}`))
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
     mmkv.set(Global.HordeModels, JSON.stringify([]))
     if (mmkv.getString(Global.OpenAIModel) === undefined)
@@ -182,3 +180,5 @@ export const migratePresets = async () => {
         })
         .catch(() => {})
 }
+
+// TODO: Migrate to db

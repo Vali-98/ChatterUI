@@ -7,7 +7,7 @@ import { MenuProvider } from 'react-native-popup-menu'
 import migrations from '../db/migrations/migrations'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { db } from '@db'
-// init values should be here
+
 const Layout = () => {
     const [firstRender, setFirstRender] = useState<boolean>(true)
     const { success, error } = useMigrations(db, migrations)
@@ -19,7 +19,15 @@ const Layout = () => {
         setFirstRender(false)
     }, [])
 
-    const color = Style.useColorScheme((state) => state.colors)
+    if (error)
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: Style.getColor('primary-text1'), fontSize: 16 }}>
+                    Database Migration Failed!
+                </Text>
+            </View>
+        )
+
     if (!success)
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -29,14 +37,6 @@ const Layout = () => {
             </View>
         )
 
-    if (error)
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ color: Style.getColor('primary-text1'), fontSize: 16 }}>
-                    Database Migration Failed!
-                </Text>
-            </View>
-        )
     if (!firstRender)
         return (
             <GestureHandlerRootView style={{ flex: 1 }}>

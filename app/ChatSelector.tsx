@@ -17,14 +17,13 @@ type ListItem = {
 const ChatSelector = () => {
     const router = useRouter()
     const [chats, setChats] = useState<Array<ListItem>>([])
-    const { charName, charId } = Characters.useCharacterCard(
+    const { charName, charId, imageId } = Characters.useCharacterCard(
         useShallow((state) => ({
             charName: state.card?.data.name,
             charId: state.id,
+            imageId: state.card?.data.image_id,
         }))
     )
-
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
 
     useEffect(() => {
         refreshfilenames()
@@ -129,7 +128,7 @@ const ChatSelector = () => {
                                 : styles.longButtonContainer
                         }>
                         <Image
-                            source={{ uri: Characters.getImageDir(charId ?? -1) }}
+                            source={{ uri: Characters.getImageDir(imageId ?? -1) }}
                             style={styles.avatar}
                         />
                         <Text style={styles.chatname}>{item.createDate.toLocaleTimeString()}</Text>

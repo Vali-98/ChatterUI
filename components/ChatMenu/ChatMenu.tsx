@@ -126,7 +126,13 @@ const ChatMenu = () => {
         if (abortFunction !== undefined) abortFunction()
     }
 
-    const menuoptions = [
+    type MenuData = {
+        callback: () => void
+        text: string
+        button: 'back' | 'edit' | 'paperclip'
+    }
+
+    const menuoptions: Array<MenuData> = [
         /*{
             callback: () => {},
             text: 'Continue',
@@ -181,7 +187,6 @@ const ChatMenu = () => {
                             }>
                             <AntDesign
                                 style={{ minWidth: 25, marginLeft: 5 }}
-                                //@ts-expect-error
                                 name={item.button}
                                 color={Style.getColor('primary-text2')}
                                 size={24}

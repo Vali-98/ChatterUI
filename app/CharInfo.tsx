@@ -34,7 +34,7 @@ const CharInfo = () => {
 
     const [characterCard, setCharacterCard] = useState<CharacterCardV2 | undefined>(currentCard)
 
-    const imageDir = Characters.getImageDir(charId ?? -1)
+    const imageDir = Characters.getImageDir(currentCard?.data.image_id ?? -1)
 
     const [imageSource, setImageSource] = useState({
         uri: imageDir,

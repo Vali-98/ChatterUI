@@ -16,6 +16,7 @@ type CharacterCardState = {
     id: number | undefined
     setCard: (id: number) => Promise<string | undefined>
     unloadCard: () => void
+    getImage: () => string
 }
 
 export namespace Characters {
@@ -26,15 +27,18 @@ export namespace Characters {
             setCard: async (id: number) => {
                 let start = performance.now()
                 const card = await readCard(id)
-                console.log(`[Characters] time for db query: `, performance.now() - start)
+                Logger.debug(`[Characters] time for db query: ${performance.now() - start}`)
                 start = performance.now()
                 set((state) => ({ ...state, card: card, id: id }))
 
-                console.log('[Characters] time for zustand set: ', performance.now() - start)
+                Logger.debug(`[Characters] time for zustand set: ${performance.now() - start}`)
                 return card?.data.name
             },
             unloadCard: () => {
                 set((state) => ({ ...state, id: undefined, card: undefined }))
+            },
+            getImage: () => {
+                return getImageDir(get().card?.data.image_id ?? 0)
             },
         })
     )
@@ -75,20 +79,20 @@ export namespace Characters {
     }
 
     export const updateCard = async (card: CharacterCardV2, charId: number) => {
-        // NOTE: ...card.data fails for some reason
         await db
             .update(characters)
             .set({ description: card.data.description, first_mes: card.data.first_mes })
             .where(eq(characters.id, charId))
     }
 
+    // TODO: Proper per field updates, though not that expensive
     export const updateCardField = async (field: string, data: any, charId: number) => {
         if (field === 'tags') {
-            //
+            // find tags and update
             return
         }
         if (field === 'alternate_greetings') {
-            //
+            // find greetings and update
             return
         }
         await db
@@ -117,6 +121,7 @@ export namespace Characters {
             columns: {
                 id: true,
                 name: true,
+                image_id: true,
             },
             with: {
                 tags: {
@@ -130,7 +135,6 @@ export namespace Characters {
             },
             where: (characters, { eq }) => eq(characters.type, 'character'),
         })
-        //  ERROR CAUSE: Drizzle incorrect type definition above
         return query.map((item) => ({ ...item, tags: item.tags.map((item) => item.tag.tag) }))
     }
 
@@ -146,15 +150,15 @@ export namespace Characters {
         const { data } = card
         // provide warning ?
         // if (data.character_book) { console.log(warn) }
-        const id = await db.transaction(async (tx) => {
+        const image_id = await db.transaction(async (tx) => {
             try {
-                const [{ id }, ..._] = await tx
+                const [{ id, image_id }, ..._] = await tx
                     .insert(characters)
                     .values({
                         type: 'character',
                         ...data,
                     })
-                    .returning({ id: characters.id })
+                    .returning({ id: characters.id, image_id: characters.image_id })
 
                 const greetingdata = data.alternate_greetings.map((item) => ({
                     character_id: id,
@@ -177,14 +181,14 @@ export namespace Characters {
                     }))
                     await tx.insert(characterTags).values(tagids).onConflictDoNothing()
                 }
-                return id
+                return image_id
             } catch (error) {
                 Logger.log(`Rolling back due to error: ` + error)
                 tx.rollback()
                 return undefined
             }
         })
-        if (id) await copyImage(imageuri, id)
+        if (image_id) await copyImage(imageuri, image_id)
     }
 
     export const createCharacterFromImage = async (uri: string) => {
@@ -252,7 +256,6 @@ export namespace Characters {
             `https://server.pygmalion.chat/api/export/character/${character_id}/v2`,
             {
                 method: 'GET',
-                //body: JSON.stringify({ character_id: clean }),
                 headers: {
                     accept: 'application/json',
                     'content-type': 'application/json',
@@ -280,12 +283,17 @@ export namespace Characters {
     }
 
     export const importCharacterFromRemote = async (text: string) => {
+        // UUID standard RFC 4122, only used by pyg for now
+        const uuidRegex =
+            /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
         const url = new URL(text)
 
         if (url.hostname === 'pygmalion.chat') {
             const param = new URLSearchParams(text)
-            const character_id = param.get('id')?.replaceAll(`"`, '')
+            let character_id = param.get('id')?.replaceAll(`"`, '')
+            const path = url.pathname.replace('/characters/', '')
             if (character_id) return importCharacterFromPyg(character_id)
+            else if (uuidRegex.test(path)) return importCharacterFromPyg(path)
             else {
                 Logger.log(`Failed to get id from Pygmalion URL`, true)
                 return
@@ -303,9 +311,6 @@ export namespace Characters {
 
         // Regex checks for format of [name][/][character]
         if (/^[^\/]+\/[^\/]+$/.test(text)) return importCharacterFromChub(text)
-        // UUID standard RFC 4122, only used by pyg for now
-        const uuidRegex =
-            /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
         if (uuidRegex.test(text)) return importCharacterFromPyg(text)
         Logger.log(`Invalid input!`, true)
     }
@@ -355,6 +360,9 @@ export type CharacterCardV2 = {
     spec: string
     spec_version: string
     data: {
+        // field for chatterUI
+        image_id: number
+
         name: string
         description: string
         personality: string
@@ -367,6 +375,7 @@ export type CharacterCardV2 = {
         system_prompt: string
         post_history_instructions: string
         alternate_greetings: Array<string>
+        //for ChatterUI this will be removed into its own table
         //character_book: string
 
         // May 8th additions
