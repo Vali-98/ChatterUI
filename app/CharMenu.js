@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     nametag : {
         fontSize:16,
         marginLeft: 20,
-        color: Color.White,
+        color: Color.Text,
     },
     
     modalview: {

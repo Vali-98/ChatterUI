@@ -2,7 +2,7 @@ import { SafeAreaView, View, Text, Image, TouchableOpacity, StyleSheet, TextInpu
 import React from 'react'
 import { Stack, useRouter } from 'expo-router'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
-import { Global, getUserImageDirectory, saveUserCard, copyUserImage } from '@globals'
+import { Global, Color, getUserImageDirectory, saveUserCard, copyUserImage } from '@globals'
 import { FontAwesome  } from '@expo/vector-icons'
 import * as DocumentPicker from 'expo-document-picker'
 
@@ -17,7 +17,7 @@ const UserInfo = () => {
     
 
     return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.mainContainer}>
         <Stack.Screen
             options={{
                 title: 'Edit User',
@@ -36,7 +36,7 @@ const UserInfo = () => {
                         saveCard()
                         router.back()
                     }}>
-                        <FontAwesome size={20} name='check'/>
+                        <FontAwesome size={20} name='check' color={Color.Button}/>
                     </TouchableOpacity>
                     <TouchableOpacity  style={styles.button} 
                         onPress={() => {
@@ -45,20 +45,22 @@ const UserInfo = () => {
                             copyUserImage(result.assets[0].uri, userName)
                         })
                     }}>
-                        <FontAwesome size={20} name='upload' />
+                        <FontAwesome size={20} name='upload' color={Color.Button}/>
                     </TouchableOpacity>
                 </View>
             </View>
         </View>
         <View   style={styles.inputarea}>
             
-        <Text>Description</Text>
+        <Text style={{color:Color.Text}}>Description</Text>
         <TextInput 
             style={styles.input}
             multiline
-            numberOfLines={3}
+            numberOfLines={6}
             value={userCard?.description ?? ''}
             onChangeText={text => {setUserCard({...userCard, description: text})}}
+            placeholder='----'
+            placeholderTextColor={Color.Offwhite}
         />
         </View>
 
@@ -70,7 +72,12 @@ export default UserInfo
 
 
 const styles = StyleSheet.create({
- 
+    
+    mainContainer: {
+        backgroundColor: Color.Background,
+        flex: 1,
+    },
+
     userContainer: {
         flexDirection:'row',
         marginBottom: 40,
@@ -83,9 +90,8 @@ const styles = StyleSheet.create({
     },
 
     button: {
+        backgroundColor: Color.DarkContainer,
         marginRight: 10,
-        borderWidth: 1,
-        borderRadius: 4,
         padding: 8,
     },
 
@@ -116,10 +122,12 @@ const styles = StyleSheet.create({
     },
 
     input: {
-        borderWidth: 1,
-        borderRadius: 8,
+        marginTop: 12,
+        color: Color.Text,
+        backgroundColor: Color.DarkContainer,
         textAlignVertical: 'top',
         paddingVertical:8,
+        borderRadius: 8,
       },
 
 })

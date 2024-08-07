@@ -10,10 +10,13 @@ export const MessageContext = createContext([])
 
 
 export const enum Color {
+    Header= '#1e1e1e',
     Background = '#222',
     Container = '#333',
     BorderColor = '#252525',
     White = '#fff',
+    Text = '#fff',
+    TextItalic = '#aaa',
     Black = '#000',
     DarkContainer= '#111',
     Offwhite= '#aaa',

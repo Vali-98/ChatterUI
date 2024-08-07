@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		margin: 40,
 		fontSize:20,
-		color: Color.White
+		color: Color.Text
 	},
 
 	inputContainer: {
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 16,
 	},
 	input: {
-		color: Color.White,
+		color: Color.Text,
 		backgroundColor: Color.DarkContainer,
 		flex: 1,
 		borderWidth: 1,

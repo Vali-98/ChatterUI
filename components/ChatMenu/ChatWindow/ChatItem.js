@@ -74,8 +74,8 @@ const ChatItem = ({ message, id}) => {
             <View style={{flex:1}}>
 
                 <View style={{flexDirection:'row', alignItems:'flex-end', marginBottom: 8}}>
-                <Text style={{fontSize: 16, color: Color.White}}>{message.name}   </Text>
-                <Text style={{fontSize: 10, color: Color.White, flex: 1}}>{message.send_date}</Text>
+                <Text style={{fontSize: 16, color: Color.Text}}>{message.name}   </Text>
+                <Text style={{fontSize: 10, color: Color.Text, flex: 1}}>{message.send_date}</Text>
 
                 { 
                 (!nowGenerating) &&
@@ -140,7 +140,7 @@ const ChatItem = ({ message, id}) => {
                                 fontStyle:'italic',
                             },
                             text: {
-                                color: Color.White
+                                color: Color.Text
                             },
                         }}
                     >
@@ -150,7 +150,7 @@ const ChatItem = ({ message, id}) => {
                 :
                 <View style={styles.messageInput} >
                 <TextInput
-                    style ={{color:Color.White}}
+                    style ={{color:Color.Text}}
                     value={placeholderText.trim('\n')} 
                     onChangeText={setPlaceholderText}        
                     textBreakStrategy='simple'
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     },
 
     messageInput : {
-        color: Color.White,
+        color: Color.Text,
         backgroundColor:Color.DarkContainer,
         borderRadius: 8,
         padding:8,

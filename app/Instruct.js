@@ -230,7 +230,7 @@ const Instruct = () => {
                 value={currentInstruct.wrap}
                 onValueChange={value => setCurrentInstruct({...currentInstruct, "wrap" : value})}
             />
-            <Text style={{paddingLeft: 8, color:Color.White}}>Wrap Sequence with Newline</Text>
+            <Text style={{paddingLeft: 8, color:Color.Text}}>Wrap Sequence with Newline</Text>
         </View>
 
         <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
@@ -241,7 +241,7 @@ const Instruct = () => {
                 value={currentInstruct.macro}
                 onValueChange={value => setCurrentInstruct({...currentInstruct, ["macro"] : value})}
             />
-            <Text style={{paddingLeft: 8, color:Color.White}}>Replace Macro In Sequences</Text>
+            <Text style={{paddingLeft: 8, color:Color.Text}}>Replace Macro In Sequences</Text>
         </View>
 
         <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
@@ -252,18 +252,18 @@ const Instruct = () => {
                 value={currentInstruct.names}
                 onValueChange={value => setCurrentInstruct({...currentInstruct, names : value})}
             />
-            <Text style={{paddingLeft: 8, color:Color.White}}>Include Names</Text>
+            <Text style={{paddingLeft: 8, color:Color.Text}}>Include Names</Text>
         </View>
 
         <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
             <CheckBox 
-                tintColors={{false:Color.White, true:Color.White}}
+                tintColors={{false:Color.White, true:Color.Text}}
                 onFillColor={Color.White}
                 onCheckColor={Color.White}
                 value={currentInstruct.names_force_groups}
                 onValueChange={value => setCurrentInstruct({...currentInstruct, names_force_groups : value})}
             />
-            <Text style={{paddingLeft: 8, color:Color.White}}>Force for Groups and Personas</Text>
+            <Text style={{paddingLeft: 8, color:Color.Text}}>Force for Groups and Personas</Text>
         </View>
 
             <TextBox 
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     },
 
     selected : {
-        color: Color.White,
+        color: Color.Text,
     },
 
 

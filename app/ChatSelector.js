@@ -65,7 +65,7 @@ const ChatSelector = () => {
                                         }))},
                                         style:'destructive'
                                     }])}}>
-                                <FontAwesome name='trash' size={32} color={Color.White} />
+                                <FontAwesome name='trash' size={32} color={Color.Button} />
                             </TouchableOpacity>
                         </TouchableOpacity>
             ))}
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     },
 
     chatname : {
-        color: Color.White,
+        color: Color.Text,
     },
 
     chatlogitem: {
