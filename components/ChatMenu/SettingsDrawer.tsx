@@ -42,7 +42,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                 activeOpacity={1}
                 onPress={handleOverlayClick}
                 style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     flex: 1,
                     justifyContent: 'center',
                 }}>
@@ -105,7 +105,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                         <TouchableOpacity
                             style={styles.largeButton}
                             onPress={() => handlePush('./LorebookMenu')}>
-                            <Text style={styles.largeButtonText}>Lorebooks</Text>
+                            <Text style={styles.largeButtonText}>[DEV] Lorebooks</Text>
                         </TouchableOpacity>
                     )}
 
