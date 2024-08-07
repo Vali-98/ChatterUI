@@ -42,7 +42,7 @@ const Recents = () => {
         setNowLoading(false)
     }
     const noRecents = !recentMessages || (recentMessages.length === 0 && !nowLoading)
-    const showRecents = !nowLoading && recentMessages && recentMessages.reverse().length > 0
+    const showRecents = !nowLoading && recentMessages && recentMessages.length > 0
 
     return (
         <ScrollView style={styles.mainContainer}>
@@ -62,18 +62,24 @@ const Recents = () => {
                 />
             )}
             {showRecents &&
-                [...recentMessages]?.map((item, index) => (
-                    <TouchableOpacity
-                        key={index}
-                        style={styles.longButton}
-                        onPress={() => {
-                            handleLoadEntry(item)
-                        }}>
-                        <View>
-                            <Text style={styles.longButtonTitle}>{item.charName}</Text>
-                            <Text style={styles.longButtonBody}>{item.chatName}</Text>
-                        </View>
-                    </TouchableOpacity>
+                [...recentMessages].reverse()?.map((item, index) => (
+                    <View key={index} style={{ flexDirection: 'row' }}>
+                        <TouchableOpacity
+                            style={{ ...styles.longButton, flex: 1, marginRight: 8 }}
+                            onPress={() => {
+                                handleLoadEntry(item)
+                            }}>
+                            <View>
+                                <Text style={styles.longButtonTitle}>{item.charName}</Text>
+                                <Text style={styles.longButtonBody}>{item.chatName}</Text>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.longButton}
+                            onPress={() => RecentMessages.deleteEntry(item.chatName)}>
+                            <FontAwesome color={Color.Button} name="close" size={28} />
+                        </TouchableOpacity>
+                    </View>
                 ))}
             {noRecents && <Text style={styles.subtitle}>No Recent Messages</Text>}
         </ScrollView>
@@ -118,6 +124,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginVertical: 4,
         justifyContent: 'space-between',
+        alignItems: 'center',
     },
 
     longButtonTitle: {
