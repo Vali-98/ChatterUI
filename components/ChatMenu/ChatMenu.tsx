@@ -17,6 +17,7 @@ import {
 const { SlideInMenu } = renderers
 import { useShallow } from 'zustand/react/shallow'
 import Recents from './Recents'
+import AnimatedView from '@components/AnimatedView'
 
 const ChatMenu = () => {
     const router = useRouter()
@@ -69,99 +70,101 @@ const ChatMenu = () => {
         { callback: regenerateResponse, text: 'Regenerate', button: 'reload' },
     ]
 
+    const modificationMenu = (
+        <Menu renderer={SlideInMenu}>
+            <MenuTrigger>
+                <MaterialIcons
+                    name="menu"
+                    style={styles.optionsButton}
+                    size={36}
+                    color={Color.Button}
+                />
+            </MenuTrigger>
+            <MenuOptions customStyles={menustyle}>
+                {menuoptions.map((item, index) => (
+                    <MenuOption key={index} onSelect={item.callback}>
+                        <View
+                            style={
+                                index === menuoptions.length - 1
+                                    ? styles.optionItemLast
+                                    : styles.optionItem
+                            }>
+                            <Ionicons
+                                //@ts-ignore
+                                name={item.button}
+                                color={Color.Button}
+                                size={24}
+                            />
+                            <Text style={styles.optionText}>{item.text}</Text>
+                        </View>
+                    </MenuOption>
+                ))}
+            </MenuOptions>
+        </Menu>
+    )
+
+    const headerViewRight = (
+        <View style={styles.headerButtonContainer}>
+            {charName !== 'Welcome' && (
+                <View style={styles.headerButtonContainer}>
+                    <TouchableOpacity
+                        style={styles.headerButtonRight}
+                        onPress={() => {
+                            setCharName('Welcome')
+                        }}>
+                        <Ionicons name="chevron-back" size={28} color={Color.Button} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.headerButtonRight}
+                        onPress={() => {
+                            router.push('/ChatSelector')
+                        }}>
+                        <Ionicons name="chatbox" size={28} color={Color.Button} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.headerButtonRight}
+                        onPress={() => router.push(`/CharInfo`)}>
+                        <FontAwesome name="cog" size={28} color={Color.Button} />
+                    </TouchableOpacity>
+                </View>
+            )}
+            <TouchableOpacity
+                style={styles.headerButtonRight}
+                onPress={() => {
+                    router.push('/CharMenu')
+                }}>
+                <Ionicons name="person" size={28} color={Color.Button} />
+            </TouchableOpacity>
+        </View>
+    )
+
+    const headerViewLeft = (
+        <TouchableOpacity style={styles.headerButtonLeft} onPress={() => router.push('/Settings')}>
+            <Ionicons name="menu" size={28} color={Color.Button} />
+        </TouchableOpacity>
+    )
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <Stack.Screen
                 options={{
                     title: '',
-                    headerRight: () => (
-                        <View style={styles.headerButtonContainer}>
-                            {charName !== 'Welcome' && (
-                                <View style={styles.headerButtonContainer}>
-                                    <TouchableOpacity
-                                        style={styles.headerButtonRight}
-                                        onPress={() => {
-                                            setCharName('Welcome')
-                                        }}>
-                                        <Ionicons
-                                            name="chevron-back"
-                                            size={28}
-                                            color={Color.Button}
-                                        />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={styles.headerButtonRight}
-                                        onPress={() => {
-                                            router.push('/ChatSelector')
-                                        }}>
-                                        <Ionicons name="chatbox" size={28} color={Color.Button} />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={styles.headerButtonRight}
-                                        onPress={() => router.push(`/CharInfo`)}>
-                                        <FontAwesome name="cog" size={28} color={Color.Button} />
-                                    </TouchableOpacity>
-                                </View>
-                            )}
-                            <TouchableOpacity
-                                style={styles.headerButtonRight}
-                                onPress={() => {
-                                    router.push('/CharMenu')
-                                }}>
-                                <Ionicons name="person" size={28} color={Color.Button} />
-                            </TouchableOpacity>
-                        </View>
-                    ),
-                    headerLeft: () => (
-                        <TouchableOpacity
-                            style={styles.headerButtonLeft}
-                            onPress={() => router.push('/Settings')}>
-                            <Ionicons name="menu" size={28} color={Color.Button} />
-                        </TouchableOpacity>
-                    ),
+                    headerRight: () => headerViewRight,
+                    headerLeft: () => headerViewLeft,
                 }}
             />
 
             {charName === 'Welcome' ? (
-                <View>
+                <AnimatedView dy={100} tduration={200} fade={0} fduration={100}>
                     <Text style={styles.welcometext}>Select A Character To Get Started!</Text>
                     <Recents />
-                </View>
+                </AnimatedView>
             ) : (
                 <View style={styles.container}>
                     <ChatWindow />
 
                     <View style={styles.inputContainer}>
-                        <Menu renderer={SlideInMenu}>
-                            <MenuTrigger>
-                                <MaterialIcons
-                                    name="menu"
-                                    style={styles.optionsButton}
-                                    size={36}
-                                    color={Color.Button}
-                                />
-                            </MenuTrigger>
-                            <MenuOptions customStyles={menustyle}>
-                                {menuoptions.map((item, index) => (
-                                    <MenuOption key={index} onSelect={item.callback}>
-                                        <View
-                                            style={
-                                                index === menuoptions.length - 1
-                                                    ? styles.optionItemLast
-                                                    : styles.optionItem
-                                            }>
-                                            <Ionicons
-                                                //@ts-ignore
-                                                name={item.button}
-                                                color={Color.Button}
-                                                size={24}
-                                            />
-                                            <Text style={styles.optionText}>{item.text}</Text>
-                                        </View>
-                                    </MenuOption>
-                                ))}
-                            </MenuOptions>
-                        </Menu>
+                        {modificationMenu}
                         <TextInput
                             style={styles.input}
                             placeholder="Message..."
