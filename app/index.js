@@ -264,6 +264,41 @@ const Home = () => {
 	}
 
 	const hordeResponse = async () => {
+		if(hordeModels.length === 0) {
+			ToastAndroid(`No Models Selected`, 2000)
+			setNowGenerating(false)
+			return
+		}
+		console.log(`Using Horde`)
+
+		const request = await fetch(`https://stablehorde.net/api/v2/generate/text/async`, {
+			method: 'POST',
+			body: JSON.stringify(constructHordePayload()),
+			headers: {'apikey' : hordeKey, ...hordeHeader(), 'accept' : 'application/json', 'Content-Type' : 'application/json'}
+		})
+		const body = await request.json()
+		const generation_id = body.id
+		setHordeID(generation_id)
+		let result = undefined
+		do {
+			await new Promise(resolve => setTimeout(resolve, 5000))
+			console.log(`Checking...`)
+			const response = await fetch(`https://stablehorde.net/api/v2/generate/text/status/${generation_id}`, {
+				method: 'GET',
+				headers: {...hordeHeader()}
+			})
+			if(response.status !== 200) {
+				console.log(`Response failed.`)
+				setNowGenerating(false)
+				return
+			}
+			result = await response.json()
+		} while (!result.done)
+
+		setNowGenerating(() => {
+			insertGeneratedMessage(result.generations[0].text, true)
+			return false
+		})
 	}
 
 
