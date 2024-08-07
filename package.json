@@ -50,7 +50,7 @@
     "expo-sqlite": "~13.4.0",
     "expo-status-bar": "~1.11.1",
     "expo-system-ui": "~2.9.4",
-    "llama.rn": "^0.3.0-rc.18",
+    "llama.rn": "^0.3.1",
     "onnxruntime-react-native": "^1.17.3",
     "png-chunk-text": "^1.0.0",
     "png-chunks-extract": "^1.0.0",
