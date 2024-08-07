@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
 
     inputContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-end',
         justifyContent: 'space-between',
         marginVertical: 8,
         paddingHorizontal: 12,
