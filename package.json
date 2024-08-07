@@ -1,7 +1,7 @@
 {
   "name": "chatterui",
   "main": "expo-router/entry",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -33,8 +33,8 @@
     "bert-tokenizer": "^1.1.8",
     "dicer": "^0.3.1",
     "drizzle-orm": "^0.30.1",
-    "expo": "~50.0.15",
-    "expo-application": "~5.8.3",
+    "expo": "~50.0.17",
+    "expo-application": "~5.8.4",
     "expo-build-properties": "^0.11.1",
     "expo-clipboard": "~5.0.1",
     "expo-crypto": "~12.8.1",
@@ -49,7 +49,7 @@
     "expo-splash-screen": "~0.26.4",
     "expo-sqlite": "~13.4.0",
     "expo-status-bar": "~1.11.1",
-    "expo-system-ui": "~2.9.3",
+    "expo-system-ui": "~2.9.4",
     "llama.rn": "^0.3.0-rc.17",
     "onnxruntime-react-native": "^1.17.3",
     "png-chunk-text": "^1.0.0",
