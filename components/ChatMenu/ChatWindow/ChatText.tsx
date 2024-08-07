@@ -46,7 +46,7 @@ const ChatText: React.FC<ChatTextProps> = ({ showEllipsis, nowGenerating, id, is
         const oveflowPadding = 12
         if (height.current === newheight) return
         height.current = newheight
-        handleAnimateHeight(newheight + (nowGenerating ? oveflowPadding : 0))
+        handleAnimateHeight(newheight + (nowGenerating && buffer !== '' ? oveflowPadding : 0))
     }
 
     useEffect(() => {
