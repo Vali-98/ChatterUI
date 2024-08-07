@@ -83,7 +83,9 @@ const TextCompletions = () => {
                 placeholderTextColor={Style.getColor('primary-text2')}
             />
 
-            {endpoint && <HeartbeatButton api={endpoint} />}
+            {endpoint && (
+                <HeartbeatButton api={endpoint} headers={{ 'X-API-KEY': completionsKey }} />
+            )}
 
             <View style={styles.dropdownContainer}>
                 <Text style={styles.title}>Models</Text>

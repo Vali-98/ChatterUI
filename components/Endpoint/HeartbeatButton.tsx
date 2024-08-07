@@ -16,6 +16,7 @@ type HeartbeatButtonProps = {
     messageNeutral?: string
     messageError?: string
     messageOK?: string
+    headers?: any
 }
 
 const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
@@ -32,6 +33,7 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
     messageNeutral = 'Not Connected',
     messageError = 'Failed To Connect',
     messageOK = 'Connected',
+    headers = {},
 }) => {
     const [status, setStatus] = useState<ResponseStatus>(ResponseStatus.DEFAULT)
 
@@ -60,6 +62,7 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
             const response = await fetch(endpoint, {
                 method: 'GET',
                 signal: controller.signal,
+                headers: headers ?? {},
             }).catch(() => ({ status: 400 }))
             clearTimeout(timeout)
             setStatus(response.status === 200 ? ResponseStatus.OK : ResponseStatus.ERROR)
