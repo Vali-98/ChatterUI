@@ -20,7 +20,8 @@ const ChatItem = ({ message, id, scroll}) => {
     const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
-    
+    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
+
     // drilled
     const [messages, setMessages, setTargetLength] = useContext(MessageContext)
     
@@ -99,7 +100,7 @@ const ChatItem = ({ message, id, scroll}) => {
                             setMessages(messages => {
                                 let newmessages = messages.slice()
                                 newmessages.splice(id + 1, 1)
-                                Chats.saveFile(newmessages)
+                                Chats.saveFile(newmessages, charName, currentChat)
                                 return newmessages
                             })
                             setEditMode(editMode => false)
@@ -115,7 +116,7 @@ const ChatItem = ({ message, id, scroll}) => {
                                 newmessages.at(id + 1).mes = placeholderText
                                 if(newmessages.swipes !== undefined)
                                     newmessages.at(id + 1).swipes[newmessages.at(id + 1).swipe_id] = placeholderText
-                                Chats.saveFile(newmessages)
+                                    Chats.saveFile(newmessages, charName, currentChat)
                                 return newmessages
                             })
                             setEditMode(editMode => false)
@@ -194,7 +195,7 @@ const ChatItem = ({ message, id, scroll}) => {
                         newmessages.at(id + 1).gen_finished = messages.at(id + 1).swipe_info.at(swipeid).gen_finished
 
                         newmessages.at(id + 1).swipe_id = swipeid
-                        Chats.saveFile(newmessages)
+                        Chats.saveFile(newmessages, charName, currentChat)
                         return newmessages
                     })
                     setPlaceholderText(message.swipes.at(message.swipe_id  - 1))
@@ -224,7 +225,7 @@ const ChatItem = ({ message, id, scroll}) => {
                             newmessages.at(id + 1).swipe_id = swipeid
 
 
-                            Chats.saveFile(newmessages)
+                            Chats.saveFile(newmessages, charName, currentChat)
                             return newmessages
                         })
                         setPlaceholderText(message.swipes.at(message.swipe_id + 1))
@@ -248,7 +249,7 @@ const ChatItem = ({ message, id, scroll}) => {
                         newmessages.at(id + 1).gen_started = Date()
                         newmessages.at(id + 1).gen_finished = Date()
                         newmessages.at(id + 1).swipe_id = newmessages.at(id + 1).swipe_id + 1
-                        Chats.saveFile(newmessages).then(() => {
+                        Chats.saveFile(newmessages, charName, currentChat).then(() => {
                             setTargetLength(messages.length)
                             setNowGenerating(true)
                         })

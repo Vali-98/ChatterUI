@@ -49,7 +49,6 @@ const Layout = () => {
 		setNowGenerating(nowGenerating => false)
         setHordeWorkers([])
         setHordeModels([])
-        setPreset(Presets.defaultPreset())
         console.log("Reset values")
         SystemUI.setBackgroundColorAsync(Color.Background)
         migratePresets()
