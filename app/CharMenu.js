@@ -1,6 +1,6 @@
 import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { Color, Global, Characters } from '@globals'
+import { Color, Global, Characters, Chats } from '@globals'
 import * as FS from 'expo-file-system'
 import { useRouter, Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
@@ -12,15 +12,21 @@ import {
     Image,
     StyleSheet,
     View,
+    ActivityIndicator,
 } from 'react-native'
-import { useMMKVString } from 'react-native-mmkv'
+import { useMMKVString, useMMKVObject } from 'react-native-mmkv'
 
 const CharMenu = () => {
     const router = useRouter()
-    const [characterList, setCharacterList] = useState([])
+
+    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
+    const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
     const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+    const [messages, setMessages] = useMMKVObject(Global.Messages)
+    const [characterList, setCharacterList] = useState([])
     const [showNewChar, setShowNewChar] = useState(false)
     const [showDownload, setShowDownload] = useState(false)
+    const [nowLoading, setNowLoading] = useState(false)
 
     const getCharacterList = async () => {
         await Characters.getCardList()
@@ -28,6 +34,21 @@ const CharMenu = () => {
                 setCharacterList(list)
             })
             .catch((error) => console.log(`Could not retrieve characters.\n${error}`))
+    }
+
+    const setCurrentCharacter = async (character) => {
+        setNowLoading(true)
+        setCharName(character)
+        Chats.getNewest(character).then(async (filename) => {
+            setCurrentChat(filename)
+            await Chats.getFile(character, filename).then((newmessage) => {
+                setMessages(newmessage)
+            })
+            await Characters.getCard(character).then((data) => {
+                setCurrentCard(JSON.parse(data))
+            })
+            router.back()
+        })
     }
 
     useEffect(() => {
@@ -96,10 +117,7 @@ const CharMenu = () => {
                     <TouchableOpacity
                         style={styles.longButton}
                         key={index}
-                        onPress={() => {
-                            setCharName(character)
-                            router.back()
-                        }}>
+                        onPress={() => setCurrentCharacter(character)}>
                         <Image
                             source={{
                                 uri: `${FS.documentDirectory}characters/${character}/${character}.png`,
@@ -107,6 +125,9 @@ const CharMenu = () => {
                             style={styles.avatar}
                         />
                         <Text style={styles.nametag}>{character}</Text>
+                        {nowLoading && character == charName && (
+                            <ActivityIndicator color={Color.White} style={{ paddingLeft: 8 }} />
+                        )}
                     </TouchableOpacity>
                 ))}
             </ScrollView>
