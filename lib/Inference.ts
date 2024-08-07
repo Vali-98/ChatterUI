@@ -388,7 +388,6 @@ const constructLocalPayload = () => {
         grammar: preset.grammar ?? '',
         stop: [
             currentInstruct.input_sequence,
-            currentInstruct.output_sequence,
             '\n\n\n\n\n',
             currentInstruct.stop_sequence,
         ],
