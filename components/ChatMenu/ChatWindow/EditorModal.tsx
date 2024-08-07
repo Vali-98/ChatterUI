@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
         backgroundColor: Style.getColor('primary-surface2'),
         paddingTop: 4,
         maxHeight: '70%',
-        paddingVertical: 24,
+        paddingVertical: 12,
     },
 
     topText: {
