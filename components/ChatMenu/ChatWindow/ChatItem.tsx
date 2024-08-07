@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     Animated,
     LayoutChangeEvent,
+    Easing,
 } from 'react-native'
 //@ts-expect-error
 import Markdown from 'react-native-markdown-package'
@@ -101,6 +102,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
             toValue: newheight,
             duration: 200,
             useNativeDriver: false,
+            easing: Easing.inOut((x) => x * x),
         }).start()
     }
 
