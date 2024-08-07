@@ -143,10 +143,8 @@ const buildChatCompletionContext = (max_length: number) => {
     \n${userCard?.data?.description ?? userCard?.description ?? ''}
     \n${currentCard?.description ?? currentCard?.data.description}\n`
     let total_length = llamaTokenizer.encode(initial).length
-
     const payload = [{ role: 'system', content: replaceMacros(initial) }]
-
-    for (const message of messages?.reverse() ?? []) {
+    for (const message of messages.reverse()) {
         const len = llamaTokenizer.encode(message.mes).length + total_length
         if (len > max_length) break
         payload.push({
@@ -439,7 +437,7 @@ const constructOpenAIPayload = () => {
     const currentInstruct = instructReplaceMacro()
     const preset = getObject(Global.PresetData)
     return {
-        messages: buildChatCompletionContext(preset.genamt),
+        messages: buildChatCompletionContext(preset.max_length),
         model: openAIModel.id,
         max_tokens: preset.genamt,
         frequency_penalty: preset.freq_pen,

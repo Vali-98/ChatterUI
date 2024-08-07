@@ -79,10 +79,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
         ]).start()
     }, [fadeAnim])
 
-    useEffect(() => {
-        setEditMode(false)
-    }, [nowGenerating])
-
     const markdownFormat = {
         em: {
             color: Color.TextItalic,
@@ -104,7 +100,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
     const handleSwipeRight = async () => {
         const atLimit = swipeChat(id, 1)
         await saveChat()
-        if (atLimit) {
+        if (atLimit && id !== 0) {
             addSwipe()
             setNowGenerating(true)
         }
@@ -209,7 +205,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                         )}
                     </View>
 
-                    {!editMode ? (
+                    {!editMode || nowGenerating ? (
                         message.name === charName &&
                         buffer === '' &&
                         nowGenerating &&
