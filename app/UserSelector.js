@@ -1,13 +1,11 @@
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Modal, TextInput, Alert } from 'react-native'
-import { Stack } from 'expo-router'
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Modal, TextInput, Alert, ToastAndroid } from 'react-native'
+import { Stack, useRouter } from 'expo-router'
 import { ScrollView } from 'react-native-gesture-handler'
-import { useState } from 'react'
-import { useEffect } from 'react'
-import { Color, getUserFilenames, getUserImageDirectory, Global, createNewUser, loadUserCard, deleteUser } from '@globals'
+import { useState, useEffect } from 'react'
+import { Global, Color, Users } from '@globals'
 import { useMMKVString } from 'react-native-mmkv'
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
-import { useRouter } from 'expo-router'
-import { ToastAndroid } from 'react-native'
+import { FontAwesome } from '@expo/vector-icons'
+
 import  TextBoxModal  from '@components/TextBoxModal'
 
 const UserSelector = () => {
@@ -17,17 +15,16 @@ const UserSelector = () => {
     const [userCard, setUserCard] = useMMKVString(Global.CurrentUserCard)
     const [userList, setUserList] = useState([])
     const [showNewUser, setShowNewUser] = useState(false)
-    const [newUserName, setNewUserName] = useState('')
 
     const loadUserList = () => {
 
-        getUserFilenames().then((response)=> {
+        Users.getFileList().then((response)=> {
             if(response.length === 0) {
                 const defaultName = 'User'
-                createNewUser(defaultName).then(() => {
+                Users.createUser(defaultName).then(() => {
                     setUserList(response)
                     setUserName(defaultName)
-                    loadUserCard(defaultName).then(card => setUserCard(card))
+                    Users.loadFile(defaultName).then(card => setUserCard(card))
                     loadUserList()
                 })
             }
@@ -63,15 +60,14 @@ const UserSelector = () => {
                         <TouchableOpacity 
                             style={styles.useritembutton}
                             onPress={() => {
-                                loadUserCard(name).then((file) => {
+                                Users.loadFile(name).then((file) => {
                                     setUserCard(file)
                                     setUserName(name)
                                     router.back()
                                 })
                             }}
                         >
-
-                            <Image source={{uri:getUserImageDirectory(name)}} loadingIndicatorSource={require('@assets/user.png')} style={styles.avatar}/>
+                            <Image source={{uri:Users.getImageDir(name)}} loadingIndicatorSource={require('@assets/user.png')} style={styles.avatar}/>
                         
                             <Text style={{flex:1, color: Color.Text}}>{name}</Text>
                         
@@ -82,7 +78,7 @@ const UserSelector = () => {
                                     {
                                         text:`Confirm`, 
                                         style: `destructive`, 
-                                        onPress: () =>  deleteUser(name).then(() => { loadUserList()})
+                                        onPress: () =>  Users.deleteFile(name).then(() => { loadUserList()})
                                     }
                                 ])
                                 

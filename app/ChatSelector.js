@@ -1,7 +1,7 @@
 import { ScrollView, View, Text, StyleSheet, Image ,Alert, ToastAndroid } from 'react-native'
 import { useEffect, useState } from 'react'
 import { useMMKVString } from 'react-native-mmkv'
-import { Global, Color, getCharacterImageDirectory, getChatFilenames, deleteChatFile, getNewestChatFilename, saveStringExternal, getChatFile}  from '@globals'
+import { Global, Color, Chats, Characters, saveStringExternal}  from '@globals'
 import { useRouter } from 'expo-router'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { FontAwesome } from '@expo/vector-icons'
@@ -18,7 +18,7 @@ const ChatSelector = () => {
     },[])
 
     const refreshfilenames = () => {
-        getChatFilenames().then(setChats)
+        Chats.getFileList().then(setChats)
     }
 
     const deleteChat = (chatname) => {
@@ -31,8 +31,8 @@ const ChatSelector = () => {
             {
                 text:'Confirm',
                 onPress: () => {
-                    deleteChatFile(charName, chatname).then(() =>
-                        getNewestChatFilename(charName).then(filename => {
+                    Chats.deleteFile(charName, chatname).then(() =>
+                        Chats.getNewest(charName).then(filename => {
                             setCurrentChat(filename)    
                             refreshfilenames()
                 }))},
@@ -44,7 +44,7 @@ const ChatSelector = () => {
     const exportChat = async (chatname) => {
         saveStringExternal(
             chatname,
-            await getChatFile(charName, chatname),
+            await Chats.getFile(charName, chatname),
             "application/*"
         ).catch((error) => {
             ToastAndroid.show(`Could not save file.`, 2000)
@@ -65,7 +65,7 @@ const ChatSelector = () => {
                 style = {chat === currentChat ? styles.selectedchatlogitem : styles.chatlogitem}
             >   
             
-                <Image source={{uri:getCharacterImageDirectory()}} style={styles.avatar}/>
+                <Image source={{uri:Characters.getImageDir(charName)}} style={styles.avatar}/>
                 <Text style={styles.chatname}>{chat.replace('.jsonl', '')}</Text>
            
                 <TouchableOpacity style={styles.button} onPress={() => exportChat(chat)}>
