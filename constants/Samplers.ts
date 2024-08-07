@@ -77,7 +77,7 @@ export type SamplerItem = {
           }
 }
 
-export const Samplers = {
+export const Samplers: Record<SamplerID, SamplerItem> = {
     /*Default Sampler definitions here*/
 
     [SamplerID.CONTEXT_LENGTH]: {

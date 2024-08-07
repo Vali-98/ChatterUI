@@ -36,7 +36,7 @@ type ButtonData = {
 const paths: ButtonData[] = [
     {
         name: 'Sampler',
-        path: '/PresetMenu',
+        path: '/SamplerMenu',
         icon: 'barschart',
     },
     {
