@@ -1,5 +1,5 @@
 import { Llama } from '@constants/llama'
-import { Global, Logger, Style } from '@globals'
+import { AppSettings, Global, Logger, Style } from '@globals'
 import { useEffect, useState } from 'react'
 import {
     View,
@@ -11,7 +11,7 @@ import {
     Platform,
 } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
+import { useMMKVBoolean, useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
 import { SliderItem } from '..'
 
@@ -25,13 +25,17 @@ const Local = () => {
     const [downloadLink, setDownloadLink] = useState('')
     const [preset, setPreset] = useMMKVObject<Llama.LlamaPreset>(Global.LocalPreset)
     const [loadedModel, setLoadedModel] = useState(Llama.getModelname())
-
+    const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
+    const [kvSize, setKVSize] = useState<number>(-1)
     const getModels = async () => {
         setModelList(await Llama.getModels())
     }
 
     useEffect(() => {
         getModels()
+        Llama.getKVSizeMB().then((size) => {
+            setKVSize(size)
+        })
     }, [])
 
     const handleLoad = async () => {
@@ -246,6 +250,17 @@ const Local = () => {
                     />
                 )}
             </View>
+            {saveKV && (
+                <View style={{ marginTop: 16 }}>
+                    <Text style={styles.title}>Cache Management</Text>
+                    <Text style={{ ...styles.subtitle, marginTop: 4 }}>Cache Size: {kvSize}MB</Text>
+                    <TouchableOpacity
+                        style={{ ...styles.textbutton, marginTop: 8 }}
+                        onPress={handleImport}>
+                        <Text style={styles.buttonlabel}>Delete Cache</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
     )
 }

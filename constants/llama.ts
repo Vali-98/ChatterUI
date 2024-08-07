@@ -3,7 +3,8 @@ import { CompletionParams, LlamaContext, initLlama } from 'llama.rn'
 import { Platform } from 'react-native'
 import DocumentPicker from 'react-native-document-picker'
 
-import { Global } from './GlobalValues'
+import { API } from './API'
+import { AppSettings, Global } from './GlobalValues'
 import { Logger } from './Logger'
 import { mmkv } from './mmkv'
 
@@ -96,15 +97,31 @@ export namespace Llama {
     }
 
     export const completion = async (params: CompletionParams, callback = (text: string) => {}) => {
-        if (!isModelLoaded()) return
-        Logger.log('Completion Started with Prompt:')
-        Logger.log(`Completion Input:\n\n` + params.prompt)
-        if (llamaContext === undefined) return
+        if (!isModelLoaded()) {
+            if (!mmkv.getBoolean(AppSettings.AutoLoadLocal)) return
+            const model = mmkv.getString(Global.LocalModel)
+            const api = mmkv.getString(Global.APIType)
+            if (model && api === API.LOCAL) {
+                await Llama.loadModel(model)
+            }
+        }
+        if (llamaContext === undefined) {
+            Logger.log('No Model Loaded', true)
+            return
+        }
+        if (
+            mmkv.getBoolean(AppSettings.AutoLoadLocal) &&
+            !mmkv.getBoolean(Global.LocalSessionLoaded)
+        ) {
+            await Llama.loadKV()
+            mmkv.set(Global.LocalSessionLoaded, true)
+        }
+
         return llamaContext
             ?.completion(params, (data: any) => {
                 callback(data.token)
             })
-            .then(({ text, timings }: CompletionOutput) => {
+            .then(async ({ text, timings }: CompletionOutput) => {
                 Logger.log(`Completion Output:\n\n` + text)
                 const timingtext =
                     `\n[Prompt Timings]` +
@@ -118,6 +135,9 @@ export namespace Llama {
                     `\nPrediction Time: ${(timings.predicted_ms / 1000).toFixed(2)}s` +
                     `\nPredicted Tokens: ${timings.predicted_n} tokens`
                 Logger.log(timingtext)
+                if (mmkv.getBoolean(AppSettings.SaveLocalKV)) {
+                    await saveKV()
+                }
             })
     }
 
@@ -205,6 +225,80 @@ export namespace Llama {
 
     export const getModelname = () => {
         return modelname
+    }
+
+    const sessionFileDir = `${FS.documentDirectory}llama/`
+    const sessionFile = `${sessionFileDir}llama-session.bin`
+
+    export const saveKV = async () => {
+        if (!llamaContext) {
+            Logger.log('No Model Loaded', true)
+            return
+        }
+        if (!(await FS.getInfoAsync(sessionFileDir)).exists) {
+            await FS.makeDirectoryAsync(sessionFileDir)
+        }
+
+        if (!(await FS.getInfoAsync(sessionFile)).exists) {
+            await FS.writeAsStringAsync(sessionFile, '', { encoding: 'base64' })
+        }
+
+        const now = performance.now()
+        const data = await llamaContext.saveSession(sessionFile.replace('file://', ''))
+        Logger.log(
+            data === -1
+                ? 'Failed to save KV cache'
+                : `Saved KV in ${(performance.now() - now).toPrecision(2)}ms with ${data} tokens`
+        )
+        Logger.log(`Current KV Size is: ${await getKVSizeMB()}MB`)
+    }
+
+    export const loadKV = async () => {
+        if (!llamaContext) {
+            Logger.log('No Model Loaded', true)
+            return
+        }
+        const data = await FS.getInfoAsync(sessionFile)
+        if (!data.exists) {
+            Logger.log('No cache found')
+            return
+        }
+        await llamaContext
+            .loadSession(sessionFile.replace('file://', ''))
+            .then(() => {
+                Logger.log('Session loaded from KV cache')
+            })
+            .catch(() => {
+                Logger.log('Session loaded could not load from KV cache')
+            })
+    }
+
+    export const kvInfo = async () => {
+        const data = await FS.getInfoAsync(sessionFile)
+        if (!data.exists) {
+            Logger.log('No KV Cache found')
+            return
+        }
+        Logger.log(`Size of KV cache: ${Math.floor(data.size * 0.000001)} MB`)
+    }
+
+    export const getKVSizeMB = async () => {
+        const data = await FS.getInfoAsync(sessionFile)
+        if (!data.exists) {
+            return 0
+        }
+        return Math.floor(data.size * 0.000001)
+    }
+
+    export const deleteKV = async () => {
+        if ((await FS.getInfoAsync(sessionFile)).exists) {
+            await FS.deleteAsync(sessionFile)
+        }
+    }
+
+    export const tokenize = async (text: string) => {
+        if (!llamaContext) return -1
+        return (await llamaContext.tokenize(text)).tokens.length
     }
 
     export const setLlamaPreset = () => {
