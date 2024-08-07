@@ -9,6 +9,7 @@ import {
     OpenRouter,
     OpenAI,
     Ollama,
+    Claude,
 } from '@components/Endpoint'
 import { Global, API, Style } from '@globals'
 import { Stack } from 'expo-router'
@@ -29,6 +30,7 @@ const APIMenu = () => {
         { label: 'Mancer', value: API.MANCER },
         { label: 'Open Router', value: API.OPENROUTER },
         { label: 'OpenAI', value: API.OPENAI },
+        { label: 'Claude', value: API.CLAUDE },
         //{label: 'NovelAI', value:API.NOVELAI},
     ]
 
@@ -77,6 +79,7 @@ const APIMenu = () => {
                     {APIType === API.OPENROUTER && <OpenRouter />}
                     {APIType === API.OPENAI && <OpenAI />}
                     {APIType === API.OLLAMA && <Ollama />}
+                    {APIType === API.CLAUDE && <Claude />}
                 </ScrollView>
             </SafeAreaView>
         </AnimatedView>
