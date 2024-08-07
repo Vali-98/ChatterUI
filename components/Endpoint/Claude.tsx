@@ -13,7 +13,8 @@ type ClaudeModel = {
 const modelList: ClaudeModel[] = [
     { name: 'Claude 3 Haiku', id: 'claude-3-haiku-20240307' },
     { name: 'Claude 3 Sonnet', id: 'claude-3-sonnet-20240229' },
-    { name: 'Claude 3 Opus', id: '	claude-3-opus-20240229' },
+    { name: 'Claude 3 Opus', id: 'claude-3-opus-20240229' },
+    { name: 'Claude 3.5 Sonnnet', id: 'claude-3-5-sonnet-20240620' },
 ]
 
 const Claude = () => {
