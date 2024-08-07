@@ -135,7 +135,6 @@ const Home = () => {
 						const mescontent = chatCache + data
 						.replace(currentInstruct.input_sequence, ``)
 						.replace(currentInstruct.output_sequence, ``)
-						.trim()
 						const newmessage = (createnew) ? createChatEntry(charName, false, "") : messages.at(-1)
 						newmessage.mes = mescontent
 						newmessage.swipes[newmessage.swipe_id] = mescontent
