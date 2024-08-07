@@ -1,17 +1,17 @@
-import { MaterialIcons } from '@expo/vector-icons';
-import { Color } from '@globals';
-import { useState, useEffect } from 'react';
-import { View, Text, Modal, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons'
+import { Color } from '@globals'
+import { useState, useEffect } from 'react'
+import { View, Text, Modal, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 const TextBoxModal = ({
     booleans: [showModal, setShowModal],
     onConfirm = (text) => {},
     title = 'Enter Name',
 }) => {
-    const [text, setText] = useState('');
+    const [text, setText] = useState('')
 
     useEffect(() => {
-        setText('');
-    }, [showModal]);
+        setText('')
+    }, [showModal])
 
     return (
         <Modal
@@ -19,7 +19,7 @@ const TextBoxModal = ({
             transparent
             animationType="fade"
             onDismiss={() => {
-                setShowModal(false);
+                setShowModal(false)
             }}>
             <View
                 style={{
@@ -40,8 +40,8 @@ const TextBoxModal = ({
                         <TouchableOpacity
                             style={styles.modalButton}
                             onPress={() => {
-                                onConfirm(text);
-                                setShowModal(false);
+                                onConfirm(text)
+                                setShowModal(false)
                             }}>
                             <MaterialIcons name="check" size={28} color={Color.White} />
                         </TouchableOpacity>
@@ -49,10 +49,10 @@ const TextBoxModal = ({
                 </View>
             </View>
         </Modal>
-    );
-};
+    )
+}
 
-export default TextBoxModal;
+export default TextBoxModal
 
 const styles = StyleSheet.create({
     title: {
@@ -95,4 +95,4 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         margin: 8,
     },
-});
+})

@@ -1,10 +1,10 @@
-import CheckboxTitle from '@components/CheckboxTitle';
-import TextBox from '@components/TextBox';
-import TextBoxModal from '@components/TextBoxModal';
-import { FontAwesome } from '@expo/vector-icons';
-import { Global, Color, Instructs, saveStringExternal } from '@globals';
-import { Stack } from 'expo-router';
-import { useState, useEffect } from 'react';
+import CheckboxTitle from '@components/CheckboxTitle'
+import TextBox from '@components/TextBox'
+import TextBoxModal from '@components/TextBoxModal'
+import { FontAwesome } from '@expo/vector-icons'
+import { Global, Color, Instructs, saveStringExternal } from '@globals'
+import { Stack } from 'expo-router'
+import { useState, useEffect } from 'react'
 import {
     View,
     Text,
@@ -14,39 +14,39 @@ import {
     ToastAndroid,
     Alert,
     ScrollView,
-} from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
+} from 'react-native'
+import { Dropdown } from 'react-native-element-dropdown'
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
 const Instruct = () => {
-    const [instructName, setInstructName] = useMMKVString(Global.InstructName);
-    const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct);
-    const [instructList, setInstructList] = useState([]);
-    const [selectedItem, setSelectedItem] = useState(null);
-    const [showNewInstruct, setShowNewInstruct] = useState(false);
+    const [instructName, setInstructName] = useMMKVString(Global.InstructName)
+    const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
+    const [instructList, setInstructList] = useState([])
+    const [selectedItem, setSelectedItem] = useState(null)
+    const [showNewInstruct, setShowNewInstruct] = useState(false)
 
     const loadInstructList = (name) => {
         Instructs.getFileList().then((list) => {
             const mainlist = list.map((item, index) => {
-                return { label: item.replace(`.json`, ''), value: index };
-            });
-            setInstructList(mainlist);
+                return { label: item.replace(`.json`, ''), value: index }
+            })
+            setInstructList(mainlist)
             for (const item of mainlist) {
                 if (item.label.replace(`.json`, '') === name) {
-                    setSelectedItem(item.value);
-                    return;
+                    setSelectedItem(item.value)
+                    return
                 }
             }
-            setSelectedItem(0);
+            setSelectedItem(0)
             Instructs.loadFile(list[0].replace(`.json`, '')).then((instruct) => {
-                setCurrentInstruct(JSON.parse(instruct));
-            });
-        });
-    };
+                setCurrentInstruct(JSON.parse(instruct))
+            })
+        })
+    }
 
     useEffect(() => {
-        loadInstructList(instructName);
-    }, []);
+        loadInstructList(instructName)
+    }, [])
 
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -61,15 +61,15 @@ const Instruct = () => {
                 booleans={[showNewInstruct, setShowNewInstruct]}
                 onConfirm={(text) => {
                     if (instructList.some((item) => item.label === text)) {
-                        ToastAndroid.show(`Preset name already exists.`, 2000);
-                        return;
+                        ToastAndroid.show(`Preset name already exists.`, 2000)
+                        return
                     }
 
                     Instructs.saveFile(text, { ...currentInstruct, name: text }).then(() => {
-                        ToastAndroid.show(`Preset created.`, 2000);
-                        setInstructName(text);
-                        loadInstructList(text);
-                    });
+                        ToastAndroid.show(`Preset created.`, 2000)
+                        setInstructName(text)
+                        loadInstructList(text)
+                    })
                 }}
             />
 
@@ -82,12 +82,12 @@ const Instruct = () => {
                     labelField="label"
                     valueField="value"
                     onChange={(item) => {
-                        if (item.label === instructName) return;
+                        if (item.label === instructName) return
 
-                        setInstructName(item.label);
+                        setInstructName(item.label)
                         Instructs.loadFile(item.label).then((preset) => {
-                            setCurrentInstruct(JSON.parse(preset));
-                        });
+                            setCurrentInstruct(JSON.parse(preset))
+                        })
                     }}
                 />
                 <TouchableOpacity
@@ -95,7 +95,7 @@ const Instruct = () => {
                     onPress={() => {
                         Instructs.saveFile(instructName, currentInstruct).then(
                             ToastAndroid.show(`Preset Updated!`, 2000)
-                        );
+                        )
                     }}>
                     <FontAwesome size={24} name="save" color={Color.Button} />
                 </TouchableOpacity>
@@ -104,8 +104,8 @@ const Instruct = () => {
                     style={styles.button}
                     onPress={() => {
                         if (instructList.length === 1) {
-                            ToastAndroid.show(`Cannot delete last Instruct preset.`, 2000);
-                            return;
+                            ToastAndroid.show(`Cannot delete last Instruct preset.`, 2000)
+                            return
                         }
                         Alert.alert(
                             `Delete Preset`,
@@ -117,12 +117,12 @@ const Instruct = () => {
                                     style: `destructive`,
                                     onPress: () => {
                                         Instructs.deleteFile(instructName).then(() => {
-                                            loadInstructList();
-                                        });
+                                            loadInstructList()
+                                        })
                                     },
                                 },
                             ]
-                        );
+                        )
                     }}>
                     <FontAwesome size={24} name="trash" color={Color.Button} />
                 </TouchableOpacity>
@@ -132,14 +132,14 @@ const Instruct = () => {
                     onPress={() => {
                         Instructs.uploadFile().then((name) => {
                             if (name === undefined) {
-                                return;
+                                return
                             }
                             Instructs.loadFile(name).then((instruct) => {
-                                setCurrentInstruct(JSON.parse(instruct));
-                                setInstructName(name);
-                                loadInstructList(name);
-                            });
-                        });
+                                setCurrentInstruct(JSON.parse(instruct))
+                                setInstructName(name)
+                                loadInstructList(name)
+                            })
+                        })
                     }}>
                     <FontAwesome size={24} name="upload" color={Color.Button} />
                 </TouchableOpacity>
@@ -147,7 +147,7 @@ const Instruct = () => {
                 <TouchableOpacity
                     style={styles.button}
                     onPress={async () => {
-                        saveStringExternal(instructName, JSON.stringify(currentInstruct));
+                        saveStringExternal(instructName, JSON.stringify(currentInstruct))
                     }}>
                     <FontAwesome size={24} name="download" color={Color.Button} />
                 </TouchableOpacity>
@@ -155,7 +155,7 @@ const Instruct = () => {
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => {
-                        setShowNewInstruct(true);
+                        setShowNewInstruct(true)
                     }}>
                     <FontAwesome size={24} name="plus" color={Color.Button} />
                 </TouchableOpacity>
@@ -282,10 +282,10 @@ const Instruct = () => {
                 </View>
             </ScrollView>
         </SafeAreaView>
-    );
-};
+    )
+}
 
-export default Instruct;
+export default Instruct
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -318,4 +318,4 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         marginLeft: 8,
     },
-});
+})

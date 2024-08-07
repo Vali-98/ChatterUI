@@ -1,13 +1,13 @@
-import { FontAwesome } from '@expo/vector-icons';
-import { Global, Color, Users } from '@globals';
-import { useRouter } from 'expo-router';
-import React from 'react';
-import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { useMMKVString } from 'react-native-mmkv';
+import { FontAwesome } from '@expo/vector-icons'
+import { Global, Color, Users } from '@globals'
+import { useRouter } from 'expo-router'
+import React from 'react'
+import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
+import { useMMKVString } from 'react-native-mmkv'
 
 const Settings = () => {
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser);
-    const router = useRouter();
+    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    const router = useRouter()
 
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -36,7 +36,7 @@ const Settings = () => {
                 <TouchableOpacity
                     style={styles.largeButton}
                     onPress={() => {
-                        router.push('/PresetMenu');
+                        router.push('/PresetMenu')
                     }}>
                     <Text style={styles.largeButtonText}>Presets</Text>
                 </TouchableOpacity>
@@ -53,10 +53,10 @@ const Settings = () => {
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
-    );
-};
+    )
+}
 
-export default Settings;
+export default Settings
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -123,4 +123,4 @@ const styles = StyleSheet.create({
         fontSize: 20,
         borderColor: Color.Offwhite,
     },
-});
+})

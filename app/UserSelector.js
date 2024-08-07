@@ -1,8 +1,8 @@
-import TextBoxModal from '@components/TextBoxModal';
-import { FontAwesome } from '@expo/vector-icons';
-import { Global, Color, Users } from '@globals';
-import { Stack, useRouter } from 'expo-router';
-import { useState, useEffect } from 'react';
+import TextBoxModal from '@components/TextBoxModal'
+import { FontAwesome } from '@expo/vector-icons'
+import { Global, Color, Users } from '@globals'
+import { Stack, useRouter } from 'expo-router'
+import { useState, useEffect } from 'react'
 import {
     SafeAreaView,
     View,
@@ -13,41 +13,41 @@ import {
     ScrollView,
     Alert,
     ToastAndroid,
-} from 'react-native';
-import { useMMKVString } from 'react-native-mmkv';
+} from 'react-native'
+import { useMMKVString } from 'react-native-mmkv'
 
 const UserSelector = () => {
-    const router = useRouter();
+    const router = useRouter()
 
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser);
-    const [userCard, setUserCard] = useMMKVString(Global.CurrentUserCard);
-    const [userList, setUserList] = useState([]);
-    const [showNewUser, setShowNewUser] = useState(false);
+    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    const [userCard, setUserCard] = useMMKVString(Global.CurrentUserCard)
+    const [userList, setUserList] = useState([])
+    const [showNewUser, setShowNewUser] = useState(false)
 
     const loadUserList = () => {
         Users.getFileList()
             .then((response) => {
                 if (response.length === 0) {
-                    const defaultName = 'User';
+                    const defaultName = 'User'
                     Users.createUser(defaultName).then(() => {
-                        setUserName(defaultName);
-                        Users.loadFile(defaultName).then((card) => setUserCard(card));
-                        setUserList([defaultName]);
-                    });
-                    return;
+                        setUserName(defaultName)
+                        Users.loadFile(defaultName).then((card) => setUserCard(card))
+                        setUserList([defaultName])
+                    })
+                    return
                 }
-                setUserList(response);
-                const cleanlist = response.map((item) => item.replace('.json', ''));
-                if (cleanlist.includes(userName)) return;
-                setUserName(cleanlist[0]);
-                Users.loadFile(cleanlist[0]).then((card) => setUserCard(card));
+                setUserList(response)
+                const cleanlist = response.map((item) => item.replace('.json', ''))
+                if (cleanlist.includes(userName)) return
+                setUserName(cleanlist[0])
+                Users.loadFile(cleanlist[0]).then((card) => setUserCard(card))
             })
-            .catch(() => setUserList([]));
-    };
+            .catch(() => setUserList([]))
+    }
 
     useEffect(() => {
-        if (userName !== undefined) loadUserList();
-    }, []);
+        if (userName !== undefined) loadUserList()
+    }, [])
 
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -60,12 +60,12 @@ const UserSelector = () => {
                             <View>
                                 <TouchableOpacity
                                     onPress={() => {
-                                        setShowNewUser(true);
+                                        setShowNewUser(true)
                                     }}>
                                     <FontAwesome size={28} name="plus" color={Color.Button} />
                                 </TouchableOpacity>
                             </View>
-                        );
+                        )
                     },
                 }}
             />
@@ -83,10 +83,10 @@ const UserSelector = () => {
                             style={styles.useritembutton}
                             onPress={() => {
                                 Users.loadFile(name).then((file) => {
-                                    setUserCard(file);
-                                    setUserName(name);
-                                    router.back();
-                                });
+                                    setUserCard(file)
+                                    setUserName(name)
+                                    router.back()
+                                })
                             }}>
                             <Image
                                 source={{ uri: Users.getImageDir(name) }}
@@ -108,11 +108,11 @@ const UserSelector = () => {
                                                 style: `destructive`,
                                                 onPress: () =>
                                                     Users.deleteFile(name).then(() => {
-                                                        loadUserList();
+                                                        loadUserList()
                                                     }),
                                             },
                                         ]
-                                    );
+                                    )
                                 }}>
                                 <FontAwesome size={28} name="trash" color={Color.Button} />
                             </TouchableOpacity>
@@ -125,25 +125,25 @@ const UserSelector = () => {
                 booleans={[showNewUser, setShowNewUser]}
                 onConfirm={(text) => {
                     if (userList.includes(text)) {
-                        ToastAndroid.show(`Persona already exists.`, ToastAndroid.SHORT);
-                        return;
+                        ToastAndroid.show(`Persona already exists.`, ToastAndroid.SHORT)
+                        return
                     }
                     Users.createUser(text)
                         .then(async () => {
-                            return Users.loadFile(text);
+                            return Users.loadFile(text)
                         })
                         .then((card) => {
-                            setUserName(text);
-                            setUserCard(card);
-                            router.back();
-                        });
+                            setUserName(text)
+                            setUserCard(card)
+                            router.back()
+                        })
                 }}
             />
         </SafeAreaView>
-    );
-};
+    )
+}
 
-export default UserSelector;
+export default UserSelector
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -179,4 +179,4 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
-});
+})

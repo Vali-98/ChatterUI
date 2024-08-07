@@ -1,31 +1,31 @@
-import { FontAwesome } from '@expo/vector-icons';
-import { Global, Color } from '@globals';
-import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
+import { FontAwesome } from '@expo/vector-icons'
+import { Global, Color } from '@globals'
+import { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native'
+import { Dropdown } from 'react-native-element-dropdown'
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 const Mancer = () => {
-    const [mancerModel, setMancerModel] = useMMKVObject(Global.MancerModel);
-    const [mancerKey, setMancerKey] = useMMKVString(Global.MancerKey);
-    const [keyInput, setKeyInput] = useState('');
+    const [mancerModel, setMancerModel] = useMMKVObject(Global.MancerModel)
+    const [mancerKey, setMancerKey] = useMMKVString(Global.MancerKey)
+    const [keyInput, setKeyInput] = useState('')
 
-    const [modelList, setModelList] = useState([]);
+    const [modelList, setModelList] = useState([])
 
     const getModels = async () => {
         const modelresults = await fetch(`https://mancer.tech/oai/v1/models`, {
             method: 'GET',
             headers: { accept: 'application/json' },
         }).catch(() => {
-            ToastAndroid.show(`Could not get Mancer models.`, 2000);
-            return [];
-        });
-        const list = (await modelresults.json()).data;
-        setModelList(list);
-    };
+            ToastAndroid.show(`Could not get Mancer models.`, 2000)
+            return []
+        })
+        const list = (await modelresults.json()).data
+        setModelList(list)
+    }
 
     useEffect(() => {
-        getModels();
-    }, []);
+        getModels()
+    }, [])
 
     return (
         <View style={styles.mainContainer}>
@@ -36,7 +36,7 @@ const Mancer = () => {
                     style={styles.input}
                     value={keyInput}
                     onChangeText={(value) => {
-                        setKeyInput(value);
+                        setKeyInput(value)
                     }}
                     placeholder="Press save to confirm key"
                     placeholderTextColor={Color.Offwhite}
@@ -46,12 +46,12 @@ const Mancer = () => {
                     style={styles.button}
                     onPress={() => {
                         if (keyInput === '') {
-                            ToastAndroid.show('No key entered!', 2000);
-                            return;
+                            ToastAndroid.show('No key entered!', 2000)
+                            return
                         }
-                        setMancerKey(keyInput);
-                        setKeyInput('');
-                        ToastAndroid.show('Key saved!', 2000);
+                        setMancerKey(keyInput)
+                        setKeyInput('')
+                        ToastAndroid.show('Key saved!', 2000)
                     }}>
                     <FontAwesome name="save" color={Color.Button} size={28} />
                 </TouchableOpacity>
@@ -65,8 +65,8 @@ const Mancer = () => {
                     labelField="name"
                     valueField="id"
                     onChange={(item) => {
-                        if (item.name === mancerModel?.name) return;
-                        setMancerModel(item);
+                        if (item.name === mancerModel?.name) return
+                        setMancerModel(item)
                     }}
                     style={styles.dropdownbox}
                     selectedTextStyle={styles.selected}
@@ -108,10 +108,10 @@ const Mancer = () => {
                 </View>
             )}
         </View>
-    );
-};
+    )
+}
 
-export default Mancer;
+export default Mancer
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -169,4 +169,4 @@ const styles = StyleSheet.create({
         padding: 16,
         marginTop: 12,
     },
-});
+})

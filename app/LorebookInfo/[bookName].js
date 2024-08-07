@@ -1,19 +1,19 @@
-import { Lorebooks } from '@constants/Lorebooks';
-import { Stack, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { Text, ScrollView } from 'react-native';
+import { Lorebooks } from '@constants/Lorebooks'
+import { Stack, useLocalSearchParams } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { Text, ScrollView } from 'react-native'
 
 const LorebookEntryInfo = () => {
-    const { bookName } = useLocalSearchParams();
-    const [book, setBook] = useState(undefined);
+    const { bookName } = useLocalSearchParams()
+    const [book, setBook] = useState(undefined)
 
     useEffect(() => {
-        loadBook();
-    }, []);
+        loadBook()
+    }, [])
 
     const loadBook = async () => {
-        setBook(await Lorebooks.loadFile(bookName));
-    };
+        setBook(await Lorebooks.loadFile(bookName))
+    }
 
     return (
         <ScrollView>
@@ -24,7 +24,7 @@ const LorebookEntryInfo = () => {
                     <Text key={index}>{book.entries[key].content}</Text>
                 ))}
         </ScrollView>
-    );
-};
+    )
+}
 
-export default LorebookEntryInfo;
+export default LorebookEntryInfo

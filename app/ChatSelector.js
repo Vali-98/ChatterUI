@@ -1,7 +1,7 @@
-import { FontAwesome } from '@expo/vector-icons';
-import { Global, Color, Chats, Characters, saveStringExternal } from '@globals';
-import { useRouter, Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { FontAwesome } from '@expo/vector-icons'
+import { Global, Color, Chats, Characters, saveStringExternal } from '@globals'
+import { useRouter, Stack } from 'expo-router'
+import { useEffect, useState } from 'react'
 import {
     ScrollView,
     View,
@@ -11,23 +11,23 @@ import {
     Alert,
     ToastAndroid,
     TouchableOpacity,
-} from 'react-native';
-import { useMMKVString } from 'react-native-mmkv';
+} from 'react-native'
+import { useMMKVString } from 'react-native-mmkv'
 
 const ChatSelector = () => {
-    const router = useRouter();
-    const [chats, setChats] = useState([]);
-    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat);
-    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter);
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser);
+    const router = useRouter()
+    const [chats, setChats] = useState([])
+    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
+    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
 
     useEffect(() => {
-        refreshfilenames();
-    }, []);
+        refreshfilenames()
+    }, [])
 
     const refreshfilenames = () => {
-        Chats.getFileList(charName).then(setChats);
-    };
+        Chats.getFileList(charName).then(setChats)
+    }
 
     const deleteChat = (chatname) => {
         Alert.alert(`Delete Chat`, `Are you sure you want to delete this chat file?`, [
@@ -41,15 +41,15 @@ const ChatSelector = () => {
                 onPress: () => {
                     Chats.deleteFile(charName, chatname).then(() =>
                         Chats.getNewest(charName).then((filename) => {
-                            setCurrentChat(filename);
-                            refreshfilenames();
+                            setCurrentChat(filename)
+                            refreshfilenames()
                         })
-                    );
+                    )
                 },
                 style: 'destructive',
             },
-        ]);
-    };
+        ])
+    }
 
     const exportChat = async (chatname) => {
         saveStringExternal(
@@ -57,10 +57,10 @@ const ChatSelector = () => {
             await Chats.getFile(charName, chatname),
             'application/*'
         ).catch((error) => {
-            ToastAndroid.show(`Could not save file.`, 2000);
-            console.log(error);
-        });
-    };
+            ToastAndroid.show(`Could not save file.`, 2000)
+            console.log(error)
+        })
+    }
 
     return (
         <ScrollView style={styles.mainContainer}>
@@ -74,8 +74,8 @@ const ChatSelector = () => {
                                     // create new default chat from globals
                                     Chats.createDefault(charName, userName).then((response) =>
                                         setCurrentChat(response)
-                                    );
-                                    router.back();
+                                    )
+                                    router.back()
                                 }}>
                                 <FontAwesome name="plus" size={28} color={Color.Button} />
                             </TouchableOpacity>
@@ -87,8 +87,8 @@ const ChatSelector = () => {
                 <TouchableOpacity
                     key={index}
                     onPress={() => {
-                        setCurrentChat(chat);
-                        router.back();
+                        setCurrentChat(chat)
+                        router.back()
                     }}
                     style={chat === currentChat ? styles.selectedchatlogitem : styles.chatlogitem}>
                     <Image
@@ -106,10 +106,10 @@ const ChatSelector = () => {
                 </TouchableOpacity>
             ))}
         </ScrollView>
-    );
-};
+    )
+}
 
-export default ChatSelector;
+export default ChatSelector
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -153,4 +153,4 @@ const styles = StyleSheet.create({
         marginRight: 8,
         marginLeft: 16,
     },
-});
+})

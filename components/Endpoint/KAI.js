@@ -1,15 +1,14 @@
-import { Global, Color } from '@globals';
-import { useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
-import { useMMKVString } from 'react-native-mmkv';
+import { Global, Color } from '@globals'
+import { useEffect } from 'react'
+import { View, Text, TextInput, StyleSheet } from 'react-native'
+import { useMMKVString } from 'react-native-mmkv'
 
 const KAI = () => {
-    const [kaiendpoint, setKAIEndpoint] = useMMKVString(Global.KAIEndpoint);
+    const [kaiendpoint, setKAIEndpoint] = useMMKVString(Global.KAIEndpoint)
 
     useEffect(() => {
-        if (kaiendpoint === undefined || kaiendpoint === ``)
-            setKAIEndpoint(`http://127.0.0.1:5000`);
-    }, []);
+        if (kaiendpoint === undefined || kaiendpoint === ``) setKAIEndpoint(`http://127.0.0.1:5000`)
+    }, [])
 
     return (
         <View style={styles.mainContainer}>
@@ -18,16 +17,16 @@ const KAI = () => {
                 style={styles.input}
                 value={kaiendpoint}
                 onChangeText={(value) => {
-                    setKAIEndpoint(value);
+                    setKAIEndpoint(value)
                 }}
                 placeholder="eg. http://127.0.0.1:5000"
                 placeholderTextColor={Color.Offwhite}
             />
         </View>
-    );
-};
+    )
+}
 
-export default KAI;
+export default KAI
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -48,4 +47,4 @@ const styles = StyleSheet.create({
         marginVertical: 8,
         borderRadius: 8,
     },
-});
+})

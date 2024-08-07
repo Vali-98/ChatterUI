@@ -1,32 +1,32 @@
 //@ts-ignore
-import * as FS from 'expo-file-system';
+import * as FS from 'expo-file-system'
 
-import { API } from './API';
-import { Global } from './GlobalValues';
-import { humanizedISO8601DateTime, replaceMacros } from './Utils';
-import { mmkv } from './mmkv';
+import { API } from './API'
+import { Global } from './GlobalValues'
+import { humanizedISO8601DateTime, replaceMacros } from './Utils'
+import { mmkv } from './mmkv'
 
 export namespace Chats {
     const create = (userName: any, characterName: any, card: any) => {
-        const initmessage: string = card?.data?.first_mes ?? card.first_mes;
+        const initmessage: string = card?.data?.first_mes ?? card.first_mes
 
-        const newMessage: any = createEntry(characterName, false, replaceMacros(initmessage));
+        const newMessage: any = createEntry(characterName, false, replaceMacros(initmessage))
 
         if (
             card?.data?.alternate_greetings !== undefined &&
             card.data.alternate_greetings.length !== 0
         ) {
-            newMessage.swipes = [];
-            newMessage.swipe_info = [];
+            newMessage.swipes = []
+            newMessage.swipe_info = []
             card.data.alternate_greetings.map((item: any) => {
-                newMessage.swipes.push(replaceMacros(item));
+                newMessage.swipes.push(replaceMacros(item))
                 newMessage.swipe_info.push({
                     send_date: humanizedISO8601DateTime(),
                     gen_started: Date(),
                     gen_finished: Date(),
                     extra: { api: 'none', model: 'none' },
-                });
-            });
+                })
+            })
         }
 
         return [
@@ -63,67 +63,67 @@ export namespace Chats {
                 },
             },
             newMessage,
-        ];
-    };
+        ]
+    }
 
     export const createDefault = (charName: string, userName: string) => {
-        console.log(`Creating new chat for character: ${charName} and user: ${userName}`);
-        if (charName === 'Welcome') return;
+        console.log(`Creating new chat for character: ${charName} and user: ${userName}`)
+        if (charName === 'Welcome') return
 
         return FS.readAsStringAsync(
             `${FS.documentDirectory}characters/${charName}/${charName}.json`,
             { encoding: FS.EncodingType.UTF8 }
         )
             .then((response) => {
-                const card = JSON.parse(response);
-                const newmessage = create(userName, charName, card);
+                const card = JSON.parse(response)
+                const newmessage = create(userName, charName, card)
 
                 return FS.writeAsStringAsync(
                     `${FS.documentDirectory}characters/${charName}/chats/${newmessage[0].create_date}.jsonl`,
                     newmessage.map((item: any) => JSON.stringify(item)).join('\u000d\u000a'),
                     { encoding: FS.EncodingType.UTF8 }
                 ).then(() => {
-                    return `${newmessage[0].create_date}.jsonl`;
-                });
+                    return `${newmessage[0].create_date}.jsonl`
+                })
             })
-            .catch((error) => console.log(`Could not create new chat file: ${error}`));
-    };
+            .catch((error) => console.log(`Could not create new chat file: ${error}`))
+    }
 
     export const getNewest = async (charName: string) => {
-        const chats = await getFileList(charName);
+        const chats = await getFileList(charName)
         return chats.length === 0
             ? await createDefault(charName, mmkv.getString(Global.CurrentUser) ?? '')
-            : chats.at(-1);
-    };
+            : chats.at(-1)
+    }
 
     export const getFileList = async (charName: string) => {
         return await FS.readDirectoryAsync(getDir(charName))
             .catch(() => console.log(`Failed to get chat directory of ${charName}`))
             .then((response: any) => {
-                return response;
-            });
-    };
+                return response
+            })
+    }
 
     export const getFile = async (charName: string, chatfilename: string) => {
         return await FS.readAsStringAsync(getFileDir(charName, chatfilename), {
             encoding: FS.EncodingType.UTF8,
         })
             .then((file) => {
-                return file.split('\u000d\u000a').map((row) => JSON.parse(row));
+                return file.split('\u000d\u000a').map((row) => JSON.parse(row))
             })
             .catch((error) =>
                 console.log(`Couldn't load chat file ${chatfilename} for ${charName}: ${error}`)
-            );
-    };
+            )
+    }
 
     export const deleteFile = async (charName: string, chatfilename: string) => {
         return await FS.deleteAsync(getFileDir(charName, chatfilename)).then(() => {
             return getFileList(charName).then((files) => {
                 if (files.length === 0)
-                    return createDefault(charName, mmkv.getString(Global.CurrentUser) ?? '');
-            });
-        });
-    };
+                    return createDefault(charName, mmkv.getString(Global.CurrentUser) ?? '')
+            })
+        })
+    }
 
     export const saveFile = async (messages: string[], charName: string, currentChat: string) => {
         //const _charName = charName === '' ? mmkv.getString(Global.CurrentCharacter) : charName;
@@ -133,32 +133,32 @@ export namespace Chats {
             getFileDir(charName, currentChat),
             messages.map((item) => JSON.stringify(item)).join('\u000d\u000a'),
             { encoding: FS.EncodingType.UTF8 }
-        ).catch((error) => console.log(`Could not save file! ${error}`));
-    };
+        ).catch((error) => console.log(`Could not save file! ${error}`))
+    }
 
     export const createEntry = (name: string, is_user: boolean, message: string) => {
-        let api: any = 'unknown';
-        let model: any = 'unknown';
-        const apitype = mmkv.getString(Global.APIType);
+        let api: any = 'unknown'
+        let model: any = 'unknown'
+        const apitype = mmkv.getString(Global.APIType)
         switch (apitype) {
             case API.KAI:
-                api = 'kobold';
-                break;
+                api = 'kobold'
+                break
             case API.TGWUI:
-                api = 'text-generation-webui';
-                break;
+                api = 'text-generation-webui'
+                break
             case API.HORDE:
-                api = 'horde';
-                model = mmkv.getString(Global.HordeModels);
-                break;
+                api = 'horde'
+                model = mmkv.getString(Global.HordeModels)
+                break
             case API.MANCER:
-                api = 'mancer';
-                model = mmkv.getString(Global.MancerModel);
-                break;
+                api = 'mancer'
+                model = mmkv.getString(Global.MancerModel)
+                break
             case API.NOVELAI:
-                api = 'novelai';
-                model = mmkv.getString(Global.NovelModel);
-                break;
+                api = 'novelai'
+                model = mmkv.getString(Global.NovelModel)
+                break
         }
 
         return {
@@ -182,14 +182,14 @@ export namespace Chats {
                     gen_finished: new Date(),
                 },
             ],
-        };
-    };
+        }
+    }
 
     export const getFileDir = (charName: string, chatfilename: string) => {
-        return `${FS.documentDirectory}characters/${charName}/chats/${chatfilename}`;
-    };
+        return `${FS.documentDirectory}characters/${charName}/chats/${chatfilename}`
+    }
 
     export const getDir = (charName: string) => {
-        return `${FS.documentDirectory}characters/${charName}/chats`;
-    };
+        return `${FS.documentDirectory}characters/${charName}/chats`
+    }
 }

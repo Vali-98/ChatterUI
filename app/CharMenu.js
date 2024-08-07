@@ -1,9 +1,9 @@
-import TextBoxModal from '@components/TextBoxModal';
-import { FontAwesome } from '@expo/vector-icons';
-import { Color, Global, Characters } from '@globals';
-import * as FS from 'expo-file-system';
-import { useRouter, Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
+import TextBoxModal from '@components/TextBoxModal'
+import { FontAwesome } from '@expo/vector-icons'
+import { Color, Global, Characters } from '@globals'
+import * as FS from 'expo-file-system'
+import { useRouter, Stack } from 'expo-router'
+import { useEffect, useState } from 'react'
 import {
     SafeAreaView,
     TouchableOpacity,
@@ -13,27 +13,27 @@ import {
     StyleSheet,
     View,
     ToastAndroid,
-} from 'react-native';
-import { useMMKVString } from 'react-native-mmkv';
+} from 'react-native'
+import { useMMKVString } from 'react-native-mmkv'
 
 const CharMenu = () => {
-    const router = useRouter();
-    const [characterList, setCharacterList] = useState([]);
-    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter);
-    const [showNewChar, setShowNewChar] = useState(false);
-    const [showDownload, setShowDownload] = useState(false);
+    const router = useRouter()
+    const [characterList, setCharacterList] = useState([])
+    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+    const [showNewChar, setShowNewChar] = useState(false)
+    const [showDownload, setShowDownload] = useState(false)
 
     const getCharacterList = async () => {
         await Characters.getCardList()
             .then((list) => {
-                setCharacterList(list);
+                setCharacterList(list)
             })
-            .catch((error) => console.log(`Could not retrieve characters.\n${error}`));
-    };
+            .catch((error) => console.log(`Could not retrieve characters.\n${error}`))
+    }
 
     useEffect(() => {
-        getCharacterList();
-    }, []);
+        getCharacterList()
+    }, [])
 
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -44,7 +44,7 @@ const CharMenu = () => {
                             <TouchableOpacity
                                 style={styles.headerButtonRight}
                                 onPress={async () => {
-                                    setShowDownload(true);
+                                    setShowDownload(true)
                                 }}>
                                 <FontAwesome name="cloud-download" size={28} color={Color.Button} />
                             </TouchableOpacity>
@@ -62,7 +62,7 @@ const CharMenu = () => {
                             <TouchableOpacity
                                 style={styles.headerButtonRight}
                                 onPress={async () => {
-                                    setShowNewChar(true);
+                                    setShowNewChar(true)
                                 }}>
                                 <FontAwesome name="pencil" size={28} color={Color.Button} />
                             </TouchableOpacity>
@@ -75,10 +75,10 @@ const CharMenu = () => {
                 booleans={[showNewChar, setShowNewChar]}
                 onConfirm={(text) => {
                     Characters.createCard(text).then(() => {
-                        setCharName(text);
-                        router.push('CharInfo');
-                        getCharacterList();
-                    });
+                        setCharName(text)
+                        router.push('CharInfo')
+                        getCharacterList()
+                    })
                 }}
             />
 
@@ -87,7 +87,7 @@ const CharMenu = () => {
                 booleans={[showDownload, setShowDownload]}
                 onConfirm={(text) =>
                     Characters.importCharacterFromRemote(text).then(() => {
-                        getCharacterList();
+                        getCharacterList()
                     })
                 }
             />
@@ -98,8 +98,8 @@ const CharMenu = () => {
                         style={styles.longButton}
                         key={index}
                         onPress={() => {
-                            setCharName(character);
-                            router.back();
+                            setCharName(character)
+                            router.back()
                         }}>
                         <Image
                             source={{
@@ -112,10 +112,10 @@ const CharMenu = () => {
                 ))}
             </ScrollView>
         </SafeAreaView>
-    );
-};
+    )
+}
 
-export default CharMenu;
+export default CharMenu
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -165,4 +165,4 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         margin: 8,
     },
-});
+})

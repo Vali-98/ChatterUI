@@ -1,13 +1,13 @@
-import { FontAwesome } from '@expo/vector-icons';
-import { Global, Color } from '@globals';
-import { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
-import { useMMKVString } from 'react-native-mmkv';
+import { FontAwesome } from '@expo/vector-icons'
+import { Global, Color } from '@globals'
+import { useState } from 'react'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid } from 'react-native'
+import { useMMKVString } from 'react-native-mmkv'
 
 const TextCompletions = () => {
-    const [endpoint, setEndpoint] = useMMKVString(Global.CompletionsEndpoint);
-    const [completionsKey, setCompletionsKey] = useMMKVString(Global.CompletionsKey);
-    const [keyInput, setKeyInput] = useState('');
+    const [endpoint, setEndpoint] = useMMKVString(Global.CompletionsEndpoint)
+    const [completionsKey, setCompletionsKey] = useMMKVString(Global.CompletionsKey)
+    const [keyInput, setKeyInput] = useState('')
     return (
         <View style={styles.mainContainer}>
             <Text style={styles.title}>API Key</Text>
@@ -25,12 +25,12 @@ const TextCompletions = () => {
                     style={styles.button}
                     onPress={() => {
                         if (keyInput === '') {
-                            ToastAndroid.show('No key entered!', 2000);
-                            return;
+                            ToastAndroid.show('No key entered!', 2000)
+                            return
                         }
-                        setCompletionsKey(keyInput);
-                        setKeyInput('');
-                        ToastAndroid.show('Key saved!', 2000);
+                        setCompletionsKey(keyInput)
+                        setKeyInput('')
+                        ToastAndroid.show('Key saved!', 2000)
                     }}
                 />
                 <TouchableOpacity>
@@ -46,16 +46,16 @@ const TextCompletions = () => {
                 style={styles.input}
                 value={endpoint}
                 onChangeText={(value) => {
-                    setEndpoint(value);
+                    setEndpoint(value)
                 }}
                 placeholder="eg. https://127.0.0.1:5000"
                 placeholderTextColor={Color.Offwhite}
             />
         </View>
-    );
-};
+    )
+}
 
-export default TextCompletions;
+export default TextCompletions
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -89,4 +89,4 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         marginLeft: 8,
     },
-});
+})

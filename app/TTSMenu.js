@@ -1,45 +1,45 @@
-import { FontAwesome } from '@expo/vector-icons';
-import { Global, Color } from '@globals';
-import { Stack } from 'expo-router';
-import * as Speech from 'expo-speech';
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Switch, ToastAndroid } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv';
+import { FontAwesome } from '@expo/vector-icons'
+import { Global, Color } from '@globals'
+import { Stack } from 'expo-router'
+import * as Speech from 'expo-speech'
+import { useEffect, useState } from 'react'
+import { StyleSheet, Text, TouchableOpacity, View, Switch, ToastAndroid } from 'react-native'
+import { Dropdown } from 'react-native-element-dropdown'
+import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 
 function groupBy(array, key) {
-    if (array.length === 0) return [];
+    if (array.length === 0) return []
     return array.reduce((result, obj) => {
-        const keyValue = obj[key];
+        const keyValue = obj[key]
         if (!result[keyValue]) {
-            result[keyValue] = [];
+            result[keyValue] = []
         }
-        result[keyValue].push(obj);
-        return result;
-    }, {});
+        result[keyValue].push(obj)
+        return result
+    }, {})
 }
 
 const TTSMenu = () => {
-    const [currentSpeaker, setCurrentSpeaker] = useMMKVObject(Global.TTSSpeaker);
-    const [enableTTS, setEnableTTS] = useMMKVBoolean(Global.TTSEnable);
-    const [lang, setLang] = useState(currentSpeaker?.language ?? 'en-US');
-    const [modelList, setModelList] = useState([]);
-    const languageList = groupBy(modelList, 'language');
+    const [currentSpeaker, setCurrentSpeaker] = useMMKVObject(Global.TTSSpeaker)
+    const [enableTTS, setEnableTTS] = useMMKVBoolean(Global.TTSEnable)
+    const [lang, setLang] = useState(currentSpeaker?.language ?? 'en-US')
+    const [modelList, setModelList] = useState([])
+    const languageList = groupBy(modelList, 'language')
 
     const languages = Object.keys(languageList)
         .sort()
         .map((name) => {
-            return { name };
-        });
+            return { name }
+        })
 
     useEffect(() => {
-        getVoices();
-    }, []);
+        getVoices()
+    }, [])
 
     const getVoices = (value = false) => {
         if (enableTTS || value)
-            Speech.getAvailableVoicesAsync().then((list) => setModelList((current) => list));
-    };
+            Speech.getAvailableVoicesAsync().then((list) => setModelList((current) => list))
+    }
 
     return (
         <View style={styles.mainContainer}>
@@ -52,9 +52,9 @@ const TTSMenu = () => {
                     ios_backgroundColor="#3e3e3e"
                     onValueChange={(value) => {
                         if (value) {
-                            getVoices(true);
+                            getVoices(true)
                         }
-                        setEnableTTS(value);
+                        setEnableTTS(value)
                     }}
                     value={enableTTS}
                 />
@@ -121,13 +121,13 @@ const TTSMenu = () => {
                 <TouchableOpacity
                     onPress={() => {
                         if (currentSpeaker === undefined) {
-                            ToastAndroid.show('No Speaker Chosen', 2000);
-                            return;
+                            ToastAndroid.show('No Speaker Chosen', 2000)
+                            return
                         }
                         Speech.speak('This is a test audio.', {
                             language: currentSpeaker.language,
                             voice: currentSpeaker.identifier,
-                        });
+                        })
                     }}
                     style={{ ...styles.button, padding: 8, marginRight: 16 }}>
                     <Text style={styles.buttonlabel}>Test</Text>
@@ -135,10 +135,10 @@ const TTSMenu = () => {
                 <Text style={styles.subtitle}>"This is a test audio."</Text>
             </View>
         </View>
-    );
-};
+    )
+}
 
-export default TTSMenu;
+export default TTSMenu
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -209,4 +209,4 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 16,
     },
-});
+})

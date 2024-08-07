@@ -1,8 +1,8 @@
-import { FontAwesome } from '@expo/vector-icons';
-import { Global, Color, Users } from '@globals';
-import * as DocumentPicker from 'expo-document-picker';
-import { Stack, useRouter } from 'expo-router';
-import React from 'react';
+import { FontAwesome } from '@expo/vector-icons'
+import { Global, Color, Users } from '@globals'
+import * as DocumentPicker from 'expo-document-picker'
+import { Stack, useRouter } from 'expo-router'
+import React from 'react'
 import {
     SafeAreaView,
     View,
@@ -11,17 +11,17 @@ import {
     TouchableOpacity,
     StyleSheet,
     TextInput,
-} from 'react-native';
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv';
+} from 'react-native'
+import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
 const UserInfo = () => {
-    const router = useRouter();
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser);
-    const [userCard, setUserCard] = useMMKVObject(Global.CurrentUserCard);
+    const router = useRouter()
+    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    const [userCard, setUserCard] = useMMKVObject(Global.CurrentUserCard)
 
     const saveCard = () => {
-        Users.saveFile(userName, userCard);
-    };
+        Users.saveFile(userName, userCard)
+    }
 
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -42,8 +42,8 @@ const UserInfo = () => {
                         <TouchableOpacity
                             style={styles.button}
                             onPress={() => {
-                                saveCard();
-                                router.back();
+                                saveCard()
+                                router.back()
                             }}>
                             <FontAwesome size={20} name="check" color={Color.Button} />
                         </TouchableOpacity>
@@ -54,9 +54,9 @@ const UserInfo = () => {
                                     copyToCacheDirectory: true,
                                     type: 'image/*',
                                 }).then((result) => {
-                                    if (result.canceled) return;
-                                    Users.copyImage(result.assets[0].uri, userName);
-                                });
+                                    if (result.canceled) return
+                                    Users.copyImage(result.assets[0].uri, userName)
+                                })
                             }}>
                             <FontAwesome size={20} name="upload" color={Color.Button} />
                         </TouchableOpacity>
@@ -71,17 +71,17 @@ const UserInfo = () => {
                     numberOfLines={6}
                     value={userCard?.description ?? ''}
                     onChangeText={(text) => {
-                        setUserCard({ ...userCard, description: text });
+                        setUserCard({ ...userCard, description: text })
                     }}
                     placeholder="----"
                     placeholderTextColor={Color.Offwhite}
                 />
             </View>
         </SafeAreaView>
-    );
-};
+    )
+}
 
-export default UserInfo;
+export default UserInfo
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -143,4 +143,4 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         borderRadius: 8,
     },
-});
+})

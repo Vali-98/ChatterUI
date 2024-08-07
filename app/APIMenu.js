@@ -1,21 +1,13 @@
-import {
-    KAI,
-    Horde,
-    TGWUI,
-    Mancer,
-    TextCompletions,
-    Local,
-    OpenRouter,
-} from '@components/Endpoint';
-import { Global, Color, API } from '@globals';
-import { Stack } from 'expo-router';
-import { useEffect } from 'react';
-import { SafeAreaView, Text, StyleSheet, View, ScrollView } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { useMMKVString } from 'react-native-mmkv';
+import { KAI, Horde, TGWUI, Mancer, TextCompletions, Local, OpenRouter } from '@components/Endpoint'
+import { Global, Color, API } from '@globals'
+import { Stack } from 'expo-router'
+import { useEffect } from 'react'
+import { SafeAreaView, Text, StyleSheet, View, ScrollView } from 'react-native'
+import { Dropdown } from 'react-native-element-dropdown'
+import { useMMKVString } from 'react-native-mmkv'
 
 const APIMenu = () => {
-    const [APIType, setAPIType] = useMMKVString(Global.APIType);
+    const [APIType, setAPIType] = useMMKVString(Global.APIType)
     const apinames = [
         { label: 'KoboldAI', value: API.KAI },
         { label: 'Text Generation Web UI', value: API.TGWUI },
@@ -25,11 +17,11 @@ const APIMenu = () => {
         { label: 'Open Router', value: API.OPENROUTER },
         { label: 'Local', value: API.LOCAL },
         //{label: 'NovelAI', value:API.NOVELAI},
-    ];
+    ]
 
     useEffect(() => {
-        if (APIType === undefined) setAPIType(API.KAI);
-    }, []);
+        if (APIType === undefined) setAPIType(API.KAI)
+    }, [])
 
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -50,8 +42,8 @@ const APIMenu = () => {
                         labelField="label"
                         valueField="value"
                         onChange={(item) => {
-                            if (item.value === APIType) return;
-                            setAPIType(item.value);
+                            if (item.value === APIType) return
+                            setAPIType(item.value)
                         }}
                         containerStyle={styles.dropdownbox}
                         itemTextStyle={{ color: Color.Text }}
@@ -72,10 +64,10 @@ const APIMenu = () => {
                 {APIType === API.OPENROUTER && <OpenRouter />}
             </ScrollView>
         </SafeAreaView>
-    );
-};
+    )
+}
 
-export default APIMenu;
+export default APIMenu
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -99,4 +91,4 @@ const styles = StyleSheet.create({
     selected: {
         color: Color.Text,
     },
-});
+})

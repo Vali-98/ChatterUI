@@ -1,32 +1,32 @@
-import { ChatWindow } from '@components/ChatMenu/ChatWindow/ChatWindow';
-import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
-import { Global, Color, Chats, Characters, MessageContext } from '@globals';
-import { generateResponse } from '@lib/Inference';
-import { Stack, useRouter } from 'expo-router';
-import { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
-import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv';
-import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu';
+import { ChatWindow } from '@components/ChatMenu/ChatWindow/ChatWindow'
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'
+import { Global, Color, Chats, Characters, MessageContext } from '@globals'
+import { generateResponse } from '@lib/Inference'
+import { Stack, useRouter } from 'expo-router'
+import { useState, useEffect, useRef } from 'react'
+import { View, Text, TextInput, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native'
+import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
+import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu'
 
 const Home = () => {
-    const router = useRouter();
+    const router = useRouter()
     // User
-    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter);
-    const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard);
+    const [charName, setCharName] = useMMKVString(Global.CurrentCharacter)
+    const [currentCard, setCurrentCard] = useMMKVObject(Global.CurrentCharacterCard)
     // Character
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser);
-    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat);
+    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    const [currentChat, setCurrentChat] = useMMKVString(Global.CurrentChat)
     // Process
-    const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating);
+    const [nowGenerating, setNowGenerating] = useMMKVBoolean(Global.NowGenerating)
     // Instruct
-    const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct);
+    const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
     // Local
-    const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState('');
+    const [messages, setMessages] = useState([])
+    const [newMessage, setNewMessage] = useState('')
     // this target length allows for managing whether a message is replaced, added or swiped
-    const [targetLength, setTargetLength] = useState(0);
+    const [targetLength, setTargetLength] = useState(0)
     // dynamically set abort function that is set by respective API
-    const [abortFunction, setAbortFunction] = useState(undefined);
+    const [abortFunction, setAbortFunction] = useState(undefined)
 
     // load character chat upon character change, functionality might better be a dedicated function
 
@@ -40,29 +40,29 @@ const Home = () => {
     // TODO: Move messages to MMKV, this will solve all these needless useEffects
 
     useEffect(() => {
-        if (charName === 'Welcome' || charName === undefined) return;
-        console.log(`Character changed to ${charName}`);
-        Chats.getNewest(charName).then((filename) => setCurrentChat(filename));
+        if (charName === 'Welcome' || charName === undefined) return
+        console.log(`Character changed to ${charName}`)
+        Chats.getNewest(charName).then((filename) => setCurrentChat(filename))
         Characters.getCard(charName).then((data) => {
-            setCurrentCard(JSON.parse(data));
-        });
-    }, [charName]);
+            setCurrentCard(JSON.parse(data))
+        })
+    }, [charName])
 
     // load character upon currentChat changing - consider replacing for global messages
     useEffect(() => {
         if (currentChat === '' || charName === 'Welcome' || charName === undefined) {
-            return;
+            return
         }
-        console.log('Now reading ' + currentChat + ' for ' + charName);
+        console.log('Now reading ' + currentChat + ' for ' + charName)
         Chats.getFile(charName, currentChat).then((newmessage) => {
-            setMessages((messages) => newmessage);
-        });
-    }, [currentChat]);
+            setMessages((messages) => newmessage)
+        })
+    }, [currentChat])
 
     // triggers generation when set true
     // TODO : Use this to save instead
     useEffect(() => {
-        nowGenerating && startInference();
+        nowGenerating && startInference()
 
         if (
             !nowGenerating &&
@@ -70,82 +70,82 @@ const Home = () => {
             charName !== 'Welcome' &&
             messages.length !== 0
         ) {
-            console.log(`Saving chat`);
-            Chats.saveFile(messages, charName, currentChat);
+            console.log(`Saving chat`)
+            Chats.saveFile(messages, charName, currentChat)
         }
-    }, [nowGenerating]);
+    }, [nowGenerating])
 
     const startInference = async () => {
-        setNewMessage((message) => '');
-        insertGeneratedMessage('');
-        generateResponse(setAbortFunction, insertGeneratedMessage, messages);
-    };
+        setNewMessage((message) => '')
+        insertGeneratedMessage('')
+        generateResponse(setAbortFunction, insertGeneratedMessage, messages)
+    }
 
     const handleSend = () => {
         if (newMessage.trim() !== '') {
-            const newMessageItem = Chats.createEntry(userName, true, newMessage);
-            setMessages((messages) => [...messages, newMessageItem]);
-            setTargetLength(messages.length + 2);
-        } else setTargetLength(messages.length + 1);
+            const newMessageItem = Chats.createEntry(userName, true, newMessage)
+            setMessages((messages) => [...messages, newMessageItem])
+            setTargetLength(messages.length + 2)
+        } else setTargetLength(messages.length + 1)
 
-        setNowGenerating(true);
-    };
+        setNowGenerating(true)
+    }
 
     const insertGeneratedMessage = (data) => {
         setMessages((messages) => {
             try {
-                const createnew = messages.length < targetLength;
+                const createnew = messages.length < targetLength
                 const mescontent = (createnew ? data : messages.at(-1).mes + data)
                     .replaceAll(currentInstruct.input_sequence, ``)
                     .replaceAll(currentInstruct.output_sequence, ``)
-                    .replaceAll(currentInstruct.stop_sequence, '');
+                    .replaceAll(currentInstruct.stop_sequence, '')
                 const newmessage = createnew
                     ? Chats.createEntry(charName, false, '')
-                    : messages.at(-1);
-                newmessage.mes = mescontent;
-                newmessage.swipes[newmessage.swipe_id] = mescontent;
-                newmessage.gen_finished = Date();
-                newmessage.swipe_info[newmessage.swipe_id].gen_finished = Date();
+                    : messages.at(-1)
+                newmessage.mes = mescontent
+                newmessage.swipes[newmessage.swipe_id] = mescontent
+                newmessage.gen_finished = Date()
+                newmessage.swipe_info[newmessage.swipe_id].gen_finished = Date()
                 const finalized_messages = createnew
                     ? [...messages, newmessage]
-                    : [...messages.slice(0, -1), newmessage];
-                return finalized_messages;
+                    : [...messages.slice(0, -1), newmessage]
+                return finalized_messages
             } catch (error) {
-                console.log('Couldnt write due to:' + error);
-                return messages;
+                console.log('Couldnt write due to:' + error)
+                return messages
             }
-        });
-    };
+        })
+    }
 
     const abortResponse = () => {
-        console.log(`Aborting Generation`);
-        if (abortFunction !== undefined) abortFunction();
-    };
+        console.log(`Aborting Generation`)
+        if (abortFunction !== undefined) abortFunction()
+    }
 
     const regenerateResponse = () => {
-        console.log('Regenerate Response');
-        const len = messages.length;
+        console.log('Regenerate Response')
+        const len = messages.length
         if (messages.at(-1)?.name === charName) {
-            setMessages(messages.slice(0, -1));
-            setTargetLength(len);
-        } else setTargetLength(len + 1);
-        setNowGenerating(true);
-    };
+            setMessages(messages.slice(0, -1))
+            setTargetLength(len)
+        } else setTargetLength(len + 1)
+        setNowGenerating(true)
+    }
 
     const continueResponse = () => {
-        console.log(`Continuing Reponse`);
-        setTargetLength(messages.length + (messages.at(-1).name === charName) ? 0 : 1);
+        console.log(`Continuing Reponse`)
+        setTargetLength(messages.length + (messages.at(-1).name === charName) ? 0 : 1)
         if (messages.at(-1).name === charName) {
-            setTargetLength(messages.length);
-        } else setTargetLength(messages.length + 1);
-        setNowGenerating(true);
-    };
+            setTargetLength(messages.length)
+        } else setTargetLength(messages.length + 1)
+        setNowGenerating(true)
+    }
 
     const menuoptions = [
         { callback: abortResponse, text: 'Stop', button: 'stop' },
         { callback: continueResponse, text: 'Continue', button: 'arrow-forward' },
         { callback: regenerateResponse, text: 'Regenerate', button: 'reload' },
-    ];
+    ]
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -159,7 +159,7 @@ const Home = () => {
                                     <TouchableOpacity
                                         style={styles.headerButtonRight}
                                         onPress={() => {
-                                            router.push('ChatSelector');
+                                            router.push('ChatSelector')
                                         }}>
                                         <Ionicons name="chatbox" size={28} color={Color.Button} />
                                     </TouchableOpacity>
@@ -173,7 +173,7 @@ const Home = () => {
                             <TouchableOpacity
                                 style={styles.headerButtonRight}
                                 onPress={() => {
-                                    router.push('CharMenu');
+                                    router.push('CharMenu')
                                 }}>
                                 <Ionicons name="person" size={28} color={Color.Button} />
                             </TouchableOpacity>
@@ -252,8 +252,8 @@ const Home = () => {
                 </MessageContext.Provider>
             )}
         </SafeAreaView>
-    );
-};
+    )
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -340,6 +340,6 @@ const styles = StyleSheet.create({
     headerButtonContainer: {
         flexDirection: 'row',
     },
-});
+})
 
-export default Home;
+export default Home
