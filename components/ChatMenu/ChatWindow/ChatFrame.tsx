@@ -29,7 +29,11 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
     })
 
     useEffect(() => {
-        setImageSource({ uri: imageDir })
+        const newdir =
+            message.name === userName
+                ? Users.getImageDir(userName)
+                : Characters.getImageDir(charName)
+        setImageSource({ uri: newdir })
     }, [charName])
 
     const handleImageError = () => {

@@ -1,6 +1,7 @@
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Users } from '@globals'
 import { useRouter } from 'expo-router'
+import { nativeApplicationVersion } from 'expo-application'
 import React from 'react'
 import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
@@ -69,6 +70,11 @@ const Settings = () => {
                         <Text style={styles.largeButtonText}>Lorebooks</Text>
                     </TouchableOpacity>
                 )}
+
+                <Text style={{ alignSelf: 'center', color: Color.Offwhite, marginTop: 8 }}>
+                    {__DEV__ && 'DEV BUILD\t'}
+                    {'v' + require(`../app.json`).expo.version}
+                </Text>
             </View>
         </SafeAreaView>
     )
