@@ -155,7 +155,7 @@ export namespace Presets {
             temp: 1,
             top_p: 1,
             top_k: 0,
-            top_a: 1,
+            top_a: 0,
             // merged from KAI
 
             min_p: 0.0,
