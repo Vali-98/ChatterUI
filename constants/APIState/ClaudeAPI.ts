@@ -31,7 +31,7 @@ class ClaudeAPI extends APIBase {
             system: system.content,
             ...payloadFields,
             model: claudeModel.id,
-            messages: [{ role: 'user', content: 'Hi' }, ...messages],
+            messages: [{ role: 'user', content: firstMes }, ...messages],
             stop_sequences: this.constructStopSequence(),
         }
     }
