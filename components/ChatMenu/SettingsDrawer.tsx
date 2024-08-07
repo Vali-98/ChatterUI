@@ -22,6 +22,62 @@ type SettingsDrawerProps = {
     booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
 }
 
+type Icon = 'barschart' | 'profile' | 'link' | 'sound' | 'codesquareo'
+
+type ButtonData = {
+    name: string
+    path: `/${string}`
+    icon?: Icon
+}
+
+const paths: Array<ButtonData> = [
+    {
+        name: 'Sampler',
+        path: '/PresetMenu',
+        icon: 'barschart',
+    },
+    {
+        name: 'Instruct',
+        path: '/Instruct',
+        icon: 'profile',
+    },
+    {
+        name: 'API',
+        path: '/APIMenu',
+        icon: 'link',
+    },
+    {
+        name: 'TTS',
+        path: '/TTSMenu',
+        icon: 'sound',
+    },
+    {
+        name: 'Logs',
+        path: '/Logs',
+        icon: 'codesquareo',
+    },
+]
+
+const paths_dev: Array<ButtonData> = [
+    {
+        name: '[DEV] Lorebooks',
+        path: '/LorebookMenu',
+    },
+    {
+        name: '[DEV] COLOR TEST',
+        path: '/ColorTest',
+    },
+    {
+        name: '[DEV] Classifier',
+        path: '/Classifier',
+    },
+]
+
+type DrawerButtonProps = {
+    item: ButtonData
+    index: number
+}
+
 const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, setShowModal] }) => {
     const router = useRouter()
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
@@ -41,58 +97,6 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
 
     const handlePush = (route: any) => {
         router.navigate(route)
-    }
-
-    type Icon = 'barschart' | 'profile' | 'link' | 'sound' | 'codesquareo'
-
-    type ButtonData = {
-        name: string
-        path: `/${string}`
-        icon?: Icon
-    }
-
-    const paths: Array<ButtonData> = [
-        {
-            name: 'Sampler',
-            path: '/PresetMenu',
-            icon: 'barschart',
-        },
-        {
-            name: 'Instruct',
-            path: '/Instruct',
-            icon: 'profile',
-        },
-        {
-            name: 'API',
-            path: '/APIMenu',
-            icon: 'link',
-        },
-        {
-            name: 'TTS',
-            path: '/TTSMenu',
-            icon: 'sound',
-        },
-        {
-            name: 'Logs',
-            path: '/Logs',
-            icon: 'codesquareo',
-        },
-    ]
-
-    const paths_dev: Array<ButtonData> = [
-        {
-            name: '[DEV] Lorebooks',
-            path: '/LorebookMenu',
-        },
-        {
-            name: '[DEV] COLOR TEST',
-            path: '/ColorTest',
-        },
-    ]
-
-    type DrawerButtonProps = {
-        item: ButtonData
-        index: number
     }
 
     const DrawerButton = ({ item, index }: DrawerButtonProps) => (
