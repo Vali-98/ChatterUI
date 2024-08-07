@@ -156,7 +156,8 @@ const buildChatCompletionContext = (max_length: number) => {
 
 const constructStopSequence = (instruct: InstructType): Array<string> => {
     const sequence: Array<string> = []
-    instruct.stop_sequence.split(',').forEach((item) => sequence.push(item))
+    if (instruct.stop_sequence !== '')
+        instruct.stop_sequence.split(',').forEach((item) => item !== '' && sequence.push(item))
     // maybe people rather this not be removed?
     //sequence.push(instruct.input_sequence)
     return sequence
