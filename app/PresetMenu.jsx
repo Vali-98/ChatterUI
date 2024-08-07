@@ -233,15 +233,7 @@ const PresetMenu = () => {
                                 setCurrentPreset(JSON.parse(preset))
                             })
                         }}
-                        style={styles.dropdownbox}
-                        selectedTextStyle={styles.selected}
-                        placeholderStyle={{ color: Style.getColor('primary-text1') }}
-                        containerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
-                        itemContainerStyle={{
-                            backgroundColor: Style.getColor('primary-surface2'),
-                        }}
-                        itemTextStyle={{ color: Style.getColor('primary-text1') }}
-                        activeColor={Style.getColor('primary-surface4')}
+                        {...Style.drawer.default}
                     />
                     <TouchableOpacity
                         style={styles.button}
@@ -398,15 +390,6 @@ const styles = StyleSheet.create({
 
     selected: {
         color: Style.getColor('primary-text1'),
-    },
-
-    dropdownbox: {
-        backgroundColor: Style.getColor('primary-surface3'),
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        marginVertical: 8,
-        borderRadius: 8,
-        flex: 1,
     },
 
     selected: {

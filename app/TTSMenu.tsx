@@ -102,22 +102,12 @@ const TTSMenu = () => {
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Dropdown
                                     value={lang}
-                                    style={{ ...styles.dropdownbox, flex: 1 }}
-                                    selectedTextStyle={styles.selected}
                                     data={languages}
                                     labelField="name"
                                     valueField="name"
                                     placeholder="Select Language"
                                     onChange={(item) => setLang(item.name)}
-                                    placeholderStyle={{ color: Style.getColor('primary-text2') }}
-                                    containerStyle={{
-                                        backgroundColor: Style.getColor('primary-surface2'),
-                                    }}
-                                    itemContainerStyle={{
-                                        backgroundColor: Style.getColor('primary-surface2'),
-                                    }}
-                                    itemTextStyle={{ color: Style.getColor('primary-text1') }}
-                                    activeColor={Style.getColor('primary-surface4')}
+                                    {...Style.drawer.default}
                                 />
                                 <TouchableOpacity
                                     style={{ ...styles.button, marginLeft: 8 }}
@@ -136,26 +126,16 @@ const TTSMenu = () => {
                             Speakers: {modelList.filter((item) => item.language === lang).length}
                         </Text>
 
-                        <View style={{ marginTop: 8, marginBottom: 16 }}>
+                        <View style={{ marginTop: 8, marginBottom: 16, flexDirection: 'row' }}>
                             {modelList.length !== 0 && (
                                 <Dropdown
                                     value={currentSpeaker?.identifier ?? ''}
-                                    style={styles.dropdownbox}
-                                    selectedTextStyle={styles.selected}
                                     data={languageList[lang]}
                                     labelField={'identifier'}
                                     valueField={'name'}
                                     placeholder="Select Speaker"
                                     onChange={(item) => setCurrentSpeaker(item)}
-                                    placeholderStyle={{ color: Style.getColor('primary-text2') }}
-                                    containerStyle={{
-                                        backgroundColor: Style.getColor('primary-surface2'),
-                                    }}
-                                    itemContainerStyle={{
-                                        backgroundColor: Style.getColor('primary-surface2'),
-                                    }}
-                                    itemTextStyle={{ color: Style.getColor('primary-text1') }}
-                                    activeColor={Style.getColor('primary-surface4')}
+                                    {...Style.drawer.default}
                                 />
                             )}
                         </View>
@@ -235,18 +215,6 @@ const styles = StyleSheet.create({
 
     dropdownContainer: {
         marginTop: 16,
-    },
-
-    dropdownbox: {
-        backgroundColor: Style.getColor('primary-surface3'),
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        marginVertical: 8,
-        borderRadius: 8,
-    },
-
-    selected: {
-        color: Style.getColor('primary-text1'),
     },
 
     enableContainer: {

@@ -35,7 +35,7 @@
     "expo-crypto": "~12.8.1",
     "expo-document-picker": "~11.10.1",
     "expo-file-system": "~16.0.5",
-    "expo-font": "~11.10.2",
+    "expo-font": "~11.10.3",
     "expo-image-picker": "^14.7.1",
     "expo-linking": "~6.2.2",
     "expo-router": "~3.4.7",

@@ -112,23 +112,7 @@ const Horde = () => {
                         )
                         setDropdownValues(item)
                     }}
-                    placeholderStyle={{ color: Style.getColor('primary-text2') }}
-                    containerStyle={{ backgroundColor: Style.getColor('primary-surface2') }}
-                    itemContainerStyle={{
-                        backgroundColor: Style.getColor('primary-surface2'),
-                    }}
-                    itemTextStyle={{ color: Style.getColor('primary-text1') }}
-                    activeColor={Style.getColor('primary-surface4')}
-                    selectedTextStyle={{
-                        color: Style.getColor('primary-text1'),
-                    }}
-                    style={{
-                        backgroundColor: Style.getColor('primary-surface3'),
-                        paddingHorizontal: 8,
-                        paddingVertical: 2,
-                        marginVertical: 8,
-                        borderRadius: 8,
-                    }}
+                    {...Style.drawer.default}
                     placeholder="Select Model"
                     renderSelectedItem={(item: HordeModel, unSelect) => (
                         <View style={styles.iteminfo}>
