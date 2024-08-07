@@ -51,6 +51,9 @@ const Settings = () => {
                 <TouchableOpacity style={styles.largeButton} onPress={() => router.push('TTSMenu')}>
                     <Text style={styles.largeButtonText}>TTS</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.largeButton} onPress={() => router.push('Logs')}>
+                    <Text style={styles.largeButtonText}>Logs</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     )
