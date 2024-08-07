@@ -5,23 +5,38 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-nativ
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
+type OpenRouterModel = {
+    architecture: { instruct_type: string; modality: string; tokenizer: string }
+    id: string
+    name: string
+    description: string
+    pricing: { completion: string; prompt: string }
+    context_length: number
+    top_provider: { is_moderated: boolean; max_completion_tokens: number | null }
+    per_request_limits: { prompt_tokens: string; completion_tokens: string }
+}
+
 const OpenRouter = () => {
-    const [openRouterModel, setOpenRouterModel] = useMMKVObject(Global.OpenRouterModel)
+    const [openRouterModel, setOpenRouterModel] = useMMKVObject<OpenRouterModel>(
+        Global.OpenRouterModel
+    )
     const [openRouterKey, setOpenRouterKey] = useMMKVString(Global.OpenRouterKey)
     const [keyInput, setKeyInput] = useState('')
 
-    const [modelList, setModelList] = useState([])
+    const [modelList, setModelList] = useState<Array<OpenRouterModel>>([])
 
     const getModels = useCallback(async () => {
         const modelresults = await fetch('https://openrouter.ai/api/v1/models', {
             method: 'GET',
             headers: { accept: 'application/json' },
-        }).catch(() => {
-            Logger.log(`Could not get OpenRouter Mddels`, true)
-            return []
         })
-        const list = (await modelresults.json()).data
-        setModelList(list)
+            .then(async (modelresults) => {
+                const list = (await modelresults.json()).data
+                setModelList(list)
+            })
+            .catch(() => {
+                Logger.log(`Could not get OpenRouter Mddels`, true)
+            })
     }, [modelList])
 
     useEffect(() => {

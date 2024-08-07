@@ -103,7 +103,7 @@ const OpenAI = () => {
                             <Text style={{ color: Color.Offwhite }}>Id</Text>
                             <Text style={{ color: Color.Offwhite }}>Object</Text>
                             <Text style={{ color: Color.Offwhite }}>Created</Text>
-                            <Text style={{ color: Color.Offwhite }}>Owned Byt</Text>
+                            <Text style={{ color: Color.Offwhite }}>Owned By</Text>
                         </View>
                         <View style={{ marginLeft: 8 }}>
                             <Text style={{ color: Color.Offwhite }}>: {openAIModel.id}</Text>
