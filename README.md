@@ -12,6 +12,8 @@ Built for the purpose of learning Javascript, so it may be a little rough around
 ### Supported Backends
 - KoboldAI
 - AI Horde
+- text-generation-webui
+- Mancer
 
 ### Building from source.
 Building from source has **not** been tested.
@@ -23,6 +25,4 @@ eas build --platform android --local
 
 ### Roadmap
 
-- text-generation-webui Support
-- Mancer Support
 - Lorebooks 
