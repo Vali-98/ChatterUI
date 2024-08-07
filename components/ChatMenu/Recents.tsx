@@ -23,7 +23,10 @@ const Recents = () => {
     const handleLoadEntry = async (entry: RecentEntry) => {
         if (nowLoading) return
         setNowLoading(true)
-        if (!(await Characters.exists(entry.charId)) || !(await Chats.exists(entry.chatId))) {
+        if (
+            !(await Characters.db.query.cardExists(entry.charId)) ||
+            !(await Chats.db.query.chatExists(entry.chatId))
+        ) {
             Logger.log('Character or Chat no longer exists', true)
             RecentMessages.deleteEntry(entry.chatId)
             setNowLoading(false)

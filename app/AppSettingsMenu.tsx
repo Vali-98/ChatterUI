@@ -172,7 +172,7 @@ const AppSettingsMenu = () => {
             <Text style={styles.subtitle}>
                 Saves the KV cache on generations, allowing you to continue sessions after closing
                 the app. You must use the same model for this to function properly. Be warned that
-                the KV cache file may be very big!
+                the KV cache file may be very big and negatively impact battery life!
             </Text>
 
             <SwitchComponent

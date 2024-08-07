@@ -26,7 +26,7 @@ const Instruct = () => {
     const [showNewInstruct, setShowNewInstruct] = useState<boolean>(false)
 
     const loadInstructList = async (id = -1) => {
-        const list = await Instructs.Database.readList()
+        const list = await Instructs.db.query.instructList()
         if (!list) {
             Logger.log('Could not retrieve Instructs', true)
             return
@@ -48,7 +48,8 @@ const Instruct = () => {
     }, [])
 
     const handleSaveInstruct = (log: boolean) => {
-        if (currentInstruct && instructID) Instructs.Database.update(instructID, currentInstruct)
+        if (currentInstruct && instructID)
+            Instructs.db.mutate.updateInstruct(instructID, currentInstruct)
     }
 
     const regenerateDefaults = () => {
@@ -102,14 +103,14 @@ const Instruct = () => {
                             }
                             if (!currentInstruct) return
 
-                            Instructs.Database.create({ ...currentInstruct, name: text }).then(
-                                async (newid) => {
+                            Instructs.db.mutate
+                                .createInstruct({ ...currentInstruct, name: text })
+                                .then(async (newid) => {
                                     Logger.log(`Preset created.`, true)
                                     setInstructID(newid)
                                     await loadInstruct(newid)
                                     loadInstructList(newid)
-                                }
-                            )
+                                })
 
                             //Instructs.saveFile(text, { ...currentInstruct, name: text })
                         }}
@@ -157,11 +158,11 @@ const Instruct = () => {
                                             style: `destructive`,
                                             onPress: () => {
                                                 if (!instructID) return
-                                                Instructs.Database.deleteEntry(instructID).then(
-                                                    () => {
+                                                Instructs.db.mutate
+                                                    .deleteInstruct(instructID)
+                                                    .then(() => {
                                                         loadInstructList()
-                                                    }
-                                                )
+                                                    })
                                             },
                                         },
                                     ]

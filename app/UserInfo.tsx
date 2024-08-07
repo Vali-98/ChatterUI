@@ -50,7 +50,7 @@ const UserInfo = () => {
 
     const saveCard = async () => {
         if (currentCard && id) {
-            const newid = await Characters.updateCard(currentCard, id)
+            const newid = await Characters.db.mutate.updateCard(currentCard, id)
             setCard(id)
         }
     }

@@ -51,7 +51,7 @@ const CharInfo = () => {
 
     const savecard = async () => {
         if (characterCard && charId)
-            return Characters.updateCard(characterCard, charId).then(() => {
+            return Characters.db.mutate.updateCard(characterCard, charId).then(() => {
                 setCurrentCard(charId)
             })
     }
@@ -72,7 +72,7 @@ const CharInfo = () => {
                     text: 'Confirm',
                     onPress: () => {
                         RecentMessages.deleteByCharacter(charName ?? '')
-                        Characters.deleteCard(charId ?? -1)
+                        Characters.db.mutate.deleteCard(charId ?? -1)
 
                         router.back()
                     },

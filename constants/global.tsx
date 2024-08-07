@@ -9,6 +9,7 @@ import { Characters } from './Characters'
 import { Chats } from './Chat'
 import { Global, AppSettings } from './GlobalValues'
 import { Instructs } from './Instructs'
+import { Llama } from './LlamaLocal'
 import { Logger } from './Logger'
 import { MarkdownStyle } from './Markdown'
 import { Presets } from './Presets'
@@ -16,7 +17,6 @@ import { RecentEntry, RecentMessages } from './RecentMessages'
 import { Style } from './Style'
 import { Llama3Tokenizer } from './Tokenizer/tokenizer'
 import { humanizedISO8601DateTime } from './Utils'
-import { Llama } from './llama'
 import { mmkv } from './mmkv'
 export {
     mmkv,
@@ -27,7 +27,6 @@ export {
     Global,
     AppSettings,
     API,
-    Llama,
     humanizedISO8601DateTime,
     Logger,
     Style,
@@ -89,7 +88,10 @@ const loadChatOnInit = async () => {
     const entry = entries.at(-1)
     if (!entry) return
 
-    if (!(await Characters.exists(entry.charId)) || !(await Chats.exists(entry.chatId))) {
+    if (
+        !(await Characters.db.query.cardExists(entry.charId)) ||
+        !(await Chats.db.query.chatExists(entry.chatId))
+    ) {
         Logger.log('Character or Chat no longer exists', true)
         RecentMessages.deleteEntry(entry.chatId)
         return
@@ -101,7 +103,7 @@ const loadChatOnInit = async () => {
 // runs every startup to clear some MMKV values
 
 const createDefaultUserData = async () => {
-    await Characters.createCard('User', 'user').then((id: number) => {
+    await Characters.db.mutate.createCard('User', 'user').then((id: number) => {
         mmkv.set(Global.UserID, id)
         Characters.useUserCard.getState().setCard(id)
     })
@@ -177,7 +179,7 @@ export const initializeApp = async () => {
         Logger.log('User ID is undefined, creating default User')
         await createDefaultUserData()
     } else {
-        const list = await Characters.getCardList('user')
+        const list = await Characters.db.query.cardList('user')
         if (!list) {
             Logger.log('Database is Invalid, this should not happen! Please report this occurence.')
         } else if (list?.length === 0) {
@@ -195,7 +197,7 @@ export const initializeApp = async () => {
         const id = await Instructs.generateInitialDefaults()
         mmkv.set(Global.InstructID, id ?? 1)
     } else {
-        Instructs.Database.readList().then(async (list) => {
+        Instructs.db.query.instructList().then(async (list) => {
             if (!list) {
                 Logger.log('Database Invalid, this should not happen! Please report this!')
             } else if (list?.length === 0) {

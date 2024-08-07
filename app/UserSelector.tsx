@@ -34,11 +34,12 @@ const UserSelector = () => {
     const [showNewUser, setShowNewUser] = useState<boolean>(false)
 
     const loadUserList = () => {
-        Characters.getCardList('user')
+        Characters.db.query
+            .cardList('user')
             .then(async (list: CardInfo[]) => {
                 if (list.length === 0) {
                     const defaultName = 'User'
-                    const id = await Characters.createCard(defaultName, 'user')
+                    const id = await Characters.db.mutate.createCard(defaultName, 'user')
                     await setCard(id)
                     loadUserList()
                     return
@@ -113,7 +114,9 @@ const UserSelector = () => {
                                                     text: `Confirm`,
                                                     style: `destructive`,
                                                     onPress: async () => {
-                                                        await Characters.deleteCard(info.id)
+                                                        await Characters.db.mutate.deleteCard(
+                                                            info.id
+                                                        )
                                                         loadUserList()
                                                     },
                                                 },
@@ -134,7 +137,7 @@ const UserSelector = () => {
                 <TextBoxModal
                     booleans={[showNewUser, setShowNewUser]}
                     onConfirm={async (text) => {
-                        const id = await Characters.createCard(text, 'user')
+                        const id = await Characters.db.mutate.createCard(text, 'user')
                         await setCard(id)
                         loadUserList()
                     }}
