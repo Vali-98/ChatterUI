@@ -19,9 +19,10 @@ type EditorProps = {
     id: number
     isLastMessage: boolean
     setEditMode: React.Dispatch<React.SetStateAction<boolean>>
+    editMode: boolean
 }
 
-const Editor: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode }) => {
+const Editor: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, editMode }) => {
     const { updateChat, deleteChat } = Chats.useChat(
         useShallow((state) => ({
             updateChat: state.updateEntry,

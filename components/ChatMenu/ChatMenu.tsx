@@ -28,6 +28,13 @@ import Recents from './Recents'
 import SettingsDrawer from './SettingsDrawer'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { SlideInRight, runOnJS, Easing } from 'react-native-reanimated'
+import ChatInput from './ChatInput'
+
+type MenuData = {
+    callback: () => void
+    text: string
+    button: 'back' | 'edit' | 'paperclip'
+}
 
 const ChatMenu = () => {
     const router = useRouter()
@@ -39,9 +46,7 @@ const ChatMenu = () => {
         }))
     )
 
-    const [newMessage, setNewMessage] = useState<string>('')
     const [showDrawer, setDrawer] = useState<boolean>(false)
-    const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const menuRef = useRef<Menu | null>(null)
 
     const setShowDrawer = (show: boolean | ((b: boolean) => void)) => {
@@ -102,46 +107,7 @@ const ChatMenu = () => {
 
     const gesture = Gesture.Exclusive(swipeDrawer, swipeChar)
 
-    const { insertEntry, deleteEntry, inserLastToBuffer, nowGenerating, abortFunction } =
-        Chats.useChat(
-            useShallow((state) => ({
-                insertEntry: state.addEntry,
-                deleteEntry: state.deleteEntry,
-                inserLastToBuffer: state.insertLastToBuffer,
-                nowGenerating: state.nowGenerating,
-                abortFunction: state.abortFunction,
-            }))
-        )
-
-    const handleSend = async () => {
-        if (newMessage.trim() !== '') await insertEntry(userName ?? '', true, newMessage)
-        await insertEntry(charName ?? '', false, '')
-        setNewMessage((message) => '')
-        generateResponse()
-    }
-
-    const abortResponse = async () => {
-        Logger.log(`Aborting Generation`)
-        if (abortFunction !== undefined) abortFunction()
-    }
-
-    type MenuData = {
-        callback: () => void
-        text: string
-        button: 'back' | 'edit' | 'paperclip'
-    }
-
     const menuoptions: Array<MenuData> = [
-        /*{
-            callback: () => {},
-            text: 'Continue',
-            button: 'forward',
-        },
-        {
-            callback: () => {},
-            text: 'Regenerate',
-            button: 'retweet',
-        },*/
         {
             callback: () => {
                 unloadCharacter()
@@ -215,34 +181,6 @@ const ChatMenu = () => {
 
     const headerViewRight = (
         <View style={styles.headerButtonContainer}>
-            {/*charName !== 'Welcome' && (
-                <Animated.View
-                    entering={SlideInRight.withInitialValues({ originX: 150 })
-                        .duration(200)
-                        .easing(Easing.out(Easing.ease))}>
-                    <View style={styles.headerButtonContainer}>
-                        <TouchableOpacity
-                            style={styles.headerButtonRight}
-                            onPress={() => {
-                                setCharName('Welcome')
-                            }}>
-                            <Ionicons name="chevron-back" size={28} color={Color.Button} />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.headerButtonRight}
-                            onPress={() => {
-                                router.push('/ChatSelector')
-                            }}>
-                            <Ionicons name="chatbox" size={28} color={Color.Button} />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.headerButtonRight}
-                            onPress={() => router.push(`/CharInfo`)}>
-                            <FontAwesome name="edit" size={28} color={Color.Button} />
-                        </TouchableOpacity>
-                    </View>
-                </Animated.View>
-                        )*/}
             <Animated.View
                 entering={SlideInRight.withInitialValues({ originX: 200 })
                     .duration(200)
@@ -291,33 +229,7 @@ const ChatMenu = () => {
 
                         <View style={styles.inputContainer}>
                             {modificationMenu}
-
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Message..."
-                                placeholderTextColor={Style.getColor('primary-text2')}
-                                value={newMessage}
-                                onChangeText={(text) => setNewMessage(text)}
-                                multiline
-                            />
-
-                            {nowGenerating ? (
-                                <TouchableOpacity style={styles.stopButton} onPress={abortResponse}>
-                                    <MaterialIcons
-                                        name="stop"
-                                        color={Style.getColor('destructive-text1')}
-                                        size={28}
-                                    />
-                                </TouchableOpacity>
-                            ) : (
-                                <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-                                    <MaterialIcons
-                                        name="send"
-                                        color={Style.getColor('primary-surface1')}
-                                        size={28}
-                                    />
-                                </TouchableOpacity>
-                            )}
+                            <ChatInput />
                         </View>
                     </View>
                 )}
@@ -360,34 +272,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginVertical: 8,
         paddingHorizontal: 12,
-    },
-
-    input: {
-        color: Style.getColor('primary-text1'),
-        backgroundColor: Style.getColor('primary-surface1'),
-        flex: 1,
-        borderWidth: 1,
-        borderColor: Style.getColor('primary-brand'),
-        borderRadius: 12,
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        marginHorizontal: 8,
-    },
-
-    sendButton: {
-        borderRadius: 8,
-        minWidth: 44,
-        minHeight: 44,
-        backgroundColor: Style.getColor('primary-brand'),
-        padding: 8,
-    },
-
-    stopButton: {
-        borderRadius: 8,
-        minWidth: 44,
-        minHeight: 44,
-        backgroundColor: Style.getColor('destructive-brand'),
-        padding: 8,
     },
 
     optionsButton: {},
