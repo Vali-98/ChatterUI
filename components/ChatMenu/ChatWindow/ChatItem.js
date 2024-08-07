@@ -39,7 +39,6 @@ const ChatItem = ({ id, scroll }) => {
     const [editMode, setEditMode] = useState(false)
     // figure this  out
     //const [imageExists, setImageExists] = useState(true)
-    console.log(id)
     /*useEffect(() => {
         FS.readAsStringAsync(
             message.name === charName
