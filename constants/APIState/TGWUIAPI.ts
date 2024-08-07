@@ -16,7 +16,6 @@ class TWGUIAPI extends APIBase {
         { externalName: 'top_p', samplerID: SamplerID.TOP_P },
         { externalName: 'top_k', samplerID: SamplerID.TOP_K },
         { externalName: 'typical_p', samplerID: SamplerID.TYPICAL },
-        { externalName: 'sampler_seed', samplerID: SamplerID.SEED },
         { externalName: 'min_p', samplerID: SamplerID.MIN_P },
         { externalName: 'smoothing_factor', samplerID: SamplerID.SMOOTHING_FACTOR },
         { externalName: 'seed', samplerID: SamplerID.SEED },
@@ -32,6 +31,7 @@ class TWGUIAPI extends APIBase {
         { externalName: 'no_repeat_ngram_size', samplerID: SamplerID.NO_REPEAT_NGRAM_SIZE },
 
         { externalName: 'guidance_scale', samplerID: SamplerID.GUIDANCE_SCALE },
+        //TODO: Truncation Length?
         //{ externalName: 'truncation_length', samplerID: SamplerID.TRUNCATION_LENGTH },
 
         { externalName: 'use_default_badwordids', samplerID: SamplerID.BAN_EOS_TOKEN },
@@ -46,8 +46,6 @@ class TWGUIAPI extends APIBase {
         { externalName: 'penalty_alpha', samplerID: SamplerID.PENALTY_ALPHA },
         { externalName: 'length_penalty', samplerID: SamplerID.LENGTH_PENALTY },
         { externalName: 'early_stopping', samplerID: SamplerID.EARLY_STOPPING },
-        //TODO: DynaTempCalcs
-        //{ externalName: 'dynatemp_range', samplerID: SamplerID.DYNATEMP_RANGE },
     ]
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()

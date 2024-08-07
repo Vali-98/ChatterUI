@@ -1,7 +1,7 @@
 import AnimatedView from '@components/AnimatedView'
 import { APIState } from '@constants/APIState'
 import { SamplerPreset } from '@constants/Presets'
-import { Samplers } from '@constants/Samplers'
+import { SamplerID, Samplers } from '@constants/Samplers'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Presets, saveStringExternal, Logger, Style, API } from '@globals'
 import { Stack } from 'expo-router'
@@ -16,6 +16,7 @@ import {
     Alert,
 } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
+import { TextInput } from 'react-native-gesture-handler'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
 import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from '../components'
@@ -210,7 +211,7 @@ const SamplerMenu = () => {
                                                     min={samplerItem.values.min}
                                                     max={samplerItem.values.max}
                                                     step={samplerItem.values.step}
-                                                    precision={samplerItem.values.precision}
+                                                    precision={samplerItem.values.precision ?? 2}
                                                 />
                                             )
                                         )
@@ -236,6 +237,35 @@ const SamplerMenu = () => {
                                         )
                                     case 'custom':
                                     default:
+                                        if (item.samplerID === SamplerID.SEED) {
+                                            return (
+                                                <View style={{ paddingBottom: 8, flex: 1 }}>
+                                                    <Text
+                                                        style={{
+                                                            color: Style.getColor('primary-text1'),
+                                                        }}>
+                                                        Seed
+                                                    </Text>
+                                                    <TextInput
+                                                        key={item.samplerID}
+                                                        style={styles.input}
+                                                        value={currentPreset?.seed.toString()}
+                                                        onChangeText={(text) => {
+                                                            let data = -1
+                                                            try {
+                                                                data = parseFloat(text)
+                                                            } catch (e) {}
+                                                            if (currentPreset)
+                                                                setCurrentPreset({
+                                                                    ...currentPreset,
+                                                                    seed: data,
+                                                                })
+                                                        }}
+                                                    />
+                                                </View>
+                                            )
+                                        }
+
                                         return <Text>Something Went Wrong!</Text>
                                 }
                             })}
@@ -270,5 +300,17 @@ const styles = StyleSheet.create({
         padding: 5,
         borderRadius: 4,
         marginLeft: 8,
+    },
+
+    input: {
+        color: Style.getColor('primary-text1'),
+        backgroundColor: Style.getColor('primary-surface1'),
+        borderColor: Style.getColor('primary-surface4'),
+        borderWidth: 1,
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+        marginVertical: 8,
+        marginHorizontal: 4,
+        borderRadius: 8,
     },
 })
