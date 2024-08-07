@@ -2,7 +2,7 @@ import AnimatedView from '@components/AnimatedView'
 import { CharacterCardV2 } from '@constants/Characters'
 import { RecentMessages } from '@constants/RecentMessages'
 import { FontAwesome } from '@expo/vector-icons'
-import { Characters, Logger, LlamaTokenizer, Style } from '@globals'
+import { Characters, Llama3Tokenizer, Logger, Style } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
 import { useState } from 'react'
@@ -158,7 +158,7 @@ const CharInfo = () => {
                         <Text style={styles.boxText}>
                             Description Tokens:{' '}
                             {characterCard?.data?.description !== undefined &&
-                                LlamaTokenizer.encode(characterCard.data.description).length}
+                                Llama3Tokenizer.encode(characterCard.data.description).length}
                         </Text>
 
                         <ScrollView

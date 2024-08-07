@@ -1,5 +1,11 @@
 import { Tensor } from 'onnxruntime-react-native'
+//@ts-ignore
+import { polyfill as polyfillBase64 } from 'react-native-polyfill-globals/src/base64'
+//@ts-ignore
+import { polyfill as polyfillTextEncoding } from 'react-native-polyfill-globals/src/encoding'
 
+polyfillBase64()
+polyfillTextEncoding()
 const PUNCTUATION_REGEX = '\\p{P}\\u0021-\\u002F\\u003A-\\u0040\\u005B-\\u0060\\u007B-\\u007E'
 const PROBLEMATIC_REGEX_MAP = new Map([
     // This uses the case insensitive group modifier, which is not supported in JavaScript.
@@ -387,15 +393,16 @@ class AddedToken {
 
 export class PreTrainedTokenizer extends Callable {
     return_token_type_ids = false
-    _tokenizer_config: any
+
     _default_chat_template = `{% for message in messages %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}`
-    normalizer: any
-    pre_tokenizer: PreTokenizer | null
-    model: TokenizerModel | null
-    post_processor: PostProcessor | null
-    //decoder: any
-    special_tokens: any[]
-    all_special_ids: any[]
+    _tokenizer_config: any
+    normalizer: BertNormalizer | null
+    pre_tokenizer: ByteLevelPreTokenizer | PreTokenizerSequence | SplitPreTokenizer | null
+
+    post_processor: any
+    decoder: ByteLevelDecoder | null
+    special_tokens: number[]
+    all_special_ids: number[]
     added_tokens: AddedToken[]
     additional_special_tokens: any
     added_tokens_regex: RegExp | null
@@ -411,11 +418,12 @@ export class PreTrainedTokenizer extends Callable {
     remove_space: any
     clean_up_tokenization_spaces: any
     do_lowercase_and_remove_accent: any
-    padding_side: 'left' | 'right'
+    padding_side: any
     legacy: boolean
     chat_template: any
     _compiled_template_cache: Map<any, any>
     _warned_about_chat_template: any
+    model: any
 
     /**
      * Create a new PreTrainedTokenizer instance.
@@ -431,9 +439,8 @@ export class PreTrainedTokenizer extends Callable {
         this.normalizer = Normalizer.fromConfig(tokenizerJSON.normalizer)
         this.pre_tokenizer = PreTokenizer.fromConfig(tokenizerJSON.pre_tokenizer)
         this.model = TokenizerModel.fromConfig(tokenizerJSON.model, tokenizerConfig)
-        if (!this.model) throw new Error('Model Invalid')
         this.post_processor = PostProcessor.fromConfig(tokenizerJSON.post_processor)
-        //this.decoder = Decoder.fromConfig(tokenizerJSON.decoder)
+        this.decoder = Decoder.fromConfig(tokenizerJSON.decoder)
 
         // Add added_tokens to model
         this.special_tokens = []
@@ -459,7 +466,7 @@ export class PreTrainedTokenizer extends Callable {
         this.special_tokens.push(...this.additional_special_tokens)
         this.special_tokens = [...new Set(this.special_tokens)] // Remove duplicates
 
-        /*if (this.decoder) {
+        if (this.decoder) {
             // Slight hack, but it prevents code duplication:
             this.decoder.added_tokens = this.added_tokens
 
@@ -468,7 +475,7 @@ export class PreTrainedTokenizer extends Callable {
             // For more information, see https://github.com/xenova/transformers.js/issues/74
             // TODO: save this to the decoder when exporting?
             this.decoder.end_of_word_suffix = this.model.end_of_word_suffix
-        }*/
+        }
 
         this.added_tokens_regex =
             this.added_tokens.length > 0
@@ -534,7 +541,7 @@ export class PreTrainedTokenizer extends Callable {
      * @returns {string|null} The value associated with the first matching key, or null if no match is found.
      * @throws {Error} If an object is found for a matching key and its __type property is not "AddedToken".
      */
-    getToken(...keys: any) {
+    getToken(...keys: any[]) {
         for (const key of keys) {
             const item = this._tokenizer_config[key]
 
@@ -562,7 +569,7 @@ export class PreTrainedTokenizer extends Callable {
      * @throws {Error} Throws an error if the tokenizer.json or tokenizer_config.json files are not found in the `pretrained_model_name_or_path`.
      * @returns {Promise<PreTrainedTokenizer>} A new instance of the `PreTrainedTokenizer` class.
      */
-    static async from_pretrained(
+    static from_pretrained(
         pretrained_model_name_or_path: string,
         {
             progress_callback = null,
@@ -573,7 +580,7 @@ export class PreTrainedTokenizer extends Callable {
             legacy = null,
         } = {}
     ) {
-        const info = await loadTokenizer(pretrained_model_name_or_path, {
+        const info = loadTokenizer(pretrained_model_name_or_path, {
             progress_callback,
             config,
             cache_dir,
@@ -605,6 +612,7 @@ export class PreTrainedTokenizer extends Callable {
      * @param {boolean} [options.truncation=null] Whether to truncate the input sequences.
      * @param {number} [options.max_length=null] Maximum length of the returned list and optionally padding length.
      * @param {boolean} [options.return_tensor=true] Whether to return the results as Tensors or arrays.
+     * @param {boolean} [options.return_token_type_ids=null] Whether to return the token type ids.
      * @returns {BatchEncoding} Object to be passed to the model.
      */
     _call(
@@ -619,13 +627,15 @@ export class PreTrainedTokenizer extends Callable {
             truncation = null,
             max_length = null,
             return_tensor = true, // Different to HF
+            return_token_type_ids = null,
         }: {
             text_pair?: any
             add_special_tokens?: boolean
             padding?: any
             truncation?: any
             max_length?: any
-            return_tensor?: boolean
+            return_tensor?: boolean // Different to HF
+            return_token_type_ids?: any
         } = {}
     ) {
         const isBatched = Array.isArray(text)
@@ -646,10 +656,15 @@ export class PreTrainedTokenizer extends Callable {
                 }
 
                 encodedTokens = text.map((t, i) =>
-                    this._encode_plus(t, text_pair[i], { add_special_tokens })
+                    this._encode_plus(t, text_pair[i], {
+                        add_special_tokens,
+                        return_token_type_ids,
+                    })
                 )
             } else {
-                encodedTokens = text.map((x) => this._encode_plus(x, null, { add_special_tokens }))
+                encodedTokens = text.map((x) =>
+                    this._encode_plus(x, null, { add_special_tokens, return_token_type_ids })
+                )
             }
         } else {
             if (text === null || text === undefined) {
@@ -663,7 +678,9 @@ export class PreTrainedTokenizer extends Callable {
             }
 
             // For single input, we just wrap in an array, and then unwrap later.
-            encodedTokens = [this._encode_plus(text, text_pair, { add_special_tokens })]
+            encodedTokens = [
+                this._encode_plus(text, text_pair, { add_special_tokens, return_token_type_ids }),
+            ]
         }
         // At this point, tokens is batched: [batch_size, tokens]
         // However, array may be jagged. So, we pad to max_length
@@ -777,11 +794,11 @@ export class PreTrainedTokenizer extends Callable {
         // First, we take care of special tokens. Needed to avoid issues arising from
         // normalization and/or pretokenization (which may not preserve special tokens)
         const sections = this.added_tokens_regex
-            ? text.split(this.added_tokens_regex).filter((x: any) => x)
+            ? text.split(this.added_tokens_regex).filter((x) => x)
             : [text]
 
         const tokens = sections
-            .map((x: any, section_index: any) => {
+            .map((x, section_index) => {
                 const addedToken = this.added_tokens.find((t) => t.content === x)
                 if (addedToken !== undefined) {
                     // Ignore added tokens
@@ -795,6 +812,7 @@ export class PreTrainedTokenizer extends Callable {
                     }
 
                     if (this.normalizer !== null) {
+                        //@ts-ignore
                         x = this.normalizer(x)
                     }
 
@@ -806,12 +824,12 @@ export class PreTrainedTokenizer extends Callable {
 
                     const sectionTokens =
                         this.pre_tokenizer !== null
-                            ? this.pre_tokenizer.pre_tokenize_text(x, {
+                            ? this.pre_tokenizer.pre_tokenize(x, {
                                   section_index,
                               })
                             : [x]
-                    if (!this.model) throw new Error('Something bad happened')
-                    const tokens = this.model.encode(sectionTokens)
+
+                    const tokens = this.model.call(sectionTokens)
 
                     return tokens
                 }
@@ -828,17 +846,21 @@ export class PreTrainedTokenizer extends Callable {
      * @param {string|null} text_pair The optional second text to encode.
      * @param {Object} options An optional object containing the following properties:
      * @param {boolean} [options.add_special_tokens=true] Whether or not to add the special tokens associated with the corresponding model.
+     * @param {boolean} [options.return_token_type_ids=null] Whether to return token_type_ids.
      * @returns {EncodingSingle} An object containing the encoded text.
      * @private
      */
-    _encode_plus(text: string, text_pair: any = null, { add_special_tokens = true } = {}) {
-        if (!this.model) throw new Error('Model Invalid')
+    _encode_plus(
+        text: string,
+        text_pair: any = null,
+        { add_special_tokens = true, return_token_type_ids = null } = {}
+    ) {
         // Function called by users to encode possibly multiple texts
         const tokens = this._encode_text(text)
         const tokens2 = this._encode_text(text_pair)
 
         const combinedTokens = this.post_processor
-            ? this.post_processor.post_process(tokens, tokens2, { add_special_tokens })
+            ? this.post_processor.call(tokens, tokens2, { add_special_tokens })
             : { tokens: mergeArrays(tokens ?? [], tokens2 ?? []) }
 
         const input_ids = this.model.convert_tokens_to_ids(combinedTokens.tokens)
@@ -847,7 +869,10 @@ export class PreTrainedTokenizer extends Callable {
             input_ids,
             attention_mask: new Array(input_ids.length).fill(1),
         }
-        if (this.return_token_type_ids && combinedTokens.token_type_ids) {
+        if (
+            (return_token_type_ids ?? this.return_token_type_ids) &&
+            combinedTokens.token_type_ids
+        ) {
             result.token_type_ids = combinedTokens.token_type_ids
         }
         return result
@@ -860,11 +885,17 @@ export class PreTrainedTokenizer extends Callable {
      * @param {string|null} text_pair The optional second text to encode.
      * @param {Object} options An optional object containing the following properties:
      * @param {boolean} [options.add_special_tokens=true] Whether or not to add the special tokens associated with the corresponding model.
+     * @param {boolean} [options.return_token_type_ids=null] Whether to return token_type_ids.
      * @returns {number[]} An array of token IDs representing the encoded text(s).
      */
-    encode(text: string, text_pair = null, { add_special_tokens = true } = {}) {
+    encode(
+        text: string,
+        text_pair = null,
+        { add_special_tokens = true, return_token_type_ids = null } = {}
+    ) {
         const { input_ids } = this._encode_plus(text, text_pair, {
             add_special_tokens,
+            return_token_type_ids,
         })
         return input_ids
     }
@@ -876,13 +907,12 @@ export class PreTrainedTokenizer extends Callable {
      * @returns {string[]} List of decoded sequences.
      */
     /*
-    batch_decode(batch : any, decode_args = {}) {
+    batch_decode(batch, decode_args = {}) {
         if (batch instanceof Tensor) {
-            
             batch = batch.tolist()
         }
         return batch.map((x) => this.decode(x, decode_args))
-    }*/
+    }
 
     /**
      * Decodes a sequence of token IDs back to a string.
@@ -910,7 +940,7 @@ export class PreTrainedTokenizer extends Callable {
         }
 
         return this.decode_single(token_ids, decode_args)
-    }*/
+    }
 
     /**
      * Decode a single list of token ids to a string.
@@ -948,7 +978,7 @@ export class PreTrainedTokenizer extends Callable {
         }
 
         return decoded
-    }*/
+    }
 
     get default_chat_template() {
         if (!this._warned_about_chat_template) {
@@ -1328,7 +1358,6 @@ class PreTokenizer extends Callable {
      */
     static fromConfig(config: any) {
         if (config === null) return null
-
         switch (config.type) {
             /*case 'BertPreTokenizer':
                 return new BertPreTokenizer(config)
@@ -1433,8 +1462,8 @@ class ByteLevelPreTokenizer extends PreTokenizer {
     trim_offsets: any
     use_regex: any
     pattern: RegExp
-    byte_encoder: any
-    text_encoder: any
+    byte_encoder: { [k: string]: string }
+    text_encoder: TextEncoder
     /**
      * Creates a new instance of the `ByteLevelPreTokenizer` class.
      * @param {Object} config The configuration object.
@@ -1474,7 +1503,7 @@ class ByteLevelPreTokenizer extends PreTokenizer {
      * @param {Object} [options] Additional options for the pre-tokenization logic.
      * @returns {string[]} An array of tokens.
      */
-    pre_tokenize_text(text: string, options: any): any {
+    pre_tokenize_text(text: string, options: any) {
         // Add a leading space if the option is enabled
         if (this.add_prefix_space && !text.startsWith(' ')) {
             text = ' ' + text
@@ -1485,10 +1514,7 @@ class ByteLevelPreTokenizer extends PreTokenizer {
 
         // Maps all our bytes to unicode strings, avoiding control tokens of the BPE (spaces in our case)
         return tokens.map((token) =>
-            Array.from(
-                this.text_encoder.encode(token),
-                (byte: any) => this.byte_encoder[byte]
-            ).join('')
+            Array.from(this.text_encoder.encode(token), (byte) => this.byte_encoder[byte]).join('')
         )
     }
 }
@@ -1595,7 +1621,7 @@ export class TokenizerModel extends Callable {
      * @param {string[]} tokens The tokens to encode.
      * @returns {string[]} The encoded token IDs.
      */
-    _call(tokens: any) {
+    call(tokens: any) {
         let ids = this.encode(tokens)
         if (this.fuse_unk) {
             // Fuse unknown tokens
@@ -1898,18 +1924,16 @@ class PostProcessor extends Callable {
     static fromConfig(config: any) {
         if (config === null) return null
         switch (config.type) {
-            /*
             case 'TemplateProcessing':
                 return new TemplateProcessing(config)
-
-            case 'ByteLevel':
-                return new ByteLevelPostProcessor(config)*/
-
             case 'RobertaProcessing':
                 return new RobertaProcessing(config)
             case 'BertProcessing':
                 return new BertProcessing(config)
-
+            case 'Sequence':
+                return new PostProcessorSequence(config)
+            case 'ByteLevel':
+                return new ByteLevelPostProcessor(config)
             default:
                 throw new Error(`Unknown PostProcessor type: ${config.type}`)
         }
@@ -1933,7 +1957,7 @@ class PostProcessor extends Callable {
      * @param {...*} args Additional arguments required by the post-processing logic.
      * @returns {PostProcessedOutput} The post-processed tokens.
      */
-    _call(tokens: any, ...args: any) {
+    call(tokens: any, ...args: any) {
         return this.post_process(tokens, ...args)
     }
 }
@@ -1983,9 +2007,115 @@ class BertProcessing extends PostProcessor {
 }
 class RobertaProcessing extends BertProcessing {} // NOTE: extends BertProcessing
 
+class ByteLevelPostProcessor extends PostProcessor {
+    /**
+     * Post process the given tokens.
+     * @param {string[]} tokens The list of tokens for the first sequence.
+     * @param {string[]} [tokens_pair=null] The list of tokens for the second sequence (optional).
+     * @returns {PostProcessedOutput} An object containing the post-processed tokens.
+     */
+    post_process(tokens: number[], tokens_pair = null) {
+        if (tokens_pair) {
+            tokens = mergeArrays(tokens, tokens_pair)
+        }
+        return { tokens }
+    }
+}
+
+class PostProcessorSequence extends PostProcessor {
+    processors: any
+
+    /**
+     * Creates a new instance of PostProcessorSequence.
+     * @param {Object} config The configuration object.
+     * @param {Object[]} config.processors The list of post-processors to apply.
+     */
+    constructor(config: any) {
+        super(config)
+        this.processors = config.processors.map((x: any) => PostProcessor.fromConfig(x))
+    }
+
+    /**
+     * Post process the given tokens.
+     * @param {string[]} tokens The list of tokens for the first sequence.
+     * @param {string[]} [tokens_pair=null] The list of tokens for the second sequence (optional).
+     * @returns {PostProcessedOutput} An object containing the post-processed tokens.
+     */
+    post_process(tokens: number[], tokens_pair: null | number[] = null, options = {}) {
+        let token_type_ids
+        for (const processor of this.processors) {
+            if (processor instanceof ByteLevelPostProcessor) {
+                // Special case where we need to pass the tokens_pair to the post-processor
+                const output = processor.post_process(tokens)
+                tokens = output.tokens
+                if (tokens_pair) {
+                    const pair_output = processor.post_process(tokens_pair)
+                    tokens_pair = pair_output.tokens
+                }
+            } else {
+                const output = processor.post_process(tokens, tokens_pair, options)
+                tokens = output.tokens
+                token_type_ids = output.token_type_ids
+            }
+        }
+        return { tokens, token_type_ids }
+    }
+}
+
+class TemplateProcessing extends PostProcessor {
+    single: any
+    pair: any
+    /**
+     * Creates a new instance of `TemplateProcessing`.
+     * @param {Object} config The configuration options for the post processor.
+     * @param {Array} config.single The template for a single sequence of tokens.
+     * @param {Array} config.pair The template for a pair of sequences of tokens.
+     */
+    constructor(config: any) {
+        super(config)
+
+        this.single = config.single
+        this.pair = config.pair
+    }
+
+    /**
+     * Replaces special tokens in the template with actual tokens.
+     * @param {string[]} tokens The list of tokens for the first sequence.
+     * @param {string[]} [tokens_pair=null] The list of tokens for the second sequence (optional).
+     * @returns {PostProcessedOutput} An object containing the list of tokens with the special tokens replaced with actual tokens.
+     */
+    post_process(tokens: number[], tokens_pair = null, { add_special_tokens = true } = {}) {
+        const type = tokens_pair === null ? this.single : this.pair
+
+        let processedTokens = []
+        let types = []
+        for (const item of type) {
+            if ('SpecialToken' in item) {
+                if (add_special_tokens) {
+                    processedTokens.push(item.SpecialToken.id)
+                    types.push(item.SpecialToken.type_id)
+                }
+            } else if ('Sequence' in item) {
+                if (item.Sequence.id === 'A') {
+                    processedTokens = mergeArrays(processedTokens, tokens)
+                    types = mergeArrays(types, new Array(tokens.length).fill(item.Sequence.type_id))
+                } else if (item.Sequence.id === 'B') {
+                    processedTokens = mergeArrays(processedTokens, tokens_pair)
+                    types = mergeArrays(
+                        types,
+                        //@ts-ignore
+                        new Array(tokens_pair.length).fill(item.Sequence.type_id)
+                    )
+                }
+            }
+        }
+        return { tokens: processedTokens, token_type_ids: types }
+    }
+}
+
 class Decoder extends Callable {
     config: any
-    added_tokens: never[]
+    added_tokens: AddedToken[]
     end_of_word_suffix: null
     trim_offsets: any
     /**
@@ -2076,6 +2206,7 @@ class Decoder extends Callable {
 class ByteLevelDecoder extends Decoder {
     byte_decoder: any
     text_decoder: any
+
     /**
      * Create a `ByteLevelDecoder` object.
      * @param {Object} config Configuration object.
@@ -2140,12 +2271,11 @@ class ByteLevelDecoder extends Decoder {
     }
 }
 
-async function loadTokenizer(name: string, { ...stuff }) {
+function loadTokenizer(name: string, { ...stuff }) {
     if (name === 'roberta')
         return [require('./Roberta/tokenizer.json'), require('./Roberta/tokenizer_config.json')]
     if (name === 'llama3')
         return [require('./Llama3/tokenizer.json'), require('./Llama3/tokenizer_config.json')]
 }
 
-//export const RobertaTokenizer = PreTrainedTokenizer.from_pretrained('roberta')
-//export const Llama3Tokenizer = PreTrainedTokenizer.from_pretrained('llama3')
+export const Llama3Tokenizer = PreTrainedTokenizer.from_pretrained('llama3')

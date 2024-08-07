@@ -5,9 +5,9 @@ import { create } from 'zustand'
 
 import { Global } from './GlobalValues'
 import { Logger } from './Logger'
+import { Llama3Tokenizer } from './Tokenizer/tokenizer'
 import { replaceMacros } from './Utils'
 import { mmkv } from './mmkv'
-import { LlamaTokenizer } from './tokenizer'
 
 type InstructState = {
     data: InstructType | undefined
@@ -73,14 +73,15 @@ export namespace Instructs {
             const newCache: InstructTokenCache = {
                 charName: charName,
                 userName: userName,
-                system_prompt_length: LlamaTokenizer.encode(instruct.system_prompt).length,
-                system_prefix_length: LlamaTokenizer.encode(instruct.system_prefix).length,
-                system_suffix_length: LlamaTokenizer.encode(instruct.system_suffix).length,
-                input_prefix_length: LlamaTokenizer.encode(instruct.input_prefix).length,
-                input_suffix_length: LlamaTokenizer.encode(instruct.input_suffix).length,
-                output_prefix_length: LlamaTokenizer.encode(instruct.output_prefix).length,
-                output_suffix_length: LlamaTokenizer.encode(instruct.output_suffix).length,
-                user_alignment_message_length: LlamaTokenizer.encode(instruct.system_prompt).length,
+                system_prompt_length: Llama3Tokenizer.encode(instruct.system_prompt).length,
+                system_prefix_length: Llama3Tokenizer.encode(instruct.system_prefix).length,
+                system_suffix_length: Llama3Tokenizer.encode(instruct.system_suffix).length,
+                input_prefix_length: Llama3Tokenizer.encode(instruct.input_prefix).length,
+                input_suffix_length: Llama3Tokenizer.encode(instruct.input_suffix).length,
+                output_prefix_length: Llama3Tokenizer.encode(instruct.output_prefix).length,
+                output_suffix_length: Llama3Tokenizer.encode(instruct.output_suffix).length,
+                user_alignment_message_length: Llama3Tokenizer.encode(instruct.system_prompt)
+                    .length,
             }
             set((state) => ({ ...state, tokenCache: newCache }))
             return newCache
