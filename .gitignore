@@ -11,6 +11,9 @@ android
 eas.json
 *.apk
 
+# builds
+builds/
+
 # Expo
 .expo/
 dist/
