@@ -1,5 +1,5 @@
 import AnimatedView from '@components/AnimatedView'
-import { RecentMessages } from '@constants/RecentMessages'
+import { RecentMessages } from 'app/constants/RecentMessages'
 import { FontAwesome } from '@expo/vector-icons'
 import { Chats, Characters, saveStringExternal, Logger, Style } from '@globals'
 import { useRouter, Stack } from 'expo-router'

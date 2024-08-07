@@ -1,4 +1,4 @@
-import { Lorebooks } from '@constants/Lorebooks'
+import { Lorebooks } from 'app/constants/Lorebooks'
 import { Style } from '@globals'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useState } from 'react'

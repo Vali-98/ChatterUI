@@ -1,7 +1,7 @@
 import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from '@components'
 import AnimatedView from '@components/AnimatedView'
+import { Global, Presets, saveStringExternal, Logger, Style } from './constants/Global'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Presets, saveStringExternal, Logger, Style } from '@globals'
 import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
 import {

@@ -1,4 +1,4 @@
-import { CharacterCardV2 } from '@constants/Characters'
+import { CharacterCardV2 } from 'app/constants/Characters'
 import { FontAwesome } from '@expo/vector-icons'
 import { Characters, Style } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
