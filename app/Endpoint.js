@@ -10,9 +10,9 @@ const Endpoint = () => {
     const [currentEndpoint, setCurrentEndpoint ] = useMMKVString(Global.Endpoint)   
     useEffect(() => {
         if(currentEndpoint === undefined || currentEndpoint === ``)
-            setCurrentEndpoint(`127.0.0.1:5000`)
+            setCurrentEndpoint(`http://127.0.0.1:5000`)
     }, [])
-
+    
     return (
         <SafeAreaView style={styles.mainContainer}>
             <Stack.Screen options={{
