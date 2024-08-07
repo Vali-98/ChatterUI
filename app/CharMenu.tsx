@@ -112,7 +112,16 @@ const CharMenu = () => {
                 booleans={[showNewChar, setShowNewChar]}
                 title="[Creating Character]  Enter Name Below"
                 onConfirm={(text) => {
-                    Characters.createCard(text).then(() => {
+                    Characters.createCard(text).then(async () => {
+                        if (!text) {
+                            Logger.log('Name Cannot Be Empty!', true)
+                            return
+                        }
+                        if (await Characters.exists(text)) {
+                            Logger.log('Character Name Already Exists', true)
+                            return
+                        }
+
                         setCharName(text)
                         router.push(`/CharInfo`)
                         getCharacterList()
