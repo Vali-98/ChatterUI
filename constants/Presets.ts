@@ -192,7 +192,7 @@ export namespace Presets {
         }
     }
 
-    const fixPreset = async (preset: any, filename = '') => {
+    export const fixPreset = (preset: any, filename = '') => {
         const existingKeys = Object.keys(preset)
         const targetPreset: any = defaultPreset()
         const defaultKeys = Object.keys(targetPreset)
@@ -202,7 +202,7 @@ export namespace Presets {
             preset[key] = targetPreset[key]
             samekeys = false
         })
-        if (filename !== '') await saveFile(filename, preset)
+        if (filename !== '') saveFile(filename, preset)
         if (!samekeys) console.log(`Preset fixed!`)
         return JSON.stringify(preset)
     }
