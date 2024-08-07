@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-markdown-package/index.js b/node_modules/react-native-markdown-package/index.js
+index 180626e..633572a 100644
+--- a/node_modules/react-native-markdown-package/index.js
++++ b/node_modules/react-native-markdown-package/index.js
+@@ -51,7 +51,7 @@ class Markdown extends Component {
+ 
+     const tree = this.parse(child);
+ 
+-    return <View style={[styles.view, this.props.styles.view]}>{this.renderer(tree)}</View>
++    return <View {...this.props} style={[styles.view, this.props.styles.view]}>{this.renderer(tree)}</View>
+   }
+ }
+ 
