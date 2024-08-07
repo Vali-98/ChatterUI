@@ -67,7 +67,7 @@ const ChatItem = ({ message, id, scroll}) => {
                 transform: [{ translateY: dyAnim }],
             }}
         >
-            <View style={styles.chatItem}>
+            <View style={{...styles.chatItem, ...((id === messages.length-2)?{borderBottomWidth: 1, borderColor: Color.Offwhite} : {})}}>
 
             <View style={{alignItems: 'center'}}>
                 <Image style={styles.avatar} source={
@@ -239,10 +239,14 @@ const ChatItem = ({ message, id, scroll}) => {
                         newmessages.at(id + 1).swipe_info.push(
                         {
                             "send_date":humanizedISO8601DateTime(),
-                            "gen_started":new Date(),
-                            "gen_finished":"",
+                            "gen_started":Date(),
+                            "gen_finished":Date(),
                             "extra":{"api":"kobold","model":"concedo/koboldcpp"}
                         })
+                        
+                        newmessages.at(id + 1).send_date = humanizedISO8601DateTime()
+                        newmessages.at(id + 1).gen_started = Date()
+                        newmessages.at(id + 1).gen_finished = Date()
                         newmessages.at(id + 1).swipe_id = newmessages.at(id + 1).swipe_id + 1
                         saveChatFile(newmessages).then(() => {
                             setTargetLength(messages.length)
