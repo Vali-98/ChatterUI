@@ -1,6 +1,6 @@
 import { copyFileRes } from '@dr.pogodin/react-native-fs'
 import { initLlama, LlamaContext } from 'cui-llama.rn'
-import { deleteAsync, documentDirectory, getInfoAsync } from 'expo-file-system'
+import { deleteAsync, documentDirectory, getInfoAsync, makeDirectoryAsync } from 'expo-file-system'
 import { create } from 'zustand'
 
 import { Logger } from './Logger'
@@ -24,9 +24,13 @@ export namespace Tokenizer {
         },
         loadModel: async () => {
             if (get().model) return
-            const modelExists = (
-                await getInfoAsync(`${documentDirectory}appAssets/llama3tokenizer.gguf`)
-            ).exists
+
+            const folderDir = `${documentDirectory}appAssets/`
+            const folderExists = (await getInfoAsync(folderDir)).exists
+            if (!folderExists) await makeDirectoryAsync(`${documentDirectory}appAssets`)
+
+            const modelDir = `${folderDir}llama3tokenizer.gguf`
+            const modelExists = (await getInfoAsync(modelDir)).exists
             if (!modelExists) await importModelFromRes()
 
             const context = await initLlama({
@@ -47,7 +51,7 @@ export namespace Tokenizer {
     }
 
     export const debugDeleteModel = async () => {
-        await deleteAsync(documentDirectory + 'appAssets/llama3tokenizer.gguf')
+        await deleteAsync(documentDirectory + 'appAssets')
     }
 }
 
