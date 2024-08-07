@@ -52,7 +52,9 @@ const Mancer = () => {
                 setKeyInput('')
                 ToastAndroid.show('Key saved!', 2000)
             }}>
-                <FontAwesome name='save' color={Color.Button} size={28} />
+            
+            
+            <FontAwesome name='save' color={Color.Button} size={28} />
             </TouchableOpacity>
             </View>
             <View style={styles.dropdownContainer}>
@@ -75,7 +77,7 @@ const Mancer = () => {
             />
             </View>
 
-
+            {(mancerModel !== undefined) &&
             <View style={styles.modelInfo}>
                 <Text style={{...styles.title, marginBottom: 8}}>{mancerModel.name}</Text>
                 <View style={{flexDirection: 'row'}}>
@@ -92,7 +94,7 @@ const Mancer = () => {
                         <Text style={{color:Color.Offwhite}}>:    {mancerModel.pricing.prompt}</Text>
                         </View>
                     </View>
-            </View>
+            </View>}
         </View>
     )
 }
