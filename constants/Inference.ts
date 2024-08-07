@@ -1,7 +1,7 @@
 import { Chats } from '@constants/Chat'
 import { InstructType } from '@constants/Instructs'
 import { replaceMacros } from '@constants/Utils'
-import llamaTokenizer from '@constants/tokenizer'
+import { LlamaTokenizer } from './tokenizer'
 //import { mmkv, Global, API, hordeHeader, Llama, Logger } from '@globals'
 import { Logger } from './Logger'
 import { API } from './API'
@@ -108,8 +108,8 @@ const buildContext = (max_length: number) => {
         payload += ' ' + currentInstruct.system_sequence_suffix
 
     let message_acc = ``
-    const payload_length = llamaTokenizer.encode(payload).length
-    let message_acc_length = llamaTokenizer.encode(message_acc).length
+    const payload_length = LlamaTokenizer.encode(payload).length
+    let message_acc_length = LlamaTokenizer.encode(message_acc).length
     for (const message of messages?.reverse() ?? []) {
         let message_shard = `${message.name === charName ? currentInstruct.output_sequence : currentInstruct.input_sequence}`
 
@@ -118,9 +118,8 @@ const buildContext = (max_length: number) => {
         if (currentInstruct.separator_sequence) message_shard += currentInstruct.separator_sequence
         message_shard += currentInstruct.wrap ? `\n` : ' '
 
-        const shard_length = llamaTokenizer.encode(message_shard).length
+        const shard_length = LlamaTokenizer.encode(message_shard).length
         if (message_acc_length + payload_length + shard_length > max_length) {
-            //Logger.log(llamaTokenizer.encode(payload + message_acc).length > currentInstruct.max_length)
             break
         }
         message_acc_length += shard_length
@@ -137,7 +136,7 @@ const buildContext = (max_length: number) => {
         if (currentInstruct.names) payload += userCard.name + ': '
     }*/
     payload = replaceMacros(payload)
-    Logger.log(`Payload size: ${llamaTokenizer.encode(payload).length}`)
+    Logger.log(`Payload size: ${LlamaTokenizer.encode(payload).length}`)
     Logger.log(`${new Date().getTime() - delta}ms taken to build context`)
     return payload
 }
@@ -152,10 +151,10 @@ const buildChatCompletionContext = (max_length: number) => {
     const initial = `${currentInstruct.system_sequence_prefix}
     \n${userCard?.data?.description ?? userCard?.description ?? ''}
     \n${currentCard?.description ?? currentCard?.data.description}\n`
-    let total_length = llamaTokenizer.encode(initial).length
+    let total_length = LlamaTokenizer.encode(initial).length
     const payload = [{ role: 'system', content: replaceMacros(initial) }]
     for (const message of messages.reverse()) {
-        const len = llamaTokenizer.encode(message.mes).length + total_length
+        const len = LlamaTokenizer.encode(message.mes).length + total_length
         if (len > max_length) break
         payload.push({
             role: message.name === charName ? 'assistant' : 'user',

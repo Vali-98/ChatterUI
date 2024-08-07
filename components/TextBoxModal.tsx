@@ -6,7 +6,7 @@ import { View, Text, Modal, TextInput, StyleSheet, TouchableOpacity } from 'reac
 type TextBoxModalProps = {
     booleans: [boolean, (b: boolean) => void]
     onConfirm: (text: string) => void
-    title: string
+    title?: string
 }
 
 const TextBoxModal: React.FC<TextBoxModalProps> = ({
