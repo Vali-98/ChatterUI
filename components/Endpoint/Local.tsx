@@ -256,7 +256,16 @@ const Local = () => {
                     <Text style={{ ...styles.subtitle, marginTop: 4 }}>Cache Size: {kvSize}MB</Text>
                     <TouchableOpacity
                         style={{ ...styles.textbutton, marginTop: 8 }}
-                        onPress={handleImport}>
+                        onPress={() =>
+                            WarningAlert(
+                                'Delete Cache',
+                                'Are you sure you want to delete the cache? This cannot be undone.',
+                                async () => {
+                                    await Llama.deleteKV()
+                                    setKVSize(await Llama.getKVSizeMB())
+                                }
+                            )
+                        }>
                         <Text style={styles.buttonlabel}>Delete Cache</Text>
                     </TouchableOpacity>
                 </View>
@@ -332,3 +341,14 @@ const styles = StyleSheet.create({
         color: Style.getColor('primary-text1'),
     },
 })
+
+const WarningAlert = (title: string, description: string, onPress: () => void) => {
+    Alert.alert(title, description, [
+        { text: `Cancel`, style: `cancel` },
+        {
+            text: `Confirm`,
+            style: `destructive`,
+            onPress: onPress,
+        },
+    ])
+}
