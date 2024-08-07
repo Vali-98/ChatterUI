@@ -2,9 +2,17 @@ import { ChatWindow } from './ChatWindow/ChatWindow'
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Chats, Logger } from '@globals'
 import { generateResponse } from '@constants/Inference'
-import { Stack, useRouter } from 'expo-router'
-import { useState } from 'react'
-import { View, Text, TextInput, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native'
+import { Stack, useFocusEffect, useRouter } from 'expo-router'
+import { useCallback, useRef, useState } from 'react'
+import {
+    View,
+    Text,
+    TextInput,
+    SafeAreaView,
+    TouchableOpacity,
+    StyleSheet,
+    BackHandler,
+} from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
 import {
     Menu,
@@ -20,13 +28,7 @@ import Recents from './Recents'
 import AnimatedView from '@components/AnimatedView'
 import SettingsDrawer from './SettingsDrawer'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import Animated, {
-    SlideInRight,
-    runOnJS,
-    Easing,
-    SlideOutLeft,
-    SlideOutRight,
-} from 'react-native-reanimated'
+import Animated, { SlideInRight, runOnJS, Easing } from 'react-native-reanimated'
 
 const ChatMenu = () => {
     const router = useRouter()
@@ -35,6 +37,32 @@ const ChatMenu = () => {
     const [showDrawer, setShowDrawer] = useState<boolean>(false)
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const messagesLength = Chats.useChat(useShallow((state) => state?.data?.length)) ?? -1
+
+    const backAction = () => {
+        if (showDrawer) {
+            setShowDrawer(false)
+            Logger.debug('Closing Drawer')
+            return true
+        }
+
+        if (charName !== 'Welcome') {
+            setCharName('Welcome')
+            Logger.debug('Returning to primary Menu')
+            return true
+        }
+        BackHandler.exitApp()
+    }
+
+    useFocusEffect(
+        useCallback(() => {
+            BackHandler.removeEventListener('hardwareBackPress', backAction)
+            BackHandler.addEventListener('hardwareBackPress', backAction)
+
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', backAction)
+            }
+        }, [charName, showDrawer])
+    )
 
     const gesture = Gesture.Fling()
         .direction(1)
@@ -142,13 +170,13 @@ const ChatMenu = () => {
                         .duration(200)
                         .easing(Easing.out(Easing.ease))}>
                     <View style={styles.headerButtonContainer}>
-                        <TouchableOpacity
+                        {/*<TouchableOpacity
                             style={styles.headerButtonRight}
                             onPress={() => {
                                 setCharName('Welcome')
                             }}>
                             <Ionicons name="chevron-back" size={28} color={Color.Button} />
-                        </TouchableOpacity>
+                        </TouchableOpacity>*/}
                         <TouchableOpacity
                             style={styles.headerButtonRight}
                             onPress={() => {
