@@ -41,10 +41,8 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
     const handleImageError = () => {
         setImageSource(require('@assets/user.png'))
     }
-
-    const deltaTime = Math.max(
-        0,
-        (swipe.gen_finished.getTime() - swipe.gen_started.getTime()) / 1000
+    const deltaTime = Math.round(
+        Math.max(0, (swipe.gen_finished.getTime() - swipe.gen_started.getTime()) / 1000)
     )
     return (
         <View style={{ flexDirection: 'row' }}>

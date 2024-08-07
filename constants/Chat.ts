@@ -191,13 +191,13 @@ export namespace Chats {
         },
 
         updateEntry: async (index: number, message: string) => {
-            const messages = get().data?.messages
+            const messages = get()?.data?.messages
             if (!messages) return
-            const chatSwipeId = messages[index].swipes[messages[index].swipe_id].id
+            const chatSwipeId = messages[index]?.swipes[messages[index].swipe_id].id
             if (!chatSwipeId) return
-            await updateChatSwipe(chatSwipeId, message)
-
+            const date = await updateChatSwipe(chatSwipeId, message)
             messages[index].swipes[messages[index].swipe_id].swipe = message
+            messages[index].swipes[messages[index].swipe_id].gen_finished = date
             set((state) => ({
                 ...state,
                 data: state?.data ? { ...state.data, messages: messages } : state.data,
@@ -249,10 +249,9 @@ export namespace Chats {
             set((state: ChatState) => ({ ...state, buffer: state.buffer + data })),
 
         updateFromBuffer: async () => {
-            const messages = get().data?.messages
-            if (!messages) return
-            const index = messages.length - 1
-            await get().updateEntry(index, get().buffer)
+            const index = get().data?.messages?.length
+            if (!index) return
+            await get().updateEntry(index - 1, get().buffer)
         },
         insertLastToBuffer: () => {
             const message = get()?.data?.messages?.at(-1)
@@ -378,10 +377,12 @@ export namespace Chats {
     }
 
     export const updateChatSwipe = async (chatSwipeId: number, message: string) => {
+        const date = new Date()
         await db
             .update(chatSwipes)
-            .set({ swipe: message, gen_finished: new Date() })
+            .set({ swipe: message, gen_finished: date })
             .where(eq(chatSwipes.id, chatSwipeId))
+        return date
     }
 
     export const deleteChat = async (chatId: number) => {
