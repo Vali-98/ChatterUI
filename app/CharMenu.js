@@ -179,7 +179,7 @@ const CharMenu = () => {
                                 'https://api.chub.ai/api/characters/download', 
                                 {
                                     "format" : "tavern",
-                                    "fullPath" : downloadName
+                                    "fullPath" : downloadName.trim('https://chub.ai/characters/')
                                 },
                                 {
                                     responseType: 'arraybuffer'
