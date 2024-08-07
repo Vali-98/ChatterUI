@@ -1,8 +1,8 @@
 import { useInference } from '@constants/Chat'
-import { Characters, Chats, Global } from '@globals'
-import { useEffect, useRef } from 'react'
+import { AppSettings, Characters, Chats, Global } from '@globals'
+import { useRef } from 'react'
 import { StyleSheet, FlatList } from 'react-native'
-import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
+import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
 import { ChatItem } from './ChatItem'
@@ -21,10 +21,8 @@ const ChatWindow = () => {
     const flatListRef = useRef<FlatList>(null)
     const messagesLength = Chats.useChat((state) => state?.data?.messages?.length) ?? -1
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
+    const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
 
-    /*useEffect(() => {
-        if (nowGenerating) flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 })
-    }, [nowGenerating])*/
     const getItems = (): ListItem[] => {
         const arr: ListItem[] = []
         for (let i = 0; i < messagesLength; i++) {
@@ -50,6 +48,9 @@ const ChatWindow = () => {
         <FlatList
             style={styles.chatHistory}
             ref={flatListRef}
+            maintainVisibleContentPosition={
+                autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
+            }
             keyboardShouldPersistTaps="handled"
             removeClippedSubviews={false}
             inverted
