@@ -85,7 +85,8 @@ class LocalAPI extends APIBase {
         }
 
         const outputCompleted = (text: string) => {
-            Chats.useChat.getState().setBuffer(text.replaceAll(replace, ''))
+            const regenCache = Chats.useChat.getState().getRegenCache()
+            Chats.useChat.getState().setBuffer((regenCache + text).replaceAll(replace, ''))
             if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.log(`Completion Output:\n${text}`)
         }
 
