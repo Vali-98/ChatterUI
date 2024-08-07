@@ -40,28 +40,29 @@ const ChatText: React.FC<ChatTextProps> = ({ showEllipsis, nowGenerating, id, is
             }).start()
         )
     }
-
     const handleContentSizeChange = (event: LayoutChangeEvent) => {
-        const newheight = event.nativeEvent.layout.height
+        const newHeight = event.nativeEvent.layout.height
         const oveflowPadding = 12
-        if (height.current === newheight) return
-        height.current = newheight
-        handleAnimateHeight(newheight + (nowGenerating && buffer !== '' ? oveflowPadding : 0))
+        if (height.current === newHeight) return
+        height.current = newHeight
+        const showPadding = nowGenerating && buffer !== ''
+        handleAnimateHeight(newHeight + (showPadding ? oveflowPadding : 0))
     }
 
     useEffect(() => {
-        if (!nowGenerating && height.current !== -1) {
+        if (!nowGenerating) {
             handleAnimateHeight(height.current)
         } else if (nowGenerating && !mes) {
             // NOTE: this assumes that mes is empty due to a swipe and may break, but unlikely
-            height.current = 0
+            height.current = -1
             handleAnimateHeight(height.current)
         }
     }, [nowGenerating])
+
     return (
         <Animated.View
             style={{
-                height: height.current === -1 ? 'auto' : animatedHeight,
+                height: animatedHeight,
                 overflow: 'scroll',
             }}>
             {showEllipsis && buffer === '' && (
@@ -72,6 +73,7 @@ const ChatText: React.FC<ChatTextProps> = ({ showEllipsis, nowGenerating, id, is
                     }}
                 />
             )}
+
             <Markdown
                 onLayout={handleContentSizeChange}
                 style={styles.messageText}
@@ -87,6 +89,7 @@ export default ChatText
 
 const styles = StyleSheet.create({
     messageText: {
-        textAlignVertical: 'top',
+        borderWidth: 2,
+        borderColor: 'red',
     },
 })
