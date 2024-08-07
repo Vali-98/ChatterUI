@@ -204,26 +204,29 @@ export const uploadPreset = async (api = apiType()) => {
             from: result.assets[0].uri, 
             to: `${FS.documentDirectory}/presets/${api}/${name}.json`
         }).then(() => {
-            return FS.readAsStringAsync(`${FS.documentDirectory}/preset/${api}/${name}.json`, {encoding: FS.EncodingType.UTF8})
+            return FS.readAsStringAsync(`${FS.documentDirectory}/presets/${api}/${name}.json`, {encoding: FS.EncodingType.UTF8})
         }).then((file) => {
-            console.log(JSON.parse(file))
+
             let filekeys =Object.keys(JSON.parse(file))
             let preset : any = defaultPresetKAI()
             if(api === 'tgwui')
                 preset = defaultPresetTGWUI()
             if(api === 'novelai')
                 preset = defaultPresetNovelAI()
-
+            // change to generate default values insstead ??
             let correctkeys = Object.keys(preset)
             let samekeys =  filekeys.every((element, index) => {return element === correctkeys[index]})
             if (!samekeys) {
-                return FS.deleteAsync(`${FS.documentDirectory}/preset/${api}/${name}.json`).then(() => {
+                return FS.deleteAsync(`${FS.documentDirectory}/presets/${api}/${name}.json`).then(() => {
                     throw new TypeError(`JSON file has invalid format`)
                 })
             }
             else
                 return name
-        }).catch(error => ToastAndroid.show(error.message, 2000))
+        }).catch(error => {
+            console.log(error)
+            ToastAndroid.show(error.message, 2000)
+        })
     })
 }
 

@@ -86,17 +86,17 @@ const PresetsKAI = () => {
             
             <TouchableOpacity style={styles.button} 
                 onPress={() => {
+                    if(presetList.length === 1) {
+                        ToastAndroid.show(`Cannot delete last preset`, 2000)
+                        return
+                    }
                     Alert.alert(`Delete Preset`, `Are you sure you want to delete \'${presetName}\'?`, 
                         [
                             {text:`Cancel`, style: `cancel`},
                             {
                                 text:`Confirm`, 
                                 style: `destructive`, 
-                                onPress: () =>  {
-                                    if(presetList.length === 1) {
-                                        ToastAndroid.show(`Cannot delete last preset`, 2000)
-                                        return
-                                    }
+                                onPress: () =>  {               
                                     deletePreset(presetName).then(() => { 
                                         loadPresetList()
                                     })
