@@ -1,0 +1,20 @@
+name: Build Workflow
+
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    trigger-build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Connect Tailscale
+              uses: tailscale/github-actions@v2
+              with:
+                  oauth-client-id: ${{secrets.TS_OAUTH_CLIENT_ID}}
+                  oauth-secret: ${{secrets.TS_OAUTH_SECRET}}
+                  tags: tag:chatterui-cd
+
+            - name: Trigger Build
+              run: curl -X GET ${{secrets.TS_BUILD_API}}
