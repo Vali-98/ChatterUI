@@ -1,5 +1,5 @@
+import { CompletionParams, LlamaContext, initLlama } from 'cui-llama.rn'
 import * as FS from 'expo-file-system'
-import { CompletionParams, LlamaContext, initLlama } from 'llama.rn'
 import { Platform } from 'react-native'
 import DocumentPicker from 'react-native-document-picker'
 import { create } from 'zustand'
@@ -111,7 +111,9 @@ export namespace Llama {
             }
         },
         unload: async () => {
-            get().context?.release()
+            await get().context?.release()
+            set((state) => ({ ...state, context: undefined, modelname: undefined }))
+            Logger.log('Model Unloaded', true)
         },
         completion: async (
             params: CompletionParams,
