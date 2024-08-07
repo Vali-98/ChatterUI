@@ -1,5 +1,5 @@
 import { Chats } from '@constants/Chat'
-import { InstructType } from '@constants/Instructs'
+import { InstructType, Instructs } from '@constants/Instructs'
 import { replaceMacros } from '@constants/Utils'
 import { LlamaTokenizer } from './tokenizer'
 //import { mmkv, Global, API, hordeHeader, Llama, Logger } from '@globals'
@@ -12,6 +12,7 @@ import axios from 'axios'
 import EventSource from 'react-native-sse'
 import * as Application from 'expo-application'
 import { Characters } from './Characters'
+import Instruct from 'app/Instruct'
 
 export const regenerateResponse = async () => {
     const charName = Characters.useCharacterCard.getState().card?.data.name
@@ -114,30 +115,30 @@ export const hordeHeader = () => {
 const buildContext = (max_length: number) => {
     const messages = [...(Chats.useChat.getState().data?.messages ?? [])]
     const delta = new Date().getTime()
-    const currentInstruct = getObject(Global.CurrentInstruct)
+    const currentInstruct = instructReplaceMacro()
     const userCard = getObject(Global.CurrentUserCard)
     const currentCard = { ...Characters.useCharacterCard.getState().card }
 
     const usercarddata = (userCard?.description ?? '').trim()
     const charcarddata = (currentCard?.data?.description ?? '').trim()
     let payload = ``
-    if (currentInstruct.system_sequence_prefix) payload += currentInstruct.system_sequence_prefix
+    if (currentInstruct.system_prefix) payload += currentInstruct.system_prefix
     if (currentInstruct.system_prompt) payload += `${currentInstruct.system_prompt}\n`
     if (usercarddata) payload += usercarddata + '\n'
     if (charcarddata) payload += charcarddata + '\n'
 
-    if (currentInstruct.system_sequence_suffix)
-        payload += ' ' + currentInstruct.system_sequence_suffix
+    if (currentInstruct.system_suffix) payload += ' ' + currentInstruct.system_suffix
 
     let message_acc = ``
     const payload_length = LlamaTokenizer.encode(payload).length
     let message_acc_length = LlamaTokenizer.encode(message_acc).length
     for (const message of messages?.reverse() ?? []) {
-        let message_shard = `${message.is_user ? currentInstruct.input_sequence : currentInstruct.output_sequence}`
+        let message_shard = `${message.is_user ? currentInstruct.input_prefix : currentInstruct.output_prefix}`
 
         if (currentInstruct.names) message_shard += message.name + ': '
         message_shard += message.swipes[message.swipe_id].swipe
-        if (currentInstruct.separator_sequence) message_shard += currentInstruct.separator_sequence
+        //if (currentInstruct.separator_sequence) message_shard += currentInstruct.separator_sequence
+        message_shard += `${message.is_user ? currentInstruct.input_suffix : currentInstruct.output_suffix}`
         message_shard += currentInstruct.wrap ? `\n` : ' '
 
         const shard_length = LlamaTokenizer.encode(message_shard).length
@@ -169,9 +170,12 @@ const buildChatCompletionContext = (max_length: number) => {
     const currentCard = { ...Characters.useCharacterCard.getState().card }
     const currentInstruct = instructReplaceMacro()
 
-    const initial = `${currentInstruct.system_sequence_prefix}
+    const initial = `${currentInstruct.system_prefix}
+    ${currentInstruct.system_prompt}
     \n${userCard?.data?.description ?? ''}
-    \n${currentCard?.data?.description ?? ''}\n`
+    \n${currentCard?.data?.description ?? ''}
+    \n${currentInstruct.system_suffix}`
+
     let total_length = LlamaTokenizer.encode(initial).length
     const payload = [{ role: 'system', content: replaceMacros(initial) }]
     for (const message of messages.reverse()) {
@@ -196,11 +200,17 @@ const constructStopSequence = (instruct: InstructType): Array<string> => {
     return sequence
 }
 
-const instructReplaceMacro = () => {
-    const instruct = getObject(Global.CurrentInstruct)
-    Object.keys(instruct).forEach((key) => {
-        if (typeof instruct[key] == 'string') instruct[key] = replaceMacros(instruct[key])
+const instructReplaceMacro = (): InstructType => {
+    const rawinstruct = Instructs.useInstruct.getState().data
+
+    if (!rawinstruct) return Instructs.defaultInstruct
+    const instruct = { ...rawinstruct }
+    const keys = Object.keys(instruct) as (keyof typeof instruct)[]
+
+    keys.forEach((key) => {
+        if (typeof instruct[key] === 'string') replaceMacros(instruct[key] as string)
     })
+
     return instruct
 }
 
@@ -406,7 +416,7 @@ const constructCompletionsPayload = () => {
                 ? Math.floor(Math.random() * 999999)
                 : parseInt(preset.seed),
         sampler_order: [6, 0, 1, 3, 4, 2, 5],
-        stop: ['\n\n\n\n\n', currentInstruct.input_sequence],
+        stop: ['\n\n\n\n\n', currentInstruct.input_prefix],
         frequency_penalty: preset.freq_pen,
         presence_penalty: preset.presence_pen,
         smoothing_factor: preset.smoothing_factor,

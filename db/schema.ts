@@ -144,7 +144,7 @@ export const swipesRelations = relations(chatSwipes, ({ one }) => ({
 
 // INSTRUCT
 
-export const instructs = sqliteTable('instructs', {
+/*export const instructs = sqliteTable('instructs', {
     id: integer('id', { mode: 'number' }).primaryKey(),
     name: text('name').notNull(),
 
@@ -161,6 +161,26 @@ export const instructs = sqliteTable('instructs', {
 
     activation_regex: text('activation_regex').notNull(),
 
+    wrap: integer('wrap', { mode: 'boolean' }).notNull(),
+    macro: integer('macro', { mode: 'boolean' }).notNull(),
+    names: integer('names', { mode: 'boolean' }).notNull(),
+    names_force_groups: integer('names_force_groups', { mode: 'boolean' }).notNull(),
+})*/
+
+export const instructs = sqliteTable('instructs', {
+    id: integer('id', { mode: 'number' }).primaryKey(),
+    name: text('name').notNull(),
+
+    system_prompt: text('system_prompt').notNull(),
+    system_prefix: text('system_prefix').notNull(),
+    system_suffix: text('system_suffix').notNull(),
+    input_prefix: text('inpput_prefix').notNull(),
+    input_suffix: text('input_suffix').notNull(),
+    output_suffix: text('output_suffix').notNull(),
+    output_prefix: text('output_prefix').notNull(),
+    stop_sequence: text('stop_sequence').notNull(),
+    activation_regex: text('activation_regex').notNull(),
+    user_alignment_message: text('user_alignment_message').notNull(),
     wrap: integer('wrap', { mode: 'boolean' }).notNull(),
     macro: integer('macro', { mode: 'boolean' }).notNull(),
     names: integer('names', { mode: 'boolean' }).notNull(),
