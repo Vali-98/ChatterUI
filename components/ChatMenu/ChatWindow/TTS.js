@@ -22,6 +22,10 @@ const TTS = ({message}) => {
 			</TouchableOpacity> 
 			:
 			<TouchableOpacity onPress={async () => {
+				if(currentSpeaker == undefined) {
+					ToastAndroid.show('No Speaker Chosen', 2000)
+					return
+				}
 				setIsSpeaking(true)
 				if (await Speech.isSpeakingAsync())
 					Speech.stop()

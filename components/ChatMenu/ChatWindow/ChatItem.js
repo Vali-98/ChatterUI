@@ -59,17 +59,110 @@ const ChatItem = ({ message, id, scroll}) => {
             }),
         ]).start();
     }, [fadeAnim])
-    // logic for multi part chat content if swipe exists
-    // note, swipes: [mes1, mes2] swipe_no: 1
-    // Note: Show edit buttons if global prop is inactive
-    return (
+    
+    const markdownFormat = {
+        em:{
+            color: Color.TextItalic,
+            fontStyle:'italic',
+        },
+        text: {
+            color: Color.Text
+        },
+        list: {
+            color: Color.Text
+        },
+    }
 
+    let swapMessage = (n) => {
+        let newmessages = Array.from(messages)
+        
+        const swipeid = message.swipe_id + n
+        newmessages.at(id + 1).mes = messages.at(id + 1).swipes.at(swipeid)
+        newmessages.at(id + 1).extra = messages.at(id + 1).swipe_info.at(swipeid).extra
+        newmessages.at(id + 1).send_date = messages.at(id + 1).swipe_info.at(swipeid).send_date
+        newmessages.at(id + 1).gen_started = messages.at(id + 1).swipe_info.at(swipeid).gen_started
+        newmessages.at(id + 1).gen_finished = messages.at(id + 1).swipe_info.at(swipeid).gen_finished
+        newmessages.at(id + 1).swipe_id = swipeid
+        Chats.saveFile(newmessages, charName, currentChat)
+        setMessages(newmessages)
+    }
+
+    const generateSwipe = () => {
+        let newmessages = messages
+        newmessages.at(id + 1).mes = ""
+        newmessages.at(id + 1).swipes.push(``)
+        newmessages.at(id + 1).swipe_info.push(
+        {
+            "send_date":humanizedISO8601DateTime(),
+            "gen_started":Date(),
+            "gen_finished":Date(),
+            "extra":{"api":"kobold","model":"concedo/koboldcpp"}
+        })
+        newmessages.at(id + 1).send_date = humanizedISO8601DateTime()
+        newmessages.at(id + 1).gen_started = Date()
+        newmessages.at(id + 1).gen_finished = Date()
+        newmessages.at(id + 1).swipe_id = newmessages.at(id + 1).swipe_id + 1
+        Chats.saveFile(newmessages, charName, currentChat).then(() => {
+            setTargetLength(messages.length)
+            setNowGenerating(true)
+        })
+        setMessages(newmessages)
+    }
+
+    const handleSwipe = (n) => {
+        const swipeid = message.swipe_id + n
+        if(swipeid < 0) return
+        if(swipeid < message.swipes.length) {
+            swapMessage(n)
+            return
+        }
+        if(id == 0) return
+        generateSwipe()
+        scroll.current?.scrollToEnd()
+    }
+
+    const handleEditMessage = () => {
+        setMessages(messages => {
+            let newmessages = messages
+
+            newmessages.at(id + 1).mes = placeholderText
+            if(newmessages.swipes !== undefined)
+                newmessages.at(id + 1).swipes[newmessages.at(id + 1).swipe_id] = placeholderText
+                Chats.saveFile(newmessages, charName, currentChat)
+            return newmessages
+        })
+        setEditMode(editMode => false)
+    }
+
+    const handleDeleteMessage = () => {
+        setMessages(messages => {
+            let newmessages = messages.slice()
+            newmessages.splice(id + 1, 1)
+            Chats.saveFile(newmessages, charName, currentChat)
+            return newmessages
+        })
+        setEditMode(editMode => false)
+    }
+
+    const handleEnableEdit = () => {
+        setPlaceholderText(message.mes)   
+        setEditMode(!nowGenerating)
+    }
+
+    const handleDisableEdit = () => {
+        setPlaceholderText(message.mes)
+        setEditMode(editMode => false)
+    }
+
+    const deltaTime = Math.max(0, ((new Date(message.gen_finished) - new Date(message.gen_started))/1000).toFixed(0))
+
+    return (
         <Animated.View
             style={{
                 opacity: fadeAnim,
                 transform: [{ translateY: dyAnim }],
-            }}
-        >
+            }}>
+                
             <View style={{...styles.chatItem, ...((id === messages.length-2)?{borderBottomWidth: 1, borderColor: Color.Offwhite} : {})}}>
 
             <View style={{alignItems: 'center'}}>
@@ -82,130 +175,64 @@ const ChatItem = ({ message, id, scroll}) => {
                 <Text style={styles.graytext}>#{id}</Text>
                 {(message?.gen_started !== undefined && message?.gen_finished !== undefined && message.name === charName)
                     &&
-                <Text style={styles.graytext}>{((new Date(message.gen_finished) - new Date(message.gen_started))/1000).toFixed(0)}s</Text>
+                <Text style={styles.graytext}>{deltaTime}s</Text>
                 }
                 {TTSenabled && <TTSMenu message={message.mes}/>}
             </View>
                 
-            
-            
             <View style={{flex:1}}>
 
-            <View style={{flexDirection:'row', alignItems:'flex-end', marginBottom: 8}}>
-                <Text style={{fontSize: 16, color: Color.Text}}>{message.name}   </Text>
-                <Text style={{fontSize: 10, color: Color.Text, flex: 1}}>{message.send_date}</Text>
+                <View style={{marginBottom: 8}}>
+                       
+                    <Text style={{fontSize: 16, color: Color.Text, marginRight: 4}}>{message.name}</Text>
+                    <Text style={{fontSize: 10, color: Color.Text}}>{message.send_date}</Text>
+                 
+                    { 
+                    (!nowGenerating) &&
+                    (editMode) && 
+                        (<View style={{flexDirection:'row'}} >
+                            {id !== 0 && <TouchableOpacity style= {styles.editButton} onPress={handleDeleteMessage}>
+                                <MaterialIcons name='delete' size={28} color={Color.Button} />
+                            </TouchableOpacity>}
 
-                { 
-                (!nowGenerating) &&
-                (editMode) && 
-                    (<View style={{flexDirection:'row'}} >
-                        {id !== 0 && <TouchableOpacity style= {styles.editButton} onPress={() => {
-                            setMessages(messages => {
-                                let newmessages = messages.slice()
-                                newmessages.splice(id + 1, 1)
-                                Chats.saveFile(newmessages, charName, currentChat)
-                                return newmessages
-                            })
-                            setEditMode(editMode => false)
-                        }}>
-                            <MaterialIcons name='delete' size={28} color={Color.Button} />
-                        </TouchableOpacity>}
+                            <TouchableOpacity style={styles.editButton} onPress={handleEditMessage}>
+                                <MaterialIcons name='check' size={28} color={Color.Button} />
+                            </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.editButton} onPress={() => {
-                            // update content of file THEN => 
-                            setMessages(messages => {
-                                let newmessages = messages
-
-                                newmessages.at(id + 1).mes = placeholderText
-                                if(newmessages.swipes !== undefined)
-                                    newmessages.at(id + 1).swipes[newmessages.at(id + 1).swipe_id] = placeholderText
-                                    Chats.saveFile(newmessages, charName, currentChat)
-                                return newmessages
-                            })
-                            setEditMode(editMode => false)
-                            }}>
-                            <MaterialIcons name='check' size={28} color={Color.Button} />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={styles.editButton} onPress={() => {
-                            
-                            // update content of file THEN => 
-                            setPlaceholderText(message.mes)
-                            setEditMode(editMode => false)
-                            }}>
-                            <MaterialIcons name='close' size={28} color={Color.Button} /> 
-                        </TouchableOpacity>
-                    </View>)
-                   
-                }
-                
-            </View>
-
-            {!editMode?
-                <TouchableOpacity style={styles.messageTextContainer} activeOpacity={0.7}
-                    onLongPress={() => {
-                        setPlaceholderText(message.mes)   
-                        setEditMode(!nowGenerating)
-                    }}
-                >
-                    <Markdown
-                        style={styles.messageText}
-                        styles={{
-                            em:{
-                                color: Color.TextItalic,
-                                fontStyle:'italic',
-                            },
-                            text: {
-                                color: Color.Text
-                            },
-                            list: {
-                                color: Color.Text
-                            },
-                        }}
-                        rules={{speech}}
-                        
-                    >
-                    {message.mes.trim(`\n`)}
-                    </Markdown>
-                </TouchableOpacity  >
-                :
-                <View style={styles.messageInput} >
-                <TextInput
-                    style={{color:Color.Text}}
-                    value={placeholderText} 
-                    onChangeText={setPlaceholderText}        
-                    textBreakStrategy='simple'
-                    multiline
-                    autoFocus
-                />
+                            <TouchableOpacity style={styles.editButton} onPress={handleDisableEdit}>
+                                <MaterialIcons name='close' size={28} color={Color.Button} /> 
+                            </TouchableOpacity>
+                        </View>)
+                    }
                 </View>
-            }
+
+                {!editMode?
+                    <TouchableOpacity style={styles.messageTextContainer} activeOpacity={0.7} onLongPress={handleEnableEdit}>
+                        <Markdown style={styles.messageText} styles={markdownFormat} rules={{speech}}>
+                            {message.mes.trim(`\n`)}
+                        </Markdown>
+                    </TouchableOpacity  >
+                    :
+                    <View style={styles.messageInput} >
+                        <TextInput
+                            style={{color:Color.Text}}
+                            value={placeholderText} 
+                            onChangeText={setPlaceholderText}        
+                            textBreakStrategy='simple'
+                            multiline
+                            autoFocus
+                        />
+                    </View>
+                }
             </View>
             </View>
             
-            {(id === messages?.length - 2) 
-                && id !== 0 // remove once alternatives added 
-                && message.name === messages[0].character_name 
+            {   ((id === messages?.length - 2 && message.name === messages[0].character_name  && message?.swipes != undefined && id != 0)
+                || (id === 0 && messages?.swipes != undefined && message?.swipes?.length != 1))
                 && <View style={styles.swipesItem}>
                 {!nowGenerating &&
                 <TouchableOpacity onPress={() => {
-                    // go previous if not first
-                    if(message.swipe_id === 0) return
-                    setMessages(messages => {
-                        let newmessages = messages
-                        let swipeid = messages.at(id + 1).swipe_id - 1
-                        newmessages.at(id + 1).mes = messages.at(id + 1).swipes.at(swipeid)
-                        newmessages.at(id + 1).extra = messages.at(id + 1).swipe_info.at(swipeid).extra
-                        newmessages.at(id + 1).send_date = messages.at(id + 1).swipe_info.at(swipeid).send_date
-                        newmessages.at(id + 1).gen_started = messages.at(id + 1).swipe_info.at(swipeid).gen_started
-                        newmessages.at(id + 1).gen_finished = messages.at(id + 1).swipe_info.at(swipeid).gen_finished
-
-                        newmessages.at(id + 1).swipe_id = swipeid
-                        Chats.saveFile(newmessages, charName, currentChat)
-                        return newmessages
-                    })
-                    setPlaceholderText(message.swipes.at(message.swipe_id  - 1))
-                    scroll.current?.scrollToEnd()
+                   handleSwipe(-1)
                 }}>
                     <AntDesign name='left' size={20} color={Color.Button} />
                 </TouchableOpacity>}
@@ -217,51 +244,7 @@ const ChatItem = ({ message, id, scroll}) => {
 
                 {!nowGenerating &&
                 <TouchableOpacity onPress={() => {
-                    
-                    if(message.swipe_id < messages.at(id + 1).swipes.length - 1){
-                        setMessages(messages => {
-                            let newmessages = messages
-                            let swipeid = messages.at(id + 1).swipe_id + 1
-                            newmessages.at(id + 1).mes = messages.at(id + 1).swipes.at(swipeid)
-                            newmessages.at(id + 1).extra = messages.at(id + 1).swipe_info.at(swipeid).extra
-                            newmessages.at(id + 1).send_date = messages.at(id + 1).swipe_info.at(swipeid).send_date
-                            newmessages.at(id + 1).gen_started = messages.at(id + 1).swipe_info.at(swipeid).gen_started
-                            newmessages.at(id + 1).gen_finished = messages.at(id + 1).swipe_info.at(swipeid).gen_finished
-
-                            newmessages.at(id + 1).swipe_id = swipeid
-
-
-                            Chats.saveFile(newmessages, charName, currentChat)
-                            return newmessages
-                        })
-                        setPlaceholderText(message.swipes.at(message.swipe_id + 1))
-                        scroll.current?.scrollToEnd()
-                        return
-                    }
-                    
-                    setMessages( (messages) => {
-                        let newmessages = messages
-                        newmessages.at(id + 1).mes = ""
-                        newmessages.at(id + 1).swipes.push(``)
-                        newmessages.at(id + 1).swipe_info.push(
-                        {
-                            "send_date":humanizedISO8601DateTime(),
-                            "gen_started":Date(),
-                            "gen_finished":Date(),
-                            "extra":{"api":"kobold","model":"concedo/koboldcpp"}
-                        })
-                        
-                        newmessages.at(id + 1).send_date = humanizedISO8601DateTime()
-                        newmessages.at(id + 1).gen_started = Date()
-                        newmessages.at(id + 1).gen_finished = Date()
-                        newmessages.at(id + 1).swipe_id = newmessages.at(id + 1).swipe_id + 1
-                        Chats.saveFile(newmessages, charName, currentChat).then(() => {
-                            setTargetLength(messages.length)
-                            setNowGenerating(true)
-                        })
-                        return newmessages
-                    })
-                    
+                   handleSwipe(1)
                 }}>
                     <AntDesign name='right' size={20} color={Color.Button} />
                 </TouchableOpacity>}
@@ -281,8 +264,6 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         paddingVertical: 12,
         paddingHorizontal: 8,
-        //borderColor: Color.Offwhite,
-        //borderBottomWidth: 1,
     },
 
     messageText: {
