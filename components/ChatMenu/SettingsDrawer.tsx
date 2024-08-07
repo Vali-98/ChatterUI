@@ -13,6 +13,7 @@ import Animated, {
     SlideOutRight,
     SlideOutLeft,
     FadeIn,
+    FadeOut,
 } from 'react-native-reanimated'
 import { Color, Global, Users } from '@globals'
 import { usePathname, useRouter } from 'expo-router'
@@ -43,11 +44,45 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
     const handlePush = (route: any) => {
         router.navigate(route)
     }
+
+    type ButtonData = {
+        name: string
+        path: `/${string}`
+    }
+
+    const paths: Array<ButtonData> = [
+        {
+            name: 'Sampler',
+            path: '/PresetMenu',
+        },
+        {
+            name: 'Instruct',
+            path: '/Instruct',
+        },
+        {
+            name: 'API',
+            path: '/APIMenu',
+        },
+        {
+            name: 'TTS',
+            path: '/TTSMenu',
+        },
+        {
+            name: 'Sampler',
+            path: '/PresetMenu',
+        },
+        {
+            name: 'Logs',
+            path: '/Logs',
+        },
+    ]
+
     if (showModal)
         return (
             <View style={styles.absolute}>
                 <Animated.View
-                    entering={FadeIn.duration(200).easing(Easing.ease)}
+                    entering={FadeIn.duration(200)}
+                    exiting={FadeOut.duration(200)}
                     style={styles.absolute}>
                     <TouchableOpacity
                         activeOpacity={1}
@@ -90,33 +125,21 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                             </View>
                         </View>
                     </View>
-                    <TouchableOpacity
-                        style={styles.firstlargeButton}
-                        onPress={() => {
-                            handlePush('/PresetMenu')
-                        }}>
-                        <Text style={styles.largeButtonText}>Sampler</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.largeButton}
-                        onPress={() => handlePush('/Instruct')}>
-                        <Text style={styles.largeButtonText}>Instruct</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.largeButton}
-                        onPress={() => handlePush('/APIMenu')}>
-                        <Text style={styles.largeButtonText}>API</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.largeButton}
-                        onPress={() => handlePush('/TTSMenu')}>
-                        <Text style={styles.largeButtonText}>TTS</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.largeButton}
-                        onPress={() => handlePush('/Logs')}>
-                        <Text style={styles.largeButtonText}>Logs</Text>
-                    </TouchableOpacity>
+                    {paths.map((item, index) => (
+                        <Animated.View
+                            key={index}
+                            entering={SlideInLeft.duration(500 + index * 30)
+                                .withInitialValues({ originX: index * -150 + -400 })
+                                .easing(Easing.out(Easing.exp))}>
+                            <TouchableOpacity
+                                style={styles.firstlargeButton}
+                                onPress={() => {
+                                    handlePush(item.path)
+                                }}>
+                                <Text style={styles.largeButtonText}>{item.name}</Text>
+                            </TouchableOpacity>
+                        </Animated.View>
+                    ))}
 
                     {__DEV__ && (
                         <TouchableOpacity
@@ -205,13 +228,13 @@ const styles = StyleSheet.create({
     largeButton: {
         borderBottomWidth: 1,
         fontSize: 20,
-        borderColor: Color.Offwhite,
+        borderColor: Color.Container,
     },
 
     firstlargeButton: {
         borderBottomWidth: 1,
         borderTopWidth: 1,
         fontSize: 20,
-        borderColor: Color.Offwhite,
+        borderColor: Color.Container,
     },
 })
