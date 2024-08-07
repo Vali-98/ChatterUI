@@ -97,8 +97,8 @@ export interface ChatState {
     updateEntry: (
         index: number,
         message: string,
-        updateTime?: boolean,
-        resetTime?: boolean
+        updateFinished?: boolean,
+        updateStarted?: boolean
     ) => Promise<void>
     deleteEntry: (index: number) => Promise<void>
     reset: () => void

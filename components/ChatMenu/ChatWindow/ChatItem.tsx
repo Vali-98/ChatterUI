@@ -29,7 +29,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
                 }}>
                 <ChatFrame
                     charId={charId}
-                    userName={userName}
                     id={id}
                     nowGenerating={nowGenerating}
                     isLast={isLastMessage}

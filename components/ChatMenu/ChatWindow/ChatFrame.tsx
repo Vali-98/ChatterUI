@@ -1,13 +1,12 @@
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { ReactNode, useEffect, useState } from 'react'
-import { ChatEntry, Chats } from '@constants/Chat'
+import { Chats } from '@constants/Chat'
 import { Characters, Style } from '@globals'
 import TTSMenu from './TTS'
 import { useShallow } from 'zustand/react/shallow'
 
 type ChatFrameProps = {
     children?: ReactNode
-    userName: string
     TTSenabled: boolean
     id: number
     charId: number
@@ -17,15 +16,15 @@ type ChatFrameProps = {
 
 const ChatFrame: React.FC<ChatFrameProps> = ({
     children,
-    userName,
     TTSenabled,
     id,
     nowGenerating,
     isLast,
 }) => {
-    const { message } = Chats.useChat(
+    const { message, buffer } = Chats.useChat(
         useShallow((state) => ({
             message: state?.data?.messages?.[id] ?? Chats.dummyEntry,
+            buffer: state.buffer,
         }))
     )
 
@@ -51,21 +50,14 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
         setImageSource(require('@assets/user.png'))
     }
 
-    const getDeltaTime = () =>
-        Math.round(
-            Math.max(
-                0,
-                ((nowGenerating && isLast ? new Date().getTime() : swipe.gen_finished.getTime()) -
-                    swipe.gen_started.getTime()) /
-                    1000
-            )
+    const deltaTime = Math.round(
+        Math.max(
+            0,
+            ((nowGenerating && isLast ? new Date().getTime() : swipe.gen_finished.getTime()) -
+                swipe.gen_started.getTime()) /
+                1000
         )
-
-    const [deltaTime, setDeltaTime] = useState(getDeltaTime())
-
-    useEffect(() => {
-        setDeltaTime(getDeltaTime())
-    }, [nowGenerating])
+    )
 
     // TODO: Change TTS to take id and simply retrieve that data on TTS as needed
     return (
