@@ -15,6 +15,10 @@ export const enum Global {
 
     // EditedWindow = 'editedwindow', // exit editing window confirmation == never used
 
+    // App
+
+    GenerateDefaultInstructs = 'generatedefaultinstructs',
+
     // Processing
 
     NowGenerating = 'nowgenerating', // generation signal

@@ -71,7 +71,7 @@ export const saveStringExternal = async (
 // runs every startup to clear some MMKV values
 
 const createDefaultInstructData = async () => {
-    await Instructs.Database.createDefault().then(() => {
+    await Instructs.generateInitialDefaults().then(() => {
         const defaultid = 1
         mmkv.set(Global.InstructID, JSON.stringify(defaultid))
         Instructs.useInstruct.getState().load(defaultid)
@@ -130,17 +130,6 @@ export const startupApp = () => {
 export const initializeApp = async () => {
     await generateDefaultDirectories()
 
-    /*
-    await Users.getFileList()
-        .then((files) => {
-            if (files.length > 0) return
-            mmkv.set(Global.CurrentUser, Users.defaultUserName)
-            mmkv.set(Global.CurrentUserCard, JSON.stringify(Users.defaultUserCard))
-            Users.createUser(Users.defaultUserName)
-            Logger.log('Created default User')
-        })
-        .catch((error) => Logger.log(`Could not generate default User. Reason: ${error}`))
-    */
     await Presets.getFileList()
         .then((files) => {
             if (files.length > 0) return
@@ -150,7 +139,6 @@ export const initializeApp = async () => {
         })
         .catch((error) => Logger.log(`Could not generate default Preset. Reason: ${error}`))
 
-    //TODO: DB User defaults
     const userid = mmkv.getNumber(Global.UserID)
     if (userid === undefined) {
         Logger.log('User ID is undefined, creating default User')
@@ -166,6 +154,10 @@ export const initializeApp = async () => {
             Logger.log('User ID does not exist in database, defaulting to oldest User')
             Characters.useUserCard.getState().setCard(list[0].id)
         } else Characters.useUserCard.getState().setCard(userid)
+    }
+    if (!mmkv.getBoolean(Global.GenerateDefaultInstructs)) {
+        Logger.log('Default Instructs were not generated yet, now generating.')
+        await Instructs.generateInitialDefaults()
     }
 
     const instructid = mmkv.getNumber(Global.InstructID)
