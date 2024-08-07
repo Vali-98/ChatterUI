@@ -183,14 +183,12 @@ const ChatItem: React.FC<ChatItemProps> = ({
                                     overflow: 'scroll',
                                 }}>
                                 {showEllipsis && (
-                                    <View style={{ ...styles.messageTextContainer, padding: 5 }}>
-                                        <AnimatedEllipsis
-                                            style={{
-                                                color: Style.getColor('primary-text2'),
-                                                fontSize: 20,
-                                            }}
-                                        />
-                                    </View>
+                                    <AnimatedEllipsis
+                                        style={{
+                                            color: Style.getColor('primary-text2'),
+                                            fontSize: 20,
+                                        }}
+                                    />
                                 )}
                                 <Markdown
                                     onLayout={handleContentSizeChange}
