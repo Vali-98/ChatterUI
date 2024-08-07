@@ -185,7 +185,9 @@ const buildContext = (max_length: number) => {
             message_shard += `${message.is_user ? currentInstruct.input_suffix : currentInstruct.output_suffix}`
         else is_last = false
 
-        message_shard += currentInstruct.wrap ? `\n` : ' '
+        if (currentInstruct.wrap) {
+            message_shard += `\n`
+        }
 
         message_acc_length += shard_length * token_mult
         message_acc = message_shard + message_acc
