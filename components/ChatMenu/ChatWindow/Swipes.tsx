@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableHighlight } from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
-import { Color, Logger } from '@globals'
+import { Style } from '@globals'
 import React from 'react'
 import { ChatEntry, Chats } from '@constants/Chat'
 import { useShallow } from 'zustand/react/shallow'
@@ -48,8 +48,8 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, id }) => {
                     size={20}
                     color={
                         message.swipe_id === 0 || nowGenerating
-                            ? Color.ButtonDisabled
-                            : Color.Button
+                            ? Style.getColor('primary-text2')
+                            : Style.getColor('primary-text1')
                     }
                 />
             </TouchableHighlight>
@@ -62,7 +62,11 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, id }) => {
                     <AntDesign
                         name="retweet"
                         size={20}
-                        color={nowGenerating ? Color.ButtonDisabled : Color.Button}
+                        color={
+                            nowGenerating
+                                ? Style.getColor('primary-text2')
+                                : Style.getColor('primary-text1')
+                        }
                     />
                 </TouchableHighlight>
             )}
@@ -79,7 +83,11 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, id }) => {
                     <AntDesign
                         name="forward"
                         size={20}
-                        color={nowGenerating ? Color.ButtonDisabled : Color.Button}
+                        color={
+                            nowGenerating
+                                ? Style.getColor('primary-text2')
+                                : Style.getColor('primary-text1')
+                        }
                     />
                 </TouchableHighlight>
             )}
@@ -91,7 +99,11 @@ const Swipes: React.FC<SwipesProps> = ({ message, nowGenerating, id }) => {
                 <AntDesign
                     name="right"
                     size={20}
-                    color={isLastAltGreeting || nowGenerating ? Color.ButtonDisabled : Color.Button}
+                    color={
+                        isLastAltGreeting || nowGenerating
+                            ? Style.getColor('primary-text2')
+                            : Style.getColor('primary-text1')
+                    }
                 />
             </TouchableHighlight>
         </View>
@@ -109,7 +121,7 @@ const styles = StyleSheet.create({
     },
 
     swipeText: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         borderRadius: 20,
         paddingVertical: 6,
         paddingHorizontal: 8,

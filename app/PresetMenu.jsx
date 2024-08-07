@@ -398,8 +398,6 @@ const styles = StyleSheet.create({
 
     button: {
         padding: 5,
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 1,
         borderRadius: 4,
         marginLeft: 8,
     },

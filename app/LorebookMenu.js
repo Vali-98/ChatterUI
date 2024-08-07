@@ -1,8 +1,8 @@
 import TextBoxModal from '@components/TextBoxModal'
 import { Lorebooks } from '@constants/Lorebooks'
 import { FontAwesome } from '@expo/vector-icons'
-import { Color } from '@globals'
 import { Stack, useRouter } from 'expo-router'
+import { Style } from '@globals'
 import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native'
 
@@ -31,21 +31,21 @@ const LorebookMenu = () => {
             <View style={styles.bar}>
                 <View style={styles.searchBox}>
                     <TextInput style={styles.searchInput} onChangeText={setSearchData} />
-                    <FontAwesome name="search" size={15} color={Color.White} />
+                    <FontAwesome name="search" size={15} color={Style.getColor('primary-text1')} />
                 </View>
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => {
                         Lorebooks.uploadFile().then(() => loadBooksList())
                     }}>
-                    <FontAwesome size={24} name="upload" color={Color.Button} />
+                    <FontAwesome size={24} name="upload" color={Style.getColor('primary-text1')} />
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => {
                         setShowNewBook(true)
                     }}>
-                    <FontAwesome size={24} name="plus" color={Color.Button} />
+                    <FontAwesome size={24} name="plus" color={Style.getColor('primary-text1')} />
                 </TouchableOpacity>
             </View>
             <ScrollView style={{ marginTop: 16 }}>
@@ -59,10 +59,12 @@ const LorebookMenu = () => {
                                 key={index}
                                 style={styles.lorebookItem}
                                 onPress={() => router.push(`/BookInfo/${book}`)}>
-                                <Text style={{ color: Color.Text }}>{book}</Text>
+                                <Text style={{ color: Style.getColor('primary-text1') }}>
+                                    {book}
+                                </Text>
                                 <TouchableOpacity>
                                     <FontAwesome
-                                        color={Color.White}
+                                        color={Style.getColor('primary-text1')}
                                         size={24}
                                         name="trash"
                                         onPress={() =>
@@ -99,21 +101,21 @@ const styles = StyleSheet.create({
     searchBox: {
         flex: 1,
         borderRadius: 16,
-        backgroundColor: Color.DarkContainer,
+        backgroundColor: Style.getColor('primary-surface2'),
         padding: 8,
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         flexDirection: 'row',
         alignItems: 'center',
     },
 
     searchInput: {
         flex: 1,
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
     },
 
     button: {
         padding: 8,
-        backgroundColor: Color.DarkContainer,
+        backgroundColor: Style.getColor('primary-surface2'),
         borderRadius: 4,
         marginLeft: 8,
     },
@@ -124,7 +126,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: Color.Container,
+        backgroundColor: Style.getColor('primary-surface3'),
         borderRadius: 16,
         marginVertical: 4,
     },

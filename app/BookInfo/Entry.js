@@ -1,7 +1,7 @@
 import CheckboxTitle from '@components/CheckboxTitle'
 import SliderItem from '@components/SliderItem'
 import { FontAwesome } from '@expo/vector-icons'
-import { Color, Logger } from '@globals'
+import { Style, Logger } from '@globals'
 import { useState, useRef } from 'react'
 import { Text, View, TouchableOpacity, TextInput, StyleSheet } from 'react-native'
 import Collapsible from 'react-native-collapsible'
@@ -25,30 +25,30 @@ const Entry = ({ data, datakey, updateBook }) => {
                     marginRight: 8,
                 }}
                 onPress={() => setCollapsed(!collapsed)}>
-                <Text style={{ color: Color.Text }}>{data.key[0]}</Text>
+                <Text style={{ color: Style.getColor('primary-text1') }}>{data.key[0]}</Text>
 
                 <FontAwesome
                     name={collapsed ? 'chevron-down' : 'chevron-up'}
                     size={20}
-                    color={Color.Button}
+                    color={Style.getColor('primary-text1')}
                 />
             </TouchableOpacity>
 
             <Collapsible style={{ ...styles.container, marginTop: 0 }} collapsed={collapsed}>
-                <Text style={{ color: Color.Text }}>Key</Text>
+                <Text style={{ color: Style.getColor('primary-text1') }}>Key</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
-                        style={{ color: Color.Text }}
+                        style={{ color: Style.getColor('primary-text1') }}
                         value={data.key[0]}
                         onChangeText={(text) => {
                             updateBook(datakey, 'key', [text])
                         }}
                     />
                 </View>
-                <Text style={{ color: Color.Text }}>Secondary Key</Text>
+                <Text style={{ color: Style.getColor('primary-text1') }}>Secondary Key</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
-                        style={{ color: Color.Text }}
+                        style={{ color: Style.getColor('primary-text1') }}
                         value={data.keysecondary.join(', ')}
                         onChangeText={(text) => {
                             updateBook(
@@ -59,10 +59,10 @@ const Entry = ({ data, datakey, updateBook }) => {
                         }}
                     />
                 </View>
-                <Text style={{ color: Color.Text }}>Content</Text>
+                <Text style={{ color: Style.getColor('primary-text1') }}>Content</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
-                        style={{ color: Color.Text }}
+                        style={{ color: Style.getColor('primary-text1') }}
                         value={data.content}
                         multiline
                         onChangeText={(text) => {
@@ -70,10 +70,10 @@ const Entry = ({ data, datakey, updateBook }) => {
                         }}
                     />
                 </View>
-                <Text style={{ color: Color.Text }}>Comment</Text>
+                <Text style={{ color: Style.getColor('primary-text1') }}>Comment</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
-                        style={{ color: Color.Text }}
+                        style={{ color: Style.getColor('primary-text1') }}
                         value={data.comment}
                         multiline
                         onChangeText={(text) => {
@@ -139,13 +139,13 @@ const styles = StyleSheet.create({
         marginVertical: 4,
         marginHorizontal: 16,
         padding: 16,
-        backgroundColor: Color.Container,
+        backgroundColor: Style.getColor('primary-surface3'),
         borderRadius: 16,
     },
 
     inputContainer: {
         marginTop: 8,
-        backgroundColor: Color.DarkContainer,
+        backgroundColor: Style.getColor('primary-surface2'),
         borderRadius: 8,
         paddingHorizontal: 8,
         maxHeight: 160,

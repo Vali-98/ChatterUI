@@ -16,7 +16,7 @@ import { Llama } from './llama'
 import { mmkv } from './mmkv'
 import { Logger } from './Logger'
 import { LlamaTokenizer } from './tokenizer'
-import { Style, ComponentStyle } from './Style'
+import { Style } from './Style'
 export {
     mmkv,
     Presets,
@@ -31,25 +31,6 @@ export {
     Logger,
     LlamaTokenizer,
     Style,
-    ComponentStyle,
-}
-
-export const enum Color {
-    Header = '#1e1e1e',
-    Background = '#222',
-    Container = '#333',
-    BorderColor = '#252525',
-    White = '#fff',
-    Text = '#fff',
-    TextItalic = '#aaa',
-    TextQuote = '#e69d17',
-    Black = '#000',
-    DarkContainer = '#111',
-    Offwhite = '#888',
-    Button = '#ddd',
-    ButtonDisabled = '#353535',
-    TextWhite = '#fff',
-    TextBlack = '#000',
 }
 
 export const GlobalStyle = StyleSheet.create({})

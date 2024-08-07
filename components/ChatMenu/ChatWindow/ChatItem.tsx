@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import { Color, Chats, Style } from '@globals'
+import { Chats, Style } from '@globals'
 import React, { useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 //@ts-ignore
@@ -81,7 +81,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
 
     const EditorButton = ({ name, onPress }: EditorProps) => (
         <TouchableOpacity style={styles.editButton} onPress={onPress}>
-            <MaterialIcons name={name} size={28} color={Color.Button} />
+            <MaterialIcons name={name} size={28} color={Style.getColor('primary-text1')} />
         </TouchableOpacity>
     )
 
@@ -100,7 +100,9 @@ const ChatItem: React.FC<ChatItemProps> = ({
                     TTSenabled={TTSenabled}>
                     {showEllipsis && (
                         <View style={{ ...styles.messageTextContainer, padding: 5 }}>
-                            <AnimatedEllipsis style={{ color: Color.White, fontSize: 20 }} />
+                            <AnimatedEllipsis
+                                style={{ color: Style.getColor('primary-text2'), fontSize: 20 }}
+                            />
                         </View>
                     )}
 
@@ -126,7 +128,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                             </View>
                             <View style={styles.messageInput}>
                                 <TextInput
-                                    style={{ color: Color.Text }}
+                                    style={{ color: Style.getColor('primary-text1') }}
                                     value={placeholderText}
                                     onChangeText={setPlaceholderText}
                                     textBreakStrategy="simple"
@@ -144,8 +146,8 @@ const ChatItem: React.FC<ChatItemProps> = ({
                             onLongPress={handleEnableEdit}>
                             <Markdown
                                 style={styles.messageText}
-                                styles={markdownFormat}
-                                rules={{ speech }}>
+                                rules={{ speech }}
+                                styles={markdownFormat}>
                                 {nowGenerating && id === messagesLength - 1
                                     ? buffer.trim()
                                     : message.mes.trim()}
@@ -198,21 +200,16 @@ const styles = StyleSheet.create({
     },
 
     messageInput: {
-        color: Color.Text,
+        color: Style.getColor('primary-text1'),
         backgroundColor: Style.getColor('primary-surface1'),
         borderColor: Style.getColor('primary-brand'),
         borderWidth: 1,
         borderRadius: 8,
         padding: 8,
     },
-
-    graytext: {
-        color: Color.Offwhite,
-        paddingTop: 4,
-    },
 })
 
-const speechStyle = { color: Color.TextQuote }
+const speechStyle = { color: '#e69d17' }
 const speech = {
     order: SimpleMarkdown.defaultRules.em.order + 0.6,
     match(source: string, state: any, lookbehind: any) {
@@ -242,16 +239,17 @@ const speech = {
     },
     html: undefined,
 }
-
+const text = Style.getColor('primary-text1')
+const offtext = Style.getColor('primary-text2')
 const markdownFormat = {
     em: {
-        color: Color.TextItalic,
+        color: text,
         fontStyle: 'italic',
     },
     text: {
-        color: Color.Text,
+        color: offtext,
     },
     list: {
-        color: Color.Text,
+        color: offtext,
     },
 }
