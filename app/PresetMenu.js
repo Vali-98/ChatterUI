@@ -26,6 +26,7 @@ const PresetMenu = () => {
         genamt: {type: SLIDER, data : {name: 'Generated Tokens', step: 16, min: 16, max: 8192}},
         streaming: {type : CHECKBOX, data : {name: `Streaming (this doesn't do anything)`}},
         temp : {type: SLIDER,  data : {name: 'Temperature', precision:2, min: 0, max:2}},
+        dynatemp_range : {type: SLIDER, data: {name : 'Temperature Range', precision: 2, min: 0, max: 5}},
         rep_pen: {type: SLIDER,  data : {name: 'Repetition Penalty', precision:2, min: 1.0, max:1.5}},
         rep_pen_range: {type: SLIDER,  data : {name: 'Repetition Penalty Range', min: 1, max: 4096}},
         rep_pen_slope: {type: SLIDER,  data : {name: 'Repetition Penalty Slope', precision:1, min: 1.0, max:10.0}},
