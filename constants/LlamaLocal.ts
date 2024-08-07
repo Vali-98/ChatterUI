@@ -269,7 +269,7 @@ export namespace Llama {
                 .catch((error) => {
                     Logger.log(`Import Failed: ${error.message}`, true)
                 })
-        }).catch
+        })
     }
 
     export const getKVSizeMB = async () => {
