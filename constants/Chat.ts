@@ -40,20 +40,15 @@ export type ChatData = {
     messages: ChatEntry[] | undefined
 }
 
-//type ChatDataArray = [ChatInfo, ...ChatEntry[]]
-
 type AbortFunction = () => void
 
 type SetAbortFunction = (fn: AbortFunction) => void
 
 export interface ChatState {
-    //id: number | undefined
-    //metadata: ChatInfo | undefined
     data: ChatData | undefined
     buffer: string
     load: (chatId: number) => Promise<void>
     delete: (chatId: number) => Promise<void>
-    //save: () => Promise<void>
     addEntry: (name: string, is_user: boolean, message: string) => Promise<void>
     updateEntry: (
         index: number,
