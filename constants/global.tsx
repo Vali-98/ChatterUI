@@ -91,17 +91,7 @@ export const hordeHeader = () => {
     return { "Client-Agent":`ChatterUI:${Application.nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`} 
 }
 
-// DEFAULT DIRECTORIES
-
-export const generateDefaultDirectories = async () => {
-
-    const dirs = ['characters', 'presets', 'instruct', 'persona']
-
-    dirs.map(async (dir : string)  => {
-        await FS.makeDirectoryAsync(`${FS.documentDirectory}${dir}`).catch(() => console.log(`Failed to make directory: ${dir}`))
-    })
-
-}
+// runs every startup to clear some MMKV values
 
 export const startupApp = async () => {
     mmkv.set(Global.CurrentCharacter, 'Welcome')
@@ -113,6 +103,8 @@ export const startupApp = async () => {
     console.log("Reset values")
     SystemUI.setBackgroundColorAsync(Color.Background)
 }
+
+// creates default dirs and default objects
 
 export const initializeApp = async () => {
 
@@ -144,12 +136,15 @@ export const initializeApp = async () => {
     
 }
 
+export const generateDefaultDirectories = async () => {
 
-// FORMATS
+    const dirs = ['characters', 'presets', 'instruct', 'persona']
 
+    dirs.map(async (dir : string)  => {
+        await FS.makeDirectoryAsync(`${FS.documentDirectory}${dir}`).catch(() => console.log(`Failed to make directory: ${dir}`))
+    })
 
-
-// TODO: create function that loads presets from old files to new one
+}
 
 // Migrate seperated presets from 0.4.2 to unified presets
 export const migratePresets = async () => {

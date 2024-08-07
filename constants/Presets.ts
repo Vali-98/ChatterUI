@@ -5,6 +5,10 @@ import { API } from './API'
 
 export namespace Presets {
 
+const presetdir = `${FS.documentDirectory}presets/`
+
+const getPresetDir = (name : string) => `${presetdir}${name}.json`
+
 export const APIFields : Object = {
     [API.KAI] : ['max_length', 'genamt', 'rep_pen', 'rep_pen_range', 
     'rep_pen_slope', 'temp', 'tfs', 'top_a', 'top_k', 'top_p', 
@@ -96,21 +100,21 @@ const fixPreset = async (preset : any, filename = '') => {
 }
 
 export const loadFile = async (name : string) => {    
-    return FS.readAsStringAsync(`${FS.documentDirectory}presets/${name}.json`, {encoding: FS.EncodingType.UTF8}).then((file) => {
+    return FS.readAsStringAsync(getPresetDir(name), {encoding: FS.EncodingType.UTF8}).then((file) => {
         return fixPreset(JSON.parse(file), name)
     })
 }
 
 export const saveFile = async (name : string, preset : Object) => {
-    return FS.writeAsStringAsync(`${FS.documentDirectory}presets/${name}.json`, JSON.stringify(preset), {encoding:FS.EncodingType.UTF8})
+    return FS.writeAsStringAsync(getPresetDir(name), JSON.stringify(preset), {encoding:FS.EncodingType.UTF8})
 }
 
 export const deleteFile = async (name : string) => {
-    return FS.deleteAsync(`${FS.documentDirectory}presets/${name}.json`)
+    return FS.deleteAsync(getPresetDir(name))
 }
 
 export const getFileList = async () => {
-    return FS.readDirectoryAsync(`${FS.documentDirectory}presets/`)
+    return FS.readDirectoryAsync(presetdir)
 }
 
 export const uploadFile= async () => {
@@ -122,9 +126,9 @@ export const uploadFile= async () => {
         let name = result.assets[0].name.replace(`.json`, '').replace('.settings', '')
         return FS.copyAsync({
             from: result.assets[0].uri, 
-            to: `${FS.documentDirectory}/presets/${name}.json`
+            to: getPresetDir(name)
         }).then(() => {
-            return FS.readAsStringAsync(`${FS.documentDirectory}/presets/${name}.json`, {encoding: FS.EncodingType.UTF8})
+            return FS.readAsStringAsync(getPresetDir(name), {encoding: FS.EncodingType.UTF8})
         }).then(async (file) => {
             await fixPreset(JSON.parse(file), name)
             return name
