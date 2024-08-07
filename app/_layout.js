@@ -3,7 +3,9 @@ import { Stack, useRouter} from 'expo-router'
 import { TouchableOpacity, View, StyleSheet} from 'react-native'
 import { useEffect } from 'react'
 import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import { Global, generateDefaultDirectories, createNewDefaultChat, loadUserCard, createNewUser, writePreset } from '@globals'
+import { Global, generateDefaultDirectories, createNewDefaultChat, 
+    loadUserCard, createNewUser, writePreset,  writeInstruct,
+} from '@globals'
 import * as FS from 'expo-file-system'
 // init values should be here
 require('fastestsmallesttextencoderdecoder')
@@ -19,6 +21,7 @@ const Layout = () => {
     const [currentInstruct, setCurrentInstruct] = useMMKVObject(Global.CurrentInstruct)
     const [userCard, setUserCard] = useMMKVObject(Global.CurrentUserCard)
 
+    const [instructName, setInstructName] = useMMKVObject(Global.InstructName)
     const [presetName, setPresetName] = useMMKVString(Global.PresetName)
 
     // reset defaults
@@ -41,19 +44,22 @@ const Layout = () => {
 
                 
             })
+            
             writePreset(`Default`, defaultPreset()).then(() => {
                 console.log(`Creating Default Presets`)
                 setCurrentPreset(defaultPreset())
                 setPresetName(`Default`)
             })
             
+            writeInstruct('Default', defaultInstruct()).then(() => {
+                console.log(`Creating Default Instruct`)
+                setCurrentInstruct(defaultInstruct())
+                setInstructName(`Default`)
+            })
+
         }).catch(
             (error) => console.log(`Could not generate default folders. Reason: ${error}`)
         ))
-
-        if(currentInstruct?.system_prompt === undefined)
-            setCurrentInstruct(defaultInstruct())
-
 	}, []) 
 
     return (
@@ -189,5 +195,18 @@ const defaultInstruct = () => {
         "system_prompt": "Write {{char}}'s next reply in a roleplay chat between {{char}} and {{user}}.",
         "input_sequence": "### Instruction: ",
         "output_sequence": "### Response: ",
+        "first_output_sequence": "",
+        "last_output_sequence": "",
+        "system_sequence_prefix": "",
+        "system_sequence_suffix": "",
+        "stop_sequence": "",
+        "separator_sequence": "",
+        "wrap": false,
+        "macro": false,
+        "names": false,
+        "names_force_groups": false,
+        "activation_regex": "",
+        "name": "Default"
     }
 }
+

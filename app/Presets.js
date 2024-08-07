@@ -135,18 +135,14 @@ const Presets = () => {
      
             <TouchableOpacity style={styles.button} onPress={async () => {
                 const permissions = await FS.StorageAccessFramework.requestDirectoryPermissionsAsync();
-                // Check if permission granted
                 if (permissions.granted) {
-                  // Get the directory uri that was approved
-                  let directoryUri = permissions.directoryUri;
-                  // Create file and pass it's SAF URI
-                  await FS.StorageAccessFramework.createFileAsync(directoryUri, presetName, "application/json").then(async(fileUri) => {
-                    // Save data to newly created file
+                    let directoryUri = permissions.directoryUri;
+                    await FS.StorageAccessFramework.createFileAsync(directoryUri, presetName, "application/json").then(async(fileUri) => {
                     await FS.writeAsStringAsync(fileUri, JSON.stringify(currentPreset), { encoding: FS.EncodingType.UTF8 });
-                  })
-                  .catch((e) => {
-                    console.log(e);
-                  });
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                    });
                 } 
             }}>
                 <FontAwesome  size={24} name='download' />
@@ -331,7 +327,7 @@ export default Presets
 const styles = StyleSheet.create({
     mainContainer: {
         margin:16,
-        paddingBottom: 32,
+        paddingBottom: 150,
     },
 
     sliderContainer: {

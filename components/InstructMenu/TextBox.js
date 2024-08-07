@@ -14,6 +14,7 @@ const TextBox = ({text, instruct, varname, setvalue, lines = 1}) => {
                 onChangeText={(value) => {
                     setvalue({...instruct, [varname]:value})
                 }}
+                placeholder='----'
             />
         </View>
     )
@@ -24,6 +25,7 @@ export default TextBox
 const styles = StyleSheet.create({
     mainContainer: {
         marginBottom: 8,
+        flex:1,
     },
 
     input: {
@@ -32,5 +34,6 @@ const styles = StyleSheet.create({
         paddingVertical: 4,
         paddingHorizontal: 8,
         marginVertical:8,
+        marginHorizontal: 4,
     },
 })

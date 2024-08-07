@@ -2,7 +2,7 @@ import * as FS from 'expo-file-system'
 import {MMKV} from 'react-native-mmkv'
 import { createContext } from 'react'
 import * as DocumentPicker from 'expo-document-picker'
-
+import { ToastAndroid } from 'react-native'
 const mmkv = new MMKV()
 
 
@@ -20,6 +20,7 @@ export const enum Global {
     NowGenerating='nowgenerating',      // generation signal
     EditedWindow='editedwindow',        // exit editing window confirmation
     PresetName='presetname',            // name of current preset
+    InstructName='instructname',
 }
 
 
@@ -34,7 +35,6 @@ export const generateDefaultDirectories = async () => {
         () => { return FS.makeDirectoryAsync(`${FS.documentDirectory}persona`).catch(() => console.log(`Could not create personas folder.`))}
     )
 }
-
 
 // presets
 
@@ -61,12 +61,67 @@ export const uploadPreset = async () => {
         return FS.copyAsync({
             from: result.assets[0].uri, 
             to: `${FS.documentDirectory}/preset/${name}.json`
-        }).then(() => {return name})
+        }).then(() => {
+            return FS.readAsStringAsync(`${FS.documentDirectory}/preset/${name}.json`, {encoding: FS.EncodingType.UTF8})
+        }).then((file) => {
+            let filekeys =Object.keys(JSON.parse(file))
+            let correctkeys = Object.keys(defaultPreset())
+            let samekeys =  filekeys.every((element, index) => {return element === correctkeys[index]})
+            if (!samekeys) {
+                return FS.deleteAsync(`${FS.documentDirectory}/preset/${name}.json`).then(() => {
+                    throw new TypeError(`JSON file has invalid format`)
+                })
+            }
+            else
+                return name
+        }).catch(error => ToastAndroid.show(error.message, 2000))
     })
 }
 
-// user
+// instruct
 
+export const loadInstruct = async (name : string) => {
+    return FS.readAsStringAsync(`${FS.documentDirectory}instruct/${name}.json`, {encoding: FS.EncodingType.UTF8})
+}
+
+export const writeInstruct = async (name : string, preset : Object) => {
+    return FS.writeAsStringAsync(`${FS.documentDirectory}instruct/${name}.json`, JSON.stringify(preset), {encoding:FS.EncodingType.UTF8})
+}
+
+export const deleteInstruct = async (name : string ) => {
+    return FS.deleteAsync(`${FS.documentDirectory}instruct/${name}.json`)
+}
+
+export const getInstructList = async () => {
+    return FS.readDirectoryAsync(`${FS.documentDirectory}instruct`)
+}
+
+export const uploadInstruct = async () => {
+    return DocumentPicker.getDocumentAsync({type:'application/json'}).then((result) => {
+        if(result.canceled) return
+        let name = result.assets[0].name.replace(`.json`, '')
+        return FS.copyAsync({
+            from: result.assets[0].uri, 
+            to: `${FS.documentDirectory}/instruct/${name}.json`
+        }).then(() => {
+            return FS.readAsStringAsync(`${FS.documentDirectory}/instruct/${name}.json`, {encoding: FS.EncodingType.UTF8})
+        }).then((file) => {
+            let filekeys =Object.keys(JSON.parse(file))
+            let correctkeys = Object.keys(defaultInstruct())
+            let samekeys =  filekeys.every((element, index) => {return element === correctkeys[index]})
+            if (!samekeys) {
+                return FS.deleteAsync(`${FS.documentDirectory}/instruct/${name}.json`).then(() => {
+                    throw new TypeError(`JSON file has invalid format`)
+                })
+            }
+            else
+                return name
+        }).catch(error => ToastAndroid.show(error.message, 2000))
+    })
+}
+
+
+// user
 
 export const createNewUser = async (name : string) => {
     return FS.makeDirectoryAsync(`${FS.documentDirectory}persona/${name}`).then(() => {
@@ -344,4 +399,69 @@ export const copyCharImage = async (
         from: uri,
         to: getCharacterImageDirectory(charName)
     })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const defaultPreset = () => {
+    return {
+        "temp": 1,
+        "rep_pen": 1,
+        "rep_pen_range": 1,
+        "top_p": 0.9,
+        "top_a": 0.9,
+        "top_k": 20,
+        "typical": 1,
+        "tfs": 1,
+        "rep_pen_slope": 0.9,
+        "single_line": false,
+        "sampler_order": [
+            6,
+            0,
+            1,
+            3,
+            4,
+            2,
+            5
+        ],
+        "mirostat": 0,
+        "mirostat_tau": 5,
+        "mirostat_eta": 0.1,
+        "use_default_badwordsids": true,
+        "grammar": "",
+        "genamt": 220,
+        "max_length": 4096
+    }
+
+}
+
+const defaultInstruct = () => {
+    return {
+        "system_prompt": "Write {{char}}'s next reply in a roleplay chat between {{char}} and {{user}}.",
+        "input_sequence": "### Instruction: ",
+        "output_sequence": "### Response: ",
+        "first_output_sequence": "",
+        "last_output_sequence": "",
+        "system_sequence_prefix": "",
+        "system_sequence_suffix": "",
+        "stop_sequence": "",
+        "separator_sequence": "",
+        "wrap": false,
+        "macro": false,
+        "names": false,
+        "names_force_groups": false,
+        "activation_regex": "",
+        "name": "Default"
+    }
 }
