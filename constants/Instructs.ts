@@ -33,7 +33,7 @@ const defaultInstructs: InstructType[] = [
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
-        system_prefix: '<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n',
+        system_prefix: '<|start_header_id|>system<|end_header_id|>\n\n',
         system_suffix: '<|eot_id|>',
         input_prefix: '<|start_header_id|>user<|end_header_id|>\n\n',
         input_suffix: '<|eot_id|>',
