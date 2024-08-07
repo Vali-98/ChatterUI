@@ -1,4 +1,11 @@
 import * as FS from 'expo-file-system'
+import  extractChunks  from 'png-chunks-extract'
+import { decode } from 'png-chunk-text'
+import { Buffer } from '@craftzdog/react-native-buffer'
+import * as Base64 from 'base-64'
+import { ToastAndroid } from 'react-native'
+import * as DocumentPicker from 'expo-document-picker'
+import axios from 'axios'
 
 export namespace Characters {
 
@@ -47,6 +54,66 @@ export namespace Characters {
             from: uri,
             to: getImageDir(charName)
         })
+    }
+
+    export const createCharacterFromImage = async (uri : string) => {
+        return FS.readAsStringAsync(uri, {encoding: FS.EncodingType.Base64}).then((file)=>{
+            const chunks = extractChunks(Buffer.from(file, 'base64'))
+            const textChunks = chunks.filter(function (chunk : any) {
+                return chunk.name === 'tEXt'
+                }).map(function (chunk) {
+                return decode(chunk.data)
+                })
+            const charactercard = JSON.parse(Base64.decode(textChunks[0].text))
+            const newname = charactercard?.data?.name ?? charactercard.name
+            console.log(`Creating new character: ${newname}`)
+            if(newname === 'Detailed Example Character' || charactercard === undefined){
+                ToastAndroid.show('Invalid Character ID', 2000)
+                return
+            }
+            Characters.createCard(newname).then(() => {
+                return Characters.saveCard(newname, JSON.stringify(charactercard))
+            }).then(() => {
+                return Characters.copyImage(uri, newname)
+            }).then(() => {
+                ToastAndroid.show(`Successfully Imported Character`, ToastAndroid.SHORT)
+            }).catch(() => {
+                ToastAndroid.show(`Failed to create card - Character might already exist.`, 2000)
+            })
+        }).catch(error => {
+            ToastAndroid.show(`Failed to create card - Character might already exist?`, 2000)
+            console.log(error)
+        })
+    }
+
+    export const importCharacterFromImage = async () => {
+        return DocumentPicker.getDocumentAsync({copyToCacheDirectory: true, type:'image/*'}).then((result) => {
+            if(result.canceled) return
+            return createCharacterFromImage(result.assets[0].uri)
+        })
+    }
+
+    export const importCharacterFromRemote = async (text : string) => {
+        return axios.create({timeout: 1000}).post(
+            'https://api.chub.ai/api/characters/download', 
+            {
+                "format" : "tavern",
+                "fullPath" : text.replace('https://chub.ai/characters/', '')
+            },
+            {responseType: 'arraybuffer'}
+            ).then((res) => {
+                const response = Buffer.from(res.data, 'base64').toString('base64')
+                return FS.writeAsStringAsync(
+                    `${FS.cacheDirectory}image.png`, 
+                    response, 
+                    {encoding:FS.EncodingType.Base64}).then( async () => {
+                    return createCharacterFromImage(`${FS.cacheDirectory}image.png`)
+                })
+                
+            }).catch((error) => {
+                console.log(`Could not retrieve card. ${error}`)
+                ToastAndroid.show(`Invalid ID or URL`, ToastAndroid.SHORT)
+            })
     }
 
     export const getChatDir = (
