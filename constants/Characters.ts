@@ -129,17 +129,12 @@ export namespace Characters {
             const imageID = get().card?.data.image_id
             if (imageID) return copyImage(sourceURI, imageID)
         },
-        getCardTest: () => {
-            return get().card
-        },
         getCache: (charName: string) => {
             const cache = get().tokenCache
-            console.log(cache)
             const card = get().card
             if (cache?.otherName && cache.otherName === useUserCard.getState().card?.data.name)
                 return cache
 
-            console.log(card)
             if (!card)
                 return {
                     otherName: charName,
