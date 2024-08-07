@@ -58,7 +58,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
     const [placeholderText, setPlaceholderText] = useState('')
 
     const handleEditMessage = () => {
-        updateChat(id, placeholderText)
+        updateChat(id, placeholderText, false)
         setEditMode(false)
     }
 
@@ -248,5 +248,11 @@ const markdownFormat = {
     },
     list: {
         color: Style.getColor('primary-text1'),
+    },
+    inlineCode: {
+        color: Style.getColor('primary-text2'),
+        backgroundColor: Style.getColor('primary-surface2'),
+        padding: 16,
+        borderRadius: 4,
     },
 }

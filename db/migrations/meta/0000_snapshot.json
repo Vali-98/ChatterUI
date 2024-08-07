@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "1400ff2f-fa52-4fd1-9ee4-4b8e28085b01",
+  "id": "e6a2401f-ac5e-4ef4-9339-c8635d8b57f8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "character_greetings": {
@@ -482,29 +482,43 @@
           "notNull": true,
           "autoincrement": false
         },
-        "input_sequence": {
-          "name": "input_sequence",
+        "system_prefix": {
+          "name": "system_prefix",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "output_sequence": {
-          "name": "output_sequence",
+        "system_suffix": {
+          "name": "system_suffix",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "first_output_sequence": {
-          "name": "first_output_sequence",
+        "inpput_prefix": {
+          "name": "inpput_prefix",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "system_sequence_prefix": {
-          "name": "system_sequence_prefix",
+        "input_suffix": {
+          "name": "input_suffix",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "output_suffix": {
+          "name": "output_suffix",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "output_prefix": {
+          "name": "output_prefix",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -517,15 +531,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "separator_sequence": {
-          "name": "separator_sequence",
+        "activation_regex": {
+          "name": "activation_regex",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "activation_regex": {
-          "name": "activation_regex",
+        "user_alignment_message": {
+          "name": "user_alignment_message",
           "type": "text",
           "primaryKey": false,
           "notNull": true,

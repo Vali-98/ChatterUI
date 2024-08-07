@@ -92,7 +92,7 @@ export interface ChatState {
     delete: (chatId: number) => Promise<void>
     //save: () => Promise<void>
     addEntry: (name: string, is_user: boolean, message: string) => Promise<void>
-    updateEntry: (index: number, message: string) => Promise<void>
+    updateEntry: (index: number, message: string, updateTime?: boolean) => Promise<void>
     deleteEntry: (index: number) => Promise<void>
     reset: () => void
     swipe: (index: number, direction: number) => Promise<boolean>
@@ -190,14 +190,14 @@ export namespace Chats {
             }))
         },
 
-        updateEntry: async (index: number, message: string) => {
+        updateEntry: async (index: number, message: string, updateTime = true) => {
             const messages = get()?.data?.messages
             if (!messages) return
             const chatSwipeId = messages[index]?.swipes[messages[index].swipe_id].id
             if (!chatSwipeId) return
             const date = await updateChatSwipe(chatSwipeId, message)
             messages[index].swipes[messages[index].swipe_id].swipe = message
-            messages[index].swipes[messages[index].swipe_id].gen_finished = date
+            if (updateTime) messages[index].swipes[messages[index].swipe_id].gen_finished = date
             set((state) => ({
                 ...state,
                 data: state?.data ? { ...state.data, messages: messages } : state.data,
