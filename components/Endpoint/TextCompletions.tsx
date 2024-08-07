@@ -5,11 +5,12 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-nativ
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { OpenAIModel } from './OpenAI'
 import { Dropdown } from 'react-native-element-dropdown'
+import axios from 'axios'
 
 const TextCompletions = () => {
     const [endpoint, setEndpoint] = useMMKVString(Global.CompletionsEndpoint)
     const [completionsKey, setCompletionsKey] = useMMKVString(Global.CompletionsKey)
-    const [completionsModel, setComletionsModel] = useMMKVObject<OpenAIModel>(
+    const [completionsModel, setCompletionsModel] = useMMKVObject<OpenAIModel>(
         Global.CompletionsModel
     )
     const [keyInput, setKeyInput] = useState('')
@@ -22,20 +23,23 @@ const TextCompletions = () => {
 
     const getModelList = () => {
         if (!endpoint) return
-        fetch(endpoint + '/v1/models', {
-            method: 'GET',
-            headers: { accept: 'application/json', Authorization: `Bearer ${completionsKey}` },
-        })
+        axios
+            .create({ timeout: 5000 })
+            .get(endpoint + '/v1/models', {
+                headers: { accept: 'application/json', Authorization: `Bearer ${completionsKey}` },
+            })
+
             .then(async (response) => {
                 if (response.status !== 200) {
-                    Logger.log(`Error with response: ${response.status}`)
+                    Logger.log(`Error with response: ${response.status}`, true)
                     return
                 }
-                const { data } = await response.json()
+                const { data } = response.data
                 setModelList(data)
             })
-            .catch((error) => {
-                Logger.log(`Could not get models: ${error}`)
+            .catch((error: any) => {
+                Logger.log(`Could not get models: ${error}`, true)
+                setModelList([])
             })
     }
 
@@ -102,7 +106,7 @@ const TextCompletions = () => {
                     valueField="id"
                     onChange={(item: OpenAIModel) => {
                         if (item.id === completionsModel?.id) return
-                        setComletionsModel(item)
+                        setCompletionsModel(item)
                     }}
                     style={styles.dropdownbox}
                     selectedTextStyle={styles.selected}

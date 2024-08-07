@@ -72,4 +72,6 @@ export const enum Global {
 
     TTSSpeaker = 'ttsspeaker',
     TTSEnable = 'ttsenable',
+    TTSAuto = `ttsauto`,
+    TTSAutoStart = 'ttsautostart',
 }

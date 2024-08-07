@@ -99,6 +99,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                     userName={userName}
                     message={message}
                     id={id}
+                    isLast={id === messagesLength - 1}
                     TTSenabled={TTSenabled}>
                     {showEllipsis && (
                         <View style={{ ...styles.messageTextContainer, padding: 5 }}>

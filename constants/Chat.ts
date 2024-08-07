@@ -94,7 +94,16 @@ export namespace Chats {
             Logger.log(`Saving Chat`)
             get().updateFromBuffer()
             get().setBuffer('')
-            get().save()
+            get()
+                .save()
+                .then(() => {
+                    // AUTO TTS
+                    const auto = mmkv.getBoolean(Global.TTSAuto)
+                    if (auto) {
+                        Logger.log(`Automatically using TTS`)
+                        mmkv.set(Global.TTSAutoStart, JSON.stringify(true))
+                    }
+                })
         },
         abortFunction: undefined,
         setAbortFunction: (fn) => set((state) => ({ ...state, abortFunction: fn })),
@@ -230,6 +239,7 @@ export namespace Chats {
             const swipes = data[lastindex].swipes
             const swipe_id = data[lastindex].swipe_id
             const cleanedBuffer = get().buffer.trim()
+
             swipes[swipe_id] = cleanedBuffer
 
             const swipe_info = data[lastindex].swipe_info
