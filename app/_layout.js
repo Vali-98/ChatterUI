@@ -1,16 +1,19 @@
 import { Stack } from 'expo-router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Color, initializeApp, startupApp } from '@globals'
 import { MenuProvider } from 'react-native-popup-menu';
 
 // init values should be here
 const Layout = () => {
-    
+    const [firstRender, setFirstRender] = useState(true)
     // reset defaults
     useEffect(() => {
-        initializeApp().then(() => startupApp())
+        startupApp()
+        initializeApp()
+        setFirstRender(false)
 	}, []) 
     
+    if(!firstRender)
     return (
     <MenuProvider>
     <Stack screenOptions={{
