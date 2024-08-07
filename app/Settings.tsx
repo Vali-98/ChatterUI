@@ -1,13 +1,13 @@
-// DEPRECATED //
-
-// This file is no longer in use since the migration to SettingsDrawer
-
 import { FontAwesome } from '@expo/vector-icons'
 import { Characters, Style } from '@globals'
 import { useRouter } from 'expo-router'
 import React from 'react'
 import { SafeAreaView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 
+/**
+ *
+ * @deprecated This file is no longer in use since the migration to SettingsDrawer
+ */
 const Settings = () => {
     const { userName, userId } = Characters.useUserCard((state) => ({
         userName: state.card?.data.name,
