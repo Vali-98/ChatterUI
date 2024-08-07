@@ -1,4 +1,4 @@
-import { ChatEntry, Chats } from '@constants/Chat'
+import { Chats } from '@constants/Chat'
 import { InstructType } from '@constants/Instructs'
 import { replaceMacros } from '@constants/Utils'
 import llamaTokenizer from '@constants/tokenizer'
@@ -9,7 +9,6 @@ import EventSource from 'react-native-sse'
 export const generateResponse = async (setAbortFunction: AbortFunction) => {
     console.log(`Obtaining response.`)
     const APIType = getString(Global.APIType)
-    const messages = Chats.useChat.getState().data
     try {
         switch (APIType) {
             case API.KAI:
@@ -155,8 +154,9 @@ const buildChatCompletionContext = (max_length: number) => {
 
 const constructStopSequence = (instruct: InstructType): Array<string> => {
     const sequence: Array<string> = []
-    const sequence_array = instruct.stop_sequence.split(',').forEach((item) => sequence.push(item))
-    sequence.push(instruct.input_sequence)
+    instruct.stop_sequence.split(',').forEach((item) => sequence.push(item))
+    // maybe people rather this not be removed?
+    //sequence.push(instruct.input_sequence)
     return sequence
 }
 
@@ -624,7 +624,6 @@ const constructReplaceStrings = (): Array<string> => {
 
     output.push(`${userName} :`)
     output.push(`${charName} :`)
-    output.push(currentInstruct.input_sequence)
     stops.forEach((item) => output.push(item))
 
     return output

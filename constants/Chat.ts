@@ -300,12 +300,11 @@ export namespace Chats {
     export const createChat = async (
         charName: string,
         userName: string
-    ): Promise<void | string> => {
+    ): Promise<undefined | string> => {
         //for now use mmkv, change to zustand later
         const cardstring = mmkv.getString(Global.CurrentCharacterCard)
         if (!cardstring) return
         const card: CharacterCardV2 = JSON.parse(cardstring)
-
         const metadata: ChatInfo = {
             charName: charName,
             userName: userName,
@@ -320,8 +319,8 @@ export namespace Chats {
         }
 
         const swipes: Array<string> =
-            card.data.alternate_greetings.length > 0
-                ? card.data.alternate_greetings.map((item) => replaceMacros(item))
+            card.data?.alternate_greetings && card.data.alternate_greetings.length > 0
+                ? card.data?.alternate_greetings.map((item) => replaceMacros(item))
                 : []
         const firstMessage: ChatEntry = createEntry(
             charName,
@@ -338,6 +337,7 @@ export namespace Chats {
             })
             .catch((error) => {
                 Logger.log('Failed create message: ' + error, true)
+                return undefined
             })
     }
 }

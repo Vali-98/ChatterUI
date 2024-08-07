@@ -35,7 +35,7 @@ const CharInfo = () => {
     }
 
     const autosave = () => {
-        if (!characterCard) return
+        if (!characterCard || charName === 'Welcome') return
         Logger.log(`Autosaved Card ${charName}`)
         savecard()
     }

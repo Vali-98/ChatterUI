@@ -10,6 +10,13 @@ import { Logger } from './Logger'
 export namespace Llama {
     const model_dir = `${FS.documentDirectory}models/`
 
+    export type LlamaPreset = {
+        context_length: number
+        threads: number
+        gpu_layers: number
+        batch: number
+    }
+
     const default_preset = {
         context_length: 2048,
         threads: 1,
@@ -20,7 +27,11 @@ export namespace Llama {
     let llamaContext: LlamaContext | void = undefined
     let modelname = ''
 
-    export const loadModel = async (name: string, preset = default_preset, usecache = true) => {
+    export const loadModel = async (
+        name: string,
+        preset: LlamaPreset = default_preset,
+        usecache: boolean = true
+    ) => {
         const newname = name
         const dir = `${model_dir}${name}`
         // if not using from cache, pick model and load it
@@ -92,20 +103,22 @@ export namespace Llama {
     }
 
     export const completion = async (
-        prompt: CompletionParams,
+        params: CompletionParams,
         callback = (text: string) => {
             console.log(text)
         }
     ) => {
         if (!isModelLoaded()) return
-        console.log('Completion begin.')
+        Logger.log('Completion Started with Prompt:')
+        Logger.log(params.prompt)
         if (llamaContext === undefined) return
         return llamaContext
-            ?.completion(prompt, (data: any) => {
+            ?.completion(params, (data: any) => {
                 callback(data.token)
             })
             .then(({ text, timings }: any) => {
-                console.log(timings)
+                Logger.log(JSON.stringify(timings))
+                Logger.log(text)
             })
     }
 
