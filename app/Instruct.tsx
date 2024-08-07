@@ -99,6 +99,7 @@ const Instruct = () => {
                             setCurrentInstruct(JSON.parse(preset))
                         })
                     }}
+                    placeholderStyle={{ color: Color.Offwhite }}
                 />
                 <TouchableOpacity
                     style={styles.button}

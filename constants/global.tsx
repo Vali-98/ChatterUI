@@ -117,6 +117,8 @@ export const startupApp = () => {
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
     mmkv.set(Global.HordeModels, JSON.stringify([]))
     mmkv.set(Global.LocalModelWeights, JSON.stringify({}))
+    if (mmkv.getString(Global.OpenAIModel) === undefined)
+        mmkv.set(Global.OpenAIModel, JSON.stringify({}))
     //mmkv.set(Global.Messages, JSON.stringify([]))
     mmkv.set(
         Global.PresetData,

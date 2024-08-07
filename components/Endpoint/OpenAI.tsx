@@ -1,32 +1,45 @@
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Color, Logger } from '@globals'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
-const OpenRouter = () => {
-    const [openRouterModel, setOpenRouterModel] = useMMKVObject(Global.OpenRouterModel)
-    const [openRouterKey, setOpenRouterKey] = useMMKVString(Global.OpenRouterKey)
-    const [keyInput, setKeyInput] = useState('')
+type OpenAIModel = {
+    id: string
+    object: string
+    created: number
+    owned_by: string
+}
 
-    const [modelList, setModelList] = useState([])
+const OpenAI = () => {
+    const [openAIModel, setOpenAIModel] = useMMKVObject<OpenAIModel>(Global.OpenAIModel)
+    const [openAIKey, setOpenAIKey] = useMMKVString(Global.OpenAIKey)
+    const [keyInput, setKeyInput] = useState<string>('')
 
-    const getModels = useCallback(async () => {
-        const modelresults = await fetch('https://openrouter.ai/api/v1/models', {
+    const [modelList, setModelList] = useState<Array<OpenAIModel>>([])
+
+    const getModels = async () => {
+        const modelresults = await fetch(`https://api.openai.com/v1/models`, {
             method: 'GET',
-            headers: { accept: 'application/json' },
+            headers: { accept: 'application/json', Authorization: `Bearer ${openAIKey}` },
         }).catch(() => {
-            Logger.log(`Could not get OpenRouter Mddels`, true)
-            return []
+            Logger.log(`Could not get OpenAI models.`, true)
         })
+        if (!modelresults) return
+
+        if (modelresults.status !== 200) {
+            Logger.log(`Could not get OpenAI models. Ensure API Key is entered.`, true)
+            return
+        }
         const list = (await modelresults.json()).data
-        setModelList(list)
-    }, [modelList])
+        //console.log(await modelresults.json())
+        setModelList(list.filter((item: OpenAIModel) => item.id.startsWith('gpt')))
+    }
 
     useEffect(() => {
         getModels()
-    }, [])
+    }, [openAIKey])
 
     return (
         <View style={styles.mainContainer}>
@@ -47,12 +60,12 @@ const OpenRouter = () => {
                     style={styles.button}
                     onPress={() => {
                         if (keyInput === '') {
-                            Logger.log('No key entered!', true)
+                            Logger.log('No API Key Entered!', true)
                             return
                         }
-                        setOpenRouterKey(keyInput)
+                        setOpenAIKey(keyInput)
                         setKeyInput('')
-                        Logger.log('Key saved!', true)
+                        Logger.log('Key Saved!', true)
                     }}>
                     <FontAwesome name="save" color={Color.Button} size={28} />
                 </TouchableOpacity>
@@ -60,14 +73,15 @@ const OpenRouter = () => {
 
             <View style={styles.dropdownContainer}>
                 <Text style={{ color: Color.Text, fontSize: 16 }}>Model</Text>
+                <Text style={styles.subtitle}>API Key must be provided to get model list.</Text>
                 <Dropdown
-                    value={openRouterModel}
+                    value={openAIModel}
                     data={modelList}
                     labelField="id"
                     valueField="id"
                     onChange={(item) => {
-                        if (item.id === openRouterModel?.id) return
-                        setOpenRouterModel(item)
+                        if (item.id === openAIModel?.id) return
+                        setOpenAIModel(item)
                     }}
                     style={styles.dropdownbox}
                     selectedTextStyle={styles.selected}
@@ -79,44 +93,24 @@ const OpenRouter = () => {
                     }}
                     activeColor={Color.Container}
                     placeholderStyle={{ color: Color.Offwhite }}
+                    placeholder={modelList.length === 0 ? 'No Models Available' : 'Select Model'}
                 />
             </View>
-
-            {openRouterModel !== undefined && (
+            {openAIModel?.id && (
                 <View style={styles.modelInfo}>
-                    <Text style={{ ...styles.title, marginBottom: 8 }}>{openRouterModel.id}</Text>
+                    <Text style={{ ...styles.title, marginBottom: 8 }}>{openAIModel.id}</Text>
                     <View style={{ flexDirection: 'row' }}>
                         <View>
-                            <Text style={{ color: Color.Offwhite }}>Context Size</Text>
-                            {openRouterModel.per_request_limits && (
-                                <View>
-                                    <Text style={{ color: Color.Offwhite }}>Completion Tokens</Text>
-                                    <Text style={{ color: Color.Offwhite }}>Prompt Tokens</Text>
-                                </View>
-                            )}
-                            <Text style={{ color: Color.Offwhite }}>Completion Cost</Text>
-                            <Text style={{ color: Color.Offwhite }}>Prompt Cost</Text>
+                            <Text style={{ color: Color.Offwhite }}>Id</Text>
+                            <Text style={{ color: Color.Offwhite }}>Object</Text>
+                            <Text style={{ color: Color.Offwhite }}>Created</Text>
+                            <Text style={{ color: Color.Offwhite }}>Owned Byt</Text>
                         </View>
                         <View style={{ marginLeft: 8 }}>
-                            <Text style={{ color: Color.Offwhite }}>
-                                : {openRouterModel.context_length}
-                            </Text>
-                            {openRouterModel.per_request_limits && (
-                                <View>
-                                    <Text style={{ color: Color.Offwhite }}>
-                                        : {openRouterModel.per_request_limits.prompt_tokens}
-                                    </Text>
-                                    <Text style={{ color: Color.Offwhite }}>
-                                        : {openRouterModel.per_request_limits.completion_tokens}
-                                    </Text>
-                                </View>
-                            )}
-                            <Text style={{ color: Color.Offwhite }}>
-                                : {openRouterModel.pricing.completion}
-                            </Text>
-                            <Text style={{ color: Color.Offwhite }}>
-                                : {openRouterModel.pricing.prompt}
-                            </Text>
+                            <Text style={{ color: Color.Offwhite }}>: {openAIModel.id}</Text>
+                            <Text style={{ color: Color.Offwhite }}>: {openAIModel.object}</Text>
+                            <Text style={{ color: Color.Offwhite }}>: {openAIModel.created}</Text>
+                            <Text style={{ color: Color.Offwhite }}>: {openAIModel.owned_by}</Text>
                         </View>
                     </View>
                 </View>
@@ -125,7 +119,7 @@ const OpenRouter = () => {
     )
 }
 
-export default OpenRouter
+export default OpenAI
 
 const styles = StyleSheet.create({
     mainContainer: {

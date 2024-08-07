@@ -1,4 +1,13 @@
-import { KAI, Horde, TGWUI, Mancer, TextCompletions, Local, OpenRouter } from '@components/Endpoint'
+import {
+    KAI,
+    Horde,
+    TGWUI,
+    Mancer,
+    TextCompletions,
+    Local,
+    OpenRouter,
+    OpenAI,
+} from '@components/Endpoint'
 import { Global, Color, API } from '@globals'
 import { Stack } from 'expo-router'
 import { useEffect } from 'react'
@@ -16,6 +25,7 @@ const APIMenu = () => {
         { label: 'Mancer', value: API.MANCER },
         { label: 'Open Router', value: API.OPENROUTER },
         { label: 'Local', value: API.LOCAL },
+        { label: 'OpenAI', value: API.OPENAI },
         //{label: 'NovelAI', value:API.NOVELAI},
     ]
 
@@ -53,6 +63,7 @@ const APIMenu = () => {
                         }}
                         activeColor={Color.Container}
                         maxHeight={500}
+                        placeholderStyle={{ color: Color.Offwhite }}
                     />
                 </View>
                 {APIType === API.KAI && <KAI />}
@@ -62,6 +73,7 @@ const APIMenu = () => {
                 {APIType === API.COMPLETIONS && <TextCompletions />}
                 {APIType === API.LOCAL && <Local />}
                 {APIType === API.OPENROUTER && <OpenRouter />}
+                {APIType === API.OPENAI && <OpenAI />}
             </ScrollView>
         </SafeAreaView>
     )

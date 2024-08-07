@@ -4,12 +4,26 @@ import { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
-const Mancer = () => {
-    const [mancerModel, setMancerModel] = useMMKVObject(Global.MancerModel)
-    const [mancerKey, setMancerKey] = useMMKVString(Global.MancerKey)
-    const [keyInput, setKeyInput] = useState('')
 
-    const [modelList, setModelList] = useState([])
+type MancerModel = {
+    id: string
+    limits: {
+        completion: number
+        context: number
+    }
+    name: string
+    pricing: {
+        completion: number
+        prompt: number
+    }
+}
+
+const Mancer = () => {
+    const [mancerModel, setMancerModel] = useMMKVObject<MancerModel>(Global.MancerModel)
+    const [mancerKey, setMancerKey] = useMMKVString(Global.MancerKey)
+    const [keyInput, setKeyInput] = useState<string>('')
+
+    const [modelList, setModelList] = useState<Array<MancerModel>>([])
 
     const getModels = async () => {
         const modelresults = await fetch(`https://mancer.tech/oai/v1/models`, {
@@ -17,8 +31,8 @@ const Mancer = () => {
             headers: { accept: 'application/json' },
         }).catch(() => {
             Logger.log(`Could not get Mancer models.`, true)
-            return []
         })
+        if (!modelresults) return
         const list = (await modelresults.json()).data
         setModelList(list)
     }
@@ -77,6 +91,7 @@ const Mancer = () => {
                         borderRadius: 8,
                     }}
                     activeColor={Color.Container}
+                    placeholderStyle={{ color: Color.Offwhite }}
                 />
             </View>
 
