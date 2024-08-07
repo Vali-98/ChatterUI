@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-nativ
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
-type OpenAIModel = {
+export type OpenAIModel = {
     id: string
     object: string
     created: number
