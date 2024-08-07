@@ -37,6 +37,7 @@ const CharMenu = () => {
     }
 
     const setCurrentCharacter = async (character) => {
+        if (nowLoading) return
         setNowLoading(true)
         setCharName(character)
         Chats.getNewest(character).then(async (filename) => {
@@ -115,6 +116,7 @@ const CharMenu = () => {
             <ScrollView style={styles.characterContainer}>
                 {characterList.map((character, index) => (
                     <TouchableOpacity
+                        disabled={nowLoading}
                         style={styles.longButton}
                         key={index}
                         onPress={() => setCurrentCharacter(character)}>
