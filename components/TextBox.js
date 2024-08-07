@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TextInput } from 'react-native'
 import React from 'react'
 import { Color } from '@globals'
 
-const TextBox = ({text, instruct, varname, setvalue, lines = 1}) => {
+const TextBox = ({text, body, varname, setvalue, lines = 1, keyboardType='default'}) => {
 
     return (
         <View style={styles.mainContainer}>
@@ -11,12 +11,13 @@ const TextBox = ({text, instruct, varname, setvalue, lines = 1}) => {
                 multiline={lines > 1}
                 numberOfLines={lines}
                 style={{...styles.input, textAlignVertical: (lines > 1)? `top` : `center`}}
-                value={instruct[varname]}
+                value={body[varname]}
                 onChangeText={(value) => {
-                    setvalue({...instruct, [varname]:value})
+                    setvalue({...body, [varname]:value})
                 }}
                 placeholder='----'
                 placeholderTextColor={Color.TextItalic}
+                keyboardType={keyboardType}
             />
         </View>
     )
@@ -41,5 +42,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         marginVertical:8,
         marginHorizontal: 4,
+        borderRadius: 8,
     },
 })

@@ -1,5 +1,5 @@
 import { SafeAreaView, View, Text, Image, StyleSheet } from 'react-native'
-import { Global, Color, getUserImageDirectory } from '@globals'
+import { Global,  Color, API, getUserImageDirectory } from '@globals'
 import React from 'react'
 import { useMMKVString } from 'react-native-mmkv'
 import { TouchableOpacity } from 'react-native-gesture-handler'
@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router'
 
 const Settings = () => {
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
+    const [apiType, setAPIType] = useMMKVString(Global.APIType)
     const router = useRouter()
 
     return (
@@ -31,7 +32,12 @@ const Settings = () => {
         </View>
 
         <View style={styles.largeButtonContainer}>
-            <TouchableOpacity style={styles.largeButton} onPress={() => router.push("Presets")} >
+            <TouchableOpacity style={styles.largeButton} onPress={() => {
+                if(apiType === API.KAI || apiType === API.HORDE)
+                    router.push("PresetsKAI")
+                if(apiType === API.MANCER || apiType === API.TGWUI)
+                    router.push("PresetsTGWUI")
+            }} >
                 <Text style={styles.largeButtonText}>Presets</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.largeButton} onPress={() => router.push("Instruct")}>

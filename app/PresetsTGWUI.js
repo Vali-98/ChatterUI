@@ -1,21 +1,17 @@
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert  } from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert, ToastAndroid   } from 'react-native'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
-import { Global, Color, getPresetList, writePreset, loadPreset, deletePreset, uploadPreset } from '@globals'
+import { Global, Color, getPresetList, writePreset, loadPreset, deletePreset, uploadPreset, saveStringExternal} from '@globals'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
-import CheckBox from '@react-native-community/checkbox'
-import SliderItem from '@components/PresetMenu/SliderItem'
 import { TextInput } from 'react-native-gesture-handler'
 import { Dropdown } from 'react-native-element-dropdown'
 import { FontAwesome } from '@expo/vector-icons'
 import { useEffect } from 'react'
-import TextBoxModal from '@components/TextBoxModal'
-import { ToastAndroid } from 'react-native'
-import * as FS from 'expo-file-system'
+import {TextBoxModal, SliderItem, TextBox, CheckboxTitle} from '@components'
 
-const Presets = () => {
-    const [presetName, setPresetName] = useMMKVString(Global.PresetName)
-    const [currentPreset, setCurrentPreset] = useMMKVObject(Global.CurrentPreset)
+const PresetsTGWUI = () => {
+    const [presetName, setPresetName] = useMMKVString(Global.PresetNameTGWUI)
+    const [currentPreset, setCurrentPreset] = useMMKVObject(Global.PresetTGWUI)
     const [presetList, setPresetList] = useState([])
     const [selectedItem, setSelectedItem] = useState(null)
     const [showNewPreset, setShowNewPreset] = useState(false)
@@ -36,7 +32,6 @@ const Presets = () => {
             })
         })
     }
-
     useEffect(() => {
         loadPresetList()
     },[])
@@ -44,7 +39,7 @@ const Presets = () => {
     const setPresetValue = (varName, value) => {
         setCurrentPreset({...currentPreset, [varName]:value})
     }
-
+    
     return (
         <SafeAreaView style={{backgroundColor:Color.Background}}>
         
@@ -67,7 +62,7 @@ const Presets = () => {
 
         <Stack.Screen options={{
                 animation: 'slide_from_left',
-                title: `Presets`
+                title: `Text Gen Presets`
             }} />
         
         <View style={styles.dropdownContainer}>
@@ -135,16 +130,7 @@ const Presets = () => {
             </TouchableOpacity>
      
             <TouchableOpacity style={styles.button} onPress={async () => {
-                const permissions = await FS.StorageAccessFramework.requestDirectoryPermissionsAsync();
-                if (permissions.granted) {
-                    let directoryUri = permissions.directoryUri;
-                    await FS.StorageAccessFramework.createFileAsync(directoryUri, presetName, "application/json").then(async(fileUri) => {
-                    await FS.writeAsStringAsync(fileUri, JSON.stringify(currentPreset), { encoding: FS.EncodingType.UTF8 });
-                    })
-                    .catch((e) => {
-                        console.log(e);
-                    });
-                } 
+               saveStringExternal(`${presetName}.json`, JSON.stringify(currentPreset))
             }}>
                 <FontAwesome  size={24} name='download' color={Color.Button }/>
             </TouchableOpacity>
@@ -155,21 +141,17 @@ const Presets = () => {
         </View>
        
 
-
-
         <ScrollView >
         <View style={styles.mainContainer}>
          
-        
-       
         <SliderItem 
             name="Context Size" 
             varname="max_length" 
             step={16}
             min={1024}
             max={8192}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
         />
 
         <SliderItem 
@@ -177,8 +159,15 @@ const Presets = () => {
             varname="genamt" 
             min={16}
             max={1024}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
+        />
+
+        <CheckboxTitle 
+            name="Streaming"
+            varname="streaming"
+            setValue={setCurrentPreset}
+            body={currentPreset}
         />
 
         <SliderItem 
@@ -186,8 +175,8 @@ const Presets = () => {
             varname="temp" 
             min={0}
             max={2}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
             precision={2}
         />
         
@@ -196,8 +185,8 @@ const Presets = () => {
             varname="rep_pen" 
             min={1.0}
             max={1.5}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
             precision={2}
         />
         
@@ -206,18 +195,59 @@ const Presets = () => {
             varname="rep_pen_range" 
             min={1}
             max={4096}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
         />
 
         <SliderItem 
-            name="Repetition Penalty Slope" 
-            varname="rep_pen_slope" 
+            name="Encoder Repetition Penalty" 
+            varname="encoder_rep_pen"
+            min={0.8}
+            max={1.5}
+            setValue={setCurrentPreset}
+            body={currentPreset}
+            precision={2}
+        />
+
+        
+<       SliderItem 
+            name="Frequency Penalty" 
+            varname="freq_pen"
+            min={-2}
+            max={2}
+            setValue={setCurrentPreset}
+            body={currentPreset}
+            precision={2}
+        />
+
+        <SliderItem 
+            name="Presence Penalty" 
+            varname="presence_pen"
+            min={-2}
+            max={2}
+            setValue={setCurrentPreset}
+            body={currentPreset}
+            precision={2}
+        />
+
+        <SliderItem 
+            name="No Repeat Ngram Size" 
+            varname="no_repeat_ngram_size"
             min={0}
-            max={10}
-            fn={setPresetValue} 
-            preset={currentPreset}
-            precision={1}
+            max={20}
+            setValue={setCurrentPreset}
+            body={currentPreset}
+            precision={0}
+        />
+
+        <SliderItem 
+            name="Min Length" 
+            varname="min_length"
+            min={0}
+            max={2000}
+            setValue={setCurrentPreset}
+            body={currentPreset}
+            precision={0}
         />
 
         <SliderItem 
@@ -225,8 +255,8 @@ const Presets = () => {
             varname="top_p" 
             min={0}
             max={1}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
             precision={2}
         />
 
@@ -235,8 +265,8 @@ const Presets = () => {
             varname="top_a" 
             min={0}
             max={1}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
             precision={2}
         />
 
@@ -245,17 +275,17 @@ const Presets = () => {
             varname="top_k" 
             min={0}
             max={100}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
         />
 
         <SliderItem 
             name="Typical Sampling" 
-            varname="typical" 
+            varname="typical_p" 
             min={0}
             max={1}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
             precision={2}
         />
 
@@ -264,19 +294,130 @@ const Presets = () => {
             varname="tfs" 
             min={0}
             max={1}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
             precision={2}
         />
 
         <SliderItem 
-            name="Mirostat" 
-            varname="mirostat" 
+            name="Epsilon Cutoff" 
+            varname="epsilon_cutoff" 
+            min={0}
+            max={9}
+            setValue={setCurrentPreset}
+            body={currentPreset}
+            precision={2}
+        />
+
+        <SliderItem 
+            name="Eta Cutoff" 
+            varname="eta_cutoff" 
+            min={0}
+            max={20}
+            setValue={setCurrentPreset}
+            body={currentPreset}
+            precision={2}
+        />
+
+        <CheckboxTitle 
+            name="Do Sample"
+            varname="do_sample"
+            body={currentPreset}
+            setValue={setCurrentPreset}
+        />
+
+        <CheckboxTitle 
+            name="Add BOS Token"
+            varname="add_bos_token"
+            body={currentPreset}
+            setValue={setCurrentPreset}
+        />
+
+        <CheckboxTitle 
+            name="Ban EOS Token"
+            varname="ban_eos_token"
+            body={currentPreset}
+            setValue={setCurrentPreset}
+        />
+
+        <CheckboxTitle 
+            name="Skip Special Token"
+            varname="skip_special_tokens"
+            body={currentPreset}
+            setValue={setCurrentPreset}
+        />
+
+        <TextBox 
+            text="Banned Tokens"
+            varname="banned_tokens"
+            body={currentPreset}
+            setvalue={setCurrentPreset}
+            lines={3}
+        />
+
+        <SliderItem 
+            name="CFG Scale" 
+            varname="guidance_scale" 
+            min={0.1}
+            max={4}
+            setValue={setCurrentPreset}
+            body={currentPreset}
+            precision={2}
+        />
+
+        <TextBox 
+            text="Negative Prompts"
+            varname="negative_prompt"
+            body={currentPreset}
+            setvalue={setCurrentPreset}
+            lines={3}
+        />
+
+        <SliderItem 
+            name="Number of Beams" 
+            varname="num_beams" 
+            min={1}
+            max={20}
+            step={1}
+            setValue={setCurrentPreset}
+            body={currentPreset}
+        />
+
+        <SliderItem 
+            name="Length Penalty" 
+            varname="length_penalty" 
+            min={-5}
+            max={5}
+            setValue={setCurrentPreset}
+            body={currentPreset}
+            precision={1}
+        />
+
+        <CheckboxTitle 
+            name="Early Stopping"
+            varname="early_stopping"
+            body={currentPreset}
+            setValue={setCurrentPreset}
+        />
+
+        <SliderItem 
+            name="Penalty Alpha" 
+            varname="penalty_alpha" 
+            min={0}
+            max={5}
+            setValue={setCurrentPreset}
+            body={currentPreset}
+            precision={2}
+        />
+
+        <SliderItem 
+            name="Mirostat Mode" 
+            varname="mirostat_mode" 
             min={0}
             max={2}
             step={1}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
         />
 
         <SliderItem 
@@ -284,49 +425,45 @@ const Presets = () => {
             varname="mirostat_tau" 
             min={0}
             max={20}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
             precision={2}
         />
-
+        
+        
         <SliderItem 
             name="Mirostat Eta" 
             varname="mirostat_eta" 
             min={0}
             max={1}
-            fn={setPresetValue} 
-            preset={currentPreset}
+            setValue={setCurrentPreset}
+            body={currentPreset}
             precision={2}
         />
 
-        <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
-            <CheckBox 
-                tintColors={{false:Color.White, true:Color.White}}
-                onFillColor={Color.White}
-                onCheckColor={Color.White}
-                value={currentPreset.use_default_badwordsids}
-                onValueChange={value => setPresetValue("use_default_badwordsids", value)}
-            />
-            <Text style={{paddingLeft: 8, color:Color.Text }}>Ban EOS Tokens</Text>
-        </View>
-
-        <Text style={{alignSelf:'center', color:Color.Text }}>Grammar</Text>
-        <TextInput
-            style={styles.grammarbox}
-            value={currentPreset.grammar}
-            onChangeText={value => setPresetValue("grammar", value)}
-            multiline
-            numberOfLines={3}
+        <TextBox 
+            text='Grammar'
+            varname= "grammar_string"
+            body={currentPreset}
+            setvalue={setCurrentPreset}
+            lines={3}
         />
 
-            
+        <TextBox 
+            text='Seed'
+            varname= "seed"
+            body={currentPreset}
+            setvalue={setCurrentPreset}
+            keyboardType='number-pad'
+        />
+        
         </View>
         </ScrollView>
         </SafeAreaView>
     )
 }
 
-export default Presets
+export default PresetsTGWUI
 
 const styles = StyleSheet.create({
     mainContainer: {

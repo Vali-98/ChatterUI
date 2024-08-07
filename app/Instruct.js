@@ -1,9 +1,9 @@
 import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, ToastAndroid, Alert} from 'react-native'
 import { Stack } from 'expo-router'
-import { Global, Color, getInstructList, writeInstruct, loadInstruct, deleteInstruct, uploadInstruct} from '@globals'
+import { Global, Color, getInstructList, writeInstruct, loadInstruct, deleteInstruct, uploadInstruct, saveStringExternal} from '@globals'
 import { useMMKVObject } from 'react-native-mmkv'
 import { ScrollView } from 'react-native-gesture-handler'
-import TextBox from '@components/InstructMenu/TextBox'
+import TextBox from '@components/TextBox'
 import CheckBox from '@react-native-community/checkbox'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useState, useEffect } from 'react'
@@ -129,16 +129,7 @@ const Instruct = () => {
             </TouchableOpacity>
      
             <TouchableOpacity style={styles.button} onPress={async () => {
-                const permissions = await FS.StorageAccessFramework.requestDirectoryPermissionsAsync()
-                if (permissions.granted) {
-                    let directoryUri = permissions.directoryUri;
-                    await FS.StorageAccessFramework.createFileAsync(directoryUri, instructName, "application/json").then(async(fileUri) => {
-                    await FS.writeAsStringAsync(fileUri, JSON.stringify(currentInstruct), { encoding: FS.EncodingType.UTF8 })
-                    })
-                    .catch((e) => {
-                        console.log(e)
-                    })
-                } 
+                saveStringExternal(instructName, JSON.stringify(currentInstruct))
             }}>
                 <FontAwesome  size={24} name='download' color={Color.Button}/>
             </TouchableOpacity>
@@ -156,7 +147,7 @@ const Instruct = () => {
                 text='System Sequence'
                 varname="system_prompt"
                 lines={3}
-                instruct={currentInstruct}
+                body={currentInstruct}
                 setvalue={setCurrentInstruct}
             />
 
@@ -164,13 +155,13 @@ const Instruct = () => {
             <TextBox 
                 text='Input Sequence'
                 varname='input_sequence'
-                instruct={currentInstruct}
+                body={currentInstruct}
                 setvalue={setCurrentInstruct}
             />
             <TextBox 
                 text='Output Sequence'
                 varname= "output_sequence"
-                instruct={currentInstruct}
+                body={currentInstruct}
                 setvalue={setCurrentInstruct}
             />
             </View>
@@ -179,13 +170,13 @@ const Instruct = () => {
             <TextBox 
                 text='First Output Sequence'
                 varname='first_output_sequence'
-                instruct={currentInstruct}
+                body={currentInstruct}
                 setvalue={setCurrentInstruct}
             />
             <TextBox 
                 text='Last Output Sequence'
                 varname= "last_output_sequence"
-                instruct={currentInstruct}
+                body={currentInstruct}
                 setvalue={setCurrentInstruct}
             />
             </View>
@@ -194,13 +185,13 @@ const Instruct = () => {
             <TextBox 
                 text='System Sequence Suffix'
                 varname='system_sequence_prefix'
-                instruct={currentInstruct}
+                body={currentInstruct}
                 setvalue={setCurrentInstruct}
             />
             <TextBox 
                 text='System Sequence Suffix'
                 varname= "system_sequence_suffix"
-                instruct={currentInstruct}
+                body={currentInstruct}
                 setvalue={setCurrentInstruct}
             />
             </View>
@@ -209,25 +200,25 @@ const Instruct = () => {
             <TextBox 
                 text='Stop Sequence'
                 varname='stop_sequence'
-                instruct={currentInstruct}
+                body={currentInstruct}
                 setvalue={setCurrentInstruct}
             />
             <TextBox 
                 text='Seperator Sequence'
                 varname= "separator_sequence"
-                instruct={currentInstruct}
+                body={currentInstruct}
                 setvalue={setCurrentInstruct}
             />
             </View>
 
             
 
-            <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
+        <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
             <CheckBox 
                 tintColors={{false:Color.White, true:Color.White}}
                 onFillColor={Color.White}
                 onCheckColor={Color.White}
-                value={currentInstruct.wrap}
+                body={currentInstruct.wrap}
                 onValueChange={value => setCurrentInstruct({...currentInstruct, "wrap" : value})}
             />
             <Text style={{paddingLeft: 8, color:Color.Text}}>Wrap Sequence with Newline</Text>
@@ -269,7 +260,7 @@ const Instruct = () => {
             <TextBox 
                 text='Activation Regex'
                 varname="activation_regex"
-                instruct={currentInstruct}
+                body={currentInstruct}
                 setvalue={setCurrentInstruct}
             />
 

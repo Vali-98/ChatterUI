@@ -11,6 +11,7 @@ Built for the purpose of learning Javascript, so it may be a little rough around
 
 ### Supported Backends
 - KoboldAI
+- AI Horde
 
 ### Building from source.
 Building from source has **not** been tested.
@@ -19,3 +20,9 @@ Requires Node.js and Android SDK. Expo uses EAS to build apps which in a Linux e
 npm install
 eas build --platform android --local
 ```
+
+### Roadmap
+
+- text-generation-webui Support
+- Mancer Support
+- Lorebooks 
