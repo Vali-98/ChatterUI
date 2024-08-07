@@ -71,6 +71,7 @@ export const saveStringExternal = async (
 // runs every startup to clear some MMKV values
 
 export const startupApp = () => {
+    console.log('[APP STARTED]: T1APT')
     mmkv.set(Global.CurrentCharacter, 'Welcome')
     mmkv.set(Global.CurrentCharacterCard, JSON.stringify(`{}`))
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
