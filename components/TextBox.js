@@ -11,7 +11,7 @@ const TextBox = ({text, body, varname, setvalue, lines = 1, keyboardType='defaul
                 multiline={lines > 1}
                 numberOfLines={lines}
                 style={{...styles.input, textAlignVertical: (lines > 1)? `top` : `center`}}
-                value={body[varname]}
+                value={body[varname]?.toString() ?? ''}
                 onChangeText={(value) => {
                     setvalue({...body, [varname]:value})
                 }}

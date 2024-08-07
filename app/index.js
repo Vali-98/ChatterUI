@@ -58,6 +58,7 @@ const Home = () => {
 	const [targetLength, setTargetLength] = useState(0)
 	const [chatCache, setChatCache] = useState('')
 	const [hordeID, setHordeID] = useState('')
+	const [abortFunction, setAbortFunction] = useState(undefined)
 
 	// load character chat upon character change
 	useEffect(() => {
@@ -150,15 +151,16 @@ const Home = () => {
 		}
 	}
 
-	const constructHordePayload = (presetKAI = presetKAI, dry = false,) => {
+	const constructHordePayload = (dry = false,) => {
 		const usedModels = hordeModels.map(item => {return item.name})
 		const usedWorkers = hordeWorkers.filter(item => item.models.some(model => usedModels.includes(model)))
 		const maxWorkerContext = Math.min.apply(null, 
 			usedWorkers.map(item => {return item.max_context_length})
 			)
 		const usedResponseLength = Math.min.apply(null,
-			usedWorkers.map(item => {return item.max_length})
+			usedWorkers.map(item => {return item?.max_length})
 			) 
+		
 		console.log('Max worker context length: ' + maxWorkerContext)
 		console.log('Max worker response length: ' + usedResponseLength)
 		console.log('Models used: ' + usedModels)
@@ -289,6 +291,16 @@ const Home = () => {
 		console.log(`Using KAI`)
 		const controller = new AbortController();
 		const timeout = setTimeout(() => controller.abort(), 60000);
+		aborted = false
+		setAbortFunction(abortFunction => () => {
+			controller.abort()
+			aborted = true
+			axios
+				.create({timeout: 1000})
+				.post(`${kaiendpoint}/api/extra/abort`)
+				.catch(() => {ToastAndroid.show(`Abort Failed`, 2000)})
+		})
+
 		fetch(`${kaiendpoint}/api/extra/generate/stream`, {
 			reactNative: {textStreaming: true},
 			method: `POST`,
@@ -299,7 +311,7 @@ const Home = () => {
 			clearTimeout(timeout)
 			const reader = response.body.getReader()
 			return reader.read().then(function processText ({done, value}) {
-				if(done) {
+				if(done || aborted) {
 					setNowGenerating(false)
 					insertGeneratedMessage('', true)					
 					console.log('Done')
@@ -317,18 +329,36 @@ const Home = () => {
 
 		}).catch((error) => {
 			setNowGenerating(false)
-			ToastAndroid.show('Connection Lost...', ToastAndroid.SHORT)
+			if(!aborted)
+				ToastAndroid.show('Connection Lost...', ToastAndroid.SHORT)
 			console.log('Something went wrong.' + error)
 		})
 
 	}
 
 	const hordeResponse = async () => {
+
+		let aborted = false
+
 		if(hordeModels.length === 0) {
 			ToastAndroid.show(`No Models Selected`, 2000)
 			setNowGenerating(false)
 			return
 		}
+
+		setAbortFunction(abortFunction => () => {
+			aborted = true
+			fetch(`https://stablehorde.net/api/v2/generate/text/status/${hordeID}`,{
+				method: 'DELETE',
+				headers:{
+					...hordeHeader(),							
+					'accept':'application/json',
+					'Content-Type':'application/json'
+				},
+			})	
+			setNowGenerating(false)
+		})
+
 		console.log(`Using Horde`)
 		const payload = constructHordePayload()
 		const request = await fetch(`https://stablehorde.net/api/v2/generate/text/async`, {
@@ -356,8 +386,10 @@ const Home = () => {
 		const body = await request.json()
 		const generation_id = body.id
 		let result = undefined
-		do {
+		do {			
 			await new Promise(resolve => setTimeout(resolve, 5000))
+			if(aborted) return
+			
 			console.log(`Checking...`)
 			const response = await fetch(`https://stablehorde.net/api/v2/generate/text/status/${generation_id}`, {
 				method: 'GET',
@@ -372,6 +404,8 @@ const Home = () => {
 			result = await response.json()
 		} while (!result.done)
 
+		if(aborted) return
+		
 		setNowGenerating(() => {
 			insertGeneratedMessage(result.generations[0].text, true)
 			return false
@@ -379,6 +413,13 @@ const Home = () => {
 	}
 
 	const TGWUIReponseStream = async () => {
+		
+		let aborted = false
+		setAbortFunction(abortFunction => () => {
+			aborted = true
+			setNowGenerating(false)
+		})
+
 		if(APIType === API.MANCER) {
 			const check = await fetch(`https://neuro.mancer.tech/webui/${mancerModel?.id}/api/v1/model`, {
 			method: 'GET',
@@ -390,7 +431,9 @@ const Home = () => {
 				return
 			}
 		}
-		//return
+
+		if(aborted) return
+
 		try {
 		const ws = new WebSocket(
 			(APIType === API.MANCER)?
@@ -398,9 +441,21 @@ const Home = () => {
 			:
 			`${TGWUIStreamEndpoint}`
 			)
+		
+		setAbortFunction(abortFunction => () => {
+			ws.close()
+			aborted = true
+			setNowGenerating(false)
+		})
 
 		ws.onopen = () => {
+
 			console.log(`Connected!`)
+
+			if(aborted) {
+				ws.close()
+				return
+			}
 
 			let headers = {}
 			if(APIType === API.MANCER)
@@ -416,7 +471,7 @@ const Home = () => {
 		}
 		
 		ws.onmessage = (message) => {
-			if(!nowGenerating) {
+			if(aborted) {
 				ws.close()
 				return
 			}
@@ -426,8 +481,11 @@ const Home = () => {
 				insertGeneratedMessage(data.text)
 			if(data.event === 'stream_end'){
 				ws.close()
-				insertGeneratedMessage(``, true)
-				console.log(data.error ?? 'Stream closed.')
+				if(!aborted)
+					insertGeneratedMessage(``, true)
+				console.log(data?.error ?? 'Stream closed.')
+				if(data?.error !== undefined)
+					ToastAndroid.show(data.error.replace(`<br/>`, `\n`), 2000)
 			}
 		}
 
@@ -437,11 +495,12 @@ const Home = () => {
 		}
 
 		ws.onerror = (error) => {
-			console.log(error.message)
-			ToastAndroid.show(error.message, 2000)
+			console.log(`ERROR: ` + error?.message)
+			if(error?.messsage !== undefined)
+				ToastAndroid.show(error?.message, 2000)
 		}
 		} catch (error) {
-			console.log(error)
+			console.log(`ERROR: ` + error)
 		}
 	}
 
@@ -474,12 +533,7 @@ const Home = () => {
 						
 						<MenuOption onSelect={() => {
 							console.log(`Aborting Generation`)
-							if(APIType === API.KAI)
-								axios
-									.create({timeout: 1000})
-									.post(`${kaiendpoint}/api/extra/abort`)
-									.then(() => {setNowGenerating(false)})	
-
+							abortFunction()
 							if(APIType === API.HORDE)
 									setNowGenerating(false)
 						}}>
@@ -534,24 +588,11 @@ const Home = () => {
 
 					{ nowGenerating ?
 					<TouchableOpacity style={styles.sendButton} onPress={()=> {
-						if(APIType === API.KAI)
-								{	
-									axios
-									.create({timeout: 1000})
-									.post(`${kaiendpoint}/api/extra/abort`)
-									.catch(() => {ToastAndroid.show(`Abort Failed`, 2000)})
-									setNowGenerating(false)
-								}
+						console.log(`Aborting Generation`)
+						abortFunction()
 
 						if(APIType === API.HORDE){
-								fetch(`https://stablehorde.net/api/v2/generate/text/status/${hordeID}`,{
-									method: 'DELETE',
-									headers:{
-										...hordeHeader(),							
-										'accept':'application/json',
-										'Content-Type':'application/json'
-									},
-								})	
+								
 								setNowGenerating(false)
 							}
 						if(APIType === API.TGWUI)
