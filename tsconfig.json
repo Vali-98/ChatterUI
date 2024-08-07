@@ -4,17 +4,19 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@globals": ["constants/global.tsx"],
+      "@globals": ["constants/global"],
       "@components/*": ["components/*"],
       "@assets/*" : ["assets/*"],
       "@public/*" : ["public/*"],
-      "@constants" : ["constants/*"],
+      "@constants/*" : ["constants/*"],
+      "@lib/*" : ["lib/*"]
     },
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "**/*.js",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "constants/global.tsx"  ]
+  ]
 }

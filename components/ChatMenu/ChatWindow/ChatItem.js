@@ -23,7 +23,7 @@ const ChatItem = ({ message, id, scroll}) => {
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     
     // drilled
-    const [messages, setMessages, setTargetLength, setChatCache] = useContext(MessageContext)
+    const [messages, setMessages, setTargetLength] = useContext(MessageContext)
     
     // local
     const [placeholderText, setPlaceholderText] = useState(message.mes)
@@ -166,7 +166,7 @@ const ChatItem = ({ message, id, scroll}) => {
                 <View style={styles.messageInput} >
                 <TextInput
                     style ={{color:Color.Text}}
-                    value={placeholderText.trim('\n')} 
+                    value={placeholderText} 
                     onChangeText={setPlaceholderText}        
                     textBreakStrategy='simple'
                     multiline
@@ -234,7 +234,6 @@ const ChatItem = ({ message, id, scroll}) => {
                         })
                         newmessages.at(id + 1).swipe_id = newmessages.at(id + 1).swipe_id + 1
                         saveChatFile(newmessages).then(() => {
-                            setChatCache(``)
                             setTargetLength(messages.length)
                             setNowGenerating(true)
                         })
