@@ -101,12 +101,15 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
             style={{ flex: 1 }}>
             <FadeScreen handleOverlayClick={handleOverlayClick} />
             <View style={{ flex: 1 }} />
-            <View style={styles.topText}>
+            <Animated.View
+                style={styles.topText}
+                entering={SlideInDown.duration(300).easing(Easing.out(Easing.quad))}
+                exiting={SlideOutDown.duration(300).easing(Easing.out(Easing.quad))}>
                 <Text style={styles.nameText}>{message?.name}</Text>
                 <Text style={styles.timeText}>
                     {message?.swipes[message.swipe_id].send_date.toLocaleTimeString()}
                 </Text>
-            </View>
+            </Animated.View>
             <Animated.View
                 style={styles.editorContainer}
                 entering={SlideInDown.duration(300).easing(Easing.out(Easing.quad))}
@@ -172,7 +175,7 @@ const styles = StyleSheet.create({
 
     editButton: {
         padding: 4,
-        paddingVertical: 8,
+        paddingVertical: 12,
     },
 
     messageInput: {
