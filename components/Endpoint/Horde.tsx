@@ -1,19 +1,73 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
-import { Global, Color, hordeHeader, Logger } from '@globals'
+import { Global, Color, Logger } from '@globals'
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import { MultiSelect } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
+import { hordeHeader } from '@constants/Inference'
+
+type HordeModel = {
+    name: string
+    count: number
+    performance: number
+    queued: number
+    jobs: number
+    eta: number
+    type: 'image' | 'text'
+}
+
+type HordeWorker = {
+    type: 'image' | 'text'
+    name: string
+    id: string
+    online: boolean
+    requests_fulfilled: number
+    kudos_rewards: number
+    kudos_details: {
+        generated: number
+        uptime: number
+    }
+    performance: string
+    threads: number
+    uptime: number
+    maintenance_mode: boolean
+    paused: boolean
+    info: string
+    nsfw: boolean
+    owner: string
+    ipaddr: string
+    trusted: boolean
+    flagged: boolean
+    suspicious: number
+    uncompleted_jobs: number
+    models: Array<string>
+    forms: Array<string>
+    team: {
+        name: string
+        id: string
+    }
+    contact: string
+    bridge_agent: string
+    max_pixels: number
+    megapixelsteps_generated: number
+    img2img: boolean
+    painting: boolean
+    'post-processing': boolean
+    lora: boolean
+    max_length: number
+    max_context_length: number
+    tokens_generated: number
+}
 
 const Horde = () => {
     const [hordeKey, setHordeKey] = useMMKVString(Global.HordeKey)
-    const [hordeModels, setHordeModels] = useMMKVObject(Global.HordeModels)
-    const [hordeWorkers, setHordeWorkers] = useMMKVObject(Global.HordeWorkers)
+    const [hordeModels, setHordeModels] = useMMKVObject<Array<HordeModel>>(Global.HordeModels)
+    const [hordeWorkers, setHordeWorkers] = useMMKVObject<Array<HordeWorker>>(Global.HordeWorkers)
 
-    const [dropdownValues, setDropdownValues] = useState(
-        hordeModels.map((item) => {
+    const [dropdownValues, setDropdownValues] = useState<Array<string>>(
+        hordeModels?.map((item) => {
             return item.name
-        })
+        }) ?? []
     )
     const [keyInput, setKeyInput] = useState('')
     const [modelList, setModelList] = useState([])
@@ -24,26 +78,28 @@ const Horde = () => {
             headers: { ...hordeHeader() },
         }).catch(() => {
             Logger.log(`Could not connect to horde`, true)
-            return []
         })
+        if (!modelresults) return
+
         const list = await modelresults.json()
-        setModelList(list)
-        const names = list.map((item) => {
+
+        const names = list.map((item: HordeModel) => {
             return item.name
         })
-
         setDropdownValues(dropdownValues.filter((item) => names.includes(item)))
-        setHordeModels(hordeModels.filter((item) => dropdownValues.includes(item.name)))
+        if (hordeModels)
+            setHordeModels(hordeModels.filter((item) => dropdownValues.includes(item.name)))
 
         const workerresults = await fetch(`https://stablehorde.net/api/v2/workers?type=text`, {
             method: 'GET',
             ...hordeHeader(),
         }).catch(() => {
             Logger.log(`Could not connect to horde`, true)
-            return []
         })
-        const workerlist = await workerresults.json()
-        setHordeWorkers(workerlist)
+        if (workerresults) {
+            const workerlist = await workerresults.json()
+            setHordeWorkers(workerlist)
+        }
     }
 
     useEffect(() => {
@@ -102,7 +158,7 @@ const Horde = () => {
                     valueField="name"
                     onChange={(item) => {
                         setHordeModels(
-                            modelList.filter((value) => {
+                            modelList.filter((value: HordeModel) => {
                                 return item.includes(value.name)
                             })
                         )
@@ -117,8 +173,8 @@ const Horde = () => {
                     activeColor={Color.Container}
                     placeholderStyle={styles.selected}
                     placeholder="Select Model"
-                    renderSelectedItem={(item, unSelect) => (
-                        <View style={styles.iteminfo} onPress={() => {}}>
+                    renderSelectedItem={(item: HordeModel, unSelect) => (
+                        <View style={styles.iteminfo}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Text style={{ color: Color.Text, flex: 1, fontSize: 16 }}>
                                     {item.name}
