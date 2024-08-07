@@ -257,7 +257,10 @@ const ChatItem: React.FC<ChatItemProps> = ({
                 message.name === charName &&
                 message?.swipes !== undefined &&
                 id !== 0) ||
-                (id === 0 && message?.swipes !== undefined && message?.swipes?.length !== 1)) && (
+                (id === 0 &&
+                    messagesLength === 1 &&
+                    message?.swipes !== undefined &&
+                    message?.swipes?.length !== 1)) && (
                 <View style={styles.swipesItem}>
                     {!nowGenerating && (
                         <TouchableOpacity
