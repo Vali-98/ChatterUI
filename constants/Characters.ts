@@ -8,7 +8,7 @@ import extractChunks from 'png-chunks-extract'
 import { Logger } from './Logger'
 import { db } from '@db'
 import { characterGreetings, characterTags, characters, tags } from 'db/schema'
-import { eq, inArray, notExists, notInArray } from 'drizzle-orm'
+import { eq, inArray, notExists, notInArray, sql } from 'drizzle-orm'
 import { create } from 'zustand'
 
 type CharacterCardState = {
@@ -24,8 +24,13 @@ export namespace Characters {
             id: undefined,
             card: undefined,
             setCard: async (id: number) => {
+                let start = performance.now()
                 const card = await readCard(id)
+                console.log(`[Characters] time for db query: `, performance.now() - start)
+                start = performance.now()
                 set((state) => ({ ...state, card: card, id: id }))
+
+                console.log('[Characters] time for zustand set: ', performance.now() - start)
                 return card?.data.name
             },
             unloadCard: () => {
@@ -42,9 +47,9 @@ export namespace Characters {
         return id
     }
 
-    export const readCard = async (charID: number): Promise<CharacterCardV2 | undefined> => {
+    export const readCard = async (charId: number): Promise<CharacterCardV2 | undefined> => {
         const data = await db.query.characters.findFirst({
-            where: eq(characters.id, charID),
+            where: eq(characters.id, charId),
             with: {
                 tags: {
                     columns: {

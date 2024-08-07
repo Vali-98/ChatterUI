@@ -15,8 +15,8 @@ import { Characters } from './Characters'
 
 export const regenerateResponse = async () => {
     const charName = Characters.useCharacterCard.getState().card?.data.name
-    const messageName = Chats.useChat.getState()?.data?.messages.at(-1)?.name
-    const messagesLength = Chats.useChat.getState()?.data?.messages.length
+    const messageName = Chats.useChat.getState()?.data?.messages?.at(-1)?.name ?? ''
+    const messagesLength = Chats.useChat.getState()?.data?.messages?.length ?? -1
     Logger.log('Regenerate Response')
     if (messageName == charName && messagesLength && messagesLength !== 1) {
         await Chats.useChat.getState().deleteEntry(messagesLength - 1)

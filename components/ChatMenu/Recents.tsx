@@ -31,9 +31,7 @@ const Recents = () => {
             setNowLoading(false)
             return
         }
-
         await setCurrentCard(entry.charId)
-
         await loadChat(entry.chatId)
         setNowLoading(false)
     }
@@ -67,7 +65,7 @@ const Recents = () => {
                             <View key={index} style={{ flexDirection: 'row' }}>
                                 <TouchableOpacity
                                     style={styles.longButton}
-                                    onPress={() => {
+                                    onPress={async () => {
                                         handleLoadEntry(item)
                                     }}>
                                     <View style={styles.textContainer}>

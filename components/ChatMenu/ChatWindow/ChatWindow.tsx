@@ -3,6 +3,7 @@ import { ChatItem } from './ChatItem'
 import { Characters, Chats, Global } from '@globals'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 import { useEffect, useRef } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 
 type ListItem = {
     index: number
@@ -14,13 +15,12 @@ const ChatWindow = () => {
     const { nowGenerating } = Chats.useChat((state) => ({
         nowGenerating: state.nowGenerating,
     }))
-
-    const charId = Characters.useCharacterCard((state) => state?.id)
+    const charId = Characters.useCharacterCard(useShallow((state) => state?.id))
 
     const [userName, setUserName] = useMMKVString(Global.CurrentUser)
     const flatListRef = useRef<FlatList>(null)
-    const messages = Chats.useChat((state) => state?.data?.messages) ?? ''
-    const messagesLength = messages?.length ?? 0
+    //const messages = Chats.useChat(useShallow((state) => state.messages)) ?? []
+    const messagesLength = Chats.useChat((state) => state?.data?.messages?.length) ?? -1
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
 
     useEffect(() => {

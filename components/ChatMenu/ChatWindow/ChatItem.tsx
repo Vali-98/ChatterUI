@@ -25,30 +25,26 @@ const ChatItem: React.FC<ChatItemProps> = ({ id, nowGenerating, charId, userName
     const message =
         Chats.useChat(useShallow((state) => state?.data?.messages?.[id])) ?? Chats.dummyEntry
 
-    const messagesLength = Chats.useChat(useShallow((state) => state.data?.messages.length)) ?? -1
+    const messagesLength = Chats.useChat(useShallow((state) => state?.data?.messages?.length)) ?? -1
     const mes = message.swipes[message.swipe_id].swipe ?? ''
     const [placeholderText, setPlaceholderText] = useState(mes)
     const [editMode, setEditMode] = useState(false)
 
-    const { updateChat, deleteChat, saveChat } = Chats.useChat(
+    const { updateChat, deleteChat } = Chats.useChat(
         useShallow((state) => ({
             updateChat: state.updateEntry,
             deleteChat: state.deleteEntry,
-            saveChat: state.save,
         }))
     )
-
     const buffer = Chats.useChat((state) => (id === messagesLength - 1 ? state.buffer : ''))
 
     const handleEditMessage = () => {
         updateChat(id, placeholderText)
-        saveChat()
         setEditMode(false)
     }
 
     const handleDeleteMessage = () => {
         deleteChat(id)
-        saveChat()
         setEditMode(false)
     }
     const handleEnableEdit = () => {
