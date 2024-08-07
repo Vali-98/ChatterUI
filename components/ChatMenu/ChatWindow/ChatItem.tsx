@@ -93,8 +93,8 @@ const ChatItem: React.FC<ChatItemProps> = ({
     const showEllipsis =
         !message.is_user && buffer === '' && id === messagesLength - 1 && nowGenerating
 
-    const animatedHeight = useRef(new Animated.Value(10)).current // initial height
-    const height = useRef(0)
+    const animatedHeight = useRef(new Animated.Value(-1)).current
+    const height = useRef(-1)
 
     const handleAnimateHeight = (newheight: number) => {
         animatedHeight.stopAnimation(() =>
@@ -108,6 +108,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
     }
 
     const handleContentSizeChange = (event: LayoutChangeEvent) => {
+        if (!isLastMessage) return
         const newheight = event.nativeEvent.layout.height
         const oveflowPadding = 12
         if (height.current === newheight) return
@@ -179,7 +180,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                             onLongPress={handleEnableEdit}>
                             <Animated.View
                                 style={{
-                                    height: animatedHeight,
+                                    height: height.current === -1 ? 'auto' : animatedHeight,
                                     overflow: 'scroll',
                                 }}>
                                 {showEllipsis && (
