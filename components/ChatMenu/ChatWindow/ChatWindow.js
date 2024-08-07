@@ -33,7 +33,8 @@ const ChatWindow = ({ messages }) => {
                 keyExtractor={(item) => item.key}
                 renderItem={({ item, index }) => (
                     <ChatItem id={item.index} message={item.message} />
-                )}></FlatList>
+                )}
+            />
         </KeyboardAvoidingView>
     )
 }

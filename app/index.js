@@ -6,8 +6,8 @@ import { Stack, useRouter } from 'expo-router'
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native'
 import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu'
-
+import { Menu, MenuTrigger, MenuOptions, MenuOption, renderers } from 'react-native-popup-menu'
+const { SlideInMenu } = renderers
 const Home = () => {
     const router = useRouter()
 
@@ -122,7 +122,7 @@ const Home = () => {
                     <ChatWindow messages={messages} />
 
                     <View style={styles.inputContainer}>
-                        <Menu>
+                        <Menu renderer={SlideInMenu}>
                             <MenuTrigger>
                                 <MaterialIcons
                                     name="menu"
@@ -151,7 +151,6 @@ const Home = () => {
                                 ))}
                             </MenuOptions>
                         </Menu>
-
                         <TextInput
                             style={styles.input}
                             placeholder="Message..."
@@ -223,8 +222,8 @@ const styles = StyleSheet.create({
             backgroundColor: Color.DarkContainer,
             padding: 4,
             borderRadius: 8,
-            borderColor: Color.Offwhite,
-            borderWidth: 1,
+            //borderColor: Color.Offwhite,
+            //borderWidth: 1,
         },
     },
 
