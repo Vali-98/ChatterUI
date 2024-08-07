@@ -99,8 +99,9 @@ const ChatItem: React.FC<ChatItemProps> = ({
         const newheight = event.nativeEvent.layout.height
         if (height.current === newheight) return
         height.current = newheight
+        const oveflowPadding = 12
         Animated.timing(animatedHeight, {
-            toValue: newheight + 12,
+            toValue: newheight + (nowGenerating ? oveflowPadding : 0),
             duration: 200,
             useNativeDriver: false,
         }).start()
