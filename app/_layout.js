@@ -9,6 +9,9 @@ import { Global, generateDefaultDirectories, createNewDefaultChat,
 import { MenuProvider } from 'react-native-popup-menu';
 
 import * as FS from 'expo-file-system'
+
+
+
 // init values should be here
 const Layout = () => {
     const router = useRouter()
