@@ -11,6 +11,7 @@ type ChatFrameProps = {
     TTSenabled: boolean
     id: number
     charId: number
+    nowGenerating: boolean
     isLast?: boolean
 }
 
@@ -21,6 +22,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
     userName,
     TTSenabled,
     id,
+    nowGenerating,
     isLast,
 }) => {
     const imageDir = message.is_user
@@ -42,7 +44,12 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
         setImageSource(require('@assets/user.png'))
     }
     const deltaTime = Math.round(
-        Math.max(0, (swipe.gen_finished.getTime() - swipe.gen_started.getTime()) / 1000)
+        Math.max(
+            0,
+            ((nowGenerating && isLast ? new Date().getTime() : swipe.gen_finished.getTime()) -
+                swipe.gen_started.getTime()) /
+                1000
+        )
     )
     return (
         <View style={{ flexDirection: 'row' }}>

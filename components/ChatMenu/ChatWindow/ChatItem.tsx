@@ -135,6 +135,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                     userName={userName}
                     message={message}
                     id={id}
+                    nowGenerating={nowGenerating}
                     isLast={id === messagesLength - 1}
                     TTSenabled={TTSenabled}>
                     {showEditor && (
