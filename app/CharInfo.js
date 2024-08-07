@@ -103,7 +103,7 @@ const CharInfo = () => {
 
       <Text
         style={styles.boxText}
-      >Description    Tokens: {(characterCard?.description ?? characterCard?.data?.description) !== undefined && llamaTokenizer.encode(characterCard.description).length}</Text>
+      >Description    Tokens: {(characterCard?.description ?? characterCard?.data?.description) !== undefined && llamaTokenizer.encode(characterCard?.description ?? characterCard.data.description).length}</Text>
      
       <ScrollView style={styles.inputContainer}>
       <TextInput 

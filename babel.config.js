@@ -7,14 +7,19 @@ module.exports = function (api) {
       'expo-router/babel',
       'react-native-reanimated/plugin',
       ["module-resolver", {
-        "root": ["."],
-        "alias": {
+        root: ["."],
+        alias: {
           "@globals": "./constants/global",
           "@components": "./components",
           "@assets": "./assets",
           "@public": "./public",
           "@constants" : "./constants",
-        }
+        },
+        extension: [
+          '.js',
+          '.ts',
+          '.tsx',
+        ],
       }],
     ],
   };
