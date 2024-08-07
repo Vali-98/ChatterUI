@@ -139,14 +139,14 @@ const buildChatCompletionContext = (max_length: number) => {
     \n${currentCard?.description ?? currentCard?.data.description}\n`
     let total_length = llamaTokenizer.encode(initial).length
 
-    const payload = [{ role: 'system', content: initial }]
+    const payload = [{ role: 'system', content: replaceMacros(initial) }]
 
     for (const message of messages?.slice(1)?.reverse() ?? []) {
         const len = llamaTokenizer.encode(message.mes).length + total_length
         if (len > max_length) break
         payload.push({
             role: message.name === charName ? 'assistant' : 'user',
-            content: message.mes,
+            content: replaceMacros(message.mes),
         })
         total_length += len
     }
@@ -655,13 +655,17 @@ const localStreamResponse = async (setAbortFunction: AbortFunction) => {
         })
 }
 
+type KeyHeader = {
+    [key: string]: string
+}
+
 const readableStreamResponse = async (
     endpoint: string,
     payload: Object,
     jsonreader: (event: any) => string,
     setAbortFunction: AbortFunction,
     abort_func = () => {},
-    header = {}
+    header: KeyHeader = {}
 ) => {
     const replace = constructReplaceStrings()
 
@@ -674,6 +678,7 @@ const readableStreamResponse = async (
             ...header,
         },
         pollingInterval: 0,
+        withCredentials: header?.['X-API-KEY'] !== undefined || header?.Authorization !== undefined,
     })
 
     const closeStream = () => {
@@ -688,11 +693,16 @@ const readableStreamResponse = async (
     })
 
     es.addEventListener('message', (event) => {
+        if (event.data === `[DONE]`) {
+            es.close()
+            return
+        }
         const text = jsonreader(event.data)
         const output = Chats.useChat.getState().buffer + text
         replace.forEach((item) => output.replaceAll(item, ''))
         Chats.useChat.getState().setBuffer(output)
     })
+
     es.addEventListener('error', (event) => {
         console.log(event)
     })
