@@ -96,7 +96,7 @@ const ColorSettings = () => {
                 />
             </View>
 
-            {!devMode && (
+            {__DEV__ && (
                 <View style={{ alignItems: 'center', flexDirection: 'row' }}>
                     <Text style={{ color: getColor('primary-text1') }}>Sat: {color.s}</Text>
                     <Slider
@@ -117,7 +117,7 @@ const ColorSettings = () => {
                     />
                 </View>
             )}
-            {!devMode && (
+            {__DEV__ && (
                 <View style={{ alignItems: 'center', flexDirection: 'row' }}>
                     <Text style={{ color: getColor('primary-text1') }}>Lit: {color.l}</Text>
                     <Slider
