@@ -151,7 +151,7 @@ export namespace Chats {
             const messages = get().data?.messages
             const chatId = get().data?.id
             if (!messages || !chatId) return
-            const order = messages[messages.length - 1].order + 1
+            const order = messages.length > 0 ? messages[messages.length - 1].order + 1 : 0
 
             const entry = await createEntry(chatId, name, is_user, order, message)
             if (entry) messages.push(entry)
