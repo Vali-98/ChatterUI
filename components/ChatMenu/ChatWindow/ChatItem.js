@@ -6,8 +6,10 @@ import { useRef, useEffect, useState, useContext} from 'react'
 import { AntDesign, MaterialIcons} from '@expo/vector-icons'
 import {  Global, Color, MessageContext, saveChatFile, getCharacterImageDirectory, getUserImageDirectory, humanizedISO8601DateTime } from '@globals'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
+import SimpleMarkdown from 'simple-markdown'
 import Markdown from 'react-native-markdown-package'
 import * as FS from 'expo-file-system'
+import React from 'react'
 // global chat property for editing
 
 const ChatItem = ({ message, id, scroll}) => {
@@ -151,6 +153,8 @@ const ChatItem = ({ message, id, scroll}) => {
                                 color: Color.Text
                             },
                         }}
+                        rules={{speech}}
+                        
                     >
                     {message.mes.trim(`\n`)}
                     </Markdown>
@@ -304,3 +308,27 @@ const styles = StyleSheet.create({
     }
 });
 
+const speechStyle = {color: Color.TextQuote}
+const speech = {
+      order: SimpleMarkdown.defaultRules.em.order - 0.6,
+      match: function(source, state, lookbehind) {
+          return /^"([\s\S]+?)"(?!")/.exec(source);
+      },
+      parse: function(capture, parse, state) {
+          return {
+              content: parse(capture[1], state),
+          };
+      },
+      react: function (node, output, {...state}) {
+        state.withinText = true;
+        state.style = {
+          ...(state.style || {}),
+          ...speechStyle
+        };
+        return React.createElement(Text, {
+          key: state.key,
+          style: speechStyle,
+        }, `\"`, output(node.content, state), `\"`);
+      },
+      html: undefined
+  }
