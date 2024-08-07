@@ -8,6 +8,7 @@ import {
     Local,
     OpenRouter,
     OpenAI,
+    Ollama,
 } from '@components/Endpoint'
 import { Global, API, Style } from '@globals'
 import { Stack } from 'expo-router'
@@ -21,6 +22,7 @@ const APIMenu = () => {
     const apinames = [
         { label: 'Local', value: API.LOCAL },
         { label: 'KoboldAI', value: API.KAI },
+        { label: 'Ollama', value: API.OLLAMA },
         { label: 'Text Generation Web UI', value: API.TGWUI },
         { label: 'Text Completions', value: API.COMPLETIONS },
         { label: 'Horde', value: API.HORDE },
@@ -51,7 +53,7 @@ const APIMenu = () => {
                                 fontSize: 16,
                                 marginBottom: 8,
                             }}>
-                            Type
+                            API Type
                         </Text>
                         <Dropdown
                             value={APIType}
@@ -74,6 +76,7 @@ const APIMenu = () => {
                     {APIType === API.LOCAL && <Local />}
                     {APIType === API.OPENROUTER && <OpenRouter />}
                     {APIType === API.OPENAI && <OpenAI />}
+                    {APIType === API.OLLAMA && <Ollama />}
                 </ScrollView>
             </SafeAreaView>
         </AnimatedView>

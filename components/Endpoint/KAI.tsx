@@ -39,7 +39,9 @@ const styles = StyleSheet.create({
     },
 
     title: {
+        paddingTop: 8,
         color: Style.getColor('primary-text1'),
+        fontSize: 16,
     },
 
     input: {

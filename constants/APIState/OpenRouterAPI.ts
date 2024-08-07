@@ -1,4 +1,5 @@
 import { Global } from '@constants/GlobalValues'
+import { Logger } from '@constants/Logger'
 import { SamplerID } from '@constants/Samplers'
 
 import { APIBase, APISampler } from './BaseAPI'
@@ -34,6 +35,7 @@ class OpenRouterAPI extends APIBase {
         }
     }
     inference = async () => {
+        Logger.log(`Using endpoint: OpenRouter`)
         this.readableStreamResponse(
             'https://openrouter.ai/api/v1/chat/completions',
             JSON.stringify(this.buildPayload()),

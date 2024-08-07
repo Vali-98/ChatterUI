@@ -1,92 +1,78 @@
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
+import { MaterialIcons } from '@expo/vector-icons'
 import { Global, Logger, Style } from '@globals'
 import { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import { useAutosave } from 'react-autosave'
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
+import { ScrollView } from 'react-native-gesture-handler'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
-type MancerModel = {
-    id: string
-    limits: {
-        completion: number
-        context: number
-    }
-    name: string
-    pricing: {
-        completion: number
-        prompt: number
-    }
-}
+import HeartbeatButton from './HeartbeatButton'
 
-const Mancer = () => {
-    const [mancerModel, setMancerModel] = useMMKVObject<MancerModel>(Global.MancerModel)
-    const [mancerKey, setMancerKey] = useMMKVString(Global.MancerKey)
-    const [keyInput, setKeyInput] = useState<string>('')
-
-    const [modelList, setModelList] = useState<MancerModel[]>([])
-
-    const getModels = async () => {
-        const modelresults = await fetch(`https://mancer.tech/oai/v1/models`, {
-            method: 'GET',
-            headers: { accept: 'application/json' },
-        }).catch(() => {
-            Logger.log(`Could not get Mancer models.`, true)
-        })
-        if (!modelresults) return
-        const list = (await modelresults.json()).data
-        setModelList(list)
-    }
+const Ollama = () => {
+    const [ollamaEndpoint, setOllamaEndpoint] = useMMKVString(Global.OllamaEndpoint)
+    const [ollamaModel, setOllamaModel] = useMMKVObject<OllamaModel>(Global.OllamaModel)
+    const [modelList, setModelList] = useState<OllamaModel[]>([])
 
     useEffect(() => {
         getModels()
     }, [])
 
-    return (
-        <View style={styles.mainContainer}>
-            <Text style={styles.title}>API Key</Text>
-            <Text style={styles.subtitle}>Key will not be shown</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <TextInput
-                    style={styles.input}
-                    value={keyInput}
-                    onChangeText={(value) => {
-                        setKeyInput(value)
-                    }}
-                    placeholder="Press save to confirm key"
-                    placeholderTextColor={Style.getColor('primary-text2')}
-                    secureTextEntry
-                />
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        if (keyInput === '') {
-                            Logger.log('No API Key Entered!', true)
-                            return
-                        }
-                        setMancerKey(keyInput)
-                        setKeyInput('')
-                        Logger.log('Key Saved!', true)
-                    }}>
-                    <FontAwesome name="save" color={Style.getColor('primary-text1')} size={28} />
-                </TouchableOpacity>
-            </View>
+    const getModels = async () => {
+        const endpoint = new URL('api/tags', ollamaEndpoint)
+        const modelresults = await fetch(endpoint, {
+            method: 'GET',
+            headers: { accept: 'application/json' },
+        }).catch(() => {
+            Logger.log(`Could not get models.`, true)
+        })
+        if (!modelresults) return
+        const list = (await modelresults.json()).models
+        if (!list) return
+        setModelList(list)
+    }
+    useAutosave({
+        data: ollamaEndpoint,
+        onSave: getModels,
+        interval: 1000,
+    })
 
+    return (
+        <ScrollView style={styles.mainContainer}>
+            <Text style={styles.title}>URL</Text>
+            <TextInput
+                style={styles.input}
+                value={ollamaEndpoint}
+                onChangeText={(value) => {
+                    setOllamaEndpoint(value)
+                }}
+                placeholder="eg. http://127.0.0.1:5000"
+                placeholderTextColor={Style.getColor('primary-text2')}
+            />
+            {ollamaEndpoint && (
+                <HeartbeatButton
+                    api={ollamaEndpoint}
+                    apiFormat={(s: string) => {
+                        const url = new URL('api/tags', s)
+                        return url.toString()
+                    }}
+                />
+            )}
             <View style={styles.dropdownContainer}>
                 <Text style={styles.title}>Model</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Dropdown
-                        value={mancerModel}
+                        value={ollamaModel}
                         data={modelList}
                         labelField="name"
-                        valueField="id"
+                        valueField="name"
                         onChange={(item) => {
-                            if (item.name === mancerModel?.name) return
-                            setMancerModel(item)
+                            if (item.name === ollamaModel?.name) return
+                            setOllamaModel(item)
                         }}
                         placeholder="Select Model"
                         {...Style.drawer.default}
                     />
-
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
@@ -101,45 +87,41 @@ const Mancer = () => {
                 </View>
             </View>
 
-            {mancerModel !== undefined && (
+            {ollamaModel !== undefined && modelList.length > 0 && (
                 <View style={styles.modelInfo}>
                     <View style={{ flexDirection: 'row' }}>
                         <View>
                             <Text style={{ color: Style.getColor('primary-text2') }}>
-                                Context Size
+                                Parameters
                             </Text>
                             <Text style={{ color: Style.getColor('primary-text2') }}>
-                                Generation Limit
+                                Quantization
                             </Text>
-                            <Text style={{ color: Style.getColor('primary-text2') }}>
-                                Completion Cost
-                            </Text>
-                            <Text style={{ color: Style.getColor('primary-text2') }}>
-                                Prompt Cost
-                            </Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>Format</Text>
+                            <Text style={{ color: Style.getColor('primary-text2') }}>Family</Text>
                         </View>
-                        <View style={{ marginLeft: 8 }}>
+                        <View style={{ marginLeft: 16 }}>
                             <Text style={{ color: Style.getColor('primary-text2') }}>
-                                : {mancerModel.limits.context}
+                                : {ollamaModel.details.parameter_size}
                             </Text>
                             <Text style={{ color: Style.getColor('primary-text2') }}>
-                                : {mancerModel.limits.completion}
+                                : {ollamaModel.details.quantization_level}
                             </Text>
                             <Text style={{ color: Style.getColor('primary-text2') }}>
-                                : {mancerModel.pricing.completion}
+                                : {ollamaModel.details.format}
                             </Text>
                             <Text style={{ color: Style.getColor('primary-text2') }}>
-                                : {mancerModel.pricing.prompt}
+                                : {ollamaModel.details.family}
                             </Text>
                         </View>
                     </View>
                 </View>
             )}
-        </View>
+        </ScrollView>
     )
 }
 
-export default Mancer
+export default Ollama
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -159,8 +141,7 @@ const styles = StyleSheet.create({
     },
 
     input: {
-        flex: 1,
-        color: Style.getColor('primary-text2'),
+        color: Style.getColor('primary-text1'),
         borderColor: Style.getColor('primary-brand'),
         borderWidth: 1,
         paddingVertical: 4,
@@ -169,16 +150,16 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
 
+    dropdownContainer: {
+        marginTop: 16,
+    },
+
     button: {
         padding: 5,
         borderColor: Style.getColor('primary-brand'),
         borderWidth: 1,
         borderRadius: 4,
         marginLeft: 8,
-    },
-
-    dropdownContainer: {
-        marginTop: 16,
     },
 
     modelInfo: {
@@ -190,3 +171,17 @@ const styles = StyleSheet.create({
         paddingBottom: 24,
     },
 })
+
+type OllamaModel = {
+    name: string
+    modified_at: Date
+    size: number
+    digest: string
+    details: {
+        format: string
+        family: string
+        families: null | string[]
+        parameter_size: string
+        quantization_level: string
+    }
+}

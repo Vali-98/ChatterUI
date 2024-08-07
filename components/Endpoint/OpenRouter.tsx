@@ -1,4 +1,4 @@
-import { FontAwesome } from '@expo/vector-icons'
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { Global, Style, Logger } from '@globals'
 import { useCallback, useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
@@ -75,23 +75,37 @@ const OpenRouter = () => {
 
             <View style={styles.dropdownContainer}>
                 <Text style={{ color: Style.getColor('primary-text1'), fontSize: 16 }}>Model</Text>
-                <Dropdown
-                    value={openRouterModel}
-                    data={modelList}
-                    labelField="id"
-                    valueField="id"
-                    onChange={(item) => {
-                        if (item.id === openRouterModel?.id) return
-                        setOpenRouterModel(item)
-                    }}
-                    {...Style.drawer.default}
-                    placeholder="Select Model"
-                />
+
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Dropdown
+                        value={openRouterModel}
+                        data={modelList}
+                        labelField="id"
+                        valueField="id"
+                        onChange={(item) => {
+                            if (item.id === openRouterModel?.id) return
+                            setOpenRouterModel(item)
+                        }}
+                        {...Style.drawer.default}
+                        placeholder="Select Model"
+                    />
+
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            getModels()
+                        }}>
+                        <MaterialIcons
+                            name="refresh"
+                            color={Style.getColor('primary-text1')}
+                            size={24}
+                        />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             {openRouterModel !== undefined && (
                 <View style={styles.modelInfo}>
-                    <Text style={{ ...styles.title, marginBottom: 8 }}>{openRouterModel.id}</Text>
                     <View style={{ flexDirection: 'row' }}>
                         <View>
                             <Text style={{ color: Style.getColor('primary-text2') }}>
@@ -152,8 +166,9 @@ const styles = StyleSheet.create({
     },
 
     title: {
+        paddingTop: 8,
         color: Style.getColor('primary-text1'),
-        fontSize: 20,
+        fontSize: 16,
     },
 
     subtitle: {
@@ -187,7 +202,8 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         backgroundColor: Style.getColor('primary-surface2'),
         flex: 1,
-        padding: 16,
-        marginTop: 12,
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        paddingBottom: 24,
     },
 })

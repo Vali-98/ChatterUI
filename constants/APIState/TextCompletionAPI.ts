@@ -1,4 +1,5 @@
 import { Global } from '@constants/GlobalValues'
+import { Logger } from '@constants/Logger'
 import { SamplerID } from '@constants/Samplers'
 
 import { APIBase, APISampler } from './BaseAPI'
@@ -49,6 +50,7 @@ class TextCompletionAPI extends APIBase {
     inference = async () => {
         const endpoint = this.getString(Global.CompletionsEndpoint)
         const key = this.getString(Global.CompletionsKey)
+        Logger.log(`Using endpoint: TGWUI`)
         this.readableStreamResponse(
             new URL('/v1/completions', endpoint).toString(),
             JSON.stringify(this.buildPayload()),

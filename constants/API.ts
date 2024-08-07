@@ -9,4 +9,5 @@ export const enum API {
     LOCAL = 'local',
     OPENROUTER = 'openrouter',
     OPENAI = 'openai',
+    OLLAMA = 'ollama',
 }
