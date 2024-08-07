@@ -64,6 +64,8 @@ Currently untested as I do have the resources to develop for IoS. Assistance her
 
 ### Fix For Text Streaming in Development
 
+(Note: This is only applicable for versions prior to Expo SDK 51 in 20fbff2fb6375cfd0d76acf06a9cd13ae9126c57)
+
 ReactNativeFlipper causes streaming to break on Android development builds. To fix this, navigate to:
 
 `android/app/src/main/java/com/Vali98/ChatterUI/MainApplication.kt`
