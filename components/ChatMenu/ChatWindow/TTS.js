@@ -1,6 +1,5 @@
 import { View, TouchableOpacity } from 'react-native'
 import * as Speech from 'expo-speech'
-import {  } from 'react-native-gesture-handler'
 import { useState } from 'react'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Color } from '@globals'

@@ -1,11 +1,10 @@
-import { SafeAreaView, Text, StyleSheet, View } from 'react-native'
+import { SafeAreaView, Text, StyleSheet, View, ScrollView } from 'react-native'
 import { Stack } from 'expo-router'
 import { useMMKVString } from 'react-native-mmkv'
 import { Global, Color, API } from '@globals'
 import { useEffect } from 'react'
 import { Dropdown } from 'react-native-element-dropdown'
 import { KAI, Horde, TGWUI, Mancer, TextCompletions, Local, OpenRouter } from '@components/Endpoint'
-import { ScrollView } from 'react-native-gesture-handler'
 const APIMenu = () => {
 
     const [APIType, setAPIType] = useMMKVString(Global.APIType)

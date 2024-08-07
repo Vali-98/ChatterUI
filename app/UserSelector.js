@@ -1,6 +1,5 @@
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Modal, TextInput, Alert, ToastAndroid } from 'react-native'
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, ToastAndroid } from 'react-native'
 import { Stack, useRouter } from 'expo-router'
-import { ScrollView } from 'react-native-gesture-handler'
 import { useState, useEffect } from 'react'
 import { Global, Color, Users } from '@globals'
 import { useMMKVString } from 'react-native-mmkv'
