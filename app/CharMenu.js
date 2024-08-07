@@ -31,7 +31,7 @@ const CharMenu = () => {
     const [showDownload, setShowDownload] = useState(false)
 
     const getCharacterList = async () => {
-        await FS.readDirectoryAsync(FS.documentDirectory + 'characters/').then((response) => {
+        await Characters.getCardList().then((response) => {
             setCharacterList(response)
         }).catch(error => console.log(`Could not retrieve characters.\n${error}`))
     }
@@ -71,7 +71,6 @@ const CharMenu = () => {
         })
 
     }
-
 
     return (
 
