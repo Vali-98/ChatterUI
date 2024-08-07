@@ -45,7 +45,7 @@ const ChatItemLast = ({ id }) => {
         )
             .then(() => setImageExists(true))
             .catch(() => setImageExists(false))
-        setPlaceholderText(messages.at(id + 1).mes)
+        setPlaceholderText(message)
     }, [message])
 
     useEffect(() => {
@@ -117,7 +117,11 @@ const ChatItemLast = ({ id }) => {
 
     const deltaTime = Math.max(
         0,
-        ((new Date(message.gen_finished) - new Date(message.gen_started)) / 1000).toFixed(0)
+        (
+            ((nowGenerating ? new Date() : new Date(message.gen_finished)) -
+                new Date(message.gen_started)) /
+            1000
+        ).toFixed(0)
     )
 
     return (
@@ -227,7 +231,7 @@ const ChatItemLast = ({ id }) => {
             </View>
 
             {((id === messages?.length - 2 &&
-                message.name === messages[0].character_name &&
+                message.name === charName &&
                 message?.swipes !== undefined &&
                 id !== 0) ||
                 (id === 0 && message?.swipes !== undefined && message?.swipes?.length !== 1)) && (

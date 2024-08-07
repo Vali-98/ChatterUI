@@ -125,6 +125,18 @@ export namespace Chats {
         })
     }
 
+    export const saveCurrentFile = async (charName: string, currentChat: string) => {
+        //const _charName = charName === '' ? mmkv.getString(Global.CurrentCharacter) : charName;
+        //const _currentChat = currentChat === '' ? mmkv.getString(Global.CurrentChat) : currentChat;
+        const messages = JSON.parse(mmkv.getString(Global.Messages) ?? '[]')
+        if (messages.length === 0) return
+        FS.writeAsStringAsync(
+            getFileDir(charName, currentChat),
+            messages.map((item: any) => JSON.stringify(item)).join('\u000d\u000a'),
+            { encoding: FS.EncodingType.UTF8 }
+        ).catch((error) => console.log(`Could not save file! ${error}`))
+    }
+
     export const saveFile = async (messages: string[], charName: string, currentChat: string) => {
         //const _charName = charName === '' ? mmkv.getString(Global.CurrentCharacter) : charName;
         //const _currentChat = currentChat === '' ? mmkv.getString(Global.CurrentChat) : currentChat;

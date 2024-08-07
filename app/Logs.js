@@ -1,7 +1,7 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Color, Global, saveStringExternal } from '@globals'
+import { Color, Global, Logger, saveStringExternal } from '@globals'
 import { Stack } from 'expo-router'
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { useMMKVObject } from 'react-native-mmkv'
 
 const Logs = () => {
@@ -14,16 +14,41 @@ const Logs = () => {
         saveStringExternal('logs.txt', data, 'text/plain')
     }
 
+    const handleFlushLogs = () => {
+        Alert.alert(
+            `Delete Logs`,
+            `Are you sure you want to delete logs? This cannot be undone.`,
+            [
+                { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+                {
+                    text: 'Confirm',
+                    onPress: () => {
+                        Logger.flushLogs()
+                    },
+                    style: 'destructive',
+                },
+            ],
+            { cancelable: true }
+        )
+    }
+
     return (
         <View style={styles.container}>
             <Stack.Screen
                 options={{
                     headerRight: () => (
-                        <TouchableOpacity
-                            style={{ marginRight: 20, marginTop: 12 }}
-                            onPress={handleExportLogs}>
-                            <FontAwesome name="download" size={28} color={Color.Button} />
-                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity
+                                style={{ marginRight: 30, marginTop: 12 }}
+                                onPress={handleFlushLogs}>
+                                <FontAwesome name="trash" size={28} color={Color.Button} />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ marginRight: 20, marginTop: 12 }}
+                                onPress={handleExportLogs}>
+                                <FontAwesome name="download" size={28} color={Color.Button} />
+                            </TouchableOpacity>
+                        </View>
                     ),
                 }}
             />

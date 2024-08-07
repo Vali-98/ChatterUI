@@ -23,4 +23,8 @@ export namespace Logger {
     export const debug = (data: string) => {
         if (__DEV__) console.log(`[Debug]: `, data)
     }
+
+    export const flushLogs = () => {
+        mmkv.set(Global.Logs, '[]')
+    }
 }
