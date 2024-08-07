@@ -55,11 +55,13 @@ const Settings = () => {
                     <Text style={styles.largeButtonText}>Logs</Text>
                 </TouchableOpacity>
 
-                {/*<TouchableOpacity
-                    style={styles.largeButton}
-                    onPress={() => router.push('LorebookMenu')}>
-                    <Text style={styles.largeButtonText}>Lorebooks</Text>
-                </TouchableOpacity> */}
+                {__DEV__ && (
+                    <TouchableOpacity
+                        style={styles.largeButton}
+                        onPress={() => router.push('LorebookMenu')}>
+                        <Text style={styles.largeButtonText}>Lorebooks</Text>
+                    </TouchableOpacity>
+                )}
             </View>
         </SafeAreaView>
     )

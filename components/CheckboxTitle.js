@@ -2,7 +2,7 @@ import { Color } from '@globals'
 import CheckBox from '@react-native-community/checkbox'
 import { View, Text } from 'react-native'
 
-const CheckboxTitle = ({ name, body, varname, setValue }) => {
+const CheckboxTitle = ({ name, body, varname, setValue = undefined, onChange = undefined }) => {
     return (
         <View style={{ flexDirection: `row`, alignItems: `center`, paddingVertical: 4 }}>
             <CheckBox
@@ -10,7 +10,11 @@ const CheckboxTitle = ({ name, body, varname, setValue }) => {
                 onFillColor={Color.White}
                 onCheckColor={Color.White}
                 value={body[varname]}
-                onValueChange={(value) => setValue({ ...body, [varname]: value })}
+                onValueChange={
+                    onChange !== undefined
+                        ? (value) => onChange(value)
+                        : (value) => setValue({ ...body, [varname]: value })
+                }
             />
             <Text style={{ paddingLeft: 8, color: Color.Text }}>{name}</Text>
         </View>

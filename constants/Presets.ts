@@ -30,6 +30,7 @@ export namespace Presets {
             'mirostat_eta',
             'grammar',
             'dynatemp_range',
+            'smoothing_factor',
         ],
         [API.TGWUI]: [
             'max_length',
@@ -65,6 +66,7 @@ export namespace Presets {
             'freq_pen',
             'presence_pen',
             'dynatemp_range',
+            'smoothing_factor',
         ],
         [API.HORDE]: [
             'max_length',
@@ -109,6 +111,8 @@ export namespace Presets {
             'seed',
             'typical',
             'ban_eos_tokens',
+
+            'smoothing_factor',
             'mirostat_mode',
             'mirostat_tau',
             'mirostat_eta',
@@ -184,6 +188,7 @@ export namespace Presets {
             max_length: 4096,
 
             dynatemp_range: 0,
+            smoothing_factor: 0,
         }
     }
 

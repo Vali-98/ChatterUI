@@ -19,7 +19,7 @@ const ChatWindow = ({ messages }) => {
             .map((message, index) => ({
                 index: index,
                 message: message,
-                key: message.send_date,
+                key: index,
             }))
             .reverse()
     }

@@ -102,6 +102,10 @@ const PresetMenu = () => {
             type: SLIDER,
             data: { name: 'Min P', precision: 2, step: 0.01, min: 0, max: 1 },
         },
+        smoothing_factor: {
+            type: SLIDER,
+            data: { name: 'Smoothing Factor', precision: 2, min: 0, max: 10 },
+        },
         typical: {
             type: SLIDER,
             data: { name: 'Typical Sampling', precision: 2, min: 0, max: 1 },
