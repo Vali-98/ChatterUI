@@ -32,7 +32,7 @@
     "babel-plugin-module-resolver": "^5.0.0",
     "babel-plugin-react-compiler": "^0.0.0-experimental-592953e-20240517",
     "bert-tokenizer": "^1.1.8",
-    "cui-llama.rn": "^1.0.1",
+    "cui-llama.rn": "^1.0.2",
     "drizzle-orm": "^0.30.10",
     "eas-cli": "^9.1.0",
     "expo": "^51.0.21",
