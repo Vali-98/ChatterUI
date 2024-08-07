@@ -197,9 +197,12 @@ export const getPresetList = async (api = apiType()) => {
 }
 
 export const uploadPreset = async (api = apiType()) => {
-    return DocumentPicker.getDocumentAsync({type:'application/json'}).then((result) => {
-        if(result.canceled) return
-        let name = result.assets[0].name.replace(`.json`, '')
+    return DocumentPicker.getDocumentAsync({type:['application/*']}).then((result) => {
+        if(result.canceled || !result.assets[0].name.endsWith('json') || !result.assets[0].name.endsWith('settings')) {
+            ToastAndroid.show(`Invalid File Type!`, 3000)    
+            return
+        }
+        let name = result.assets[0].name.replace(`.json`, '').replace('.settings', '')
         return FS.copyAsync({
             from: result.assets[0].uri, 
             to: `${FS.documentDirectory}/presets/${api}/${name}.json`
