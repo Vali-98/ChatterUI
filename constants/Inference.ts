@@ -217,7 +217,7 @@ const constructKAIPayload = () => {
     }
 }
 
-const constructHordePayload = async () => {
+const constructHordePayload = () => {
     const preset = getObject(Global.PresetData)
     const currentInstruct = instructReplaceMacro()
     const hordeModels = getObject(Global.HordeModels)
@@ -518,7 +518,6 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
     Logger.log(`Using Horde`)
 
     const payload = constructHordePayload()
-
     const request = await fetch(`https://stablehorde.net/api/v2/generate/text/async`, {
         method: 'POST',
         body: JSON.stringify(payload),
@@ -529,17 +528,17 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
             'content-type': 'application/json',
         },
     })
+
     if (request.status === 401) {
         Logger.log(`Invalid API Key`, true)
         stopGenerating()
         return
     }
     if (request.status !== 202) {
-        // TODO: switch case per error type
         Logger.log(`Request failed.`)
         stopGenerating()
         const body = await request.json()
-        Logger.log(body.message)
+        Logger.log(JSON.stringify(body))
         for (const e of body.errors) Logger.log(e)
         return
     }

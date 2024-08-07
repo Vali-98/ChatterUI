@@ -195,6 +195,12 @@ export namespace Characters {
     export const getDir = (charName: string) => {
         return `${FS.documentDirectory}characters/${charName}`
     }
+
+    export const exists = async (charName: string) => {
+        return FS.getInfoAsync(getDir(charName)).then((info) => {
+            return info.exists
+        })
+    }
 }
 
 type CharacterCardV1 = {

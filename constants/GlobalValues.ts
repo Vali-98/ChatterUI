@@ -5,6 +5,7 @@ export const enum Global {
     EditedWindow = 'editedwindow', // exit editing window confirmation
     //Messages = 'messages',
     Logs = 'logs',
+    RecentMessages = 'recentmessages',
     // Character
 
     CurrentCharacter = 'currentchar', // current char filename, locates dir

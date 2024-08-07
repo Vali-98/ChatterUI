@@ -31,22 +31,6 @@ export {
     LlamaTokenizer,
 }
 
-/*
-    Partition data
-    /globals
-        |- index.js
-        |- Color
-        |- Global
-        |- API
-        |- Presets
-        |- Chars
-        |- Chats
-        |- Users
-        |- Filesystem
-    
-    globals file becoming too crowded
-*/
-
 export const enum Color {
     Header = '#1e1e1e',
     Background = '#222',
