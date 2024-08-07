@@ -35,12 +35,16 @@ const TTS: React.FC<TTSProps> = ({ message, isLast }) => {
         }
         setIsSpeaking(true)
         if (await Speech.isSpeakingAsync()) Speech.stop()
-        const chunks = message
-            .split(/[\n.,]/)
-            .map((item) => item.trim())
-            .filter((item) => item.length > 0)
-        Logger.debug('TTS started with ' + chunks.length + ' chunks')
-        chunks.forEach((chunk, index) =>
+        const filter = /([!?.,])/
+        const finalchunks: Array<string> = []
+        const chunks = message.split(filter)
+        chunks.forEach(
+            (item, index) =>
+                index > 0 && filter.test(item) && finalchunks.push(chunks.at(index - 1) + item)
+        )
+        console.log(finalchunks)
+        Logger.debug('TTS started with ' + finalchunks.length + ' chunks')
+        finalchunks.forEach((chunk, index) =>
             Speech.speak(chunk, {
                 language: currentSpeaker?.language,
                 voice: currentSpeaker?.identifier,

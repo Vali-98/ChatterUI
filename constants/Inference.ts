@@ -31,6 +31,10 @@ export const continueResponse = () => {
 }
 
 export const generateResponse = async () => {
+    if (Chats.useChat.getState().nowGenerating) {
+        Logger.log('Generation already in progress', true)
+        return
+    }
     Chats.useChat.getState().startGenerating()
     const setAbortFunction = Chats.useChat.getState().setAbortFunction
     Logger.log(`Obtaining response.`)
