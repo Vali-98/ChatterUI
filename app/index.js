@@ -388,7 +388,7 @@ const createChatEntry = (name, is_user, message) => {
 		],
 	}
 }
-function humanizedISO8601DateTime(date) {
+const  humanizedISO8601DateTime = (date) => {
     let baseDate = typeof date === 'number' ? new Date(date) : new Date();
     let humanYear = baseDate.getFullYear();
     let humanMonth = (baseDate.getMonth() + 1);
@@ -402,7 +402,7 @@ function humanizedISO8601DateTime(date) {
 };
 
 
-async function fetchWithTimeout(resource, options = {}) {
+const fetchWithTimeout = async (resource, options = {}) => {
 	const { timeout = 200 } = options;
 	
 	const controller = new AbortController();
