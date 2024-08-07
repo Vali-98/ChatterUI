@@ -8,5 +8,6 @@ const config = getDefaultConfig(__dirname, {
 })
 
 config.resolver.sourceExts.push('sql')
+config.resolver.sourceExts.push('gguf')
 
 module.exports = config

@@ -13,7 +13,7 @@ import { create } from 'zustand'
 
 import { Global } from './GlobalValues'
 import { Logger } from './Logger'
-import { Llama3Tokenizer } from './Tokenizer/tokenizer'
+import { Tokenizer } from './Tokenizer'
 import { mmkv } from './mmkv'
 
 type CharacterTokenCache = {
@@ -23,7 +23,7 @@ type CharacterTokenCache = {
 }
 
 type CharacterCardState = {
-    card: CharacterCardV2 | undefined
+    card?: CharacterCardV2
     tokenCache: CharacterTokenCache | undefined
     id: number | undefined
     setCard: (id: number) => Promise<string | undefined>
@@ -34,129 +34,130 @@ type CharacterCardState = {
 }
 
 export namespace Characters {
-    export const useUserCard = create<CharacterCardState>()(
-        (set, get: () => CharacterCardState) => ({
-            id: undefined,
-            card: undefined,
-            tokenCache: undefined,
-            setCard: async (id: number) => {
-                let start = performance.now()
-                const card = await db.query.card(id)
-                Logger.debug(`[User] time for database query: ${performance.now() - start}`)
-                start = performance.now()
-                set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
-                Logger.debug(`[User] time for zustand set: ${performance.now() - start}`)
-                mmkv.set(Global.UserID, id)
-                return card?.data.name
-            },
-            unloadCard: () => {
-                set((state) => ({
-                    ...state,
-                    id: undefined,
-                    card: undefined,
-                    tokenCache: undefined,
-                }))
-            },
-            getImage: () => {
-                return getImageDir(get().card?.data.image_id ?? 0)
-            },
-            updateImage: async (sourceURI: string) => {
-                const id = get().id
-                const oldImageID = get().card?.data.image_id
-                const card = get().card
-                if (!id || !oldImageID || !card) {
-                    Logger.log('Could not get data, something very wrong has happned!', true)
-                    return
-                }
-                const imageID = new Date().getTime()
-                await db.mutate.updateCardField('image_id', imageID, id)
-                await deleteImage(oldImageID)
-                await copyImage(sourceURI, imageID)
-                card.data.image_id = imageID
-                set((state) => ({ ...state, card: card }))
-            },
-            getCache: (userName: string) => {
-                const cache = get().tokenCache
-                if (cache && cache?.otherName === useCharacterCard.getState().card?.data.name)
-                    return cache
+    export const useUserCard = create<CharacterCardState>()((set, get) => ({
+        id: undefined,
+        card: undefined,
+        tokenCache: undefined,
+        setCard: async (id: number) => {
+            let start = performance.now()
+            const card = await db.query.card(id)
+            Logger.debug(`[User] time for database query: ${performance.now() - start}`)
+            start = performance.now()
+            set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
+            Logger.debug(`[User] time for zustand set: ${performance.now() - start}`)
+            mmkv.set(Global.UserID, id)
+            return card?.data.name
+        },
+        unloadCard: () => {
+            set((state) => ({
+                ...state,
+                id: undefined,
+                card: undefined,
+                tokenCache: undefined,
+            }))
+        },
+        getImage: () => {
+            return getImageDir(get().card?.data.image_id ?? 0)
+        },
+        updateImage: async (sourceURI: string) => {
+            const id = get().id
+            const oldImageID = get().card?.data.image_id
+            const card = get().card
+            if (!id || !oldImageID || !card) {
+                Logger.log('Could not get data, something very wrong has happned!', true)
+                return
+            }
+            const imageID = new Date().getTime()
+            await db.mutate.updateCardField('image_id', imageID, id)
+            await deleteImage(oldImageID)
+            await copyImage(sourceURI, imageID)
+            card.data.image_id = imageID
+            set((state) => ({ ...state, card: card }))
+        },
+        getCache: (userName: string) => {
+            const cache = get().tokenCache
+            if (cache && cache?.otherName === userName) return cache
 
-                const card = get().card
-                if (!card)
-                    return {
-                        otherName: userName,
-                        description_length: 0,
-                        examples_length: 0,
-                    }
-                const description = replaceMacros(card.data.description)
-                const examples = replaceMacros(card.data.mes_example)
-                const newCache = {
+            const card = get().card
+            if (!card)
+                return {
                     otherName: userName,
-                    description_length: Llama3Tokenizer.encode(description).length,
-                    examples_length: Llama3Tokenizer.encode(examples).length,
+                    description_length: 0,
+                    examples_length: 0,
                 }
+            const description = replaceMacros(card.data.description)
+            const examples = replaceMacros(card.data.mes_example)
+            const getTokenCount = Tokenizer.useTokenizer.getState().getTokenCount
+            const newCache = {
+                otherName: userName,
+                description_length: getTokenCount(description),
+                examples_length: getTokenCount(examples),
+            }
 
-                set((state) => ({ ...state, tokenCache: newCache }))
-                return newCache
-            },
-        })
-    )
+            set((state) => ({ ...state, tokenCache: newCache }))
+            return newCache
+        },
+    }))
 
-    export const useCharacterCard = create<CharacterCardState>()(
-        (set, get: () => CharacterCardState) => ({
-            id: undefined,
-            card: undefined,
-            tokenCache: undefined,
-            setCard: async (id: number) => {
-                let start = performance.now()
-                const card = await db.query.card(id)
-                Logger.debug(`[Characters] time for database query: ${performance.now() - start}`)
-                start = performance.now()
-                set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
+    export const useCharacterCard = create<CharacterCardState>()((set, get) => ({
+        id: undefined,
+        card: undefined,
+        tokenCache: undefined,
+        setCard: async (id: number) => {
+            let start = performance.now()
+            const card = await db.query.card(id)
+            Logger.debug(`[Characters] time for database query: ${performance.now() - start}`)
+            start = performance.now()
+            set((state) => {
+                return { ...state, card: card, id: id, tokenCache: undefined }
+            })
+            Logger.debug(`[Characters] time for zustand set: ${performance.now() - start}`)
+            return card?.data.name
+        },
+        unloadCard: () => {
+            set((state) => ({
+                ...state,
+                id: undefined,
+                card: undefined,
+                tokenCache: undefined,
+            }))
+        },
+        getImage: () => {
+            return getImageDir(get().card?.data.image_id ?? 0)
+        },
+        updateImage: async (sourceURI: string) => {
+            const imageID = get().card?.data.image_id
+            if (imageID) return copyImage(sourceURI, imageID)
+        },
+        getCardTest: () => {
+            return get().card
+        },
+        getCache: (charName: string) => {
+            const cache = get().tokenCache
+            console.log(cache)
+            const card = get().card
+            if (cache?.otherName && cache.otherName === useUserCard.getState().card?.data.name)
+                return cache
 
-                Logger.debug(`[Characters] time for zustand set: ${performance.now() - start}`)
-                return card?.data.name
-            },
-            unloadCard: () => {
-                set((state) => ({
-                    ...state,
-                    id: undefined,
-                    card: undefined,
-                    tokenCache: undefined,
-                }))
-            },
-            getImage: () => {
-                return getImageDir(get().card?.data.image_id ?? 0)
-            },
-            updateImage: async (sourceURI: string) => {
-                const imageID = get().card?.data.image_id
-                if (imageID) return copyImage(sourceURI, imageID)
-            },
-            getCache: (charName: string) => {
-                const cache = get().tokenCache
-                if (cache?.otherName && cache.otherName === useUserCard.getState().card?.data.name)
-                    return cache
-
-                const card = get().card
-                if (!card)
-                    return {
-                        otherName: charName,
-                        description_length: 0,
-                        examples_length: 0,
-                    }
-                const description = replaceMacros(card.data.description)
-                const examples = replaceMacros(card.data.mes_example)
-
-                const newCache = {
+            console.log(card)
+            if (!card)
+                return {
                     otherName: charName,
-                    description_length: Llama3Tokenizer.encode(description).length,
-                    examples_length: Llama3Tokenizer.encode(examples).length,
+                    description_length: 0,
+                    examples_length: 0,
                 }
-
-                set((state) => ({ ...state, tokenCache: newCache }))
-                return newCache
-            },
-        })
-    )
+            const description = replaceMacros(card.data.description)
+            const examples = replaceMacros(card.data.mes_example)
+            const getTokenCount = Tokenizer.useTokenizer.getState().getTokenCount
+            const newCache = {
+                otherName: charName,
+                description_length: getTokenCount(description),
+                examples_length: getTokenCount(examples),
+            }
+            set((state) => ({ ...state, tokenCache: newCache }))
+            return newCache
+        },
+    }))
 
     export namespace db {
         export namespace query {
@@ -449,7 +450,6 @@ export namespace Characters {
             const param = new URLSearchParams(text)
             const character_id = param.get('id')?.replaceAll(`"`, '')
             const path = url.pathname.replace('/character/', '')
-            console.log(path)
             if (character_id) return importCharacterFromPyg(character_id)
             else if (uuidRegex.test(path)) return importCharacterFromPyg(path)
             else {

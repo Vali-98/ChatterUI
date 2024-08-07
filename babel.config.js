@@ -16,7 +16,7 @@ module.exports = function (api) {
                 'module-resolver',
                 {
                     root: ['.'],
-                    extension: ['.js', '.ts', '.tsx'],
+                    extension: ['.js', '.jsx', '.ts', '.tsx'],
                     alias: {
                         '@globals': './constants/global',
                         '@components': './components',

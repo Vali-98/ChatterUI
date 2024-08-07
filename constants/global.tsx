@@ -15,7 +15,6 @@ import { MarkdownStyle } from './Markdown'
 import { Presets } from './Presets'
 import { RecentEntry, RecentMessages } from './RecentMessages'
 import { Style } from './Style'
-import { Llama3Tokenizer } from './Tokenizer/tokenizer'
 import { humanizedISO8601DateTime } from './Utils'
 import { mmkv } from './mmkv'
 export {
@@ -31,7 +30,6 @@ export {
     Logger,
     Style,
     MarkdownStyle,
-    Llama3Tokenizer,
 }
 
 // GENERAL FUNCTIONS
@@ -216,7 +214,7 @@ export const initializeApp = async () => {
 
 export const generateDefaultDirectories = async () => {
     // Removed: 'characters', 'instruct', 'persona',
-    const dirs = ['presets', 'lorebooks', 'models']
+    const dirs = ['presets', 'lorebooks', 'models', 'appAssets']
 
     dirs.map(async (dir: string) => {
         await FS.makeDirectoryAsync(`${FS.documentDirectory}${dir}`, {})

@@ -6,7 +6,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { Global } from './GlobalValues'
 import { Logger } from './Logger'
-import { Llama3Tokenizer } from './Tokenizer/tokenizer'
+import { Tokenizer } from './Tokenizer'
 import { replaceMacros } from './Utils'
 import { mmkv, mmkvStorage } from './mmkv'
 
@@ -193,19 +193,18 @@ export namespace Instructs {
                             output_suffix_length: 0,
                             user_alignment_message_length: 0,
                         }
+                    const getTokenCount = Tokenizer.useTokenizer.getState().getTokenCount
                     const newCache: InstructTokenCache = {
                         charName: charName,
                         userName: userName,
-                        system_prompt_length: Llama3Tokenizer.encode(instruct.system_prompt).length,
-                        system_prefix_length: Llama3Tokenizer.encode(instruct.system_prefix).length,
-                        system_suffix_length: Llama3Tokenizer.encode(instruct.system_suffix).length,
-                        input_prefix_length: Llama3Tokenizer.encode(instruct.input_prefix).length,
-                        input_suffix_length: Llama3Tokenizer.encode(instruct.input_suffix).length,
-                        output_prefix_length: Llama3Tokenizer.encode(instruct.output_prefix).length,
-                        output_suffix_length: Llama3Tokenizer.encode(instruct.output_suffix).length,
-                        user_alignment_message_length: Llama3Tokenizer.encode(
-                            instruct.system_prompt
-                        ).length,
+                        system_prompt_length: getTokenCount(instruct.system_prompt),
+                        system_prefix_length: getTokenCount(instruct.system_prefix),
+                        system_suffix_length: getTokenCount(instruct.system_suffix),
+                        input_prefix_length: getTokenCount(instruct.input_prefix),
+                        input_suffix_length: getTokenCount(instruct.input_suffix),
+                        output_prefix_length: getTokenCount(instruct.output_prefix),
+                        output_suffix_length: getTokenCount(instruct.output_suffix),
+                        user_alignment_message_length: getTokenCount(instruct.system_prompt),
                     }
                     set((state) => ({ ...state, tokenCache: newCache }))
                     return newCache

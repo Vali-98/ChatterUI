@@ -35,6 +35,13 @@
             "favicon": "./assets/images/adaptive-icon.png"
         },
         "plugins": [
+            [
+                "expo-custom-assets",
+                {
+                    "assetsPaths": ["./assets/models"],
+                    "assetsDirName": "appAssets"
+                }
+            ],
             "expo-router",
             [
                 "expo-image-picker",

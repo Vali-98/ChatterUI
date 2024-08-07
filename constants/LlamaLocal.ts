@@ -1,4 +1,4 @@
-import { CompletionParams, LlamaContext, initLlama } from 'cui-llama.rn'
+import { CompletionParams, ContextParams, LlamaContext, initLlama } from 'cui-llama.rn'
 import * as FS from 'expo-file-system'
 import { Platform } from 'react-native'
 import DocumentPicker from 'react-native-document-picker'
@@ -38,7 +38,7 @@ type LlamaState = {
         completed: (text: string) => void
     ) => Promise<void>
     stopCompletion: () => Promise<void>
-    tokenLength: (text: string) => Promise<number>
+    tokenLength: (text: string) => number
 }
 
 export type LlamaPreset = {
@@ -89,12 +89,13 @@ export namespace Llama {
                 set((state) => ({ ...state, context: undefined, modelname: undefined }))
             }
 
-            const params = {
+            const params: ContextParams = {
                 model: dir,
                 n_ctx: preset.context_length,
                 n_threads: preset.threads,
                 n_batch: preset.batch,
                 n_gpu_layers: Platform.OS === 'ios' ? preset.gpu_layers : 0,
+                use_mlock: true,
             }
 
             mmkv.set(Global.LocalSessionLoaded, false)
@@ -184,8 +185,8 @@ export namespace Llama {
                     Logger.log('Session loaded could not load from KV cache')
                 })
         },
-        tokenLength: async () => {
-            return -1
+        tokenLength: (text: string) => {
+            return get().context?.tokenizeSync(text)?.tokens?.length ?? 0
         },
     }))
 
