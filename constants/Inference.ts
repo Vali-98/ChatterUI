@@ -600,7 +600,14 @@ const hordeResponse = async (setAbortFunction: AbortFunction) => {
 
     if (aborted) return
 
-    Chats.useChat.getState().setBuffer(result.generations[0].text)
+    const replace = RegExp(
+        constructReplaceStrings()
+            .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+            .join(`|`),
+        'g'
+    )
+
+    Chats.useChat.getState().setBuffer(result.generations[0].text.replaceAll(replace, ''))
     stopGenerating()
 }
 
