@@ -41,8 +41,15 @@ const ChatSelector = () => {
 
     }
 
-    const exportChat = (chatname) => {
-        
+    const exportChat = async (chatname) => {
+        saveStringExternal(
+            chatname,
+            await getChatFile(charName, chatname),
+            "application/*"
+        ).catch((error) => {
+            ToastAndroid.show(`Could not save file.`, 2000)
+            console.log(error)
+        })
     }
 
     return (
@@ -61,16 +68,7 @@ const ChatSelector = () => {
                 <Image source={{uri:getCharacterImageDirectory()}} style={styles.avatar}/>
                 <Text style={styles.chatname}>{chat.replace('.jsonl', '')}</Text>
            
-                <TouchableOpacity style={styles.button} onPress={async () => {
-                    saveStringExternal(
-                        chat,
-                        await getChatFile(charName, chat),
-                        "application/*"
-                    ).catch((error) => {
-                        ToastAndroid.show(`Could not save file.`, 2000)
-                        console.log(error)
-                    })
-                }}>
+                <TouchableOpacity style={styles.button} onPress={() => exportChat(chat)}>
                     <FontAwesome name='download' size={32} color={Color.Button} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => deleteChat(chat)}>

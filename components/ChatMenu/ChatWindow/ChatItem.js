@@ -152,6 +152,9 @@ const ChatItem = ({ message, id, scroll}) => {
                             text: {
                                 color: Color.Text
                             },
+                            list: {
+                                color: Color.Text
+                            },
                         }}
                         rules={{speech}}
                         
