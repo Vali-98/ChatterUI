@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert  } from 'react-native'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
-import { Global, getPresetList, writePreset, loadPreset, deletePreset, uploadPreset } from '@globals'
+import { Global, Color, getPresetList, writePreset, loadPreset, deletePreset, uploadPreset } from '@globals'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import CheckBox from '@react-native-community/checkbox'
 import SliderItem from '@components/PresetMenu/SliderItem'
@@ -46,7 +46,7 @@ const Presets = () => {
     }
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{backgroundColor:Color.Background}}>
         
         <TextBoxModal 
             booleans={[showNewPreset, setShowNewPreset]}
@@ -74,6 +74,7 @@ const Presets = () => {
             <Dropdown 
                 value={selectedItem}
                 style={styles.dropdownbox}
+                selectedTextStyle={styles.selected}
                 data={presetList}
                 labelField={"label"}
                 valueField={"value"}
@@ -92,7 +93,7 @@ const Presets = () => {
                     writePreset(presetName, currentPreset).then(
                     ToastAndroid.show(`Preset Updated!`, 2000)
                 )}}>
-                <FontAwesome  size={24} name='save'/>
+                <FontAwesome  size={24} name='save' color={Color.Button}/>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.button} 
@@ -115,7 +116,7 @@ const Presets = () => {
                             }
                     ])
                 }}> 
-                <FontAwesome  size={24} name='trash' />
+                <FontAwesome  size={24} name='trash' color={Color.Button}/>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.button} onPress={() => {
@@ -130,7 +131,7 @@ const Presets = () => {
                     })
                 })
             }}> 
-                <FontAwesome  size={24} name='upload' />
+                <FontAwesome  size={24} name='upload' color={Color.Button}/>
             </TouchableOpacity>
      
             <TouchableOpacity style={styles.button} onPress={async () => {
@@ -145,11 +146,11 @@ const Presets = () => {
                     });
                 } 
             }}>
-                <FontAwesome  size={24} name='download' />
+                <FontAwesome  size={24} name='download' color={Color.Button }/>
             </TouchableOpacity>
      
-            <TouchableOpacity style={styles.button}>
-                <FontAwesome  size={24} name='plus' onPress={() => {setShowNewPreset(true)}} />
+            <TouchableOpacity style={styles.button} onPress={() => {setShowNewPreset(true)}}>
+                <FontAwesome  size={24} name='plus' color={Color.Button}  />
             </TouchableOpacity>
         </View>
        
@@ -300,13 +301,16 @@ const Presets = () => {
 
         <View style={{flexDirection:`row`, alignItems:`center`, paddingVertical: 4}}>
             <CheckBox 
+                tintColors={{false:Color.DarkContainer, true:Color.White}}
+                onFillColor={Color.White}
+                onCheckColor={Color.White}
                 value={currentPreset.use_default_badwordsids}
                 onValueChange={value => setPresetValue("use_default_badwordsids", value)}
             />
-            <Text style={{paddingLeft: 8}}>Ban EOS Tokens</Text>
+            <Text style={{paddingLeft: 8, color:Color.White }}>Ban EOS Tokens</Text>
         </View>
 
-        <Text style={{alignSelf:'center'}}>Grammar</Text>
+        <Text style={{alignSelf:'center', color:Color.White }}>Grammar</Text>
         <TextInput
             style={styles.grammarbox}
             value={currentPreset.grammar}
@@ -330,18 +334,8 @@ const styles = StyleSheet.create({
         paddingBottom: 150,
     },
 
-    sliderContainer: {
-
-    },
-
-    slider: {
-        flex:1,
-        height: 40,
-    },
-
     grammarbox : {
-        borderWidth: 1,
-        borderRadius: 8,
+        backgroundColor: Color.DarkContainer,
         paddingVertical: 8,
         paddingHorizontal: 8,
         marginVertical:8,
@@ -359,13 +353,18 @@ const styles = StyleSheet.create({
     dropdownbox : {
         flex:1,
         paddingHorizontal: 8,
-        borderWidth: 1,
+        backgroundColor: Color.DarkContainer,
         borderRadius: 8,
     },
 
+    selected : {
+        color: Color.White,
+
+    },
+
     button : {
-        padding:4,
-        borderWidth: 1,
+        padding:5,
+        backgroundColor: Color.DarkContainer,
         borderRadius: 4,
         marginLeft: 8,
     },

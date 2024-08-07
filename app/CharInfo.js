@@ -1,7 +1,7 @@
 import { View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity, Alert, ToastAndroid } from 'react-native'
 import { useState } from 'react'
 
-import { Global, copyCharImage, deleteCharacter, getCharacterCard, getCharacterImageDirectory, saveCharacterCard } from '@globals'
+import { Global, Color, copyCharImage, deleteCharacter, getCharacterCard, getCharacterImageDirectory, saveCharacterCard } from '@globals'
 import { useMMKVString } from 'react-native-mmkv'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { useEffect } from 'react'
@@ -40,7 +40,7 @@ const CharInfo = () => {
                 savecard().then(() => loadcard())
                 ToastAndroid.show(`Character saved!`,ToastAndroid.SHORT)
               }}>
-                <FontAwesome name='save' size={28} />
+                <FontAwesome name='save' size={28} color={Color.Button} />
             </TouchableOpacity>
 
             <TouchableOpacity  style={styles.button} onPress={() => {
@@ -70,7 +70,7 @@ const CharInfo = () => {
                 }
               )}
               }>
-              <FontAwesome name='trash' size={28} />
+              <FontAwesome name='trash' size={28} color={Color.Button} />
             </TouchableOpacity></View>)
     }} />
 
@@ -81,7 +81,7 @@ const CharInfo = () => {
 
         <View style={styles.characterHeaderInfo}>
           
-        <Text style={{fontSize:20, marginBottom: 12,}}>{charName}</Text>
+        <Text style={{fontSize:20, marginBottom: 12, color:Color.White}}>{charName}</Text>
           <View style={styles.buttonContainer}> 
             <TouchableOpacity 
               style={styles.foregroundButton}
@@ -92,7 +92,7 @@ const CharInfo = () => {
                 })
               }}
               >
-              <FontAwesome name='upload' size={20}/>
+              <FontAwesome name='upload' size={20} color={Color.Button}/>
             </TouchableOpacity>
           </View>
 
@@ -101,7 +101,9 @@ const CharInfo = () => {
       
      
 
-      <Text>Description    Tokens: {characterCard?.description && characterCard?.data.description !== undefined && llamaTokenizer.encode(characterCard.description).length}</Text>
+      <Text
+        style={styles.boxText}
+      >Description    Tokens: {characterCard?.description && characterCard?.data.description !== undefined && llamaTokenizer.encode(characterCard.description).length}</Text>
      
       <ScrollView style={styles.inputContainer}>
       <TextInput 
@@ -118,7 +120,7 @@ const CharInfo = () => {
       />
       </ScrollView>
 
-      <Text>First Message</Text>
+      <Text style={styles.boxText}>First Message</Text>
       <ScrollView style={styles.inputContainer}>
       <TextInput 
         style={styles.input}
@@ -142,8 +144,9 @@ const CharInfo = () => {
 const styles = StyleSheet.create({
   mainContainer:{
     flex:1,
-    marginHorizontal:12,
-    marginVertical: 20,
+    paddingHorizontal:12,
+    paddingVertical: 20,
+    backgroundColor: Color.Background
   },
 
   button : {
@@ -170,7 +173,7 @@ const styles = StyleSheet.create({
 
   foregroundButton: {
     padding:8, 
-    borderColor: '#222',
+    borderColor: Color.White,
     borderWidth: 1,
     borderRadius: 4,
   },
@@ -186,14 +189,19 @@ const styles = StyleSheet.create({
 
   inputContainer: {
 		borderWidth: 1,
-		borderColor: '#bbb',
+		borderColor: Color.White,
 		borderRadius: 8, 
 		paddingHorizontal: 8,
     maxHeight: 160,
 	},
 
+  boxText:{
+    color:Color.White, 
+    paddingVertical: 8
+  },
+
   input: {
-    
+    color: Color.White,
     textAlignVertical: 'top',
     paddingVertical:8,
   },

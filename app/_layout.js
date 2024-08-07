@@ -4,11 +4,11 @@ import { TouchableOpacity, View, StyleSheet} from 'react-native'
 import { useEffect } from 'react'
 import { useMMKVString, useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 import { Global, generateDefaultDirectories, createNewDefaultChat, 
-    loadUserCard, createNewUser, writePreset,  writeInstruct,
+    loadUserCard, createNewUser, writePreset,  writeInstruct, Color
 } from '@globals'
+
 import * as FS from 'expo-file-system'
 // init values should be here
-require('fastestsmallesttextencoderdecoder')
 const Layout = () => {
     const router = useRouter()
     
@@ -63,38 +63,43 @@ const Layout = () => {
 	}, []) 
 
     return (
-    <Stack>
-       <Stack.Screen name='index' options={{
-					title: charName,
-                    headerRight : () => 
-                         (<View style={styles.headerButtonContainer}>
-                            {charName !== 'Welcome' && 
-                            <View style={styles.headerButtonContainer}>
-                                <TouchableOpacity style={styles.headerButtonRight} onPress={() => {router.push('ChatSelector')}}>
-                                    <Ionicons name='chatbox' size={28} />
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.headerButtonRight} onPress={() => router.push(`CharInfo`)}>
-                                    <FontAwesome name='cog' size={28} />
-                                </TouchableOpacity>
-                            </View>
-                        }
-                            <TouchableOpacity style={styles.headerButtonRight} onPress={() => {router.push('CharMenu')}}>
-                            <Ionicons name='person' size={28} />
-                            
-                            </TouchableOpacity>
-                            {false &&
-                            <TouchableOpacity style={styles.headerButtonRight} onPress={() => generateDefaults()}>
-                            <Ionicons name='reload' size={28} />
-                            </TouchableOpacity>}
-                        </View>)
-                    ,
-                    headerLeft :() =>  (
-                        <TouchableOpacity style={styles.headerButtonLeft} onPress={() => router.push('Settings')}>
-                            <Ionicons name='menu' size={28} />
+    <Stack screenOptions={{
+        headerStyle: {backgroundColor: Color.Background},
+        navigationBarColor: Color.Background,
+        headerTitleStyle: {color: Color.White},
+        headerTintColor: Color.White,
+    }}>
+       <Stack.Screen 
+        name='index' 
+        options={{         
+            title: charName,
+            headerRight : () => 
+                    (<View style={styles.headerButtonContainer}>
+                    {charName !== 'Welcome' && 
+                    <View style={styles.headerButtonContainer}>
+                        <TouchableOpacity style={styles.headerButtonRight} onPress={() => {router.push('ChatSelector')}}>
+                            <Ionicons name='chatbox' size={28} color={Color.Button} />
                         </TouchableOpacity>
-                    ),
-                   
-                   paddingRight:20,
+                        <TouchableOpacity style={styles.headerButtonRight} onPress={() => router.push(`CharInfo`)}>
+                            <FontAwesome name='cog' size={28} color={Color.Button} />
+                        </TouchableOpacity> 
+                    </View>
+                }
+                    <TouchableOpacity style={styles.headerButtonRight} onPress={() => {router.push('CharMenu')}}>
+                    <Ionicons name='person' size={28} color={Color.Button}/>
+                    
+                    </TouchableOpacity>
+                    {false &&
+                    <TouchableOpacity style={styles.headerButtonRight} onPress={() => generateDefaults()}>
+                    <Ionicons name='reload' size={28} color={Color.Button}/>
+                    </TouchableOpacity>}
+                </View>)
+            ,
+            headerLeft :() =>  (
+                <TouchableOpacity style={styles.headerButtonLeft} onPress={() => router.push('Settings')}>
+                    <Ionicons name='menu' size={28} color={ Color.White}/>
+                </TouchableOpacity>
+            ),
         }}/> 
                 
        <Stack.Screen name='CharMenu' options={{
@@ -120,7 +125,7 @@ const Layout = () => {
                                 )
                                 router.back()
                             }}>
-                                <FontAwesome name='plus' size={28} />
+                                <FontAwesome name='plus' size={28} color={Color.Button} />
                             </TouchableOpacity>
                         </View>),
                          

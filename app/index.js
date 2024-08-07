@@ -1,14 +1,15 @@
 import {
 	View, Text, TextInput,
 	SafeAreaView, TouchableOpacity,
-	StyleSheet, ToastAndroid, ActivityIndicator
+	StyleSheet, ToastAndroid,
 } from 'react-native'
 import { useState, useEffect} from 'react'
 import axios  from 'axios'
 import ChatMenu from '@components/ChatMenu/ChatMenu' 
 import { useMMKVString,  useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import { Global,  getChatFile,getNewestChatFilename , MessageContext, saveChatFile, getCharacterCard} from '@globals'
+import { Global, Color, getChatFile,getNewestChatFilename , MessageContext, saveChatFile, getCharacterCard} from '@globals'
 import llamaTokenizer from '@constants/tokenizer'
+import { MaterialIcons } from '@expo/vector-icons'
 
 const Home = () => {
 
@@ -201,6 +202,7 @@ const Home = () => {
 					<TextInput
 						style={styles.input}
 						placeholder="Message..."
+						placeholderTextColor={Color.Offwhite}
 						value={newMessage}
 						onChangeText={(text) => setNewMessage(text)}
 						multiline={true}
@@ -213,16 +215,14 @@ const Home = () => {
 							setNowGenerating(false)
 						})	
 					}}>
-					<Text style={styles.sendButtonText}>Stop</Text>
+					<Text>Stop</Text>
 					</TouchableOpacity>
 						:
 					
 					<TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-						<Text style={styles.sendButtonText}>Send</Text>
+						<MaterialIcons name='send' color={Color.Button} size={30}/>
 					</TouchableOpacity>
 					}
-					
-					
 				</View>
 			</View>
 			</MessageContext.Provider>
@@ -234,16 +234,18 @@ const Home = () => {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		flex:1
 	},
 	safeArea: {
 		flex: 1,
+		backgroundColor: Color.Background
 	},
 
 	welcometext : {
 		justifyContent: 'center',
 		margin: 40,
-		fontSize:20
+		fontSize:20,
+		color: Color.White
 	},
 
 	inputContainer: {
@@ -253,6 +255,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 16,
 	},
 	input: {
+		color: Color.White,
 		flex: 1,
 		borderWidth: 1,
 		borderColor: '#ccc',
@@ -261,20 +264,11 @@ const styles = StyleSheet.create({
 		paddingVertical: 8,
 	},
 
-	activity : {
-		marginLeft: 12,
-		padding: 8,
-	},
-
 	sendButton: {
-		marginLeft: 12,
+		marginLeft: 8,
 		padding: 8,
-		borderRadius: 24,
-		backgroundColor: 'blue',
 	},
-	sendButtonText: {
-		color: 'white',
-	},
+	
 });
 
 export default Home;
