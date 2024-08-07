@@ -10,6 +10,7 @@ import Markdown from 'react-native-markdown-package'
 import * as FS from 'expo-file-system'
 import React from 'react'
 import TTSMenu from './TTS'
+import AnimatedEllipsis from 'rn-animated-ellipsis';
 // global chat property for editing
 
 const ChatItem = ({ message, id, scroll}) => {
@@ -207,11 +208,18 @@ const ChatItem = ({ message, id, scroll}) => {
                 </View>
 
                 {!editMode?
+                    (message.name == charName && message.mes == '' && nowGenerating)?
+                    <View style={{...styles.messageTextContainer, padding: 5}}>
+                        <AnimatedEllipsis style={{color:Color.White, fontSize: 20}} />
+                    </View> 
+                    :
                     <TouchableOpacity style={styles.messageTextContainer} activeOpacity={0.7} onLongPress={handleEnableEdit}>
                         <Markdown style={styles.messageText} styles={markdownFormat} rules={{speech}}>
                             {message.mes.trim(`\n`)}
                         </Markdown>
                     </TouchableOpacity  >
+                    
+                    
                     :
                     <View style={styles.messageInput} >
                         <TextInput

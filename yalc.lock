@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "llama.rn": {
+      "signature": "855159b3ee78d3d3639bd9f598ab71c1",
+      "file": true
+    }
+  }
+}
