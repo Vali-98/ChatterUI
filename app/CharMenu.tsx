@@ -1,6 +1,6 @@
 import AnimatedView from '@components/AnimatedView'
 import TextBoxModal from '@components/TextBoxModal'
-import { AntDesign, FontAwesome } from '@expo/vector-icons'
+import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons'
 import { Global, Characters, Chats, Logger, Style } from '@globals'
 import { useRouter, Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
@@ -109,6 +109,22 @@ const CharMenu = () => {
     useEffect(() => {
         getCharacterList()
     }, [])
+
+    if (characterList.length === 0)
+        return (
+            <View style={{ ...styles.mainContainer, alignItems: 'center', marginTop: 30 }}>
+                <Ionicons name="person-outline" color={Style.getColor('primary-text2')} size={60} />
+                <Text
+                    style={{
+                        color: Style.getColor('primary-text2'),
+                        marginTop: 16,
+                        fontStyle: 'italic',
+                        fontSize: 16,
+                    }}>
+                    No Characters Found. Try Importing Some!
+                </Text>
+            </View>
+        )
 
     return (
         <GestureDetector gesture={gesture}>

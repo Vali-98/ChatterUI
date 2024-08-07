@@ -10,7 +10,8 @@ import { useState } from 'react'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import { Characters, Chats, Global, Logger, Style } from '@globals'
 import { RecentEntry, RecentMessages } from '@constants/RecentMessages'
-import { AntDesign, FontAwesome } from '@expo/vector-icons'
+import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons'
+import AnimatedView from '@components/AnimatedView'
 
 const Recents = () => {
     const [recentMessages, setRecentMessages] = useMMKVObject<Array<RecentEntry>>(
@@ -45,56 +46,83 @@ const Recents = () => {
     const showRecents = !nowLoading && recentMessages && recentMessages.length > 0
     if (recentMessages && recentMessages?.length !== 0)
         return (
-            <ScrollView style={styles.mainContainer}>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.title}>Recent</Text>
-                    {!noRecents && (
-                        <TouchableOpacity style={styles.button} onPress={RecentMessages.flush}>
-                            <FontAwesome
-                                size={20}
-                                name="trash"
-                                color={Style.getColor('primary-text1')}
-                            />
-                        </TouchableOpacity>
-                    )}
-                </View>
-                {nowLoading && (
-                    <ActivityIndicator
-                        color={Style.getColor('primary-text2')}
-                        size={'large'}
-                        style={{ marginRight: 24 }}
-                    />
-                )}
-                {showRecents &&
-                    [...recentMessages].reverse()?.map((item, index) => (
-                        <View key={index} style={{ flexDirection: 'row' }}>
-                            <TouchableOpacity
-                                style={styles.longButton}
-                                onPress={() => {
-                                    handleLoadEntry(item)
-                                }}>
-                                <View style={styles.textContainer}>
-                                    <Text style={styles.longButtonTitle}>{item.charName}</Text>
-                                    <Text style={styles.longButtonBody}>{item.chatName}</Text>
-                                </View>
-                                <TouchableOpacity
-                                    style={{ marginTop: 8 }}
-                                    onPress={() => RecentMessages.deleteEntry(item.chatName)}>
-                                    <FontAwesome
-                                        color={Style.getColor('primary-text2')}
-                                        name="close"
-                                        size={28}
-                                    />
-                                </TouchableOpacity>
+            <AnimatedView style={{ flex: 1 }} dy={100} tduration={200} fade={0} fduration={100}>
+                <ScrollView style={styles.mainContainer}>
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.title}>Recent</Text>
+                        {!noRecents && (
+                            <TouchableOpacity style={styles.button} onPress={RecentMessages.flush}>
+                                <FontAwesome
+                                    size={20}
+                                    name="trash"
+                                    color={Style.getColor('primary-text1')}
+                                />
                             </TouchableOpacity>
-                        </View>
-                    ))}
-                {noRecents && <Text style={styles.subtitle}>No Recent Messages</Text>}
-            </ScrollView>
+                        )}
+                    </View>
+                    {nowLoading && (
+                        <ActivityIndicator
+                            color={Style.getColor('primary-text2')}
+                            size={'large'}
+                            style={{ marginRight: 24 }}
+                        />
+                    )}
+                    {showRecents &&
+                        [...recentMessages].reverse()?.map((item, index) => (
+                            <View key={index} style={{ flexDirection: 'row' }}>
+                                <TouchableOpacity
+                                    style={styles.longButton}
+                                    onPress={() => {
+                                        handleLoadEntry(item)
+                                    }}>
+                                    <View style={styles.textContainer}>
+                                        <Text style={styles.longButtonTitle}>{item.charName}</Text>
+                                        <Text style={styles.longButtonBody}>{item.chatName}</Text>
+                                    </View>
+                                    <TouchableOpacity
+                                        style={{ marginTop: 8 }}
+                                        onPress={() => RecentMessages.deleteEntry(item.chatName)}>
+                                        <FontAwesome
+                                            color={Style.getColor('primary-text2')}
+                                            name="close"
+                                            size={28}
+                                        />
+                                    </TouchableOpacity>
+                                </TouchableOpacity>
+                            </View>
+                        ))}
+                    {noRecents && <Text style={styles.subtitle}>No Recent Messages</Text>}
+                </ScrollView>
+            </AnimatedView>
         )
+
+    return (
+        <AnimatedView
+            style={{ flex: 1, marginHorizontal: 30, marginTop: 60, alignItems: 'center' }}
+            dy={100}
+            tduration={200}
+            fade={0}
+            fduration={100}>
+            <Text style={styles.welcometext}>
+                Select A Character{' '}
+                <Ionicons size={14} color={Style.getColor('primary-text1')} name="person" /> To Get
+                Started!
+            </Text>
+            <Text style={{ color: Style.getColor('primary-text2'), marginTop: 8 }}>
+                You can also swipe right to go to characters
+            </Text>
+        </AnimatedView>
+    )
 }
 
 const styles = StyleSheet.create({
+    welcometext: {
+        justifyContent: 'center',
+
+        fontSize: 20,
+        color: Style.getColor('primary-text1'),
+    },
+
     mainContainer: {
         paddingVertical: 16,
         paddingHorizontal: 16,
@@ -104,6 +132,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         flexDirection: 'row',
+        justifyContent: 'space-between',
         marginBottom: 20,
     },
 
@@ -118,7 +147,8 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        padding: 8,
+        padding: 4,
+        paddingHorizontal: 8,
         borderColor: Style.getColor('primary-surface3'),
         borderWidth: 2,
         borderRadius: 4,
