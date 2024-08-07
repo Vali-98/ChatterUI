@@ -137,44 +137,6 @@ const styles = StyleSheet.create({
     },
 })
 
-
-const devReset = async () => {
-
-	await FS.deleteAsync(FS.documentDirectory + 'characters').catch(error => console.log("Couldnt delete?" + error))
-
-
-	const dirinfo = await FS.getInfoAsync(FS.documentDirectory + 'characters/Flux').then( async (dirinfo) => {
-		if(dirinfo.exists){
-			await FS.readDirectoryAsync(FS.documentDirectory + 'characters/Flux').then(response => console.log(response))
-			return
-		}
-		chardata = require('@public/characters/Flux_the_Cat/default_FluxTheCat.json')
-		const charImage =  require('@public/characters/Flux_the_Cat/default_FluxTheCat.png')
-		
-		await FS.makeDirectoryAsync(FS.documentDirectory + 'characters/')
-		
-		await FS.makeDirectoryAsync(FS.documentDirectory + 'characters/Flux The Cat')
-		await FS.makeDirectoryAsync(FS.documentDirectory + 'characters/Flux The Cat/chats')
-		await FS.makeDirectoryAsync(FS.documentDirectory + 'characters/Flux2')
-		await FS.makeDirectoryAsync(FS.documentDirectory + 'characters/Flux2/chats')
-
-		await FS.writeAsStringAsync(FS.documentDirectory + 'characters/Flux The Cat/Flux The Cat.json', JSON.stringify(chardata), {encoding:FS.EncodingType.UTF8})
-		await FS.writeAsStringAsync(FS.documentDirectory + 'characters/Flux2/Flux2.json', JSON.stringify(chardata), {encoding:FS.EncodingType.UTF8})
-		//await FS.writeAsStringAsync(FS.documentDirectory + 'characters/Flux/FluxTheCat.png', charImage, {encoding:FS.EncodingType.Base64})
-		await FS.downloadAsync(
-			Asset.fromModule(require('@public/characters/Flux_the_Cat/default_FluxTheCat.png')).uri ,
-			FS.documentDirectory + 'characters/Flux The Cat/Flux The Cat.png')
-		
-			await FS.downloadAsync(
-				Asset.fromModule(require('@public/characters/Flux_the_Cat/default_FluxTheCat.png')).uri ,
-				FS.documentDirectory + 'characters/Flux2/Flux2.png')
-
-		console.log("Default Files Successfully Generated")
-	}
-		
-	).catch((error) => console.log("Something went wrong!\n" + error))
-}
-
 const defaultPreset = () => {
     return {
         "temp": 1,
