@@ -1,6 +1,6 @@
-import { StyleSheet, KeyboardAvoidingView, FlatList } from 'react-native'
+import { StyleSheet, FlatList } from 'react-native'
 import { ChatItem } from './ChatItem'
-import { Chats, Color, Global } from '@globals'
+import { Chats, Global } from '@globals'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 import { useEffect, useRef } from 'react'
 
@@ -46,16 +46,17 @@ const ChatWindow = () => {
     }
 
     return (
-        <KeyboardAvoidingView style={styles.chatHistory}>
-            <FlatList
-                ref={flatListRef}
-                inverted
-                windowSize={3}
-                data={getItems()}
-                keyExtractor={(item) => item.key.toString()}
-                renderItem={renderItems}
-            />
-        </KeyboardAvoidingView>
+        <FlatList
+            style={styles.chatHistory}
+            ref={flatListRef}
+            keyboardShouldPersistTaps={'handled'}
+            removeClippedSubviews={false}
+            inverted
+            windowSize={3}
+            data={getItems()}
+            keyExtractor={(item) => item.key.toString()}
+            renderItem={renderItems}
+        />
     )
 }
 
