@@ -110,22 +110,6 @@ const CharMenu = () => {
         getCharacterList()
     }, [usePathname()])
 
-    if (characterList.length === 0)
-        return (
-            <View style={{ ...styles.mainContainer, alignItems: 'center', marginTop: 30 }}>
-                <Ionicons name="person-outline" color={Style.getColor('primary-text2')} size={60} />
-                <Text
-                    style={{
-                        color: Style.getColor('primary-text2'),
-                        marginTop: 16,
-                        fontStyle: 'italic',
-                        fontSize: 16,
-                    }}>
-                    No Characters Found. Try Importing Some!
-                </Text>
-            </View>
-        )
-
     return (
         <GestureDetector gesture={gesture}>
             <SafeAreaView style={styles.mainContainer}>
@@ -191,60 +175,82 @@ const CharMenu = () => {
                     }
                     showPaste={true}
                 />
+                {characterList.length === 0 && (
+                    <View style={{ ...styles.mainContainer, alignItems: 'center', marginTop: 30 }}>
+                        <Ionicons
+                            name="person-outline"
+                            color={Style.getColor('primary-text2')}
+                            size={60}
+                        />
+                        <Text
+                            style={{
+                                color: Style.getColor('primary-text2'),
+                                marginTop: 16,
+                                fontStyle: 'italic',
+                                fontSize: 16,
+                            }}>
+                            No Characters Found. Try Importing Some!
+                        </Text>
+                    </View>
+                )}
 
-                <ScrollView>
-                    {characterList.map((character, index) => (
-                        <AnimatedView
-                            style={
-                                character.name === charName
-                                    ? styles.longButtonSelectedContainer
-                                    : styles.longButtonContainer
-                            }
-                            key={index}
-                            dx={Math.min(500 + index * 200, 2000)}
-                            tduration={Math.min(500 + index * 100, 1000)}
-                            fade={0}
-                            fduration={500}>
-                            <TouchableOpacity
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                }}
-                                disabled={nowLoading}
-                                onPress={() => setCurrentCharacter(character.name)}>
-                                <View style={styles.longButton}>
-                                    <Image
-                                        source={{
-                                            uri: Characters.getImageDir(character.name),
-                                        }}
-                                        style={styles.avatar}
-                                    />
-                                    <View>
-                                        <Text style={styles.nametag}>{character.name}</Text>
-                                        <Text style={styles.subtag}>Chats: {character.n}</Text>
-                                    </View>
-                                </View>
-                                {nowLoading && character.name == charName ? (
-                                    <ActivityIndicator
-                                        color={Style.getColor('primary-text2')}
-                                        style={{ paddingLeft: 8 }}
-                                        size={28}
-                                    />
-                                ) : (
-                                    <TouchableOpacity
-                                        onPress={() => setCurrentCharacter(character.name, true)}>
-                                        <AntDesign
-                                            color={Style.getColor('primary-text2')}
-                                            name="idcard"
-                                            size={32}
+                {characterList.length !== 0 && (
+                    <ScrollView>
+                        {characterList.map((character, index) => (
+                            <AnimatedView
+                                style={
+                                    character.name === charName
+                                        ? styles.longButtonSelectedContainer
+                                        : styles.longButtonContainer
+                                }
+                                key={index}
+                                dx={Math.min(500 + index * 200, 2000)}
+                                tduration={Math.min(500 + index * 100, 1000)}
+                                fade={0}
+                                fduration={500}>
+                                <TouchableOpacity
+                                    style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                    }}
+                                    disabled={nowLoading}
+                                    onPress={() => setCurrentCharacter(character.name)}>
+                                    <View style={styles.longButton}>
+                                        <Image
+                                            source={{
+                                                uri: Characters.getImageDir(character.name),
+                                            }}
+                                            style={styles.avatar}
                                         />
-                                    </TouchableOpacity>
-                                )}
-                            </TouchableOpacity>
-                        </AnimatedView>
-                    ))}
-                </ScrollView>
+                                        <View>
+                                            <Text style={styles.nametag}>{character.name}</Text>
+                                            <Text style={styles.subtag}>Chats: {character.n}</Text>
+                                        </View>
+                                    </View>
+                                    {nowLoading && character.name == charName ? (
+                                        <ActivityIndicator
+                                            color={Style.getColor('primary-text2')}
+                                            style={{ paddingLeft: 8 }}
+                                            size={28}
+                                        />
+                                    ) : (
+                                        <TouchableOpacity
+                                            onPress={() =>
+                                                setCurrentCharacter(character.name, true)
+                                            }>
+                                            <AntDesign
+                                                color={Style.getColor('primary-text2')}
+                                                name="idcard"
+                                                size={32}
+                                            />
+                                        </TouchableOpacity>
+                                    )}
+                                </TouchableOpacity>
+                            </AnimatedView>
+                        ))}
+                    </ScrollView>
+                )}
             </SafeAreaView>
         </GestureDetector>
     )
