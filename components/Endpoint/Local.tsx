@@ -28,7 +28,7 @@ const Local = () => {
         return { name: item }
     })
     const [currentModel, setCurrentModel] = useMMKVString(Global.LocalModel)
-    const [downloadLink, setDownloadLink] = useState('')
+    //const [downloadLink, setDownloadLink] = useState('')
     const [preset, setPreset] = useMMKVObject<LlamaPreset>(Global.LocalPreset)
     const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
     const [kvSize, setKVSize] = useState<number>(-1)
@@ -85,18 +85,19 @@ const Local = () => {
         await unloadModel()
     }
 
-    const handleDownload = () => {
+    /*const handleDownload = () => {
         setDownloadLink('')
         Llama.downloadModel(downloadLink).then(() => {
             getModels()
         })
-    }
+    }*/
 
     const handleImport = async () => {
         setModelLoading(true)
         await Llama.importModel().then(() => {
             getModels()
         })
+        await getModels()
         setModelLoading(false)
     }
 
