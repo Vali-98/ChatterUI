@@ -11,4 +11,5 @@ export const enum API {
     OPENAI = 'openai',
     OLLAMA = 'ollama',
     CLAUDE = 'claude',
+    CHATCOMPLETIONS = 'chatcompletions',
 }

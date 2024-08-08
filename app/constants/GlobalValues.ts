@@ -17,7 +17,7 @@ export const enum Global {
 
     // Processing
 
-    NowGenerating = 'nowgenerating', // generation signal
+    // NowGenerating = 'nowgenerating', // generation signal == removed since migrtion of generating state to db
 
     // Management
 
@@ -92,6 +92,10 @@ export const enum Global {
     ClaudeAPIKey = 'claudeapikey',
     ClaudePrefill = 'claudeprefill',
     ClaudeFirstMessage = 'claudefirstmessage',
+
+    ChatCompletionsEndpoint = 'chatcompletionsendpoint',
+    ChatCompletionsKey = 'chatcompletionskey',
+    ChatCompletionsModel = 'chatcompletionsmodel',
 
     TTSSpeaker = 'ttsspeaker',
     TTSEnable = 'ttsenable',

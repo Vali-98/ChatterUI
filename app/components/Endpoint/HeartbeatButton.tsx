@@ -24,7 +24,7 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
     buttonText = 'Test',
     apiFormat = (url: string) => {
         try {
-            const newurl = new URL('/v1/models', api)
+            const newurl = new URL('v1/models', api)
             return newurl.toString()
         } catch (e) {
             return ''

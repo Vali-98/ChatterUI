@@ -10,6 +10,7 @@ import {
     OpenAI,
     Ollama,
     Claude,
+    ChatCompletions,
 } from '@components/Endpoint'
 import { Global, API, Style } from '@globals'
 import { Stack } from 'expo-router'
@@ -26,6 +27,7 @@ const APIMenu = () => {
         { label: 'Ollama', value: API.OLLAMA },
         { label: 'Text Generation Web UI', value: API.TGWUI },
         { label: 'Text Completions', value: API.COMPLETIONS },
+        { label: 'Chat Completions', value: API.CHATCOMPLETIONS },
         { label: 'Horde', value: API.HORDE },
         { label: 'Mancer', value: API.MANCER },
         { label: 'Open Router', value: API.OPENROUTER },
@@ -80,6 +82,7 @@ const APIMenu = () => {
                     {APIType === API.OPENAI && <OpenAI />}
                     {APIType === API.OLLAMA && <Ollama />}
                     {APIType === API.CLAUDE && <Claude />}
+                    {APIType === API.CHATCOMPLETIONS && <ChatCompletions />}
                 </ScrollView>
             </SafeAreaView>
         </AnimatedView>

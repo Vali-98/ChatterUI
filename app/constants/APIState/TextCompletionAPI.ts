@@ -53,6 +53,7 @@ class TextCompletionAPI extends APIBase {
     inference = async () => {
         const endpoint = this.getString(Global.CompletionsEndpoint)
         const key = this.getString(Global.CompletionsKey)
+
         Logger.log(`Using endpoint: Text Completions`)
         this.readableStreamResponse(
             new URL('/v1/completions', endpoint).toString(),

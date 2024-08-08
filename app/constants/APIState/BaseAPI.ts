@@ -197,6 +197,11 @@ export abstract class APIBase implements IAPIBase {
     }
 
     buildChatCompletionContext = (max_length: number) => {
+        const tokenizer =
+            mmkv.getString(Global.APIType) === API.LOCAL
+                ? Llama.useLlama.getState().tokenLength
+                : Tokenizer.useTokenizer.getState().getTokenCount
+
         const messages = [...(Chats.useChat.getState().data?.messages ?? [])]
         const userCard = { ...Characters.useUserCard.getState().card }
         const currentCard = { ...Characters.useCharacterCard.getState().card }
@@ -226,9 +231,19 @@ export abstract class APIBase implements IAPIBase {
 
         let index = messages.length - 1
         for (const message of messages.reverse()) {
+            const swipe_data = message.swipes[message.swipe_id]
             // special case for claude, prefill may be useful!
+            const timestamp_string = `[${swipe_data.send_date.toString().split(' ')[0]} ${swipe_data.send_date.toLocaleTimeString()}]\n`
+            const timestamp_length = currentInstruct.timestamp ? tokenizer(timestamp_string) : 0
 
-            const len = Chats.useChat.getState().getTokenCount(index) + total_length
+            const name_string = `${message.name} :`
+            const name_length = currentInstruct.names ? tokenizer(name_string) : 0
+
+            const len =
+                Chats.useChat.getState().getTokenCount(index) +
+                total_length +
+                name_length +
+                timestamp_length
             if (len > max_length) break
             messageBuffer.push({
                 role: message.is_user ? 'user' : 'assistant',

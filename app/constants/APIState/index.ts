@@ -3,6 +3,7 @@ import { useInference } from 'app/constants/Chat'
 import { Logger } from 'app/constants/Logger'
 
 import { APIBase } from './BaseAPI'
+import chatCompletionsAPI from './ChatCompletionsAPI'
 import claudeAPI from './ClaudeAPI'
 import hordeAPI from './HordeAPI'
 import koboldAPI from './KoboldAPI'
@@ -37,7 +38,7 @@ export const APIState: Record<API, APIBase> = {
     [API.OPENROUTER]: openRouterAPI,
     [API.OLLAMA]: ollamaAPI,
     [API.CLAUDE]: claudeAPI,
-
+    [API.CHATCOMPLETIONS]: chatCompletionsAPI,
     //UNIMPLEMENTED
     [API.NOVELAI]: unimplementedAPI,
     [API.APHRODITE]: unimplementedAPI,
