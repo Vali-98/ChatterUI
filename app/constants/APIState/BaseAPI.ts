@@ -7,11 +7,10 @@ import { Chats, useInference } from 'app/constants/Chat'
 import { InstructType, Instructs } from 'app/constants/Instructs'
 import { Logger } from 'app/constants/Logger'
 import { mmkv } from 'app/constants/MMKV'
-import { SamplerPreset } from 'app/constants/Presets'
 import { replaceMacros } from 'app/constants/Utils'
 import EventSource from 'react-native-sse'
 
-import { SamplerID, Samplers } from '../Samplers'
+import { SamplerID, Samplers, SamplerPreset } from '../SamplerData'
 
 export type APISampler = {
     samplerID: SamplerID

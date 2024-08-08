@@ -1,9 +1,8 @@
 import AnimatedView from '@components/AnimatedView'
-import { APIState } from 'app/constants/APIState'
-import { SamplerPreset } from 'app/constants/Presets'
-import { SamplerID, Samplers } from 'app/constants/Samplers'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Presets, saveStringExternal, Logger, Style, API } from '@globals'
+import { APIState } from 'app/constants/APIState'
+import { Samplers, SamplerPreset } from 'app/constants/SamplerData'
 import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
 import {
@@ -16,7 +15,6 @@ import {
     Alert,
 } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
-import { TextInput } from 'react-native-gesture-handler'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
 import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from './components'
@@ -235,7 +233,7 @@ const SamplerMenu = () => {
                                                 name={samplerItem.friendlyName}
                                             />
                                         )
-                                    case 'custom':
+                                    //case 'custom':
                                     default:
                                         return (
                                             <Text style={styles.warningText}>

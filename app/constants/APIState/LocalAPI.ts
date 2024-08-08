@@ -3,7 +3,7 @@ import { Chats, useInference } from 'app/constants/Chat'
 import { Llama, LlamaPreset } from 'app/constants/LlamaLocal'
 import { Logger } from 'app/constants/Logger'
 import { mmkv } from 'app/constants/MMKV'
-import { SamplerID } from 'app/constants/Samplers'
+import { SamplerID } from 'app/constants/SamplerData'
 import BackgroundService from 'react-native-background-actions'
 
 import { APIBase, APISampler } from './BaseAPI'

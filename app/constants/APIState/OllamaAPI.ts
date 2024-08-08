@@ -1,7 +1,6 @@
 import { Global } from '@constants/GlobalValues'
 import { Logger } from 'app/constants/Logger'
-import { SamplerID } from 'app/constants/Samplers'
-import axios from 'axios'
+import { SamplerID } from 'app/constants/SamplerData'
 
 import { APIBase, APISampler } from './BaseAPI'
 

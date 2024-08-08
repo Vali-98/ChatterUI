@@ -11,12 +11,12 @@ import { Global, AppSettings } from './GlobalValues'
 import { Instructs } from './Instructs'
 import { Llama } from './LlamaLocal'
 import { Logger } from './Logger'
+import { mmkv } from './MMKV'
 import { MarkdownStyle } from './Markdown'
 import { Presets } from './Presets'
 import { RecentEntry, RecentMessages } from './RecentMessages'
 import { Style } from './Style'
 import { humanizedISO8601DateTime } from './Utils'
-import { mmkv } from './MMKV'
 export {
     mmkv,
     Presets,
@@ -125,7 +125,11 @@ export const startupApp = () => {
     // This was in case of initializing new data into Presets, may change with SQL migration
     mmkv.set(
         Global.PresetData,
-        Presets.fixPreset(JSON.parse(mmkv.getString(Global.PresetData) ?? '{}'))
+        Presets.fixPreset(
+            JSON.parse(mmkv.getString(Global.PresetData) ?? '{}'),
+            Global.PresetName,
+            true
+        )
     )
 
     // default horde [0000000000] key is needed
@@ -166,8 +170,8 @@ export const initializeApp = async () => {
     await Presets.getFileList()
         .then((files) => {
             if (files.length > 0) return
-            mmkv.set(Global.PresetData, JSON.stringify(Presets.defaultPreset()))
-            Presets.saveFile('Default', Presets.defaultPreset())
+            mmkv.set(Global.PresetData, JSON.stringify(Presets.defaultPreset))
+            Presets.saveFile('Default', Presets.defaultPreset)
             Logger.log('Created default Preset')
         })
         .catch((error) => Logger.log(`Could not generate default Preset. Reason: ${error}`))

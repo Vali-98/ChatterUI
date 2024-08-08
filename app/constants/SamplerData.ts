@@ -45,39 +45,45 @@ export enum SamplerID {
 
     DYNATEMP_RANGE = 'dynatemp_range',
     SMOOTHING_FACTOR = 'smoothing_factor',
+
+    DRY_MULTIPLIER = 'dry_multiplier',
+    DRY_BASE = 'dry_base',
+    DRY_ALLOWED_LENGTH = 'dry_allowed_length',
+    DRY_SEQUENCE_BREAK = 'dry_sequence_break',
     //...
 }
 
 type InputType = 'slider' | 'textinput' | 'checkbox' | 'custom'
 
+type SamplerStringItem = { type: 'string'; default: string }
+
+type SamplerNumberItem = {
+    type: 'integer' | 'float'
+    default: number
+    min: number
+    max: number
+    step: number
+    precision?: number
+}
+
+type SamplerObjectItem = { type: 'object'; default: object }
+
+type SamplerBooleanItem = { type: 'boolean'; default: boolean }
+
+type SamplerItemValues =
+    | SamplerStringItem
+    | SamplerBooleanItem
+    | SamplerNumberItem
+    | SamplerObjectItem
+
 export type SamplerItem = {
     internalID: SamplerID
     friendlyName: string
     inputType: InputType
-    values:
-        | {
-              type: 'string'
-              default: string
-          }
-        | {
-              type: 'object'
-              default: object
-          }
-        | {
-              type: 'integer' | 'float'
-              default: number
-              min: number
-              max: number
-              step: number
-              precision?: number
-          }
-        | {
-              type: 'boolean'
-              default: boolean
-          }
+    values: SamplerItemValues
 }
 
-export const Samplers: Record<SamplerID, SamplerItem> = {
+export const Samplers = {
     /*Default Sampler definitions here*/
 
     [SamplerID.CONTEXT_LENGTH]: {
@@ -125,6 +131,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 10,
             default: 1,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.DYNATEMP_RANGE]: {
@@ -137,6 +144,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 10,
             default: 1,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.MIN_P]: {
@@ -149,6 +157,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 1,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.TOP_P]: {
@@ -161,6 +170,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 1,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.TOP_A]: {
@@ -173,6 +183,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 1,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.TOP_K]: {
@@ -198,6 +209,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 1.5,
             default: 1,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.REPETITION_PENALTY_RANGE]: {
@@ -210,6 +222,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 4096,
             default: 1,
             step: 1,
+            precision: 0,
         },
     },
     [SamplerID.REPETITION_PENALTY_SLOPE]: {
@@ -222,6 +235,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 10,
             default: 1,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.ENCODER_REPETITION_PENALTY]: {
@@ -234,6 +248,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 1.5,
             default: 1,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.FREQUENCY_PENALTY]: {
@@ -246,6 +261,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 2,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.PRESENCE_PENALTY]: {
@@ -258,6 +274,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 2,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.NO_REPEAT_NGRAM_SIZE]: {
@@ -296,6 +313,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 10,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.TYPICAL]: {
@@ -308,6 +326,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 1,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.TAIL_FREE_SAMPLING]: {
@@ -320,6 +339,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 1,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.EPSILON_CUTOFF]: {
@@ -332,6 +352,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 9,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.ETA_CUTOFF]: {
@@ -344,6 +365,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 20,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.MIROSTAT_MODE]: {
@@ -369,6 +391,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 20,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.MIROSTAT_ETA]: {
@@ -381,6 +404,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 1,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.BAN_EOS_TOKEN]: {
@@ -470,6 +494,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             max: 4,
             default: 0.01,
             step: 0.01,
+            precision: 2,
         },
     },
     [SamplerID.NEGATIVE_PROMPT]: {
@@ -508,7 +533,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
         friendlyName: 'Length Penalty',
         inputType: 'slider',
         values: {
-            type: 'integer',
+            type: 'float',
             min: -5,
             max: 5,
             default: 0,
@@ -521,11 +546,76 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
         friendlyName: 'Penalty Alpha',
         inputType: 'slider',
         values: {
-            type: 'integer',
+            type: 'float',
             min: 0,
             max: 5,
             default: 0,
             step: 0.01,
+            precision: 2,
         },
     },
+    [SamplerID.DRY_MULTIPLIER]: {
+        internalID: SamplerID.DRY_MULTIPLIER,
+        friendlyName: 'Dry Multiplier',
+        inputType: 'slider',
+        values: {
+            type: 'float',
+            min: 0,
+            max: 10,
+            default: 0,
+            step: 0.01,
+            precision: 2,
+        },
+    },
+    [SamplerID.DRY_BASE]: {
+        internalID: SamplerID.DRY_BASE,
+        friendlyName: 'Dry Base',
+        inputType: 'slider',
+        values: {
+            type: 'float',
+            min: 0,
+            max: 10,
+            default: 0,
+            step: 0.01,
+            precision: 2,
+        },
+    },
+    [SamplerID.DRY_ALLOWED_LENGTH]: {
+        internalID: SamplerID.DRY_ALLOWED_LENGTH,
+        friendlyName: 'Dry Allowed Length',
+        inputType: 'slider',
+        values: {
+            type: 'integer',
+            min: 0,
+            max: 8196,
+            default: 0,
+            step: 1,
+            precision: 0,
+        },
+    },
+    [SamplerID.DRY_SEQUENCE_BREAK]: {
+        internalID: SamplerID.DRY_SEQUENCE_BREAK,
+        friendlyName: 'Dry Sequence Break',
+        inputType: 'textinput',
+        values: {
+            type: 'string',
+            default: '',
+        },
+    },
+} as const
+
+type ValueType<V extends SamplerItemValues> = V extends SamplerStringItem
+    ? string
+    : V extends SamplerObjectItem
+      ? object
+      : V extends SamplerNumberItem
+        ? number
+        : boolean
+
+type SamplerValueMap = {
+    [ID in keyof typeof Samplers]: ValueType<(typeof Samplers)[ID]['values']>
+}
+
+export type SamplerPreset = {
+    -readonly [ID in keyof SamplerValueMap]: SamplerValueMap[ID]
 }

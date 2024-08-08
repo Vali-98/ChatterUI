@@ -1,7 +1,7 @@
 import { Global } from '@constants/GlobalValues'
 import { Logger } from 'app/constants/Logger'
-import { SamplerID } from 'app/constants/Samplers'
 import { mmkv } from 'app/constants/MMKV'
+import { SamplerID } from 'app/constants/SamplerData'
 import axios from 'axios'
 
 import { APIBase, APISampler } from './BaseAPI'
@@ -27,16 +27,24 @@ class KoboldAPI extends APIBase {
         { externalName: 'dynatemp_range', samplerID: SamplerID.DYNATEMP_RANGE },
         { externalName: 'smooth_range', samplerID: SamplerID.SMOOTHING_FACTOR },
         { externalName: 'sampler_seed', samplerID: SamplerID.SEED },
+        { externalName: 'dry_multiplier', samplerID: SamplerID.DRY_MULTIPLIER },
+        { externalName: 'dry_base', samplerID: SamplerID.DRY_BASE },
+        { externalName: 'dry_allowed_length', samplerID: SamplerID.DRY_ALLOWED_LENGTH },
+        { externalName: 'dry_sequence_break', samplerID: SamplerID.DRY_SEQUENCE_BREAK },
     ]
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
         const length = payloadFields?.['max_context_length']
+        const dry_sequence_break = payloadFields?.['dry_sequence_break'] as string
+
+        const seq_break_array = dry_sequence_break ? dry_sequence_break.split(',') : []
 
         return {
             ...payloadFields,
             samplerOrder: [6, 0, 1, 3, 4, 2, 5],
             prompt: this.buildTextCompletionContext(typeof length === 'number' ? length : 0),
             stop_sequence: this.constructStopSequence(),
+            dry_sequence_break: seq_break_array,
         }
     }
     inference = async () => {

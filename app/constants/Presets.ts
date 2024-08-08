@@ -1,9 +1,11 @@
 import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
 
-import { API } from './API'
+import { Global } from './GlobalValues'
 import { Logger } from './Logger'
-
+import { mmkv } from './MMKV'
+import { SamplerID, SamplerPreset, Samplers } from './SamplerData'
+/*
 export type SamplerPreset = {
     temp: number
     top_p: number
@@ -52,7 +54,65 @@ export type SamplerPreset = {
 
     dynatemp_range: number
     smoothing_factor: number
-}
+
+    dry_multiplier: number
+    dry_base: number
+    dry_allowed_length: number
+    dry_sequence_break: string
+}*/
+
+/*temp: 1,
+        top_p: 1,
+        top_k: 40,
+        top_a: 0,
+        // merged from KAI
+
+        min_p: 0.0,
+        single_line: false,
+        //sampler_order: [6, 0, 1, 3, 4, 2, 5],
+        seed: -1,
+
+        //
+        tfs: 1,
+        epsilon_cutoff: 0,
+        eta_cutoff: 0,
+        typical: 1,
+        rep_pen: 1,
+        rep_pen_range: 0,
+        rep_pen_slope: 1,
+        no_repeat_ngram_size: 20,
+        penalty_alpha: 0,
+        num_beams: 1,
+        length_penalty: 1,
+        min_length: 0,
+        encoder_rep_pen: 1,
+        freq_pen: 0,
+        presence_pen: 0,
+        do_sample: true,
+        early_stopping: false,
+        add_bos_token: true,
+        //truncation_length: 2048,
+        ban_eos_token: false,
+        skip_special_tokens: true,
+        streaming: true,
+        mirostat_mode: 0,
+        mirostat_tau: 5,
+        mirostat_eta: 0.1,
+        guidance_scale: 1,
+        negative_prompt: '',
+        grammar_string: '',
+        banned_tokens: '',
+        ///rep_pen_size: 0,
+        genamt: 256,
+        max_length: 4096,
+
+        dynatemp_range: 0,
+        smoothing_factor: 0,
+
+        dry_multiplier: 0,
+        dry_base: 0,
+        dry_allowed_length: 0,
+        dry_sequence_break: '',*/
 
 export type SamplerField = keyof SamplerPreset
 
@@ -61,240 +121,27 @@ export namespace Presets {
 
     const getPresetDir = (name: string) => `${presetdir}${name}.json`
 
-    type FieldList = {
-        [key in API]: SamplerField[]
-    }
+    export const defaultPreset = (Object.keys(Samplers) as SamplerID[])
+        .map((key) => ({ id: key, value: Samplers[key].values.default }))
+        .reduce((a, b) => (a = { ...a, [b.id]: b.value }), {}) as SamplerPreset
 
-    export const APIFields: FieldList = {
-        [API.KAI]: [
-            'max_length',
-            'genamt',
-            'rep_pen',
-            'rep_pen_range',
-            'rep_pen_slope',
-            'temp',
-            'tfs',
-            'top_a',
-            'top_k',
-            'top_p',
-            'min_p',
-            'typical',
-            'single_line',
-            'seed',
-            'mirostat_mode',
-            'mirostat_tau',
-            'mirostat_eta',
-            'grammar_string',
-            'dynatemp_range',
-            'smoothing_factor',
-        ],
-        [API.TGWUI]: [
-            'max_length',
-            'genamt',
-            'rep_pen',
-            'rep_pen_range',
-            'rep_pen_slope',
-            'temp',
-            'tfs',
-            'top_a',
-            'top_k',
-            'top_p',
-            'min_p',
-            'typical',
-            'single_line',
-            'seed',
-            'mirostat_mode',
-            'mirostat_tau',
-            'mirostat_eta',
-            'grammar_string',
-            'epsilon_cutoff',
-            'eta_cutoff',
-            'min_length',
-            'no_repeat_ngram_size',
-            'num_beams',
-            'penalty_alpha',
-            'length_penalty',
-            'early_stopping',
-            'add_bos_token',
-            'truncation_length',
-            'ban_eos_token',
-            'skip_special_tokens',
-            'freq_pen',
-            'presence_pen',
-            'dynatemp_range',
-            'smoothing_factor',
-        ],
-        [API.HORDE]: [
-            'max_length',
-            'genamt',
-            'rep_pen',
-            'rep_pen_range',
-            'rep_pen_slope',
-            'temp',
-            'tfs',
-            'top_a',
-            'top_k',
-            'top_p',
-            'min_p',
-            'ban_eos_token',
-            'typical',
-            'single_line',
-            'min_p',
-        ],
-        [API.MANCER]: [
-            'max_length',
-            'genamt',
-            'rep_pen',
-            'temp',
-            'top_a',
-            'top_k',
-            'top_p',
-            'freq_pen',
-            'presence_pen',
-        ],
-        [API.COMPLETIONS]: [
-            'max_length',
-            'genamt',
-            'rep_pen',
-            'temp',
-            'tfs',
-            'top_a',
-            'top_k',
-            'top_p',
-            'min_p',
-            'freq_pen',
-            'presence_pen',
-            'seed',
-            'typical',
-            'ban_eos_token',
-            'smoothing_factor',
-            'mirostat_mode',
-            'mirostat_tau',
-            'mirostat_eta',
-            'grammar_string',
-        ],
-        [API.LOCAL]: [
-            'genamt',
-            'rep_pen',
-            'rep_pen_range',
-            'temp',
-            'top_a',
-            'top_k',
-            'top_p',
-            'freq_pen',
-            'tfs',
-            'typical',
-            'presence_pen',
-            'mirostat_mode',
-            'mirostat_tau',
-            'mirostat_eta',
-            'grammar_string',
-            'min_p',
-            'seed',
-        ],
-        [API.OPENROUTER]: [
-            'max_length',
-            'freq_pen',
-            'genamt',
-            'presence_pen',
-            'seed',
-            'temp',
-            'top_p',
-            'top_k',
-        ],
-        [API.OPENAI]: ['max_length', 'freq_pen', 'genamt', 'presence_pen', 'seed', 'temp', 'top_p'],
-        [API.OLLAMA]: [
-            'max_length',
-            'genamt',
-            'rep_pen',
-            'temp',
-            'tfs',
-            'top_a',
-            'top_k',
-            'top_p',
-            'min_p',
-            'freq_pen',
-            'presence_pen',
-            'seed',
-            'typical',
-            'ban_eos_token',
-            'smoothing_factor',
-            'mirostat_mode',
-            'mirostat_tau',
-            'mirostat_eta',
-            'grammar_string',
-        ],
-        [API.NOVELAI]: [],
-        [API.APHRODITE]: [],
-        [API.CLAUDE]: [],
-    }
-
-    export const defaultPreset = () => {
-        return {
-            temp: 1,
-            top_p: 1,
-            top_k: 40,
-            top_a: 0,
-            // merged from KAI
-
-            min_p: 0.0,
-            single_line: false,
-            sampler_order: [6, 0, 1, 3, 4, 2, 5],
-            seed: -1,
-
-            //
-            tfs: 1,
-            epsilon_cutoff: 0,
-            eta_cutoff: 0,
-            typical: 1,
-            rep_pen: 1,
-            rep_pen_range: 0,
-            rep_pen_slope: 1,
-            no_repeat_ngram_size: 20,
-            penalty_alpha: 0,
-            num_beams: 1,
-            length_penalty: 1,
-            min_length: 0,
-            encoder_rep_pen: 1,
-            freq_pen: 0,
-            presence_pen: 0,
-            do_sample: true,
-            early_stopping: false,
-            add_bos_token: true,
-            truncation_length: 2048,
-            ban_eos_token: false,
-            skip_special_tokens: true,
-            streaming: true,
-            mirostat_mode: 0,
-            mirostat_tau: 5,
-            mirostat_eta: 0.1,
-            guidance_scale: 1,
-            negative_prompt: '',
-            grammar_string: '',
-            banned_tokens: '',
-            rep_pen_size: 0,
-            genamt: 256,
-            max_length: 4096,
-
-            dynatemp_range: 0,
-            smoothing_factor: 0,
-        }
-    }
-
-    export const fixPreset = (preset: any, filename = '') => {
+    export const fixPreset = (preset: any, presetname = '', fixmmkv = false) => {
         const existingKeys = Object.keys(preset)
-        const targetPreset: any = defaultPreset()
-        const defaultKeys = Object.keys(targetPreset)
+        const defaultKeys = Object.keys(Samplers) as SamplerID[]
         let samekeys = true
         defaultKeys.map((key) => {
-            if (key === 'seed' && typeof preset[key] === 'string')
+            if (key === SamplerID.SEED && typeof preset[key] === 'string')
                 preset[key] = parseInt(preset[key])
 
             if (existingKeys.includes(key)) return
-            preset[key] = targetPreset[key]
+            const data = Samplers[key].values.default
+            preset[key] = data
             samekeys = false
+            Logger.log(`Prese was missing field ${key}`)
         })
-        if (filename !== '') saveFile(filename, preset)
+        if (presetname !== '') saveFile(presetname, preset)
+        if (fixmmkv) mmkv.set(Global.PresetData, JSON.stringify(preset))
+
         if (!samekeys) Logger.log(`Preset had missing fields and was fixed!`)
         return JSON.stringify(preset)
     }
@@ -307,7 +154,7 @@ export namespace Presets {
         })
     }
 
-    export const saveFile = async (name: string, preset: object) => {
+    export const saveFile = async (name: string, preset: SamplerPreset) => {
         return FS.writeAsStringAsync(getPresetDir(name), JSON.stringify(preset), {
             encoding: FS.EncodingType.UTF8,
         })
