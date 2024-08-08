@@ -35,6 +35,7 @@ class TextCompletionAPI extends APIBase {
 
         { externalName: 'frequency_penalty', samplerID: SamplerID.FREQUENCY_PENALTY },
         { externalName: 'presence_penalty', samplerID: SamplerID.PRESENCE_PENALTY },
+        { externalName: 'skip_special_tokens', samplerID: SamplerID.SKIP_SPECIAL_TOKENS },
     ]
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
