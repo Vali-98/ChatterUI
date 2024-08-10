@@ -31,7 +31,7 @@
     "babel-plugin-inline-import": "^3.0.0",
     "babel-plugin-react-compiler": "^0.0.0-experimental-696af53-20240625",
     "bert-tokenizer": "^1.1.8",
-    "cui-llama.rn": "^1.0.7",
+    "cui-llama.rn": "^1.0.9",
     "drizzle-orm": "^0.30.10",
     "eas-cli": "^9.1.0",
     "expo": "^51.0.21",

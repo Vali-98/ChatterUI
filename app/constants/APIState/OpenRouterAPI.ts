@@ -31,7 +31,6 @@ class OpenRouterAPI extends APIBase {
                 Math.min(length, openRouterModel.context_length)
             ),
             stop: this.constructStopSequence(),
-            response_format: { type: 'json_object' },
         }
     }
     inference = async () => {
