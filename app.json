@@ -18,7 +18,9 @@
         },
         "android": {
             "adaptiveIcon": {
-                "foregroundImage": "./assets/images/adaptive-icon.png",
+                "foregroundImage": "./assets/images/adaptive-icon-foreground.png",
+                "backgroundImage": "./assets/images//adaptive-icon-background.png",
+                "monochromeImage": "./assets/images/adaptive-icon-foreground.png",
                 "backgroundColor": "#000"
             },
             "package": "com.Vali98.ChatterUI",
@@ -67,7 +69,6 @@
                     }
                 }
             ],
-            "expo-font",
             "./bgactions.plugin.js"
         ],
         "experiments": {
@@ -83,4 +84,3 @@
         }
     }
 }
-
