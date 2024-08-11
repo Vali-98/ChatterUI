@@ -8,6 +8,7 @@ import { APIBase, APISampler } from './BaseAPI'
 class CohereAPI extends APIBase {
     samplers: APISampler[] = [
         { externalName: 'max_context_length', samplerID: SamplerID.CONTEXT_LENGTH },
+        { externalName: 'max_tokens', samplerID: SamplerID.GENERATED_LENGTH },
         { externalName: 'stream', samplerID: SamplerID.STREAMING },
         { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
         { externalName: 'p', samplerID: SamplerID.TOP_P },
