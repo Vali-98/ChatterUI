@@ -196,7 +196,13 @@ export abstract class APIBase implements IAPIBase {
         return payload
     }
 
-    buildChatCompletionContext = (max_length: number) => {
+    buildChatCompletionContext = (
+        max_length: number,
+        systemRole = 'system',
+        userRole = 'user',
+        assistantRole = 'assistant',
+        contentName = 'content'
+    ) => {
         const tokenizer =
             mmkv.getString(Global.APIType) === API.LOCAL
                 ? Llama.useLlama.getState().tokenLength
@@ -226,7 +232,7 @@ export abstract class APIBase implements IAPIBase {
             instructCache.system_prompt_length +
             characterCache.description_length +
             userCache.description_length
-        const payload = [{ role: 'system', content: replaceMacros(initial) }]
+        const payload = [{ role: systemRole, content: replaceMacros(initial) }]
         const messageBuffer = []
 
         let index = messages.length - 1
@@ -246,7 +252,7 @@ export abstract class APIBase implements IAPIBase {
                 timestamp_length
             if (len > max_length) break
             messageBuffer.push({
-                role: message.is_user ? 'user' : 'assistant',
+                role: message.is_user ? userRole : assistantRole,
                 content: replaceMacros(message.swipes[message.swipe_id].swipe),
             })
             total_length += len

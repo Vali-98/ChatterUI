@@ -11,6 +11,7 @@ import {
     Ollama,
     Claude,
     ChatCompletions,
+    Cohere,
 } from '@components/Endpoint'
 import { Global, API, Style } from '@globals'
 import { Stack } from 'expo-router'
@@ -33,6 +34,7 @@ const APIMenu = () => {
         { label: 'Open Router', value: API.OPENROUTER },
         { label: 'OpenAI', value: API.OPENAI },
         { label: 'Claude', value: API.CLAUDE },
+        { label: 'Cohere', value: API.COHERE },
         //{label: 'NovelAI', value:API.NOVELAI},
     ]
 
@@ -83,6 +85,7 @@ const APIMenu = () => {
                     {APIType === API.OLLAMA && <Ollama />}
                     {APIType === API.CLAUDE && <Claude />}
                     {APIType === API.CHATCOMPLETIONS && <ChatCompletions />}
+                    {APIType === API.COHERE && <Cohere />}
                 </ScrollView>
             </SafeAreaView>
         </AnimatedView>

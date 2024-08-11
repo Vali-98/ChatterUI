@@ -5,6 +5,7 @@ import { Logger } from 'app/constants/Logger'
 import { APIBase } from './BaseAPI'
 import chatCompletionsAPI from './ChatCompletionsAPI'
 import claudeAPI from './ClaudeAPI'
+import cohereAPI from './CohereAPI'
 import hordeAPI from './HordeAPI'
 import koboldAPI from './KoboldAPI'
 import localAPI from './LocalAPI'
@@ -39,6 +40,7 @@ export const APIState: Record<API, APIBase> = {
     [API.OLLAMA]: ollamaAPI,
     [API.CLAUDE]: claudeAPI,
     [API.CHATCOMPLETIONS]: chatCompletionsAPI,
+    [API.COHERE]: cohereAPI,
     //UNIMPLEMENTED
     [API.NOVELAI]: unimplementedAPI,
     [API.APHRODITE]: unimplementedAPI,

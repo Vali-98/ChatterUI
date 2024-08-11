@@ -97,6 +97,9 @@ export const enum Global {
     ChatCompletionsKey = 'chatcompletionskey',
     ChatCompletionsModel = 'chatcompletionsmodel',
 
+    CohereKey = 'coherekey',
+    CohereModel = 'coheremodel',
+
     TTSSpeaker = 'ttsspeaker',
     TTSEnable = 'ttsenable',
     TTSAuto = `ttsauto`,

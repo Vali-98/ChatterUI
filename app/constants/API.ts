@@ -12,4 +12,5 @@ export const enum API {
     OLLAMA = 'ollama',
     CLAUDE = 'claude',
     CHATCOMPLETIONS = 'chatcompletions',
+    COHERE = 'cohere',
 }
