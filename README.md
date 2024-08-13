@@ -18,6 +18,14 @@ Support the development of this app here:
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/optionsmenu.png" width="150" > 
 </div>
 
+## Usage
+
+#### Android
+
+Download the and install latest APK from the [releases](https://github.com/Vali-98/ChatterUI/releases/latest) page.
+
+<i>IOS is Currently unavailable, I do not have the means to test and deploy on IOS :(</i>
+
 ## Supported Backends
 
 ### On Device Inferencing:
