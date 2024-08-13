@@ -1,16 +1,21 @@
 export const enum API {
+    // On device
+    LOCAL = 'local',
+    // FOSS APIs
     KAI = 'kai',
     HORDE = 'horde',
     TGWUI = 'textgenwebui',
+    // Dedicated APIs
     MANCER = 'mancer',
-    NOVELAI = 'novel',
-    APHRODITE = 'aphrodite',
-    COMPLETIONS = 'completions',
-    LOCAL = 'local',
     OPENROUTER = 'openrouter',
     OPENAI = 'openai',
     OLLAMA = 'ollama',
     CLAUDE = 'claude',
-    CHATCOMPLETIONS = 'chatcompletions',
     COHERE = 'cohere',
+    // Generic
+    CHATCOMPLETIONS = 'chatcompletions',
+    COMPLETIONS = 'completions',
+    // Unimplemented
+    NOVELAI = 'novel',
+    APHRODITE = 'aphrodite',
 }

@@ -142,7 +142,7 @@ export const startupApp = () => {
     if (mmkv.getString(Global.LorebookNames) === undefined)
         mmkv.set(Global.LorebookNames, JSON.stringify([]))
     // Init step, APIType is never null
-    if (mmkv.getString(Global.APIType) === undefined) mmkv.set(Global.APIType, API.KAI)
+    if (mmkv.getString(Global.APIType) === undefined) mmkv.set(Global.APIType, API.LOCAL)
 
     Object.keys(AppSettingsDefault).map((item) => {
         const data =

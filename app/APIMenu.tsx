@@ -24,17 +24,21 @@ const APIMenu = () => {
     const [APIType, setAPIType] = useMMKVString(Global.APIType)
     const apinames = [
         { label: 'Local', value: API.LOCAL },
+
         { label: 'KoboldAI', value: API.KAI },
-        { label: 'Ollama', value: API.OLLAMA },
         { label: 'Text Generation Web UI', value: API.TGWUI },
-        { label: 'Text Completions', value: API.COMPLETIONS },
-        { label: 'Chat Completions', value: API.CHATCOMPLETIONS },
-        { label: 'Horde', value: API.HORDE },
-        { label: 'Mancer', value: API.MANCER },
-        { label: 'Open Router', value: API.OPENROUTER },
+        { label: 'Ollama', value: API.OLLAMA },
+
         { label: 'OpenAI', value: API.OPENAI },
         { label: 'Claude', value: API.CLAUDE },
         { label: 'Cohere', value: API.COHERE },
+        { label: 'Open Router', value: API.OPENROUTER },
+        { label: 'Mancer', value: API.MANCER },
+
+        { label: 'Horde', value: API.HORDE },
+
+        { label: 'Text Completions', value: API.COMPLETIONS },
+        { label: 'Chat Completions', value: API.CHATCOMPLETIONS },
         //{label: 'NovelAI', value:API.NOVELAI},
     ]
 
@@ -74,18 +78,21 @@ const APIMenu = () => {
                             {...Style.drawer.default}
                         />
                     </View>
-                    {APIType === API.KAI && <KAI />}
-                    {APIType === API.HORDE && <Horde />}
-                    {APIType === API.TGWUI && <TGWUI />}
-                    {APIType === API.MANCER && <Mancer />}
-                    {APIType === API.COMPLETIONS && <TextCompletions />}
                     {APIType === API.LOCAL && <Local />}
-                    {APIType === API.OPENROUTER && <OpenRouter />}
-                    {APIType === API.OPENAI && <OpenAI />}
+
+                    {APIType === API.KAI && <KAI />}
+                    {APIType === API.TGWUI && <TGWUI />}
                     {APIType === API.OLLAMA && <Ollama />}
+
+                    {APIType === API.OPENAI && <OpenAI />}
                     {APIType === API.CLAUDE && <Claude />}
-                    {APIType === API.CHATCOMPLETIONS && <ChatCompletions />}
                     {APIType === API.COHERE && <Cohere />}
+                    {APIType === API.OPENROUTER && <OpenRouter />}
+                    {APIType === API.MANCER && <Mancer />}
+                    {APIType === API.HORDE && <Horde />}
+
+                    {APIType === API.COMPLETIONS && <TextCompletions />}
+                    {APIType === API.CHATCOMPLETIONS && <ChatCompletions />}
                 </ScrollView>
             </SafeAreaView>
         </AnimatedView>
