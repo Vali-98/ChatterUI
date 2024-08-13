@@ -53,7 +53,7 @@ class HordeAPI extends APIBase {
 
         Logger.log('Max worker context length: ' + maxWorkerContext)
         Logger.log('Max worker response length: ' + usedResponseLength)
-        Logger.log('Models used: ' + usedModels)
+        Logger.log('Models used: ' + usedModels.join(', '))
 
         const payloadFields = this.getSamplerFields(maxWorkerContext)
         const length = payloadFields?.['max_context_length']

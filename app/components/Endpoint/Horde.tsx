@@ -1,6 +1,6 @@
-import { hordeHeader } from 'app/constants/APIState/HordeAPI'
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { Global, Logger, Style } from '@globals'
+import { hordeHeader } from 'app/constants/APIState/HordeAPI'
 import { useState, useEffect, useRef } from 'react'
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import { MultiSelect } from 'react-native-element-dropdown'
@@ -60,11 +60,6 @@ const Horde = () => {
     const [hordeModels, setHordeModels] = useMMKVObject<HordeModel[]>(Global.HordeModels)
     const [hordeWorkers, setHordeWorkers] = useMMKVObject<HordeWorker[]>(Global.HordeWorkers)
 
-    const [dropdownValues, setDropdownValues] = useState<string[]>(
-        hordeModels?.map((item) => {
-            return item.name
-        }) ?? []
-    )
     const [keyInput, setKeyInput] = useState('')
     const [modelList, setModelList] = useState([])
 
@@ -85,10 +80,9 @@ const Horde = () => {
         const names = list.map((item: HordeModel) => {
             return item.name
         })
-        setDropdownValues(dropdownValues.filter((item) => names.includes(item)))
+        // setDropdownValues(dropdownValues.filter((item) => names.includes(item)))
         setModelList(list)
-        if (hordeModels)
-            setHordeModels(hordeModels.filter((item) => dropdownValues.includes(item.name)))
+        if (hordeModels) setHordeModels(hordeModels.filter((item) => names.includes(item.name)))
 
         const workerresults = await fetch(`https://aihorde.net/api/v2/workers?type=text`, {
             method: 'GET',
@@ -138,6 +132,7 @@ const Horde = () => {
                 </TouchableOpacity>
             </View>
 
+            <Text style={styles.title}>Models</Text>
             <View
                 style={{
                     flexDirection: 'row',
@@ -145,7 +140,44 @@ const Horde = () => {
                     paddingTop: 8,
                     marginBottom: 8,
                 }}>
-                <Text style={styles.title}>Models</Text>
+                <MultiSelect
+                    value={
+                        hordeModels?.map((item) => {
+                            return item.name
+                        }) ?? []
+                    }
+                    data={modelList}
+                    labelField="name"
+                    valueField="name"
+                    onChange={(item) => {
+                        setHordeModels(
+                            modelList.filter((value: HordeModel) => {
+                                return item.includes(value.name)
+                            })
+                        )
+                        //setDropdownValues(item)
+                    }}
+                    {...Style.drawer.default}
+                    placeholderStyle={{
+                        color: Style.getColor(
+                            hordeModels && hordeModels?.length === 0
+                                ? 'primary-text2'
+                                : 'primary-text1'
+                        ),
+                    }}
+                    placeholder={
+                        hordeModels?.length === 0
+                            ? 'Select Model'
+                            : `Selected ${hordeModels?.length} ${
+                                  hordeModels && hordeModels?.length > 1 ? 'models' : 'model'
+                              }`
+                    }
+                    visibleSelectedItem={false}
+                    /*renderSelectedItem={(item: HordeModel, unSelect) => (
+                    <HordeItem item={item} unSelect={unSelect} hordeWorkers={hordeWorkers} />
+
+                )}*/
+                />
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => {
@@ -158,37 +190,19 @@ const Horde = () => {
                     />
                 </TouchableOpacity>
             </View>
-
-            <MultiSelect
-                value={dropdownValues}
-                data={modelList}
-                labelField="name"
-                valueField="name"
-                onChange={(item) => {
-                    setHordeModels(
-                        modelList.filter((value: HordeModel) => {
-                            return item.includes(value.name)
-                        })
-                    )
-                    setDropdownValues(item)
-                }}
-                {...Style.drawer.default}
-                placeholderStyle={{
-                    color: Style.getColor(
-                        hordeModels && hordeModels?.length === 0 ? 'primary-text2' : 'primary-text1'
-                    ),
-                }}
-                placeholder={
-                    hordeModels?.length === 0
-                        ? 'Select Model'
-                        : `Selected ${hordeModels?.length} ${
-                              hordeModels && hordeModels?.length > 1 ? 'models' : 'model'
-                          }`
-                }
-                renderSelectedItem={(item: HordeModel, unSelect) => (
-                    <HordeItem item={item} unSelect={unSelect} hordeWorkers={hordeWorkers} />
-                )}
-            />
+            <View>
+                {hordeModels?.map((item, index) => (
+                    <HordeItem
+                        item={item}
+                        unSelect={() => {
+                            const models = hordeModels
+                            models.splice(index, 1)
+                            setHordeModels(models)
+                        }}
+                        hordeWorkers={hordeWorkers}
+                    />
+                ))}
+            </View>
         </View>
     )
 }
