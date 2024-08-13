@@ -1,5 +1,5 @@
 import { rawdb } from '@db'
-import { Style, AppSettings, Logger } from '@globals'
+import { Style, AppSettings, Logger, Characters } from '@globals'
 import { reloadAppAsync } from 'expo'
 import { getDocumentAsync } from 'expo-document-picker'
 import { documentDirectory, copyAsync, deleteAsync } from 'expo-file-system'
@@ -181,6 +181,19 @@ const AppSettingsMenu = () => {
                 onValueChange={setPrintContext}
             />
             <Text style={styles.subtitle}>Prints the generation context to logs for debugging</Text>
+
+            <Text style={styles.sectionTitle}>Character Management</Text>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                    WarningAlert(
+                        `Regenerate Default Card`,
+                        `This will add the default AI Bot card to your character list.`,
+                        Characters.createDefaultCard
+                    )
+                }}>
+                <Text style={styles.buttonText}>Regenerate Default Card</Text>
+            </TouchableOpacity>
 
             <Text style={styles.sectionTitle}>Database Management</Text>
             <Text style={styles.subtitle}>

@@ -78,6 +78,7 @@ const AppSettingsDefault: Record<AppSettings, boolean | number> = {
     [AppSettings.SendOnEnter]: false,
     [AppSettings.SaveLocalKV]: false,
     [AppSettings.PrintContext]: false,
+    [AppSettings.CreateDefaultCard]: true,
 }
 
 const loadChatOnInit = async () => {
@@ -156,6 +157,14 @@ export const startupApp = () => {
 
     if (mmkv.getBoolean(AppSettings.ChatOnStartup)) {
         loadChatOnInit()
+    }
+
+    if (mmkv.getBoolean(AppSettings.CreateDefaultCard)) {
+        Characters.db.query.cardList('character').then((result) => {
+            if (result.length === 0) Characters.createDefaultCard()
+        })
+        console.log('setting')
+        mmkv.set(AppSettings.CreateDefaultCard, false)
     }
 
     Logger.log('Resetting state values for startup.')

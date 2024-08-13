@@ -1,5 +1,6 @@
 import { Buffer } from '@craftzdog/react-native-buffer'
 import { db as database } from '@db'
+import { copyFileRes } from '@dr.pogodin/react-native-fs'
 import axios from 'axios'
 import { characterGreetings, characterTags, characters, tags } from 'db/schema'
 import { eq, inArray, notInArray } from 'drizzle-orm'
@@ -481,6 +482,17 @@ export namespace Characters {
 
     export const getImageDir = (imageId: number) => {
         return `${FS.documentDirectory}characters/${imageId}.png`
+    }
+
+    export const createDefaultCard = async () => {
+        const filename = 'aibot'
+        const pngName = filename + '.png'
+        const resName = filename + '.raw'
+        const cardDefaultDir = `${FS.documentDirectory}appAssets/${pngName}`
+
+        const fileinfo = await FS.getInfoAsync(cardDefaultDir)
+        if (!fileinfo.exists) await copyFileRes(resName, cardDefaultDir)
+        await createCharacterFromImage(cardDefaultDir)
     }
 }
 

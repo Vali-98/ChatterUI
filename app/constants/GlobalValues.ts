@@ -125,4 +125,5 @@ export enum AppSettings {
     SendOnEnter = 'sendonenter',
     SaveLocalKV = 'savelocalkv',
     PrintContext = 'printcontext',
+    CreateDefaultCard = 'createdefaultcard',
 }
