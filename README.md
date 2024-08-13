@@ -6,7 +6,7 @@ ChatterUI supports multiple backends and can even run GGUF models locally on you
 
 Support the development of this app here:
 
-<a href="https://ko-fi.com/vali98" target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Support me on ko-fi.com' />
+<a href="https://ko-fi.com/vali98" target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Support me on ko-fi.com' /></a>
 
 <div>
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/recents.png" width="150" > 
@@ -18,33 +18,60 @@ Support the development of this app here:
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/optionsmenu.png" width="150" > 
 </div>
 
-### Supported Backends
+## Supported Backends
 
--   Local using [llama.rn](https://github.com/mybigday/llama.rn)
+### On Device Inferencing:
+
+-   Local device inferencing using [cui-llama.rn](https://github.com/Vali-98/cui-llama.rn)
+
+_To use Local inferencing, go to API > Local > Import Model and choose a gguf model that can fit on your device's memory. Then load the model to begin!_
+
+_For devices with Snapdragon 8 Gen 1 and above or Exynos 2200+, it is recommended to use the Q4_0_4_8 quantization for enhanced prompt processing._
+
+### Open Source Backends:
+
 -   koboldcpp
 -   text-generation-webui
--   Generic Text Completions - you can plug this into any spec compliant backend
--   AI Horde
--   Mancer
--   Open Router
+-   Ollama
+
+### Dedicated API:
+
 -   OpenAI
+-   Claude _(with ability to use a proxy)_
+-   Cohere
+-   Open Router
+-   Mancer
+-   AI Horde
 
-### Developing
+### Customizable backends:
 
-Clone the repo:
+-   Generic Text Completions
+-   Generic Chat Completions
+
+_These should be compliant with any Text Completion/Chat Completion backends such as Groq or Infermatic._
+
+## Development
+
+### Android
+
+To run a development build, follow these simple steps:
+
+-   Install any Java 17/21 SDK of your choosing
+-   Install `android-sdk` via `Android Studio`
+-   Clone the repo:
 
 ```
 git clone https://github.com/Vali-98/ChatterUI.git
 ```
 
-Install dependencies via npm and run via Expo:
+-   Install dependencies via npm and run via Expo:
 
 ```
 npm install
 npx expo run:android
 ```
 
-### Building an APK
+#### Building an APK
 
 Requires Node.js and Android SDK. Expo uses EAS to build apps which requires a Linux environment.
 
@@ -78,9 +105,3 @@ if (BuildConfig.DEBUG) {
     // ReactNativeFlipper.initializeFlipper(this, reactNativeHost.reactInstanceManager)
 }
 ```
-
-### Roadmap
-
--   NovelAI support
--   Lorebooks
--   Chat Management (export, import from compatible files)
