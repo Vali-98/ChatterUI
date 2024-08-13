@@ -58,6 +58,9 @@ class HordeAPI extends APIBase {
         const payloadFields = this.getSamplerFields(maxWorkerContext)
         const length = payloadFields?.['max_context_length']
         const limit = payloadFields?.['max_length']
+        const top_p = payloadFields?.['top_p']
+        if (!top_p) delete payloadFields?.['top_p']
+
         return {
             params: {
                 ...payloadFields,
@@ -82,6 +85,7 @@ class HordeAPI extends APIBase {
         }
     }
     inference = async () => {
+        const hordeURL = `https://aihorde.net/api/v2/`
         const hordeKey = this.getString(Global.HordeKey)
         const hordeModels = this.getObject(Global.HordeModels)
         Logger.log(`Using endpoint: Horde`)
@@ -97,7 +101,7 @@ class HordeAPI extends APIBase {
         useInference.getState().setAbort(() => {
             aborted = true
             if (generation_id !== null)
-                fetch(`https://aihorde.net/api/v2/generate/text/status/${generation_id}`, {
+                fetch(`${hordeURL}generate/text/status/${generation_id}`, {
                     method: 'DELETE',
                     headers: {
                         ...hordeHeader(),
@@ -113,7 +117,7 @@ class HordeAPI extends APIBase {
         Logger.log(`Using Horde`)
 
         const payload = this.buildPayload()
-        const request = await fetch(`https://aihorde.net/api/v2/generate/text/async`, {
+        const request = await fetch(`${hordeURL}generate/text/async`, {
             method: 'POST',
             body: JSON.stringify(payload),
             headers: {
@@ -147,17 +151,14 @@ class HordeAPI extends APIBase {
             if (aborted) return
 
             Logger.log(`Checking...`)
-            const response = await fetch(
-                `https://aihorde.net/api/v2/generate/text/status/${generation_id}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        ...hordeHeader(),
-                        accept: 'application/json',
-                        'content-type': 'application/json',
-                    },
-                }
-            )
+            const response = await fetch(`${hordeURL}generate/text/status/${generation_id}`, {
+                method: 'GET',
+                headers: {
+                    ...hordeHeader(),
+                    accept: 'application/json',
+                    'content-type': 'application/json',
+                },
+            })
 
             if (response.status === 400) {
                 Logger.log(`Response failed.`)
