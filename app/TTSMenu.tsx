@@ -28,7 +28,8 @@ const TTSMenu = () => {
     const [currentSpeaker, setCurrentSpeaker] = useMMKVObject<Speech.Voice>(Global.TTSSpeaker)
     const [enableTTS, setEnableTTS] = useMMKVBoolean(Global.TTSEnable)
     const [autoTTS, setAutoTTS] = useMMKVBoolean(Global.TTSAuto)
-    const [lang, setLang] = useState(currentSpeaker?.language ?? 'en-US')
+    const defaultLang = 'en-US'
+    const [lang, setLang] = useState(currentSpeaker?.language ?? defaultLang)
     const [modelList, setModelList] = useState<Speech.Voice[]>([])
     const languageList: LanguageListItem = groupBy(modelList, 'language')
 
@@ -37,6 +38,12 @@ const TTSMenu = () => {
         .map((name) => {
             return { name }
         })
+
+    const baseLang = lang?.split('-')[0] ?? defaultLang
+
+    const filterModel = (lang = defaultLang) => {
+        return modelList.filter((item) => item.language === lang)
+    }
 
     useEffect(() => {
         getVoices()
@@ -101,7 +108,7 @@ const TTSMenu = () => {
                         <View style={{ marginTop: 8 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Dropdown
-                                    value={lang}
+                                    value={languageList[lang]?.length > 0 ? lang : baseLang}
                                     data={languages}
                                     labelField="name"
                                     valueField="name"
@@ -123,14 +130,14 @@ const TTSMenu = () => {
 
                         <Text style={{ ...styles.title, marginTop: 8 }}>Speaker</Text>
                         <Text style={styles.subtitle}>
-                            Speakers: {modelList.filter((item) => item.language === lang).length}
+                            Speakers: {languageList[lang]?.length > 0 ? filterModel(lang).length : filterModel(baseLang).length}
                         </Text>
 
                         <View style={{ marginTop: 8, marginBottom: 16, flexDirection: 'row' }}>
                             {modelList.length !== 0 && (
                                 <Dropdown
                                     value={currentSpeaker?.identifier ?? ''}
-                                    data={languageList[lang]}
+                                    data={languageList[lang]?.length > 0 ? languageList[lang] : languageList[baseLang]}
                                     labelField="identifier"
                                     valueField="name"
                                     placeholder="Select Speaker"
