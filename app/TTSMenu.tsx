@@ -43,8 +43,7 @@ const TTSMenu = () => {
     }, [])
 
     const getVoices = (value = false) => {
-        if (enableTTS ?? value)
-            Speech.getAvailableVoicesAsync().then((list) => setModelList((current) => list))
+        if (enableTTS ?? value) Speech.getAvailableVoicesAsync().then((list) => setModelList(list))
     }
 
     return (
@@ -130,7 +129,7 @@ const TTSMenu = () => {
                             {modelList.length !== 0 && (
                                 <Dropdown
                                     value={currentSpeaker?.identifier ?? ''}
-                                    data={languageList[lang]}
+                                    data={languageList?.[lang] ?? []}
                                     labelField="identifier"
                                     valueField="name"
                                     placeholder="Select Speaker"
