@@ -1,15 +1,18 @@
-import { Chats, MarkdownStyle } from '@globals'
+import { Chats, Style, MarkdownStyle } from '@globals'
 import React, { useEffect, useRef } from 'react'
 import { StyleSheet, Animated, Easing, LayoutChangeEvent } from 'react-native'
 //@ts-expect-error
 import Markdown from 'react-native-markdown-package'
+//@ts-expect-error
+import AnimatedEllipsis from 'rn-animated-ellipsis'
+import { useShallow } from 'zustand/react/shallow'
 
 type ChatTextProps = {
     nowGenerating: boolean
     id: number
 }
 
-const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
+const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     const animatedHeight = useRef(new Animated.Value(-1)).current
     const height = useRef(-1)
 
@@ -17,6 +20,12 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
         (state) =>
             state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
                 .swipe ?? ''
+    )
+
+    const { buffer } = Chats.useChat(
+        useShallow((state) => ({
+            buffer: state.buffer,
+        }))
     )
 
     const handleAnimateHeight = (newheight: number) => {
@@ -41,8 +50,10 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
 
         if (height.current === newHeight) return
         height.current = newHeight
-        handleAnimateHeight(newHeight)
+        const showPadding = nowGenerating && buffer !== ''
+        handleAnimateHeight(newHeight + (showPadding ? oveflowPadding : 0))
     }
+
     useEffect(() => {
         if (!nowGenerating && height.current !== -1) {
             handleAnimateHeight(height.current)
@@ -59,18 +70,27 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
                 height: __DEV__ ? 'auto' : animatedHeight, // dev fix for slow emulator animations
                 overflow: 'scroll',
             }}>
+            {nowGenerating && buffer === '' && (
+                <AnimatedEllipsis
+                    style={{
+                        color: Style.getColor('primary-text2'),
+                        fontSize: 20,
+                    }}
+                />
+            )}
+
             <Markdown
                 onLayout={handleContentSizeChange}
                 style={styles.messageText}
                 rules={{ rules: MarkdownStyle.Rules }}
                 styles={MarkdownStyle.Format}>
-                {mes.trim()}
+                {nowGenerating ? buffer.trim() : mes.trim()}
             </Markdown>
         </Animated.View>
     )
 }
 
-export default ChatText
+export default ChatTextLast
 
 const styles = StyleSheet.create({
     messageText: {

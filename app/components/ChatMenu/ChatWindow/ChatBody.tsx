@@ -4,6 +4,7 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 import ChatText from './ChatText'
+import ChatTextLast from './ChatTextLast'
 import EditorModal from './EditorModal'
 import Swipes from './Swipes'
 
@@ -27,7 +28,6 @@ const ChatBody: React.FC<ChatTextProps> = ({ id, nowGenerating, messagesLength }
         setEditMode(!nowGenerating)
     }
 
-    const showEllipsis = !message.is_user && isLastMessage && nowGenerating
     const hasSwipes = message?.swipes?.length > 1
     const showSwipe = !message.is_user && isLastMessage && (hasSwipes || !isGreeting)
 
@@ -46,12 +46,11 @@ const ChatBody: React.FC<ChatTextProps> = ({ id, nowGenerating, messagesLength }
                 style={styles.messageTextContainer}
                 activeOpacity={0.7}
                 onLongPress={handleEnableEdit}>
-                <ChatText
-                    showEllipsis={showEllipsis}
-                    nowGenerating={nowGenerating}
-                    id={id}
-                    isLastMessage={isLastMessage}
-                />
+                {isLastMessage ? (
+                    <ChatTextLast nowGenerating={nowGenerating} id={id} />
+                ) : (
+                    <ChatText nowGenerating={nowGenerating} id={id} />
+                )}
             </TouchableOpacity>
 
             {showSwipe && (
