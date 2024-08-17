@@ -22,11 +22,13 @@ const Layout = () => {
     const { success, error } = useMigrations(db, migrations)
 
     useEffect(() => {
-        // reset defaults
-        startupApp()
-        initializeApp()
-        setFirstRender(false)
-    }, [])
+        // reset
+        if (success) {
+            startupApp()
+            initializeApp()
+            setFirstRender(false)
+        }
+    }, [success])
 
     useEffect(() => {
         if (success) SplashScreen.hideAsync()
