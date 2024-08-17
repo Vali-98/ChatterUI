@@ -139,7 +139,7 @@ export namespace Presets {
             samekeys = false
             Logger.log(`Prese was missing field ${key}`)
         })
-        if (presetname !== '') saveFile(presetname, preset)
+        if (presetname) saveFile(presetname, preset)
         if (fixmmkv) mmkv.set(Global.PresetData, JSON.stringify(preset))
 
         if (!samekeys) Logger.log(`Preset had missing fields and was fixed!`)

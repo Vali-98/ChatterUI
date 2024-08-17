@@ -128,7 +128,7 @@ export const startupApp = () => {
         Global.PresetData,
         Presets.fixPreset(
             JSON.parse(mmkv.getString(Global.PresetData) ?? '{}'),
-            Global.PresetName,
+            mmkv.getString(Global.PresetName),
             true
         )
     )
