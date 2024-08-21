@@ -50,6 +50,9 @@ export enum SamplerID {
     DRY_BASE = 'dry_base',
     DRY_ALLOWED_LENGTH = 'dry_allowed_length',
     DRY_SEQUENCE_BREAK = 'dry_sequence_break',
+
+    XTC_THRESHOLD = 'xtc_threshold',
+    XTC_PROBABILITY = 'xtc_probability',
     //...
 }
 
@@ -150,6 +153,32 @@ export const Samplers = {
     [SamplerID.MIN_P]: {
         internalID: SamplerID.MIN_P,
         friendlyName: 'Min P',
+        inputType: 'slider',
+        values: {
+            type: 'float',
+            min: 0,
+            max: 1,
+            default: 0,
+            step: 0.01,
+            precision: 2,
+        },
+    },
+    [SamplerID.XTC_PROBABILITY]: {
+        internalID: SamplerID.XTC_PROBABILITY,
+        friendlyName: 'XTC Probability',
+        inputType: 'slider',
+        values: {
+            type: 'float',
+            min: 0,
+            max: 1,
+            default: 0,
+            step: 0.01,
+            precision: 2,
+        },
+    },
+    [SamplerID.XTC_THRESHOLD]: {
+        internalID: SamplerID.XTC_THRESHOLD,
+        friendlyName: 'XTC Threshold',
         inputType: 'slider',
         values: {
             type: 'float',

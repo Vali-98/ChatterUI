@@ -25,6 +25,8 @@ class LocalAPI extends APIBase {
         { externalName: 'penalty_repeat', samplerID: SamplerID.REPETITION_PENALTY },
         { externalName: 'penalty_present', samplerID: SamplerID.PRESENCE_PENALTY },
         { externalName: 'penalty_freq', samplerID: SamplerID.FREQUENCY_PENALTY },
+        { externalName: 'xtc_t', samplerID: SamplerID.XTC_THRESHOLD },
+        { externalName: 'xtc_p', samplerID: SamplerID.XTC_PROBABILITY },
         { externalName: 'seed', samplerID: SamplerID.SEED },
     ]
     buildPayload = () => {
