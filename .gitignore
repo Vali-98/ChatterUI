@@ -10,9 +10,10 @@ public/
 android
 eas.json
 *.apk
+.gradle
 
 # IoS Build
-ios
+./ios
 
 # builds
 builds/

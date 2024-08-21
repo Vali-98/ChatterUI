@@ -10,7 +10,8 @@
     "test": "jest --watchAll",
     "postinstall": "patch-package",
     "lint": "eslint .",
-    "migrate": "npx drizzle-kit generate:sqlite"
+    "migrate": "npx drizzle-kit generate:sqlite",
+    "patchsql": "npx patch-package expo-sqlite --exclude \"\\.project|\\.cxx|build|bin\" --case-sensitive-path-filtering"
   },
   "jest": {
     "preset": "jest-expo"
@@ -50,7 +51,7 @@
     "expo-sharing": "~12.0.1",
     "expo-speech": "~12.0.2",
     "expo-splash-screen": "~0.27.5",
-    "expo-sqlite": "~14.0.6",
+    "expo-sqlite": "^14.0.5",
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
     "png-chunk-text": "^1.0.0",
@@ -65,7 +66,7 @@
     "react-native-element-dropdown": "^2.10.0",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-markdown-package": "^1.8.2",
-    "react-native-mmkv": "^2.10.2",
+    "react-native-mmkv": "^2.12.2",
     "react-native-popup-menu": "^0.16.1",
     "react-native-quick-base64": "^2.1.2",
     "react-native-reanimated": "~3.10.1",

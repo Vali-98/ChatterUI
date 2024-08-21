@@ -65,11 +65,13 @@
                         "enableProguardInReleaseBuilds": true,
                         "enableShrinkResourcesInReleaseBuilds": true,
                         "useLegacyPackaging": true,
-                        "extraProguardRules": "-keep class com.rnllama.** { *; }"
+                        "extraProguardRules": "-keep class com.rnllama.** { *; }",
+                        "photosBuildHook": "node ./loadJniLibs.js"
                     }
                 }
             ],
-            "./bgactions.plugin.js"
+            "./bgactions.plugin.js",
+            "./copyjni.plugin.js"
         ],
         "experiments": {
             "typedRoutes": true
