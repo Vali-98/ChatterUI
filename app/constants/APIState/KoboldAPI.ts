@@ -2,7 +2,6 @@ import { Global } from '@constants/GlobalValues'
 import { Logger } from 'app/constants/Logger'
 import { mmkv } from 'app/constants/MMKV'
 import { SamplerID } from 'app/constants/SamplerData'
-import axios from 'axios'
 
 import { APIBase, APISampler } from './BaseAPI'
 
@@ -58,12 +57,7 @@ class KoboldAPI extends APIBase {
                 return JSON.parse(item).token
             },
             () => {
-                axios
-                    .create({ timeout: 1000 })
-                    .post(new URL('/api/extra/abort', endpoint).toString())
-                    .catch(() => {
-                        Logger.log(`Abort signal failed`)
-                    })
+                fetch(new URL('/api/extra/abort', endpoint).toString(), { method: 'GET' })
             }
         )
     }

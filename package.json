@@ -27,7 +27,6 @@
     "@react-navigation/drawer": "^6.6.4",
     "@react-navigation/native": "^6.0.2",
     "@shopify/flash-list": "1.6.4",
-    "axios": "^1.7.4",
     "babel-plugin-inline-import": "^3.0.0",
     "babel-plugin-react-compiler": "^0.0.0-experimental-696af53-20240625",
     "cui-llama.rn": "^1.1.1",

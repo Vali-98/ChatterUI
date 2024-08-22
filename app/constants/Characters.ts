@@ -1,6 +1,5 @@
 import { db as database } from '@db'
-import { copyFileRes } from '@dr.pogodin/react-native-fs'
-import axios from 'axios'
+import { copyFileRes, writeFile } from '@dr.pogodin/react-native-fs'
 import { characterGreetings, characterTags, characters, tags } from 'db/schema'
 import { eq, inArray, notInArray } from 'drizzle-orm'
 import { randomUUID } from 'expo-crypto'
@@ -300,10 +299,13 @@ export namespace Characters {
                             })
                             .returning({ id: characters.id, image_id: characters.image_id })
 
-                        const greetingdata = data.alternate_greetings.map((item) => ({
-                            character_id: id,
-                            greeting: item,
-                        }))
+                        const greetingdata =
+                            typeof data?.alternate_greetings === 'object'
+                                ? data?.alternate_greetings?.map((item) => ({
+                                      character_id: id,
+                                      greeting: item,
+                                  })) ?? []
+                                : []
                         if (greetingdata.length > 0)
                             for (const greeting of greetingdata)
                                 await tx.insert(characterGreetings).values(greeting)
@@ -400,22 +402,23 @@ export namespace Characters {
     export const importCharacterFromChub = async (character_id: string) => {
         Logger.log(`Importing character from Chub: ${character_id}`, true)
         try {
-            const res = await axios.create({ timeout: 10000 }).post(
-                'https://api.chub.ai/api/characters/download',
-                {
+            const res = await fetch('https://api.chub.ai/api/characters/download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
                     format: 'tavern',
                     fullPath: character_id,
-                },
-                { responseType: 'arraybuffer' }
-            )
-
-            const response = Buffer.from(res.data, 'base64').toString('base64')
-            const uuid = randomUUID()
-            return FS.writeAsStringAsync(`${FS.cacheDirectory}${uuid}.png`, response, {
-                encoding: FS.EncodingType.Base64,
-            }).then(async () => {
-                return createCharacterFromImage(`${FS.cacheDirectory}${uuid}.png`)
+                }),
             })
+            const data = await res.arrayBuffer()
+            const dataArray = new Uint8Array(data)
+            let binaryString = ''
+            dataArray.forEach((byte) => (binaryString += String.fromCharCode(byte)))
+            const cardCacheDir = `${FS.cacheDirectory}${randomUUID()}.png`
+            await writeFile(cardCacheDir, btoa(binaryString), 'base64')
+            return createCharacterFromImage(cardCacheDir)
         } catch (error) {
             Logger.log(`Could not retreive card. ${error}`)
         }
@@ -424,40 +427,48 @@ export namespace Characters {
     export const importCharacterFromPyg = async (character_id: string) => {
         Logger.log(`Loading from Pygmalion with id: ${character_id}`, true)
 
-        const data = await fetch(
+        const query = await fetch(
             `https://server.pygmalion.chat/api/export/character/${character_id}/v2`,
             {
                 method: 'GET',
                 headers: {
                     accept: 'application/json',
-                    'content-type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
             }
         )
-        if (data.status !== 200) {
-            Logger.log(`Failed to retrieve card from Pygmalion: ${data.status}`, true)
+        if (query.status !== 200) {
+            Logger.log(`Failed to retrieve card from Pygmalion: ${query.status}`, true)
             return
         }
 
-        const { character } = await data.json()
+        const { character } = await query.json()
 
         const res = await fetch(character.data.avatar, {
             method: 'GET',
         })
-        const buffer = await res.arrayBuffer()
-        const image = Buffer.from(buffer).toString('base64')
+        const data = await res.arrayBuffer()
+        const dataArray = new Uint8Array(data)
+        let binaryString = ''
+        dataArray.forEach((byte) => (binaryString += String.fromCharCode(byte)))
         const uuid = randomUUID()
-        return FS.writeAsStringAsync(`${FS.cacheDirectory}${uuid}.png`, image, {
-            encoding: FS.EncodingType.Base64,
-        }).then(async () => {
-            return db.mutate.createCharacter(character, `${FS.cacheDirectory}${uuid}.png`)
-        })
+
+        await writeFile(`${FS.cacheDirectory}${uuid}.png`, btoa(binaryString), 'base64')
+        await db.mutate.createCharacter(character, `${FS.cacheDirectory}${uuid}.png`)
+        Logger.log('Imported Character: ' + character.data.name)
     }
 
     export const importCharacterFromRemote = async (text: string) => {
         // UUID standard RFC 4122, only used by pyg for now
         const uuidRegex =
             /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+
+        if (uuidRegex.test(text)) {
+            return importCharacterFromPyg(text)
+        }
+
+        if (/^[^/]+\/[^/]+$/.test(text)) return importCharacterFromChub(text)
+
         const url = new URL(text)
         if (/pygmalion.chat/.test(url.hostname)) {
             const param = new URLSearchParams(text)
@@ -481,8 +492,6 @@ export namespace Characters {
         }
 
         // Regex checks for format of [name][/][character]
-        if (/^[^/]+\/[^/]+$/.test(text)) return importCharacterFromChub(text)
-        if (uuidRegex.test(text)) return importCharacterFromPyg(text)
         Logger.log(`URL not recognized`, true)
     }
 
