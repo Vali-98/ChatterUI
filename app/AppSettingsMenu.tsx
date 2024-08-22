@@ -1,4 +1,5 @@
 import { rawdb } from '@db'
+import { copyFile, DocumentDirectoryPath, DownloadDirectoryPath } from '@dr.pogodin/react-native-fs'
 import { Style, AppSettings, Logger, Characters } from '@globals'
 import { reloadAppAsync } from 'expo'
 import { getDocumentAsync } from 'expo-document-picker'
@@ -6,7 +7,6 @@ import { documentDirectory, copyAsync, deleteAsync } from 'expo-file-system'
 import { Stack, useRouter } from 'expo-router'
 import React from 'react'
 import { StyleSheet, Text, View, Switch, TouchableOpacity, Alert, ScrollView } from 'react-native'
-import ReactNativeBlobUtil from 'react-native-blob-util'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 const appVersion = `${require(`../app.json`).expo.version}`
@@ -55,17 +55,15 @@ const WarningAlert = (title: string, description: string, onPress: () => void) =
 }
 
 const exportDB = async () => {
-    ReactNativeBlobUtil.MediaCollection.copyToMediaStore(
-        {
-            name: `${appVersion}-db-backup.db`,
-            parentFolder: '',
-            mimeType: 'application/x-sqlite3',
-        },
-        'Download',
-        `${documentDirectory}SQLite/db.db`
-    ).then(() => {
-        Logger.log('Download Successful!', true)
-    })
+    console.log(`${DocumentDirectoryPath}/SQLite/db.db`)
+    await copyFile(
+        `${DocumentDirectoryPath}/SQLite/db.db`,
+        `${DownloadDirectoryPath}/${appVersion}-db-backup.db`
+    )
+        .then(() => {
+            Logger.log('Download Successful!', true)
+        })
+        .catch((e) => Logger.log('Failed to copy database: ' + e, true))
 }
 
 const importDB = async (uri: string, name: string) => {
