@@ -1,4 +1,3 @@
-import { Buffer } from '@craftzdog/react-native-buffer'
 import { db as database } from '@db'
 import { copyFileRes } from '@dr.pogodin/react-native-fs'
 import axios from 'axios'
@@ -354,7 +353,14 @@ export namespace Characters {
             return
         }
 
-        const chunks = extractChunks(Buffer.from(file, 'base64'))
+        const binaryString = atob(file)
+
+        const bytes = new Uint8Array(binaryString.length).map(
+            (item, index) => (item = binaryString.charCodeAt(index))
+        )
+
+        const chunks = extractChunks(bytes)
+
         const textChunks = chunks
             .filter(function (chunk: any) {
                 return chunk.name === 'tEXt'
