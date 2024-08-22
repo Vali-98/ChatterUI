@@ -65,8 +65,7 @@
                         "enableProguardInReleaseBuilds": true,
                         "enableShrinkResourcesInReleaseBuilds": true,
                         "useLegacyPackaging": true,
-                        "extraProguardRules": "-keep class com.rnllama.** { *; }",
-                        "photosBuildHook": "node ./loadJniLibs.js"
+                        "extraProguardRules": "-keep class com.rnllama.** { *; }"
                     }
                 }
             ],
