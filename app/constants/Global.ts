@@ -163,7 +163,6 @@ export const startupApp = () => {
         Characters.db.query.cardList('character').then((result) => {
             if (result.length === 0) Characters.createDefaultCard()
         })
-        console.log('setting')
         mmkv.set(AppSettings.CreateDefaultCard, false)
     }
 

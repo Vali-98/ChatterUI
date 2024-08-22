@@ -137,7 +137,7 @@ export namespace Presets {
             const data = Samplers[key].values.default
             preset[key] = data
             samekeys = false
-            Logger.log(`Prese was missing field ${key}`)
+            Logger.log(`Preset was missing field: ${key}`)
         })
         if (presetname) saveFile(presetname, preset)
         if (fixmmkv) mmkv.set(Global.PresetData, JSON.stringify(preset))
