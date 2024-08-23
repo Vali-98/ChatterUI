@@ -18,6 +18,7 @@ type TextBoxModalProps = {
     onConfirm: (text: string) => void
     title?: string
     showPaste?: boolean
+    placeholder?: string
 }
 
 const TextBoxModal: React.FC<TextBoxModalProps> = ({
@@ -25,6 +26,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
     onConfirm = (text) => {},
     title = 'Enter Name',
     showPaste = false,
+    placeholder = '',
 }) => {
     const [text, setText] = useState('')
 
@@ -35,30 +37,36 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
     const handleOverlayClick = (e: GestureResponderEvent) => {
         if (e.target === e.currentTarget) setShowModal(false)
     }
+
+    const handleClose = () => {
+        setShowModal(false)
+    }
+
     return (
         <Modal
             visible={showModal}
-            onRequestClose={() => {
-                setShowModal(false)
-            }}
+            style={{ flex: 1 }}
             transparent
-            statusBarTranslucent={Platform.OS === 'android'}
-            animationType="fade"
-            onDismiss={() => {
-                setShowModal(false)
-            }}>
+            onRequestClose={handleClose}
+            animationType="fade">
             <TouchableOpacity
                 activeOpacity={1}
                 onPress={handleOverlayClick}
                 style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     flex: 1,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     justifyContent: 'center',
                 }}>
                 <View style={styles.modalview}>
                     <Text style={styles.title}>{title}</Text>
                     <View style={styles.inputContainer}>
-                        <TextInput style={styles.input} value={text} onChangeText={setText} />
+                        <TextInput
+                            style={styles.input}
+                            value={text}
+                            onChangeText={setText}
+                            placeholder={placeholder}
+                            placeholderTextColor={Style.getColor('primary-text3')}
+                        />
                         {showPaste && !text && (
                             <TouchableOpacity
                                 style={styles.inputButton}
@@ -105,9 +113,11 @@ const styles = StyleSheet.create({
 
     modalview: {
         margin: 20,
-        backgroundColor: Style.getColor('primary-surface1'),
+        backgroundColor: Style.getColor('primary-surface2'),
         borderRadius: 20,
-        padding: 35,
+        paddingHorizontal: 32,
+        paddingTop: 30,
+        paddingBottom: 20,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: {
@@ -145,8 +155,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderColor: Style.getColor('primary-surface4'),
-        borderWidth: 1,
+        backgroundColor: Style.getColor('primary-surface1'),
         borderRadius: 8,
         marginBottom: 8,
     },

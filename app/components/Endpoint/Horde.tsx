@@ -193,6 +193,7 @@ const Horde = () => {
             <View>
                 {hordeModels?.map((item, index) => (
                     <HordeItem
+                        key={item.name}
                         item={item}
                         unSelect={() => {
                             const models = hordeModels

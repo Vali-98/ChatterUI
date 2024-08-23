@@ -1,7 +1,7 @@
-import { ColorId } from 'app/constants/Style'
 import { MaterialIcons } from '@expo/vector-icons'
 import { Chats, Style } from '@globals'
-import { useState } from 'react'
+import { ColorId } from 'app/constants/Style'
+import { ReactElement, useState } from 'react'
 import {
     GestureResponderEvent,
     Modal,
@@ -16,12 +16,21 @@ import { useShallow } from 'zustand/react/shallow'
 type EditorButtonProps = {
     name: 'delete' | 'check' | 'close'
     color: ColorId
+    label: string
     onPress: () => void
 }
 
-const EditorButton = ({ name, onPress, color }: EditorButtonProps) => (
+const EditorButton = ({ name, onPress, label, color }: EditorButtonProps) => (
     <TouchableOpacity style={styles.editButton} onPress={onPress}>
-        <MaterialIcons name={name} size={32} color={Style.getColor(color)} />
+        <MaterialIcons name={name} size={24} color={Style.getColor(color)} />
+        <Text
+            style={{
+                color: Style.getColor('primary-text2'),
+                fontSize: 16,
+                paddingLeft: 8,
+            }}>
+            {label}
+        </Text>
     </TouchableOpacity>
 )
 
@@ -34,10 +43,13 @@ type EditorProps = {
 
 type FadeScreenProps = {
     handleOverlayClick: (e: GestureResponderEvent) => void
+    children: ReactElement
 }
-const FadeScreen: React.FC<FadeScreenProps> = ({ handleOverlayClick }) => {
+const FadeScreen: React.FC<FadeScreenProps> = ({ handleOverlayClick, children }) => {
     return (
-        <TouchableOpacity activeOpacity={1} onPress={handleOverlayClick} style={styles.absolute} />
+        <TouchableOpacity activeOpacity={1} onPress={handleOverlayClick} style={styles.absolute}>
+            {children}
+        </TouchableOpacity>
     )
 }
 
@@ -80,21 +92,14 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
                 transparent
                 onRequestClose={handleClose}
                 style={{ flex: 1 }}>
-                <FadeScreen handleOverlayClick={handleOverlayClick} />
-                <View style={{ flex: 1 }} />
-                <View style={styles.topText}>
-                    <Text style={styles.nameText}>{message?.name}</Text>
-                    <Text style={styles.timeText}>
-                        {message?.swipes[message.swipe_id].send_date.toLocaleTimeString()}
-                    </Text>
-                </View>
-                <View style={styles.editorContainer}>
-                    <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                        <EditorButton
-                            name="delete"
-                            onPress={handleDeleteMessage}
-                            color="destructive-brand"
-                        />
+                <FadeScreen handleOverlayClick={handleOverlayClick}>
+                    <View style={styles.editorContainer}>
+                        <View style={styles.topText}>
+                            <Text style={styles.nameText}>{message?.name}</Text>
+                            <Text style={styles.timeText}>
+                                {message?.swipes[message.swipe_id].send_date.toLocaleTimeString()}
+                            </Text>
+                        </View>
                         <TextInput
                             style={styles.messageInput}
                             value={placeholderText}
@@ -102,13 +107,27 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
                             textBreakStrategy="simple"
                             multiline
                         />
-                        <EditorButton
-                            name="check"
-                            onPress={handleEditMessage}
-                            color="primary-text1"
-                        />
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                            }}>
+                            <EditorButton
+                                name="delete"
+                                label="Delete"
+                                onPress={handleDeleteMessage}
+                                color="destructive-brand"
+                            />
+
+                            <EditorButton
+                                name="check"
+                                label="Confirm"
+                                onPress={handleEditMessage}
+                                color="primary-text1"
+                            />
+                        </View>
                     </View>
-                </View>
+                </FadeScreen>
             </Modal>
         </View>
     )
@@ -118,22 +137,22 @@ export default EditorModal
 
 const styles = StyleSheet.create({
     absolute: {
-        position: 'absolute',
-        width: '100%',
         height: '100%',
+        justifyContent: 'flex-end',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
 
     editorContainer: {
         backgroundColor: Style.getColor('primary-surface2'),
-        paddingTop: 4,
-        maxHeight: '70%',
+        flexShrink: 1,
         paddingVertical: 12,
+        paddingHorizontal: 16,
     },
 
     topText: {
         flexDirection: 'row',
-        padding: 8,
+        paddingTop: 12,
+        marginBottom: 8,
         alignItems: 'flex-end',
         shadowColor: Style.getColor('primary-shadow'),
         backgroundColor: Style.getColor('primary-surface2'),
@@ -144,7 +163,7 @@ const styles = StyleSheet.create({
     nameText: {
         color: Style.getColor('primary-text1'),
         fontSize: 18,
-        marginLeft: 40,
+        marginLeft: 24,
     },
 
     timeText: {
@@ -154,18 +173,24 @@ const styles = StyleSheet.create({
     },
 
     editButton: {
-        padding: 4,
-        paddingVertical: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingLeft: 16,
+        paddingVertical: 8,
+        width: 128,
+        marginTop: 8,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: Style.getColor('primary-surface4'),
     },
 
     messageInput: {
         color: Style.getColor('primary-text1'),
         backgroundColor: Style.getColor('primary-surface1'),
         borderColor: Style.getColor('primary-brand'),
-        borderWidth: 1,
-        minHeight: 32,
         borderRadius: 8,
+        borderWidth: 1,
         padding: 8,
-        flex: 1,
+        flexShrink: 1,
     },
 })

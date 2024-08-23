@@ -70,8 +70,9 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
         <View style={styles.headerButtonContainer}>
             <TextBoxModal
                 booleans={[showNewChar, setShowNewChar]}
-                title="[Creating Character]  Enter Name Below"
+                title="Create New Character"
                 onConfirm={handleCreateCharacter}
+                placeholder="Name..."
             />
 
             <TextBoxModal
