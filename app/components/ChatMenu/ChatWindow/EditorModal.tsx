@@ -9,8 +9,8 @@ import {
     Text,
     TouchableOpacity,
     View,
+    TextInput,
 } from 'react-native'
-import { TextInput } from 'react-native-gesture-handler'
 import { useShallow } from 'zustand/react/shallow'
 
 type EditorButtonProps = {
@@ -22,11 +22,14 @@ type EditorButtonProps = {
 
 const EditorButton = ({ name, onPress, label, color }: EditorButtonProps) => (
     <TouchableOpacity style={styles.editButton} onPress={onPress}>
-        <MaterialIcons name={name} size={24} color={Style.getColor(color)} />
+        <MaterialIcons
+            name={name}
+            size={name === 'delete' ? 20 : 24}
+            color={Style.getColor(color)}
+        />
         <Text
             style={{
                 color: Style.getColor('primary-text2'),
-                fontSize: 16,
                 paddingLeft: 8,
             }}>
             {label}
@@ -100,6 +103,7 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
                                 {message?.swipes[message.swipe_id].send_date.toLocaleTimeString()}
                             </Text>
                         </View>
+
                         <TextInput
                             style={styles.messageInput}
                             value={placeholderText}
@@ -107,10 +111,12 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
                             textBreakStrategy="simple"
                             multiline
                         />
+
                         <View
                             style={{
                                 flexDirection: 'row',
                                 justifyContent: 'space-between',
+                                marginTop: 8,
                             }}>
                             <EditorButton
                                 name="delete"
@@ -147,6 +153,8 @@ const styles = StyleSheet.create({
         flexShrink: 1,
         paddingVertical: 12,
         paddingHorizontal: 16,
+        borderTopRightRadius: 24,
+        borderTopLeftRadius: 24,
     },
 
     topText: {
@@ -155,7 +163,6 @@ const styles = StyleSheet.create({
         marginBottom: 8,
         alignItems: 'flex-end',
         shadowColor: Style.getColor('primary-shadow'),
-        backgroundColor: Style.getColor('primary-surface2'),
         borderTopRightRadius: 8,
         borderTopLeftRadius: 8,
     },
@@ -175,10 +182,10 @@ const styles = StyleSheet.create({
     editButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingLeft: 16,
-        paddingVertical: 8,
-        width: 128,
-        marginTop: 8,
+        width: 108,
+        height: 33,
+        paddingLeft: 12,
+        paddingVertical: 4,
         borderRadius: 8,
         borderWidth: 1,
         borderColor: Style.getColor('primary-surface4'),
