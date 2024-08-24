@@ -68,7 +68,7 @@ const ChatMenu = () => {
 
     const goToChars = () => {
         if (showDrawer) setShowDrawer(false)
-        else router.push('components/CharacterMenu/CharacterList')
+        else router.push('/components/CharacterMenu/CharacterList')
     }
 
     const swipeDrawer = Gesture.Fling()

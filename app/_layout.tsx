@@ -84,15 +84,6 @@ const Layout = () => {
                                 animationDuration: 200,
                             }}
                         />
-
-                        <Stack.Screen
-                            name="Settings"
-                            options={{
-                                animation: 'slide_from_left',
-                                title: 'Settings',
-                                animationDuration: 200,
-                            }}
-                        />
                     </Stack>
                 </MenuProvider>
             </GestureHandlerRootView>

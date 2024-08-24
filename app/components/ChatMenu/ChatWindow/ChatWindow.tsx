@@ -1,5 +1,4 @@
-import { useInference } from 'app/constants/Chat'
-import { AppSettings, Characters, Chats, Global } from '@globals'
+import { AppSettings, Characters, Chats } from '@globals'
 import { StyleSheet, FlatList } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
