@@ -4,8 +4,7 @@ import { FontAwesome } from '@expo/vector-icons'
 import { Logger, Style } from '@globals'
 import { Stack } from 'expo-router'
 import React, { useState } from 'react'
-import { View, Image, Text, StyleSheet, Linking, Settings } from 'react-native'
-import { TouchableOpacity } from 'react-native-gesture-handler'
+import { View, Image, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 const About = () => {

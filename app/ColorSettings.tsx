@@ -1,12 +1,11 @@
 import { AppSettings } from '@constants/GlobalValues'
-import { ColorId, Style } from 'app/constants/Style'
 import { FontAwesome } from '@expo/vector-icons'
 import Slider from '@react-native-community/slider'
+import { ColorId, Style } from 'app/constants/Style'
 import { reloadAppAsync } from 'expo'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
-import { View, Text, TouchableOpacity, Switch } from 'react-native'
-import { ScrollView } from 'react-native-gesture-handler'
+import { View, Text, TouchableOpacity, Switch, ScrollView } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 const ColorSettings = () => {
