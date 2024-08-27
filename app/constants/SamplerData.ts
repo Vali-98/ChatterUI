@@ -221,7 +221,7 @@ export const Samplers = {
         inputType: 'slider',
         values: {
             type: 'integer',
-            min: 1,
+            min: 0,
             max: 100,
             default: 100,
             step: 1,
