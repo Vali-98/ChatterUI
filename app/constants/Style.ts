@@ -117,8 +117,9 @@ const createColor = (
 const getColorFromKV = () => {
     const primary = mmkv.getNumber(AppSettings.PrimaryHue)
     if (!primary) {
-        mmkv.set(AppSettings.PrimaryHue, 270)
-        return 270
+        const baseHue = 230
+        mmkv.set(AppSettings.PrimaryHue, baseHue)
+        return baseHue
     }
     return primary
 }
