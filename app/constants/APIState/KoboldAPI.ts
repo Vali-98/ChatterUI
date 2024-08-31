@@ -30,6 +30,8 @@ class KoboldAPI extends APIBase {
         { externalName: 'dry_base', samplerID: SamplerID.DRY_BASE },
         { externalName: 'dry_allowed_length', samplerID: SamplerID.DRY_ALLOWED_LENGTH },
         { externalName: 'dry_sequence_break', samplerID: SamplerID.DRY_SEQUENCE_BREAK },
+        { externalName: 'xtc_threshold', samplerID: SamplerID.XTC_THRESHOLD },
+        { externalName: 'xtc_probability', samplerID: SamplerID.XTC_PROBABILITY },
     ]
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
