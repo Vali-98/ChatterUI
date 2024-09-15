@@ -1,14 +1,13 @@
-import { useInference } from 'app/constants/Chat'
-import { generateResponse } from 'app/constants/Inference'
 import { MaterialIcons } from '@expo/vector-icons'
 import { AppSettings, Characters, Chats, Logger, Style } from '@globals'
+import { useInference } from 'app/constants/Chat'
+import { generateResponse } from 'app/constants/Inference'
 import React, { useState } from 'react'
 import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
 const ChatInput = () => {
-    'use no memo'
     const [sendOnEnter, setSendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
 
     const { insertEntry } = Chats.useChat((state) => ({

@@ -13,18 +13,18 @@ type ListItem = {
 const ChatWindow = () => {
     'use no memo'
     const charId = Characters.useCharacterCard(useShallow((state) => state?.id))
-    const { messages } = Chats.useChat((state) => ({
-        messages: state.data?.messages ?? [],
-    }))
-    const messagesLength = messages?.length ?? -1
+    const messages = Chats.useChat((state) => state.data?.messages)
+    const messagesLength = Chats.useChat((state) => state.data?.messages?.length ?? -1)
     const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
 
-    const getItems = (): ListItem[] => {
-        const list: ListItem[] = []
-        messages.map((item, index) => list.push({ index: index, key: item.id.toString() }))
-        return list.reverse()
-    }
+    const list: ListItem[] = (messages ?? [])
+        .map((item, index) => ({
+            index: index,
+            key: item.id.toString(),
+        }))
+        .reverse()
 
+    console.log('main window rerender')
     const renderItems = ({ item, index }: { item: ListItem; index: number }) => {
         return <ChatItem messagesLength={messagesLength} id={item.index} charId={charId ?? -1} />
     }
@@ -39,7 +39,7 @@ const ChatWindow = () => {
             removeClippedSubviews={false}
             inverted
             windowSize={2}
-            data={getItems()}
+            data={list}
             keyExtractor={(item) => item.key}
             renderItem={renderItems}
         />
