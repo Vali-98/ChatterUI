@@ -14,7 +14,7 @@ const ChatWindow = () => {
     'use no memo'
     const charId = Characters.useCharacterCard(useShallow((state) => state?.id))
     const messages = Chats.useChat((state) => state.data?.messages)
-    const messagesLength = Chats.useChat((state) => state.data?.messages?.length ?? -1)
+    const messagesLength = messages?.length ?? -1
     const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
 
     const list: ListItem[] = (messages ?? [])
