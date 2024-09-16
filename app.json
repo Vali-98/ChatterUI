@@ -69,8 +69,9 @@
                     }
                 }
             ],
-            "./bgactions.plugin.js",
-            "./copyjni.plugin.js"
+            "./expo-build-plugins/bgactions.plugin.js",
+            "./expo-build-plugins/copyjni.plugin.js",
+            "./expo-build-plugins/usercert.plugin.js"
         ],
         "experiments": {
             "typedRoutes": true
