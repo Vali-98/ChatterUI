@@ -1,4 +1,4 @@
-import { db as database } from '@db'
+import { db as database, rawdb } from '@db'
 import { copyFileRes, writeFile } from '@dr.pogodin/react-native-fs'
 import { characterGreetings, characterTags, characters, tags } from 'db/schema'
 import { eq, inArray, notInArray } from 'drizzle-orm'
@@ -111,6 +111,7 @@ export namespace Characters {
         setCard: async (id: number) => {
             let start = performance.now()
             const card = await db.query.card(id)
+            db.mutate.updateModified(id)
             Logger.debug(`[Characters] time for database query: ${performance.now() - start}`)
             start = performance.now()
             set((state) => {
@@ -186,6 +187,7 @@ export namespace Characters {
                         spec_version: '2.0',
                         data: {
                             ...data,
+                            last_modified: data?.last_modified ?? 0, // assume this never actually fails
                             tags: data.tags.map((item) => item.tag.tag),
                             alternate_greetings: data.alternate_greetings.map(
                                 (item) => item.greeting
@@ -194,7 +196,10 @@ export namespace Characters {
                     }
             }
 
-            export const cardList = async (type: 'character' | 'user') => {
+            export const cardList = async (
+                type: 'character' | 'user',
+                orderBy: 'id' | 'modified' = 'id'
+            ) => {
                 const query = await database.query.characters.findMany({
                     columns: {
                         id: true,
@@ -212,6 +217,7 @@ export namespace Characters {
                         },
                     },
                     where: (characters, { eq }) => eq(characters.type, type),
+                    orderBy: orderBy === 'id' ? characters.id : characters.last_modified,
                 })
                 return query.map((item) => ({
                     ...item,
@@ -282,6 +288,13 @@ export namespace Characters {
                     )
                 if (charID === useCharacterCard.getState().id)
                     useCharacterCard.getState().unloadCard()
+            }
+
+            export const updateModified = async (charID: number) => {
+                await database
+                    .update(characters)
+                    .set({ last_modified: new Date().getTime() })
+                    .where(eq(characters.id, charID))
             }
 
             export const createCharacter = async (card: CharacterCardV2, imageuri: string = '') => {
@@ -535,6 +548,7 @@ export type CharacterCardV2Data = {
     creator: string
     character_version: string
     //extensions: {},
+    last_modified: number | null
 }
 
 export type CharacterCardV2 = {

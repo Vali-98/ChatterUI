@@ -126,7 +126,7 @@ export namespace Chats {
                 data: data,
             }))
             Logger.debug(`[Chats] time for zustand set: ${performance.now() - start}`)
-
+            db.mutate.updateChatModified(chatId)
             const charName = Characters.useCharacterCard.getState().card?.data.name
             const charId = Characters.useCharacterCard.getState().id
             if (charName && charId) RecentMessages.insertEntry(charName, charId, chatId)
@@ -366,9 +366,20 @@ export namespace Chats {
                             swipe: convertToFormatInstruct(replaceMacros(data)),
                         })
                     })
-
+                    await Characters.db.mutate.updateModified(charId)
                     return chatId
                 })
+            }
+
+            export const updateChatModified = async (chatID: number) => {
+                const chat = await database.query.chats.findFirst({ where: eq(chats.id, chatID) })
+                if (chat?.character_id) {
+                    await Characters.db.mutate.updateModified(chat.character_id)
+                }
+                await database
+                    .update(chats)
+                    .set({ last_modified: new Date().getTime() })
+                    .where(eq(chats.id, chatID))
             }
 
             export const createEntry = async (
@@ -394,7 +405,17 @@ export namespace Chats {
                     where: eq(chatEntries.id, entryId),
                     with: { swipes: true },
                 })
+                await updateChatModified(chatId)
                 return entry
+            }
+
+            export const updateEntryModified = async (entryId: number) => {
+                const entry = await database.query.chatEntries.findFirst({
+                    where: eq(chatEntries.id, entryId),
+                })
+                if (entry?.chat_id) {
+                    await updateChatModified(entry.chat_id)
+                }
             }
 
             export const createSwipe = async (entryId: number, message: string) => {
@@ -405,11 +426,12 @@ export namespace Chats {
                         swipe: replaceMacros(message),
                     })
                     .returning({ swipeId: chatSwipes.id })
+                await updateEntryModified(entryId)
                 return await database.query.chatSwipes.findFirst({
                     where: eq(chatSwipes.id, swipeId),
                 })
             }
-
+            /*
             export const readChat = async (chatId: number): Promise<ChatData | undefined> => {
                 const chat = await database.query.chats.findFirst({
                     where: eq(chats.id, chatId),
@@ -424,8 +446,9 @@ export namespace Chats {
                 })
                 if (chat) return { ...chat }
             }
-
+*/
             export const updateEntrySwipeId = async (entryId: number, swipeId: number) => {
+                await updateEntryModified(entryId)
                 await database
                     .update(chatEntries)
                     .set({ swipe_id: swipeId })
@@ -449,14 +472,20 @@ export namespace Chats {
                 if (updateStarted) data.gen_started = date
                 if (updateFinished) data.gen_finished = date
                 await database.update(chatSwipes).set(data).where(eq(chatSwipes.id, chatSwipeId))
+                const swipe = await database.query.chatSwipes.findFirst({
+                    where: eq(chatSwipes.id, chatSwipeId),
+                })
+                if (swipe?.entry_id) updateEntryModified(swipe.entry_id)
                 return date
             }
 
             export const deleteChat = async (chatId: number) => {
+                await updateChatModified(chatId)
                 await database.delete(chats).where(eq(chats.id, chatId))
             }
 
             export const deleteChatEntry = async (entryId: number) => {
+                await updateEntryModified(entryId)
                 await database.delete(chatEntries).where(eq(chatEntries.id, entryId))
             }
         }
