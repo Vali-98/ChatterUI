@@ -10,7 +10,7 @@
     "test": "jest --watchAll",
     "postinstall": "patch-package",
     "lint": "eslint .",
-    "migrate": "npx drizzle-kit generate:sqlite",
+    "migrate": "npx drizzle-kit generate",
     "patchsql": "npx patch-package expo-sqlite --exclude \"\\.project|\\.cxx|build|bin\" --case-sensitive-path-filtering"
   },
   "jest": {
@@ -30,7 +30,7 @@
     "babel-plugin-inline-import": "^3.0.0",
     "babel-plugin-react-compiler": "^0.0.0-experimental-696af53-20240625",
     "cui-llama.rn": "^1.1.6",
-    "drizzle-orm": "^0.30.10",
+    "drizzle-orm": "^0.33.0",
     "eas-cli": "^9.1.0",
     "expo": "~51.0.28",
     "expo-application": "~5.9.1",
@@ -80,7 +80,7 @@
     "@types/png-chunk-text": "^1.0.3",
     "@types/png-chunks-extract": "^1.0.2",
     "@types/react": "~18.2.79",
-    "drizzle-kit": "^0.20.18",
+    "drizzle-kit": "^0.24.2",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-universe": "^12.0.0",
