@@ -24,7 +24,6 @@ const ChatWindow = () => {
         }))
         .reverse()
 
-    console.log('main window rerender')
     const renderItems = ({ item, index }: { item: ListItem; index: number }) => {
         return <ChatItem messagesLength={messagesLength} id={item.index} charId={charId ?? -1} />
     }

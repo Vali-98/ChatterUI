@@ -55,7 +55,6 @@ const WarningAlert = (title: string, description: string, onPress: () => void) =
 }
 
 const exportDB = async () => {
-    console.log(`${DocumentDirectoryPath}/SQLite/db.db`)
     await copyFile(
         `${DocumentDirectoryPath}/SQLite/db.db`,
         `${DownloadDirectoryPath}/${appVersion}-db-backup.db`

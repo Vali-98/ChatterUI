@@ -44,7 +44,6 @@ class CohereAPI extends APIBase {
             chat_history: chat_history,
             stop: this.constructStopSequence(),
         }
-        console.log(payload)
         return payload
     }
     inference = async () => {

@@ -38,7 +38,6 @@ class ChatCompletionsAPI extends APIBase {
             new URL('v1/chat/completions', endpoint).toString(),
             JSON.stringify(this.buildPayload()),
             (item) => {
-                console.log(item)
                 const output = JSON.parse(item)
                 return (
                     output?.choices?.[0]?.text ??
