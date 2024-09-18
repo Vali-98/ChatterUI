@@ -15,6 +15,13 @@
       "when": 1719971104700,
       "tag": "0001_yellow_squirrel_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1726593007556,
+      "tag": "0002_majestic_brother_voodoo",
+      "breakpoints": true
     }
   ]
 }

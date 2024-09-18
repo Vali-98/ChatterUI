@@ -1,6 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
+  "id": "bd5f0c89-3dfa-4031-a195-527c4010ea23",
+  "prevId": "0725e924-217d-41ad-9dff-6d8694fad773",
   "tables": {
     "character_greetings": {
       "name": "character_greetings",
@@ -32,15 +34,15 @@
         "character_greetings_character_id_characters_id_fk": {
           "name": "character_greetings_character_id_characters_id_fk",
           "tableFrom": "character_greetings",
+          "tableTo": "characters",
           "columnsFrom": [
             "character_id"
           ],
-          "tableTo": "characters",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -69,28 +71,28 @@
         "character_lorebooks_character_id_characters_id_fk": {
           "name": "character_lorebooks_character_id_characters_id_fk",
           "tableFrom": "character_lorebooks",
+          "tableTo": "characters",
           "columnsFrom": [
             "character_id"
           ],
-          "tableTo": "characters",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         },
         "character_lorebooks_lorebook_id_lorebooks_id_fk": {
           "name": "character_lorebooks_lorebook_id_lorebooks_id_fk",
           "tableFrom": "character_lorebooks",
+          "tableTo": "lorebooks",
           "columnsFrom": [
             "lorebook_id"
           ],
-          "tableTo": "lorebooks",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -127,28 +129,28 @@
         "character_tags_character_id_characters_id_fk": {
           "name": "character_tags_character_id_characters_id_fk",
           "tableFrom": "character_tags",
+          "tableTo": "characters",
           "columnsFrom": [
             "character_id"
           ],
-          "tableTo": "characters",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         },
         "character_tags_tag_id_tags_id_fk": {
           "name": "character_tags_tag_id_tags_id_fk",
           "tableFrom": "character_tags",
+          "tableTo": "tags",
           "columnsFrom": [
             "tag_id"
           ],
-          "tableTo": "tags",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -273,6 +275,13 @@
           "notNull": true,
           "autoincrement": false,
           "default": "''"
+        },
+        "last_modified": {
+          "name": "last_modified",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -332,15 +341,15 @@
         "chat_entries_chat_id_chats_id_fk": {
           "name": "chat_entries_chat_id_chats_id_fk",
           "tableFrom": "chat_entries",
+          "tableTo": "chats",
           "columnsFrom": [
             "chat_id"
           ],
-          "tableTo": "chats",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -398,15 +407,15 @@
         "chat_swipes_entry_id_chat_entries_id_fk": {
           "name": "chat_swipes_entry_id_chat_entries_id_fk",
           "tableFrom": "chat_swipes",
+          "tableTo": "chat_entries",
           "columnsFrom": [
             "entry_id"
           ],
-          "tableTo": "chat_entries",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -435,6 +444,13 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "last_modified": {
+          "name": "last_modified",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -442,15 +458,15 @@
         "chats_character_id_characters_id_fk": {
           "name": "chats_character_id_characters_id_fk",
           "tableFrom": "chats",
+          "tableTo": "characters",
           "columnsFrom": [
             "character_id"
           ],
-          "tableTo": "characters",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -570,6 +586,30 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "examples": {
+          "name": "examples",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "format_type": {
+          "name": "format_type",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {},
@@ -653,15 +693,15 @@
         "lorebook_entries_lorebook_id_lorebooks_id_fk": {
           "name": "lorebook_entries_lorebook_id_lorebooks_id_fk",
           "tableFrom": "lorebook_entries",
+          "tableTo": "lorebooks",
           "columnsFrom": [
             "lorebook_id"
           ],
-          "tableTo": "lorebooks",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -753,9 +793,11 @@
   },
   "enums": {},
   "_meta": {
+    "schemas": {},
     "tables": {},
     "columns": {}
   },
-  "id": "e6a2401f-ac5e-4ef4-9339-c8635d8b57f8",
-  "prevId": "00000000-0000-0000-0000-000000000000"
+  "internal": {
+    "indexes": {}
+  }
 }

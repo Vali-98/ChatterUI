@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import { integer, sqliteTable, text, primaryKey } from 'drizzle-orm/sqlite-core'
 
 // TAVERN V2 SPEC
@@ -22,6 +22,11 @@ export const characters = sqliteTable('characters', {
         .$defaultFn(() => new Date().getTime()),
     creator: text('creator').notNull().default(''),
     character_version: text('character_version').notNull().default(''),
+    last_modified: integer('last_modified', { mode: 'number' })
+        .$defaultFn(() => new Date().getTime())
+        .$onUpdateFn(() => new Date().getTime()),
+    //.default(sql`(unixepoch('subsec')*1000)`)
+    //.$onUpdate(() => sql`(unixepoch('subsec')*1000)`),
 })
 
 export const characterGreetings = sqliteTable('character_greetings', {
@@ -90,6 +95,11 @@ export const chats = sqliteTable('chats', {
     character_id: integer('character_id', { mode: 'number' })
         .notNull()
         .references(() => characters.id, { onDelete: 'cascade' }),
+    last_modified: integer('last_modified', { mode: 'number' })
+        .$defaultFn(() => new Date().getTime())
+        .$onUpdateFn(() => new Date().getTime()),
+    //.default(sql`(unixepoch('subsec')*1000)`)
+    //.$onUpdate(() => sql`(unixepoch('subsec')*1000)`),
 })
 
 export const chatEntries = sqliteTable('chat_entries', {
