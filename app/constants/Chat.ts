@@ -117,15 +117,15 @@ export namespace Chats {
         abortFunction: undefined,
         setAbortFunction: (fn) => (get().abortFunction = fn),
         load: async (chatId: number) => {
-            let start = performance.now()
+            //let start = performance.now()
             const data = await db.query.chat(chatId)
-            Logger.debug(`[Chats] time for database query: ${performance.now() - start}`)
-            start = performance.now()
+            //Logger.debug(`[Chats] time for database query: ${performance.now() - start}`)
+            //start = performance.now()
             set((state: ChatState) => ({
                 ...state,
                 data: data,
             }))
-            Logger.debug(`[Chats] time for zustand set: ${performance.now() - start}`)
+            //Logger.debug(`[Chats] time for zustand set: ${performance.now() - start}`)
             db.mutate.updateChatModified(chatId)
             const charName = Characters.useCharacterCard.getState().card?.data.name
             const charId = Characters.useCharacterCard.getState().id
@@ -431,22 +431,7 @@ export namespace Chats {
                     where: eq(chatSwipes.id, swipeId),
                 })
             }
-            /*
-            export const readChat = async (chatId: number): Promise<ChatData | undefined> => {
-                const chat = await database.query.chats.findFirst({
-                    where: eq(chats.id, chatId),
-                    with: {
-                        messages: {
-                            orderBy: chatEntries.order,
-                            with: {
-                                swipes: true,
-                            },
-                        },
-                    },
-                })
-                if (chat) return { ...chat }
-            }
-*/
+
             export const updateEntrySwipeId = async (entryId: number, swipeId: number) => {
                 await updateEntryModified(entryId)
                 await database

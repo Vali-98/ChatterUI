@@ -4,6 +4,7 @@ import { Characters, Chats, Logger, Style } from '@globals'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 type CharacterNewMenuProps = {
@@ -67,7 +68,13 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
     }
 
     return (
-        <View style={styles.headerButtonContainer}>
+        <Animated.View
+            style={styles.headerButtonContainer}
+            collapsable={false}
+            entering={SlideInRight.withInitialValues({ originX: 150 })
+                .easing(Easing.out(Easing.ease))
+                .duration(300)}
+            exiting={SlideOutRight.duration(500).easing(Easing.out(Easing.linear))}>
             <TextBoxModal
                 booleans={[showNewChar, setShowNewChar]}
                 title="Create New Character"
@@ -114,7 +121,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
                 }}>
                 <FontAwesome name="pencil" size={28} color={Style.getColor('primary-text1')} />
             </TouchableOpacity>
-        </View>
+        </Animated.View>
     )
 }
 

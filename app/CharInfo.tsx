@@ -1,12 +1,12 @@
 import AnimatedView from '@components/AnimatedView'
 import { FontAwesome } from '@expo/vector-icons'
-import { Characters, Logger, Style } from '@globals'
+import { Characters, Chats, Logger, Style } from '@globals'
 import { CharacterCardV2 } from 'app/constants/Characters'
 import { RecentMessages } from 'app/constants/RecentMessages'
 import { Tokenizer } from 'app/constants/Tokenizer'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAutosave } from 'react-autosave'
 import {
     View,
@@ -18,27 +18,40 @@ import {
     Alert,
     ScrollView,
     TextInput,
+    BackHandler,
 } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 const CharInfo = () => {
     const router = useRouter()
-    const { currentCard, setCurrentCard, charId, charName } = Characters.useCharacterCard(
-        useShallow((state) => ({
-            charId: state.id,
-            currentCard: state.card,
-            setCurrentCard: state.setCard,
-            charName: state.card?.data.name,
-        }))
-    )
+    const { currentCard, setCurrentCard, charId, charName, unloadCharacter } =
+        Characters.useCharacterCard(
+            useShallow((state) => ({
+                charId: state.id,
+                currentCard: state.card,
+                setCurrentCard: state.setCard,
+                charName: state.card?.data.name,
+                unloadCharacter: state.unloadCard,
+            }))
+        )
     const getTokenCount = Tokenizer.useTokenizer((state) => state.getTokenCount)
     const [characterCard, setCharacterCard] = useState<CharacterCardV2 | undefined>(currentCard)
 
     const imageDir = Characters.getImageDir(currentCard?.data.image_id ?? -1)
+    const chat = Chats.useChat((state) => state.data)
 
     const [imageSource, setImageSource] = useState({
         uri: imageDir,
     })
+
+    useEffect(() => {
+        const backAction = () => {
+            if (!chat) unloadCharacter()
+            return false
+        }
+        const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
+        return () => handler.remove()
+    }, [])
 
     const handleImageError = () => {
         setImageSource(require('@assets/user.png'))

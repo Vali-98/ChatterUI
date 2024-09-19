@@ -59,15 +59,6 @@ const Layout = () => {
                         <Stack.Screen name="index" options={{ animation: 'fade' }} />
 
                         <Stack.Screen
-                            name="CharMenu"
-                            options={{
-                                animation: 'slide_from_right',
-                                title: 'Characters',
-                                animationDuration: 200,
-                            }}
-                        />
-
-                        <Stack.Screen
                             name="CharInfo"
                             options={{
                                 animation: 'fade',

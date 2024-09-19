@@ -1,7 +1,15 @@
 import { db as database, rawdb } from '@db'
 import { copyFileRes, writeFile } from '@dr.pogodin/react-native-fs'
-import { characterGreetings, characterTags, characters, tags } from 'db/schema'
-import { eq, inArray, notInArray } from 'drizzle-orm'
+import {
+    characterGreetings,
+    characterTags,
+    characters,
+    chatEntries,
+    chatSwipes,
+    chats,
+    tags,
+} from 'db/schema'
+import { desc, eq, inArray, notInArray } from 'drizzle-orm'
 import { randomUUID } from 'expo-crypto'
 import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
@@ -40,12 +48,12 @@ export namespace Characters {
         card: undefined,
         tokenCache: undefined,
         setCard: async (id: number) => {
-            let start = performance.now()
+            //let start = performance.now()
             const card = await db.query.card(id)
-            Logger.debug(`[User] time for database query: ${performance.now() - start}`)
-            start = performance.now()
+            //Logger.debug(`[User] time for database query: ${performance.now() - start}`)
+            //start = performance.now()
             set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
-            Logger.debug(`[User] time for zustand set: ${performance.now() - start}`)
+            //Logger.debug(`[User] time for zustand set: ${performance.now() - start}`)
             mmkv.set(Global.UserID, id)
             return card?.data.name
         },
@@ -109,15 +117,15 @@ export namespace Characters {
         card: undefined,
         tokenCache: undefined,
         setCard: async (id: number) => {
-            let start = performance.now()
+            //let start = performance.now()
             const card = await db.query.card(id)
             db.mutate.updateModified(id)
-            Logger.debug(`[Characters] time for database query: ${performance.now() - start}`)
-            start = performance.now()
+            //Logger.debug(`[Characters] time for database query: ${performance.now() - start}`)
+            //start = performance.now()
             set((state) => {
                 return { ...state, card: card, id: id, tokenCache: undefined }
             })
-            Logger.debug(`[Characters] time for zustand set: ${performance.now() - start}`)
+            //Logger.debug(`[Characters] time for zustand set: ${performance.now() - start}`)
             return card?.data.name
         },
         unloadCard: () => {
@@ -205,6 +213,7 @@ export namespace Characters {
                         id: true,
                         name: true,
                         image_id: true,
+                        last_modified: true,
                     },
                     with: {
                         tags: {
@@ -215,12 +224,43 @@ export namespace Characters {
                                 tag: true,
                             },
                         },
+                        chats: {
+                            columns: {
+                                id: true,
+                            },
+                            limit: 1,
+                            orderBy: desc(chats.last_modified),
+                            with: {
+                                messages: {
+                                    columns: {
+                                        id: true,
+                                        name: true,
+                                    },
+                                    limit: 1,
+                                    orderBy: desc(chatEntries.id),
+                                    with: {
+                                        swipes: {
+                                            columns: {
+                                                swipe: true,
+                                            },
+                                            orderBy: desc(chatSwipes.id),
+                                            limit: 1,
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     },
                     where: (characters, { eq }) => eq(characters.type, type),
-                    orderBy: orderBy === 'id' ? characters.id : characters.last_modified,
+                    orderBy: orderBy === 'id' ? characters.id : desc(characters.last_modified),
                 })
+
                 return query.map((item) => ({
                     ...item,
+                    latestChat: item.chats[0]?.id,
+                    latestSwipe: item.chats[0]?.messages[0]?.swipes[0]?.swipe,
+                    latestName: item.chats[0]?.messages[0]?.name,
+                    last_modified: item.last_modified ?? 0,
                     tags: item.tags.map((item) => item.tag.tag),
                 }))
             }

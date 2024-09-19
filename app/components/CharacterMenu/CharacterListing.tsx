@@ -1,4 +1,3 @@
-import AnimatedView from '@components/AnimatedView'
 import { AntDesign } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
 import { router } from 'expo-router'
@@ -8,6 +7,7 @@ type CharacterListingProps = {
     index: number
     character: CharInfo
     nowLoading: boolean
+    showTags: boolean
     setNowLoading: (b: boolean) => void
 }
 
@@ -15,13 +15,28 @@ type CharInfo = {
     name: string
     id: number
     image_id: number
+    last_modified: number
     tags: string[]
+    latestSwipe?: string
+    latestName?: string
+    latestChat?: number
+}
+
+const day_ms = 86400000
+const day2_ms = 172800000
+const getTimeStamp = (oldtime: number) => {
+    const now = new Date().getTime()
+    const delta = now - oldtime
+    if (delta < now % day_ms) return new Date(oldtime).toLocaleTimeString()
+    if (delta < (now % day_ms) + day_ms) return 'Yesterday'
+    return new Date(oldtime).toLocaleDateString()
 }
 
 const CharacterListing: React.FC<CharacterListingProps> = ({
     index,
     character,
     nowLoading,
+    showTags,
     setNowLoading,
 }) => {
     const { loadedCharId, setCurrentCard } = Characters.useCharacterCard((state) => ({
@@ -35,40 +50,45 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
         if (nowLoading) return
 
         try {
-            await setCurrentCard(charId)
             setNowLoading(true)
-            const returnedChatId = await Chats.db.query.chatNewest(charId)
-            let chatId = returnedChatId
-            if (!chatId) {
-                chatId = await Chats.db.mutate.createChat(charId)
-            }
-            if (!chatId) {
-                Logger.log('Chat creation backup has failed! Please report.', true)
-                return
-            }
+            await setCurrentCard(charId)
 
-            await loadChat(chatId)
+            if (edit) {
+                router.push('/CharInfo')
+            } else {
+                let chatId = character.latestChat
+                if (!chatId) {
+                    chatId = await Chats.db.mutate.createChat(charId)
+                }
+                if (!chatId) {
+                    Logger.log('Chat creation backup has failed! Please report.', true)
+                    return
+                }
+                await loadChat(chatId)
+            }
 
             setNowLoading(false)
-            if (edit) router.push('/CharInfo')
-            else router.back()
         } catch (error) {
             Logger.log(`Couldn't load character: ${error}`, true)
             setNowLoading(false)
         }
     }
 
+    const getPreviewText = () => {
+        if (!character.latestSwipe || !character.latestName) return ''
+        const previewText =
+            (character.latestName + ':  ' + character.latestSwipe).substring(0, 80) +
+            (character.latestSwipe.length > 80 ? '...' : '')
+        return previewText
+    }
+
     return (
-        <AnimatedView
+        <View
             style={
                 character.id === loadedCharId
                     ? styles.longButtonSelectedContainer
                     : styles.longButtonContainer
-            }
-            dx={Math.min(500 + index * 200, 2000)}
-            tduration={Math.min(500 + index * 100, 1000)}
-            fade={0}
-            fduration={500}>
+            }>
             <TouchableOpacity
                 style={styles.longButton}
                 disabled={nowLoading}
@@ -79,14 +99,25 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                     }}
                     style={styles.avatar}
                 />
-                <View>
-                    <Text style={styles.nametag}>{character.name}</Text>
+                <View style={{ flex: 1, paddingLeft: 12 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={styles.nametag}>{character.name}</Text>
+                        <Text style={styles.timestamp}>
+                            {' '}
+                            {getTimeStamp(character.last_modified)}
+                        </Text>
+                    </View>
+                    {character.latestSwipe && (
+                        <Text style={styles.previewText}>{getPreviewText()}</Text>
+                    )}
                     <View
                         style={{
                             paddingLeft: 16,
                             flex: 1,
                             flexDirection: 'row',
                             flexWrap: 'wrap',
+                            columnGap: 2,
+                            rowGap: 2,
                         }}>
                         {character.tags.map((item, index) => (
                             <Text style={styles.tag} key={index}>
@@ -110,15 +141,11 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                             setCurrentCharacter(character.id, true)
                         }}
                         disabled={nowLoading}>
-                        <AntDesign
-                            color={Style.getColor('primary-text2')}
-                            name="idcard"
-                            size={32}
-                        />
+                        <AntDesign color={Style.getColor('primary-text2')} name="edit" size={26} />
                     </TouchableOpacity>
                 )}
             </View>
-        </AnimatedView>
+        </View>
     )
 }
 
@@ -170,8 +197,18 @@ const styles = StyleSheet.create({
 
     nametag: {
         fontSize: 16,
-        marginLeft: 20,
         color: Style.getColor('primary-text1'),
+    },
+
+    timestamp: {
+        fontSize: 12,
+        color: Style.getColor('primary-text2'),
+    },
+
+    previewText: {
+        marginTop: 4,
+        fontSize: 12,
+        color: Style.getColor('primary-text3'),
     },
 
     tag: {

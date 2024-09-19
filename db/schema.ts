@@ -61,6 +61,7 @@ export const characterRelations = relations(characters, ({ many }) => ({
     alternate_greetings: many(characterGreetings),
     tags: many(characterTags),
     lorebooks: many(characterLorebooks),
+    chats: many(chats),
 }))
 
 export const greetingsRelations = relations(characterGreetings, ({ one }) => ({
@@ -133,8 +134,12 @@ export const chatSwipes = sqliteTable('chat_swipes', {
         .$defaultFn(() => new Date()),
 })
 
-export const chatsRelations = relations(chats, ({ many }) => ({
+export const chatsRelations = relations(chats, ({ many, one }) => ({
     messages: many(chatEntries),
+    character: one(characters, {
+        fields: [chats.character_id],
+        references: [characters.id],
+    }),
 }))
 
 export const chatEntriesRelations = relations(chatEntries, ({ one, many }) => ({

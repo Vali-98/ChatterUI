@@ -1,27 +1,31 @@
+import CharacterList from '@components/CharacterMenu/CharacterList'
 import { Ionicons, FontAwesome } from '@expo/vector-icons'
-import { Logger, Style, Characters } from '@globals'
+import { Logger, Style, Characters, Chats } from '@globals'
 import { Stack, useFocusEffect, useRouter } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
 import { View, SafeAreaView, TouchableOpacity, StyleSheet, BackHandler } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Menu } from 'react-native-popup-menu'
-import Animated, { SlideInRight, runOnJS, Easing } from 'react-native-reanimated'
+import Animated, { SlideInRight, runOnJS, Easing, SlideOutRight } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import ChatInput from './ChatInput'
 import { ChatWindow } from './ChatWindow/ChatWindow'
 import OptionsMenu from './OptionsMenu'
-import Recents from './Recents'
 import SettingsDrawer from './SettingsDrawer'
 
 const ChatMenu = () => {
     const router = useRouter()
-    const { charName, unloadCharacter } = Characters.useCharacterCard(
+    const { unloadCharacter } = Characters.useCharacterCard(
         useShallow((state) => ({
-            charName: state?.card?.data.name,
             unloadCharacter: state.unloadCard,
         }))
     )
+
+    const { chat, unloadChat } = Chats.useChat((state) => ({
+        chat: state.data,
+        unloadChat: state.reset,
+    }))
 
     const [showDrawer, setDrawer] = useState<boolean>(false)
     const menuRef = useRef<Menu | null>(null)
@@ -46,7 +50,8 @@ const ChatMenu = () => {
             return true
         }
 
-        if (charName) {
+        if (chat) {
+            unloadChat()
             unloadCharacter()
             Logger.debug('Returning to primary Menu')
             return true
@@ -58,18 +63,12 @@ const ChatMenu = () => {
         useCallback(() => {
             BackHandler.removeEventListener('hardwareBackPress', backAction)
             BackHandler.addEventListener('hardwareBackPress', backAction)
-
             return () => {
                 BackHandler.removeEventListener('hardwareBackPress', backAction)
             }
             // eslint-disable-next-line react-compiler/react-compiler
-        }, [charName, showDrawer, menuRef.current?.isOpen()])
+        }, [chat, showDrawer, menuRef.current?.isOpen()])
     )
-
-    const goToChars = () => {
-        if (showDrawer) setShowDrawer(false)
-        else router.push('/components/CharacterMenu/CharacterList')
-    }
 
     const swipeDrawer = Gesture.Fling()
         .direction(1)
@@ -80,16 +79,18 @@ const ChatMenu = () => {
     const swipeChar = Gesture.Fling()
         .direction(3)
         .onEnd(() => {
-            runOnJS(goToChars)()
+            // runOnJS(goToChars)()
         })
 
     const gesture = Gesture.Exclusive(swipeDrawer, swipeChar)
 
     const headerViewRightSettings = (
         <Animated.View
+            collapsable={false}
             entering={SlideInRight.withInitialValues({ originX: 150 })
-                .duration(200)
-                .easing(Easing.out(Easing.ease))}>
+                .easing(Easing.out(Easing.ease))
+                .duration(300)}
+            exiting={SlideOutRight.duration(500).easing(Easing.out(Easing.linear))}>
             <TouchableOpacity
                 style={styles.headerButtonRight}
                 onPress={() => {
@@ -103,15 +104,13 @@ const ChatMenu = () => {
     const headerViewRight = (
         <View style={styles.headerButtonContainer}>
             <Animated.View
+                collapsable={false}
                 entering={SlideInRight.withInitialValues({ originX: 200 })
-                    .duration(200)
-                    .easing(Easing.out(Easing.ease))}>
-                <TouchableOpacity
-                    style={styles.headerButtonRight}
-                    onPress={() => {
-                        goToChars()
-                    }}>
-                    <Ionicons name="person" size={28} color={Style.getColor('primary-text1')} />
+                    .easing(Easing.out(Easing.ease))
+                    .duration(300)}
+                exiting={SlideOutRight.duration(500).easing(Easing.out(Easing.linear))}>
+                <TouchableOpacity style={styles.headerButtonRight} onPress={() => {}}>
+                    <Ionicons name="chatbox" size={28} color={Style.getColor('primary-text1')} />
                 </TouchableOpacity>
             </Animated.View>
         </View>
@@ -137,13 +136,17 @@ const ChatMenu = () => {
                 <Stack.Screen
                     options={{
                         title: '',
-                        headerRight: () => (showDrawer ? headerViewRightSettings : headerViewRight),
                         headerLeft: () => headerViewLeft,
+
+                        headerRight: () => {
+                            if (showDrawer) return headerViewRightSettings
+                            if (chat) return headerViewRight
+                        },
                     }}
                 />
 
-                {!charName ? (
-                    <Recents />
+                {!chat ? (
+                    <CharacterList showHeader={!showDrawer} />
                 ) : (
                     <View style={styles.container}>
                         <ChatWindow />
