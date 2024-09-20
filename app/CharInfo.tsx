@@ -38,7 +38,10 @@ const CharInfo = () => {
     const [characterCard, setCharacterCard] = useState<CharacterCardV2 | undefined>(currentCard)
 
     const imageDir = Characters.getImageDir(currentCard?.data.image_id ?? -1)
-    const chat = Chats.useChat((state) => state.data)
+    const { chat, unloadChat } = Chats.useChat((state) => ({
+        chat: state.data,
+        unloadChat: state.reset,
+    }))
 
     const [imageSource, setImageSource] = useState({
         uri: imageDir,
@@ -87,7 +90,7 @@ const CharInfo = () => {
                     onPress: () => {
                         RecentMessages.deleteByCharacter(charName ?? '')
                         Characters.db.mutate.deleteCard(charId ?? -1)
-
+                        unloadChat()
                         router.back()
                     },
                     style: 'destructive',
