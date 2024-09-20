@@ -90,6 +90,7 @@ const CharInfo = () => {
                     onPress: () => {
                         RecentMessages.deleteByCharacter(charName ?? '')
                         Characters.db.mutate.deleteCard(charId ?? -1)
+                        unloadCharacter()
                         unloadChat()
                         router.back()
                     },
