@@ -1,7 +1,8 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Characters, Logger, Style } from '@globals'
-import { Stack, usePathname } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { Characters, Style } from '@globals'
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
+import { Stack } from 'expo-router'
+import { useState } from 'react'
 import { SafeAreaView, View, Text, StyleSheet, FlatList } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import Animated, { SequencedTransition } from 'react-native-reanimated'
@@ -34,6 +35,11 @@ const sortAlphabetical = (item1: CharInfo, item2: CharInfo) => {
     return -item2.name.localeCompare(item1.name)
 }
 
+const sortList = (sortType: SortType) => {
+    if (sortType === SortType.ALPHABETICAL) return sortAlphabetical
+    else return sortModified
+}
+
 type SortButtonProps = {
     sortType: SortType
     currentSortType: SortType
@@ -64,24 +70,22 @@ type CharacterListProps = {
 
 const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
     'use no memo'
-    const [characterList, setCharacterList] = useState<CharInfo[]>([])
+    // const [characterList, setCharacterList] = useState<CharInfo[]>([])
     const [nowLoading, setNowLoading] = useState(false)
 
     const [sortType, setSortType] = useState<SortType>(SortType.RECENT)
+    const { data } = useLiveQuery(Characters.db.query.cardListQuery('character', 'modified'))
 
-    const getCharacterList = async () => {
-        try {
-            const list = await Characters.db.query.cardList('character', 'modified')
-            console.log(list.length)
-            setCharacterList(list)
-        } catch (error) {
-            Logger.log(`Could not retrieve characters.\n${error}`, true)
-        }
-    }
-
-    useEffect(() => {
-        getCharacterList()
-    }, [usePathname()])
+    const characterList: CharInfo[] = data
+        .map((item) => ({
+            ...item,
+            latestChat: item.chats[0]?.id,
+            latestSwipe: item.chats[0]?.messages[0]?.swipes[0]?.swipe,
+            latestName: item.chats[0]?.messages[0]?.name,
+            last_modified: item.last_modified ?? 0,
+            tags: item.tags.map((item) => item.tag.tag),
+        }))
+        .sort(sortList(sortType ?? SortType.RECENT))
 
     return (
         <SafeAreaView style={{ paddingVertical: 16, paddingHorizontal: 8, flex: 1 }}>
@@ -94,7 +98,6 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                                   <CharacterNewMenu
                                       nowLoading={nowLoading}
                                       setNowLoading={setNowLoading}
-                                      getCharacterList={getCharacterList}
                                   />
                               ),
                           }
@@ -124,7 +127,6 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                         label="Recent"
                         onPress={() => {
                             setSortType(SortType.RECENT)
-                            setCharacterList(characterList.sort(sortModified))
                         }}
                     />
                     <SortButton
@@ -133,7 +135,6 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                         label="A-z"
                         onPress={() => {
                             setSortType(SortType.ALPHABETICAL)
-                            setCharacterList(characterList.sort(sortAlphabetical))
                         }}
                     />
                 </View>
@@ -146,13 +147,12 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
             {characterList.length === 0 && <CharactersEmpty />}
 
             {characterList.length !== 0 && (
-                <Animated.FlatList
-                    itemLayoutAnimation={SequencedTransition}
+                <FlatList
+                    // itemLayoutAnimation={SequencedTransition}
                     data={characterList}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item, index }) => (
                         <CharacterListing
-                            key={item.id}
                             index={index}
                             character={item}
                             nowLoading={nowLoading}

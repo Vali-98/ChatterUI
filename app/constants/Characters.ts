@@ -265,6 +265,58 @@ export namespace Characters {
                 }))
             }
 
+            export const cardListQuery = (
+                type: 'character' | 'user',
+                orderBy: 'id' | 'modified' = 'id'
+            ) => {
+                return database.query.characters.findMany({
+                    columns: {
+                        id: true,
+                        name: true,
+                        image_id: true,
+                        last_modified: true,
+                    },
+                    with: {
+                        tags: {
+                            columns: {
+                                character_id: false,
+                            },
+                            with: {
+                                tag: true,
+                            },
+                        },
+                        chats: {
+                            columns: {
+                                id: true,
+                            },
+                            limit: 1,
+                            orderBy: desc(chats.last_modified),
+                            with: {
+                                messages: {
+                                    columns: {
+                                        id: true,
+                                        name: true,
+                                    },
+                                    limit: 1,
+                                    orderBy: desc(chatEntries.id),
+                                    with: {
+                                        swipes: {
+                                            columns: {
+                                                swipe: true,
+                                            },
+                                            orderBy: desc(chatSwipes.id),
+                                            limit: 1,
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    where: (characters, { eq }) => eq(characters.type, type),
+                    orderBy: orderBy === 'id' ? characters.id : desc(characters.last_modified),
+                })
+            }
+
             export const cardExists = async (charId: number) => {
                 return await database.query.characters.findFirst({
                     where: eq(characters.id, charId),
@@ -326,8 +378,6 @@ export namespace Characters {
                             database.select({ tag_id: characterTags.tag_id }).from(characterTags)
                         )
                     )
-                if (charID === useCharacterCard.getState().id)
-                    useCharacterCard.getState().unloadCard()
             }
 
             export const updateModified = async (charID: number) => {

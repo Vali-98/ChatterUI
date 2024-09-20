@@ -75,11 +75,8 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
     }
 
     const getPreviewText = () => {
-        if (!character.latestSwipe || !character.latestName) return ''
-        const previewText =
-            (character.latestName + ':  ' + character.latestSwipe).substring(0, 80) +
-            (character.latestSwipe.length > 80 ? '...' : '')
-        return previewText
+        if (!character.latestSwipe || !character.latestName) return '(No Chat Data)'
+        return character.latestName + ':  ' + character.latestSwipe
     }
 
     return (
@@ -103,12 +100,13 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={styles.nametag}>{character.name}</Text>
                         <Text style={styles.timestamp}>
-                            {' '}
                             {getTimeStamp(character.last_modified)}
                         </Text>
                     </View>
                     {character.latestSwipe && (
-                        <Text style={styles.previewText}>{getPreviewText()}</Text>
+                        <Text numberOfLines={2} ellipsizeMode="tail" style={styles.previewText}>
+                            {getPreviewText()}
+                        </Text>
                     )}
                     <View
                         style={{
@@ -207,7 +205,6 @@ const styles = StyleSheet.create({
 
     previewText: {
         marginTop: 4,
-        fontSize: 12,
         color: Style.getColor('primary-text3'),
     },
 

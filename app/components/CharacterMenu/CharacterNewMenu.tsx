@@ -20,7 +20,6 @@ const { Popover } = renderers
 type CharacterNewMenuProps = {
     nowLoading: boolean
     setNowLoading: (b: boolean) => void
-    getCharacterList: () => Promise<void>
 }
 
 type PopupProps = {
@@ -40,11 +39,7 @@ const PopupOption: React.FC<PopupProps> = ({ onPress, label, iconName }) => {
     )
 }
 
-const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
-    nowLoading,
-    setNowLoading,
-    getCharacterList,
-}) => {
+const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowLoading }) => {
     const menuRef: React.MutableRefObject<Menu | null> = useRef(null)
 
     useEffect(() => {
@@ -121,11 +116,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
             <TextBoxModal
                 title="Enter Character Hub or Pygmalion Link"
                 booleans={[showDownload, setShowDownload]}
-                onConfirm={(text) =>
-                    Characters.importCharacterFromRemote(text).then(() => {
-                        getCharacterList()
-                    })
-                }
+                onConfirm={(text) => Characters.importCharacterFromRemote(text)}
                 showPaste
             />
 
@@ -134,7 +125,11 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
                 renderer={Popover}
                 rendererProps={{ placement: 'bottom', anchorStyle: styles.anchor }}>
                 <MenuTrigger>
-                    <FontAwesome name="plus" size={28} color={Style.getColor('primary-text1')} />
+                    <FontAwesome
+                        name={menuRef.current?.isOpen() ? 'close' : 'plus'}
+                        size={28}
+                        color={Style.getColor('primary-text1')}
+                    />
                 </MenuTrigger>
                 <MenuOptions customStyles={menustyle}>
                     <PopupOption
@@ -148,9 +143,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
                     <PopupOption
                         onPress={() => {
                             menuRef.current?.close()
-                            Characters.importCharacterFromImage().then(async () => {
-                                getCharacterList()
-                            })
+                            Characters.importCharacterFromImage()
                         }}
                         iconName="upload"
                         label="Import From File"
