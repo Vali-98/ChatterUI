@@ -52,8 +52,8 @@ const sessionFileDir = `${FS.documentDirectory}llama/`
 const sessionFile = `${sessionFileDir}llama-session.bin`
 
 const default_preset = {
-    context_length: 2048,
-    threads: 1,
+    context_length: 4096,
+    threads: 4,
     gpu_layers: 0,
     batch: 512,
 }
