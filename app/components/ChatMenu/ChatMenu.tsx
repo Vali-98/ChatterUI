@@ -11,6 +11,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import ChatInput from './ChatInput'
 import { ChatWindow } from './ChatWindow/ChatWindow'
+import ChatsDrawer from './ChatsDrawer'
 import OptionsMenu from './OptionsMenu'
 import SettingsDrawer from './SettingsDrawer'
 
@@ -27,20 +28,20 @@ const ChatMenu = () => {
         unloadChat: state.reset,
     }))
 
-    const [showDrawer, setDrawer] = useState<boolean>(false)
-    const menuRef = useRef<Menu | null>(null)
+    const [showDrawer, setShowDrawer] = useState<boolean>(false)
+    const [showChats, setShowChats] = useState<boolean>(false)
 
-    const setShowDrawer = (show: boolean | ((b: boolean) => void)) => {
-        if (typeof show === 'boolean') setDrawer(show)
-        else Logger.debug('This was not supposed to be used!')
-        if (menuRef.current?.isOpen()) {
-            menuRef.current.close()
-        }
-    }
+    const menuRef = useRef<Menu | null>(null)
 
     const backAction = () => {
         if (menuRef.current?.isOpen()) {
             menuRef.current.close()
+            return true
+        }
+
+        if (showChats) {
+            setShowChats(false)
+            Logger.debug('Closing Chats')
             return true
         }
 
@@ -67,22 +68,32 @@ const ChatMenu = () => {
                 BackHandler.removeEventListener('hardwareBackPress', backAction)
             }
             // eslint-disable-next-line react-compiler/react-compiler
-        }, [chat, showDrawer, menuRef.current?.isOpen()])
+        }, [chat, showDrawer, menuRef.current?.isOpen(), showChats])
     )
+
+    const handleLeftFling = () => {
+        if (showDrawer) return setShowDrawer(false)
+        if (chat) setShowChats(true)
+    }
+
+    const handleRightFlight = () => {
+        if (showChats) return setShowChats(false)
+        setShowDrawer(true)
+    }
 
     const swipeDrawer = Gesture.Fling()
         .direction(1)
         .onEnd(() => {
-            runOnJS(setShowDrawer)(true)
+            runOnJS(handleRightFlight)()
         })
 
-    const swipeChar = Gesture.Fling()
+    const swipeChats = Gesture.Fling()
         .direction(3)
         .onEnd(() => {
-            // runOnJS(goToChars)()
+            runOnJS(handleLeftFling)()
         })
 
-    const gesture = Gesture.Exclusive(swipeDrawer, swipeChar)
+    const gesture = Gesture.Exclusive(swipeDrawer, swipeChats)
 
     const headerViewRightSettings = (
         <Animated.View
@@ -109,14 +120,22 @@ const ChatMenu = () => {
                     .easing(Easing.out(Easing.ease))
                     .duration(300)}
                 exiting={SlideOutRight.duration(500).easing(Easing.out(Easing.linear))}>
-                <TouchableOpacity style={styles.headerButtonRight} onPress={() => {}}>
-                    <Ionicons name="chatbox" size={28} color={Style.getColor('primary-text1')} />
+                <TouchableOpacity
+                    style={styles.headerButtonRight}
+                    onPress={() => {
+                        setShowChats(!showChats)
+                    }}>
+                    <Ionicons
+                        name={showChats ? 'close' : 'chatbox'}
+                        size={28}
+                        color={Style.getColor('primary-text1')}
+                    />
                 </TouchableOpacity>
             </Animated.View>
         </View>
     )
 
-    const headerViewLeft = (
+    const headerViewLeft = !showChats && (
         <TouchableOpacity
             style={styles.headerButtonLeft}
             onPress={() => {
@@ -157,7 +176,7 @@ const ChatMenu = () => {
                         </View>
                     </View>
                 )}
-
+                <ChatsDrawer booleans={[showChats, setShowChats]} />
                 <SettingsDrawer booleans={[showDrawer, setShowDrawer]} />
             </SafeAreaView>
         </GestureDetector>
