@@ -72,6 +72,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
     const getCharacterList = async () => {
         try {
             const list = await Characters.db.query.cardList('character', 'modified')
+            console.log(list.length)
             setCharacterList(list)
         } catch (error) {
             Logger.log(`Could not retrieve characters.\n${error}`, true)
@@ -104,7 +105,8 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                 style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
-                    paddingHorizontal: 16,
+                    paddingLeft: 16,
+                    paddingRight: 8,
                     paddingBottom: 12,
                 }}>
                 <View
@@ -137,25 +139,13 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                 </View>
 
                 <TouchableOpacity>
-                    <FontAwesome name="search" color={Style.getColor('primary-text1')} size={28} />
+                    <FontAwesome name="search" color={Style.getColor('primary-text2')} size={26} />
                 </TouchableOpacity>
             </View>
 
             {characterList.length === 0 && <CharactersEmpty />}
 
             {characterList.length !== 0 && (
-                /*<ScrollView>
-                    {characterList.map((character, index) => (
-                        <CharacterListing
-                            key={character.id}
-                            index={index}
-                            character={character}
-                            nowLoading={nowLoading}
-                            showTags={false}
-                            setNowLoading={setNowLoading}
-                        />
-                    ))}
-                </ScrollView>*/
                 <Animated.FlatList
                     itemLayoutAnimation={SequencedTransition}
                     data={characterList}
