@@ -2,10 +2,20 @@ import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
 import { useRouter } from 'expo-router'
-import { useState } from 'react'
-import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
+import { StyleSheet, TouchableOpacity, Text, BackHandler } from 'react-native'
+import {
+    Menu,
+    MenuOption,
+    MenuOptions,
+    MenuOptionsCustomStyle,
+    MenuTrigger,
+    renderers,
+} from 'react-native-popup-menu'
 import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
+
+const { Popover } = renderers
 
 type CharacterNewMenuProps = {
     nowLoading: boolean
@@ -13,11 +23,40 @@ type CharacterNewMenuProps = {
     getCharacterList: () => Promise<void>
 }
 
+type PopupProps = {
+    onPress: () => void | Promise<void>
+    label: string
+    iconName: 'pencil' | 'cloud-download' | 'upload'
+}
+
+const PopupOption: React.FC<PopupProps> = ({ onPress, label, iconName }) => {
+    return (
+        <MenuOption>
+            <TouchableOpacity style={styles.popupButton} onPress={onPress}>
+                <FontAwesome name={iconName} size={28} color={Style.getColor('primary-text2')} />
+                <Text style={styles.optionLabel}>{label}</Text>
+            </TouchableOpacity>
+        </MenuOption>
+    )
+}
+
 const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
     nowLoading,
     setNowLoading,
     getCharacterList,
 }) => {
+    const menuRef: React.MutableRefObject<Menu | null> = useRef(null)
+
+    useEffect(() => {
+        const backAction = () => {
+            if (!menuRef) return false
+            menuRef.current?.close()
+            return true
+        }
+        const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
+        return () => handler.remove()
+    }, [])
+
     const { setCurrentCard } = Characters.useCharacterCard(
         useShallow((state) => ({
             setCurrentCard: state.setCard,
@@ -70,11 +109,8 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
     return (
         <Animated.View
             style={styles.headerButtonContainer}
-            collapsable={false}
-            entering={SlideInRight.withInitialValues({ originX: 150 })
-                .easing(Easing.out(Easing.ease))
-                .duration(300)}
-            exiting={SlideOutRight.duration(500).easing(Easing.out(Easing.linear))}>
+            entering={SlideInRight.easing(Easing.out(Easing.ease)).duration(300)}
+            exiting={SlideOutRight.duration(500).easing(Easing.out(Easing.ease))}>
             <TextBoxModal
                 booleans={[showNewChar, setShowNewChar]}
                 title="Create New Character"
@@ -92,35 +128,43 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
                 }
                 showPaste
             />
-            <TouchableOpacity
-                style={styles.headerButtonRight}
-                onPress={async () => {
-                    setShowDownload(true)
-                }}>
-                <FontAwesome
-                    name="cloud-download"
-                    size={28}
-                    color={Style.getColor('primary-text1')}
-                />
-            </TouchableOpacity>
 
-            <TouchableOpacity
-                style={styles.headerButtonRight}
-                onPress={() =>
-                    Characters.importCharacterFromImage().then(async () => {
-                        getCharacterList()
-                    })
-                }>
-                <FontAwesome name="upload" size={28} color={Style.getColor('primary-text1')} />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-                style={styles.headerButtonRight}
-                onPress={async () => {
-                    setShowNewChar(true)
-                }}>
-                <FontAwesome name="pencil" size={28} color={Style.getColor('primary-text1')} />
-            </TouchableOpacity>
+            <Menu
+                ref={menuRef}
+                renderer={Popover}
+                rendererProps={{ placement: 'bottom', anchorStyle: styles.anchor }}>
+                <MenuTrigger>
+                    <FontAwesome name="plus" size={28} color={Style.getColor('primary-text1')} />
+                </MenuTrigger>
+                <MenuOptions customStyles={menustyle}>
+                    <PopupOption
+                        onPress={() => {
+                            menuRef.current?.close()
+                            setShowDownload(true)
+                        }}
+                        iconName="cloud-download"
+                        label="Download"
+                    />
+                    <PopupOption
+                        onPress={() => {
+                            menuRef.current?.close()
+                            Characters.importCharacterFromImage().then(async () => {
+                                getCharacterList()
+                            })
+                        }}
+                        iconName="upload"
+                        label="Import From File"
+                    />
+                    <PopupOption
+                        onPress={() => {
+                            menuRef.current?.close()
+                            setShowNewChar(true)
+                        }}
+                        iconName="pencil"
+                        label="Create Character"
+                    />
+                </MenuOptions>
+            </Menu>
         </Animated.View>
     )
 }
@@ -128,12 +172,39 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
 export default CharacterNewMenu
 
 const styles = StyleSheet.create({
-    headerButtonRight: {
-        marginLeft: 20,
-        marginRight: 4,
+    anchor: {
+        backgroundColor: Style.getColor('primary-surface3'),
+        padding: 8,
+    },
+
+    popupButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: 12,
+        paddingVertical: 12,
+        paddingRight: 24,
+        paddingLeft: 12,
+        borderRadius: 12,
     },
 
     headerButtonContainer: {
         flexDirection: 'row',
     },
+
+    optionLabel: {
+        fontSize: 16,
+        fontWeight: '400',
+        color: Style.getColor('primary-text1'),
+    },
 })
+
+const menustyle: MenuOptionsCustomStyle = {
+    optionsContainer: {
+        backgroundColor: Style.getColor('primary-surface3'),
+        padding: 4,
+        borderRadius: 12,
+    },
+    optionsWrapper: {
+        backgroundColor: Style.getColor('primary-surface3'),
+    },
+}
