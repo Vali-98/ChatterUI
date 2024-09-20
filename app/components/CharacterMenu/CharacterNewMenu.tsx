@@ -49,7 +49,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
 
     useEffect(() => {
         const backAction = () => {
-            if (!menuRef) return false
+            if (!menuRef || !menuRef.current?.isOpen()) return false
             menuRef.current?.close()
             return true
         }
