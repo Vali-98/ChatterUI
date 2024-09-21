@@ -496,9 +496,14 @@ export namespace Characters {
         return DocumentPicker.getDocumentAsync({
             copyToCacheDirectory: true,
             type: 'image/*',
+            multiple: true,
         }).then((result) => {
             if (result.canceled) return
-            return createCharacterFromImage(result.assets[0].uri)
+            result.assets.map(async (item) => {
+                await createCharacterFromImage(item.uri).catch((e) =>
+                    Logger.log(`Failed to create card from '${item.name}': ${e}`)
+                )
+            })
         })
     }
 
