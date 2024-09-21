@@ -1,4 +1,4 @@
-import { db as database, rawdb } from '@db'
+import { db as database } from '@db'
 import { copyFileRes, writeFile } from '@dr.pogodin/react-native-fs'
 import {
     characterGreetings,
@@ -13,8 +13,6 @@ import { desc, eq, inArray, notInArray } from 'drizzle-orm'
 import { randomUUID } from 'expo-crypto'
 import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
-import { decode } from 'png-chunk-text'
-import extractChunks from 'png-chunks-extract'
 import { atob } from 'react-native-quick-base64'
 import { create } from 'zustand'
 
@@ -23,6 +21,7 @@ import { Global } from './GlobalValues'
 import { Llama } from './LlamaLocal'
 import { Logger } from './Logger'
 import { mmkv } from './MMKV'
+import { getPngChunkText } from './PNG'
 import { Tokenizer } from './Tokenizer'
 
 type CharacterTokenCache = {
@@ -458,24 +457,9 @@ export namespace Characters {
             return
         }
 
-        const binaryString = atob(file)
+        const charactercard = getPngChunkText(file)
 
-        const bytes = new Uint8Array(binaryString.length).map(
-            (item, index) => (item = binaryString.charCodeAt(index))
-        )
-
-        const chunks = extractChunks(bytes)
-
-        const textChunks = chunks
-            .filter(function (chunk: any) {
-                return chunk.name === 'tEXt'
-            })
-            .map(function (chunk) {
-                return decode(chunk.data)
-            })
-
-        const charactercard = JSON.parse(atob(textChunks[0].text))
-        // dangerous here, card is never verified
+        // WARNING: dangerous here, card is never verified to fulfill v2 card spec
 
         if (charactercard === undefined) {
             Logger.log('No character was found.', true)

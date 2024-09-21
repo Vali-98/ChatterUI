@@ -51,7 +51,6 @@
     "expo-sqlite": "^14.0.5",
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
-    "png-chunk-text": "^1.0.0",
     "png-chunks-extract": "^1.0.0",
     "react": "18.2.0",
     "react-autosave": "^0.4.4",
@@ -77,8 +76,6 @@
   "devDependencies": {
     "@babel/core": "^7.24.7",
     "@types/base-64": "^1.0.2",
-    "@types/png-chunk-text": "^1.0.3",
-    "@types/png-chunks-extract": "^1.0.2",
     "@types/react": "~18.2.79",
     "drizzle-kit": "^0.24.2",
     "eslint": "^8.56.0",
