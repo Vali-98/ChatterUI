@@ -268,12 +268,14 @@ export namespace Instructs {
                 version: 2,
                 migrate: async (persistedState: any, version) => {
                     if (!version) {
-                        persistedState.timestamp = false
-                        persistedState.examples = true
-                        persistedState.format_type = 0
+                        persistedState.data.timestamp = false
+                        persistedState.data.examples = true
+                        persistedState.data.format_type = 0
                         Logger.log('[INSTRUCT] Migrated to v1')
                     }
+                    console.log(version)
                     if (version === 1) {
+                        persistedState.data.last_output_prefix = persistedState.data.output_prefix
                         const entries = await database.query.instructs.findMany({
                             columns: {
                                 id: true,
@@ -281,13 +283,13 @@ export namespace Instructs {
                             },
                         })
                         entries.forEach(async (item) => {
-                            if (item?.id === persistedState?.id)
-                                persistedState.last_output_prefix = item.output_prefix
                             await database
                                 .update(instructs)
                                 .set({ last_output_prefix: item.output_prefix })
                                 .where(eq(instructs.id, item.id))
                         })
+
+                        Logger.log('[INSTRUCT] Migrated to v2')
                     }
 
                     return persistedState
