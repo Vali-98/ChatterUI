@@ -21,9 +21,10 @@ type MenuData = {
 
 type OptionsMenuProps = {
     menuRef: React.MutableRefObject<Menu | null>
+    showChats: (b: boolean) => void
 }
 
-const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef }) => {
+const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef, showChats }) => {
     const router = useRouter()
     const { unloadCharacter } = Characters.useCharacterCard((state) => ({
         unloadCharacter: state.unloadCard,
@@ -49,7 +50,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef }) => {
         },
         {
             callback: () => {
-                router.push('/ChatSelector')
+                showChats(true)
             },
             text: 'Chat History',
             button: 'paperclip',

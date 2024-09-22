@@ -164,19 +164,18 @@ const ChatMenu = () => {
                     }}
                 />
 
-                {!chat ? (
-                    <CharacterList showHeader={!showDrawer} />
-                ) : (
+                {!chat && <CharacterList showHeader={!showDrawer} />}
+                {chat && (
                     <View style={styles.container}>
                         <ChatWindow />
 
                         <View style={styles.inputContainer}>
-                            <OptionsMenu menuRef={menuRef} />
+                            <OptionsMenu menuRef={menuRef} showChats={setShowChats} />
                             <ChatInput />
                         </View>
                     </View>
                 )}
-                <ChatsDrawer booleans={[showChats, setShowChats]} />
+                {showChats && <ChatsDrawer booleans={[showChats, setShowChats]} />}
                 <SettingsDrawer booleans={[showDrawer, setShowDrawer]} />
             </SafeAreaView>
         </GestureDetector>

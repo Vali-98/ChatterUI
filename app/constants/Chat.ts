@@ -1,6 +1,6 @@
 import { db as database } from '@db'
 import { chatEntries, chatSwipes, chats } from 'db/schema'
-import { eq } from 'drizzle-orm'
+import { count, desc, eq, getTableColumns } from 'drizzle-orm'
 import { create } from 'zustand'
 
 import { API } from './API'
@@ -37,8 +37,9 @@ export type ChatEntry = {
 
 export type ChatData = {
     id: number
-    createDate: Date
+    create_date: Date
     character_id: number
+    name: string
     messages: ChatEntry[] | undefined
 }
 
@@ -317,11 +318,37 @@ export namespace Chats {
                 return chatIds?.[chatIds?.length - 1]?.id
             }
 
-            export const chatList = async (charId: number) => {
+            export const chatListOld = async (charId: number) => {
                 const chatIds = await database.query.chats.findMany({
                     where: eq(chats.character_id, charId),
                 })
                 return chatIds
+            }
+
+            export const chatList = async (charId: number) => {
+                const result = await database
+                    .select({
+                        ...getTableColumns(chats),
+                        entryCount: count(chatEntries.id),
+                    })
+                    .from(chats)
+                    .leftJoin(chatEntries, eq(chats.id, chatEntries.chat_id))
+                    .groupBy(chats.id)
+                    .where(eq(chats.character_id, charId))
+                return result
+            }
+
+            export const chatListQuery = (charId: number) => {
+                return database
+                    .select({
+                        ...getTableColumns(chats),
+                        entryCount: count(chatEntries.id),
+                    })
+                    .from(chats)
+                    .leftJoin(chatEntries, eq(chats.id, chatEntries.chat_id))
+                    .groupBy(chats.id)
+                    .where(eq(chats.character_id, charId))
+                    .orderBy(desc(chats.last_modified))
             }
 
             export const chatExists = async (chatId: number) => {
