@@ -90,7 +90,7 @@ export const tagsRelations = relations(tags, ({ many }) => ({
 
 export const chats = sqliteTable('chats', {
     id: integer('id', { mode: 'number' }).primaryKey().notNull(),
-    createDate: integer('create_date', { mode: 'timestamp' })
+    create_date: integer('create_date', { mode: 'timestamp' })
         .notNull()
         .$defaultFn(() => new Date()),
     character_id: integer('character_id', { mode: 'number' })
@@ -99,8 +99,7 @@ export const chats = sqliteTable('chats', {
     last_modified: integer('last_modified', { mode: 'number' })
         .$defaultFn(() => new Date().getTime())
         .$onUpdateFn(() => new Date().getTime()),
-    //.default(sql`(unixepoch('subsec')*1000)`)
-    //.$onUpdate(() => sql`(unixepoch('subsec')*1000)`),
+    name: text('name').notNull().default('New Chat'),
 })
 
 export const chatEntries = sqliteTable('chat_entries', {
