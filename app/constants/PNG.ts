@@ -1,11 +1,22 @@
+import { atob, fromByteArray } from 'react-native-quick-base64'
+
 export const getPngChunkText = (filedata: string) => {
     const binaryString = atob(filedata)
 
     const bytes = new Uint8Array(binaryString.length).map(
         (item, index) => (item = binaryString.charCodeAt(index))
     )
+    // gets tEXt chunk, returns UInt8Array
     const chunk = extractChunks(bytes)
-    return JSON.parse(atob(decodePNG(chunk).text))
+
+    // decodePNG returns
+    const decodeText = atob(decodePNG(chunk).text)
+
+    const bytes2 = new Uint8Array(decodeText.length).map(
+        (item, index) => (item = decodeText.charCodeAt(index))
+    )
+
+    return JSON.parse(utf8Decode(bytes2))
 }
 
 /// PNG DATA
@@ -90,9 +101,7 @@ function extractChunks(data: Uint8Array) {
 
 function decodePNG(data: Uint8Array) {
     let naming = true
-
-    let text = ''
-
+    const textBytes: number[] = []
     let name = ''
 
     for (let i = 0; i < data.length; i++) {
@@ -106,7 +115,7 @@ function decodePNG(data: Uint8Array) {
             }
         } else {
             if (code) {
-                text += String.fromCharCode(code)
+                textBytes.push(code)
             } else {
                 throw new Error(
                     'Invalid NULL character found. 0x00 character is not permitted in tEXt content'
@@ -115,9 +124,10 @@ function decodePNG(data: Uint8Array) {
         }
     }
 
+    const textUint8Array = new Uint8Array(textBytes)
+    const text = utf8Decode(textUint8Array)
     return {
         keyword: name,
-
         text: text,
     }
 }
@@ -201,4 +211,41 @@ function crc32_buf(B: Uint8Array) {
     while (i < L) C = (C >>> 8) ^ T0[(C ^ B[i++]) & 0xff]
 
     return ~C
+}
+
+const utf8Decode = (bytes: Uint8Array): string => {
+    let string = ''
+    let i = 0
+
+    while (i < bytes.length) {
+        const byte1 = bytes[i++]
+        if (byte1 < 0x80) {
+            string += String.fromCharCode(byte1)
+        } else if (byte1 < 0xe0) {
+            const byte2 = bytes[i++]
+            string += String.fromCharCode(((byte1 & 0x1f) << 6) | (byte2 & 0x3f))
+        } else if (byte1 < 0xf0) {
+            const byte2 = bytes[i++]
+            const byte3 = bytes[i++]
+            string += String.fromCharCode(
+                ((byte1 & 0x0f) << 12) | ((byte2 & 0x3f) << 6) | (byte3 & 0x3f)
+            )
+        } else {
+            const byte2 = bytes[i++]
+            const byte3 = bytes[i++]
+            const byte4 = bytes[i++]
+            const codepoint =
+                (((byte1 & 0x07) << 18) |
+                    ((byte2 & 0x3f) << 12) |
+                    ((byte3 & 0x3f) << 6) |
+                    (byte4 & 0x3f)) -
+                0x10000
+            string += String.fromCharCode(
+                ((codepoint >> 10) & 0x3ff) | 0xd800,
+                (codepoint & 0x3ff) | 0xdc00
+            )
+        }
+    }
+
+    return string
 }
