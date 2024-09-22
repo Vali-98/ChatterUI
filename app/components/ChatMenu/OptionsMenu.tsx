@@ -1,5 +1,5 @@
 import { AntDesign, Ionicons } from '@expo/vector-icons'
-import { Characters, Style } from '@globals'
+import { Characters, Chats, Style } from '@globals'
 import { useRouter } from 'expo-router'
 import { View, Text, StyleSheet } from 'react-native'
 import {
@@ -29,10 +29,13 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef }) => {
         unloadCharacter: state.unloadCard,
     }))
 
+    const unloadChat = Chats.useChat((state) => state.reset)
+
     const menuoptions: MenuData[] = [
         {
             callback: () => {
                 unloadCharacter()
+                unloadChat()
             },
             text: 'Main Menu',
             button: 'back',
