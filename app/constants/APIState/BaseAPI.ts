@@ -124,7 +124,9 @@ export abstract class APIBase implements IAPIBase {
 
             let instruct_len = message.is_user
                 ? instructCache.input_prefix_length
-                : instructCache.output_suffix_length
+                : is_last
+                  ? instructCache.last_output_prefix_length
+                  : instructCache.output_suffix_length
 
             // for last message, we want to skip the end token to allow the LLM to generate
 
@@ -143,14 +145,17 @@ export abstract class APIBase implements IAPIBase {
                 swipe_len + instruct_len + name_length + timestamp_length + wrap_length
 
             // check if within context window
-
             if (message_acc_length + payload_length + shard_length > max_length) {
                 break
             }
 
             // apply strings
 
-            let message_shard = `${message.is_user ? currentInstruct.input_prefix : currentInstruct.output_prefix}`
+            let message_shard = message.is_user
+                ? currentInstruct.input_prefix
+                : is_last
+                  ? currentInstruct.last_output_prefix
+                  : currentInstruct.output_prefix
 
             if (currentInstruct.timestamp) message_shard += timestamp_string
 

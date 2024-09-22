@@ -1,4 +1,7 @@
+import { API } from './API'
 import { Characters } from './Characters'
+import { Global } from './GlobalValues'
+import { mmkv } from './MMKV'
 
 export const humanizedISO8601DateTime = (date = '') => {
     const baseDate = typeof date === 'number' ? new Date(date) : new Date()
@@ -49,4 +52,24 @@ export const replaceMacros = (text: string) => {
     ]
     for (const rule of rules) newtext = newtext.replaceAll(rule.macro, rule.value)
     return newtext
+}
+
+const getMMKVObjectModel = (mmkvKey: string, field: string) => {
+    const data = mmkv.getString(mmkvKey)
+    if (!data) return 'undefined'
+    const model = JSON.parse(data)[field]
+    return model
+}
+
+export const getCurrentModel = () => {
+    const api = mmkv.getString(Global.APIType)
+    switch (api) {
+        case API.CHATCOMPLETIONS: {
+            return getMMKVObjectModel(Global.ChatCompletionsModel, 'id')
+        }
+        case API.CLAUDE: {
+            return getMMKVObjectModel(Global.ClaudeModel, 'name')
+        }
+        // TODO: Finish this - need data for KAI api
+    }
 }

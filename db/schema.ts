@@ -182,6 +182,9 @@ export const instructs = sqliteTable('instructs', {
     timestamp: integer('timestamp', { mode: 'boolean' }).notNull().default(false),
     examples: integer('examples', { mode: 'boolean' }).notNull().default(true),
     format_type: integer('format_type').notNull().default(0),
+
+    // additions 22/9/2024, v4
+    last_output_prefix: text('last_output_prefix').notNull().default(''),
 })
 
 // LOREBOOKS

@@ -3,10 +3,9 @@ import CheckboxTitle from '@components/CheckboxTitle'
 import SliderItem from '@components/SliderItem'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
-import { InstructListItem } from 'app/constants/Instructs'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Instructs, saveStringExternal, Logger, Style } from '@globals'
-import Slider from '@react-native-community/slider'
+import { InstructListItem } from 'app/constants/Instructs'
 import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
 import { useAutosave } from 'react-autosave'
@@ -45,7 +44,6 @@ const Instruct = () => {
         const targetID = id === -1 ? instructID : id
         const currentitem = list.filter((item) => item.id === targetID)
         if (currentitem.length === 0) {
-            // item no longer exists
             setSelectedItem(list[0])
             loadInstruct(list[0].id)
         } else {
@@ -121,8 +119,6 @@ const Instruct = () => {
                                     await loadInstruct(newid)
                                     loadInstructList(newid)
                                 })
-
-                            //Instructs.saveFile(text, { ...currentInstruct, name: text })
                         }}
                     />
 
@@ -316,6 +312,22 @@ const Instruct = () => {
                                 />
                             </View>
                             */}
+                            <View style={{ flexDirection: 'row' }}>
+                                <TextBox
+                                    name="Last Output Prefix"
+                                    varname="last_output_prefix"
+                                    body={currentInstruct}
+                                    setValue={setCurrentInstruct}
+                                    multiline
+                                />
+                                {/*<TextBox
+                                    name="Separator Sequence"
+                                    varname="separator_sequence"
+                                    body={currentInstruct}
+                                    setValue={setCurrentInstruct}
+                                    multiline
+                                />*/}
+                            </View>
                             <View style={{ flexDirection: 'row' }}>
                                 <TextBox
                                     name="Stop Sequence"

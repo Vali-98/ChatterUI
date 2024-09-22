@@ -22,6 +22,13 @@
       "when": 1726593007556,
       "tag": "0002_majestic_brother_voodoo",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1726978324478,
+      "tag": "0003_violet_firelord",
+      "breakpoints": true
     }
   ]
 }

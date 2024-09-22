@@ -20,6 +20,7 @@ const defaultInstructs: InstructType[] = [
         input_prefix: '### Instruction: ',
         input_suffix: '\n',
         output_prefix: '### Response: ',
+        last_output_prefix: '### Response: ',
         output_suffix: '\n',
         stop_sequence: '### Instruction',
         user_alignment_message: '',
@@ -40,6 +41,7 @@ const defaultInstructs: InstructType[] = [
         input_prefix: '<|start_header_id|>user<|end_header_id|>\n\n',
         input_suffix: '<|eot_id|>',
         output_prefix: '<|start_header_id|>assistant<|end_header_id|>\n\n',
+        last_output_prefix: '<|start_header_id|>assistant<|end_header_id|>\n\n',
         output_suffix: '<|eot_id|>',
         stop_sequence: '<|eot_id|>',
         user_alignment_message: '',
@@ -60,6 +62,7 @@ const defaultInstructs: InstructType[] = [
         input_prefix: '<|im_start|>user\n',
         input_suffix: '<|im_end|>\n',
         output_prefix: '<|im_start|>assistant\n',
+        last_output_prefix: '<|im_start|>assistant\n',
         output_suffix: '<|im_end|>\n',
         stop_sequence: '<|im_end|>',
         user_alignment_message: '',
@@ -80,6 +83,7 @@ const defaultInstructs: InstructType[] = [
         input_prefix: '<|user|>\n',
         input_suffix: '<|endoftext|>\n',
         output_prefix: '<|assistant|>\n',
+        last_output_prefix: '<|assistant|>\n',
         output_suffix: '<|endoftext|>\n',
         stop_sequence: '<|endoftext|>\n',
         user_alignment_message: '',
@@ -100,6 +104,7 @@ const defaultInstructs: InstructType[] = [
         input_prefix: '<|user|>\n',
         input_suffix: '<|end|>\n',
         output_prefix: '<|assistant|>\n',
+        last_output_prefix: '<|assistant|>\n',
         output_suffix: '<|end|>\n',
         stop_sequence: '<|end|>\n',
         user_alignment_message: '',
@@ -120,6 +125,7 @@ const defaultInstructs: InstructType[] = [
         input_prefix: '<start_of_turn>user\n',
         input_suffix: '<end_of_turn>\n',
         output_prefix: '<start_of_turn>model',
+        last_output_prefix: '<start_of_turn>model',
         output_suffix: '<end_of_turn>\n',
         stop_sequence: '<end_of_turn>',
         user_alignment_message: '',
@@ -158,6 +164,7 @@ type InstructTokenCache = {
     input_prefix_length: number
     input_suffix_length: number
     output_prefix_length: number
+    last_output_prefix_length: number
     output_suffix_length: number
     user_alignment_message_length: number
 }
@@ -170,6 +177,7 @@ export namespace Instructs {
         input_prefix: '### Instruction: ',
         input_suffix: '\n',
         output_prefix: '### Response: ',
+        last_output_prefix: '### Response: ',
         output_suffix: '\n',
         stop_sequence: '### Instruction',
         user_alignment_message: '',
@@ -212,6 +220,7 @@ export namespace Instructs {
                             input_prefix_length: 0,
                             input_suffix_length: 0,
                             output_prefix_length: 0,
+                            last_output_prefix_length: 0,
                             output_suffix_length: 0,
                             user_alignment_message_length: 0,
                         }
@@ -229,9 +238,11 @@ export namespace Instructs {
                         input_prefix_length: getTokenCount(instruct.input_prefix),
                         input_suffix_length: getTokenCount(instruct.input_suffix),
                         output_prefix_length: getTokenCount(instruct.output_prefix),
+                        last_output_prefix_length: getTokenCount(instruct.last_output_prefix),
                         output_suffix_length: getTokenCount(instruct.output_suffix),
                         user_alignment_message_length: getTokenCount(instruct.system_prompt),
                     }
+                    console.log('cache created')
                     set((state) => ({ ...state, tokenCache: newCache }))
                     return newCache
                 },
@@ -254,13 +265,29 @@ export namespace Instructs {
                 name: 'instruct-storage',
                 storage: createJSONStorage(() => mmkvStorage),
                 partialize: (state) => ({ data: state.data }),
-                version: 1,
-                migrate: (persistedState: any, version) => {
+                version: 2,
+                migrate: async (persistedState: any, version) => {
                     if (!version) {
                         persistedState.timestamp = false
                         persistedState.examples = true
                         persistedState.format_type = 0
                         Logger.log('[INSTRUCT] Migrated to v1')
+                    }
+                    if (version === 1) {
+                        const entries = await database.query.instructs.findMany({
+                            columns: {
+                                id: true,
+                                output_prefix: true,
+                            },
+                        })
+                        entries.forEach(async (item) => {
+                            if (item?.id === persistedState?.id)
+                                persistedState.last_output_prefix = item.output_prefix
+                            await database
+                                .update(instructs)
+                                .set({ last_output_prefix: item.output_prefix })
+                                .where(eq(instructs.id, item.id))
+                        })
                     }
 
                     return persistedState
@@ -344,4 +371,6 @@ export type InstructType = {
     timestamp: boolean
     examples: boolean
     format_type: number
+
+    last_output_prefix: string
 }
