@@ -117,11 +117,12 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                             columnGap: 2,
                             rowGap: 2,
                         }}>
-                        {character.tags.map((item, index) => (
-                            <Text style={styles.tag} key={index}>
-                                {item}
-                            </Text>
-                        ))}
+                        {showTags &&
+                            character.tags.map((item, index) => (
+                                <Text style={styles.tag} key={index}>
+                                    {item}
+                                </Text>
+                            ))}
                     </View>
                 </View>
             </TouchableOpacity>
