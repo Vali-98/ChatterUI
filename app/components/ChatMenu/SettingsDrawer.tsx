@@ -75,6 +75,10 @@ const paths_dev: ButtonData[] = [
         name: '[DEV] Classifier',
         path: '/Classifier',
     },
+    /*{
+        name: '[DEV] Embedding',
+        path: '/Embedding',
+    },*/
 ]
 
 type DrawerButtonProps = {
@@ -163,8 +167,8 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                         borderTopWidth: 3,
                         elevation: 20,
                     }}
-                    entering={SlideInLeft.duration(300).easing(Easing.out(Easing.quad))}
-                    exiting={SlideOutLeft.duration(500).easing(Easing.out(Easing.quad))}>
+                    entering={SlideInLeft.duration(200).easing(Easing.out(Easing.quad))}
+                    exiting={SlideOutLeft.duration(300).easing(Easing.out(Easing.quad))}>
                     <View style={{ justifyContent: 'space-between', flex: 1 }}>
                         <View>
                             <View style={styles.userContainer}>
