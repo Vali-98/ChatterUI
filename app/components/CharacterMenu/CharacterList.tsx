@@ -201,6 +201,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                     exiting={FadeOutUp.duration(100)}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <TextInput
+                            autoFocus
                             placeholder="Search Name..."
                             placeholderTextColor={Style.getColor('primary-text3')}
                             value={textFilter}
@@ -268,7 +269,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 2,
         paddingHorizontal: 12,
-        borderColor: Style.getColor('primary-surface3'),
+        borderColor: Style.getColor('primary-brand'),
         borderWidth: 2,
     },
 })
