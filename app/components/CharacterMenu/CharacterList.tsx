@@ -1,4 +1,4 @@
-import { FontAwesome } from '@expo/vector-icons'
+import { FontAwesome, Ionicons } from '@expo/vector-icons'
 import { Characters, Style } from '@globals'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
@@ -90,6 +90,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
     // const [characterList, setCharacterList] = useState<CharInfo[]>([])
     const [nowLoading, setNowLoading] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
+    const [showMenu, setShowMenu] = useState(false)
     const [textFilter, setTextFilter] = useState('')
 
     const [sortType, setSortType] = useState<SortType>(SortType.RECENT_DESC)
@@ -118,6 +119,8 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                                   <CharacterNewMenu
                                       nowLoading={nowLoading}
                                       setNowLoading={setNowLoading}
+                                      setShowMenu={setShowMenu}
+                                      showMenu={showMenu}
                                   />
                               ),
                           }
@@ -161,8 +164,8 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                 {showSearch && (
                     <Animated.View entering={ZoomIn} exiting={ZoomOut}>
                         <TouchableOpacity>
-                            <FontAwesome
-                                name={showSearch ? 'close' : 'search'}
+                            <Ionicons
+                                name="close"
                                 color={Style.getColor('primary-text2')}
                                 size={26}
                                 onPress={() => {
@@ -177,7 +180,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                     <Animated.View entering={ZoomIn} exiting={ZoomOut}>
                         <TouchableOpacity>
                             <FontAwesome
-                                name={showSearch ? 'close' : 'search'}
+                                name="search"
                                 color={Style.getColor('primary-text2')}
                                 size={26}
                                 onPress={() => {
@@ -197,8 +200,9 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                     })}
                     exiting={FadeOutUp.duration(100)}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={{ color: Style.getColor('primary-text2') }}>Name: </Text>
                         <TextInput
+                            placeholder="Search Name..."
+                            placeholderTextColor={Style.getColor('primary-text3')}
                             value={textFilter}
                             style={{
                                 ...styles.searchInput,
@@ -261,10 +265,10 @@ const styles = StyleSheet.create({
 
     searchInput: {
         borderRadius: 8,
-        marginLeft: 8,
         flex: 1,
         paddingVertical: 2,
         paddingHorizontal: 12,
-        backgroundColor: Style.getColor('primary-surface3'),
+        borderColor: Style.getColor('primary-surface3'),
+        borderWidth: 2,
     },
 })

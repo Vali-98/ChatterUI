@@ -6,7 +6,7 @@ import { useCallback, useRef, useState } from 'react'
 import { View, SafeAreaView, TouchableOpacity, StyleSheet, BackHandler } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Menu } from 'react-native-popup-menu'
-import Animated, { SlideInRight, runOnJS, Easing, SlideOutRight } from 'react-native-reanimated'
+import Animated, { runOnJS, ZoomIn, ZoomOut } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import ChatInput from './ChatInput'
@@ -96,12 +96,7 @@ const ChatMenu = () => {
     const gesture = Gesture.Exclusive(swipeDrawer, swipeChats)
 
     const headerViewRightSettings = (
-        <Animated.View
-            collapsable={false}
-            entering={SlideInRight.withInitialValues({ originX: 150 })
-                .easing(Easing.out(Easing.ease))
-                .duration(300)}
-            exiting={SlideOutRight.duration(500).easing(Easing.out(Easing.linear))}>
+        <Animated.View collapsable={false} entering={ZoomIn}>
             <TouchableOpacity
                 style={styles.headerButtonRight}
                 onPress={() => {
@@ -114,24 +109,26 @@ const ChatMenu = () => {
 
     const headerViewRight = (
         <View style={styles.headerButtonContainer}>
-            <Animated.View
-                collapsable={false}
-                entering={SlideInRight.withInitialValues({ originX: 200 })
-                    .easing(Easing.out(Easing.ease))
-                    .duration(300)}
-                exiting={SlideOutRight.duration(500).easing(Easing.out(Easing.linear))}>
-                <TouchableOpacity
-                    style={styles.headerButtonRight}
-                    onPress={() => {
-                        setShowChats(!showChats)
-                    }}>
-                    <Ionicons
-                        name={showChats ? 'close' : 'chatbox'}
-                        size={28}
-                        color={Style.getColor('primary-text1')}
-                    />
-                </TouchableOpacity>
-            </Animated.View>
+            <TouchableOpacity
+                style={styles.headerButtonRight}
+                onPress={() => {
+                    setShowChats(!showChats)
+                }}>
+                {showChats && (
+                    <Animated.View entering={ZoomIn}>
+                        <Ionicons name="close" size={28} color={Style.getColor('primary-text1')} />
+                    </Animated.View>
+                )}
+                {!showChats && (
+                    <Animated.View entering={ZoomIn}>
+                        <Ionicons
+                            name="chatbox"
+                            size={28}
+                            color={Style.getColor('primary-text1')}
+                        />
+                    </Animated.View>
+                )}
+            </TouchableOpacity>
         </View>
     )
 
@@ -141,10 +138,16 @@ const ChatMenu = () => {
             onPress={() => {
                 setShowDrawer(!showDrawer)
             }}>
-            {showDrawer ? (
-                <Ionicons name="close" size={28} color={Style.getColor('primary-text1')} />
-            ) : (
-                <Ionicons name="menu" size={28} color={Style.getColor('primary-text1')} />
+            {showDrawer && (
+                <Animated.View entering={ZoomIn}>
+                    <Ionicons name="close" size={28} color={Style.getColor('primary-text1')} />
+                </Animated.View>
+            )}
+
+            {!showDrawer && (
+                <Animated.View entering={ZoomIn}>
+                    <Ionicons name="menu" size={28} color={Style.getColor('primary-text1')} />
+                </Animated.View>
             )}
         </TouchableOpacity>
     )

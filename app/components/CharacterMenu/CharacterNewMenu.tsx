@@ -1,9 +1,9 @@
 import TextBoxModal from '@components/TextBoxModal'
-import { FontAwesome } from '@expo/vector-icons'
+import { FontAwesome, Ionicons } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
 import { useRouter } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
-import { StyleSheet, TouchableOpacity, Text, BackHandler } from 'react-native'
+import { StyleSheet, TouchableOpacity, Text, BackHandler, View } from 'react-native'
 import {
     Menu,
     MenuOption,
@@ -12,7 +12,13 @@ import {
     MenuTrigger,
     renderers,
 } from 'react-native-popup-menu'
-import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated'
+import Animated, {
+    Easing,
+    SlideInRight,
+    SlideOutRight,
+    ZoomIn,
+    ZoomOut,
+} from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 const { Popover } = renderers
@@ -20,6 +26,8 @@ const { Popover } = renderers
 type CharacterNewMenuProps = {
     nowLoading: boolean
     setNowLoading: (b: boolean) => void
+    showMenu: boolean
+    setShowMenu: (b: boolean) => void
 }
 
 type PopupProps = {
@@ -39,12 +47,17 @@ const PopupOption: React.FC<PopupProps> = ({ onPress, label, iconName }) => {
     )
 }
 
-const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowLoading }) => {
+const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
+    nowLoading,
+    setNowLoading,
+    showMenu,
+    setShowMenu,
+}) => {
     const menuRef: React.MutableRefObject<Menu | null> = useRef(null)
 
     useEffect(() => {
         const backAction = () => {
-            if (!menuRef || !menuRef.current?.isOpen()) return false
+            if (!menuRef.current || !menuRef.current?.isOpen()) return false
             menuRef.current?.close()
             return true
         }
@@ -102,10 +115,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
     }
 
     return (
-        <Animated.View
-            style={styles.headerButtonContainer}
-            entering={SlideInRight.easing(Easing.out(Easing.ease)).duration(300)}
-            exiting={SlideOutRight.duration(500).easing(Easing.out(Easing.ease))}>
+        <View>
             <TextBoxModal
                 booleans={[showNewChar, setShowNewChar]}
                 title="Create New Character"
@@ -121,15 +131,32 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
             />
 
             <Menu
+                onOpen={() => setShowMenu(true)}
+                onClose={() => setShowMenu(false)}
                 ref={menuRef}
                 renderer={Popover}
                 rendererProps={{ placement: 'bottom', anchorStyle: styles.anchor }}>
                 <MenuTrigger>
-                    <FontAwesome
-                        name={menuRef.current?.isOpen() ? 'close' : 'plus'}
-                        size={28}
-                        color={Style.getColor('primary-text1')}
-                    />
+                    <View>
+                        {!showMenu && (
+                            <Animated.View style={styles.headerButtonContainer} entering={ZoomIn}>
+                                <FontAwesome
+                                    name="plus"
+                                    size={28}
+                                    color={Style.getColor('primary-text1')}
+                                />
+                            </Animated.View>
+                        )}
+                        {showMenu && (
+                            <Animated.View style={styles.headerButtonContainer} entering={ZoomIn}>
+                                <Ionicons
+                                    name="close"
+                                    size={28}
+                                    color={Style.getColor('primary-text1')}
+                                />
+                            </Animated.View>
+                        )}
+                    </View>
                 </MenuTrigger>
                 <MenuOptions customStyles={menustyle}>
                     <PopupOption
@@ -158,7 +185,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                     />
                 </MenuOptions>
             </Menu>
-        </Animated.View>
+        </View>
     )
 }
 
