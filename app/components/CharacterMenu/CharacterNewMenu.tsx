@@ -1,8 +1,8 @@
 import TextBoxModal from '@components/TextBoxModal'
-import { FontAwesome, Ionicons } from '@expo/vector-icons'
+import { FontAwesome } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
-import { useRouter } from 'expo-router'
-import { useEffect, useRef, useState } from 'react'
+import { useFocusEffect, useRouter } from 'expo-router'
+import { useRef, useState } from 'react'
 import { StyleSheet, TouchableOpacity, Text, BackHandler, View } from 'react-native'
 import {
     Menu,
@@ -12,13 +12,7 @@ import {
     MenuTrigger,
     renderers,
 } from 'react-native-popup-menu'
-import Animated, {
-    Easing,
-    SlideInRight,
-    SlideOutRight,
-    ZoomIn,
-    ZoomOut,
-} from 'react-native-reanimated'
+import Animated, { ZoomIn } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 const { Popover } = renderers
@@ -55,15 +49,17 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
 }) => {
     const menuRef: React.MutableRefObject<Menu | null> = useRef(null)
 
-    useEffect(() => {
-        const backAction = () => {
-            if (!menuRef.current || !menuRef.current?.isOpen()) return false
-            menuRef.current?.close()
-            return true
-        }
+    const backAction = () => {
+        if (!menuRef.current || !menuRef.current?.isOpen()) return false
+        menuRef.current?.close()
+        return true
+    }
+
+    useFocusEffect(() => {
+        BackHandler.removeEventListener('hardwareBackPress', backAction)
         const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
         return () => handler.remove()
-    }, [])
+    })
 
     const { setCurrentCard } = Characters.useCharacterCard(
         useShallow((state) => ({
@@ -138,24 +134,13 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
                 rendererProps={{ placement: 'bottom', anchorStyle: styles.anchor }}>
                 <MenuTrigger>
                     <View>
-                        {!showMenu && (
-                            <Animated.View style={styles.headerButtonContainer} entering={ZoomIn}>
-                                <FontAwesome
-                                    name="plus"
-                                    size={28}
-                                    color={Style.getColor('primary-text1')}
-                                />
-                            </Animated.View>
-                        )}
-                        {showMenu && (
-                            <Animated.View style={styles.headerButtonContainer} entering={ZoomIn}>
-                                <Ionicons
-                                    name="close"
-                                    size={28}
-                                    color={Style.getColor('primary-text1')}
-                                />
-                            </Animated.View>
-                        )}
+                        <Animated.View style={styles.headerButtonContainer} entering={ZoomIn}>
+                            <FontAwesome
+                                name="plus"
+                                size={28}
+                                color={Style.getColor(showMenu ? 'primary-text2' : 'primary-text1')}
+                            />
+                        </Animated.View>
                     </View>
                 </MenuTrigger>
                 <MenuOptions customStyles={menustyle}>

@@ -1,7 +1,7 @@
-import { AntDesign } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
-import { router } from 'expo-router'
 import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
+
+import CharacterEditPopup from './CharacterEditPopup'
 
 type CharacterListingProps = {
     index: number
@@ -46,27 +46,20 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
 
     const loadChat = Chats.useChat((state) => state.load)
 
-    const setCurrentCharacter = async (charId: number, edit: boolean = false) => {
+    const setCurrentCharacter = async (charId: number) => {
         if (nowLoading) return
-
         try {
             setNowLoading(true)
             await setCurrentCard(charId)
-
-            if (edit) {
-                router.push('/CharInfo')
-            } else {
-                let chatId = character.latestChat
-                if (!chatId) {
-                    chatId = await Chats.db.mutate.createChat(charId)
-                }
-                if (!chatId) {
-                    Logger.log('Chat creation backup has failed! Please report.', true)
-                    return
-                }
-                await loadChat(chatId)
+            let chatId = character.latestChat
+            if (!chatId) {
+                chatId = await Chats.db.mutate.createChat(charId)
             }
-
+            if (!chatId) {
+                Logger.log('Chat creation backup has failed! Please report.', true)
+                return
+            }
+            await loadChat(chatId)
             setNowLoading(false)
         } catch (error) {
             Logger.log(`Couldn't load character: ${error}`, true)
@@ -134,14 +127,11 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                         size={28}
                     />
                 ) : (
-                    <TouchableOpacity
-                        style={styles.secondaryButton}
-                        onPress={async () => {
-                            setCurrentCharacter(character.id, true)
-                        }}
-                        disabled={nowLoading}>
-                        <AntDesign color={Style.getColor('primary-text2')} name="edit" size={26} />
-                    </TouchableOpacity>
+                    <CharacterEditPopup
+                        characterInfo={character}
+                        setNowLoading={setNowLoading}
+                        nowLoading={nowLoading}
+                    />
                 )}
             </View>
         </View>
@@ -181,11 +171,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
 
-    secondaryButton: {
-        paddingHorizontal: 12,
-        paddingVertical: 20,
-    },
-
     avatar: {
         width: 48,
         height: 48,
@@ -196,6 +181,7 @@ const styles = StyleSheet.create({
 
     nametag: {
         fontSize: 16,
+        fontWeight: '500',
         color: Style.getColor('primary-text1'),
     },
 

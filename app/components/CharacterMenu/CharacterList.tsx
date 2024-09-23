@@ -221,7 +221,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
 
             {characterList.length !== 0 && (
                 <FlatList
-                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
                     data={characterList}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item, index }) => (

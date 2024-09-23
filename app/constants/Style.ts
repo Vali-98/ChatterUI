@@ -159,7 +159,7 @@ export namespace Style {
                     },
                     accent: { h: 180, s: 80, l: 50 },
                     warning: { h: 50, s: 60, l: 50 },
-                    destructive: { h: 5, s: 60, l: 50 },
+                    destructive: { h: 5, s: 150, l: 82 },
                     confirm: { h: 140, s: 60, l: 50 },
                 },
                 setColor: (colors: ColorTypes) => set((state) => ({ ...state, colors: colors })),

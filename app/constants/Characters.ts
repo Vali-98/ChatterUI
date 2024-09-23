@@ -176,6 +176,7 @@ export namespace Characters {
             export const card = async (charId: number): Promise<CharacterCardV2 | undefined> => {
                 const data = await database.query.characters.findFirst({
                     where: eq(characters.id, charId),
+                    columns: { id: false },
                     with: {
                         tags: {
                             columns: {
@@ -435,6 +436,24 @@ export namespace Characters {
                     }
                 })
                 if (image_id) await copyImage(imageuri, image_id)
+            }
+
+            export const duplicateCard = async (charId: number) => {
+                const card = await db.query.card(charId)
+
+                if (!card) {
+                    Logger.log('Failed to copy card: Card does not exit', true)
+                    return
+                }
+                const cacheLoc = `${FS.cacheDirectory}${card.data.image_id}`
+                await FS.copyAsync({
+                    from: getImageDir(card.data.image_id),
+                    to: cacheLoc,
+                })
+                card.data.last_modified = new Date().getTime()
+                await createCharacter(card, cacheLoc)
+                    .then(() => Logger.log(`Card cloned: ${card.data.name}`))
+                    .catch((e) => Logger.log(`Failed to clone card: ${e}`))
             }
         }
     }
