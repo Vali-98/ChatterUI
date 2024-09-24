@@ -546,6 +546,10 @@ export namespace Chats {
 
                 await database.insert(chatSwipes).values(swipes)
             }
+
+            export const renameChat = async (chatId: number, name: string) => {
+                await database.update(chats).set({ name: name }).where(eq(chats.id, chatId))
+            }
         }
     }
 

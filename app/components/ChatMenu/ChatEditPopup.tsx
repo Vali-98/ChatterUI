@@ -1,3 +1,4 @@
+import TextBoxModal from '@components/TextBoxModal'
 import { AntDesign, FontAwesome } from '@expo/vector-icons'
 import { Characters, Chats, Logger, saveStringToDownload, Style } from '@globals'
 import { useFocusEffect } from 'expo-router'
@@ -32,7 +33,7 @@ type ChatEditPopupProps = {
 type PopupProps = {
     onPress: () => void | Promise<void>
     label: string
-    iconName: 'copy' | 'download' | 'trash'
+    iconName: keyof typeof FontAwesome.glyphMap
     warning?: boolean
 }
 
@@ -56,6 +57,7 @@ const PopupOption: React.FC<PopupProps> = ({ onPress, label, iconName, warning =
 
 const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, setNowLoading, nowLoading }) => {
     const [showMenu, setShowMenu] = useState<boolean>(false)
+    const [showRename, setShowRename] = useState<boolean>(false)
     const menuRef: React.MutableRefObject<Menu | null> = useRef(null)
 
     const { charName, charId } = Characters.useCharacterCard((state) => ({
@@ -158,6 +160,22 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, setNowLoading, nowL
                 />
             </MenuTrigger>
             <MenuOptions customStyles={menustyle}>
+                <TextBoxModal
+                    booleans={[showRename, setShowRename]}
+                    onConfirm={async (text) => {
+                        await Chats.db.mutate.renameChat(item.id, text)
+                    }}
+                    onClose={() => menuRef.current?.close()}
+                    textCheck={(text) => text.length === 0}
+                />
+                <PopupOption
+                    onPress={() => {
+                        setShowRename(true)
+                    }}
+                    label="Rename"
+                    iconName="pencil"
+                />
+
                 <PopupOption
                     onPress={() => handleExportChat()}
                     label="Export"

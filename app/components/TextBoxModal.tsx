@@ -1,5 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Style } from '@globals'
+import { Logger, Style } from '@globals'
 import { getStringAsync } from 'expo-clipboard'
 import { useState, useEffect } from 'react'
 import {
@@ -16,30 +16,39 @@ import {
 type TextBoxModalProps = {
     booleans: [boolean, (b: boolean) => void]
     onConfirm: (text: string) => void
+    onClose?: () => void
     title?: string
     showPaste?: boolean
     placeholder?: string
+    textCheck?: (text: string) => boolean
+    errorMessage?: string
 }
 
 const TextBoxModal: React.FC<TextBoxModalProps> = ({
     booleans: [showModal, setShowModal],
     onConfirm = (text) => {},
+    onClose = () => {},
     title = 'Enter Name',
     showPaste = false,
     placeholder = '',
+    textCheck = (text: string) => false,
+    errorMessage = 'Name cannot be empty',
 }) => {
     const [text, setText] = useState('')
+    const [showError, setShowError] = useState(false)
 
     useEffect(() => {
         setText('')
     }, [showModal])
 
     const handleOverlayClick = (e: GestureResponderEvent) => {
-        if (e.target === e.currentTarget) setShowModal(false)
+        if (e.target === e.currentTarget) handleClose()
     }
 
     const handleClose = () => {
         setShowModal(false)
+        setShowError(false)
+        onClose()
     }
 
     return (
@@ -81,18 +90,20 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                             </TouchableOpacity>
                         )}
                     </View>
-
+                    {showError && <Text style={styles.errorMessage}>{errorMessage}</Text>}
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity
-                            style={styles.cancelButton}
-                            onPress={() => setShowModal(false)}>
+                        <TouchableOpacity style={styles.cancelButton} onPress={() => handleClose()}>
                             <Text style={{ color: Style.getColor('primary-text1') }}>Cancel</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.confirmButton}
                             onPress={() => {
+                                if (textCheck(text)) {
+                                    setShowError(true)
+                                    return
+                                }
                                 onConfirm(text)
-                                setShowModal(false)
+                                handleClose()
                             }}>
                             <Text style={{ color: Style.getColor('primary-text1') }}>Confirm</Text>
                         </TouchableOpacity>
@@ -172,5 +183,10 @@ const styles = StyleSheet.create({
 
     inputButton: {
         marginLeft: 12,
+    },
+
+    errorMessage: {
+        color: Style.getColor('destructive-brand'),
+        marginBottom: 8,
     },
 })
