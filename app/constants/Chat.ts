@@ -310,12 +310,11 @@ export namespace Chats {
             }
 
             export const chatNewestId = async (charId: number): Promise<number | undefined> => {
-                const chatIds = await database.query.chats.findMany({
-                    limit: 1,
-                    orderBy: chats.last_modified,
+                const result = await database.query.chats.findFirst({
+                    orderBy: desc(chats.last_modified),
                     where: eq(chats.character_id, charId),
                 })
-                return chatIds?.[0]?.id
+                return result?.id
             }
 
             export const chatNewest = async () => {
@@ -324,13 +323,6 @@ export namespace Chats {
                     orderBy: chats.last_modified,
                 })
                 return result
-            }
-
-            export const chatListOld = async (charId: number) => {
-                const chatIds = await database.query.chats.findMany({
-                    where: eq(chats.character_id, charId),
-                })
-                return chatIds
             }
 
             export const chatList = async (charId: number) => {
@@ -507,6 +499,52 @@ export namespace Chats {
             export const deleteChatEntry = async (entryId: number) => {
                 await updateEntryModified(entryId)
                 await database.delete(chatEntries).where(eq(chatEntries.id, entryId))
+            }
+
+            export const cloneChat = async (chatId: number, limit?: number) => {
+                const result = await database.query.chats.findFirst({
+                    where: eq(chats.id, chatId),
+                    columns: { id: false },
+                    with: {
+                        messages: {
+                            columns: { id: false },
+                            orderBy: chatEntries.order,
+                            with: {
+                                swipes: {
+                                    columns: { id: false },
+                                },
+                            },
+                            ...(limit && { limit: limit }),
+                        },
+                    },
+                })
+                if (!result) return
+
+                result.last_modified = new Date().getTime()
+
+                const [{ newChatId }, ..._] = await database
+                    .insert(chats)
+                    .values(result)
+                    .returning({ newChatId: chats.id })
+
+                result.messages.forEach((item) => {
+                    item.chat_id = newChatId
+                })
+
+                const newEntryIds = await database
+                    .insert(chatEntries)
+                    .values(result.messages)
+                    .returning({ newEntryId: chatEntries.id })
+
+                result.messages.forEach((item, index) => {
+                    item.swipes.forEach((item2) => {
+                        item2.entry_id = newEntryIds[index].newEntryId
+                    })
+                })
+
+                const swipes = result.messages.map((item) => item.swipes).flat()
+
+                await database.insert(chatSwipes).values(swipes)
             }
         }
     }

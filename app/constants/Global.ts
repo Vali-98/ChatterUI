@@ -1,3 +1,4 @@
+import { DownloadDirectoryPath, writeFile } from '@dr.pogodin/react-native-fs'
 import * as Crypto from 'expo-crypto'
 import * as FS from 'expo-file-system'
 import * as Sharing from 'expo-sharing'
@@ -16,6 +17,7 @@ import { MarkdownStyle } from './Markdown'
 import { Presets } from './Presets'
 import { Style } from './Style'
 import { humanizedISO8601DateTime } from './Utils'
+
 export {
     mmkv,
     Presets,
@@ -39,8 +41,9 @@ export const resetEncryption = (value = 0) => {
     mmkv.recrypt(Crypto.getRandomBytes(16).toString())
 }
 
-// Exports a string to external storage, supports json
-
+/** Exports a string to external storage, supports json
+ * @deprecated
+ */
 export const saveStringExternal = async (
     filename: string,
     filedata: string,
@@ -65,6 +68,23 @@ export const saveStringExternal = async (
     } else if (Platform.OS === 'ios') Sharing.shareAsync(filename)
 }
 
+/**
+ *
+ * @param data string data of file
+ * @param filename filename to be written, include extension
+ * @param encoding encoding of file
+ */
+export const saveStringToDownload = async (
+    data: string,
+    filename: string,
+    encoding: 'ascii' | 'base64' | `utf8`
+) => {
+    await writeFile(`${DownloadDirectoryPath}/${filename}`, data, encoding)
+}
+
+/**
+ * Default settings on first install
+ */
 const AppSettingsDefault: Record<AppSettings, boolean | number> = {
     [AppSettings.AnimateEditor]: true,
     [AppSettings.AutoLoadLocal]: false,
@@ -87,8 +107,6 @@ const loadChatOnInit = async () => {
     await Chats.useChat.getState().load(newestChat[0].id)
 }
 
-// runs every startup to clear some MMKV values
-
 const createDefaultUserData = async () => {
     await Characters.db.mutate.createCard('User', 'user').then((id: number) => {
         mmkv.set(Global.UserID, id)
@@ -96,6 +114,9 @@ const createDefaultUserData = async () => {
     })
 }
 
+/**
+ * Runs every app start
+ */
 export const startupApp = () => {
     console.log('[APP STARTED]: T1APT')
 

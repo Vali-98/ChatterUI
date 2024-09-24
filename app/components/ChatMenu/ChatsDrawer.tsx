@@ -1,7 +1,7 @@
-import { Ionicons, AntDesign } from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons'
 import { Characters, Chats, Style } from '@globals'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
-import { SetStateAction } from 'react'
+import { SetStateAction, useState } from 'react'
 import {
     Text,
     GestureResponderEvent,
@@ -9,7 +9,6 @@ import {
     StyleSheet,
     View,
     FlatList,
-    Alert,
 } from 'react-native'
 import Animated, {
     Easing,
@@ -18,6 +17,8 @@ import Animated, {
     SlideInRight,
     SlideOutRight,
 } from 'react-native-reanimated'
+
+import ChatEditPopup from './ChatEditPopup'
 
 type ChatsDrawerProps = {
     booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
@@ -34,7 +35,7 @@ type ListItem = {
 
 const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShowModal] }) => {
     const { charId } = Characters.useCharacterCard((state) => ({ charId: state.id }))
-
+    const [nowLoading, setNowLoading] = useState<boolean>(false)
     const { data } = useLiveQuery(Chats.db.query.chatListQuery(charId ?? 0))
 
     const { deleteChat, loadChat, currentChatId } = Chats.useChat((state) => ({
@@ -59,34 +60,6 @@ const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShow
             })
     }
 
-    const handleDeleteChat = (item: ListItem) => {
-        Alert.alert(
-            `Delete Chat`,
-            `Are you sure you want to delete this chat file: '${item.name}'?`,
-            [
-                {
-                    text: 'Cancel',
-                    onPress: () => {},
-                    style: 'cancel',
-                },
-                {
-                    text: 'Confirm',
-                    onPress: async () => {
-                        await deleteChat(item.id)
-                        if (charId && currentChatId === item.id) {
-                            const returnedChatId = await Chats.db.query.chatNewestId(charId)
-                            const chatId = returnedChatId
-                                ? returnedChatId
-                                : await Chats.db.mutate.createChat(charId)
-                            chatId && (await loadChat(chatId))
-                        }
-                    },
-                    style: 'destructive',
-                },
-            ]
-        )
-    }
-
     const renderChat = (item: ListItem, index: number) => {
         const date = new Date(item.last_modified ?? 0)
         return (
@@ -106,9 +79,7 @@ const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShow
                         <Text style={styles.smallText}>{date.toLocaleTimeString()}</Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.editButton} onPress={() => handleDeleteChat(item)}>
-                    <AntDesign color={Style.getColor('primary-text2')} name="edit" size={26} />
-                </TouchableOpacity>
+                <ChatEditPopup item={item} nowLoading={nowLoading} setNowLoading={setNowLoading} />
             </View>
         )
     }
