@@ -137,113 +137,117 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                         : {}),
                 }}
             />
-            <View
-                style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    paddingLeft: 16,
-                    paddingRight: 8,
-                    paddingBottom: 12,
-                }}>
-                <View
-                    style={{
-                        columnGap: 12,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                    }}>
-                    <Text style={{ color: Style.getColor('primary-text2'), fontSize: 16 }}>
-                        Sort By
-                    </Text>
-                    <SortButton
-                        sortTypes={[SortType.RECENT_ASC, SortType.RECENT_DESC]}
-                        currentSortType={sortType}
-                        label="Recent"
-                        onPress={() => {
-                            setSortType(recentStateMap[sortType])
-                        }}
-                    />
-                    <SortButton
-                        sortTypes={[SortType.ALPHABETICAL_ASC, SortType.ALPHABETICAL_DESC]}
-                        currentSortType={sortType}
-                        label="Name"
-                        onPress={() => {
-                            setSortType(alphabeticalStateMap[sortType])
-                        }}
-                    />
-                </View>
-                {showSearch && (
-                    <Animated.View entering={ZoomIn} exiting={ZoomOut}>
-                        <TouchableOpacity>
-                            <AntDesign
-                                name="close"
-                                color={Style.getColor('primary-text2')}
-                                size={26}
-                                onPress={() => {
-                                    if (showSearch) setTextFilter('')
-                                    setShowSearch(!showSearch)
-                                }}
-                            />
-                        </TouchableOpacity>
-                    </Animated.View>
-                )}
-                {!showSearch && (
-                    <Animated.View entering={ZoomIn} exiting={ZoomOut}>
-                        <TouchableOpacity>
-                            <AntDesign
-                                name="search1"
-                                color={Style.getColor('primary-text2')}
-                                size={26}
-                                onPress={() => {
-                                    if (showSearch) setTextFilter('')
-                                    setShowSearch(!showSearch)
-                                }}
-                            />
-                        </TouchableOpacity>
-                    </Animated.View>
-                )}
-            </View>
-            {showSearch && (
-                <Animated.View
-                    style={{ paddingHorizontal: 12, paddingVertical: 8 }}
-                    entering={FadeInUp.duration(150).withInitialValues({
-                        transform: [{ translateY: -20 }],
-                    })}
-                    exiting={FadeOutUp.duration(100)}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TextInput
-                            autoFocus
-                            placeholder="Search Name..."
-                            placeholderTextColor={Style.getColor('primary-text3')}
-                            value={textFilter}
-                            style={{
-                                ...styles.searchInput,
-                                color: Style.getColor(
-                                    characterList.length === 0 ? 'primary-text2' : 'primary-text1'
-                                ),
-                            }}
-                            onChangeText={setTextFilter}
-                        />
-                    </View>
-                </Animated.View>
-            )}
 
             {characterList.length === 0 && <CharactersEmpty />}
 
             {characterList.length !== 0 && (
-                <FlatList
-                    showsVerticalScrollIndicator={false}
-                    data={characterList}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item, index }) => (
-                        <CharacterListing
-                            index={index}
-                            character={item}
-                            nowLoading={nowLoading}
-                            showTags={false}
-                            setNowLoading={setNowLoading}
-                        />
+                <View>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            paddingLeft: 16,
+                            paddingRight: 8,
+                            paddingBottom: 12,
+                        }}>
+                        <View
+                            style={{
+                                columnGap: 12,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                            }}>
+                            <Text style={{ color: Style.getColor('primary-text2'), fontSize: 16 }}>
+                                Sort By
+                            </Text>
+                            <SortButton
+                                sortTypes={[SortType.RECENT_ASC, SortType.RECENT_DESC]}
+                                currentSortType={sortType}
+                                label="Recent"
+                                onPress={() => {
+                                    setSortType(recentStateMap[sortType])
+                                }}
+                            />
+                            <SortButton
+                                sortTypes={[SortType.ALPHABETICAL_ASC, SortType.ALPHABETICAL_DESC]}
+                                currentSortType={sortType}
+                                label="Name"
+                                onPress={() => {
+                                    setSortType(alphabeticalStateMap[sortType])
+                                }}
+                            />
+                        </View>
+                        {showSearch && (
+                            <Animated.View entering={ZoomIn} exiting={ZoomOut}>
+                                <TouchableOpacity>
+                                    <AntDesign
+                                        name="close"
+                                        color={Style.getColor('primary-text2')}
+                                        size={26}
+                                        onPress={() => {
+                                            if (showSearch) setTextFilter('')
+                                            setShowSearch(!showSearch)
+                                        }}
+                                    />
+                                </TouchableOpacity>
+                            </Animated.View>
+                        )}
+                        {!showSearch && (
+                            <Animated.View entering={ZoomIn} exiting={ZoomOut}>
+                                <TouchableOpacity>
+                                    <AntDesign
+                                        name="search1"
+                                        color={Style.getColor('primary-text2')}
+                                        size={26}
+                                        onPress={() => {
+                                            if (showSearch) setTextFilter('')
+                                            setShowSearch(!showSearch)
+                                        }}
+                                    />
+                                </TouchableOpacity>
+                            </Animated.View>
+                        )}
+                    </View>
+                    {showSearch && (
+                        <Animated.View
+                            style={{ paddingHorizontal: 12, paddingVertical: 8 }}
+                            entering={FadeInUp.duration(150).withInitialValues({
+                                transform: [{ translateY: -20 }],
+                            })}
+                            exiting={FadeOutUp.duration(100)}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <TextInput
+                                    autoFocus
+                                    placeholder="Search Name..."
+                                    placeholderTextColor={Style.getColor('primary-text3')}
+                                    value={textFilter}
+                                    style={{
+                                        ...styles.searchInput,
+                                        color: Style.getColor(
+                                            characterList.length === 0
+                                                ? 'primary-text2'
+                                                : 'primary-text1'
+                                        ),
+                                    }}
+                                    onChangeText={setTextFilter}
+                                />
+                            </View>
+                        </Animated.View>
                     )}
-                />
+                    <FlatList
+                        showsVerticalScrollIndicator={false}
+                        data={characterList}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item, index }) => (
+                            <CharacterListing
+                                index={index}
+                                character={item}
+                                nowLoading={nowLoading}
+                                showTags={false}
+                                setNowLoading={setNowLoading}
+                            />
+                        )}
+                    />
+                </View>
             )}
         </SafeAreaView>
     )
