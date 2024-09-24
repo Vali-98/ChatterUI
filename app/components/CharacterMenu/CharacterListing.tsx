@@ -1,3 +1,4 @@
+import { CharInfo } from '@constants/Characters'
 import { Characters, Chats, Logger, Style } from '@globals'
 import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
 
@@ -9,17 +10,6 @@ type CharacterListingProps = {
     nowLoading: boolean
     showTags: boolean
     setNowLoading: (b: boolean) => void
-}
-
-type CharInfo = {
-    name: string
-    id: number
-    image_id: number
-    last_modified: number
-    tags: string[]
-    latestSwipe?: string
-    latestName?: string
-    latestChat?: number
 }
 
 const day_ms = 86400000

@@ -13,7 +13,6 @@ import { desc, eq, inArray, notInArray } from 'drizzle-orm'
 import { randomUUID } from 'expo-crypto'
 import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
-import { atob } from 'react-native-quick-base64'
 import { create } from 'zustand'
 
 import { API } from './API'
@@ -23,6 +22,17 @@ import { Logger } from './Logger'
 import { mmkv } from './MMKV'
 import { getPngChunkText } from './PNG'
 import { Tokenizer } from './Tokenizer'
+
+export type CharInfo = {
+    name: string
+    id: number
+    image_id: number
+    last_modified: number
+    tags: string[]
+    latestSwipe?: string
+    latestName?: string
+    latestChat?: number
+}
 
 type CharacterTokenCache = {
     otherName: string

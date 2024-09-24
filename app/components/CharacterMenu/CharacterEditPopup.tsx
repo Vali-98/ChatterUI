@@ -1,3 +1,4 @@
+import { CharInfo } from '@constants/Characters'
 import { AntDesign, FontAwesome } from '@expo/vector-icons'
 import { Characters, Style } from '@globals'
 import { useFocusEffect, useRouter } from 'expo-router'
@@ -13,17 +14,6 @@ import {
 } from 'react-native-popup-menu'
 
 const { Popover } = renderers
-
-type CharInfo = {
-    name: string
-    id: number
-    image_id: number
-    last_modified: number
-    tags: string[]
-    latestSwipe?: string
-    latestName?: string
-    latestChat?: number
-}
 
 type CharacterEditPopupProps = {
     characterInfo: CharInfo

@@ -1,4 +1,5 @@
-import { FontAwesome, Ionicons } from '@expo/vector-icons'
+import { CharInfo } from '@constants/Characters'
+import { AntDesign } from '@expo/vector-icons'
 import { Characters, Style } from '@globals'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
@@ -12,69 +13,78 @@ import {
     TouchableOpacity,
     TextInput,
 } from 'react-native'
-import Animated, {
-    FadeInUp,
-    FadeOutUp,
-    SlideInRight,
-    ZoomIn,
-    ZoomInDown,
-    ZoomInUp,
-    ZoomOut,
-} from 'react-native-reanimated'
+import Animated, { FadeInUp, FadeOutUp, ZoomIn, ZoomOut } from 'react-native-reanimated'
 
 import CharacterListing from './CharacterListing'
 import CharacterNewMenu from './CharacterNewMenu'
 import CharactersEmpty from './CharactersEmpty'
 
-type CharInfo = {
-    name: string
-    id: number
-    image_id: number
-    last_modified: number
-    tags: string[]
-    latestSwipe?: string
-    latestName?: string
-    latestChat?: number
-}
-
 enum SortType {
-    RECENT_DESC,
     RECENT_ASC,
+    RECENT_DESC,
     ALPHABETICAL_ASC,
     ALPHABETICAL_DESC,
 }
 
-const sortModified = (item1: CharInfo, item2: CharInfo) => {
+const sortModifiedDesc = (item1: CharInfo, item2: CharInfo) => {
     return item2.last_modified - item1.last_modified
 }
 
-const sortAlphabetical = (item1: CharInfo, item2: CharInfo) => {
+const sortModifiedAsc = (item1: CharInfo, item2: CharInfo) => {
+    return -(item2.last_modified - item1.last_modified)
+}
+
+const sortAlphabeticalAsc = (item1: CharInfo, item2: CharInfo) => {
     return -item2.name.localeCompare(item1.name)
 }
 
-const sortList = (sortType: SortType) => {
-    if (sortType === SortType.ALPHABETICAL_ASC) return sortAlphabetical
-    else return sortModified
+const sortAlphabeticalDesc = (item1: CharInfo, item2: CharInfo) => {
+    return item2.name.localeCompare(item1.name)
+}
+
+const sortList = {
+    [SortType.RECENT_ASC]: sortModifiedAsc,
+    [SortType.RECENT_DESC]: sortModifiedDesc,
+    [SortType.ALPHABETICAL_ASC]: sortAlphabeticalAsc,
+    [SortType.ALPHABETICAL_DESC]: sortAlphabeticalDesc,
+}
+
+const recentStateMap = {
+    [SortType.RECENT_ASC]: SortType.RECENT_DESC,
+    [SortType.RECENT_DESC]: SortType.RECENT_ASC,
+    [SortType.ALPHABETICAL_ASC]: SortType.RECENT_DESC,
+    [SortType.ALPHABETICAL_DESC]: SortType.RECENT_DESC,
+}
+
+const alphabeticalStateMap = {
+    [SortType.RECENT_ASC]: SortType.ALPHABETICAL_ASC,
+    [SortType.RECENT_DESC]: SortType.ALPHABETICAL_ASC,
+    [SortType.ALPHABETICAL_ASC]: SortType.ALPHABETICAL_DESC,
+    [SortType.ALPHABETICAL_DESC]: SortType.ALPHABETICAL_ASC,
 }
 
 type SortButtonProps = {
-    sortType: SortType
+    sortTypes: SortType[]
     currentSortType: SortType
     label: string
     onPress: () => void | Promise<void>
 }
 
-const SortButton: React.FC<SortButtonProps> = ({ sortType, currentSortType, label, onPress }) => {
+const SortButton: React.FC<SortButtonProps> = ({ sortTypes, currentSortType, label, onPress }) => {
+    const isCurrent = sortTypes.includes(currentSortType)
+    const isAsc = sortTypes[0] === currentSortType
     return (
         <TouchableOpacity
             onPress={onPress}
-            style={sortType === currentSortType ? styles.sortButtonActive : styles.sortButton}>
-            <Text
-                style={
-                    sortType === currentSortType
-                        ? styles.sortButtonTextActive
-                        : styles.sortButtonText
-                }>
+            style={isCurrent ? styles.sortButtonActive : styles.sortButton}>
+            {isCurrent && (
+                <AntDesign
+                    size={14}
+                    name={isAsc ? 'caretup' : 'caretdown'}
+                    color={Style.getColor('primary-text1')}
+                />
+            )}
+            <Text style={isCurrent ? styles.sortButtonTextActive : styles.sortButtonText}>
                 {label}
             </Text>
         </TouchableOpacity>
@@ -105,7 +115,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
             last_modified: item.last_modified ?? 0,
             tags: item.tags.map((item) => item.tag.tag),
         }))
-        .sort(sortList(sortType ?? SortType.RECENT_DESC))
+        .sort(sortList[sortType ?? SortType.RECENT_DESC])
         .filter((item) => !textFilter || item.name.toLowerCase().includes(textFilter.toLowerCase()))
 
     return (
@@ -145,26 +155,26 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                         Sort By
                     </Text>
                     <SortButton
-                        sortType={SortType.RECENT_DESC}
+                        sortTypes={[SortType.RECENT_ASC, SortType.RECENT_DESC]}
                         currentSortType={sortType}
                         label="Recent"
                         onPress={() => {
-                            setSortType(SortType.RECENT_DESC)
+                            setSortType(recentStateMap[sortType])
                         }}
                     />
                     <SortButton
-                        sortType={SortType.ALPHABETICAL_ASC}
+                        sortTypes={[SortType.ALPHABETICAL_ASC, SortType.ALPHABETICAL_DESC]}
                         currentSortType={sortType}
-                        label="A-z"
+                        label="Name"
                         onPress={() => {
-                            setSortType(SortType.ALPHABETICAL_ASC)
+                            setSortType(alphabeticalStateMap[sortType])
                         }}
                     />
                 </View>
                 {showSearch && (
                     <Animated.View entering={ZoomIn} exiting={ZoomOut}>
                         <TouchableOpacity>
-                            <Ionicons
+                            <AntDesign
                                 name="close"
                                 color={Style.getColor('primary-text2')}
                                 size={26}
@@ -179,8 +189,8 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                 {!showSearch && (
                     <Animated.View entering={ZoomIn} exiting={ZoomOut}>
                         <TouchableOpacity>
-                            <FontAwesome
-                                name="search"
+                            <AntDesign
+                                name="search1"
                                 color={Style.getColor('primary-text2')}
                                 size={26}
                                 onPress={() => {
@@ -243,9 +253,20 @@ export default CharacterList
 
 const styles = StyleSheet.create({
     sortButton: {
+        alignItems: 'center',
+        flexDirection: 'row',
         paddingHorizontal: 16,
         paddingVertical: 8,
         backgroundColor: Style.getColor('primary-surface2'),
+        borderRadius: 16,
+    },
+
+    sortButtonActive: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        backgroundColor: Style.getColor('primary-surface3'),
         borderRadius: 16,
     },
 
@@ -253,14 +274,8 @@ const styles = StyleSheet.create({
         color: Style.getColor('primary-text2'),
     },
 
-    sortButtonActive: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        backgroundColor: Style.getColor('primary-surface3'),
-        borderRadius: 16,
-    },
-
     sortButtonTextActive: {
+        marginLeft: 4,
         color: Style.getColor('primary-text1'),
     },
 
