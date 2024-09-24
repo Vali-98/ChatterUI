@@ -74,7 +74,7 @@ const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShow
                     onPress: async () => {
                         await deleteChat(item.id)
                         if (charId && currentChatId === item.id) {
-                            const returnedChatId = await Chats.db.query.chatNewest(charId)
+                            const returnedChatId = await Chats.db.query.chatNewestId(charId)
                             const chatId = returnedChatId
                                 ? returnedChatId
                                 : await Chats.db.mutate.createChat(charId)

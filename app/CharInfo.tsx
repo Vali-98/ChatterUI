@@ -2,7 +2,6 @@ import AnimatedView from '@components/AnimatedView'
 import { FontAwesome } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
 import { CharacterCardV2 } from 'app/constants/Characters'
-import { RecentMessages } from 'app/constants/RecentMessages'
 import { Tokenizer } from 'app/constants/Tokenizer'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
@@ -88,7 +87,6 @@ const CharInfo = () => {
                 {
                     text: 'Confirm',
                     onPress: () => {
-                        RecentMessages.deleteByCharacter(charName ?? '')
                         Characters.db.mutate.deleteCard(charId ?? -1)
                         unloadCharacter()
                         unloadChat()

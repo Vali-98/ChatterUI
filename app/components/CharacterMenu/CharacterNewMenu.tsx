@@ -1,5 +1,5 @@
 import TextBoxModal from '@components/TextBoxModal'
-import { FontAwesome } from '@expo/vector-icons'
+import { AntDesign, FontAwesome } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { useRef, useState } from 'react'
@@ -27,14 +27,14 @@ type CharacterNewMenuProps = {
 type PopupProps = {
     onPress: () => void | Promise<void>
     label: string
-    iconName: 'pencil' | 'cloud-download' | 'upload'
+    iconName: 'edit' | 'clouddownload' | 'upload'
 }
 
 const PopupOption: React.FC<PopupProps> = ({ onPress, label, iconName }) => {
     return (
         <MenuOption>
             <TouchableOpacity style={styles.popupButton} onPress={onPress}>
-                <FontAwesome name={iconName} size={28} color={Style.getColor('primary-text2')} />
+                <AntDesign name={iconName} size={28} color={Style.getColor('primary-text2')} />
                 <Text style={styles.optionLabel}>{label}</Text>
             </TouchableOpacity>
         </MenuOption>
@@ -79,7 +79,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
         try {
             await setCurrentCard(charId)
             setNowLoading(true)
-            const returnedChatId = await Chats.db.query.chatNewest(charId)
+            const returnedChatId = await Chats.db.query.chatNewestId(charId)
             let chatId = returnedChatId
             if (!chatId) {
                 chatId = await Chats.db.mutate.createChat(charId)
@@ -135,8 +135,8 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
                 <MenuTrigger>
                     <View>
                         <Animated.View style={styles.headerButtonContainer} entering={ZoomIn}>
-                            <FontAwesome
-                                name="plus"
+                            <AntDesign
+                                name="adduser"
                                 size={28}
                                 color={Style.getColor(showMenu ? 'primary-text2' : 'primary-text1')}
                             />
@@ -149,7 +149,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
                             menuRef.current?.close()
                             setShowDownload(true)
                         }}
-                        iconName="cloud-download"
+                        iconName="clouddownload"
                         label="Download"
                     />
                     <PopupOption
@@ -165,7 +165,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
                             menuRef.current?.close()
                             setShowNewChar(true)
                         }}
-                        iconName="pencil"
+                        iconName="edit"
                         label="Create Character"
                     />
                 </MenuOptions>

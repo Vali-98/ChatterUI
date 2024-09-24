@@ -1,3 +1,7 @@
+/*
+
+@deprecated
+
 import { Global } from './GlobalValues'
 import { mmkv } from './MMKV'
 
@@ -50,3 +54,4 @@ export namespace RecentMessages {
         mmkv.set(Global.RecentMessages, JSON.stringify(cleaned))
     }
 }
+*/

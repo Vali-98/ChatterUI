@@ -63,7 +63,7 @@ const CharMenu = () => {
         try {
             await setCurrentCard(charId)
             setNowLoading(true)
-            const returnedChatId = await Chats.db.query.chatNewest(charId)
+            const returnedChatId = await Chats.db.query.chatNewestId(charId)
             let chatId = returnedChatId
             if (!chatId) {
                 chatId = await Chats.db.mutate.createChat(charId)

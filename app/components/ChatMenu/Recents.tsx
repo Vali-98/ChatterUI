@@ -1,3 +1,7 @@
+/*
+
+@deprecated - moved to CharacterList
+
 import AnimatedView from '@components/AnimatedView'
 import { RecentEntry, RecentMessages } from 'app/constants/RecentMessages'
 import { FontAwesome, Ionicons } from '@expo/vector-icons'
@@ -185,3 +189,6 @@ const styles = StyleSheet.create({
 })
 
 export default Recents
+
+
+*/

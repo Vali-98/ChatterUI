@@ -66,15 +66,6 @@ const Layout = () => {
                                 animationDuration: 200,
                             }}
                         />
-
-                        <Stack.Screen
-                            name="ChatSelector"
-                            options={{
-                                animation: 'fade',
-                                title: 'History',
-                                animationDuration: 200,
-                            }}
-                        />
                     </Stack>
                 </MenuProvider>
             </GestureHandlerRootView>

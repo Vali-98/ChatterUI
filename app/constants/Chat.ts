@@ -9,7 +9,6 @@ import { AppSettings, Global } from './GlobalValues'
 import { Llama } from './LlamaLocal'
 import { Logger } from './Logger'
 import { mmkv } from './MMKV'
-import { RecentMessages } from './RecentMessages'
 import { convertToFormatInstruct } from './TextFormat'
 import { Tokenizer } from './Tokenizer'
 import { replaceMacros } from './Utils'
@@ -130,7 +129,6 @@ export namespace Chats {
             db.mutate.updateChatModified(chatId)
             const charName = Characters.useCharacterCard.getState().card?.data.name
             const charId = Characters.useCharacterCard.getState().id
-            if (charName && charId) RecentMessages.insertEntry(charName, charId, chatId)
         },
 
         delete: async (chatId: number) => {
@@ -311,11 +309,21 @@ export namespace Chats {
                 if (chat) return { ...chat }
             }
 
-            export const chatNewest = async (charId: number): Promise<number | undefined> => {
+            export const chatNewestId = async (charId: number): Promise<number | undefined> => {
                 const chatIds = await database.query.chats.findMany({
+                    limit: 1,
+                    orderBy: chats.last_modified,
                     where: eq(chats.character_id, charId),
                 })
-                return chatIds?.[chatIds?.length - 1]?.id
+                return chatIds?.[0]?.id
+            }
+
+            export const chatNewest = async () => {
+                const result = await database.query.chats.findMany({
+                    limit: 1,
+                    orderBy: chats.last_modified,
+                })
+                return result
             }
 
             export const chatListOld = async (charId: number) => {

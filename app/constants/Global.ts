@@ -14,7 +14,6 @@ import { Logger } from './Logger'
 import { mmkv } from './MMKV'
 import { MarkdownStyle } from './Markdown'
 import { Presets } from './Presets'
-import { RecentEntry, RecentMessages } from './RecentMessages'
 import { Style } from './Style'
 import { humanizedISO8601DateTime } from './Utils'
 export {
@@ -82,21 +81,10 @@ const AppSettingsDefault: Record<AppSettings, boolean | number> = {
 }
 
 const loadChatOnInit = async () => {
-    const entries: RecentEntry[] = JSON.parse(mmkv.getString(Global.RecentMessages) ?? '[]')
-    if (entries.length === 0) return
-    const entry = entries.at(-1)
-    if (!entry) return
-
-    if (
-        !(await Characters.db.query.cardExists(entry.charId)) ||
-        !(await Chats.db.query.chatExists(entry.chatId))
-    ) {
-        Logger.log('Character or Chat no longer exists', true)
-        RecentMessages.deleteEntry(entry.chatId)
-        return
-    }
-    await Characters.useCharacterCard.getState().setCard(entry.charId)
-    await Chats.useChat.getState().load(entry.chatId)
+    const newestChat = await Chats.db.query.chatNewest()
+    if (!newestChat?.[0]) return
+    await Characters.useCharacterCard.getState().setCard(newestChat[0].character_id)
+    await Chats.useChat.getState().load(newestChat[0].id)
 }
 
 // runs every startup to clear some MMKV values

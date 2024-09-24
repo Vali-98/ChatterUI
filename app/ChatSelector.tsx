@@ -1,3 +1,7 @@
+/*
+
+@deprecated - moved to ChatDrawer
+
 import AnimatedView from '@components/AnimatedView'
 import { RecentMessages } from 'app/constants/RecentMessages'
 import { FontAwesome } from '@expo/vector-icons'
@@ -217,3 +221,5 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
     },
 })
+
+*/
