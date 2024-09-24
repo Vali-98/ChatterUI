@@ -450,7 +450,9 @@ export namespace Characters {
                     from: getImageDir(card.data.image_id),
                     to: cacheLoc,
                 })
-                card.data.last_modified = new Date().getTime()
+                const now = new Date().getTime()
+                card.data.last_modified = now
+                card.data.image_id = now
                 await createCharacter(card, cacheLoc)
                     .then(() => Logger.log(`Card cloned: ${card.data.name}`))
                     .catch((e) => Logger.log(`Failed to clone card: ${e}`))

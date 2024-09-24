@@ -23,7 +23,6 @@ type CharInfo = {
 }
 
 const day_ms = 86400000
-const day2_ms = 172800000
 const getTimeStamp = (oldtime: number) => {
     const now = new Date().getTime()
     const delta = now - oldtime
