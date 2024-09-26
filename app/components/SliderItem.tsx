@@ -14,6 +14,7 @@ type SliderItemProps = {
     step?: number
     precision?: number
     showInput?: boolean
+    disabled?: boolean
 }
 
 const SliderItem: React.FC<SliderItemProps> = ({
@@ -27,6 +28,7 @@ const SliderItem: React.FC<SliderItemProps> = ({
     precision = 0,
     onChange = undefined,
     showInput = true,
+    disabled = false,
 }) => {
     const clamp = (val: number) => Math.min(Math.max(parseFloat(val?.toFixed(2) ?? 0), min), max)
     const [textValue, setTextValue] = useState(body[varname]?.toFixed(precision))
@@ -57,9 +59,10 @@ const SliderItem: React.FC<SliderItemProps> = ({
 
     return (
         <View style={{ alignItems: `center` }}>
-            <Text style={styles.itemName}>{name}</Text>
+            <Text style={disabled ? styles.itemNameDisabled : styles.itemName}>{name}</Text>
             <View style={styles.sliderContainer}>
                 <Slider
+                    disabled={disabled}
                     style={styles.slider}
                     step={step}
                     minimumValue={min}
@@ -72,7 +75,8 @@ const SliderItem: React.FC<SliderItemProps> = ({
                 />
                 {showInput && (
                     <TextInput
-                        style={styles.textBox}
+                        editable={disabled}
+                        style={disabled ? styles.textBoxDisabled : styles.textBox}
                         value={textValue}
                         onChangeText={setTextValue}
                         onEndEditing={handleTextInputChange}
@@ -92,6 +96,10 @@ const styles = StyleSheet.create({
         color: Style.getColor('primary-text1'),
     },
 
+    itemNameDisabled: {
+        color: Style.getColor('primary-text3'),
+    },
+
     sliderContainer: {
         flexDirection: `row`,
     },
@@ -104,6 +112,15 @@ const styles = StyleSheet.create({
     textBox: {
         borderColor: Style.getColor('primary-surface4'),
         color: Style.getColor('primary-text1'),
+        borderWidth: 1,
+        borderRadius: 12,
+        flex: 1.5,
+        textAlign: `center`,
+    },
+
+    textBoxDisabled: {
+        borderColor: Style.getColor('primary-surface4'),
+        color: Style.getColor('primary-text3'),
         borderWidth: 1,
         borderRadius: 12,
         flex: 1.5,

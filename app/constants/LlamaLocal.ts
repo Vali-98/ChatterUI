@@ -28,7 +28,9 @@ type CompletionOutput = {
 type LlamaState = {
     context: LlamaContext | undefined
     modelname: string | undefined
+    loadProgress: number
     load: (name: string, preset?: LlamaPreset, usecache?: boolean) => Promise<void>
+    setLoadProgress: (progress: number) => void
     unload: () => Promise<void>
     saveKV: () => Promise<void>
     loadKV: () => Promise<void>
@@ -64,6 +66,7 @@ export namespace Llama {
     export const useLlama = create<LlamaState>()((set, get) => ({
         context: undefined,
         modelname: undefined,
+        loadProgress: 0,
         load: async (
             name: string,
             preset: LlamaPreset = default_preset,
@@ -99,10 +102,16 @@ export namespace Llama {
             }
 
             mmkv.set(Global.LocalSessionLoaded, false)
-            Logger.log(`Loading Model: ${name}`, true)
-            Logger.log(JSON.stringify(params))
+            Logger.log(`Loading Model: ${name}`)
+            Logger.log(
+                `Starting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}`
+            )
 
-            const llamaContext = await initLlama(params).catch((error) => {
+            const progressCallback = (progress: number) => {
+                if (progress % 5 === 0) get().setLoadProgress(progress)
+            }
+
+            const llamaContext = await initLlama(params, progressCallback).catch((error) => {
                 Logger.log(`Could Not Load Model: ${error} `, true)
             })
 
@@ -110,6 +119,9 @@ export namespace Llama {
                 set((state) => ({ ...state, context: llamaContext, modelname: name }))
                 Logger.log('Model Loaded', true)
             }
+        },
+        setLoadProgress: (progress: number) => {
+            set((state) => ({ ...state, loadProgress: progress }))
         },
         unload: async () => {
             await get().context?.release()

@@ -12,17 +12,23 @@ import {
 } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVBoolean, useMMKVObject, useMMKVString } from 'react-native-mmkv'
+import * as Progress from 'react-native-progress'
 
 import { SliderItem } from '..'
 
 const Local = () => {
-    const { loadModel, unloadModel, modelName } = Llama.useLlama((state) => ({
-        loadModel: state.load,
-        unloadModel: state.unload,
-        modelName: state.modelname,
-    }))
+    const { loadModel, unloadModel, modelName, loadProgress, setloadProgress } = Llama.useLlama(
+        (state) => ({
+            loadModel: state.load,
+            unloadModel: state.unload,
+            modelName: state.modelname,
+            loadProgress: state.loadProgress,
+            setloadProgress: state.setLoadProgress,
+        })
+    )
 
     const [modelLoading, setModelLoading] = useState(false)
+    const [modelImporting, setModelImporting] = useState(false)
     const [modelList, setModelList] = useState<string[]>([])
     const dropdownValues = modelList.map((item) => {
         return { name: item }
@@ -45,18 +51,11 @@ const Local = () => {
 
     const handleLoad = async () => {
         setModelLoading(true)
+        setloadProgress(0)
         await loadModel(currentModel ?? '', preset)
         setModelLoading(false)
         getModels()
     }
-    /*
-    const handleLoadExternal = async () => {
-        setModelLoading(true)
-        await Llama.loadModel('', preset, false).then(() => {
-            setLoadedModel(Llama.getModelname())
-        })
-        setModelLoading(false)
-    }*/
 
     const handleDelete = async () => {
         if (!(await Llama.modelExists(currentModel ?? ''))) {
@@ -94,10 +93,10 @@ const Local = () => {
     }*/
 
     const handleImport = async () => {
-        setModelLoading(true)
+        setModelImporting(true)
         await Llama.importModel()
         await getModels()
-        setModelLoading(false)
+        setModelImporting(false)
     }
 
     const disableLoad = modelList.length === 0 || modelName !== undefined
@@ -137,9 +136,52 @@ const Local = () => {
                 />
             </View>
 
-            {modelLoading ? (
-                <ActivityIndicator size="large" color={Style.getColor('primary-text1')} />
-            ) : (
+            {!modelLoading && modelImporting && (
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Progress.Bar
+                        style={{ marginVertical: 16, flex: 5 }}
+                        indeterminate
+                        indeterminateAnimationDuration={2000}
+                        color={Style.getColor('primary-brand')}
+                        borderColor={Style.getColor('primary-surface3')}
+                        height={12}
+                        borderRadius={12}
+                        width={null}
+                    />
+                    <Text
+                        style={{
+                            flex: 2,
+                            color: Style.getColor('primary-text1'),
+                            textAlign: 'center',
+                        }}>
+                        Importing...
+                    </Text>
+                </View>
+            )}
+
+            {modelLoading && !modelImporting && (
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Progress.Bar
+                        style={{ marginVertical: 16, flex: 5 }}
+                        progress={loadProgress / 100}
+                        color={Style.getColor('primary-brand')}
+                        borderColor={Style.getColor('primary-surface3')}
+                        height={12}
+                        borderRadius={12}
+                        width={null}
+                    />
+                    <Text
+                        style={{
+                            flex: 1,
+                            color: Style.getColor('primary-text1'),
+                            textAlign: 'center',
+                        }}>
+                        {loadProgress}%
+                    </Text>
+                </View>
+            )}
+
+            {!modelLoading && !modelImporting && (
                 <View style={{ flexDirection: 'row', marginTop: 8 }}>
                     <TouchableOpacity
                         disabled={disableLoad}
@@ -225,9 +267,10 @@ const Local = () => {
                     body={preset}
                     setValue={setPreset}
                     varname="context_length"
-                    min={512}
+                    min={1024}
                     max={32768}
-                    step={512}
+                    step={1024}
+                    disabled={modelImporting || modelLoading}
                 />
                 <SliderItem
                     name="Threads"
@@ -237,6 +280,7 @@ const Local = () => {
                     min={1}
                     max={8}
                     step={1}
+                    disabled={modelImporting || modelLoading}
                 />
 
                 <SliderItem
@@ -246,7 +290,8 @@ const Local = () => {
                     varname="batch"
                     min={16}
                     max={512}
-                    step={1}
+                    step={16}
+                    disabled={modelImporting || modelLoading}
                 />
                 {/* Note: llama.rn does not have any Android gpu acceleration */}
                 {Platform.OS === 'ios' && (
