@@ -4,10 +4,10 @@ import SliderItem from '@components/SliderItem'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Instructs, saveStringExternal, Logger, Style } from '@globals'
-import { InstructListItem } from 'app/constants/Instructs'
+import { Instructs, Logger, Style, saveStringToDownload } from '@globals'
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAutosave } from 'react-autosave'
 import {
     View,
@@ -29,31 +29,12 @@ const Instruct = () => {
             setCurrentInstruct: state.setData,
         })
     )
-    const [instructID, setInstructID] = useMMKVNumber(Global.InstructID)
-    const [instructList, setInstructList] = useState<InstructListItem[]>([])
-    const [selectedItem, setSelectedItem] = useState<InstructListItem | undefined>(undefined)
+    const instructID = currentInstruct?.id
+
+    const { data } = useLiveQuery(Instructs.db.query.instructListQuery())
+    const instructList = data
+    const selectedItem = data.filter((item) => item.id === instructID)?.[0]
     const [showNewInstruct, setShowNewInstruct] = useState<boolean>(false)
-
-    const loadInstructList = async (id = -1) => {
-        const list = await Instructs.db.query.instructList()
-        if (!list) {
-            Logger.log('Could not retrieve Instructs', true)
-            return
-        }
-        setInstructList(list)
-        const targetID = id === -1 ? instructID : id
-        const currentitem = list.filter((item) => item.id === targetID)
-        if (currentitem.length === 0) {
-            setSelectedItem(list[0])
-            loadInstruct(list[0].id)
-        } else {
-            setSelectedItem(currentitem[0])
-        }
-    }
-
-    useEffect(() => {
-        if (instructID) loadInstructList()
-    }, [])
 
     const handleSaveInstruct = (log: boolean) => {
         if (currentInstruct && instructID)
@@ -71,7 +52,6 @@ const Instruct = () => {
                     style: `destructive`,
                     onPress: async () => {
                         await Instructs.generateInitialDefaults()
-                        loadInstructList()
                     },
                 },
             ]
@@ -115,9 +95,7 @@ const Instruct = () => {
                                 .createInstruct({ ...currentInstruct, name: text })
                                 .then(async (newid) => {
                                     Logger.log(`Preset created.`, true)
-                                    setInstructID(newid)
                                     await loadInstruct(newid)
-                                    loadInstructList(newid)
                                 })
                         }}
                     />
@@ -130,7 +108,6 @@ const Instruct = () => {
                             valueField="id"
                             onChange={(item) => {
                                 if (item.id === instructID) return
-                                setInstructID(item.id)
                                 loadInstruct(item.id)
                             }}
                             {...Style.drawer.default}
@@ -164,11 +141,15 @@ const Instruct = () => {
                                             style: `destructive`,
                                             onPress: () => {
                                                 if (!instructID) return
-                                                Instructs.db.mutate
-                                                    .deleteInstruct(instructID)
-                                                    .then(() => {
-                                                        loadInstructList()
-                                                    })
+                                                const leftover = data.filter(
+                                                    (item) => item.id !== instructID
+                                                )
+                                                if (leftover.length === 0) {
+                                                    Logger.log('Cannot delete last instruct', true)
+                                                    return
+                                                }
+                                                Instructs.db.mutate.deleteInstruct(instructID)
+                                                loadInstruct(leftover[0].id)
                                             },
                                         },
                                     ]
@@ -208,9 +189,10 @@ const Instruct = () => {
                             style={styles.button}
                             onPress={async () => {
                                 if (instructID)
-                                    saveStringExternal(
+                                    saveStringToDownload(
                                         (currentInstruct?.name ?? 'Default') + '.json',
-                                        JSON.stringify(currentInstruct)
+                                        JSON.stringify(currentInstruct),
+                                        'utf8'
                                     )
                             }}>
                             <FontAwesome

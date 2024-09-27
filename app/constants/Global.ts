@@ -210,25 +210,15 @@ export const initializeApp = async () => {
         } else Characters.useUserCard.getState().setCard(userid)
     }
 
-    const instructid = mmkv.getNumber(Global.InstructID)
-    if (instructid === undefined) {
-        Logger.log('Instruct ID is undefined, creating default Instruct')
-        const id = await Instructs.generateInitialDefaults()
-        mmkv.set(Global.InstructID, id ?? 1)
-    } else {
-        Instructs.db.query.instructList().then(async (list) => {
-            if (!list) {
-                Logger.log('Database Invalid, this should not happen! Please report this!')
-            } else if (list?.length === 0) {
-                Logger.log('No Instructs exist, creating default Instruct')
-                const id = await Instructs.generateInitialDefaults()
-                mmkv.set(Global.InstructID, id ?? 1)
-            } else if (!list?.some((item) => item.id === instructid)) {
-                Logger.log('Instruct ID does not exist in database, defaulting to oldest Instruct')
-                Instructs.useInstruct.getState().load(list[0].id)
-            }
-        })
-    }
+    Instructs.db.query.instructList().then(async (list) => {
+        if (!list) {
+            Logger.log('Database Invalid, this should not happen! Please report this!')
+        } else if (list?.length === 0) {
+            Logger.log('No Instructs exist, creating default Instruct')
+            const id = await Instructs.generateInitialDefaults()
+            Instructs.useInstruct.getState().load(id)
+        }
+    })
 
     await migratePresets()
 }

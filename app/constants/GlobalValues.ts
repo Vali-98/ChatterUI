@@ -19,22 +19,24 @@ export const enum Global {
 
     // NowGenerating = 'nowgenerating', // generation signal == removed since migrtion of generating state to db
 
+    // RecentMessages = 'recentmessages', == removed since character list rework to include last_modified
+
+    // InstructID = 'instructid', == removed with instruct persist
+
     // Management
 
     Logs = 'logs',
-    RecentMessages = 'recentmessages',
 
     // Character
 
     // User
 
+    // TODO: use zustand persist to remove this
     UserID = 'userid',
 
     // Chat
 
     // Instruct
-
-    InstructID = 'instructid',
 
     // Presets
 

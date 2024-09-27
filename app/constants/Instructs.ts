@@ -200,7 +200,6 @@ export namespace Instructs {
                 load: async (id: number) => {
                     const data = await db.query.instruct(id)
                     set((state) => ({ ...state, data: data, tokenCache: undefined }))
-                    mmkv.set(Global.InstructID, id)
                 },
                 setData: (instruct: InstructType) => {
                     set((state) => ({ ...state, data: instruct, tokenCache: undefined }))
@@ -309,6 +308,15 @@ export namespace Instructs {
 
             export const instructList = async (): Promise<InstructListItem[] | undefined> => {
                 return await database.query.instructs.findMany({
+                    columns: {
+                        id: true,
+                        name: true,
+                    },
+                })
+            }
+
+            export const instructListQuery = () => {
+                return database.query.instructs.findMany({
                     columns: {
                         id: true,
                         name: true,
