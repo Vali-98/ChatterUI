@@ -75,7 +75,7 @@ const SliderItem: React.FC<SliderItemProps> = ({
                 />
                 {showInput && (
                     <TextInput
-                        editable={disabled}
+                        editable={!disabled}
                         style={disabled ? styles.textBoxDisabled : styles.textBox}
                         value={textValue}
                         onChangeText={setTextValue}
