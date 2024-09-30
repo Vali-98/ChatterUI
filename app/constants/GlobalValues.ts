@@ -25,9 +25,9 @@ export const enum Global {
 
     // Management
 
-    Logs = 'logs',
+    CpuFeatures = 'cpufeatures',
 
-    // Character
+    Logs = 'logs',
 
     // User
 

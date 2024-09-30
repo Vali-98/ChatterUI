@@ -1,4 +1,5 @@
 import { DownloadDirectoryPath, writeFile } from '@dr.pogodin/react-native-fs'
+import { getCpuFeatures } from 'cui-llama.rn'
 import * as Crypto from 'expo-crypto'
 import * as FS from 'expo-file-system'
 import * as Sharing from 'expo-sharing'
@@ -173,6 +174,12 @@ export const startupApp = () => {
             if (result.length === 0) Characters.createDefaultCard()
         })
         mmkv.set(AppSettings.CreateDefaultCard, false)
+    }
+
+    if (!mmkv.getString(Global.CpuFeatures)) {
+        getCpuFeatures().then((result) => {
+            mmkv.set(Global.CpuFeatures, JSON.stringify(result))
+        })
     }
 
     Logger.log('Resetting state values for startup.')

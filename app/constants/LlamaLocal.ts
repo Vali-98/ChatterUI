@@ -2,6 +2,7 @@ import { CompletionParams, ContextParams, LlamaContext, initLlama } from 'cui-ll
 import { getDocumentAsync } from 'expo-document-picker'
 import * as FS from 'expo-file-system'
 import { Platform } from 'react-native'
+
 import { create } from 'zustand'
 
 import { AppSettings, Global } from './GlobalValues'
@@ -230,25 +231,54 @@ export namespace Llama {
 
     // Downloaders
 
-    export const downloadModel = async (url: string) => {
-        const modelName = nameFromURL(url)
-        const modelList = await Llama.getModelList()
-        if (modelList.includes(modelName)) {
-            Logger.log('Model already exists!', true)
+    export const downloadModel = async (
+        url: string,
+        callback?: () => void,
+        cancel?: (cancel: () => void) => void
+    ) => {
+        // check if this model already exists
+        const result = await fetch(url, { method: 'HEAD' })
+        const contentDisposition = result.headers.get('Content-Disposition')
+        let filename = undefined
+        if (contentDisposition && contentDisposition.includes('filename=')) {
+            filename = contentDisposition.split('filename=')[1].split(';')[0].replace(/['"]/g, '')
+        }
+        if (!filename) {
+            Logger.log('Invalid URL', true)
             return
         }
-        Logger.log('Downloading Model...', true)
-        await FS.downloadAsync(url, `${model_dir}${modelName}`)
-            .then(() => {
-                Logger.log('Model downloaded!', true)
+        const fileInfo = await FS.getInfoAsync(`${model_dir}${filename}`)
+        if (fileInfo.exists) {
+            Logger.log('Model already exists!', true)
+            // return
+        }
+        let current = 0
+        const downloadTask = FS.createDownloadResumable(
+            url,
+            `${FS.cacheDirectory}${filename}`,
+            {},
+            (progress) => {
+                const percentage = progress.totalBytesWritten / progress.totalBytesExpectedToWrite
+                if (percentage <= current) return
+                current = percentage
+                console.log(percentage)
+            }
+        )
+        await downloadTask
+            .downloadAsync()
+            .then(async (result) => {
+                if (!result?.uri) {
+                    Logger.log('Download failed')
+                    return
+                }
+                await FS.moveAsync({
+                    from: result.uri,
+                    to: `${model_dir}${filename}`,
+                }).then(() => {
+                    Logger.log(`${filename} downloaded sucessfully!`)
+                })
             })
-            .catch(() => {
-                Logger.log('Download failed', true)
-            })
-    }
-
-    export const nameFromURL = (url: string) => {
-        return url.split('resolve/main/')[1].replace('?download=true', '')
+            .catch((err) => Logger.log(`Failed to download: ${err}`))
     }
 
     // Filesystem
@@ -275,16 +305,23 @@ export namespace Llama {
             const file = result.assets[0]
             const name = file.name
             Logger.log('Importing file...', true)
-            await FS.copyAsync({
+            const success = await FS.copyAsync({
                 from: file.uri,
                 to: `${model_dir}${name}`,
             })
                 .then(() => {
-                    Logger.log('File Imported!', true)
+                    return true
                 })
                 .catch((error) => {
                     Logger.log(`Import Failed: ${error.message}`, true)
+                    return false
                 })
+            if (!success) return
+
+            // database routine here
+
+            // end
+            Logger.log(`Model Imported Sucessfully!`, true)
         })
     }
 

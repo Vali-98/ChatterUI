@@ -1,20 +1,18 @@
 import { AppSettings, Global, Logger, Style } from '@globals'
 import { Llama, LlamaPreset } from 'app/constants/LlamaLocal'
 import { useEffect, useState } from 'react'
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    Alert,
-    ActivityIndicator,
-    Platform,
-} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVBoolean, useMMKVObject, useMMKVString } from 'react-native-mmkv'
 import * as Progress from 'react-native-progress'
 
 import { SliderItem } from '..'
+
+type CPUFeatures = {
+    armv8: boolean
+    i8mm: boolean
+    dotprod: boolean
+}
 
 const Local = () => {
     const { loadModel, unloadModel, modelName, loadProgress, setloadProgress } = Llama.useLlama(
@@ -38,6 +36,7 @@ const Local = () => {
     const [preset, setPreset] = useMMKVObject<LlamaPreset>(Global.LocalPreset)
     const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
     const [kvSize, setKVSize] = useState<number>(-1)
+    // const [cpuFeatures, _] = useMMKVObject<CPUFeatures>(Global.CpuFeatures)
     const getModels = async () => {
         setModelList(await Llama.getModelList())
     }
@@ -105,17 +104,43 @@ const Local = () => {
 
     return (
         <View style={styles.mainContainer}>
+            {/*<Text style={styles.title}>Compatibility</Text>
+
+            <View style={styles.cpuFeaturesContainer}>
+                <Text
+                    style={{
+                        ...styles.cpuFeature,
+                        backgroundColor: Style.getColor(
+                            cpuFeatures?.dotprod ? 'confirm-brand' : 'destructive-brand'
+                        ),
+                    }}>
+                    Q4_0_4_4 - {!cpuFeatures?.dotprod && 'Not '}Available
+                </Text>
+                <Text
+                    style={{
+                        ...styles.cpuFeature,
+                        backgroundColor: Style.getColor(
+                            cpuFeatures?.i8mm ? 'confirm-brand' : 'destructive-brand'
+                        ),
+                    }}>
+                    Q4_0_4_8 - {!cpuFeatures?.i8mm && 'Not '}Available
+                </Text>
+            </View>*/}
+
             <Text style={styles.title}>Model</Text>
 
             <View
                 style={{
                     marginTop: 16,
                     backgroundColor: Style.getColor('primary-surface2'),
-                    padding: 4,
+                    paddingVertical: 8,
+                    paddingHorizontal: 8,
                     borderRadius: 4,
                     flexDirection: 'row',
                 }}>
-                <Text style={styles.subtitle}>Loaded Model : </Text>
+                <Text style={styles.subtitle} ellipsizeMode="tail">
+                    Loaded Model :{' '}
+                </Text>
                 <Text style={{ ...styles.subtitle, color: Style.getColor('primary-text1') }}>
                     {modelName ? modelName : 'None'}
                 </Text>
@@ -395,6 +420,21 @@ const styles = StyleSheet.create({
 
     selected: {
         color: Style.getColor('primary-text1'),
+    },
+
+    cpuFeature: {
+        flex: 1,
+        textAlign: 'center',
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+        color: Style.getColor('primary-text1'),
+        borderRadius: 8,
+    },
+
+    cpuFeaturesContainer: {
+        flexDirection: 'row',
+        columnGap: 8,
+        marginVertical: 12,
     },
 })
 
