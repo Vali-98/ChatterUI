@@ -241,7 +241,6 @@ export namespace Instructs {
                         output_suffix_length: getTokenCount(instruct.output_suffix),
                         user_alignment_message_length: getTokenCount(instruct.system_prompt),
                     }
-                    console.log('cache created')
                     set((state) => ({ ...state, tokenCache: newCache }))
                     return newCache
                 },
@@ -272,7 +271,6 @@ export namespace Instructs {
                         persistedState.data.format_type = 0
                         Logger.log('[INSTRUCT] Migrated to v1')
                     }
-                    console.log(version)
                     if (version === 1) {
                         persistedState.data.last_output_prefix = persistedState.data.output_prefix
                         const entries = await database.query.instructs.findMany({

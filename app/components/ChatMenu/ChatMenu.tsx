@@ -23,10 +23,12 @@ const ChatMenu = () => {
         }))
     )
 
-    const { chat, unloadChat } = Chats.useChat((state) => ({
-        chat: state.data,
-        unloadChat: state.reset,
-    }))
+    const { chat, unloadChat } = Chats.useChat(
+        useShallow((state) => ({
+            chat: state?.data?.id,
+            unloadChat: state.reset,
+        }))
+    )
 
     const [showDrawer, setShowDrawer] = useState<boolean>(false)
     const [showChats, setShowChats] = useState<boolean>(false)

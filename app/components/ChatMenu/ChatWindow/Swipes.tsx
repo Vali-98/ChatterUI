@@ -1,7 +1,7 @@
-import { Chats } from 'app/constants/Chat'
-import { continueResponse, generateResponse, regenerateResponse } from 'app/constants/Inference'
 import { AntDesign } from '@expo/vector-icons'
 import { Style } from '@globals'
+import { Chats } from 'app/constants/Chat'
+import { continueResponse, generateResponse, regenerateResponse } from 'app/constants/Inference'
 import React from 'react'
 import { View, Text, StyleSheet, TouchableHighlight } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
@@ -31,8 +31,8 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
     const handleSwipeRight = async () => {
         const atLimit = await swipeChat(index, 1)
         if (atLimit && !isGreeting) {
-            await addSwipe(index)
-            generateResponse()
+            const id = await addSwipe(index)
+            if (id) generateResponse(id)
         }
     }
 
@@ -57,7 +57,7 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
 
             {index !== 0 && (
                 <TouchableHighlight
-                    onPress={regenerateResponse}
+                    onPress={() => regenerateResponse(message.swipes[message.swipe_id].id)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
                     <AntDesign
@@ -78,7 +78,7 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
 
             {index !== 0 && (
                 <TouchableHighlight
-                    onPress={continueResponse}
+                    onPress={() => continueResponse(message.swipes[message.swipe_id].id)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
                     <AntDesign

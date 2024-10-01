@@ -51,26 +51,27 @@ export interface ChatState {
     buffer: string
     load: (chatId: number) => Promise<void>
     delete: (chatId: number) => Promise<void>
-    addEntry: (name: string, is_user: boolean, message: string) => Promise<void>
+    addEntry: (name: string, is_user: boolean, message: string) => Promise<number | void>
     updateEntry: (
         index: number,
         message: string,
         updateFinished?: boolean,
-        updateStarted?: boolean
+        updateStarted?: boolean,
+        verifySwipeId?: number
     ) => Promise<void>
     deleteEntry: (index: number) => Promise<void>
     reset: () => void
     swipe: (index: number, direction: number) => Promise<boolean>
-    addSwipe: (index: number) => Promise<void>
+    addSwipe: (index: number) => Promise<number | void>
     getTokenCount: (index: number) => number
     setBuffer: (data: string) => void
     insertBuffer: (data: string) => void
-    updateFromBuffer: () => Promise<void>
+    updateFromBuffer: (cachedSwipeId?: number) => Promise<void>
     insertLastToBuffer: () => void
     setRegenCache: () => void
     getRegenCache: () => string
     stopGenerating: () => void
-    startGenerating: () => void
+    startGenerating: (swipeId: number) => void
     abortFunction: undefined | AbortFunction
     setAbortFunction: SetAbortFunction
 }
@@ -78,7 +79,8 @@ export interface ChatState {
 type AbortFunctionType = {
     abortFunction: () => void
     nowGenerating: boolean
-    startGenerating: () => void
+    currentSwipeId?: number
+    startGenerating: (swipeId: number) => void
     stopGenerating: () => void
     setAbort: (fn: () => void) => void
 }
@@ -88,11 +90,20 @@ export const useInference = create<AbortFunctionType>((set, get) => ({
         get().stopGenerating()
     },
     nowGenerating: false,
-    startGenerating: () => set((state) => ({ ...state, nowGenerating: true })),
-    stopGenerating: () => set((state) => ({ ...state, nowGenerating: false })),
+    currentSwipeId: undefined,
+    startGenerating: (swipeId: number) =>
+        set((state) => ({ ...state, nowGenerating: true, currentSwipeId: swipeId })),
+    stopGenerating: () =>
+        set((state) => ({ ...state, nowGenerating: false, currentSwipeId: undefined })),
     setAbort: (fn) => {
         Logger.debug('Setting abort function')
-        set((state) => ({ ...state, abortFunction: fn }))
+        set((state) => ({
+            ...state,
+            abortFunction: () => {
+                fn()
+                get().stopGenerating()
+            },
+        }))
     },
 }))
 
@@ -100,13 +111,14 @@ export namespace Chats {
     export const useChat = create<ChatState>((set, get: () => ChatState) => ({
         data: undefined,
         buffer: '',
-        startGenerating: () => {
-            useInference.getState().startGenerating()
+        startGenerating: (swipeId: number) => {
+            useInference.getState().startGenerating(swipeId)
         },
         stopGenerating: async () => {
+            const cachedSwipeId = useInference.getState().currentSwipeId
             useInference.getState().stopGenerating()
             Logger.log(`Saving Chat`)
-            await get().updateFromBuffer()
+            await get().updateFromBuffer(cachedSwipeId)
             get().setBuffer('')
 
             if (mmkv.getBoolean(Global.TTSEnable) && mmkv.getBoolean(Global.TTSAuto)) {
@@ -154,6 +166,7 @@ export namespace Chats {
                 ...state,
                 data: state?.data ? { ...state.data, messages: messages } : state.data,
             }))
+            return entry?.swipes[0].id
         },
         deleteEntry: async (index: number) => {
             const messages = get().data?.messages
@@ -175,18 +188,32 @@ export namespace Chats {
             index: number,
             message: string,
             updateFinished: boolean = true,
-            updateStarted: boolean = false
+            updateStarted: boolean = false,
+            verifySwipeId: number | undefined = undefined
         ) => {
             const messages = get()?.data?.messages
             if (!messages) return
-            const chatSwipeId = messages[index]?.swipes[messages[index].swipe_id].id
+
+            let chatSwipeId: number | undefined =
+                messages[index]?.swipes[messages[index].swipe_id].id
+            let updateState = true
+
+            if (verifySwipeId) {
+                updateState = verifySwipeId === chatSwipeId
+                if (!updateState) {
+                    chatSwipeId = verifySwipeId
+                }
+            }
+
             if (!chatSwipeId) return
+
             const date = await db.mutate.updateChatSwipe(
                 chatSwipeId,
                 message,
                 updateStarted,
                 updateFinished
             )
+            if (!updateState) return
             messages[index].swipes[messages[index].swipe_id].swipe = message
             messages[index].swipes[messages[index].swipe_id].token_count = undefined
             if (updateFinished) messages[index].swipes[messages[index].swipe_id].gen_finished = date
@@ -233,6 +260,7 @@ export namespace Chats {
                 ...state,
                 data: state?.data ? { ...state.data, messages: messages } : state.data,
             }))
+            return swipe?.id
         },
 
         getTokenCount: (index: number) => {
@@ -261,10 +289,16 @@ export namespace Chats {
         insertBuffer: (data: string) =>
             set((state: ChatState) => ({ ...state, buffer: state.buffer + data })),
 
-        updateFromBuffer: async () => {
+        updateFromBuffer: async (cachedSwipeId) => {
             const index = get().data?.messages?.length
-            if (!index) return
-            await get().updateEntry(index - 1, get().buffer)
+            if (!index) {
+                // this means there is no chat loaded, we need to update the db anyways
+                if (cachedSwipeId) {
+                    await db.mutate.updateChatSwipe(cachedSwipeId, get().buffer, false, true)
+                }
+                return
+            }
+            await get().updateEntry(index - 1, get().buffer, true, false, cachedSwipeId)
         },
         insertLastToBuffer: () => {
             const message = get()?.data?.messages?.at(-1)

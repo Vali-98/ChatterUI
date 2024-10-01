@@ -1,7 +1,7 @@
-import { AppSettings, Global } from './GlobalValues'
-import { humanizedISO8601DateTime } from './Utils'
-import { mmkv } from './MMKV'
 import Toast from 'react-native-simple-toast'
+
+import { AppSettings, Global } from './GlobalValues'
+import { mmkv } from './MMKV'
 
 export namespace Logger {
     const maxloglength = 100
@@ -11,7 +11,7 @@ export namespace Logger {
     }
 
     const insertToLogs = (data: string) => {
-        let logs = getLogs()
+        const logs = getLogs()
         logs.push(data)
         if (logs.length > maxloglength) logs.shift()
         mmkv.set(Global.Logs, JSON.stringify(logs))

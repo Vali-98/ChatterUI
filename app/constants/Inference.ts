@@ -7,7 +7,7 @@ import { Global } from './GlobalValues'
 import { Logger } from './Logger'
 import { mmkv } from './MMKV'
 
-export const regenerateResponse = async () => {
+export const regenerateResponse = async (swipeId: number) => {
     const charName = Characters.useCharacterCard.getState().card?.data.name
     const messagesLength = Chats.useChat.getState()?.data?.messages?.length ?? -1
     const message = Chats.useChat.getState()?.data?.messages?.[messagesLength - 1]
@@ -18,22 +18,22 @@ export const regenerateResponse = async () => {
         if (replacement) Chats.useChat.getState().setBuffer(replacement)
         await Chats.useChat.getState().updateEntry(messagesLength - 1, replacement, true, true)
     } else await Chats.useChat.getState().addEntry(charName ?? '', true, '')
-    generateResponse()
+    generateResponse(swipeId)
 }
 
-export const continueResponse = () => {
+export const continueResponse = (swipeId: number) => {
     Logger.log(`Continuing Response`)
     Chats.useChat.getState().setRegenCache()
     Chats.useChat.getState().insertLastToBuffer()
-    generateResponse()
+    generateResponse(swipeId)
 }
 
-export const generateResponse = async () => {
+export const generateResponse = async (swipeId: number) => {
     if (useInference.getState().nowGenerating) {
         Logger.log('Generation already in progress', true)
         return
     }
-    Chats.useChat.getState().startGenerating()
+    Chats.useChat.getState().startGenerating(swipeId)
     Logger.log(`Obtaining response.`)
     const data = performance.now()
     const APIType = getString(Global.APIType)

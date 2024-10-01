@@ -1,5 +1,5 @@
-import { Chats } from 'app/constants/Chat'
 import { Characters, Global, Style } from '@globals'
+import { Chats } from 'app/constants/Chat'
 import { ReactNode, useEffect, useState } from 'react'
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -10,7 +10,6 @@ import TTSMenu from './TTS'
 type ChatFrameProps = {
     children?: ReactNode
     id: number
-    charId: number
     nowGenerating: boolean
     isLast?: boolean
 }

@@ -8,24 +8,31 @@ import { ChatItem } from './ChatItem'
 type ListItem = {
     index: number
     key: string
+    isLastMessage: boolean
+    isGreeting: boolean
 }
 
 const ChatWindow = () => {
-    'use no memo'
-    const charId = Characters.useCharacterCard(useShallow((state) => state?.id))
-    const messages = Chats.useChat((state) => state.data?.messages)
-    const messagesLength = messages?.length ?? -1
+    const data = Chats.useChat((state) => state.data)
     const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
 
-    const list: ListItem[] = (messages ?? [])
+    const list: ListItem[] = (data?.messages ?? [])
         .map((item, index) => ({
             index: index,
             key: item.id.toString(),
+            isGreeting: index === 0,
+            isLastMessage: !!data?.messages && index === data?.messages.length - 1,
         }))
         .reverse()
 
     const renderItems = ({ item, index }: { item: ListItem; index: number }) => {
-        return <ChatItem messagesLength={messagesLength} id={item.index} charId={charId ?? -1} />
+        return (
+            <ChatItem
+                id={item.index}
+                isLastMessage={item.isLastMessage}
+                isGreeting={item.isGreeting}
+            />
+        )
     }
 
     return (

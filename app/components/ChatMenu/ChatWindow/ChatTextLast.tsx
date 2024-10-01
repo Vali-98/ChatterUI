@@ -1,3 +1,4 @@
+import { useInference } from '@constants/Chat'
 import { Chats, Style, MarkdownStyle } from '@globals'
 import React, { useEffect, useRef } from 'react'
 import { StyleSheet, Animated, Easing, LayoutChangeEvent } from 'react-native'
@@ -16,11 +17,11 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     const animatedHeight = useRef(new Animated.Value(-1)).current
     const height = useRef(-1)
 
-    const mes = Chats.useChat(
-        (state) =>
-            state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
-                .swipe ?? ''
+    const swipe = Chats.useChat(
+        (state) => state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
     )
+
+    const currentSwipeId = useInference((state) => state.currentSwipeId)
 
     const { buffer } = Chats.useChat(
         useShallow((state) => ({
@@ -57,7 +58,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     useEffect(() => {
         if (!nowGenerating && height.current !== -1) {
             handleAnimateHeight(height.current)
-        } else if (nowGenerating && !mes) {
+        } else if (nowGenerating && !swipe?.swipe) {
             // NOTE: this assumes that mes is empty due to a swipe and may break, but unlikely
             height.current = 0
             handleAnimateHeight(height.current)
@@ -70,7 +71,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
                 height: __DEV__ ? 'auto' : animatedHeight, // dev fix for slow emulator animations
                 overflow: 'scroll',
             }}>
-            {nowGenerating && buffer === '' && (
+            {swipe?.id === currentSwipeId && nowGenerating && buffer === '' && (
                 <AnimatedEllipsis
                     style={{
                         color: Style.getColor('primary-text2'),
@@ -84,7 +85,9 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
                 style={styles.messageText}
                 rules={{ rules: MarkdownStyle.Rules }}
                 styles={MarkdownStyle.Format}>
-                {nowGenerating ? buffer.trim() : mes.trim()}
+                {nowGenerating && swipe?.id === currentSwipeId
+                    ? buffer.trim()
+                    : swipe?.swipe.trim()}
             </Markdown>
         </Animated.View>
     )

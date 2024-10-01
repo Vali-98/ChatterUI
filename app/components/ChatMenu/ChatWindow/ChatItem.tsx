@@ -7,29 +7,22 @@ import ChatFrame from './ChatFrame'
 
 type ChatItemProps = {
     id: number
-    charId: number
-    messagesLength: number
+    isLastMessage: boolean
+    isGreeting: boolean
 }
 
-const ChatItem: React.FC<ChatItemProps> = ({ id, charId, messagesLength }) => {
-    const isLastMessage = id === messagesLength - 1
+const ChatItem: React.FC<ChatItemProps> = ({ id, isLastMessage, isGreeting }) => {
     const nowGenerating = useInference((state) => state.nowGenerating)
 
     return (
         <AnimatedView dy={100} fade={0} fduration={200} tduration={400}>
-            <View
-                style={{
-                    ...styles.chatItem,
-                }}>
-                <ChatFrame
-                    charId={charId}
-                    id={id}
-                    nowGenerating={nowGenerating}
-                    isLast={isLastMessage}>
+            <View style={styles.chatItem}>
+                <ChatFrame id={id} nowGenerating={nowGenerating} isLast={isLastMessage}>
                     <ChatBody
                         nowGenerating={nowGenerating}
                         id={id}
-                        messagesLength={messagesLength}
+                        isLastMessage={isLastMessage}
+                        isGreeting={isGreeting}
                     />
                 </ChatFrame>
             </View>

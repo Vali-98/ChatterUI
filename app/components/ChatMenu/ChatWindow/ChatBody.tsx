@@ -11,12 +11,11 @@ import Swipes from './Swipes'
 type ChatTextProps = {
     id: number
     nowGenerating: boolean
-    messagesLength: number
+    isLastMessage: boolean
+    isGreeting: boolean
 }
 
-const ChatBody: React.FC<ChatTextProps> = ({ id, nowGenerating, messagesLength }) => {
-    const isLastMessage = id === messagesLength - 1
-    const isGreeting = messagesLength === 1
+const ChatBody: React.FC<ChatTextProps> = ({ id, nowGenerating, isLastMessage, isGreeting }) => {
     const { message } = Chats.useChat(
         useShallow((state) => ({
             message: state?.data?.messages?.[id] ?? Chats.dummyEntry,

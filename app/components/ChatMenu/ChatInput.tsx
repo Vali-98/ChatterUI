@@ -38,9 +38,9 @@ const ChatInput = () => {
 
     const handleSend = async () => {
         if (newMessage.trim() !== '') await insertEntry(userName ?? '', true, newMessage)
-        await insertEntry(charName ?? '', false, '')
+        const swipeId = await insertEntry(charName ?? '', false, '')
         setNewMessage((message) => '')
-        generateResponse()
+        if (swipeId) generateResponse(swipeId)
     }
 
     return (
