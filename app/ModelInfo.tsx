@@ -100,14 +100,13 @@ const ModelInfo = () => {
                     style={{ flex: 1 }}
                     entering={SlideInLeft.easing(Easing.inOut(Easing.cubic))}
                     exiting={SlideOutLeft.easing(Easing.inOut(Easing.cubic))}>
-                    <View style={{ marginBottom: 16, justifyContent: 'space-evenly' }}>
+                    <View style={{ marginBottom: 16 }}>
                         <Text style={styles.title}>Supported Quantizations:</Text>
                         <View
                             style={{
                                 flexDirection: 'row',
-                                columnGap: 4,
+                                columnGap: 8,
                                 marginTop: 8,
-                                justifyContent: 'space-between',
                             }}>
                             <Text style={cpuFeatures?.dotprod ? styles.greenTag : styles.redTag}>
                                 Q4_0_4_4 {!cpuFeatures?.dotprod && 'Not '}Available
