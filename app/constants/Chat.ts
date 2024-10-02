@@ -116,9 +116,9 @@ export namespace Chats {
         },
         stopGenerating: async () => {
             const cachedSwipeId = useInference.getState().currentSwipeId
-            useInference.getState().stopGenerating()
             Logger.log(`Saving Chat`)
             await get().updateFromBuffer(cachedSwipeId)
+            useInference.getState().stopGenerating()
             get().setBuffer('')
 
             if (mmkv.getBoolean(Global.TTSEnable) && mmkv.getBoolean(Global.TTSAuto)) {
