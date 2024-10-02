@@ -71,14 +71,14 @@ const paths_dev: ButtonData[] = [
         name: '[DEV] Lorebooks',
         path: '/LorebookMenu',
     },
-    {
-        name: '[DEV] Classifier',
-        path: '/Classifier',
-    },
     /*{
         name: '[DEV] Embedding',
         path: '/Embedding',
     },*/
+    {
+        name: '[DEV] Models',
+        path: '/ModelInfo',
+    },
 ]
 
 type DrawerButtonProps = {

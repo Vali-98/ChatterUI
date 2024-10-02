@@ -263,17 +263,21 @@ export const characterLorebooksRelations = relations(characterLorebooks, ({ one 
 // export const characterGroupChats = sqliteTable('character_group_chats', {})
 
 // Model Data
-/*
-export const modelData = sqliteTable('modelData', {
+
+export const model_data = sqliteTable('model_data', {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    file: text('file').notNull(),
+    file: text('file').notNull().unique(),
     name: text('name').notNull(),
     file_size: integer('file_size').notNull().default(0),
     params: text('params').notNull(),
     quantization: text('quantization').notNull(),
     context_length: integer('context_length').notNull(),
     architecture: text('architecture').notNull(),
+    create_date: integer('create_date', { mode: 'number' })
+        .$defaultFn(() => new Date().getTime())
+        .notNull(),
     last_modified: integer('last_modified', { mode: 'number' })
         .$defaultFn(() => new Date().getTime())
+        .notNull()
         .$onUpdateFn(() => new Date().getTime()),
-})*/
+})
