@@ -103,9 +103,9 @@ const AppSettingsDefault: Record<AppSettings, boolean | number> = {
 
 const loadChatOnInit = async () => {
     const newestChat = await Chats.db.query.chatNewest()
-    if (!newestChat?.[0]) return
-    await Characters.useCharacterCard.getState().setCard(newestChat[0].character_id)
-    await Chats.useChat.getState().load(newestChat[0].id)
+    if (!newestChat) return
+    await Characters.useCharacterCard.getState().setCard(newestChat.character_id)
+    await Chats.useChat.getState().load(newestChat.id)
 }
 
 const createDefaultUserData = async () => {

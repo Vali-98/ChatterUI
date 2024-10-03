@@ -352,9 +352,8 @@ export namespace Chats {
             }
 
             export const chatNewest = async () => {
-                const result = await database.query.chats.findMany({
-                    limit: 1,
-                    orderBy: chats.last_modified,
+                const result = await database.query.chats.findFirst({
+                    orderBy: desc(chats.last_modified),
                 })
                 return result
             }
