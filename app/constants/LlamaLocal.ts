@@ -373,9 +373,15 @@ export namespace Llama {
     export const verifyModelList = async () => {
         const modelList = await db.query.model_data.findMany()
         const fileList = await getModelList()
+        // create data as migration step
         fileList.forEach(async (item) => {
             if (modelList.some((model_data) => model_data.file === item)) return
             await createModelData(`${item}`)
+        })
+        // cull missing models
+        modelList.forEach(async (item) => {
+            if (fileList.some((file_data) => file_data === item.file)) return
+            await db.delete(model_data).where(eq(model_data.id, item.id))
         })
     }
 
