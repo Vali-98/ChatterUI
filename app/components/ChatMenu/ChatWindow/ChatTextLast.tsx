@@ -17,9 +17,15 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     const animatedHeight = useRef(new Animated.Value(-1)).current
     const height = useRef(-1)
 
-    const swipe = Chats.useChat(
-        (state) => state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
-    )
+    const { mes, swipeId } = Chats.useChat((state) => ({
+        mes:
+            state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
+                .swipe ?? '',
+
+        swipeId:
+            state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1].id ??
+            -1,
+    }))
 
     const currentSwipeId = useInference((state) => state.currentSwipeId)
 
@@ -58,7 +64,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     useEffect(() => {
         if (!nowGenerating && height.current !== -1) {
             handleAnimateHeight(height.current)
-        } else if (nowGenerating && !swipe?.swipe) {
+        } else if (nowGenerating && mes) {
             // NOTE: this assumes that mes is empty due to a swipe and may break, but unlikely
             height.current = 0
             handleAnimateHeight(height.current)
@@ -71,7 +77,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
                 height: __DEV__ ? 'auto' : animatedHeight, // dev fix for slow emulator animations
                 overflow: 'scroll',
             }}>
-            {swipe?.id === currentSwipeId && nowGenerating && buffer === '' && (
+            {swipeId === currentSwipeId && nowGenerating && buffer === '' && (
                 <AnimatedEllipsis
                     style={{
                         color: Style.getColor('primary-text2'),
@@ -85,9 +91,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
                 style={styles.messageText}
                 rules={{ rules: MarkdownStyle.Rules }}
                 styles={MarkdownStyle.Format}>
-                {nowGenerating && swipe?.id === currentSwipeId
-                    ? buffer.trim()
-                    : swipe?.swipe.trim()}
+                {nowGenerating && swipeId === currentSwipeId ? buffer.trim() : mes.trim()}
             </Markdown>
         </Animated.View>
     )
