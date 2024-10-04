@@ -2,6 +2,7 @@ import SupportButton from '@components/SupportButton'
 import { AppSettings } from '@constants/GlobalValues'
 import { FontAwesome } from '@expo/vector-icons'
 import { Logger, Style } from '@globals'
+import appConfig from 'app.config'
 import { Stack } from 'expo-router'
 import React, { useState } from 'react'
 import { View, Image, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native'
@@ -20,7 +21,7 @@ const About = () => {
         setCounter(counter + 1)
     }
 
-    const version = 'v' + require(`../app.json`).expo.version
+    const version = 'v' + appConfig.expo.version
     return (
         <View style={styles.container}>
             <Stack.Screen

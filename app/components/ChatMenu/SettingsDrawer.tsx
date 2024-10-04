@@ -2,6 +2,7 @@ import SupportButton from '@components/SupportButton'
 import { AppSettings } from '@constants/GlobalValues'
 import { AntDesign, FontAwesome } from '@expo/vector-icons'
 import { Characters, Style } from '@globals'
+import appConfig from 'app.config'
 import { useRouter } from 'expo-router'
 import { SetStateAction, useEffect, useState } from 'react'
 import {
@@ -21,6 +22,7 @@ import Animated, {
     FadeOut,
 } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
+
 type SettingsDrawerProps = {
     booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
 }
@@ -215,7 +217,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                                 }}>
                                 {__DEV__ && 'DEV BUILD\t'}
                                 {devMode && 'DEV MODE\t'}
-                                {'v' + require(`../../../app.json`).expo.version}
+                                {'v' + appConfig.expo.version}
                             </Text>
                         </View>
                         <SupportButton />
