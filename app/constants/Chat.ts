@@ -60,7 +60,7 @@ export interface ChatState {
     deleteEntry: (index: number) => Promise<void>
     reset: () => void
     swipe: (index: number, direction: number) => Promise<boolean>
-    addSwipe: (index: number) => Promise<number | void>
+    addSwipe: (index: number, message?: string) => Promise<number | void>
     getTokenCount: (index: number) => number
     setBuffer: (data: string) => void
     insertBuffer: (data: string) => void
@@ -240,12 +240,12 @@ export namespace Chats {
             return false
         },
 
-        addSwipe: async (index: number) => {
+        addSwipe: async (index: number, message: string = '') => {
             const messages = get().data?.messages
             if (!messages) return
             const entryId = messages[index].id
 
-            const swipe = await db.mutate.createSwipe(entryId, '')
+            const swipe = await db.mutate.createSwipe(entryId, message)
             if (swipe) messages[index].swipes.push(swipe)
             await db.mutate.updateEntrySwipeId(entryId, messages[index].swipes.length - 1)
             messages[index].swipe_id = messages[index].swipes.length - 1

@@ -28,11 +28,13 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
         swipeChat(index, -1)
     }
 
-    const handleSwipeRight = async () => {
+    const handleSwipeRight = async (message: string) => {
         const atLimit = await swipeChat(index, 1)
         if (atLimit && !isGreeting) {
-            const id = await addSwipe(index)
-            if (id) generateResponse(id)
+            const id = await addSwipe(index, message)
+            if (!id) return
+            if (message) continueResponse(id)
+            else generateResponse(id)
         }
     }
 
@@ -98,7 +100,10 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
 
             <TouchableHighlight
                 style={styles.swipeButton}
-                onPress={handleSwipeRight}
+                onPress={() => handleSwipeRight('')}
+                onLongPress={() =>
+                    handleSwipeRight(message?.swipes?.[message.swipe_id]?.swipe ?? '')
+                }
                 disabled={nowGenerating || isLastAltGreeting}>
                 <AntDesign
                     name="right"
