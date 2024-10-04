@@ -7,25 +7,28 @@ import { Global } from './GlobalValues'
 import { Logger } from './Logger'
 import { mmkv } from './MMKV'
 
-export const regenerateResponse = async (swipeId: number) => {
+export const regenerateResponse = async (swipeId: number, regenCache: boolean = true) => {
     const charName = Characters.useCharacterCard.getState().card?.data.name
     const messagesLength = Chats.useChat.getState()?.data?.messages?.length ?? -1
     const message = Chats.useChat.getState()?.data?.messages?.[messagesLength - 1]
 
-    Logger.log('Regenerate Response')
-    if (!message?.is_user && messagesLength && messagesLength !== 1) {
+    Logger.log('Regenerate Response' + (!regenCache && ' , Resetting Message'))
+
+    if (message?.is_user) {
+        await Chats.useChat.getState().addEntry(charName ?? '', true, '')
+    } else if (regenCache && messagesLength && messagesLength !== 1) {
         const replacement = message?.swipes[message.swipe_id].regen_cache ?? ''
         if (replacement) Chats.useChat.getState().setBuffer(replacement)
         await Chats.useChat.getState().updateEntry(messagesLength - 1, replacement, true, true)
-    } else await Chats.useChat.getState().addEntry(charName ?? '', true, '')
-    generateResponse(swipeId)
+    }
+    await generateResponse(swipeId)
 }
 
-export const continueResponse = (swipeId: number) => {
+export const continueResponse = async (swipeId: number) => {
     Logger.log(`Continuing Response`)
     Chats.useChat.getState().setRegenCache()
     Chats.useChat.getState().insertLastToBuffer()
-    generateResponse(swipeId)
+    await generateResponse(swipeId)
 }
 
 export const generateResponse = async (swipeId: number) => {

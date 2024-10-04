@@ -58,6 +58,9 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
             {index !== 0 && (
                 <TouchableHighlight
                     onPress={() => regenerateResponse(message.swipes[message.swipe_id].id)}
+                    onLongPress={() =>
+                        regenerateResponse(message.swipes[message.swipe_id].id, false)
+                    }
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
                     <AntDesign
