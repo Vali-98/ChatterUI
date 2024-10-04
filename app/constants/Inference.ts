@@ -16,8 +16,12 @@ export const regenerateResponse = async (swipeId: number, regenCache: boolean = 
 
     if (message?.is_user) {
         await Chats.useChat.getState().addEntry(charName ?? '', true, '')
-    } else if (regenCache && messagesLength && messagesLength !== 1) {
-        const replacement = message?.swipes[message.swipe_id].regen_cache ?? ''
+    } else if (messagesLength && messagesLength !== 1) {
+        let replacement = ''
+
+        if (regenCache) replacement = message?.swipes[message.swipe_id].regen_cache ?? ''
+        else Chats.useChat.getState().resetRegenCache()
+
         if (replacement) Chats.useChat.getState().setBuffer(replacement)
         await Chats.useChat.getState().updateEntry(messagesLength - 1, replacement, true, true)
     }

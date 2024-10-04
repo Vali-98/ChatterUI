@@ -14,8 +14,9 @@ const ChatInput = () => {
         insertEntry: state.addEntry,
     }))
 
-    const { nowGenerating } = useInference((state) => ({
+    const { nowGenerating, abortFunction } = useInference((state) => ({
         nowGenerating: state.nowGenerating,
+        abortFunction: state.abortFunction,
     }))
 
     const { charName } = Characters.useCharacterCard(
@@ -32,8 +33,7 @@ const ChatInput = () => {
 
     const abortResponse = async () => {
         Logger.log(`Aborting Generation`)
-        const abortFunction = useInference.getState().abortFunction
-        if (abortFunction) abortFunction()
+        if (abortFunction) await abortFunction()
     }
 
     const handleSend = async () => {

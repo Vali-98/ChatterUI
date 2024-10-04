@@ -93,15 +93,13 @@ class LocalAPI extends APIBase {
             const regenCache = Chats.useChat.getState().getRegenCache()
             Chats.useChat.getState().setBuffer((regenCache + text).replaceAll(replace, ''))
             if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.log(`Completion Output:\n${text}`)
+            this.stopGenerating()
         }
 
         const completionTask = async () => {
             await Llama.useLlama
                 .getState()
                 .completion(payload, outputStream, outputCompleted)
-                .then(() => {
-                    this.stopGenerating()
-                })
                 .catch((error) => {
                     Logger.log(`Failed to generate locally: ${error}`, true)
                     this.stopGenerating()

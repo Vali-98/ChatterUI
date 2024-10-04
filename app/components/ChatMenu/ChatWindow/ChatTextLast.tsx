@@ -17,15 +17,17 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     const animatedHeight = useRef(new Animated.Value(-1)).current
     const height = useRef(-1)
 
-    const { mes, swipeId } = Chats.useChat((state) => ({
-        mes:
-            state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
-                .swipe ?? '',
+    const { mes, swipeId } = Chats.useChat(
+        useShallow((state) => ({
+            mes:
+                state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
+                    .swipe ?? '',
 
-        swipeId:
-            state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1].id ??
-            -1,
-    }))
+            swipeId:
+                state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
+                    .id ?? -1,
+        }))
+    )
 
     const currentSwipeId = useInference((state) => state.currentSwipeId)
 

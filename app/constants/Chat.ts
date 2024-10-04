@@ -44,8 +44,6 @@ export type ChatData = {
 
 type AbortFunction = () => void
 
-type SetAbortFunction = (fn: AbortFunction) => void
-
 export interface ChatState {
     data: ChatData | undefined
     buffer: string
@@ -70,19 +68,18 @@ export interface ChatState {
     insertLastToBuffer: () => void
     setRegenCache: () => void
     getRegenCache: () => string
+    resetRegenCache: () => void
     stopGenerating: () => void
     startGenerating: (swipeId: number) => void
-    abortFunction: undefined | AbortFunction
-    setAbortFunction: SetAbortFunction
 }
 
 type AbortFunctionType = {
-    abortFunction: () => void
+    abortFunction: () => void | Promise<void>
     nowGenerating: boolean
     currentSwipeId?: number
     startGenerating: (swipeId: number) => void
     stopGenerating: () => void
-    setAbort: (fn: () => void) => void
+    setAbort: (fn: () => void | Promise<void>) => void
 }
 
 export const useInference = create<AbortFunctionType>((set, get) => ({
@@ -92,15 +89,15 @@ export const useInference = create<AbortFunctionType>((set, get) => ({
     nowGenerating: false,
     currentSwipeId: undefined,
     startGenerating: (swipeId: number) =>
-        set((state) => ({ ...state, nowGenerating: true, currentSwipeId: swipeId })),
+        set((state) => ({ ...state, currentSwipeId: swipeId, nowGenerating: true })),
     stopGenerating: () =>
         set((state) => ({ ...state, nowGenerating: false, currentSwipeId: undefined })),
     setAbort: (fn) => {
         Logger.debug('Setting abort function')
         set((state) => ({
             ...state,
-            abortFunction: () => {
-                fn()
+            abortFunction: async () => {
+                await fn()
                 get().stopGenerating()
             },
         }))
@@ -126,8 +123,6 @@ export namespace Chats {
                 mmkv.set(Global.TTSAutoStart, JSON.stringify(true))
             }
         },
-        abortFunction: undefined,
-        setAbortFunction: (fn) => (get().abortFunction = fn),
         load: async (chatId: number) => {
             //let start = performance.now()
             const data = await db.query.chat(chatId)
@@ -139,8 +134,6 @@ export namespace Chats {
             }))
             //Logger.debug(`[Chats] time for zustand set: ${performance.now() - start}`)
             db.mutate.updateChatModified(chatId)
-            const charName = Characters.useCharacterCard.getState().card?.data.name
-            const charId = Characters.useCharacterCard.getState().id
         },
 
         delete: async (chatId: number) => {
@@ -323,6 +316,17 @@ export namespace Chats {
             const message = messages?.[messages.length - 1]
             if (!messages || !message) return ''
             return message.swipes[message.swipe_id].regen_cache ?? ''
+        },
+        resetRegenCache: () => {
+            const messages = get()?.data?.messages
+            const message = messages?.[messages.length - 1]
+            if (!messages || !message) return
+            message.swipes[message.swipe_id].regen_cache = ''
+            messages[messages.length - 1] = message
+            set((state) => ({
+                ...state,
+                data: state?.data ? { ...state.data, messages: messages } : state.data,
+            }))
         },
     }))
 
