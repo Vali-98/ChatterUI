@@ -139,6 +139,27 @@ const defaultInstructs: InstructType[] = [
         examples: true,
         format_type: 0,
     },
+    {
+        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prefix: '',
+        system_suffix: '',
+        input_prefix: '[INST]',
+        input_suffix: '',
+        output_prefix: '[/INST]',
+        last_output_prefix: '[/INST]',
+        output_suffix: '</s>',
+        stop_sequence: '</s>',
+        user_alignment_message: '',
+        activation_regex: '',
+        wrap: false,
+        macro: false,
+        names: false,
+        names_force_groups: false,
+        name: 'Mistral V1',
+        timestamp: false,
+        examples: true,
+        format_type: 0,
+    },
 ]
 
 type InstructState = {
