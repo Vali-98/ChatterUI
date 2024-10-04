@@ -29,6 +29,7 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
             }).start()
         )
     }
+
     const handleContentSizeChange = (event: LayoutChangeEvent) => {
         const newHeight = event.nativeEvent.layout.height
         const oveflowPadding = 12

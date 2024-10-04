@@ -1,7 +1,7 @@
 import { useInference } from '@constants/Chat'
 import { Chats, Style, MarkdownStyle } from '@globals'
 import React, { useEffect, useRef } from 'react'
-import { StyleSheet, Animated, Easing, LayoutChangeEvent } from 'react-native'
+import { StyleSheet, Easing, LayoutChangeEvent, Animated } from 'react-native'
 //@ts-expect-error
 import Markdown from 'react-native-markdown-package'
 //@ts-expect-error
@@ -14,9 +14,6 @@ type ChatTextProps = {
 }
 
 const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
-    const animatedHeight = useRef(new Animated.Value(-1)).current
-    const height = useRef(-1)
-
     const { mes, swipeId } = Chats.useChat((state) => ({
         mes:
             state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
@@ -35,6 +32,8 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
         }))
     )
 
+    const animatedHeight = useRef(new Animated.Value(-1)).current
+    const height = useRef(-1)
     const handleAnimateHeight = (newheight: number) => {
         animatedHeight.stopAnimation(() =>
             Animated.timing(animatedHeight, {
@@ -65,7 +64,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     useEffect(() => {
         if (!nowGenerating && height.current !== -1) {
             handleAnimateHeight(height.current)
-        } else if (nowGenerating && mes) {
+        } else if (nowGenerating && !mes) {
             // NOTE: this assumes that mes is empty due to a swipe and may break, but unlikely
             height.current = 0
             handleAnimateHeight(height.current)
