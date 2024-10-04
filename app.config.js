@@ -1,6 +1,6 @@
 const IS_DEV = process.env.APP_VARIANT === 'development'
 
-export default {
+module.exports = {
     expo: {
         name: IS_DEV ? 'ChatterUI[DEV]' : 'ChatterUI',
         slug: 'ChatterUI',
