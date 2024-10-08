@@ -1,3 +1,8 @@
+/**
+ * This plugin adds the required AndroidManifest headers to allow
+ * user defined https certs
+ */
+
 const { Paths } = require('@expo/config-plugins/build/android')
 const { AndroidConfig, withAndroidManifest } = require('expo/config-plugins')
 const fs = require('fs')

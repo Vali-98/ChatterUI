@@ -81,7 +81,7 @@ npx expo run:android
 
 #### Building an APK
 
-Requires Node.js and Android SDK. Expo uses EAS to build apps which requires a Linux environment.
+Requires Node.js, Java 17/21 SDK and Android SDK. Expo uses EAS to build apps which requires a Linux environment.
 
 1. Clone the repo.
 2. Rename the `eas.json.example` to `eas.json`.
