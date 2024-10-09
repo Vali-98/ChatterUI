@@ -30,9 +30,10 @@ type CompletionOutput = {
 
 type LlamaState = {
     context: LlamaContext | undefined
-    modelname: string | undefined
+    modelName: string | undefined
+    modelId: number | undefined
     loadProgress: number
-    load: (name: string, preset?: LlamaPreset, usecache?: boolean) => Promise<void>
+    load: (filePath: string, fileName: string, modelId: number) => Promise<void>
     setLoadProgress: (progress: number) => void
     unload: () => Promise<void>
     saveKV: () => Promise<void>
@@ -68,23 +69,27 @@ export namespace Llama {
 
     export const useLlama = create<LlamaState>()((set, get) => ({
         context: undefined,
-        modelname: undefined,
+        modelName: undefined,
+        modelId: undefined,
         loadProgress: 0,
-        load: async (
-            name: string,
-            preset: LlamaPreset = default_preset,
-            usecache: boolean = true
-        ) => {
-            const dir = `${model_dir}${name}`
+        load: async (filePath: string, modelName: string, modelId: number) => {
+            const presetString = mmkv.getString(Global.LocalPreset)
+            if (!presetString) return
+            const preset: LlamaPreset = JSON.parse(presetString)
 
-            switch (name) {
+            if (!modelName) {
+                Logger.log('Invalid File Name', true)
+                return
+            }
+
+            switch (modelName) {
                 case '':
                     return Logger.log('No Model Chosen', true)
-                case get().modelname:
+                case get().modelName:
                     return Logger.log('Model Already Loaded!', true)
             }
 
-            if (!(await modelExists(name))) {
+            if (!filePath.startsWith('content') && !(await modelExists(modelName))) {
                 Logger.log('Model Does Not Exist!', true)
                 return
             }
@@ -92,11 +97,16 @@ export namespace Llama {
             if (get().context !== undefined) {
                 Logger.log('Unloading current model', true)
                 await get().context?.release()
-                set((state) => ({ ...state, context: undefined, modelname: undefined }))
+                set((state) => ({
+                    ...state,
+                    context: undefined,
+                    modelName: undefined,
+                    modelId: undefined,
+                }))
             }
 
             const params: ContextParams = {
-                model: dir,
+                model: filePath,
                 n_ctx: preset.context_length,
                 n_threads: preset.threads,
                 n_batch: preset.batch,
@@ -105,7 +115,7 @@ export namespace Llama {
             }
 
             mmkv.set(Global.LocalSessionLoaded, false)
-            Logger.log(`Loading Model: ${name}`)
+            Logger.log(`Loading Model: ${modelName}`)
             Logger.log(
                 `Starting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}`
             )
@@ -119,7 +129,12 @@ export namespace Llama {
             })
 
             if (llamaContext) {
-                set((state) => ({ ...state, context: llamaContext, modelname: name }))
+                set((state) => ({
+                    ...state,
+                    context: llamaContext,
+                    modelName: modelName,
+                    modelId: modelId,
+                }))
                 Logger.log('Model Loaded', true)
             }
         },
@@ -128,7 +143,12 @@ export namespace Llama {
         },
         unload: async () => {
             await get().context?.release()
-            set((state) => ({ ...state, context: undefined, modelname: undefined }))
+            set((state) => ({
+                ...state,
+                context: undefined,
+                modelName: undefined,
+                modelId: undefined,
+            }))
             Logger.log('Model Unloaded', true)
         },
         completion: async (
@@ -295,13 +315,17 @@ export namespace Llama {
     export const deleteModelById = async (id: number) => {
         const modelInfo = await db.query.model_data.findFirst({ where: eq(model_data.id, id) })
         if (!modelInfo) return
-        await deleteModel(modelInfo.file)
-        db.delete(model_data).where(eq(model_data.id, id))
+        // some models may be external
+        if (modelInfo.file_path.startsWith(model_dir)) await deleteModel(modelInfo.file)
+        await db.delete(model_data).where(eq(model_data.id, id))
     }
 
+    /**
+     * @deprecated
+     */
     export const deleteModel = async (name: string) => {
         if (!(await modelExists(name))) return
-        if (name === useLlama.getState().modelname) await useLlama.getState().unload()
+        if (name === useLlama.getState().modelName) await useLlama.getState().unload()
         return await FS.deleteAsync(`${model_dir}${name}`)
     }
 
@@ -314,6 +338,7 @@ export namespace Llama {
             const name = file.name
             const newdir = `${model_dir}${name}`
             Logger.log('Importing file...', true)
+
             const success = await FS.copyAsync({
                 from: file.uri,
                 to: newdir,
@@ -329,6 +354,23 @@ export namespace Llama {
 
             // database routine here
             if (await createModelData(name, true)) Logger.log(`Model Imported Sucessfully!`, true)
+        })
+    }
+
+    export const linkModelExternal = async () => {
+        return getDocumentAsync({
+            copyToCacheDirectory: false,
+        }).then(async (result) => {
+            if (result.canceled) return
+            const file = result.assets[0]
+            Logger.log('Importing file...', true)
+            if (!file) {
+                Logger.log('File Invalid')
+                return
+            }
+            // database routine here
+            if (await createModelDataExternal(file.uri, true))
+                Logger.log(`Model Imported Sucessfully!`, true)
         })
     }
 
@@ -352,6 +394,43 @@ export namespace Llama {
             const modelDataEntry = {
                 context_length: modelInfo.metadata?.[modelType + '.context_length'] ?? '0',
                 file: filename,
+                file_path: newdir,
+                name: modelInfo.metadata?.['general.name'] ?? 'N/A',
+                file_size: fileInfo.exists ? fileInfo.size : 0,
+                params: modelInfo.metadata?.['general.size_label'] ?? 'N/A',
+                quantization: modelInfo.metadata?.['general.file_type'] ?? '-1',
+                architecture: modelType ?? 'N/A',
+            }
+            Logger.log(`New Model Data:\n${modelDataText(modelDataEntry)}`)
+            await modelContext.release()
+
+            await db.insert(model_data).values(modelDataEntry)
+            return true
+        } catch (e) {
+            Logger.log(`Failed to create data: ${e}`, true)
+            if (deleteOnFailure) FS.deleteAsync(newdir, { idempotent: true })
+            return false
+        }
+    }
+
+    export const createModelDataExternal = async (
+        newdir: string,
+        deleteOnFailure: boolean = false
+    ) => {
+        const filename = newdir.split('/').pop()
+        if (!filename) {
+            Logger.log('Filename invalid, Import Failed', true)
+            return
+        }
+        try {
+            const modelContext = await initLlama({ model: newdir, vocab_only: true })
+            const modelInfo: any = modelContext.model
+            const modelType = modelInfo.metadata?.['general.architecture']
+            const fileInfo = await FS.getInfoAsync(newdir)
+            const modelDataEntry = {
+                context_length: modelInfo.metadata?.[modelType + '.context_length'] ?? '0',
+                file: filename,
+                file_path: newdir,
                 name: modelInfo.metadata?.['general.name'] ?? 'N/A',
                 file_size: fileInfo.exists ? fileInfo.size : 0,
                 params: modelInfo.metadata?.['general.size_label'] ?? 'N/A',
@@ -380,7 +459,8 @@ export namespace Llama {
         })
         // cull missing models
         modelList.forEach(async (item) => {
-            if (fileList.some((file_data) => file_data === item.file)) return
+            if ((await FS.getInfoAsync(item.file_path)).exists) return
+            Logger.log(`Model Missing, its entry will be deleted: ${item.name}`)
             await db.delete(model_data).where(eq(model_data.id, item.id))
         })
     }
@@ -419,6 +499,10 @@ export namespace Llama {
         const quantType = GGMLNameMap[quantValue]
 
         return `Context length: ${data.context_length ?? 'N/A'}\nFile: ${data.file}\nName: ${data.name ?? 'N/A'}\nSize: ${(data.file_size && readableFileSize(data.file_size)) ?? 'N/A'}\nParams: ${data.params ?? 'N/A'}\nQuantization: ${quantType ?? 'N/A'}\nArchitecture: ${data.architecture ?? 'N/A'}`
+    }
+
+    export const updateName = async (name: string, id: number) => {
+        await db.update(model_data).set({ name: name }).where(eq(model_data.id, id))
     }
 }
 

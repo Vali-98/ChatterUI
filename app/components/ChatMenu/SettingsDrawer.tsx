@@ -79,7 +79,7 @@ const paths_dev: ButtonData[] = [
     },*/
     {
         name: '[DEV] Models',
-        path: '/ModelInfo',
+        path: '/components/ModelManager',
     },
 ]
 
