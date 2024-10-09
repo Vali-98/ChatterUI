@@ -9,7 +9,7 @@ import { Platform } from 'react-native'
 import { API } from './API'
 import { Characters } from './Characters'
 import { Chats } from './Chat'
-import { Global, AppSettings } from './GlobalValues'
+import { Global, AppSettings, AppMode } from './GlobalValues'
 import { Instructs } from './Instructs'
 import { Llama } from './LlamaLocal'
 import { Logger } from './Logger'
@@ -144,16 +144,20 @@ export const startupApp = () => {
     )
 
     // default horde [0000000000] key is needed
-    if (mmkv.getString(Global.HordeKey) === undefined) mmkv.set(Global.HordeKey, '0000000000')
+    if (!mmkv.getString(Global.HordeKey)) mmkv.set(Global.HordeKey, '0000000000')
 
     // Init step, logs are never null
-    if (mmkv.getString(Global.Logs) === undefined) mmkv.set(Global.Logs, JSON.stringify([]))
+    if (!mmkv.getString(Global.Logs)) mmkv.set(Global.Logs, JSON.stringify([]))
 
     // Init step, names[] is never null
-    if (mmkv.getString(Global.LorebookNames) === undefined)
-        mmkv.set(Global.LorebookNames, JSON.stringify([]))
-    // Init step, APIType is never null
-    if (mmkv.getString(Global.APIType) === undefined) mmkv.set(Global.APIType, API.LOCAL)
+    if (!mmkv.getString(Global.LorebookNames)) mmkv.set(Global.LorebookNames, JSON.stringify([]))
+
+    // Init step, APIType is never null, if set to deprecated LOCAL mode, change to OpenAI
+    if (!mmkv.getString(Global.APIType) || mmkv.getString(Global.APIType) === API.LOCAL)
+        mmkv.set(Global.APIType, API.OPENAI)
+
+    // Init step, appMode is never null
+    if (!mmkv.getString(Global.AppMode)) mmkv.set(Global.AppMode, AppMode.LOCAL)
 
     Object.keys(AppSettingsDefault).map((item) => {
         const data =

@@ -29,6 +29,7 @@ export const enum Global {
 
     Logs = 'logs',
 
+    AppMode = 'appmode',
     // User
 
     // TODO: use zustand persist to remove this
@@ -128,4 +129,9 @@ export enum AppSettings {
     SaveLocalKV = 'savelocalkv',
     PrintContext = 'printcontext',
     CreateDefaultCard = 'createdefaultcard',
+}
+
+export enum AppMode {
+    LOCAL = 'local',
+    REMOTE = 'remote',
 }

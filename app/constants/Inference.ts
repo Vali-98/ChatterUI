@@ -3,7 +3,7 @@ import { Chats, useInference } from 'app/constants/Chat'
 import { API } from './API'
 import { APIState } from './APIState'
 import { Characters } from './Characters'
-import { Global } from './GlobalValues'
+import { AppMode, Global } from './GlobalValues'
 import { Logger } from './Logger'
 import { mmkv } from './MMKV'
 
@@ -43,8 +43,9 @@ export const generateResponse = async (swipeId: number) => {
     Chats.useChat.getState().startGenerating(swipeId)
     Logger.log(`Obtaining response.`)
     const data = performance.now()
+    const appMode = getString(Global.AppMode)
     const APIType = getString(Global.APIType)
-    const apiState = APIState?.[APIType as API]
+    const apiState = appMode === AppMode.LOCAL ? APIState[API.LOCAL] : APIState?.[APIType as API]
     if (apiState) await apiState.inference()
     else {
         Logger.log('An invalid API was somehow chosen, this is bad!', true)

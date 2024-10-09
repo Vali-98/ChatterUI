@@ -19,7 +19,7 @@ const Local = () => {
         (state) => ({
             loadModel: state.load,
             unloadModel: state.unload,
-            modelName: state.modelname,
+            modelName: state.modelName,
             loadProgress: state.loadProgress,
             setloadProgress: state.setLoadProgress,
         })
@@ -51,7 +51,8 @@ const Local = () => {
     const handleLoad = async () => {
         setModelLoading(true)
         setloadProgress(0)
-        await loadModel(currentModel ?? '', preset)
+        Logger.log('This screen is deprecated!', true)
+        //await loadModel(currentModel ?? '')
         setModelLoading(false)
         getModels()
     }

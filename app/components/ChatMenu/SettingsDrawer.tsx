@@ -1,5 +1,5 @@
 import SupportButton from '@components/SupportButton'
-import { AppSettings } from '@constants/GlobalValues'
+import { AppMode, AppSettings, Global } from '@constants/GlobalValues'
 import { AntDesign, FontAwesome } from '@expo/vector-icons'
 import { Characters, Style } from '@globals'
 import appConfig from 'app.config'
@@ -13,7 +13,7 @@ import {
     View,
     Image,
 } from 'react-native'
-import { useMMKVBoolean } from 'react-native-mmkv'
+import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 import Animated, {
     SlideInLeft,
     Easing,
@@ -27,46 +27,11 @@ type SettingsDrawerProps = {
     booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
 }
 
-type Icon = 'barschart' | 'profile' | 'link' | 'sound' | 'codesquareo' | 'infocirlceo'
-
 type ButtonData = {
     name: string
     path: `/${string}`
-    icon?: Icon
+    icon?: keyof typeof AntDesign.glyphMap
 }
-
-const paths: ButtonData[] = [
-    {
-        name: 'Sampler',
-        path: '/SamplerMenu',
-        icon: 'barschart',
-    },
-    {
-        name: 'Instruct',
-        path: '/Instruct',
-        icon: 'profile',
-    },
-    {
-        name: 'API',
-        path: '/APIMenu',
-        icon: 'link',
-    },
-    {
-        name: 'TTS',
-        path: '/TTSMenu',
-        icon: 'sound',
-    },
-    {
-        name: 'Logs',
-        path: '/Logs',
-        icon: 'codesquareo',
-    },
-    {
-        name: 'About',
-        path: '/About',
-        icon: 'infocirlceo',
-    },
-]
 
 const paths_dev: ButtonData[] = [
     {
@@ -77,10 +42,6 @@ const paths_dev: ButtonData[] = [
         name: '[DEV] Embedding',
         path: '/Embedding',
     },*/
-    {
-        name: '[DEV] Models',
-        path: '/components/ModelManager',
-    },
 ]
 
 type DrawerButtonProps = {
@@ -98,6 +59,10 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
     )
 
     const [devMode, setDevMode] = useMMKVBoolean(AppSettings.DevMode)
+    const [appMode, setAppMode] = useMMKVString(Global.AppMode)
+
+    const localMode = appMode === AppMode.LOCAL
+    const remoteMode = appMode === AppMode.REMOTE
 
     const [imageSource, setImageSource] = useState({
         uri: Characters.getImageDir(imageID),
@@ -141,6 +106,45 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
             </TouchableOpacity>
         </Animated.View>
     )
+
+    const paths: ButtonData[] = [
+        {
+            name: 'Sampler',
+            path: '/SamplerMenu',
+            icon: 'barschart',
+        },
+        {
+            name: 'Instruct',
+            path: '/Instruct',
+            icon: 'profile',
+        },
+        appMode === AppMode.REMOTE
+            ? {
+                  name: 'API',
+                  path: '/APIMenu',
+                  icon: 'link',
+              }
+            : {
+                  name: 'Models',
+                  path: '/components/ModelManager',
+                  icon: 'folderopen',
+              },
+        {
+            name: 'TTS',
+            path: '/TTSMenu',
+            icon: 'sound',
+        },
+        {
+            name: 'Logs',
+            path: '/Logs',
+            icon: 'codesquareo',
+        },
+        {
+            name: 'About',
+            path: '/About',
+            icon: 'infocirlceo',
+        },
+    ]
 
     if (showModal)
         return (
@@ -203,6 +207,47 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                                     </View>
                                 </View>
                             </View>
+                            <View style={styles.modeContainer}>
+                                <TouchableOpacity
+                                    onPress={() => setAppMode(AppMode.LOCAL)}
+                                    style={
+                                        localMode ? styles.modeButton : styles.modeButtonInactive
+                                    }>
+                                    <AntDesign
+                                        name="mobile1"
+                                        color={Style.getColor(
+                                            localMode ? 'primary-text2' : 'primary-text3'
+                                        )}
+                                        size={30}
+                                    />
+                                    <Text
+                                        style={
+                                            localMode ? styles.modeText : styles.modeTextInactive
+                                        }>
+                                        Local Mode
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => setAppMode(AppMode.REMOTE)}
+                                    style={
+                                        remoteMode ? styles.modeButton : styles.modeButtonInactive
+                                    }>
+                                    <AntDesign
+                                        name="cloudo"
+                                        color={Style.getColor(
+                                            remoteMode ? 'primary-text2' : 'primary-text3'
+                                        )}
+                                        size={30}
+                                    />
+                                    <Text
+                                        style={
+                                            remoteMode ? styles.modeText : styles.modeTextInactive
+                                        }>
+                                        API Mode
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+
                             {(__DEV__ || devMode ? [...paths, ...paths_dev] : paths).map(
                                 (item, index) => (
                                     <DrawerButton item={item} index={index} key={index} />
@@ -283,5 +328,44 @@ const styles = StyleSheet.create({
         paddingLeft: 15,
         flexDirection: 'row',
         alignItems: 'center',
+    },
+
+    modeContainer: {
+        flexDirection: 'row',
+        paddingLeft: 12,
+        paddingRight: 16,
+        marginTop: 24,
+        marginBottom: 12,
+        columnGap: 4,
+    },
+
+    modeButton: {
+        flex: 1,
+        alignItems: 'center',
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderWidth: 2,
+        borderRadius: 8,
+        borderColor: Style.getColor('primary-surface4'),
+    },
+
+    modeText: {
+        marginTop: 4,
+        color: Style.getColor('primary-text1'),
+    },
+
+    modeButtonInactive: {
+        flex: 1,
+        alignItems: 'center',
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderWidth: 2,
+        borderRadius: 8,
+        borderColor: Style.getColor('primary-surface2'),
+    },
+
+    modeTextInactive: {
+        marginTop: 4,
+        color: Style.getColor('primary-text3'),
     },
 })

@@ -5,7 +5,6 @@ import {
     TGWUI,
     Mancer,
     TextCompletions,
-    Local,
     OpenRouter,
     OpenAI,
     Ollama,
@@ -23,8 +22,6 @@ import { useMMKVString } from 'react-native-mmkv'
 const APIMenu = () => {
     const [APIType, setAPIType] = useMMKVString(Global.APIType)
     const apinames = [
-        { label: 'Local', value: API.LOCAL },
-
         { label: 'KoboldAI', value: API.KAI },
         { label: 'Text Generation Web UI', value: API.TGWUI },
         { label: 'Ollama', value: API.OLLAMA },
@@ -78,7 +75,6 @@ const APIMenu = () => {
                             {...Style.drawer.default}
                         />
                     </View>
-                    {APIType === API.LOCAL && <Local />}
 
                     {APIType === API.KAI && <KAI />}
                     {APIType === API.TGWUI && <TGWUI />}
