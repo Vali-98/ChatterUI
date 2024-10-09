@@ -1,4 +1,5 @@
 import AnimatedView from '@components/AnimatedView'
+import useAutosave from '@constants/AutoSave'
 import { FontAwesome } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
 import { CharacterCardV2 } from 'app/constants/Characters'
@@ -6,7 +7,6 @@ import { Tokenizer } from 'app/constants/Tokenizer'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { useAutosave } from 'react-autosave'
 import {
     View,
     Text,

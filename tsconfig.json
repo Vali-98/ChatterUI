@@ -11,9 +11,9 @@
             "@assets/*": ["assets/*"],
             "@public/*": ["public/*"],
             "@lib/*": ["lib/*"],
-            "@db": ["db/db"],
+            "@db": ["db/db"]
         },
-        "allowJs": true,
+        "allowJs": true
     },
     "include": [
         "**/*.ts",
@@ -22,6 +22,6 @@
         "**/*.jsx",
         ".expo/types/**/*.ts",
         "expo-env.d.ts",
-        "app/_layout.tsx",
-    ],
+        "app/_layout.tsx"
+    ]
 }

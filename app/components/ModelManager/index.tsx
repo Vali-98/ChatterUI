@@ -1,4 +1,5 @@
 import { Llama } from '@constants/LlamaLocal'
+import { AntDesign } from '@expo/vector-icons'
 import { Style } from '@globals'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
@@ -12,7 +13,6 @@ import ModelEmpty from './ModelEmpty'
 import ModelItem from './ModelItem'
 import ModelNewMenu from './ModelNewMenu'
 import ModelSettings from './ModelSettings'
-import { AntDesign } from '@expo/vector-icons'
 
 const ModelManager = () => {
     const { data } = useLiveQuery(Llama.getModelListQuery())

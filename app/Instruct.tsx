@@ -8,7 +8,7 @@ import { Instructs, Logger, Style, saveStringToDownload } from '@globals'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
-import { useAutosave } from 'react-autosave'
+import useAutosave from '@constants/AutoSave'
 import {
     View,
     SafeAreaView,
