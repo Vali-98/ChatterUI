@@ -146,6 +146,13 @@ const ModelManager = () => {
                     exit={() => setShowSettings(false)}
                 />
             )}
+            {showSettings && (
+                <TouchableOpacity
+                    style={styles.settingsButton}
+                    onPress={() => Llama.verifyModelList()}>
+                    <Text>{'Verify Models'}</Text>
+                </TouchableOpacity>
+            )}
 
             <TouchableOpacity
                 style={styles.settingsButton}
@@ -197,6 +204,7 @@ const styles = StyleSheet.create({
     },
 
     settingsButton: {
+        marginTop: 12,
         backgroundColor: Style.getColor('primary-brand'),
         alignItems: 'center',
         paddingVertical: 8,
