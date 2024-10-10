@@ -10,7 +10,6 @@
     "test": "jest --watchAll",
     "postinstall": "patch-package",
     "lint": "eslint .",
-    "dev:android": "set APP_VARIANT=development && npx expo run:android",
     "migrate": "npx drizzle-kit generate",
     "patchsql": "npx patch-package expo-sqlite --exclude \"\\.project|\\.cxx|build|bin\" --case-sensitive-path-filtering"
   },

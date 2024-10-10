@@ -1,8 +1,6 @@
-const IS_DEV = process.env.APP_VARIANT === 'development'
-
 module.exports = {
     expo: {
-        name: IS_DEV ? 'ChatterUI[DEV]' : 'ChatterUI',
+        name: 'ChatterUI',
         slug: 'ChatterUI',
         version: '0.7.10',
         orientation: 'portrait',
@@ -25,7 +23,7 @@ module.exports = {
                 monochromeImage: './assets/images/adaptive-icon-foreground.png',
                 backgroundColor: '#000',
             },
-            package: IS_DEV ? 'com.Vali98.ChatterUI.dev' : 'com.Vali98.ChatterUI',
+            package: 'com.Vali98.ChatterUI',
 
             splash: {
                 image: './assets/images/splash.png',
