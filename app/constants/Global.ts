@@ -186,8 +186,6 @@ export const startupApp = () => {
         })
     }
 
-    Llama.verifyModelList()
-
     Logger.log('Resetting state values for startup.')
     SystemUI.setBackgroundColorAsync(Style.getColor('primary-surface1'))
 }
@@ -234,6 +232,7 @@ export const initializeApp = async () => {
     })
 
     await migratePresets()
+    await Llama.verifyModelList()
 }
 
 export const generateDefaultDirectories = async () => {
