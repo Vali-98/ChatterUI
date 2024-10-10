@@ -6,7 +6,8 @@ module.exports = function (api) {
             [
                 'babel-plugin-react-compiler',
                 {
-                    runtimeModule: 'react-compiler-runtime',
+                    // runtimeModule: 'react-compiler-runtime',
+                    target: '18',
                 },
             ], // must run first!
             ['inline-import', { extensions: ['.sql'] }],
