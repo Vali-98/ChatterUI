@@ -217,7 +217,7 @@ export namespace Style {
             style: {
                 backgroundColor: Style.getColor('primary-surface3'),
                 paddingHorizontal: 8,
-                paddingVertical: 2,
+                paddingVertical: 8,
                 marginVertical: 8,
                 borderRadius: 8,
                 flex: 1,
