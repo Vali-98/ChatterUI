@@ -463,6 +463,11 @@ export namespace Llama {
                 Logger.log(`Model Missing, its entry will be deleted: ${item.name}`)
                 await db.delete(model_data).where(eq(model_data.id, item.id))
             }
+            /**
+             * This check is specifically for migration from v0.8.0-beta4
+             * file_path was added after, hence its not null migration resulted in needing
+             * a default blank string, consider removal later
+             */
             if (item.file_path === '') {
                 await db
                     .update(model_data)
