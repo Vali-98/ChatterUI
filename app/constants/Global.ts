@@ -232,7 +232,7 @@ export const initializeApp = async () => {
     })
 
     await migratePresets()
-    // await Llama.verifyModelList()
+    await Llama.verifyModelList()
 }
 
 export const generateDefaultDirectories = async () => {

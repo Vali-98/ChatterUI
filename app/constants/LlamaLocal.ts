@@ -459,9 +459,16 @@ export namespace Llama {
         })
         // cull missing models
         modelList.forEach(async (item) => {
-            if ((await FS.getInfoAsync(item.file_path)).exists) return
-            Logger.log(`Model Missing, its entry will be deleted: ${item.name}`)
-            await db.delete(model_data).where(eq(model_data.id, item.id))
+            if (!(await FS.getInfoAsync(item.file_path)).exists) {
+                Logger.log(`Model Missing, its entry will be deleted: ${item.name}`)
+                await db.delete(model_data).where(eq(model_data.id, item.id))
+            }
+            if (item.file_path === '') {
+                await db
+                    .update(model_data)
+                    .set({ file_path: `${model_dir}${item.file}` })
+                    .where(eq(model_data.id, item.id))
+            }
         })
     }
 

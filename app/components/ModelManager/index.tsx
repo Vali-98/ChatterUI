@@ -146,13 +146,6 @@ const ModelManager = () => {
                     exit={() => setShowSettings(false)}
                 />
             )}
-            {showSettings && (
-                <TouchableOpacity
-                    style={styles.settingsButton}
-                    onPress={() => Llama.verifyModelList()}>
-                    <Text>{'Verify Models'}</Text>
-                </TouchableOpacity>
-            )}
 
             <TouchableOpacity
                 style={styles.settingsButton}

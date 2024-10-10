@@ -268,7 +268,7 @@ export const model_data = sqliteTable('model_data', {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     file: text('file').notNull().unique(),
     name: text('name').notNull(),
-    file_path: text('file_path').notNull().unique(),
+    file_path: text('file_path').notNull().unique().default(''),
     file_size: integer('file_size').notNull().default(0),
     params: text('params').notNull(),
     quantization: text('quantization').notNull(),
