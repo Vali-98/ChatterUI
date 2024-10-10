@@ -459,10 +459,6 @@ export namespace Llama {
         })
         // cull missing models
         modelList.forEach(async (item) => {
-            if (!(await FS.getInfoAsync(item.file_path)).exists) {
-                Logger.log(`Model Missing, its entry will be deleted: ${item.name}`)
-                await db.delete(model_data).where(eq(model_data.id, item.id))
-            }
             /**
              * This check is specifically for migration from v0.8.0-beta4
              * file_path was added after, hence its not null migration resulted in needing
@@ -473,6 +469,11 @@ export namespace Llama {
                     .update(model_data)
                     .set({ file_path: `${model_dir}${item.file}` })
                     .where(eq(model_data.id, item.id))
+            }
+
+            if (!(await FS.getInfoAsync(item.file_path)).exists) {
+                Logger.log(`Model Missing, its entry will be deleted: ${item.name}`)
+                await db.delete(model_data).where(eq(model_data.id, item.id))
             }
         })
     }
