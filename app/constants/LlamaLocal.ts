@@ -77,19 +77,11 @@ export namespace Llama {
             if (!presetString) return
             const preset: LlamaPreset = JSON.parse(presetString)
 
-            if (!modelName) {
-                Logger.log('Invalid File Name', true)
-                return
+            if (get().modelId === modelId) {
+                return Logger.log('Model Already Loaded!', true)
             }
 
-            switch (modelName) {
-                case '':
-                    return Logger.log('No Model Chosen', true)
-                case get().modelName:
-                    return Logger.log('Model Already Loaded!', true)
-            }
-
-            if (!filePath.startsWith('content') && !(await modelExists(modelName))) {
+            if (!(await FS.getInfoAsync(filePath)).exists) {
                 Logger.log('Model Does Not Exist!', true)
                 return
             }
@@ -450,16 +442,18 @@ export namespace Llama {
     }
 
     export const verifyModelList = async () => {
-        const modelList = await db.query.model_data.findMany()
+        let modelList = await db.query.model_data.findMany()
         const fileList = await getModelList()
 
         // cull missing models
         modelList.forEach(async (item) => {
-            if (!(await FS.getInfoAsync(item.file_path)).exists) {
+            if (item.name === '' || !(await FS.getInfoAsync(item.file_path)).exists) {
                 Logger.log(`Model Missing, its entry will be deleted: ${item.name}`)
                 await db.delete(model_data).where(eq(model_data.id, item.id))
             }
         })
+        // refresh as some may have been deleted
+        modelList = await db.query.model_data.findMany()
 
         // create data as migration step
         fileList.forEach(async (item) => {

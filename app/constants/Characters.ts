@@ -414,10 +414,10 @@ export namespace Characters {
 
                         const greetingdata =
                             typeof data?.alternate_greetings === 'object'
-                                ? data?.alternate_greetings?.map((item) => ({
+                                ? (data?.alternate_greetings?.map((item) => ({
                                       character_id: id,
                                       greeting: item,
-                                  })) ?? []
+                                  })) ?? [])
                                 : []
                         if (greetingdata.length > 0)
                             for (const greeting of greetingdata)
