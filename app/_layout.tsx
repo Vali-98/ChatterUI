@@ -27,11 +27,8 @@ const Layout = () => {
             startupApp()
             initializeApp()
             setFirstRender(false)
+            SplashScreen.hideAsync()
         }
-    }, [success])
-
-    useEffect(() => {
-        if (success) SplashScreen.hideAsync()
     }, [success])
 
     if (error)
