@@ -452,29 +452,19 @@ export namespace Llama {
     export const verifyModelList = async () => {
         const modelList = await db.query.model_data.findMany()
         const fileList = await getModelList()
-        // create data as migration step
-        fileList.forEach(async (item) => {
-            if (modelList.some((model_data) => model_data.file === item)) return
-            await createModelData(`${item}`)
-        })
+
         // cull missing models
         modelList.forEach(async (item) => {
-            /**
-             * This check is specifically for migration from v0.8.0-beta4
-             * file_path was added after, hence its not null migration resulted in needing
-             * a default blank string, consider removal later
-             */
-            if (item.file_path === '') {
-                await db
-                    .update(model_data)
-                    .set({ file_path: `${model_dir}${item.file}` })
-                    .where(eq(model_data.id, item.id))
-            }
-
             if (!(await FS.getInfoAsync(item.file_path)).exists) {
                 Logger.log(`Model Missing, its entry will be deleted: ${item.name}`)
                 await db.delete(model_data).where(eq(model_data.id, item.id))
             }
+        })
+
+        // create data as migration step
+        fileList.forEach(async (item) => {
+            if (modelList.some((model_data) => model_data.file === item)) return
+            await createModelData(`${item}`)
         })
     }
 

@@ -52,7 +52,10 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const handleDeleteModel = () => {
         Alert.alert(
             'Delete Model',
-            `Are you sure you want to delete "${item.name}"? This cannot be undone!\n\nThis operation will clear up ${readableFileSize(item.file_size)}`,
+            `Are you sure you want to delete "${item.name}"? This cannot be undone!` +
+                (!item.file_path.startsWith('content')
+                    ? `\n\nThis operation will clear up ${readableFileSize(item.file_size)}`
+                    : ''),
             [
                 { text: `Cancel`, style: `cancel` },
                 {

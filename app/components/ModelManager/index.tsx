@@ -192,7 +192,6 @@ const styles = StyleSheet.create({
     },
 
     hint: {
-        marginBottom: 8,
         color: Style.getColor('primary-text2'),
     },
 
