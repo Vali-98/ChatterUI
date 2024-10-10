@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "39f6562f-f39f-4369-82f2-d60d5826f8b5",
+  "id": "28792d74-82cf-4f0d-a6a2-67b4cb8103af",
   "prevId": "e32aff4c-ae11-4bd4-b10a-f2e8d48a3300",
   "tables": {
     "character_greetings": {
@@ -804,7 +804,8 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "''"
         },
         "file_size": {
           "name": "file_size",
