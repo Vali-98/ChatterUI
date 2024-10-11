@@ -54,14 +54,18 @@ class LocalAPI extends APIBase {
 
             try {
                 const modelString = mmkv.getString(Global.LocalModel)
-                if (!modelString) return
+                if (!modelString) {
+                    Logger.log('No Auto-Load Model Set', true)
+                    return
+                }
                 model = JSON.parse(modelString)
             } catch (e) {
-                Logger.log('Failed to auto-load model')
+                Logger.log('Failed to Auto-Load Model', true)
             }
 
             const params = this.getObject(Global.LocalPreset)
             if (model && params) {
+                Logger.log(`Auto-loading: ${model.name}`, true)
                 await Llama.useLlama.getState().load(model)
                 context = Llama.useLlama.getState().context
             }

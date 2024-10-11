@@ -1,10 +1,11 @@
 import TextBoxModal from '@components/TextBoxModal'
 import { GGMLNameMap, Llama, readableFileSize } from '@constants/LlamaLocal'
 import { AntDesign } from '@expo/vector-icons'
-import { Style } from '@globals'
+import { Global, Style } from '@globals'
 import { ModelDataType } from 'db/schema'
 import React, { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'
+import { useMMKVObject } from 'react-native-mmkv'
 import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
 
 type ModelItemProps = {
@@ -29,7 +30,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
     }))
 
     const [showEdit, setShowEdit] = useState(false)
-
+    const [autoLoad, setAutoLoad] = useMMKVObject<ModelDataType>(Global.LocalModel)
     //@ts-ignore
     const quant: string = item.quantization && GGMLNameMap[item.quantization]
     const disable = modelLoading || modelImporting || modelId !== undefined
@@ -115,6 +116,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         disabled={disable}
                         onPress={async () => {
                             setModelLoading(true)
+                            setAutoLoad(item)
                             await loadModel(item)
                             setModelLoading(false)
                         }}>
