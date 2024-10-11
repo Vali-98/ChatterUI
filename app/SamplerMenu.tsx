@@ -1,4 +1,5 @@
 import AnimatedView from '@components/AnimatedView'
+import { AppMode } from '@constants/GlobalValues'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Presets, saveStringExternal, Logger, Style, API } from '@globals'
 import { APIState } from 'app/constants/APIState'
@@ -25,6 +26,7 @@ type PresetLabel = {
 
 const SamplerMenu = () => {
     const [APIType, setAPIType] = useMMKVString(Global.APIType)
+    const [appMode, setAppMode] = useMMKVString(Global.AppMode)
     const [presetName, setPresetName] = useMMKVString(Global.PresetName)
     const [currentPreset, setCurrentPreset] = useMMKVObject<SamplerPreset>(Global.PresetData)
     const [presetList, setPresetList] = useState<PresetLabel[]>([])
@@ -49,6 +51,9 @@ const SamplerMenu = () => {
     useEffect(() => {
         loadPresetList(presetName ?? '')
     }, [])
+
+    const samplerList =
+        appMode === AppMode.LOCAL ? APIState[API.LOCAL].samplers : APIState[APIType as API].samplers
 
     return (
         <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
@@ -192,56 +197,55 @@ const SamplerMenu = () => {
 
                 <ScrollView>
                     <View style={styles.mainContainer}>
-                        {APIType &&
-                            APIState[APIType as API].samplers.map((item, index) => {
-                                const samplerItem = Samplers[item.samplerID]
-                                switch (samplerItem.inputType) {
-                                    case 'slider':
-                                        return (
-                                            (samplerItem.values.type === 'float' ||
-                                                samplerItem.values.type === 'integer') && (
-                                                <SliderItem
-                                                    key={item.samplerID}
-                                                    varname={samplerItem.internalID}
-                                                    body={currentPreset}
-                                                    setValue={setCurrentPreset}
-                                                    name={samplerItem.friendlyName}
-                                                    min={samplerItem.values.min}
-                                                    max={samplerItem.values.max}
-                                                    step={samplerItem.values.step}
-                                                    precision={samplerItem.values.precision ?? 2}
-                                                />
-                                            )
-                                        )
-                                    case 'checkbox':
-                                        return (
-                                            <CheckboxTitle
+                        {samplerList?.map((item, index) => {
+                            const samplerItem = Samplers[item.samplerID]
+                            switch (samplerItem.inputType) {
+                                case 'slider':
+                                    return (
+                                        (samplerItem.values.type === 'float' ||
+                                            samplerItem.values.type === 'integer') && (
+                                            <SliderItem
                                                 key={item.samplerID}
                                                 varname={samplerItem.internalID}
                                                 body={currentPreset}
                                                 setValue={setCurrentPreset}
                                                 name={samplerItem.friendlyName}
+                                                min={samplerItem.values.min}
+                                                max={samplerItem.values.max}
+                                                step={samplerItem.values.step}
+                                                precision={samplerItem.values.precision ?? 2}
                                             />
                                         )
-                                    case 'textinput':
-                                        return (
-                                            <TextBox
-                                                key={item.samplerID}
-                                                varname={samplerItem.internalID}
-                                                body={currentPreset}
-                                                setValue={setCurrentPreset}
-                                                name={samplerItem.friendlyName}
-                                            />
-                                        )
-                                    //case 'custom':
-                                    default:
-                                        return (
-                                            <Text style={styles.warningText}>
-                                                Invalid Sampler Field!
-                                            </Text>
-                                        )
-                                }
-                            })}
+                                    )
+                                case 'checkbox':
+                                    return (
+                                        <CheckboxTitle
+                                            key={item.samplerID}
+                                            varname={samplerItem.internalID}
+                                            body={currentPreset}
+                                            setValue={setCurrentPreset}
+                                            name={samplerItem.friendlyName}
+                                        />
+                                    )
+                                case 'textinput':
+                                    return (
+                                        <TextBox
+                                            key={item.samplerID}
+                                            varname={samplerItem.internalID}
+                                            body={currentPreset}
+                                            setValue={setCurrentPreset}
+                                            name={samplerItem.friendlyName}
+                                        />
+                                    )
+                                //case 'custom':
+                                default:
+                                    return (
+                                        <Text style={styles.warningText}>
+                                            Invalid Sampler Field!
+                                        </Text>
+                                    )
+                            }
+                        })}
                     </View>
                 </ScrollView>
             </SafeAreaView>
