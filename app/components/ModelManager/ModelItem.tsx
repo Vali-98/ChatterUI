@@ -2,26 +2,13 @@ import TextBoxModal from '@components/TextBoxModal'
 import { GGMLNameMap, Llama, readableFileSize } from '@constants/LlamaLocal'
 import { AntDesign } from '@expo/vector-icons'
 import { Style } from '@globals'
+import { ModelDataType } from 'db/schema'
 import React, { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'
 import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
 
-type ModelItemData = {
-    quantization: string
-    id: number
-    name: string
-    params: string
-    file_size: number
-    architecture: string
-    file_path: string
-    context_length: number
-    last_modified: number
-    create_date: number
-    file: string
-}
-
 type ModelItemProps = {
-    item: ModelItemData
+    item: ModelDataType
     index: number
     modelLoading: boolean
     setModelLoading: (b: boolean) => void
@@ -38,7 +25,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const { loadModel, unloadModel, modelId } = Llama.useLlama((state) => ({
         loadModel: state.load,
         unloadModel: state.unload,
-        modelId: state.modelId,
+        modelId: state.model?.id,
     }))
 
     const [showEdit, setShowEdit] = useState(false)
@@ -128,7 +115,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         disabled={disable}
                         onPress={async () => {
                             setModelLoading(true)
-                            await loadModel(item.file_path, item.name, item.id)
+                            await loadModel(item)
                             setModelLoading(false)
                         }}>
                         <AntDesign

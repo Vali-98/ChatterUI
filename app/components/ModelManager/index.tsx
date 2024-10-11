@@ -23,7 +23,7 @@ const ModelManager = () => {
     const [modelImporting, setModelImporting] = useState(false)
 
     const { modelName, loadProgress, setloadProgress } = Llama.useLlama((state) => ({
-        modelName: state.modelName,
+        modelName: state.model?.name,
         loadProgress: state.loadProgress,
         setloadProgress: state.setLoadProgress,
     }))

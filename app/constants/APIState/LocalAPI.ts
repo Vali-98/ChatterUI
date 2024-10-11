@@ -4,6 +4,7 @@ import { Llama, LlamaPreset } from 'app/constants/LlamaLocal'
 import { Logger } from 'app/constants/Logger'
 import { mmkv } from 'app/constants/MMKV'
 import { SamplerID } from 'app/constants/SamplerData'
+import { ModelDataType } from 'db/schema'
 import BackgroundService from 'react-native-background-actions'
 
 import { APIBase, APISampler } from './BaseAPI'
@@ -49,10 +50,19 @@ class LocalAPI extends APIBase {
     inference = async () => {
         let context = Llama.useLlama.getState().context
         if (!context && mmkv.getBoolean(AppSettings.AutoLoadLocal)) {
-            const model = mmkv.getString(Global.LocalModel)
+            let model: undefined | ModelDataType = undefined
+
+            try {
+                const modelString = mmkv.getString(Global.LocalModel)
+                if (!modelString) return
+                model = JSON.parse(modelString)
+            } catch (e) {
+                Logger.log('Failed to auto-load model')
+            }
+
             const params = this.getObject(Global.LocalPreset)
             if (model && params) {
-                await Llama.useLlama.getState().load(model ?? '', params)
+                await Llama.useLlama.getState().load(model)
                 context = Llama.useLlama.getState().context
             }
         }

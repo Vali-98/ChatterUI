@@ -1,6 +1,6 @@
 import { db } from '@db'
 import { CompletionParams, ContextParams, LlamaContext, initLlama } from 'cui-llama.rn'
-import { model_data } from 'db/schema'
+import { model_data, ModelDataType } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import { getDocumentAsync } from 'expo-document-picker'
 import * as FS from 'expo-file-system'
@@ -30,10 +30,9 @@ type CompletionOutput = {
 
 type LlamaState = {
     context: LlamaContext | undefined
-    modelName: string | undefined
-    modelId: number | undefined
+    model: undefined | ModelDataType
     loadProgress: number
-    load: (filePath: string, fileName: string, modelId: number) => Promise<void>
+    load: (model: ModelDataType) => Promise<void>
     setLoadProgress: (progress: number) => void
     unload: () => Promise<void>
     saveKV: () => Promise<void>
@@ -72,33 +71,27 @@ export namespace Llama {
         modelName: undefined,
         modelId: undefined,
         loadProgress: 0,
-        load: async (filePath: string, modelName: string, modelId: number) => {
+        model: undefined,
+        load: async (model: ModelDataType) => {
             const presetString = mmkv.getString(Global.LocalPreset)
             if (!presetString) return
             const preset: LlamaPreset = JSON.parse(presetString)
 
-            if (get().modelId === modelId) {
+            if (get()?.model?.id === model.id) {
                 return Logger.log('Model Already Loaded!', true)
             }
 
-            if (!(await FS.getInfoAsync(filePath)).exists) {
+            if (!(await FS.getInfoAsync(model.file_path)).exists) {
                 Logger.log('Model Does Not Exist!', true)
                 return
             }
 
             if (get().context !== undefined) {
-                Logger.log('Unloading current model', true)
-                await get().context?.release()
-                set((state) => ({
-                    ...state,
-                    context: undefined,
-                    modelName: undefined,
-                    modelId: undefined,
-                }))
+                await get().unload()
             }
 
             const params: ContextParams = {
-                model: filePath,
+                model: model.file_path,
                 n_ctx: preset.context_length,
                 n_threads: preset.threads,
                 n_batch: preset.batch,
@@ -107,7 +100,6 @@ export namespace Llama {
             }
 
             mmkv.set(Global.LocalSessionLoaded, false)
-            Logger.log(`Loading Model: ${modelName}`)
             Logger.log(
                 `Starting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}`
             )
@@ -124,10 +116,8 @@ export namespace Llama {
                 set((state) => ({
                     ...state,
                     context: llamaContext,
-                    modelName: modelName,
-                    modelId: modelId,
+                    model: model,
                 }))
-                Logger.log('Model Loaded', true)
             }
         },
         setLoadProgress: (progress: number) => {
@@ -138,10 +128,8 @@ export namespace Llama {
             set((state) => ({
                 ...state,
                 context: undefined,
-                modelName: undefined,
-                modelId: undefined,
+                model: undefined,
             }))
-            Logger.log('Model Unloaded', true)
         },
         completion: async (
             params: CompletionParams,
@@ -307,6 +295,7 @@ export namespace Llama {
     export const deleteModelById = async (id: number) => {
         const modelInfo = await db.query.model_data.findFirst({ where: eq(model_data.id, id) })
         if (!modelInfo) return
+        if (modelInfo.id === useLlama.getState()?.model?.id) await useLlama.getState().unload()
         // some models may be external
         if (modelInfo.file_path.startsWith(model_dir)) await deleteModel(modelInfo.file)
         await db.delete(model_data).where(eq(model_data.id, id))
@@ -317,7 +306,7 @@ export namespace Llama {
      */
     export const deleteModel = async (name: string) => {
         if (!(await modelExists(name))) return
-        if (name === useLlama.getState().modelName) await useLlama.getState().unload()
+        if (name === useLlama.getState()?.model?.name) await useLlama.getState().unload()
         return await FS.deleteAsync(`${model_dir}${name}`)
     }
 
