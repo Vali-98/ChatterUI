@@ -208,44 +208,55 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                                 </View>
                             </View>
                             <View style={styles.modeContainer}>
-                                <TouchableOpacity
-                                    onPress={() => setAppMode(AppMode.LOCAL)}
-                                    style={
-                                        localMode ? styles.modeButton : styles.modeButtonInactive
-                                    }>
-                                    <AntDesign
-                                        name="mobile1"
-                                        color={Style.getColor(
-                                            localMode ? 'primary-text2' : 'primary-text3'
-                                        )}
-                                        size={30}
-                                    />
-                                    <Text
+                                <Text style={styles.appModeText}>App Mode</Text>
+                                <View style={styles.modeButtonContainer}>
+                                    <TouchableOpacity
+                                        onPress={() => setAppMode(AppMode.LOCAL)}
                                         style={
-                                            localMode ? styles.modeText : styles.modeTextInactive
+                                            localMode
+                                                ? styles.modeButton
+                                                : styles.modeButtonInactive
                                         }>
-                                        Local Mode
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    onPress={() => setAppMode(AppMode.REMOTE)}
-                                    style={
-                                        remoteMode ? styles.modeButton : styles.modeButtonInactive
-                                    }>
-                                    <AntDesign
-                                        name="cloudo"
-                                        color={Style.getColor(
-                                            remoteMode ? 'primary-text2' : 'primary-text3'
-                                        )}
-                                        size={30}
-                                    />
-                                    <Text
+                                        <AntDesign
+                                            name="mobile1"
+                                            color={Style.getColor(
+                                                localMode ? 'primary-text2' : 'primary-text3'
+                                            )}
+                                            size={18}
+                                        />
+                                        <Text
+                                            style={
+                                                localMode
+                                                    ? styles.modeText
+                                                    : styles.modeTextInactive
+                                            }>
+                                            Local
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => setAppMode(AppMode.REMOTE)}
                                         style={
-                                            remoteMode ? styles.modeText : styles.modeTextInactive
+                                            remoteMode
+                                                ? styles.modeButton
+                                                : styles.modeButtonInactive
                                         }>
-                                        API Mode
-                                    </Text>
-                                </TouchableOpacity>
+                                        <AntDesign
+                                            name="cloudo"
+                                            color={Style.getColor(
+                                                remoteMode ? 'primary-text2' : 'primary-text3'
+                                            )}
+                                            size={18}
+                                        />
+                                        <Text
+                                            style={
+                                                remoteMode
+                                                    ? styles.modeText
+                                                    : styles.modeTextInactive
+                                            }>
+                                            Remote
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
 
                             {(__DEV__ || devMode ? [...paths, ...paths_dev] : paths).map(
@@ -331,17 +342,22 @@ const styles = StyleSheet.create({
     },
 
     modeContainer: {
-        flexDirection: 'row',
         paddingLeft: 12,
         paddingRight: 16,
-        marginTop: 24,
-        marginBottom: 12,
+    },
+
+    modeButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
         columnGap: 4,
     },
 
     modeButton: {
+        flexDirection: 'row',
         flex: 1,
         alignItems: 'center',
+        justifyContent: 'center',
+        columnGap: 8,
         paddingVertical: 8,
         paddingHorizontal: 12,
         borderWidth: 2,
@@ -350,13 +366,15 @@ const styles = StyleSheet.create({
     },
 
     modeText: {
-        marginTop: 4,
         color: Style.getColor('primary-text1'),
     },
 
     modeButtonInactive: {
+        flexDirection: 'row',
         flex: 1,
         alignItems: 'center',
+        justifyContent: 'center',
+        columnGap: 8,
         paddingVertical: 8,
         paddingHorizontal: 12,
         borderWidth: 2,
@@ -365,7 +383,11 @@ const styles = StyleSheet.create({
     },
 
     modeTextInactive: {
-        marginTop: 4,
         color: Style.getColor('primary-text3'),
+    },
+
+    appModeText: {
+        color: Style.getColor('primary-text1'),
+        marginBottom: 8,
     },
 })
