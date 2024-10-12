@@ -188,7 +188,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                                     <View style={styles.buttonContainer}>
                                         <TouchableOpacity
                                             style={styles.button}
-                                            onPress={() => handlePush('/UserInfo')}>
+                                            onPress={() => handlePush('components/UserEditor')}>
                                             <FontAwesome
                                                 size={20}
                                                 name="edit"
@@ -344,6 +344,7 @@ const styles = StyleSheet.create({
     modeContainer: {
         paddingLeft: 12,
         paddingRight: 16,
+        marginBottom: 8,
     },
 
     modeButtonContainer: {
