@@ -110,7 +110,6 @@ const loadChatOnInit = async () => {
 
 const createDefaultUserData = async () => {
     await Characters.db.mutate.createCard('User', 'user').then((id: number) => {
-        mmkv.set(Global.UserID, id)
         Characters.useUserCard.getState().setCard(id)
     })
 }
@@ -204,21 +203,14 @@ export const initializeApp = async () => {
         })
         .catch((error) => Logger.log(`Could not generate default Preset. Reason: ${error}`))
 
-    const userid = mmkv.getNumber(Global.UserID)
-    if (userid === undefined) {
-        Logger.log('User ID is undefined, creating default User')
+    const userList = await Characters.db.query.cardList('user')
+    if (!userList) {
+        Logger.log('Database is Invalid, this should not happen! Please report this occurence.')
+    } else if (userList?.length === 0) {
+        Logger.log('No Instructs exist, creating default Instruct')
         await createDefaultUserData()
-    } else {
-        const list = await Characters.db.query.cardList('user')
-        if (!list) {
-            Logger.log('Database is Invalid, this should not happen! Please report this occurence.')
-        } else if (list?.length === 0) {
-            Logger.log('No Instructs exist, creating default Instruct')
-            await createDefaultUserData()
-        } else if (!list?.some((item) => item.id === userid)) {
-            Logger.log('User ID does not exist in database, defaulting to oldest User')
-            Characters.useUserCard.getState().setCard(list[0].id)
-        } else Characters.useUserCard.getState().setCard(userid)
+    } else if (userList.length > 0 && !Characters.useUserCard.getState().card) {
+        Characters.useUserCard.getState().setCard(userList[0].id)
     }
 
     Instructs.db.query.instructList().then(async (list) => {
