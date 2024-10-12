@@ -150,17 +150,6 @@ const ModelItem: React.FC<ModelItemProps> = ({
 export default ModelItem
 
 const styles = StyleSheet.create({
-    mainContainer: {
-        paddingTop: 16,
-        paddingHorizontal: 16,
-        paddingBottom: 24,
-        flex: 1,
-    },
-
-    list: {
-        flex: 1,
-    },
-
     modelContainer: {
         borderRadius: 12,
         paddingVertical: 12,
@@ -191,10 +180,6 @@ const styles = StyleSheet.create({
         color: Style.getColor('primary-text1'),
     },
 
-    modelTitle: {
-        color: Style.getColor('primary-text1'),
-    },
-
     subtitle: {
         color: Style.getColor('primary-text2'),
     },
@@ -211,12 +196,5 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 8,
         paddingHorizontal: 32,
-    },
-
-    settingsButton: {
-        backgroundColor: Style.getColor('primary-brand'),
-        alignItems: 'center',
-        paddingVertical: 8,
-        borderRadius: 12,
     },
 })
