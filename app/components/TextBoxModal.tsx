@@ -22,6 +22,7 @@ type TextBoxModalProps = {
     placeholder?: string
     textCheck?: (text: string) => boolean
     errorMessage?: string
+    autoFocus?: boolean
 }
 
 const TextBoxModal: React.FC<TextBoxModalProps> = ({
@@ -33,6 +34,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
     placeholder = '',
     textCheck = (text: string) => false,
     errorMessage = 'Name cannot be empty',
+    autoFocus = false,
 }) => {
     const [text, setText] = useState('')
     const [showError, setShowError] = useState(false)
@@ -70,6 +72,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                     <Text style={styles.title}>{title}</Text>
                     <View style={styles.inputContainer}>
                         <TextInput
+                            autoFocus={autoFocus}
                             style={styles.input}
                             value={text}
                             onChangeText={setText}

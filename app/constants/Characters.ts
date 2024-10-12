@@ -60,12 +60,9 @@ export namespace Characters {
                 card: undefined,
                 tokenCache: undefined,
                 setCard: async (id: number) => {
-                    //let start = performance.now()
                     const card = await db.query.card(id)
-                    //Logger.debug(`[User] time for database query: ${performance.now() - start}`)
-                    //start = performance.now()
+                    db.mutate.updateModified(id)
                     set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
-                    //Logger.debug(`[User] time for zustand set: ${performance.now() - start}`)
                     mmkv.set(Global.UserID, id)
                     return card?.data.name
                 },
@@ -137,15 +134,9 @@ export namespace Characters {
         card: undefined,
         tokenCache: undefined,
         setCard: async (id: number) => {
-            //let start = performance.now()
             const card = await db.query.card(id)
             db.mutate.updateModified(id)
-            //Logger.debug(`[Characters] time for database query: ${performance.now() - start}`)
-            //start = performance.now()
-            set((state) => {
-                return { ...state, card: card, id: id, tokenCache: undefined }
-            })
-            //Logger.debug(`[Characters] time for zustand set: ${performance.now() - start}`)
+            set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
             return card?.data.name
         },
         unloadCard: () => {

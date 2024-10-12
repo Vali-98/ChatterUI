@@ -183,29 +183,16 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                                     source={imageSource}
                                     onError={handleImageError}
                                 />
-                                <View>
+                                <TouchableOpacity
+                                    style={styles.nameContainer}
+                                    onPress={() => router.push('/components/UserEditor')}>
                                     <Text style={styles.userName}>{userName}</Text>
-                                    <View style={styles.buttonContainer}>
-                                        <TouchableOpacity
-                                            style={styles.button}
-                                            onPress={() => handlePush('components/UserEditor')}>
-                                            <FontAwesome
-                                                size={20}
-                                                name="edit"
-                                                color={Style.getColor('primary-text1')}
-                                            />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={styles.button}
-                                            onPress={() => handlePush('/UserSelector')}>
-                                            <FontAwesome
-                                                size={20}
-                                                name="th-list"
-                                                color={Style.getColor('primary-text1')}
-                                            />
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
+                                    <AntDesign
+                                        name="edit"
+                                        color={Style.getColor('primary-text2')}
+                                        size={20}
+                                    />
+                                </TouchableOpacity>
                             </View>
                             <View style={styles.modeContainer}>
                                 <Text style={styles.appModeText}>App Mode</Text>
@@ -293,30 +280,24 @@ const styles = StyleSheet.create({
     },
 
     userContainer: {
-        flexDirection: 'row',
-        paddingBottom: 24,
-        paddingTop: 40,
+        alignItems: 'center',
+        columnGap: 12,
+        paddingBottom: 12,
+        paddingTop: 24,
         padding: 16,
     },
 
-    buttonContainer: {
+    nameContainer: {
+        marginTop: 12,
         flexDirection: 'row',
-        marginLeft: 12,
-    },
-
-    button: {
-        borderColor: Style.getColor('primary-surface3'),
-        borderWidth: 2,
-        marginRight: 10,
-        borderRadius: 4,
-        padding: 8,
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
+        columnGap: 12,
     },
 
     userName: {
         fontSize: 20,
-        marginTop: 4,
-        marginBottom: 8,
-        marginLeft: 12,
+        textAlignVertical: 'center',
         color: Style.getColor('primary-text1'),
     },
 

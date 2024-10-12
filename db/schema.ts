@@ -283,4 +283,6 @@ export const model_data = sqliteTable('model_data', {
         .$onUpdateFn(() => new Date().getTime()),
 })
 
+// Types
+
 export type ModelDataType = typeof model_data.$inferSelect

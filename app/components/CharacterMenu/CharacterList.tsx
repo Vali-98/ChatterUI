@@ -96,7 +96,6 @@ type CharacterListProps = {
 }
 
 const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
-    'use no memo'
     // const [characterList, setCharacterList] = useState<CharInfo[]>([])
     const [nowLoading, setNowLoading] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
