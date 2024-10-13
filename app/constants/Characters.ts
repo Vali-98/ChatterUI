@@ -470,7 +470,7 @@ export namespace Characters {
                         return undefined
                     }
                 })
-                if (image_id) await copyImage(imageuri, image_id)
+                if (image_id && imageuri) await copyImage(imageuri, image_id)
             }
 
             export const duplicateCard = async (charId: number) => {
@@ -480,11 +480,14 @@ export namespace Characters {
                     Logger.log('Failed to copy card: Card does not exit', true)
                     return
                 }
-                const cacheLoc = `${FS.cacheDirectory}${card.data.image_id}`
-                await FS.copyAsync({
-                    from: getImageDir(card.data.image_id),
-                    to: cacheLoc,
-                })
+                const imageInfo = await FS.getInfoAsync(getImageDir(card.data.image_id))
+
+                const cacheLoc = imageInfo.exists ? `${FS.cacheDirectory}${card.data.image_id}` : ''
+                if (imageInfo.exists)
+                    await FS.copyAsync({
+                        from: getImageDir(card.data.image_id),
+                        to: cacheLoc,
+                    })
                 const now = new Date().getTime()
                 card.data.last_modified = now
                 card.data.image_id = now
