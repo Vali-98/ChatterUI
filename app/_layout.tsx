@@ -1,3 +1,4 @@
+import { AlertBox } from '@components/Alert'
 import { db, rawdb } from '@db'
 import { Style, initializeApp, startupApp } from '@globals'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
@@ -45,6 +46,7 @@ const Layout = () => {
             <GestureHandlerRootView style={{ flex: 1 }}>
                 {__DEV__ && <DevDB />}
                 <MenuProvider>
+                    <AlertBox />
                     <Stack
                         screenOptions={{
                             headerStyle: { backgroundColor: Style.getColor('primary-surface1') },

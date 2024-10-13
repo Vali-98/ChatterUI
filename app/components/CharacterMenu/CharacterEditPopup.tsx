@@ -1,9 +1,10 @@
+import { Alert } from '@components/Alert'
 import { CharInfo } from '@constants/Characters'
 import { AntDesign, FontAwesome } from '@expo/vector-icons'
 import { Characters, Style } from '@globals'
 import { useFocusEffect, useRouter } from 'expo-router'
 import React, { useRef, useState } from 'react'
-import { StyleSheet, TouchableOpacity, Text, BackHandler, Alert } from 'react-native'
+import { StyleSheet, TouchableOpacity, Text, BackHandler } from 'react-native'
 import {
     Menu,
     MenuOption,
@@ -61,6 +62,24 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
     }))
 
     const deleteCard = () => {
+        Alert.alert({
+            title: 'Delete Chracter',
+            description: `Are you sure you want to delete '${characterInfo.name}'? This cannot be undone.`,
+            buttons: [
+                {
+                    label: 'Cancel',
+                },
+                {
+                    label: 'Delete Character',
+                    onPress: async () => {
+                        Characters.db.mutate.deleteCard(characterInfo.id ?? -1)
+                    },
+                    type: 'warning',
+                },
+            ],
+        })
+
+        /*
         Alert.alert(
             `Delete Character`,
             `Are you sure you want to delete '${characterInfo.name}'? This cannot be undone.`,
@@ -76,11 +95,30 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                 },
             ],
             { cancelable: true }
-        )
+        )*/
     }
 
     const cloneCard = () => {
-        Alert.alert(
+        Alert.alert({
+            title: 'Clone Character',
+            description: `Are you sure you want to clone '${characterInfo.name}'?`,
+            buttons: [
+                {
+                    label: 'Cancel',
+                },
+                {
+                    label: 'Clone Character',
+                    onPress: async () => {
+                        setNowLoading(true)
+                        await Characters.db.mutate.duplicateCard(characterInfo.id)
+                        menuRef.current?.close()
+                        setNowLoading(false)
+                    },
+                },
+            ],
+        })
+
+        /* Alert.alert(
             `Clone Character`,
             `Are you sure you want to clone '${characterInfo.name}'?`,
             [
@@ -97,7 +135,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                 },
             ],
             { cancelable: true }
-        )
+        ) */
     }
 
     const editCharacter = async () => {

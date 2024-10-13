@@ -45,7 +45,7 @@ type EditorProps = {
 }
 
 type FadeScreenProps = {
-    handleOverlayClick: (e: GestureResponderEvent) => void
+    handleOverlayClick?: (e: GestureResponderEvent) => void
     children: ReactElement
 }
 const FadeScreen: React.FC<FadeScreenProps> = ({ handleOverlayClick, children }) => {

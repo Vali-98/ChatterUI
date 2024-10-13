@@ -10,9 +10,11 @@ import {
     tags,
 } from 'db/schema'
 import { desc, eq, inArray, notInArray } from 'drizzle-orm'
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { randomUUID } from 'expo-crypto'
 import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
+import { useEffect } from 'react'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
@@ -45,6 +47,7 @@ type CharacterCardState = {
     card?: CharacterCardV2
     tokenCache: CharacterTokenCache | undefined
     id: number | undefined
+    updateCard: (card: CharacterCardV2) => void
     setCard: (id: number) => Promise<string | undefined>
     unloadCard: () => void
     getImage: () => string
@@ -73,6 +76,9 @@ export namespace Characters {
                         card: undefined,
                         tokenCache: undefined,
                     }))
+                },
+                updateCard: (card: CharacterCardV2) => {
+                    set((state) => ({ ...state, card: card }))
                 },
                 getImage: () => {
                     return getImageDir(get().card?.data.image_id ?? 0)
@@ -139,6 +145,9 @@ export namespace Characters {
             set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
             return card?.data.name
         },
+        updateCard: (card: CharacterCardV2) => {
+            set((state) => ({ ...state, card: card }))
+        },
         unloadCard: () => {
             set((state) => ({
                 ...state,
@@ -185,10 +194,9 @@ export namespace Characters {
 
     export namespace db {
         export namespace query {
-            export const card = async (charId: number): Promise<CharacterCardV2 | undefined> => {
-                const data = await database.query.characters.findFirst({
+            export const cardQuery = (charId: number) => {
+                return database.query.characters.findFirst({
                     where: eq(characters.id, charId),
-                    columns: { id: false },
                     with: {
                         tags: {
                             columns: {
@@ -201,19 +209,30 @@ export namespace Characters {
                         alternate_greetings: true,
                     },
                 })
-                if (data)
-                    return {
-                        spec: 'chara_card_v2',
-                        spec_version: '2.0',
-                        data: {
-                            ...data,
-                            last_modified: data?.last_modified ?? 0, // assume this never actually fails
-                            tags: data.tags.map((item) => item.tag.tag),
-                            alternate_greetings: data.alternate_greetings.map(
-                                (item) => item.greeting
-                            ),
-                        },
-                    }
+            }
+
+            export const card = async (charId: number): Promise<CharacterCardV2 | undefined> => {
+                const data = await cardQuery(charId)
+                return cardEntryToCV2(data)
+            }
+
+            type CardEntry = Awaited<ReturnType<typeof cardQuery>>
+
+            export const cardEntryToCV2 = (data: CardEntry): CharacterCardV2 | undefined => {
+                if (!data) return
+
+                const { id, ...rest } = data
+
+                return {
+                    spec: 'chara_card_v2',
+                    spec_version: '2.0',
+                    data: {
+                        ...rest,
+                        last_modified: rest?.last_modified ?? 0, // assume this never actually fails
+                        tags: rest.tags.map((item) => item.tag.tag),
+                        alternate_greetings: rest.alternate_greetings.map((item) => item.greeting),
+                    },
+                }
             }
 
             export const cardList = async (
@@ -637,6 +656,22 @@ export namespace Characters {
         const fileinfo = await FS.getInfoAsync(cardDefaultDir)
         if (!fileinfo.exists) await copyFileRes(resName, cardDefaultDir)
         await createCharacterFromImage(cardDefaultDir)
+    }
+
+    export const useCharacterUpdater = () => {
+        const { id, updateCard } = useCharacterCard((state) => ({
+            id: state.id,
+            updateCard: state.updateCard,
+        }))
+
+        const { data } = useLiveQuery(db.query.cardQuery(id ?? -1))
+
+        useEffect(() => {
+            if (id && id === data?.id) {
+                const card = db.query.cardEntryToCV2(data)
+                if (card) updateCard(card)
+            }
+        }, [data])
     }
 }
 
