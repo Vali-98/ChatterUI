@@ -8,9 +8,13 @@ import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
 
 import UserListing from './UserListing'
 
-type CharacterData = Awaited<ReturnType<typeof Characters.db.query.cardListQuery>>
+// type CharacterData = Awaited<ReturnType<typeof Characters.db.query.cardListQuery>>
 
-const UserList = () => {
+type UserListProps = {
+    setShowModal: (b: boolean) => void
+}
+
+const UserList: React.FC<UserListProps> = ({ setShowModal }) => {
     const { data } = useLiveQuery(Characters.db.query.cardListQuery('user'))
 
     const [showNewUser, setShowNewUser] = useState(false)
@@ -45,6 +49,7 @@ const UserList = () => {
                             user={item}
                             nowLoading={nowLoading}
                             setNowLoading={setNowLoading}
+                            setShowModal={setShowModal}
                         />
                     )}
                     estimatedItemSize={100}
@@ -52,7 +57,7 @@ const UserList = () => {
                 />
                 <TouchableOpacity style={styles.newUserButton} onPress={() => setShowNewUser(true)}>
                     <AntDesign name="plus" size={18} color={Style.getColor('primary-text2')} />
-                    <Text style={styles.listTitle}>New User</Text>
+                    <Text style={styles.buttonText}>New User</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -63,24 +68,30 @@ export default UserList
 
 const styles = StyleSheet.create({
     mainContainer: {
-        paddingHorizontal: 16,
         flex: 1,
     },
 
-    userListBorder: { flex: 1 },
+    userListBorder: {
+        flex: 1,
+    },
 
     userListContainer: {
         flex: 1,
     },
 
     listHeader: {
-        marginTop: 30,
+        paddingHorizontal: 16,
         marginBottom: 12,
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
 
     listTitle: {
+        fontSize: 18,
+        color: Style.getColor('primary-text2'),
+    },
+
+    buttonText: {
         fontSize: 16,
         color: Style.getColor('primary-text1'),
     },
@@ -90,7 +101,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexDirection: 'row',
         paddingVertical: 8,
-        paddingHorizontal: 12,
         marginTop: 4,
         columnGap: 8,
         borderRadius: 8,

@@ -1,21 +1,61 @@
+import { AntDesign } from '@expo/vector-icons'
+import { Style } from '@globals'
 import { Stack } from 'expo-router'
-import { View, StyleSheet } from 'react-native'
+import { useState } from 'react'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import { runOnJS } from 'react-native-reanimated'
 
 import UserCardEditor from './UserCardEditor'
-import UserList from './UserList'
+import UserDrawer from './UserDrawer'
 
 const UserEditor = () => {
+    const [showDrawer, setShowDrawer] = useState(false)
+
+    const handleLeftFling = () => {
+        setShowDrawer(false)
+    }
+
+    const handleRightFlight = () => {
+        setShowDrawer(true)
+    }
+
+    const swipeShowDrawer = Gesture.Fling()
+        .direction(3)
+        .onEnd(() => {
+            runOnJS(handleRightFlight)()
+        })
+
+    const swipeHideDrawer = Gesture.Fling()
+        .direction(1)
+        .onEnd(() => {
+            runOnJS(handleLeftFling)()
+        })
+
+    const gesture = Gesture.Exclusive(swipeHideDrawer, swipeShowDrawer)
+
     return (
-        <View style={styles.mainContainer}>
-            <Stack.Screen
-                options={{
-                    title: 'Edit User',
-                    animation: 'simple_push',
-                }}
-            />
-            <UserCardEditor />
-            <UserList />
-        </View>
+        <GestureDetector gesture={gesture}>
+            <View style={styles.mainContainer}>
+                <Stack.Screen
+                    options={{
+                        title: 'Edit User',
+                        animation: 'simple_push',
+                        headerRight: () => (
+                            <TouchableOpacity onPress={() => setShowDrawer(!showDrawer)}>
+                                <AntDesign
+                                    name={showDrawer ? 'menu-fold' : 'menu-unfold'}
+                                    color={Style.getColor('primary-text1')}
+                                    size={24}
+                                />
+                            </TouchableOpacity>
+                        ),
+                    }}
+                />
+                <UserCardEditor />
+                {showDrawer && <UserDrawer booleans={[showDrawer, setShowDrawer]} />}
+            </View>
+        </GestureDetector>
     )
 }
 
@@ -23,7 +63,6 @@ export default UserEditor
 
 const styles = StyleSheet.create({
     mainContainer: {
-        paddingBottom: 24,
         flex: 1,
     },
 })

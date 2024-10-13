@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     userContainer: {
         alignItems: 'center',
         columnGap: 12,
-        paddingBottom: 12,
+        paddingBottom: 24,
         paddingTop: 24,
         padding: 16,
     },
@@ -369,7 +369,8 @@ const styles = StyleSheet.create({
     },
 
     appModeText: {
-        color: Style.getColor('primary-text1'),
+        marginLeft: 8,
+        color: Style.getColor('primary-text2'),
         marginBottom: 8,
     },
 })

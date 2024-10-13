@@ -11,6 +11,7 @@ type CharacterListingProps = {
     user: CharacterData
     nowLoading: boolean
     setNowLoading: (b: boolean) => void
+    setShowModal: (b: boolean) => void
 }
 
 const day_ms = 86400000
@@ -22,7 +23,12 @@ const getTimeStamp = (oldtime: number) => {
     return new Date(oldtime).toLocaleDateString()
 }
 
-const UserListing: React.FC<CharacterListingProps> = ({ user, nowLoading, setNowLoading }) => {
+const UserListing: React.FC<CharacterListingProps> = ({
+    user,
+    nowLoading,
+    setNowLoading,
+    setShowModal,
+}) => {
     const { userId, setCard } = Characters.useUserCard((state) => ({
         userId: state.id,
         setCard: state.setCard,
@@ -89,6 +95,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user, nowLoading, setNow
                 onPress={async () => {
                     setNowLoading(true)
                     await setCard(user.id)
+                    setShowModal(false)
                     setNowLoading(false)
                 }}>
                 <Avatar targetImage={Characters.getImageDir(user.image_id)} style={styles.avatar} />

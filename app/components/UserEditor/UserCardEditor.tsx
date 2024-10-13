@@ -44,9 +44,8 @@ const UserCardEditor = () => {
         <View style={styles.userContainer}>
             <View style={styles.optionsBar}>
                 <Avatar targetImage={Characters.getImageDir(imageID)} style={styles.userImage} />
-
-                <View>
-                    <Text style={{ color: Style.getColor('primary-text2') }}>Name</Text>
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.inputDescription}>Name</Text>
                     <TextInput
                         style={styles.inputName}
                         textAlignVertical="center"
@@ -65,46 +64,42 @@ const UserCardEditor = () => {
                 </View>
             </View>
 
-            <View style={styles.inputArea}>
-                <Text style={{ color: Style.getColor('primary-text2'), marginTop: 8 }}>
-                    Description
-                </Text>
-                <TextInput
-                    style={styles.input}
-                    multiline
-                    value={currentCard?.data.description ?? ''}
-                    onChangeText={(text) => {
-                        if (currentCard)
-                            setCurrentCard({
-                                ...currentCard,
-                                data: { ...currentCard.data, description: text },
-                            })
-                    }}
-                    placeholder="Describe this user..."
-                    placeholderTextColor={Style.getColor('primary-text2')}
-                />
-            </View>
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={handleUploadImage}>
-                    <AntDesign
-                        style={styles.buttonIcon}
-                        size={20}
-                        name="picture"
-                        color={Style.getColor('primary-text2')}
-                    />
-                    <Text style={{ color: Style.getColor('primary-text1') }}>Change Image</Text>
-                </TouchableOpacity>
+            <Text style={styles.inputDescription}>Description</Text>
+            <TextInput
+                style={styles.input}
+                multiline
+                numberOfLines={10}
+                value={currentCard?.data.description ?? ''}
+                onChangeText={(text) => {
+                    if (currentCard)
+                        setCurrentCard({
+                            ...currentCard,
+                            data: { ...currentCard.data, description: text },
+                        })
+                }}
+                placeholder="Describe this user..."
+                placeholderTextColor={Style.getColor('primary-text2')}
+            />
 
-                <TouchableOpacity style={styles.buttonApprove} onPress={saveCard}>
-                    <AntDesign
-                        style={styles.buttonIcon}
-                        size={20}
-                        name="save"
-                        color={Style.getColor('primary-text2')}
-                    />
-                    <Text style={{ color: Style.getColor('primary-text1') }}>Save</Text>
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={styles.button} onPress={handleUploadImage}>
+                <AntDesign
+                    style={styles.buttonIcon}
+                    size={20}
+                    name="picture"
+                    color={Style.getColor('primary-text2')}
+                />
+                <Text style={{ color: Style.getColor('primary-text1') }}>Change Image</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.buttonApprove} onPress={saveCard}>
+                <AntDesign
+                    style={styles.buttonIcon}
+                    size={20}
+                    name="save"
+                    color={Style.getColor('primary-text2')}
+                />
+                <Text style={{ color: Style.getColor('primary-text1') }}>Save</Text>
+            </TouchableOpacity>
         </View>
     )
 }
@@ -113,28 +108,26 @@ export default UserCardEditor
 
 const styles = StyleSheet.create({
     userContainer: {
-        minHeight: Dimensions.get('screen').height / 3,
+        flex: 1,
         paddingTop: 16,
         paddingHorizontal: 16,
     },
 
     optionsBar: {
         flexDirection: 'row',
-        alignItems: 'center',
         columnGap: 24,
     },
 
     buttonContainer: {
-        marginTop: 12,
-        flexDirection: 'row',
+        marginTop: 32,
         columnGap: 8,
     },
 
     buttonIcon: {},
 
     button: {
+        marginTop: 12,
         flexDirection: 'row',
-        flex: 1,
         paddingVertical: 8,
         paddingHorizontal: 12,
         columnGap: 8,
@@ -142,20 +135,10 @@ const styles = StyleSheet.create({
         backgroundColor: Style.getColor('primary-surface4'),
     },
 
-    buttonDestructive: {
-        flexDirection: 'row',
-        columnGap: 8,
-        flex: 1,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderRadius: 8,
-        backgroundColor: Style.getColor('destructive-brand'),
-    },
-
     buttonApprove: {
+        marginTop: 12,
         flexDirection: 'row',
         columnGap: 8,
-        flex: 1,
         paddingVertical: 8,
         paddingHorizontal: 12,
         borderRadius: 8,
@@ -170,6 +153,12 @@ const styles = StyleSheet.create({
         borderWidth: 2,
     },
 
+    inputDescription: {
+        color: Style.getColor('primary-text2'),
+        marginTop: 8,
+        marginBottom: 4,
+    },
+
     inputName: {
         textAlign: 'center',
         color: Style.getColor('primary-text1'),
@@ -180,12 +169,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
 
-    inputArea: {
-        flex: 1,
-    },
-
     input: {
-        flex: 1,
         color: Style.getColor('primary-text1'),
         textAlignVertical: 'top',
         borderColor: Style.getColor('primary-brand'),

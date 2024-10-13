@@ -6,7 +6,7 @@ import { useCallback, useRef, useState } from 'react'
 import { View, SafeAreaView, TouchableOpacity, StyleSheet, BackHandler } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Menu } from 'react-native-popup-menu'
-import Animated, { runOnJS, ZoomIn, ZoomOut } from 'react-native-reanimated'
+import Animated, { runOnJS, ZoomIn } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import ChatInput from './ChatInput'
