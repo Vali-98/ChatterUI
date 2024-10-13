@@ -1,4 +1,5 @@
 import { Alert } from '@components/Alert'
+import { MenuRef } from '@components/PopupMenu'
 import { CharInfo } from '@constants/Characters'
 import { AntDesign, FontAwesome } from '@expo/vector-icons'
 import { Characters, Style } from '@globals'
@@ -53,7 +54,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
     nowLoading,
 }) => {
     const [showMenu, setShowMenu] = useState<boolean>(false)
-    const menuRef: React.MutableRefObject<Menu | null> = useRef(null)
+    const menuRef: MenuRef = useRef(null)
     const router = useRouter()
 
     const { setCurrentCard, unloadCard } = Characters.useCharacterCard((state) => ({
@@ -63,7 +64,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
 
     const deleteCard = () => {
         Alert.alert({
-            title: 'Delete Chracter',
+            title: 'Delete Character',
             description: `Are you sure you want to delete '${characterInfo.name}'? This cannot be undone.`,
             buttons: [
                 {
@@ -78,24 +79,6 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                 },
             ],
         })
-
-        /*
-        Alert.alert(
-            `Delete Character`,
-            `Are you sure you want to delete '${characterInfo.name}'? This cannot be undone.`,
-            [
-                { text: 'Cancel', onPress: () => {}, style: 'cancel' },
-                {
-                    text: 'Confirm',
-                    onPress: () => {
-                        Characters.db.mutate.deleteCard(characterInfo.id ?? -1)
-                        unloadCard()
-                    },
-                    style: 'destructive',
-                },
-            ],
-            { cancelable: true }
-        )*/
     }
 
     const cloneCard = () => {
@@ -117,25 +100,6 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                 },
             ],
         })
-
-        /* Alert.alert(
-            `Clone Character`,
-            `Are you sure you want to clone '${characterInfo.name}'?`,
-            [
-                { text: 'Cancel', onPress: () => {}, style: 'cancel' },
-                {
-                    text: 'Confirm',
-                    onPress: async () => {
-                        setNowLoading(true)
-                        await Characters.db.mutate.duplicateCard(characterInfo.id)
-                        menuRef.current?.close()
-                        setNowLoading(false)
-                    },
-                    style: 'destructive',
-                },
-            ],
-            { cancelable: true }
-        ) */
     }
 
     const editCharacter = async () => {

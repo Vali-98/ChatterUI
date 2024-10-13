@@ -18,7 +18,13 @@ const Avatar: React.FC<FallbackImageProps> = ({ targetImage, ...rest }) => {
     }
 
     return (
-        <Image source={imageSource} onError={handleError} {...rest} defaultSource={fallbackImage} />
+        <Image
+            source={imageSource}
+            onError={handleError}
+            {...rest}
+            defaultSource={fallbackImage}
+            resizeMode="cover"
+        />
     )
 }
 

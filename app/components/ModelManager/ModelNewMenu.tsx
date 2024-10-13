@@ -1,8 +1,8 @@
 import TextBoxModal from '@components/TextBoxModal'
 import { Llama } from '@constants/LlamaLocal'
-import { AntDesign, FontAwesome } from '@expo/vector-icons'
-import { Characters, Chats, Logger, Style } from '@globals'
-import { useFocusEffect, useRouter } from 'expo-router'
+import { AntDesign } from '@expo/vector-icons'
+import { Style } from '@globals'
+import { useFocusEffect } from 'expo-router'
 import { useRef, useState } from 'react'
 import { StyleSheet, TouchableOpacity, Text, BackHandler, View } from 'react-native'
 import {

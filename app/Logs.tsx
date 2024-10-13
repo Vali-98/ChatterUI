@@ -1,9 +1,10 @@
+import { Alert } from '@components/Alert'
 import AnimatedView from '@components/AnimatedView'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Logger, Style, saveStringExternal } from '@globals'
+import { Global, Logger, Style, saveStringToDownload } from '@globals'
 import { FlashList } from '@shopify/flash-list'
 import { Stack } from 'expo-router'
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { useMMKVObject } from 'react-native-mmkv'
 
 const Logs = () => {
@@ -14,25 +15,30 @@ const Logs = () => {
     const handleExportLogs = () => {
         if (!logs) return
         const data = logs.join('\n')
-        saveStringExternal('logs.txt', data, 'text/plain')
+        saveStringToDownload(data, 'logs.txt', 'utf8')
+            .then(() => {
+                Logger.log('Logs Downloaded!', true)
+            })
+            .catch((e) => {
+                Logger.log(`Could Not Export Logs: ${e}`, true)
+            })
     }
 
     const handleFlushLogs = () => {
-        Alert.alert(
-            `Delete Logs`,
-            `Are you sure you want to delete logs? This cannot be undone.`,
-            [
-                { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        Alert.alert({
+            title: `Delete Logs`,
+            description: `Are you sure you want to delete all logs? This cannot be undone.`,
+            buttons: [
+                { label: 'Cancel' },
                 {
-                    text: 'Confirm',
-                    onPress: () => {
+                    label: 'Delete Logs',
+                    onPress: async () => {
                         Logger.flushLogs()
                     },
-                    style: 'destructive',
+                    type: 'warning',
                 },
             ],
-            { cancelable: true }
-        )
+        })
     }
 
     return (

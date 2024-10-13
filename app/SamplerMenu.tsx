@@ -1,3 +1,4 @@
+import { Alert } from '@components/Alert'
 import AnimatedView from '@components/AnimatedView'
 import { AppMode } from '@constants/GlobalValues'
 import { FontAwesome } from '@expo/vector-icons'
@@ -6,15 +7,7 @@ import { APIState } from 'app/constants/APIState'
 import { Samplers, SamplerPreset } from 'app/constants/SamplerData'
 import { Stack } from 'expo-router'
 import { useState, useEffect } from 'react'
-import {
-    View,
-    Text,
-    StyleSheet,
-    SafeAreaView,
-    ScrollView,
-    TouchableOpacity,
-    Alert,
-} from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
@@ -124,23 +117,24 @@ const SamplerMenu = () => {
                                 Logger.log(`Cannot Delete Last Preset.`, true)
                                 return
                             }
-                            Alert.alert(
-                                `Delete Preset`,
-                                `Are you sure you want to delete '${presetName}'?`,
-                                [
-                                    { text: `Cancel`, style: `cancel` },
+
+                            Alert.alert({
+                                title: `Delete Preset`,
+                                description: `Are you sure you want to delete '${presetName}'?`,
+                                buttons: [
+                                    { label: 'Cancel' },
                                     {
-                                        text: `Confirm`,
-                                        style: `destructive`,
-                                        onPress: () => {
+                                        label: 'Delete Preset',
+                                        onPress: async () => {
                                             presetName &&
                                                 Presets.deleteFile(presetName).then(() => {
                                                     loadPresetList()
                                                 })
                                         },
+                                        type: 'warning',
                                     },
-                                ]
-                            )
+                                ],
+                            })
                         }}>
                         <FontAwesome
                             size={24}

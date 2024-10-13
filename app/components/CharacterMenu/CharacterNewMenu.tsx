@@ -1,3 +1,4 @@
+import { MenuRef } from '@components/PopupMenu'
 import TextBoxModal from '@components/TextBoxModal'
 import { AntDesign } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
@@ -47,7 +48,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
     showMenu,
     setShowMenu,
 }) => {
-    const menuRef: React.MutableRefObject<Menu | null> = useRef(null)
+    const menuRef: MenuRef = useRef(null)
 
     const backAction = () => {
         if (!menuRef.current || !menuRef.current?.isOpen()) return false

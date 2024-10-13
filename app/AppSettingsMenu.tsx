@@ -1,3 +1,4 @@
+import { Alert } from '@components/Alert'
 import { rawdb } from '@db'
 import { copyFile, DocumentDirectoryPath, DownloadDirectoryPath } from '@dr.pogodin/react-native-fs'
 import { Style, AppSettings, Logger, Characters } from '@globals'
@@ -7,7 +8,7 @@ import { getDocumentAsync } from 'expo-document-picker'
 import { documentDirectory, copyAsync, deleteAsync } from 'expo-file-system'
 import { Stack, useRouter } from 'expo-router'
 import React from 'react'
-import { StyleSheet, Text, View, Switch, TouchableOpacity, Alert, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, Switch, TouchableOpacity, ScrollView } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 const appVersion = appConfig.expo.version
@@ -44,50 +45,46 @@ const SwitchComponent: React.FC<SwitchComponentProps> = ({ title, value, onValue
     )
 }
 
-const WarningAlert = (title: string, description: string, onPress: () => void) => {
-    Alert.alert(title, description, [
-        { text: `Cancel`, style: `cancel` },
-        {
-            text: `Confirm`,
-            style: `destructive`,
-            onPress: onPress,
-        },
-    ])
-}
-
-const exportDB = async () => {
+const exportDB = async (notify: boolean = true) => {
     await copyFile(
         `${DocumentDirectoryPath}/SQLite/db.db`,
         `${DownloadDirectoryPath}/${appVersion}-db-backup.db`
     )
         .then(() => {
-            Logger.log('Download Successful!', true)
+            if (notify) Logger.log('Download Successful!', true)
         })
         .catch((e) => Logger.log('Failed to copy database: ' + e, true))
 }
 
 const importDB = async (uri: string, name: string) => {
     const copyDB = async () => {
-        rawdb.closeSync()
-        await exportDB()
+        await exportDB(false)
         await deleteAsync(`${documentDirectory}SQLite/db.db`).catch(() => {
             Logger.debug('Somehow the db is already deleted')
         })
         await copyAsync({
             from: uri,
             to: `${documentDirectory}SQLite/db.db`,
-        }).then(() => {
-            Logger.log('Copy Successful, Restarting now.')
-            reloadAppAsync()
         })
+            .then(() => {
+                Logger.log('Copy Successful, Restarting now.')
+                reloadAppAsync()
+            })
+            .catch((e) => {
+                Logger.log(`Failed to import database: ${e}`, true)
+            })
     }
-    const dbAppVersion = name.split('-')[0]
+
+    const dbAppVersion = name.split('-')?.[0]
     if (dbAppVersion !== appVersion) {
-        WarningAlert(
-            'WARNING: Different Version',
-            `The imported database file has a different app version (${dbAppVersion}) than installed (${appVersion}), this may break or corrupt the database. It is recommended to use the same app version.`,
-            copyDB
-        )
+        Alert.alert({
+            title: `WARNING: Different Version`,
+            description: `The imported database file has a different app version (${dbAppVersion}) to installed version (${appVersion}).\n\nImporting this database may break or corrupt the database. It is recommended to use the same app version.`,
+            buttons: [
+                { label: 'Cancel' },
+                { label: 'Import Anyways', onPress: copyDB, type: 'warning' },
+            ],
+        })
     } else copyDB()
 }
 
@@ -184,11 +181,14 @@ const AppSettingsMenu = () => {
             <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
-                    WarningAlert(
-                        `Regenerate Default Card`,
-                        `This will add the default AI Bot card to your character list.`,
-                        Characters.createDefaultCard
-                    )
+                    Alert.alert({
+                        title: `Regenerate Default Card`,
+                        description: `This will add the default AI Bot card to your character list.`,
+                        buttons: [
+                            { label: 'Cancel' },
+                            { label: 'Create Default Card', onPress: Characters.createDefaultCard },
+                        ],
+                    })
                 }}>
                 <Text style={styles.buttonText}>Regenerate Default Card</Text>
             </TouchableOpacity>
@@ -200,11 +200,14 @@ const AppSettingsMenu = () => {
             <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
-                    WarningAlert(
-                        `Export Database`,
-                        `Are you sure you want to export the database file?\n\nIt will automatically be downloaded to Downloads`,
-                        exportDB
-                    )
+                    Alert.alert({
+                        title: `Export Database`,
+                        description: `Are you sure you want to export the database file?\n\nIt will automatically be downloaded to Downloads`,
+                        buttons: [
+                            { label: 'Cancel' },
+                            { label: 'Export Database', onPress: exportDB },
+                        ],
+                    })
                 }}>
                 <Text style={styles.buttonText}>Export Database</Text>
             </TouchableOpacity>
@@ -214,11 +217,18 @@ const AppSettingsMenu = () => {
                 onPress={async () => {
                     getDocumentAsync({ type: ['application/*'] }).then(async (result) => {
                         if (result.canceled) return
-                        WarningAlert(
-                            `Import Database`,
-                            `Are you sure you want to import this database? This may will destroy the current database!\n\nA backup will automatically be downloaded.\n\nApp will restart automatically`,
-                            () => importDB(result.assets[0].uri, result.assets[0].name)
-                        )
+                        Alert.alert({
+                            title: `Import Database`,
+                            description: `Are you sure you want to import this database? This may will destroy the current database!\n\nA backup will automatically be downloaded.\n\nApp will restart automatically`,
+                            buttons: [
+                                { label: 'Cancel' },
+                                {
+                                    label: 'Import',
+                                    onPress: () =>
+                                        importDB(result.assets[0].uri, result.assets[0].name),
+                                },
+                            ],
+                        })
                     })
                 }}>
                 <Text style={styles.buttonText}>Import Database</Text>

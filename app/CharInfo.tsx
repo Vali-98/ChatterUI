@@ -1,3 +1,4 @@
+import { Alert } from '@components/Alert'
 import AnimatedView from '@components/AnimatedView'
 import useAutosave from '@constants/AutoSave'
 import { FontAwesome } from '@expo/vector-icons'
@@ -14,7 +15,6 @@ import {
     StyleSheet,
     Image,
     TouchableOpacity,
-    Alert,
     ScrollView,
     TextInput,
     BackHandler,
@@ -79,24 +79,23 @@ const CharInfo = () => {
     })
 
     const deleteCard = () => {
-        Alert.alert(
-            `Delete Character`,
-            `Are you sure you want to delete this character? This cannot be undone.`,
-            [
-                { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        Alert.alert({
+            title: `Delete Character`,
+            description: `Are you sure you want to delete '${charName}'? This cannot be undone.`,
+            buttons: [
+                { label: 'Cancel' },
                 {
-                    text: 'Confirm',
+                    label: 'Delete Character',
                     onPress: () => {
                         Characters.db.mutate.deleteCard(charId ?? -1)
                         unloadCharacter()
                         unloadChat()
                         router.back()
                     },
-                    style: 'destructive',
+                    type: 'warning',
                 },
             ],
-            { cancelable: true }
-        )
+        })
     }
 
     const handleImportImage = () => {

@@ -1,16 +1,8 @@
+import { Alert } from '@components/Alert'
 import Avatar from '@components/Avatar'
 import PopupMenu from '@components/PopupMenu'
-import { CharInfo } from '@constants/Characters'
-import { Characters, Chats, Logger, Style } from '@globals'
-import {
-    View,
-    Text,
-    Image,
-    StyleSheet,
-    TouchableOpacity,
-    ActivityIndicator,
-    Alert,
-} from 'react-native'
+import { Characters, Style } from '@globals'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Menu } from 'react-native-popup-menu'
 
 type CharacterData = Awaited<ReturnType<typeof Characters.db.query.cardListQuery>>[0]
@@ -37,13 +29,13 @@ const UserListing: React.FC<CharacterListingProps> = ({ user, nowLoading, setNow
     }))
 
     const handleDeleteCard = async (menuRef: React.MutableRefObject<Menu | null>) => {
-        Alert.alert(
-            `Delete Character`,
-            `Are you sure you want to delete '${user.name}'? This cannot be undone.`,
-            [
-                { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        Alert.alert({
+            title: 'Delete User',
+            description: `Are you sure you want to delete '${user.name}'?\nThis cannot be undone.`,
+            buttons: [
+                { label: 'Cancel' },
                 {
-                    text: 'Confirm',
+                    label: 'Delete User',
                     onPress: async () => {
                         await Characters.db.mutate.deleteCard(user.id)
 
@@ -61,32 +53,29 @@ const UserListing: React.FC<CharacterListingProps> = ({ user, nowLoading, setNow
                             setCard(list[0].id)
                         })
                     },
-                    style: 'destructive',
+                    type: 'warning',
                 },
             ],
-            { cancelable: true }
-        )
+        })
     }
 
     const handleCloneCard = (menuRef: React.MutableRefObject<Menu | null>) => {
-        Alert.alert(
-            `Clone Character`,
-            `Are you sure you want to clone '${user.name}'?`,
-            [
-                { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        Alert.alert({
+            title: `Clone Character`,
+            description: `Are you sure you want to clone '${user.name}'?`,
+            buttons: [
+                { label: 'Cancel' },
                 {
-                    text: 'Confirm',
+                    label: 'Clone User',
                     onPress: async () => {
                         menuRef.current?.close()
                         setNowLoading(true)
                         await Characters.db.mutate.duplicateCard(user.id)
                         setNowLoading(false)
                     },
-                    style: 'destructive',
                 },
             ],
-            { cancelable: true }
-        )
+        })
     }
 
     return (

@@ -3,7 +3,6 @@ import Claude from './Claude'
 import Cohere from './Cohere'
 import Horde from './Horde'
 import KAI from './KAI'
-import Local from './Local'
 import Mancer from './Mancer'
 import Ollama from './Ollama'
 import OpenAI from './OpenAI'
@@ -16,7 +15,6 @@ export {
     TGWUI,
     Mancer,
     TextCompletions,
-    Local,
     OpenRouter,
     OpenAI,
     Ollama,

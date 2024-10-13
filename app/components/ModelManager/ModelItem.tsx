@@ -1,10 +1,11 @@
+import { Alert } from '@components/Alert'
 import TextBoxModal from '@components/TextBoxModal'
 import { GGMLNameMap, Llama, readableFileSize } from '@constants/LlamaLocal'
 import { AntDesign } from '@expo/vector-icons'
 import { Global, Style } from '@globals'
 import { ModelDataType } from 'db/schema'
 import React, { useState } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useMMKVObject } from 'react-native-mmkv'
 import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
 
@@ -38,23 +39,24 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const disableEdit = modelId === item.id || modelLoading
 
     const handleDeleteModel = () => {
-        Alert.alert(
-            'Delete Model',
-            `Are you sure you want to delete "${item.name}"? This cannot be undone!` +
+        Alert.alert({
+            title: 'Delete Model',
+            description:
+                `Are you sure you want to delete "${item.name}"?\n\nThis cannot be undone!` +
                 (!item.file_path.startsWith('content')
                     ? `\n\nThis operation will clear up ${readableFileSize(item.file_size)}`
                     : ''),
-            [
-                { text: `Cancel`, style: `cancel` },
+            buttons: [
+                { label: 'Cancel' },
                 {
-                    text: `Confirm`,
-                    style: `destructive`,
+                    label: 'Delete Model',
                     onPress: async () => {
                         await Llama.deleteModelById(item.id)
                     },
+                    type: 'warning',
                 },
-            ]
-        )
+            ],
+        })
     }
 
     return (

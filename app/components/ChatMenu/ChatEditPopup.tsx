@@ -1,9 +1,9 @@
-import PopupMenu from '@components/PopupMenu'
+import { Alert } from '@components/Alert'
+import PopupMenu, { MenuRef } from '@components/PopupMenu'
 import TextBoxModal from '@components/TextBoxModal'
 import { Characters, Chats, Logger, saveStringToDownload } from '@globals'
 import React, { useState } from 'react'
-import { Alert, View } from 'react-native'
-import { Menu } from 'react-native-popup-menu'
+import { View } from 'react-native'
 
 type ListItem = {
     id: number
@@ -35,14 +35,14 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, setNowLoading, nowL
         unloadChat: state.reset,
     }))
 
-    const handleDeleteChat = (menuRef: React.MutableRefObject<Menu | null>) => {
-        Alert.alert(
-            `Delete Character`,
-            `Are you sure you want to delete '${item.name}'? This cannot be undone.`,
-            [
-                { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+    const handleDeleteChat = (menuRef: MenuRef) => {
+        Alert.alert({
+            title: `Delete Chat`,
+            description: `Are you sure you want to delete '${item.name}'? This cannot be undone.`,
+            buttons: [
+                { label: 'Cancel' },
                 {
-                    text: 'Confirm',
+                    label: 'Delete Chat',
                     onPress: async () => {
                         await deleteChat(item.id)
                         if (charId && currentChatId === item.id) {
@@ -57,33 +57,30 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, setNowLoading, nowL
                         }
                         menuRef.current?.close()
                     },
-                    style: 'destructive',
+                    type: 'warning',
                 },
             ],
-            { cancelable: true }
-        )
+        })
     }
 
-    const handleCloneChat = (menuRef: React.MutableRefObject<Menu | null>) => {
-        Alert.alert(
-            `Clone Character`,
-            `Are you sure you want to clone '${item.name}'?`,
-            [
-                { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+    const handleCloneChat = (menuRef: MenuRef) => {
+        Alert.alert({
+            title: `Clone Chat`,
+            description: `Are you sure you want to clone '${item.name}'?`,
+            buttons: [
+                { label: 'Cancel' },
                 {
-                    text: 'Confirm',
+                    label: 'Clone Chat',
                     onPress: async () => {
                         await Chats.db.mutate.cloneChat(item.id)
                         menuRef.current?.close()
                     },
-                    style: 'destructive',
                 },
             ],
-            { cancelable: true }
-        )
+        })
     }
 
-    const handleExportChat = async (menuRef: React.MutableRefObject<Menu | null>) => {
+    const handleExportChat = async (menuRef: MenuRef) => {
         const name = `Chatlogs-${charName}-${item.id}`.replaceAll(' ', '_')
         await saveStringToDownload(JSON.stringify(await Chats.db.query.chat(item.id)), name, 'utf8')
         menuRef.current?.close()

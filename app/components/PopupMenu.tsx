@@ -14,13 +14,15 @@ import {
 
 const { Popover } = renderers
 
+export type MenuRef = React.MutableRefObject<Menu | null>
+
 type PopupOptionProps = {
     label: string
     icon: keyof typeof AntDesign.glyphMap
-    onPress: (m: React.MutableRefObject<Menu | null>) => void | Promise<void>
+    onPress: (m: MenuRef) => void | Promise<void>
     warning?: boolean
     closeOnExit?: boolean
-    menuRef: React.MutableRefObject<Menu | null>
+    menuRef: MenuRef
 }
 type PopupMenuProps = {
     disabled: boolean
@@ -59,7 +61,7 @@ const PopupOption: React.FC<PopupOptionProps> = ({
 
 const PopupMenu: React.FC<PopupMenuProps> = ({ disabled, icon, options, placement = 'left' }) => {
     const [showMenu, setShowMenu] = useState<boolean>(false)
-    const menuRef: React.MutableRefObject<Menu | null> = useRef(null)
+    const menuRef: MenuRef = useRef(null)
 
     const backAction = () => {
         if (!menuRef.current || !menuRef.current?.isOpen()) return false

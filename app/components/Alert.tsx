@@ -59,8 +59,8 @@ const AlertButton: React.FC<AlertButtonProps> = ({ label, onPress, type = 'defau
     return (
         <TouchableOpacity
             onPress={async () => {
-                onPress && onPress()
                 useAlert.getState().hide()
+                onPress && onPress()
             }}>
             <Text style={buttonStyleMap[type]}>{label}</Text>
         </TouchableOpacity>
@@ -71,12 +71,15 @@ export const AlertBox = () => {
     const { visible, props } = useAlert((state) => ({ visible: state.visible, props: state.props }))
 
     return (
-        <Modal visible={visible} transparent style={styles.modal} animationType="fade">
-            <FadeBackrop
-                handleOverlayClick={() => {
-                    useAlert.getState().hide()
-                }}>
-                <Animated.View style={styles.textBoxContainer} entering={FadeInDown}>
+        <Modal
+            visible={visible}
+            transparent
+            style={styles.modal}
+            animationType="fade"
+            statusBarTranslucent
+            onRequestClose={() => useAlert.getState().hide()}>
+            <FadeBackrop handleOverlayClick={() => useAlert.getState().hide()}>
+                <Animated.View style={styles.textBoxContainer} entering={FadeInDown.duration(150)}>
                     <View style={styles.textBox}>
                         <Text style={styles.title}>{props.title}</Text>
                         <Text style={styles.description}>{props.description}</Text>

@@ -1,25 +1,17 @@
+import { Alert } from '@components/Alert'
 import AnimatedView from '@components/AnimatedView'
 import CheckboxTitle from '@components/CheckboxTitle'
 import SliderItem from '@components/SliderItem'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
+import useAutosave from '@constants/AutoSave'
 import { FontAwesome } from '@expo/vector-icons'
 import { Instructs, Logger, Style, saveStringToDownload } from '@globals'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
-import useAutosave from '@constants/AutoSave'
-import {
-    View,
-    SafeAreaView,
-    TouchableOpacity,
-    StyleSheet,
-    Alert,
-    ScrollView,
-    Text,
-} from 'react-native'
+import { View, SafeAreaView, TouchableOpacity, StyleSheet, ScrollView, Text } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
-import { useMMKVNumber } from 'react-native-mmkv'
 
 const Instruct = () => {
     const { currentInstruct, loadInstruct, setCurrentInstruct } = Instructs.useInstruct(
@@ -42,20 +34,19 @@ const Instruct = () => {
     }
 
     const regenerateDefaults = () => {
-        Alert.alert(
-            `Regenerate Default Instructs`,
-            `Are you sure you want to regenerate default Instructs'?`,
-            [
-                { text: `Cancel`, style: `cancel` },
+        Alert.alert({
+            title: `Regenerate Default Instructs`,
+            description: `Are you sure you want to regenerate default Instructs'?`,
+            buttons: [
+                { label: 'Cancel' },
                 {
-                    text: `Confirm`,
-                    style: `destructive`,
+                    label: 'Regenerate Default Presets',
                     onPress: async () => {
                         await Instructs.generateInitialDefaults()
                     },
                 },
-            ]
-        )
+            ],
+        })
     }
 
     useAutosave({ data: currentInstruct, onSave: () => handleSaveInstruct(false), interval: 3000 })
@@ -131,15 +122,15 @@ const Instruct = () => {
                                     Logger.log(`Cannot delete last Instruct preset.`, true)
                                     return
                                 }
-                                Alert.alert(
-                                    `Delete Preset`,
-                                    `Are you sure you want to delete  '${currentInstruct?.name}'?`,
-                                    [
-                                        { text: `Cancel`, style: `cancel` },
+
+                                Alert.alert({
+                                    title: `Delete Preset`,
+                                    description: `Are you sure you want to delete '${currentInstruct?.name}'?`,
+                                    buttons: [
+                                        { label: 'Cancel' },
                                         {
-                                            text: `Confirm`,
-                                            style: `destructive`,
-                                            onPress: () => {
+                                            label: 'Delete Instruct',
+                                            onPress: async () => {
                                                 if (!instructID) return
                                                 const leftover = data.filter(
                                                     (item) => item.id !== instructID
@@ -151,9 +142,10 @@ const Instruct = () => {
                                                 Instructs.db.mutate.deleteInstruct(instructID)
                                                 loadInstruct(leftover[0].id)
                                             },
+                                            type: 'warning',
                                         },
-                                    ]
-                                )
+                                    ],
+                                })
                             }}>
                             <FontAwesome
                                 size={24}
