@@ -61,7 +61,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user, nowLoading, setNow
 
     const handleCloneCard = (menuRef: React.MutableRefObject<Menu | null>) => {
         Alert.alert({
-            title: `Clone Character`,
+            title: `Clone User`,
             description: `Are you sure you want to clone '${user.name}'?`,
             buttons: [
                 { label: 'Cancel' },
