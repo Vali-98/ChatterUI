@@ -33,7 +33,7 @@ const UserList = () => {
                 }}
             />
             <View style={styles.listHeader}>
-                <Text style={styles.listTitle}>User List</Text>
+                <Text style={styles.listTitle}>User Profiles ({data.length})</Text>
             </View>
             <View style={styles.userListBorder}>
                 <FlashList
@@ -67,14 +67,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
 
-    userListBorder: {
-        flex: 1,
-        borderTopWidth: 1,
-        borderRightWidth: 1,
-        borderLeftWidth: 1,
-        borderRadius: 8,
-        borderColor: Style.getColor('primary-surface4'),
-    },
+    userListBorder: { flex: 1 },
 
     userListContainer: {
         flex: 1,
@@ -98,6 +91,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingVertical: 8,
         paddingHorizontal: 12,
+        marginTop: 4,
         columnGap: 8,
         borderRadius: 8,
         backgroundColor: Style.getColor('primary-surface4'),

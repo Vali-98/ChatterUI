@@ -17,7 +17,9 @@ const Avatar: React.FC<FallbackImageProps> = ({ targetImage, ...rest }) => {
         setImageSource(fallbackImage)
     }
 
-    return <Image source={imageSource} onError={handleError} {...rest} />
+    return (
+        <Image source={imageSource} onError={handleError} {...rest} defaultSource={fallbackImage} />
+    )
 }
 
 export default Avatar
