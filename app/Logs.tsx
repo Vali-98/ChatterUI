@@ -14,7 +14,7 @@ const Logs = () => {
 
     const handleExportLogs = () => {
         if (!logs) return
-        const data = logs.join('\n')
+        const data = logs.toReversed().join('\n')
         saveStringToDownload(data, 'logs.txt', 'utf8')
             .then(() => {
                 Logger.log('Logs Downloaded!', true)
