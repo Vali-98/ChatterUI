@@ -24,10 +24,13 @@ type PopupOptionProps = {
     closeOnExit?: boolean
     menuRef: MenuRef
 }
+
+type MenuOptionProp = Omit<PopupOptionProps, 'menuRef'>
+
 type PopupMenuProps = {
     disabled: boolean
     icon: keyof typeof AntDesign.glyphMap
-    options: Omit<PopupOptionProps, 'menuRef'>[]
+    options: MenuOptionProp[]
     placement?: 'top' | 'right' | 'bottom' | 'left' | 'auto'
 }
 
