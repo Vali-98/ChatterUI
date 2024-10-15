@@ -80,7 +80,9 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                 />
                 <View style={{ flex: 1, paddingLeft: 12 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={styles.nametag}>{character.name}</Text>
+                        <Text style={styles.nametag} numberOfLines={2}>
+                            {character.name}
+                        </Text>
                         <Text style={styles.timestamp}>
                             {getTimeStamp(character.last_modified)}
                         </Text>
@@ -169,6 +171,7 @@ const styles = StyleSheet.create({
     },
 
     nametag: {
+        flex: 1,
         fontSize: 16,
         fontWeight: '500',
         color: Style.getColor('primary-text1'),

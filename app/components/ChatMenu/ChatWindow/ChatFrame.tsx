@@ -1,7 +1,9 @@
+import Avatar from '@components/Avatar'
+import { useViewerState } from '@constants/AvatarViewer'
 import { Characters, Global, Style } from '@globals'
 import { Chats } from 'app/constants/Chat'
-import { ReactNode, useEffect, useState } from 'react'
-import { View, Text, Image, StyleSheet } from 'react-native'
+import { ReactNode } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -21,28 +23,13 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, id, nowGenerating, isLa
         }))
     )
 
+    const setShowViewer = useViewerState((state) => state.setShow)
+
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
     const charImageId = Characters.useCharacterCard((state) => state.card?.data.image_id) ?? 0
     const userImageId = Characters.useUserCard((state) => state.card?.data.image_id) ?? 0
 
-    const imageDir = message.is_user
-        ? Characters.getImageDir(userImageId)
-        : Characters.getImageDir(charImageId)
     const swipe = message.swipes[message.swipe_id]
-    const [imageSource, setImageSource] = useState({
-        uri: imageDir,
-    })
-
-    useEffect(() => {
-        const newdir = message.is_user
-            ? Characters.getImageDir(userImageId)
-            : Characters.getImageDir(charImageId)
-        setImageSource({ uri: newdir })
-    }, [message.is_user, charImageId, userImageId])
-
-    const handleImageError = () => {
-        setImageSource(require('@assets/user.png'))
-    }
 
     const getDeltaTime = () =>
         Math.round(
@@ -55,18 +42,18 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, id, nowGenerating, isLa
         )
     const deltaTime = getDeltaTime()
 
-    // TODO: Change TTS to take id and simply retrieve that data on TTS as needed
     return (
         <View style={{ flexDirection: 'row' }}>
             <View style={{ alignItems: 'center' }}>
-                <Image
-                    onError={(error) => {
-                        handleImageError()
-                        error.stopPropagation()
-                    }}
-                    style={styles.avatar}
-                    source={imageSource}
-                />
+                <TouchableOpacity onPress={() => setShowViewer(true, message.is_user)}>
+                    <Avatar
+                        style={styles.avatar}
+                        targetImage={Characters.getImageDir(
+                            message.is_user ? userImageId : charImageId
+                        )}
+                    />
+                </TouchableOpacity>
+
                 <Text style={styles.graytext}>#{id}</Text>
                 {deltaTime !== undefined && !message.is_user && id !== 0 && (
                     <Text style={styles.graytext}>{deltaTime}s</Text>
