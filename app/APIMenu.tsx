@@ -1,4 +1,3 @@
-import AnimatedView from '@components/AnimatedView'
 import {
     KAI,
     Horde,
@@ -12,6 +11,7 @@ import {
     ChatCompletions,
     Cohere,
 } from '@components/Endpoint'
+import FadeDownView from '@components/FadeDownView'
 import { Global, API, Style } from '@globals'
 import { Stack } from 'expo-router'
 import { useEffect } from 'react'
@@ -44,7 +44,7 @@ const APIMenu = () => {
     }, [])
 
     return (
-        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+        <FadeDownView style={{ flex: 1 }}>
             <SafeAreaView style={styles.mainContainer}>
                 <Stack.Screen
                     options={{
@@ -91,7 +91,7 @@ const APIMenu = () => {
                     {APIType === API.CHATCOMPLETIONS && <ChatCompletions />}
                 </ScrollView>
             </SafeAreaView>
-        </AnimatedView>
+        </FadeDownView>
     )
 }
 

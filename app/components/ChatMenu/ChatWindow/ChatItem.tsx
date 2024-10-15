@@ -1,4 +1,4 @@
-import AnimatedView from '@components/AnimatedView'
+import FadeDownView from '@components/FadeDownView'
 import { useInference } from 'app/constants/Chat'
 import { View, StyleSheet } from 'react-native'
 
@@ -15,7 +15,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ id, isLastMessage, isGreeting }) =>
     const nowGenerating = useInference((state) => state.nowGenerating)
 
     return (
-        <AnimatedView dy={100} fade={0} fduration={200} tduration={400}>
+        <FadeDownView>
             <View style={styles.chatItem}>
                 <ChatFrame id={id} nowGenerating={nowGenerating} isLast={isLastMessage}>
                     <ChatBody
@@ -26,7 +26,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ id, isLastMessage, isGreeting }) =>
                     />
                 </ChatFrame>
             </View>
-        </AnimatedView>
+        </FadeDownView>
     )
 }
 

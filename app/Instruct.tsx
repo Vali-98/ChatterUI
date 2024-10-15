@@ -1,6 +1,6 @@
 import { Alert } from '@components/Alert'
-import AnimatedView from '@components/AnimatedView'
 import CheckboxTitle from '@components/CheckboxTitle'
+import FadeDownView from '@components/FadeDownView'
 import SliderItem from '@components/SliderItem'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
@@ -53,7 +53,7 @@ const Instruct = () => {
 
     if (currentInstruct)
         return (
-            <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+            <FadeDownView style={{ flex: 1 }}>
                 <SafeAreaView style={styles.mainContainer}>
                     <Stack.Screen
                         options={{
@@ -398,7 +398,7 @@ const Instruct = () => {
                         </View>
                     </ScrollView>
                 </SafeAreaView>
-            </AnimatedView>
+            </FadeDownView>
         )
 }
 

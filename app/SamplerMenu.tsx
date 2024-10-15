@@ -1,5 +1,5 @@
 import { Alert } from '@components/Alert'
-import AnimatedView from '@components/AnimatedView'
+import FadeDownView from '@components/FadeDownView'
 import { AppMode } from '@constants/GlobalValues'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Presets, saveStringExternal, Logger, Style, API } from '@globals'
@@ -49,7 +49,7 @@ const SamplerMenu = () => {
         appMode === AppMode.LOCAL ? APIState[API.LOCAL].samplers : APIState[APIType as API].samplers
 
     return (
-        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+        <FadeDownView style={{ flex: 1 }}>
             <SafeAreaView>
                 <TextBoxModal
                     booleans={[showNewPreset, setShowNewPreset]}
@@ -243,7 +243,7 @@ const SamplerMenu = () => {
                     </View>
                 </ScrollView>
             </SafeAreaView>
-        </AnimatedView>
+        </FadeDownView>
     )
 }
 

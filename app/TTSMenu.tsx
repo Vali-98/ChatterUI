@@ -1,4 +1,4 @@
-import AnimatedView from '@components/AnimatedView'
+import FadeDownView from '@components/FadeDownView'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Logger, Style } from '@globals'
 import { Stack } from 'expo-router'
@@ -47,7 +47,7 @@ const TTSMenu = () => {
     }
 
     return (
-        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+        <FadeDownView style={{ flex: 1 }}>
             <View style={styles.mainContainer}>
                 <Stack.Screen options={{ title: 'TTS', animation: 'fade' }} />
                 <View style={styles.enableContainer}>
@@ -163,7 +163,7 @@ const TTSMenu = () => {
                     </View>
                 )}
             </View>
-        </AnimatedView>
+        </FadeDownView>
     )
 }
 

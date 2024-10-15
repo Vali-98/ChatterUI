@@ -1,5 +1,5 @@
 import { Alert } from '@components/Alert'
-import AnimatedView from '@components/AnimatedView'
+import FadeDownView from '@components/FadeDownView'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Logger, Style, saveStringToDownload } from '@globals'
 import { FlashList } from '@shopify/flash-list'
@@ -42,7 +42,7 @@ const Logs = () => {
     }
 
     return (
-        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+        <FadeDownView style={{ flex: 1 }}>
             <Stack.Screen
                 options={{
                     animation: 'fade',
@@ -80,7 +80,7 @@ const Logs = () => {
                     renderItem={({ item, index }) => <Text style={styles.entry}>{item.entry}</Text>}
                 />
             </View>
-        </AnimatedView>
+        </FadeDownView>
     )
 }
 

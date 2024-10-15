@@ -1,5 +1,5 @@
 import { Alert } from '@components/Alert'
-import AnimatedView from '@components/AnimatedView'
+import FadeDownView from '@components/FadeDownView'
 import useAutosave from '@constants/AutoSave'
 import { FontAwesome } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
@@ -109,7 +109,7 @@ const CharInfo = () => {
     }
 
     return (
-        <AnimatedView dy={200} tduration={500} fade={0} fduration={500} style={{ flex: 1 }}>
+        <FadeDownView style={{ flex: 1 }}>
             <SafeAreaView style={styles.mainContainer}>
                 <Stack.Screen
                     options={{
@@ -212,7 +212,7 @@ const CharInfo = () => {
                     </ScrollView>
                 )}
             </SafeAreaView>
-        </AnimatedView>
+        </FadeDownView>
     )
 }
 
