@@ -1,22 +1,9 @@
+import Drawer from '@components/Drawer'
 import { Ionicons } from '@expo/vector-icons'
 import { Characters, Chats, Style } from '@globals'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { SetStateAction, useState } from 'react'
-import {
-    Text,
-    GestureResponderEvent,
-    TouchableOpacity,
-    StyleSheet,
-    View,
-    FlatList,
-} from 'react-native'
-import Animated, {
-    Easing,
-    FadeIn,
-    FadeOut,
-    SlideInRight,
-    SlideOutRight,
-} from 'react-native-reanimated'
+import { Text, TouchableOpacity, StyleSheet, View, FlatList } from 'react-native'
 
 import ChatEditPopup from './ChatEditPopup'
 
@@ -38,15 +25,10 @@ const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShow
     const [nowLoading, setNowLoading] = useState<boolean>(false)
     const { data } = useLiveQuery(Chats.db.query.chatListQuery(charId ?? 0))
 
-    const { deleteChat, loadChat, currentChatId } = Chats.useChat((state) => ({
-        deleteChat: state.delete,
+    const { loadChat, currentChatId } = Chats.useChat((state) => ({
         loadChat: state.load,
         currentChatId: state.data?.id,
     }))
-
-    const handleOverlayClick = (e: GestureResponderEvent) => {
-        if (e.target === e.currentTarget) setShowModal(false)
-    }
 
     const handleLoadChat = async (chatId: number) => {
         await loadChat(chatId)
@@ -85,54 +67,24 @@ const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShow
     }
 
     return (
-        <View style={styles.absolute}>
-            <Animated.View
-                entering={FadeIn.duration(200)}
-                exiting={FadeOut.duration(300)}
-                style={styles.absolute}>
-                <TouchableOpacity
-                    activeOpacity={1}
-                    onPress={handleOverlayClick}
-                    style={styles.backdrop}
-                />
-            </Animated.View>
-
-            <Animated.View
-                style={styles.drawer}
-                entering={SlideInRight.duration(200).easing(Easing.out(Easing.quad))}
-                exiting={SlideOutRight.duration(300).easing(Easing.out(Easing.quad))}>
-                <Text style={styles.drawerTitle}>Chats</Text>
-                <FlatList
-                    style={styles.listContainer}
-                    data={data}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item, index }) => renderChat(item, index)}
-                />
-                <TouchableOpacity onPress={handleCreateChat} style={styles.newButton}>
-                    <Text style={{ color: Style.getColor('primary-surface2') }}>New Chat</Text>
-                </TouchableOpacity>
-            </Animated.View>
-        </View>
+        <Drawer setShowDrawer={setShowModal} drawerStyle={styles.drawer} direction="right">
+            <Text style={styles.drawerTitle}>Chats</Text>
+            <FlatList
+                style={styles.listContainer}
+                data={data}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item, index }) => renderChat(item, index)}
+            />
+            <TouchableOpacity onPress={handleCreateChat} style={styles.newButton}>
+                <Text style={{ color: Style.getColor('primary-surface2') }}>New Chat</Text>
+            </TouchableOpacity>
+        </Drawer>
     )
 }
 
 export default ChatsDrawer
 
 const styles = StyleSheet.create({
-    absolute: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-    },
-
-    backdrop: {
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        justifyContent: 'center',
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-    },
-
     drawer: {
         backgroundColor: Style.getColor('primary-surface1'),
         width: '80%',

@@ -1,8 +1,7 @@
-import FadeBackrop from '@components/FadeBackdrop'
+import Drawer from '@components/Drawer'
 import { Style } from '@globals'
-import { SetStateAction, useEffect } from 'react'
-import { BackHandler, GestureResponderEvent, StyleSheet, View } from 'react-native'
-import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated'
+import { SetStateAction } from 'react'
+import { StyleSheet } from 'react-native'
 
 import UserList from './UserList'
 
@@ -11,49 +10,18 @@ type UserDrawerProps = {
 }
 
 const UserDrawer: React.FC<UserDrawerProps> = ({ booleans: [showModal, setShowModal] }) => {
-    const handleOverlayClick = (e: GestureResponderEvent) => {
-        if (e.target === e.currentTarget) setShowModal(false)
-    }
-
-    useEffect(() => {
-        const backAction = () => {
-            if (showModal) {
-                setShowModal(false)
-                return true
-            }
-            return false
-        }
-        const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
-        return () => handler.remove()
-    }, [showModal])
-
     return (
-        <View style={styles.absolute}>
-            <FadeBackrop handleOverlayClick={handleOverlayClick}>
-                <Animated.View
-                    style={styles.drawer}
-                    entering={SlideInRight.duration(200).easing(Easing.out(Easing.quad))}
-                    exiting={SlideOutRight.duration(300).easing(Easing.out(Easing.quad))}>
-                    <UserList setShowModal={setShowModal} />
-                </Animated.View>
-            </FadeBackrop>
-        </View>
+        <Drawer drawerStyle={styles.drawer} setShowDrawer={setShowModal} direction="right">
+            <UserList setShowModal={setShowModal} />
+        </Drawer>
     )
 }
 
 export default UserDrawer
 
 const styles = StyleSheet.create({
-    absolute: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-    },
-
     drawer: {
-        backgroundColor: Style.getColor('primary-surface1'),
         width: '80%',
-        shadowColor: Style.getColor('primary-shadow'),
         left: '20%',
         borderTopWidth: 3,
         elevation: 20,

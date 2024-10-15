@@ -41,18 +41,6 @@ const ChatMenu = () => {
             return true
         }
 
-        if (showChats) {
-            setShowChats(false)
-            Logger.debug('Closing Chats')
-            return true
-        }
-
-        if (showDrawer) {
-            setShowDrawer(false)
-            Logger.debug('Closing Drawer')
-            return true
-        }
-
         if (chat) {
             unloadChat()
             unloadCharacter()
