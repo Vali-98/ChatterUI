@@ -100,6 +100,15 @@ const UserCardEditor = () => {
                 />
                 <Text style={{ color: Style.getColor('primary-text1') }}>Save</Text>
             </TouchableOpacity>
+
+            <Text
+                style={{
+                    color: Style.getColor('primary-text2'),
+                    marginTop: 24,
+                }}>
+                Hint: Swipe Left or press <AntDesign name="menu-unfold" size={16} /> to open the
+                Users drawer
+            </Text>
         </View>
     )
 }
