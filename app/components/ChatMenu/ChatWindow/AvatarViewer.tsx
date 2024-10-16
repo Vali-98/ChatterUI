@@ -49,7 +49,7 @@ const AvatarViewer = () => {
         <Modal
             style={styles.modal}
             transparent
-            statusBarTranslucent
+            animationType="fade"
             visible={show}
             onRequestClose={() => setShow(false)}>
             <FadeBackrop handleOverlayClick={() => setShow(false)} />
@@ -67,8 +67,13 @@ const AvatarViewer = () => {
                                 router.push(isUser ? '/components/UserEditor' : '/CharInfo')
                                 setShow(false)
                             }}>
+                            <AntDesign
+                                name="edit"
+                                size={18}
+                                color={Style.getColor('primary-text2')}
+                            />
                             <Text style={styles.buttonText}>
-                                <AntDesign name="edit" /> Edit {isUser ? 'User' : 'Character'}
+                                Edit {isUser ? 'User' : 'Character'}
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -76,9 +81,12 @@ const AvatarViewer = () => {
                             onPress={() => {
                                 setShow(false)
                             }}>
-                            <Text style={styles.buttonText}>
-                                <AntDesign name="close" /> Close
-                            </Text>
+                            <AntDesign
+                                name="close"
+                                size={18}
+                                color={Style.getColor('primary-text2')}
+                            />
+                            <Text style={styles.buttonText}>Close</Text>
                         </TouchableOpacity>
                     </View>
                 </Animated.View>
@@ -134,8 +142,11 @@ const styles = StyleSheet.create({
     },
 
     button: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: 4,
         paddingVertical: 8,
-        paddingHorizontal: 16,
+        paddingHorizontal: 12,
         borderRadius: 8,
         borderWidth: 1,
         borderColor: Style.getColor('primary-brand'),
