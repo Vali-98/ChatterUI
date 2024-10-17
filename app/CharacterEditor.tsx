@@ -3,30 +3,20 @@ import Avatar from '@components/Avatar'
 import AvatarViewer from '@components/ChatMenu/ChatWindow/AvatarViewer'
 import FadeDownView from '@components/FadeDownView'
 import PopupMenu from '@components/PopupMenu'
-import useAutosave from '@constants/AutoSave'
 import { useViewerState } from '@constants/AvatarViewer'
-import { AntDesign, FontAwesome } from '@expo/vector-icons'
+import { AntDesign } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
 import { CharacterCardV2 } from 'app/constants/Characters'
 import { Tokenizer } from 'app/constants/Tokenizer'
 import * as DocumentPicker from 'expo-document-picker'
-import { Stack, useRouter } from 'expo-router'
+import { Stack, useNavigation, useRouter } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
-import {
-    View,
-    Text,
-    SafeAreaView,
-    StyleSheet,
-    Image,
-    TouchableOpacity,
-    ScrollView,
-    TextInput,
-    BackHandler,
-} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 const ChracterEditor = () => {
     const router = useRouter()
+    const navigation = useNavigation()
     const { currentCard, setCurrentCard, charId, charName, unloadCharacter } =
         Characters.useCharacterCard(
             useShallow((state) => ({
@@ -48,29 +38,57 @@ const ChracterEditor = () => {
 
     const setShowViewer = useViewerState((state) => state.setShow)
 
-    useEffect(() => {
-        const backAction = () => {
-            if (!chat) unloadCharacter()
-            return false
-        }
-        const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
-        return () => handler.remove()
-    }, [])
-
     const [edited, setEdited] = useState(false)
 
-    const initialRender = useRef(true)
+    const editedBackAction = (exitCallback: () => void) => {
+        Alert.alert({
+            title: `Unsaved Changes`,
+            description: `You have unsaved changes, leaving now will discard your progress.`,
+            buttons: [
+                { label: 'Cancel' },
+                {
+                    label: 'Save',
+                    onPress: async () => {
+                        await savecard()
+                        exitCallback()
+                    },
+                },
+                {
+                    label: 'Discard Changes',
+                    onPress: () => {
+                        exitCallback()
+                    },
+                    type: 'warning',
+                },
+            ],
+        })
+        return true
+    }
 
+    const initialRender = useRef(true)
     useEffect(() => {
+        if (edited) return
         if (initialRender.current) {
             initialRender.current = false
-        } else setEdited(true)
+            return
+        }
+        setEdited(true)
+
+        navigation.addListener('beforeRemove', (e) => {
+            e.preventDefault()
+            editedBackAction(() => {
+                if (!chat) unloadCharacter()
+                navigation.dispatch(e.data.action)
+            })
+        })
     }, [characterCard])
 
     const savecard = async () => {
         if (characterCard && charId)
             return Characters.db.mutate.updateCard(characterCard, charId).then(() => {
                 setCurrentCard(charId)
+                setEdited(false)
+                Logger.log('Card Saved!', true)
             })
     }
 
