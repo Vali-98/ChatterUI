@@ -95,6 +95,17 @@ export abstract class APIBase implements IAPIBase {
             payload += char_card_data
             payload_length += characterCache.description_length
         }
+
+        if (currentInstruct.scenario && currentCard.data?.scenario) {
+            payload += currentCard.data.scenario
+            payload_length += characterCache.scenario_length
+        }
+
+        if (currentInstruct.scenario && currentCard.data?.personality) {
+            payload += currentCard.data.personality
+            payload_length += characterCache.personality_length
+        }
+
         if (user_card_data) {
             payload += user_card_data
             payload_length += userCache.description_length
@@ -229,7 +240,7 @@ export abstract class APIBase implements IAPIBase {
 
         // Logic here is that if the buffer is empty, this is not a regen, hence can popped
         if (!buffer) messages.pop()
-        const initial = `${currentInstruct.system_prompt}
+        let initial = `${currentInstruct.system_prompt}
         \n${userCard?.data?.description ?? ''}
         \n${currentCard?.data?.description ?? ''}`
 
@@ -237,6 +248,17 @@ export abstract class APIBase implements IAPIBase {
             instructCache.system_prompt_length +
             characterCache.description_length +
             userCache.description_length
+
+        if (currentInstruct.scenario && currentCard.data?.scenario) {
+            initial += currentCard.data.scenario
+            total_length += characterCache.scenario_length
+        }
+
+        if (currentInstruct.scenario && currentCard.data?.personality) {
+            initial += currentCard.data.personality
+            total_length += characterCache.personality_length
+        }
+
         const payload = [{ role: systemRole, content: replaceMacros(initial) }]
         const messageBuffer = []
 
