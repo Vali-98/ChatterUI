@@ -1,7 +1,7 @@
 import { AntDesign } from '@expo/vector-icons'
 import { Style } from '@globals'
 import { useFocusEffect } from 'expo-router'
-import React, { useRef, useState } from 'react'
+import React, { ReactNode, useRef, useState } from 'react'
 import { StyleSheet, TouchableOpacity, Text, BackHandler, Alert } from 'react-native'
 import {
     Menu,
@@ -21,17 +21,17 @@ type PopupOptionProps = {
     icon: keyof typeof AntDesign.glyphMap
     onPress: (m: MenuRef) => void | Promise<void>
     warning?: boolean
-    closeOnExit?: boolean
     menuRef: MenuRef
 }
 
 type MenuOptionProp = Omit<PopupOptionProps, 'menuRef'>
 
 type PopupMenuProps = {
-    disabled: boolean
-    icon: keyof typeof AntDesign.glyphMap
+    disabled?: boolean
+    icon?: keyof typeof AntDesign.glyphMap
     options: MenuOptionProp[]
     placement?: 'top' | 'right' | 'bottom' | 'left' | 'auto'
+    children?: ReactNode
 }
 
 const PopupOption: React.FC<PopupOptionProps> = ({
@@ -62,7 +62,13 @@ const PopupOption: React.FC<PopupOptionProps> = ({
     )
 }
 
-const PopupMenu: React.FC<PopupMenuProps> = ({ disabled, icon, options, placement = 'left' }) => {
+const PopupMenu: React.FC<PopupMenuProps> = ({
+    disabled,
+    icon,
+    options,
+    children,
+    placement = 'left',
+}) => {
     const [showMenu, setShowMenu] = useState<boolean>(false)
     const menuRef: MenuRef = useRef(null)
 
@@ -91,12 +97,15 @@ const PopupMenu: React.FC<PopupMenuProps> = ({ disabled, icon, options, placemen
                 closeAnimationDuration: 0,
             }}>
             <MenuTrigger disabled={disabled}>
-                <AntDesign
-                    style={styles.triggerButton}
-                    color={Style.getColor(showMenu ? 'primary-text3' : 'primary-text2')}
-                    name={icon}
-                    size={26}
-                />
+                {icon && (
+                    <AntDesign
+                        style={styles.triggerButton}
+                        color={Style.getColor(showMenu ? 'primary-text3' : 'primary-text2')}
+                        name={icon}
+                        size={26}
+                    />
+                )}
+                {children}
             </MenuTrigger>
             <MenuOptions customStyles={menustyle}>
                 {options.map((item) => (

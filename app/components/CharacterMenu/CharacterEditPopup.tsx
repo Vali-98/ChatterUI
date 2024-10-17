@@ -67,7 +67,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
         await setCurrentCard(characterInfo.id)
         setNowLoading(false)
         menuRef.current?.close()
-        router.push('/CharInfo')
+        router.push('/CharacterEditor')
     }
 
     return (

@@ -43,7 +43,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef, showChats }) => {
         },
         {
             callback: () => {
-                router.push('/CharInfo')
+                router.push('/CharacterEditor')
             },
             text: 'Edit Character',
             button: 'edit',

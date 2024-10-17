@@ -41,6 +41,8 @@ type CharacterTokenCache = {
     otherName: string
     description_length: number
     examples_length: number
+    personality_length: number
+    scenario_length: number
 }
 
 type CharacterCardState = {
@@ -108,18 +110,25 @@ export namespace Characters {
                             otherName: userName,
                             description_length: 0,
                             examples_length: 0,
+                            personality_length: 0,
+                            scenario_length: 0,
                         }
                     const description = replaceMacros(card.data.description)
                     const examples = replaceMacros(card.data.mes_example)
+                    const personality = replaceMacros(card.data.personality)
+                    const scenario = replaceMacros(card.data.scenario)
+
                     const getTokenCount =
                         mmkv.getString(Global.APIType) === API.LOCAL
                             ? Llama.useLlama.getState().tokenLength
                             : Tokenizer.useTokenizer.getState().getTokenCount
 
-                    const newCache = {
+                    const newCache: CharacterTokenCache = {
                         otherName: userName,
                         description_length: getTokenCount(description),
                         examples_length: getTokenCount(examples),
+                        personality_length: getTokenCount(personality),
+                        scenario_length: getTokenCount(scenario),
                     }
 
                     set((state) => ({ ...state, tokenCache: newCache }))
@@ -174,9 +183,14 @@ export namespace Characters {
                     otherName: charName,
                     description_length: 0,
                     examples_length: 0,
+                    personality_length: 0,
+                    scenario_length: 0,
                 }
             const description = replaceMacros(card.data.description)
             const examples = replaceMacros(card.data.mes_example)
+            const personality = replaceMacros(card.data.personality)
+            const scenario = replaceMacros(card.data.scenario)
+
             const getTokenCount =
                 mmkv.getString(Global.APIType) === API.LOCAL
                     ? Llama.useLlama.getState().tokenLength
@@ -186,6 +200,8 @@ export namespace Characters {
                 otherName: charName,
                 description_length: getTokenCount(description),
                 examples_length: getTokenCount(examples),
+                personality_length: getTokenCount(personality),
+                scenario_length: getTokenCount(scenario),
             }
             set((state) => ({ ...state, tokenCache: newCache }))
             return newCache
@@ -374,6 +390,9 @@ export namespace Characters {
                         description: card.data.description,
                         first_mes: card.data.first_mes,
                         name: card.data.name,
+                        personality: card.data.personality,
+                        scenario: card.data.scenario,
+                        mes_example: card.data.mes_example,
                     })
                     .where(eq(characters.id, cardID))
             }

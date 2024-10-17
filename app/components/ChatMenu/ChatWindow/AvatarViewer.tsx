@@ -8,7 +8,11 @@ import { useEffect, useState } from 'react'
 import { StyleSheet, Text, Modal, View, Image, TouchableOpacity } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 
-const AvatarViewer = () => {
+type AvatarViewerProps = {
+    editorButton?: boolean
+}
+
+const AvatarViewer = ({ editorButton = true }) => {
     const router = useRouter()
 
     const { show, setShow, isUser } = useViewerState((state) => ({
@@ -61,21 +65,25 @@ const AvatarViewer = () => {
                     />
                     <Text style={styles.name}>{name}</Text>
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {
-                                router.push(isUser ? '/components/UserEditor' : '/CharInfo')
-                                setShow(false)
-                            }}>
-                            <AntDesign
-                                name="edit"
-                                size={18}
-                                color={Style.getColor('primary-text2')}
-                            />
-                            <Text style={styles.buttonText}>
-                                Edit {isUser ? 'User' : 'Character'}
-                            </Text>
-                        </TouchableOpacity>
+                        {editorButton && (
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => {
+                                    router.push(
+                                        isUser ? '/components/UserEditor' : '/CharacterEditor'
+                                    )
+                                    setShow(false)
+                                }}>
+                                <AntDesign
+                                    name="edit"
+                                    size={18}
+                                    color={Style.getColor('primary-text2')}
+                                />
+                                <Text style={styles.buttonText}>
+                                    Edit {isUser ? 'User' : 'Character'}
+                                </Text>
+                            </TouchableOpacity>
+                        )}
                         <TouchableOpacity
                             style={styles.button}
                             onPress={() => {

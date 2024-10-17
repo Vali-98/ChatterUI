@@ -93,7 +93,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
             await loadChat(chatId)
 
             setNowLoading(false)
-            if (edit) router.push('/CharInfo')
+            if (edit) router.push('/CharacterEditor')
             else router.back()
         } catch (error) {
             Logger.log(`Couldn't load character: ${error}`, true)
