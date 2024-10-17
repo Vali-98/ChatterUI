@@ -6,12 +6,14 @@ import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
 import useAutosave from '@constants/AutoSave'
 import { FontAwesome } from '@expo/vector-icons'
-import { Instructs, Logger, Style, saveStringToDownload } from '@globals'
+import { Instructs, Logger, MarkdownStyle, Style, saveStringToDownload } from '@globals'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
 import { View, SafeAreaView, TouchableOpacity, StyleSheet, ScrollView, Text } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
+//@ts-expect-error
+import Markdown from 'react-native-markdown-package'
 
 const Instruct = () => {
     const { currentInstruct, loadInstruct, setCurrentInstruct } = Instructs.useInstruct(
@@ -318,12 +320,94 @@ const Instruct = () => {
                                     multiline
                                 />*/}
                             </View>
-                            <CheckboxTitle
-                                name="Wrap Sequence with Newline"
-                                varname="wrap"
+
+                            <View style={{ flexDirection: 'row', columnGap: 32, marginBottom: 36 }}>
+                                <View>
+                                    <CheckboxTitle
+                                        name="Wrap In Newline"
+                                        varname="wrap"
+                                        body={currentInstruct}
+                                        setValue={setCurrentInstruct}
+                                    />
+                                    <CheckboxTitle
+                                        name="Include Names"
+                                        varname="names"
+                                        body={currentInstruct}
+                                        setValue={setCurrentInstruct}
+                                    />
+                                    <CheckboxTitle
+                                        name="Add Timestamp"
+                                        varname="timestamp"
+                                        body={currentInstruct}
+                                        setValue={setCurrentInstruct}
+                                    />
+                                </View>
+                                <View>
+                                    <CheckboxTitle
+                                        name="Use Examples"
+                                        varname="examples"
+                                        body={currentInstruct}
+                                        setValue={setCurrentInstruct}
+                                    />
+                                    <CheckboxTitle
+                                        name="Use Scenario"
+                                        varname="scenario"
+                                        body={currentInstruct}
+                                        setValue={setCurrentInstruct}
+                                    />
+
+                                    <CheckboxTitle
+                                        name="Use Personality"
+                                        varname="personality"
+                                        body={currentInstruct}
+                                        setValue={setCurrentInstruct}
+                                    />
+                                </View>
+                            </View>
+
+                            <SliderItem
+                                name="Autoformat New Chats"
+                                varname="format_type"
                                 body={currentInstruct}
                                 setValue={setCurrentInstruct}
+                                min={0}
+                                max={3}
+                                step={1}
+                                showInput={false}
                             />
+                            <Text
+                                style={{ color: Style.getColor('primary-text2'), marginLeft: 16 }}>
+                                Mode: {currentInstruct.format_type} -
+                                {' ' +
+                                    [
+                                        'Autoformatting Disabled',
+                                        'Plain Action, Quote Speech',
+                                        'Asterisk Action, Plain Speech',
+                                        'Asterisk Action, Quote Speech',
+                                    ][currentInstruct.format_type]}
+                            </Text>
+                            <Text
+                                style={{
+                                    color: Style.getColor('primary-text2'),
+                                    marginLeft: 16,
+                                    marginTop: 8,
+                                }}>
+                                Example:
+                            </Text>
+                            <View style={styles.exampleContainer}>
+                                <Markdown
+                                    rules={{ rules: MarkdownStyle.Rules }}
+                                    styles={MarkdownStyle.Format}>
+                                    {
+                                        [
+                                            '*<No Formatting>*',
+                                            'Some action, "Some speech"',
+                                            '*Some action* Some speech',
+                                            '*Some action* "Some speech"',
+                                        ][currentInstruct.format_type]
+                                    }
+                                </Markdown>
+                            </View>
                             {/* @TODO: Macros are always replaced - people may want this to be changed
                             <CheckboxTitle
                                 name="Replace Macro In Sequences"
@@ -332,12 +416,7 @@ const Instruct = () => {
                                 setValue={setCurrentInstruct}
                             />
                             */}
-                            <CheckboxTitle
-                                name="Include Names"
-                                varname="names"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                            />
+
                             {/*  Groups are not implemented - leftover from ST
                             <CheckboxTitle
                                 name="Force for Groups and Personas"
@@ -362,52 +441,6 @@ const Instruct = () => {
                                 setValue={setCurrentInstruct}
                                 multiline
                             />*/}
-                            <CheckboxTitle
-                                name="Use Examples"
-                                varname="examples"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                            />
-                            <CheckboxTitle
-                                name="Use Scenario"
-                                varname="scenario"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                            />
-
-                            <CheckboxTitle
-                                name="Use Personality"
-                                varname="personality"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                            />
-                            <CheckboxTitle
-                                name="Add Timestamp"
-                                varname="timestamp"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                            />
-                            <SliderItem
-                                name="Autoformat New Chats"
-                                varname="format_type"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                                min={0}
-                                max={3}
-                                step={1}
-                                showInput={false}
-                            />
-                            <Text
-                                style={{ color: Style.getColor('primary-text2'), marginLeft: 16 }}>
-                                Mode: {currentInstruct.format_type} -
-                                {' ' +
-                                    [
-                                        'Autoformatting Disabled',
-                                        'Plain Action, Quote Speech',
-                                        'Asterisk Action, Plain Speech',
-                                        'Asterisk Action, Quote Speech',
-                                    ][currentInstruct.format_type]}
-                            </Text>
                         </View>
                     </ScrollView>
                 </SafeAreaView>
@@ -438,5 +471,13 @@ const styles = StyleSheet.create({
         padding: 5,
         borderRadius: 4,
         marginLeft: 8,
+    },
+
+    exampleContainer: {
+        backgroundColor: Style.getColor('primary-surface2'),
+        marginTop: 8,
+        paddingHorizontal: 24,
+        marginLeft: 16,
+        borderRadius: 8,
     },
 })

@@ -1,6 +1,6 @@
 import { Chats, MarkdownStyle } from '@globals'
 import React, { useEffect, useRef } from 'react'
-import { StyleSheet, Animated, Easing, LayoutChangeEvent } from 'react-native'
+import { Animated, Easing, LayoutChangeEvent } from 'react-native'
 //@ts-expect-error
 import Markdown from 'react-native-markdown-package'
 
@@ -62,7 +62,6 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
             }}>
             <Markdown
                 onLayout={handleContentSizeChange}
-                style={styles.messageText}
                 rules={{ rules: MarkdownStyle.Rules }}
                 styles={MarkdownStyle.Format}>
                 {mes.trim()}
@@ -72,10 +71,3 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
 }
 
 export default ChatText
-
-const styles = StyleSheet.create({
-    messageText: {
-        borderWidth: 2,
-        borderColor: 'red',
-    },
-})

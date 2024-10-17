@@ -1,7 +1,7 @@
 import { useInference } from '@constants/Chat'
 import { Chats, Style, MarkdownStyle } from '@globals'
 import React, { useEffect, useRef } from 'react'
-import { StyleSheet, Easing, LayoutChangeEvent, Animated } from 'react-native'
+import { Easing, LayoutChangeEvent, Animated } from 'react-native'
 //@ts-expect-error
 import Markdown from 'react-native-markdown-package'
 //@ts-expect-error
@@ -88,7 +88,6 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
 
             <Markdown
                 onLayout={handleContentSizeChange}
-                style={styles.messageText}
                 rules={{ rules: MarkdownStyle.Rules }}
                 styles={MarkdownStyle.Format}>
                 {nowGenerating && swipeId === currentSwipeId ? buffer.trim() : mes.trim()}
@@ -98,10 +97,3 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
 }
 
 export default ChatTextLast
-
-const styles = StyleSheet.create({
-    messageText: {
-        borderWidth: 2,
-        borderColor: 'red',
-    },
-})
