@@ -369,6 +369,19 @@ const Instruct = () => {
                                 setValue={setCurrentInstruct}
                             />
                             <CheckboxTitle
+                                name="Use Scenario"
+                                varname="scenario"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                            />
+
+                            <CheckboxTitle
+                                name="Use Personality"
+                                varname="personality"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                            />
+                            <CheckboxTitle
                                 name="Add Timestamp"
                                 varname="timestamp"
                                 body={currentInstruct}

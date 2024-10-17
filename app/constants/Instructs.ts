@@ -12,6 +12,18 @@ import { mmkv, mmkvStorage } from './MMKV'
 import { Tokenizer } from './Tokenizer'
 import { replaceMacros } from './Utils'
 
+const defaultBooleans = {
+    wrap: false,
+    macro: false,
+    names: false,
+    names_force_groups: false,
+    timestamp: false,
+    examples: true,
+    format_type: 0,
+    scenario: true,
+    personality: true,
+}
+
 const defaultInstructs: InstructType[] = [
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -25,14 +37,8 @@ const defaultInstructs: InstructType[] = [
         stop_sequence: '### Instruction',
         user_alignment_message: '',
         activation_regex: '',
-        wrap: false,
-        macro: false,
-        names: false,
-        names_force_groups: false,
         name: 'Alpaca',
-        timestamp: false,
-        examples: true,
-        format_type: 0,
+        ...defaultBooleans,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -46,14 +52,8 @@ const defaultInstructs: InstructType[] = [
         stop_sequence: '<|eot_id|>',
         user_alignment_message: '',
         activation_regex: '',
-        wrap: false,
-        macro: false,
-        names: false,
-        names_force_groups: false,
         name: 'Llama 3',
-        timestamp: false,
-        examples: true,
-        format_type: 0,
+        ...defaultBooleans,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -67,14 +67,8 @@ const defaultInstructs: InstructType[] = [
         stop_sequence: '<|im_end|>',
         user_alignment_message: '',
         activation_regex: '',
-        wrap: false,
-        macro: false,
-        names: false,
-        names_force_groups: false,
         name: 'ChatML',
-        timestamp: false,
-        examples: true,
-        format_type: 0,
+        ...defaultBooleans,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -88,14 +82,8 @@ const defaultInstructs: InstructType[] = [
         stop_sequence: '<|endoftext|>\n',
         user_alignment_message: '',
         activation_regex: '',
-        wrap: false,
-        macro: false,
-        names: false,
-        names_force_groups: false,
         name: 'StableLM-Zephyr',
-        timestamp: false,
-        examples: true,
-        format_type: 0,
+        ...defaultBooleans,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -109,14 +97,8 @@ const defaultInstructs: InstructType[] = [
         stop_sequence: '<|end|>\n',
         user_alignment_message: '',
         activation_regex: '',
-        wrap: false,
-        macro: false,
-        names: false,
-        names_force_groups: false,
         name: 'phi3',
-        timestamp: false,
-        examples: true,
-        format_type: 0,
+        ...defaultBooleans,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -130,14 +112,8 @@ const defaultInstructs: InstructType[] = [
         stop_sequence: '<end_of_turn>',
         user_alignment_message: '',
         activation_regex: '',
-        wrap: false,
-        macro: false,
-        names: false,
-        names_force_groups: false,
         name: 'Gemma 2',
-        timestamp: false,
-        examples: true,
-        format_type: 0,
+        ...defaultBooleans,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -151,14 +127,8 @@ const defaultInstructs: InstructType[] = [
         stop_sequence: '</s>',
         user_alignment_message: '',
         activation_regex: '',
-        wrap: false,
-        macro: false,
-        names: false,
-        names_force_groups: false,
         name: 'Mistral V1',
-        timestamp: false,
-        examples: true,
-        format_type: 0,
+        ...defaultBooleans,
     },
 ]
 
@@ -203,14 +173,8 @@ export namespace Instructs {
         stop_sequence: '### Instruction',
         user_alignment_message: '',
         activation_regex: '',
-        wrap: false,
-        macro: false,
-        names: false,
-        names_force_groups: false,
         name: 'Default',
-        timestamp: false,
-        examples: true,
-        format_type: 0,
+        ...defaultBooleans,
     }
 
     export const useInstruct = create<InstructState>()(
@@ -284,7 +248,7 @@ export namespace Instructs {
                 name: 'instruct-storage',
                 storage: createJSONStorage(() => mmkvStorage),
                 partialize: (state) => ({ data: state.data }),
-                version: 2,
+                version: 3,
                 migrate: async (persistedState: any, version) => {
                     if (!version) {
                         persistedState.data.timestamp = false
@@ -308,6 +272,10 @@ export namespace Instructs {
                         })
 
                         Logger.log('[INSTRUCT] Migrated to v2')
+                    }
+                    if (version === 2) {
+                        persistedState.data.scenario = true
+                        persistedState.data.personality = true
                     }
 
                     return persistedState
@@ -402,4 +370,7 @@ export type InstructType = {
     format_type: number
 
     last_output_prefix: string
+
+    scenario: boolean
+    personality: boolean
 }
