@@ -56,15 +56,6 @@ const Layout = () => {
                             headerShadowVisible: false,
                         }}>
                         <Stack.Screen name="index" options={{ animation: 'fade' }} />
-
-                        <Stack.Screen
-                            name="CharInfo"
-                            options={{
-                                animation: 'fade',
-                                title: 'Edit',
-                                animationDuration: 200,
-                            }}
-                        />
                     </Stack>
                 </MenuProvider>
             </GestureHandlerRootView>
