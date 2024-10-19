@@ -79,7 +79,6 @@ export const enum Global {
     // Local
 
     LocalModel = 'localmodel',
-    LocalModelWeights = 'localdata',
     LocalPreset = 'localpreset',
     LocalSessionLoaded = 'localsessionloaded',
 
