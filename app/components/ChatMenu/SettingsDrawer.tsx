@@ -42,8 +42,8 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
     const router = useRouter()
     const { userName, imageID } = Characters.useUserCard(
         useShallow((state) => ({
-            userName: state.card?.data.name,
-            imageID: state.card?.data.image_id ?? 0,
+            userName: state.card?.name,
+            imageID: state.card?.image_id ?? 0,
         }))
     )
 

@@ -1,5 +1,5 @@
 import Avatar from '@components/Avatar'
-import { CharacterCardV2 } from '@constants/Characters'
+import { CharacterCardData } from '@constants/Characters'
 import { AntDesign } from '@expo/vector-icons'
 import { Characters, Style } from '@globals'
 import * as DocumentPicker from 'expo-document-picker'
@@ -11,13 +11,13 @@ const UserCardEditor = () => {
     const { userCard, imageID, id, setCard } = Characters.useUserCard(
         useShallow((state) => ({
             userCard: state.card,
-            imageID: state.card?.data.image_id ?? 0,
+            imageID: state.card?.image_id ?? 0,
             id: state.id,
             setCard: state.setCard,
         }))
     )
 
-    const [currentCard, setCurrentCard] = useState<CharacterCardV2 | undefined>(userCard)
+    const [currentCard, setCurrentCard] = useState<CharacterCardData | undefined>(userCard)
 
     useEffect(() => {
         setCurrentCard(userCard)
@@ -50,12 +50,12 @@ const UserCardEditor = () => {
                         style={styles.inputName}
                         textAlignVertical="center"
                         textAlign="center"
-                        value={currentCard?.data.name ?? ''}
+                        value={currentCard?.name ?? ''}
                         onChangeText={(text) => {
                             if (currentCard)
                                 setCurrentCard({
                                     ...currentCard,
-                                    data: { ...currentCard.data, name: text },
+                                    name: text,
                                 })
                         }}
                         placeholder="Empty names are discouraged!"
@@ -69,12 +69,12 @@ const UserCardEditor = () => {
                 style={styles.input}
                 multiline
                 numberOfLines={10}
-                value={currentCard?.data.description ?? ''}
+                value={currentCard?.description ?? ''}
                 onChangeText={(text) => {
                     if (currentCard)
                         setCurrentCard({
                             ...currentCard,
-                            data: { ...currentCard.data, description: text },
+                            description: text,
                         })
                 }}
                 placeholder="Describe this user..."
