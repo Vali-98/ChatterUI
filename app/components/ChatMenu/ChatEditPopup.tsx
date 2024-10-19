@@ -25,7 +25,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, setNowLoading, nowL
 
     const { charName, charId } = Characters.useCharacterCard((state) => ({
         charId: state.id,
-        charName: state.card?.data?.name ?? 'Unknown',
+        charName: state.card?.name ?? 'Unknown',
     }))
 
     const { deleteChat, loadChat, currentChatId, unloadChat } = Chats.useChat((state) => ({
@@ -107,26 +107,22 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, setNowLoading, nowL
                             setShowRename(true)
                             menuRef.current?.close()
                         },
-                        closeOnExit: true,
                     },
                     {
                         label: 'Export',
                         icon: 'download',
                         onPress: (menuRef) => handleExportChat(menuRef),
-                        closeOnExit: true,
                     },
                     {
                         label: 'Clone',
                         icon: 'copy1',
                         onPress: handleCloneChat,
-                        closeOnExit: true,
                     },
                     {
                         label: 'Delete',
                         icon: 'delete',
                         warning: true,
                         onPress: handleDeleteChat,
-                        closeOnExit: true,
                     },
                 ]}
             />

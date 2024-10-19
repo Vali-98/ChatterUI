@@ -69,15 +69,15 @@ export abstract class APIBase implements IAPIBase {
 
         const userCard = { ...Characters.useUserCard.getState().card }
         const currentCard = { ...Characters.useCharacterCard.getState().card }
-        const userName = userCard.data?.name ?? ''
-        const charName = currentCard.data?.name ?? ''
+        const userName = userCard?.name ?? ''
+        const charName = currentCard?.name ?? ''
 
         const characterCache = Characters.useCharacterCard.getState().getCache(userName)
         const userCache = Characters.useUserCard.getState().getCache(charName)
         const instructCache = Instructs.useInstruct.getState().getCache(charName, userName)
 
-        const user_card_data = (userCard?.data?.description ?? '').trim()
-        const char_card_data = (currentCard?.data?.description ?? '').trim()
+        const user_card_data = (userCard?.description ?? '').trim()
+        const char_card_data = (currentCard?.description ?? '').trim()
         let payload = ``
 
         // set suffix length as its always added
@@ -96,13 +96,13 @@ export abstract class APIBase implements IAPIBase {
             payload_length += characterCache.description_length
         }
 
-        if (currentInstruct.scenario && currentCard.data?.scenario) {
-            payload += currentCard.data.scenario
+        if (currentInstruct.scenario && currentCard?.scenario) {
+            payload += currentCard.scenario
             payload_length += characterCache.scenario_length
         }
 
-        if (currentInstruct.scenario && currentCard.data?.personality) {
-            payload += currentCard.data.personality
+        if (currentInstruct.scenario && currentCard?.personality) {
+            payload += currentCard.personality
             payload_length += characterCache.personality_length
         }
 
@@ -191,7 +191,7 @@ export abstract class APIBase implements IAPIBase {
             index--
         }
 
-        const examples = currentCard.data?.mes_example
+        const examples = currentCard?.mes_example
         if (
             first_message_reached &&
             currentInstruct.examples &&
@@ -229,8 +229,8 @@ export abstract class APIBase implements IAPIBase {
         const currentCard = { ...Characters.useCharacterCard.getState().card }
         const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
 
-        const userName = userCard.data?.name ?? ''
-        const charName = currentCard.data?.name ?? ''
+        const userName = userCard?.name ?? ''
+        const charName = currentCard?.name ?? ''
 
         const characterCache = Characters.useCharacterCard.getState().getCache(userName)
         const userCache = Characters.useUserCard.getState().getCache(charName)
@@ -241,21 +241,21 @@ export abstract class APIBase implements IAPIBase {
         // Logic here is that if the buffer is empty, this is not a regen, hence can popped
         if (!buffer) messages.pop()
         let initial = `${currentInstruct.system_prompt}
-        \n${userCard?.data?.description ?? ''}
-        \n${currentCard?.data?.description ?? ''}`
+        \n${userCard?.description ?? ''}
+        \n${currentCard?.description ?? ''}`
 
         let total_length =
             instructCache.system_prompt_length +
             characterCache.description_length +
             userCache.description_length
 
-        if (currentInstruct.scenario && currentCard.data?.scenario) {
-            initial += currentCard.data.scenario
+        if (currentInstruct.scenario && currentCard?.scenario) {
+            initial += currentCard.scenario
             total_length += characterCache.scenario_length
         }
 
-        if (currentInstruct.scenario && currentCard.data?.personality) {
-            initial += currentCard.data.personality
+        if (currentInstruct.scenario && currentCard?.personality) {
+            initial += currentCard.personality
             total_length += characterCache.personality_length
         }
 
@@ -362,8 +362,8 @@ export abstract class APIBase implements IAPIBase {
         const output: string[] = []
 
         if (currentInstruct.names) {
-            const userName = Characters.useCharacterCard.getState().card?.data.name ?? ''
-            const charName: string = Characters.useCharacterCard.getState()?.card?.data?.name ?? ''
+            const userName = Characters.useCharacterCard.getState().card?.name ?? ''
+            const charName: string = Characters.useCharacterCard.getState()?.card?.name ?? ''
             output.push(`${userName} :`)
             output.push(`${charName} :`)
         }

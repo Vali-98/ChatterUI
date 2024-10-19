@@ -26,8 +26,8 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, id, nowGenerating, isLa
     const setShowViewer = useViewerState((state) => state.setShow)
 
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
-    const charImageId = Characters.useCharacterCard((state) => state.card?.data.image_id) ?? 0
-    const userImageId = Characters.useUserCard((state) => state.card?.data.image_id) ?? 0
+    const charImageId = Characters.useCharacterCard((state) => state.card?.image_id) ?? 0
+    const userImageId = Characters.useUserCard((state) => state.card?.image_id) ?? 0
 
     const swipe = message.swipes[message.swipe_id]
 

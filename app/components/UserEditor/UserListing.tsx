@@ -115,14 +115,12 @@ const UserListing: React.FC<CharacterListingProps> = ({
                             label: 'Clone',
                             icon: 'copy1',
                             onPress: handleCloneCard,
-                            closeOnExit: true,
                         },
                         {
                             label: 'Delete',
                             icon: 'delete',
                             warning: true,
                             onPress: handleDeleteCard,
-                            closeOnExit: true,
                         },
                     ]}
                 />

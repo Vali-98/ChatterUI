@@ -8,7 +8,7 @@ import { Logger } from './Logger'
 import { mmkv } from './MMKV'
 
 export const regenerateResponse = async (swipeId: number, regenCache: boolean = true) => {
-    const charName = Characters.useCharacterCard.getState().card?.data.name
+    const charName = Characters.useCharacterCard.getState().card?.name
     const messagesLength = Chats.useChat.getState()?.data?.messages?.length ?? -1
     const message = Chats.useChat.getState()?.data?.messages?.[messagesLength - 1]
 

@@ -22,13 +22,13 @@ const AvatarViewer = ({ editorButton = true }) => {
     }))
 
     const { charName, charImageId } = Characters.useCharacterCard((state) => ({
-        charName: state.card?.data.name,
-        charImageId: state.card?.data.image_id,
+        charName: state.card?.name,
+        charImageId: state.card?.image_id,
     }))
 
     const { userName, userImageId } = Characters.useUserCard((state) => ({
-        userName: state.card?.data.name,
-        userImageId: state.card?.data.image_id,
+        userName: state.card?.name,
+        userImageId: state.card?.image_id,
     }))
 
     const [aspectRatio, setAspectRatio] = useState(1)

@@ -21,12 +21,12 @@ const ChatInput = () => {
 
     const { charName } = Characters.useCharacterCard(
         useShallow((state) => ({
-            charName: state?.card?.data.name,
+            charName: state?.card?.name,
         }))
     )
 
     const { userName } = Characters.useUserCard(
-        useShallow((state) => ({ userName: state.card?.data.name }))
+        useShallow((state) => ({ userName: state.card?.name }))
     )
 
     const [newMessage, setNewMessage] = useState<string>('')

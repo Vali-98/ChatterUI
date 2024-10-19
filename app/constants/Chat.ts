@@ -396,9 +396,9 @@ export namespace Chats {
             //TODO : refactor this, the requirement to pull charID is not needed, no error handling either
             export const createChat = async (charId: number) => {
                 const card = { ...Characters.useCharacterCard.getState().card }
-                const charName = card?.data?.name
+                const charName = card?.name
                 return await database.transaction(async (tx) => {
-                    if (!card.data || !charName) return
+                    if (!card || !charName) return
                     const [{ chatId }, ..._] = await tx
                         .insert(chats)
                         .values({
@@ -414,20 +414,20 @@ export namespace Chats {
                         .values({
                             chat_id: chatId,
                             is_user: false,
-                            name: card.data.name,
+                            name: card.name ?? '',
                             order: 0,
                         })
                         .returning({ entryId: chatEntries.id })
 
                     await tx.insert(chatSwipes).values({
                         entry_id: entryId,
-                        swipe: convertToFormatInstruct(replaceMacros(card.data.first_mes)),
+                        swipe: convertToFormatInstruct(replaceMacros(card.first_mes ?? '')),
                     })
 
-                    card.data.alternate_greetings.forEach(async (data) => {
+                    card?.alternate_greetings?.forEach(async (data) => {
                         await tx.insert(chatSwipes).values({
                             entry_id: entryId,
-                            swipe: convertToFormatInstruct(replaceMacros(data)),
+                            swipe: convertToFormatInstruct(replaceMacros(data.greeting)),
                         })
                     })
                     await Characters.db.mutate.updateModified(charId)

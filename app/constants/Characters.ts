@@ -46,16 +46,18 @@ type CharacterTokenCache = {
 }
 
 type CharacterCardState = {
-    card?: CharacterCardV2
+    card?: CharacterCardData
     tokenCache: CharacterTokenCache | undefined
     id: number | undefined
-    updateCard: (card: CharacterCardV2) => void
+    updateCard: (card: CharacterCardData) => void
     setCard: (id: number) => Promise<string | undefined>
     unloadCard: () => void
     getImage: () => string
     updateImage: (sourceURI: string) => void
     getCache: (otherName: string) => CharacterTokenCache
 }
+
+export type CharacterCardData = Awaited<ReturnType<typeof Characters.db.query.cardQuery>>
 
 export namespace Characters {
     export const useUserCard = create<CharacterCardState>()(
@@ -69,7 +71,7 @@ export namespace Characters {
                     db.mutate.updateModified(id)
                     set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
                     mmkv.set(Global.UserID, id)
-                    return card?.data.name
+                    return card?.name
                 },
                 unloadCard: () => {
                     set((state) => ({
@@ -79,15 +81,15 @@ export namespace Characters {
                         tokenCache: undefined,
                     }))
                 },
-                updateCard: (card: CharacterCardV2) => {
+                updateCard: (card: CharacterCardData) => {
                     set((state) => ({ ...state, card: card }))
                 },
                 getImage: () => {
-                    return getImageDir(get().card?.data.image_id ?? 0)
+                    return getImageDir(get().card?.image_id ?? 0)
                 },
                 updateImage: async (sourceURI: string) => {
                     const id = get().id
-                    const oldImageID = get().card?.data.image_id
+                    const oldImageID = get().card?.image_id
                     const card = get().card
                     if (!id || !oldImageID || !card) {
                         Logger.log('Could not get data, something very wrong has happned!', true)
@@ -97,7 +99,7 @@ export namespace Characters {
                     await db.mutate.updateCardField('image_id', imageID, id)
                     await deleteImage(oldImageID)
                     await copyImage(sourceURI, imageID)
-                    card.data.image_id = imageID
+                    card.image_id = imageID
                     set((state) => ({ ...state, card: card }))
                 },
                 getCache: (userName: string) => {
@@ -113,10 +115,10 @@ export namespace Characters {
                             personality_length: 0,
                             scenario_length: 0,
                         }
-                    const description = replaceMacros(card.data.description)
-                    const examples = replaceMacros(card.data.mes_example)
-                    const personality = replaceMacros(card.data.personality)
-                    const scenario = replaceMacros(card.data.scenario)
+                    const description = replaceMacros(card.description)
+                    const examples = replaceMacros(card.mes_example)
+                    const personality = replaceMacros(card.personality)
+                    const scenario = replaceMacros(card.scenario)
 
                     const getTokenCount =
                         mmkv.getString(Global.APIType) === API.LOCAL
@@ -152,9 +154,9 @@ export namespace Characters {
             const card = await db.query.card(id)
             db.mutate.updateModified(id)
             set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
-            return card?.data.name
+            return card?.name
         },
-        updateCard: (card: CharacterCardV2) => {
+        updateCard: (card: CharacterCardData) => {
             set((state) => ({ ...state, card: card }))
         },
         unloadCard: () => {
@@ -166,16 +168,16 @@ export namespace Characters {
             }))
         },
         getImage: () => {
-            return getImageDir(get().card?.data.image_id ?? 0)
+            return getImageDir(get().card?.image_id ?? 0)
         },
         updateImage: async (sourceURI: string) => {
-            const imageID = get().card?.data.image_id
+            const imageID = get().card?.image_id
             if (imageID) return copyImage(sourceURI, imageID)
         },
         getCache: (charName: string) => {
             const cache = get().tokenCache
             const card = get().card
-            if (cache?.otherName && cache.otherName === useUserCard.getState().card?.data.name)
+            if (cache?.otherName && cache.otherName === useUserCard.getState().card?.name)
                 return cache
 
             if (!card)
@@ -186,10 +188,10 @@ export namespace Characters {
                     personality_length: 0,
                     scenario_length: 0,
                 }
-            const description = replaceMacros(card.data.description)
-            const examples = replaceMacros(card.data.mes_example)
-            const personality = replaceMacros(card.data.personality)
-            const scenario = replaceMacros(card.data.scenario)
+            const description = replaceMacros(card.description)
+            const examples = replaceMacros(card.mes_example)
+            const personality = replaceMacros(card.personality)
+            const scenario = replaceMacros(card.scenario)
 
             const getTokenCount =
                 mmkv.getString(Global.APIType) === API.LOCAL
@@ -227,28 +229,9 @@ export namespace Characters {
                 })
             }
 
-            export const card = async (charId: number): Promise<CharacterCardV2 | undefined> => {
+            export const card = async (charId: number): Promise<CharacterCardData | undefined> => {
                 const data = await cardQuery(charId)
-                return cardEntryToCV2(data)
-            }
-
-            type CardEntry = Awaited<ReturnType<typeof cardQuery>>
-
-            export const cardEntryToCV2 = (data: CardEntry): CharacterCardV2 | undefined => {
-                if (!data) return
-
-                const { id, ...rest } = data
-
-                return {
-                    spec: 'chara_card_v2',
-                    spec_version: '2.0',
-                    data: {
-                        ...rest,
-                        last_modified: rest?.last_modified ?? 0, // assume this never actually fails
-                        tags: rest.tags.map((item) => item.tag.tag),
-                        alternate_greetings: rest.alternate_greetings.map((item) => item.greeting),
-                    },
-                }
+                return data
             }
 
             export const cardList = async (
@@ -383,18 +366,44 @@ export namespace Characters {
                 return id
             }
 
-            export const updateCard = async (card: CharacterCardV2, cardID: number) => {
+            export const updateCard = async (card: CharacterCardData, cardID: number) => {
+                if (!card) return
                 await database
                     .update(characters)
                     .set({
-                        description: card.data.description,
-                        first_mes: card.data.first_mes,
-                        name: card.data.name,
-                        personality: card.data.personality,
-                        scenario: card.data.scenario,
-                        mes_example: card.data.mes_example,
+                        description: card.description,
+                        first_mes: card.first_mes,
+                        name: card.name,
+                        personality: card.personality,
+                        scenario: card.scenario,
+                        mes_example: card.mes_example,
                     })
                     .where(eq(characters.id, cardID))
+                await Promise.all(
+                    card.alternate_greetings.map(async (item) => {
+                        await database
+                            .update(characterGreetings)
+                            .set({ greeting: item.greeting })
+                            .where(eq(characterGreetings.id, item.id))
+                    })
+                )
+            }
+
+            export const addAltGreeting = async (charId: number) => {
+                const [{ id }, ..._] = await database
+                    .insert(characterGreetings)
+                    .values({
+                        character_id: charId,
+                        greeting: '',
+                    })
+                    .returning({ id: characterGreetings.id })
+                return id
+            }
+
+            export const deleteAltGreeting = async (altGreetingId: number) => {
+                await database
+                    .delete(characterGreetings)
+                    .where(eq(characterGreetings.id, altGreetingId))
             }
 
             // TODO: Proper per field updates, though not that expensive
@@ -499,19 +508,24 @@ export namespace Characters {
                     Logger.log('Failed to copy card: Card does not exit', true)
                     return
                 }
-                const imageInfo = await FS.getInfoAsync(getImageDir(card.data.image_id))
+                const imageInfo = await FS.getInfoAsync(getImageDir(card.image_id))
 
-                const cacheLoc = imageInfo.exists ? `${FS.cacheDirectory}${card.data.image_id}` : ''
+                const cacheLoc = imageInfo.exists ? `${FS.cacheDirectory}${card.image_id}` : ''
                 if (imageInfo.exists)
                     await FS.copyAsync({
-                        from: getImageDir(card.data.image_id),
+                        from: getImageDir(card.image_id),
                         to: cacheLoc,
                     })
                 const now = new Date().getTime()
-                card.data.last_modified = now
-                card.data.image_id = now
-                await createCharacter(card, cacheLoc)
-                    .then(() => Logger.log(`Card cloned: ${card.data.name}`))
+                card.last_modified = now
+                card.image_id = now
+                const cv2 = cardDataToCV2(card)
+                if (!cv2) {
+                    Logger.log('Failed to copy card', true)
+                    return
+                }
+                await createCharacter(cv2, cacheLoc)
+                    .then(() => Logger.log(`Card cloned: ${card.name}`))
                     .catch((e) => Logger.log(`Failed to clone card: ${e}`))
             }
         }
@@ -526,6 +540,23 @@ export namespace Characters {
             from: uri,
             to: getImageDir(imageID),
         })
+    }
+
+    export const cardDataToCV2 = (data: CharacterCardData): CharacterCardV2 | undefined => {
+        if (!data) return
+
+        const { id, ...rest } = data
+
+        return {
+            spec: 'chara_card_v2',
+            spec_version: '2.0',
+            data: {
+                ...rest,
+                last_modified: rest?.last_modified ?? 0, // assume this never actually fails
+                tags: rest.tags.map((item) => item.tag.tag),
+                alternate_greetings: rest.alternate_greetings.map((item) => item.greeting),
+            },
+        }
     }
 
     export const createCharacterFromImage = async (uri: string) => {
@@ -690,8 +721,7 @@ export namespace Characters {
 
         useEffect(() => {
             if (id && id === data?.id) {
-                const card = db.query.cardEntryToCV2(data)
-                if (card) updateCard(card)
+                if (data) updateCard(data)
             }
         }, [data])
     }
@@ -775,8 +805,8 @@ const weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday
 export const replaceMacros = (text: string) => {
     if (text === undefined) return ''
     let newtext: string = text
-    const charName = Characters.useCharacterCard.getState().card?.data.name ?? ''
-    const userName = Characters.useUserCard.getState().card?.data.name ?? ''
+    const charName = Characters.useCharacterCard.getState().card?.name ?? ''
+    const userName = Characters.useUserCard.getState().card?.name ?? ''
     const time = new Date()
     const rules: Macro[] = [
         { macro: '{{user}}', value: userName },

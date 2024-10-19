@@ -6,7 +6,7 @@ import PopupMenu from '@components/PopupMenu'
 import { useViewerState } from '@constants/AvatarViewer'
 import { AntDesign } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
-import { CharacterCardV2 } from 'app/constants/Characters'
+import { CharacterCardData } from 'app/constants/Characters'
 import { Tokenizer } from 'app/constants/Tokenizer'
 import * as DocumentPicker from 'expo-document-picker'
 import { Stack, useNavigation, useRouter } from 'expo-router'
@@ -23,13 +23,13 @@ const ChracterEditor = () => {
                 charId: state.id,
                 currentCard: state.card,
                 setCurrentCard: state.setCard,
-                charName: state.card?.data.name,
+                charName: state.card?.name,
                 unloadCharacter: state.unloadCard,
             }))
         )
 
     const getTokenCount = Tokenizer.useTokenizer((state) => state.getTokenCount)
-    const [characterCard, setCharacterCard] = useState<CharacterCardV2 | undefined>(currentCard)
+    const [characterCard, setCharacterCard] = useState<CharacterCardData | undefined>(currentCard)
 
     const { chat, unloadChat } = Chats.useChat((state) => ({
         chat: state.data,
@@ -39,6 +39,8 @@ const ChracterEditor = () => {
     const setShowViewer = useViewerState((state) => state.setShow)
 
     const [edited, setEdited] = useState(false)
+
+    const [altSwipeIndex, setAltSwipeIndex] = useState(0)
 
     const editedBackAction = (exitCallback: () => void) => {
         Alert.alert({
@@ -66,21 +68,27 @@ const ChracterEditor = () => {
     }
 
     const initialRender = useRef(true)
+
     useEffect(() => {
         if (edited) return
         if (initialRender.current) {
             initialRender.current = false
-            return
+            const removeListener = navigation.addListener('beforeRemove', (e) => {
+                if (!chat) unloadCharacter()
+                navigation.dispatch(e.data.action)
+            })
+            return () => removeListener()
         }
         setEdited(true)
 
-        navigation.addListener('beforeRemove', (e) => {
+        const removeListener = navigation.addListener('beforeRemove', (e) => {
             e.preventDefault()
             editedBackAction(() => {
                 if (!chat) unloadCharacter()
                 navigation.dispatch(e.data.action)
             })
         })
+        return () => removeListener()
     }, [characterCard])
 
     const savecard = async () => {
@@ -121,7 +129,7 @@ const ChracterEditor = () => {
                 {
                     label: 'Delete Image',
                     onPress: () => {
-                        if (characterCard) Characters.deleteImage(characterCard.data.image_id)
+                        if (characterCard) Characters.deleteImage(characterCard.image_id)
                     },
                     type: 'warning',
                 },
@@ -136,6 +144,55 @@ const ChracterEditor = () => {
         }).then((result: DocumentPicker.DocumentPickerResult) => {
             if (result.canceled || !charId) return
             Characters.useCharacterCard.getState().updateImage(result.assets[0].uri)
+        })
+    }
+
+    const handleAddAltMessage = async () => {
+        if (!charId || !characterCard) return
+        const id = await Characters.db.mutate.addAltGreeting(charId)
+        await setCurrentCard(charId)
+
+        // optimistically update editor state
+
+        const greetings = [
+            ...(characterCard?.alternate_greetings ?? []),
+            { id: id, greeting: '', character_id: charId },
+        ]
+        setCharacterCard({ ...characterCard, alternate_greetings: greetings })
+        if (characterCard.alternate_greetings.length !== 0) {
+            setAltSwipeIndex(altSwipeIndex + 1)
+        }
+    }
+
+    const deleteAltMessageRoutine = async () => {
+        const id = characterCard?.alternate_greetings[altSwipeIndex].id
+        if (!id || !charId) {
+            Logger.log('Error deleting swipe', true)
+            return
+        }
+        await Characters.db.mutate.deleteAltGreeting(id)
+        await setCurrentCard(charId)
+        const greetings = [...(characterCard?.alternate_greetings ?? [])].filter(
+            (item) => item.id !== id
+        )
+        setAltSwipeIndex(0)
+        setCharacterCard({ ...characterCard, alternate_greetings: greetings })
+    }
+
+    const handleDeleteAltMessage = async () => {
+        Alert.alert({
+            title: `Delete Alternate Message`,
+            description: `Are you sure you want to delete this alternate message? This cannot be undone.`,
+            buttons: [
+                { label: 'Cancel' },
+                {
+                    label: 'Delete',
+                    onPress: async () => {
+                        await deleteAltMessageRoutine()
+                    },
+                    type: 'warning',
+                },
+            ],
         })
     }
 
@@ -180,9 +237,7 @@ const ChracterEditor = () => {
                                 },
                             ]}>
                             <Avatar
-                                targetImage={Characters.getImageDir(
-                                    currentCard?.data.image_id ?? -1
-                                )}
+                                targetImage={Characters.getImageDir(currentCard?.image_id ?? -1)}
                                 style={styles.avatar}
                             />
                             <AntDesign
@@ -222,16 +277,16 @@ const ChracterEditor = () => {
                                 onChangeText={(mes) => {
                                     setCharacterCard({
                                         ...characterCard,
-                                        data: { ...characterCard.data, name: mes },
+                                        name: mes,
                                     })
                                 }}
-                                value={characterCard?.data?.name}
+                                value={characterCard?.name}
                             />
                         </View>
                     </View>
 
                     <Text style={styles.boxText}>
-                        Description Tokens: {getTokenCount(characterCard?.data?.description ?? '')}
+                        Description Tokens: {getTokenCount(characterCard?.description ?? '')}
                     </Text>
 
                     <TextInput
@@ -242,10 +297,10 @@ const ChracterEditor = () => {
                         onChangeText={(mes) => {
                             setCharacterCard({
                                 ...characterCard,
-                                data: { ...characterCard.data, description: mes },
+                                description: mes,
                             })
                         }}
-                        value={characterCard?.data?.description}
+                        value={characterCard?.description}
                     />
 
                     <Text style={styles.boxText}>First Message</Text>
@@ -256,12 +311,108 @@ const ChracterEditor = () => {
                         onChangeText={(mes) => {
                             setCharacterCard({
                                 ...characterCard,
-                                data: { ...characterCard.data, first_mes: mes },
+                                first_mes: mes,
                             })
                         }}
-                        value={characterCard?.data?.first_mes}
+                        value={characterCard?.first_mes}
                         numberOfLines={8}
                     />
+
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            marginTop: 24,
+                            marginBottom: 12,
+                        }}>
+                        <Text style={{ color: Style.getColor('primary-text2') }}>
+                            Alternate Greetings{'  '}
+                            {characterCard.alternate_greetings.length !== 0 && (
+                                <Text
+                                    style={{
+                                        color: Style.getColor('primary-text2'),
+                                    }}>
+                                    {altSwipeIndex + 1} / {characterCard.alternate_greetings.length}
+                                </Text>
+                            )}
+                        </Text>
+
+                        <View style={{ flexDirection: 'row', columnGap: 32 }}>
+                            <TouchableOpacity onPress={handleDeleteAltMessage}>
+                                {characterCard.alternate_greetings.length !== 0 && (
+                                    <AntDesign
+                                        color={Style.getColor('destructive-brand')}
+                                        name="delete"
+                                        size={20}
+                                    />
+                                )}
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => setAltSwipeIndex(Math.max(altSwipeIndex - 1, 0))}>
+                                <AntDesign
+                                    color={Style.getColor(
+                                        altSwipeIndex === 0 ? 'primary-text3' : 'primary-text1'
+                                    )}
+                                    name="left"
+                                    size={20}
+                                />
+                            </TouchableOpacity>
+                            {altSwipeIndex === characterCard.alternate_greetings.length - 1 ||
+                            characterCard.alternate_greetings.length === 0 ? (
+                                <TouchableOpacity onPress={handleAddAltMessage}>
+                                    <AntDesign
+                                        color={Style.getColor('primary-text1')}
+                                        name="plus"
+                                        size={20}
+                                    />
+                                </TouchableOpacity>
+                            ) : (
+                                <TouchableOpacity
+                                    onPress={() =>
+                                        setAltSwipeIndex(
+                                            Math.min(
+                                                altSwipeIndex + 1,
+                                                characterCard.alternate_greetings.length - 1
+                                            )
+                                        )
+                                    }>
+                                    <AntDesign
+                                        color={Style.getColor('primary-text1')}
+                                        name="right"
+                                        size={20}
+                                    />
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    </View>
+
+                    {characterCard.alternate_greetings.length !== 0 ? (
+                        <TextInput
+                            style={styles.input}
+                            multiline
+                            numberOfLines={2}
+                            onChangeText={(mes) => {
+                                const greetings = [...characterCard.alternate_greetings]
+                                greetings[altSwipeIndex].greeting = mes
+                                setCharacterCard({
+                                    ...characterCard,
+                                    alternate_greetings: greetings,
+                                })
+                            }}
+                            value={
+                                characterCard?.alternate_greetings?.[altSwipeIndex].greeting ?? ''
+                            }
+                        />
+                    ) : (
+                        <Text
+                            style={{
+                                ...styles.input,
+                                color: Style.getColor('primary-text2'),
+                                fontStyle: 'italic',
+                            }}>
+                            No Alernate Greetings
+                        </Text>
+                    )}
 
                     <Text style={styles.boxText}>Personality</Text>
 
@@ -272,10 +423,10 @@ const ChracterEditor = () => {
                         onChangeText={(mes) => {
                             setCharacterCard({
                                 ...characterCard,
-                                data: { ...characterCard.data, personality: mes },
+                                personality: mes,
                             })
                         }}
-                        value={characterCard?.data?.personality}
+                        value={characterCard?.personality}
                     />
 
                     <Text style={styles.boxText}>Scenario</Text>
@@ -286,10 +437,10 @@ const ChracterEditor = () => {
                         onChangeText={(mes) => {
                             setCharacterCard({
                                 ...characterCard,
-                                data: { ...characterCard.data, scenario: mes },
+                                scenario: mes,
                             })
                         }}
-                        value={characterCard?.data?.scenario}
+                        value={characterCard?.scenario}
                         numberOfLines={3}
                     />
 
@@ -301,10 +452,10 @@ const ChracterEditor = () => {
                         onChangeText={(mes) => {
                             setCharacterCard({
                                 ...characterCard,
-                                data: { ...characterCard.data, mes_example: mes },
+                                mes_example: mes,
                             })
                         }}
-                        value={characterCard?.data?.mes_example}
+                        value={characterCard?.mes_example}
                         numberOfLines={8}
                     />
                 </ScrollView>

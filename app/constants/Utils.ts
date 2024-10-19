@@ -40,8 +40,8 @@ const weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday
 export const replaceMacros = (text: string) => {
     if (text === undefined) return ''
     let newtext: string = text
-    const charName = Characters.useCharacterCard.getState().card?.data.name ?? ''
-    const userName = Characters.useUserCard.getState().card?.data.name ?? ''
+    const charName = Characters.useCharacterCard.getState().card?.name ?? ''
+    const userName = Characters.useUserCard.getState().card?.name ?? ''
     const time = new Date()
     const rules: Macro[] = [
         { macro: '{{user}}', value: userName },
