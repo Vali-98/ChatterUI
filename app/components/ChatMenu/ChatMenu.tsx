@@ -41,6 +41,11 @@ const ChatMenu = () => {
             return true
         }
 
+        if (showChats) {
+            setShowChats(false)
+            return true
+        }
+
         if (chat) {
             unloadChat()
             unloadCharacter()
@@ -168,8 +173,8 @@ const ChatMenu = () => {
                         </View>
                     </View>
                 )}
+                {showDrawer && <SettingsDrawer booleans={[showDrawer, setShowDrawer]} />}
                 {showChats && <ChatsDrawer booleans={[showChats, setShowChats]} />}
-                <SettingsDrawer booleans={[showDrawer, setShowDrawer]} />
             </SafeAreaView>
         </GestureDetector>
     )
