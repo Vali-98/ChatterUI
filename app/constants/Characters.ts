@@ -140,8 +140,16 @@ export namespace Characters {
             {
                 name: 'usercard-storage',
                 storage: createJSONStorage(() => mmkvStorage),
-                version: 1,
+                version: 2,
                 partialize: (state) => ({ id: state.id, card: state.card }),
+                migrate: async (persistedState: any, version) => {
+                    if (version === 1) {
+                        // migration from CharacterCardV2 to CharacterCardData
+                        Logger.log('Migrating User Store to v2')
+                        persistedState.id = undefined
+                        persistedState.card = undefined
+                    }
+                },
             }
         )
     )
