@@ -13,7 +13,7 @@ const SwitchComponent: React.FC<SwitchTitleProps> = ({ title, value, onValueChan
         <View style={{ flexDirection: 'row', paddingVertical: 12 }}>
             <Switch
                 trackColor={{
-                    false: Style.getColor('primary-surface1'),
+                    false: Style.getColor('primary-surface2'),
                     true: Style.getColor('primary-surface3'),
                 }}
                 thumbColor={

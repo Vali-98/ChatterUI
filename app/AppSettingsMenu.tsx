@@ -60,11 +60,9 @@ const importDB = async (uri: string, name: string) => {
 const AppSettingsMenu = () => {
     const router = useRouter()
     //const [animateEditor, setAnimateEditor] = useMMKVBoolean(AppSettings.AnimateEditor)
-    const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
     const [printContext, setPrintContext] = useMMKVBoolean(AppSettings.PrintContext)
     const [firstMes, setFirstMes] = useMMKVBoolean(AppSettings.CreateFirstMes)
     const [chatOnStartup, setChatOnStartup] = useMMKVBoolean(AppSettings.ChatOnStartup)
-    const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)
     const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
     const [sendOnEnter, setSendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
 
@@ -113,20 +111,6 @@ const AppSettingsMenu = () => {
             />
 
             <SectionTitle>Generation</SectionTitle>
-
-            <SwitchWithDescription
-                title="Load Local Model on Chat"
-                value={autoloadLocal}
-                onValueChange={setAutoloadLocal}
-                description="Automatically loads most recently used local model when chatting"
-            />
-
-            <SwitchWithDescription
-                title="Save Local KV"
-                value={saveKV}
-                onValueChange={setSaveKV}
-                description="Saves the KV cache on generations, allowing you to continue sessions after closing the app. You must use the same model for this to function properly. Be warned that the KV cache file may be very big and negatively impact battery life!"
-            />
 
             <SwitchWithDescription
                 title="Print Context"

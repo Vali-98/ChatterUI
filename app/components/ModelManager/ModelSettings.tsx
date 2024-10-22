@@ -1,10 +1,13 @@
+import SectionTitle from '@components/SectionTitle'
 import SliderItem from '@components/SliderItem'
+import SwitchTitle from '@components/SwitchTitle'
+import SwitchWithDescription from '@components/SwitchWithDescription'
 import { LlamaPreset } from '@constants/LlamaLocal'
-import { Global, Style } from '@globals'
+import { AppSettings, Global, Style } from '@globals'
 import { useFocusEffect } from 'expo-router'
 import React from 'react'
 import { Platform, View, Text, StyleSheet, BackHandler } from 'react-native'
-import { useMMKVObject } from 'react-native-mmkv'
+import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 import Animated, { SlideInRight, SlideOutRight, Easing } from 'react-native-reanimated'
 
 type ModelSettingsProp = {
@@ -23,6 +26,9 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
     const [preset, setPreset] = useMMKVObject<LlamaPreset>(Global.LocalPreset)
     const [cpuFeatures, setCpuFeatures] = useMMKVObject<CPUFeatures>(Global.CpuFeatures)
 
+    const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
+    const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)
+
     const backAction = () => {
         exit()
         return true
@@ -34,12 +40,12 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
     })
 
     return (
-        <Animated.View
+        <Animated.ScrollView
             style={{ marginTop: 16, flex: 1 }}
             entering={SlideInRight.easing(Easing.inOut(Easing.cubic))}
             exiting={SlideOutRight.easing(Easing.inOut(Easing.cubic))}>
             <View style={{ marginBottom: 16 }}>
-                <Text style={styles.title}>Supported Quantizations:</Text>
+                <SectionTitle>Supported Quantizations</SectionTitle>
                 <View
                     style={{
                         flexDirection: 'row',
@@ -55,6 +61,8 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                 </View>
             </View>
 
+            <SectionTitle>CPU Settings</SectionTitle>
+            <View style={{ marginTop: 16 }} />
             <SliderItem
                 name="Max Context"
                 body={preset}
@@ -98,7 +106,22 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                     step={1}
                 />
             )}
-        </Animated.View>
+
+            <SectionTitle>Advanced Settings</SectionTitle>
+
+            <SwitchTitle
+                title="Automatically Load Model on Chat"
+                value={autoloadLocal}
+                onValueChange={setAutoloadLocal}
+            />
+
+            <SwitchWithDescription
+                title="Save Local KV"
+                value={saveKV}
+                onValueChange={setSaveKV}
+                description="Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV cache file may be very big and negatively impact battery life!"
+            />
+        </Animated.ScrollView>
     )
 }
 
@@ -120,14 +143,5 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingTop: 4,
         paddingBottom: 8,
-    },
-
-    title: {
-        fontSize: 16,
-        color: Style.getColor('primary-text1'),
-    },
-
-    subtitle: {
-        color: Style.getColor('primary-text2'),
     },
 })
