@@ -39,10 +39,6 @@ const APIMenu = () => {
         //{label: 'NovelAI', value:API.NOVELAI},
     ]
 
-    useEffect(() => {
-        if (APIType === undefined) setAPIType(API.KAI)
-    }, [])
-
     return (
         <FadeDownView style={{ flex: 1 }}>
             <SafeAreaView style={styles.mainContainer}>
