@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     userContainer: {
         alignItems: 'center',
         columnGap: 12,
-        paddingBottom: 24,
+        paddingBottom: 16,
         paddingTop: 24,
         padding: 16,
     },
