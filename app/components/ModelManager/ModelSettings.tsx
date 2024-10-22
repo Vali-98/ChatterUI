@@ -41,7 +41,8 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
 
     return (
         <Animated.ScrollView
-            style={{ marginTop: 16, flex: 1 }}
+            showsVerticalScrollIndicator={false}
+            style={{ flex: 1 }}
             entering={SlideInRight.easing(Easing.inOut(Easing.cubic))}
             exiting={SlideOutRight.easing(Easing.inOut(Easing.cubic))}>
             <View style={{ marginBottom: 16 }}>
