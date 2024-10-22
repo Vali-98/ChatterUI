@@ -1,4 +1,8 @@
+import { Alert } from '@components/Alert'
 import Avatar from '@components/Avatar'
+import AvatarViewer from '@components/ChatMenu/ChatWindow/AvatarViewer'
+import PopupMenu from '@components/PopupMenu'
+import { useViewerState } from '@constants/AvatarViewer'
 import { CharacterCardData } from '@constants/Characters'
 import { AntDesign } from '@expo/vector-icons'
 import { Characters, Style } from '@globals'
@@ -18,6 +22,8 @@ const UserCardEditor = () => {
     )
 
     const [currentCard, setCurrentCard] = useState<CharacterCardData | undefined>(userCard)
+
+    const setShowViewer = useViewerState((state) => state.setShow)
 
     useEffect(() => {
         setCurrentCard(userCard)
@@ -40,10 +46,67 @@ const UserCardEditor = () => {
         })
     }
 
+    const handleDeleteImage = () => {
+        Alert.alert({
+            title: `Delete Image`,
+            description: `Are you sure you want to delete this image? This cannot be undone.`,
+            buttons: [
+                { label: 'Cancel' },
+                {
+                    label: 'Delete Image',
+                    onPress: () => {
+                        if (currentCard) Characters.deleteImage(currentCard.image_id)
+                    },
+                    type: 'warning',
+                },
+            ],
+        })
+    }
+
     return (
         <View style={styles.userContainer}>
+            <AvatarViewer editorButton={false} />
             <View style={styles.optionsBar}>
-                <Avatar targetImage={Characters.getImageDir(imageID)} style={styles.userImage} />
+                <PopupMenu
+                    placement="right"
+                    options={[
+                        {
+                            label: 'Change Image',
+                            icon: 'picture',
+                            onPress: (menu) => {
+                                menu.current?.close()
+                                handleUploadImage()
+                            },
+                        },
+                        {
+                            label: 'View Image',
+                            icon: 'search1',
+                            onPress: (menu) => {
+                                menu.current?.close()
+                                setShowViewer(true)
+                            },
+                        },
+                        {
+                            label: 'Delete Image',
+                            icon: 'delete',
+                            onPress: (menu) => {
+                                menu.current?.close()
+                                handleDeleteImage()
+                            },
+                            warning: true,
+                        },
+                    ]}>
+                    <Avatar
+                        targetImage={Characters.getImageDir(currentCard?.image_id ?? -1)}
+                        style={styles.userImage}
+                    />
+                    <AntDesign
+                        name="edit"
+                        color={Style.getColor('primary-text1')}
+                        style={styles.editHover}
+                    />
+                </PopupMenu>
+
                 <View style={{ flex: 1 }}>
                     <Text style={styles.inputDescription}>Name</Text>
                     <TextInput
@@ -63,7 +126,6 @@ const UserCardEditor = () => {
                     />
                 </View>
             </View>
-
             <Text style={styles.inputDescription}>Description</Text>
             <TextInput
                 style={styles.input}
@@ -80,17 +142,16 @@ const UserCardEditor = () => {
                 placeholder="Describe this user..."
                 placeholderTextColor={Style.getColor('primary-text2')}
             />
-
-            <TouchableOpacity style={styles.button} onPress={handleUploadImage}>
-                <AntDesign
-                    style={styles.buttonIcon}
-                    size={20}
-                    name="picture"
-                    color={Style.getColor('primary-text2')}
-                />
-                <Text style={{ color: Style.getColor('primary-text1') }}>Change Image</Text>
-            </TouchableOpacity>
-
+            <Text
+                style={{
+                    color: Style.getColor('primary-text2'),
+                    marginTop: 24,
+                    alignSelf: 'center',
+                }}>
+                Hint: Swipe Left or press <AntDesign name="menu-unfold" size={16} /> to open the
+                Users drawer
+            </Text>
+            <View style={{ flex: 1 }} />
             <TouchableOpacity style={styles.buttonApprove} onPress={saveCard}>
                 <AntDesign
                     style={styles.buttonIcon}
@@ -100,15 +161,6 @@ const UserCardEditor = () => {
                 />
                 <Text style={{ color: Style.getColor('primary-text1') }}>Save</Text>
             </TouchableOpacity>
-
-            <Text
-                style={{
-                    color: Style.getColor('primary-text2'),
-                    marginTop: 24,
-                }}>
-                Hint: Swipe Left or press <AntDesign name="menu-unfold" size={16} /> to open the
-                Users drawer
-            </Text>
         </View>
     )
 }
@@ -147,6 +199,7 @@ const styles = StyleSheet.create({
     buttonApprove: {
         marginTop: 12,
         flexDirection: 'row',
+        marginBottom: 24,
         columnGap: 8,
         paddingVertical: 8,
         paddingHorizontal: 12,
@@ -188,4 +241,15 @@ const styles = StyleSheet.create({
     },
 
     userListContainer: {},
+
+    editHover: {
+        position: 'absolute',
+        left: '75%',
+        top: '75%',
+        padding: 8,
+        borderColor: Style.getColor('primary-text3'),
+        borderWidth: 1,
+        backgroundColor: Style.getColor('primary-surface3'),
+        borderRadius: 12,
+    },
 })
