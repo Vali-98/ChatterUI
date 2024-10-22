@@ -1,5 +1,6 @@
 import { Alert } from '@components/Alert'
-import { rawdb } from '@db'
+import SectionTitle from '@components/SectionTitle'
+import SwitchWithDescription from '@components/SwitchWithDescription'
 import { copyFile, DocumentDirectoryPath, DownloadDirectoryPath } from '@dr.pogodin/react-native-fs'
 import { Style, AppSettings, Logger, Characters } from '@globals'
 import appConfig from 'app.config'
@@ -12,38 +13,6 @@ import { StyleSheet, Text, View, Switch, TouchableOpacity, ScrollView } from 're
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 const appVersion = appConfig.expo.version
-
-type SwitchComponentProps = {
-    title: string
-    value: boolean | undefined
-    onValueChange: (b: boolean) => void | Promise<void> | undefined
-}
-
-const SwitchComponent: React.FC<SwitchComponentProps> = ({ title, value, onValueChange }) => {
-    return (
-        <View style={{ flexDirection: 'row', paddingVertical: 12 }}>
-            <Switch
-                trackColor={{
-                    false: Style.getColor('primary-surface1'),
-                    true: Style.getColor('primary-surface3'),
-                }}
-                thumbColor={
-                    value ? Style.getColor('primary-brand') : Style.getColor('primary-surface3')
-                }
-                ios_backgroundColor="#3e3e3e"
-                onValueChange={onValueChange}
-                value={value}
-            />
-            <Text
-                style={{
-                    marginLeft: 16,
-                    color: Style.getColor(value ? 'primary-text1' : 'primary-text3'),
-                }}>
-                {title}
-            </Text>
-        </View>
-    )
-}
 
 const exportDB = async (notify: boolean = true) => {
     await copyFile(
@@ -104,17 +73,6 @@ const AppSettingsMenu = () => {
             <Stack.Screen options={{ title: 'App Settings' }} />
 
             <Text style={{ ...styles.sectionTitle, paddingTop: 0 }}>Style</Text>
-            {/* Removed as this animation is buggy on Samsung devices, now defaults to no animation */}
-            {/*<SwitchComponent
-                title="Animate Editor"
-                value={animateEditor}
-                onValueChange={setAnimateEditor}
-            />
-
-            <Text style={styles.subtitle}>
-                This will skip the popup animation on the chat editor for compatibility on certain
-                devices. Enable if you are experience weird chat editor behavior
-            </Text>*/}
 
             <TouchableOpacity
                 style={styles.button}
@@ -124,60 +82,60 @@ const AppSettingsMenu = () => {
                 <Text style={styles.buttonText}>Customize Colors</Text>
             </TouchableOpacity>
 
-            <Text style={styles.sectionTitle}>Chat</Text>
+            <SectionTitle>Chat</SectionTitle>
 
-            <SwitchComponent title="Auto Scroll" value={autoScroll} onValueChange={setAutoScroll} />
-            <Text style={styles.subtitle}>Autoscrolls text during generations</Text>
+            <SwitchWithDescription
+                title="Auto Scroll"
+                value={autoScroll}
+                onValueChange={setAutoScroll}
+                description="Autoscrolls text during generations"
+            />
 
-            <SwitchComponent
+            <SwitchWithDescription
                 title="Use First Message"
                 value={firstMes}
                 onValueChange={setFirstMes}
+                description=" This will make new chats start blank, needed by specific models"
             />
-            <Text style={styles.subtitle}>
-                This will make new chats start blank, needed by specific models
-            </Text>
 
-            <SwitchComponent
+            <SwitchWithDescription
                 title="Load Chat On Startup"
                 value={chatOnStartup}
                 onValueChange={setChatOnStartup}
+                description="Loads the most recent chat on startup"
             />
-            <Text style={styles.subtitle}>Loads the most recent chat on startup</Text>
 
-            <SwitchComponent
+            <SwitchWithDescription
                 title="Send on Enter"
                 value={sendOnEnter}
                 onValueChange={setSendOnEnter}
+                description="Submits messages when Enter is pressed"
             />
-            <Text style={styles.subtitle}>Submits messages when Enter is pressed</Text>
 
-            <Text style={styles.sectionTitle}>Generation</Text>
+            <SectionTitle>Generation</SectionTitle>
 
-            <SwitchComponent
+            <SwitchWithDescription
                 title="Load Local Model on Chat"
                 value={autoloadLocal}
                 onValueChange={setAutoloadLocal}
+                description="Automatically loads most recently used local model when chatting"
             />
-            <Text style={styles.subtitle}>
-                Automatically loads most recently used local model when chatting
-            </Text>
 
-            <SwitchComponent title="Save Local KV" value={saveKV} onValueChange={setSaveKV} />
-            <Text style={styles.subtitle}>
-                Saves the KV cache on generations, allowing you to continue sessions after closing
-                the app. You must use the same model for this to function properly. Be warned that
-                the KV cache file may be very big and negatively impact battery life!
-            </Text>
+            <SwitchWithDescription
+                title="Save Local KV"
+                value={saveKV}
+                onValueChange={setSaveKV}
+                description="Saves the KV cache on generations, allowing you to continue sessions after closing the app. You must use the same model for this to function properly. Be warned that the KV cache file may be very big and negatively impact battery life!"
+            />
 
-            <SwitchComponent
+            <SwitchWithDescription
                 title="Print Context"
                 value={printContext}
                 onValueChange={setPrintContext}
+                description="Prints the generation context to logs for debugging"
             />
-            <Text style={styles.subtitle}>Prints the generation context to logs for debugging</Text>
 
-            <Text style={styles.sectionTitle}>Character Management</Text>
+            <SectionTitle>Character Management</SectionTitle>
             <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
@@ -193,7 +151,8 @@ const AppSettingsMenu = () => {
                 <Text style={styles.buttonText}>Regenerate Default Card</Text>
             </TouchableOpacity>
 
-            <Text style={styles.sectionTitle}>Database Management</Text>
+            <SectionTitle>Database Management</SectionTitle>
+
             <Text style={styles.subtitle}>
                 WARNING: only import if you are certain it's from the same version!
             </Text>
@@ -226,6 +185,7 @@ const AppSettingsMenu = () => {
                                     label: 'Import',
                                     onPress: () =>
                                         importDB(result.assets[0].uri, result.assets[0].name),
+                                    type: 'warning',
                                 },
                             ],
                         })
