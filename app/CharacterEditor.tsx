@@ -70,7 +70,6 @@ const ChracterEditor = () => {
     const initialRender = useRef(true)
 
     useEffect(() => {
-        if (edited) return
         if (initialRender.current) {
             initialRender.current = false
             const removeListener = navigation.addListener('beforeRemove', (e) => {
