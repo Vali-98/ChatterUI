@@ -90,18 +90,6 @@ const ChatMenu = () => {
 
     const gesture = Gesture.Exclusive(swipeDrawer, swipeChats)
 
-    const headerViewRightSettings = (
-        <Animated.View collapsable={false} entering={ZoomIn}>
-            <TouchableOpacity
-                style={styles.headerButtonRight}
-                onPress={() => {
-                    router.push('/AppSettingsMenu')
-                }}>
-                <FontAwesome name="cog" size={28} color={Style.getColor('primary-text1')} />
-            </TouchableOpacity>
-        </Animated.View>
-    )
-
     const headerViewRight = (
         <View style={styles.headerButtonContainer}>
             <TouchableOpacity
@@ -156,7 +144,6 @@ const ChatMenu = () => {
                         headerLeft: () => headerViewLeft,
 
                         headerRight: () => {
-                            if (showDrawer) return headerViewRightSettings
                             if (chat) return headerViewRight
                         },
                     }}
