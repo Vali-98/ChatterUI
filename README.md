@@ -1,40 +1,68 @@
 # ChatterUI - A simple app for LLMs
 
-ChatterUI is a native mobile frontend for managing chat files and character cards inspired by SillyTavern.
-It aims to provide a mobile friendly experience to inferface with Large Language models.
-ChatterUI supports multiple backends and can even run GGUF models locally on your device.
+ChatterUI is a native mobile frontend for LLMs.
 
-Support the development of this app here:
+Run LLMs on device or connect to various commercial or open source APIs. ChatterUI aims to provide a mobile friendly experience to inferface with Large Language models, while also providing low level control on how your chats are structured.
+
+If you like the app, feel free support me here:
 
 <a href="https://ko-fi.com/vali98" target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Support me on ko-fi.com' /></a>
 
 <div>
-<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/recents.png" width="150" > 
-<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/mainchat.png" width="150" > 
-<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/charsmenu.png" width="150" > 
+Chat With Characters or Assistants
 <br/>
-<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/sampler.png" width="150" > 
-<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/instruct.png" width="150" > 
-<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/optionsmenu.png" width="150" > 
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/characterlist.png" width="150" > 
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/chat.png" width="150" > 
+<br/>
+Use on-device Models or APIs
+<br/>
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/models.png" width="150" > 
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/api.png" width="150" > 
+<br/>
+Modify and customize to your liking
+<br/>
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/charactereditor.png" width="150" > 
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/settings.png" width="150" >
+<br/>
+Personalize yourself
+<br/>
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/usereditor.png" width="150" > 
+<img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/userlist.png" width="150" >
 </div>
 
-## Usage
+## Features:
 
-#### Android
+-   Run LLMs on-device in Local Mode
+-   Connect to various APIs in Remote Mode
+-   Chat with characters. (Supports the Character Card v2 specification.)
+-   Create and manage multiple chats per character.
+-   Customize Sampler fields and Instruct formatting
+-   Integrates your on-device TTS engine for TTS support.
+
+<br/>
+
+# Usage
 
 Download the and install latest APK from the [releases](https://github.com/Vali-98/ChatterUI/releases/latest) page.
 
-<i>IOS is Currently unavailable, I do not have the means to test and deploy on IOS :(</i>
+<i>IOS is Currently unavailable, I do not have the hardware for IOS development</i>
 
-## Supported Backends
+## Local Mode
 
-### On Device Inferencing:
+ChatterUI uses a [llama.cpp](https://github.com/ggerganov/llama.cpp) under the hood to run gguf files on device. A custom adapter is used to integrate with react-native: [cui-llama.rn](https://github.com/Vali-98/cui-llama.rn)
 
--   Local device inferencing using [cui-llama.rn](https://github.com/Vali-98/cui-llama.rn)
+To use on-device inferencing, first enable Local Mode, then go to Models > Import Model / Use External Model and choose a gguf model that can fit on your device's memory. The importing functions are as follows:
 
-_To use Local inferencing, go to API > Local > Import Model and choose a gguf model that can fit on your device's memory. Then load the model to begin!_
+-   Import Model: Copies the model file into ChatterUI - this may speed up the startup process
+-   Use External Model: Uses a model from your device storage directly - this removes the need to copy large files into ChatterUI, but loads models slightly slower
 
-_For devices with Snapdragon 8 Gen 1 and above or Exynos 2200+, it is recommended to use the Q4_0_4_8 quantization for enhanced prompt processing._
+After that, you can load the model and begin chatting!
+
+_Note: For devices with Snapdragon 8 Gen 1 and above or Exynos 2200+, it is recommended to use the Q4_0_4_8 quantization for enhanced prompt processing._
+
+## Remote Mode
+
+Remote Mode allows you to connect to a few common APIs from both commercial and open source projects.
 
 ### Open Source Backends:
 
@@ -113,3 +141,8 @@ if (BuildConfig.DEBUG) {
     // ReactNativeFlipper.initializeFlipper(this, reactNativeHost.reactInstanceManager)
 }
 ```
+
+## Acknowledgement
+
+-   [llama.cpp](https://github.com/ggerganov/llama.cpp) - the underlying engine to run LLMs
+-   [llama.rn](https://github.com/mybigday/llama.rn) - the original react-native llama.cpp adapter
