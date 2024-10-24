@@ -179,8 +179,19 @@ export namespace Characters {
             return getImageDir(get().card?.image_id ?? 0)
         },
         updateImage: async (sourceURI: string) => {
-            const imageID = get().card?.image_id
-            if (imageID) return copyImage(sourceURI, imageID)
+            const id = get().id
+            const oldImageID = get().card?.image_id
+            const card = get().card
+            if (!id || !oldImageID || !card) {
+                Logger.log('Could not get data, something very wrong has happned!', true)
+                return
+            }
+            const imageID = new Date().getTime()
+            await db.mutate.updateCardField('image_id', imageID, id)
+            await deleteImage(oldImageID)
+            await copyImage(sourceURI, imageID)
+            card.image_id = imageID
+            set((state) => ({ ...state, card: card }))
         },
         getCache: (charName: string) => {
             const cache = get().tokenCache
@@ -540,7 +551,7 @@ export namespace Characters {
     }
 
     export const deleteImage = async (imageID: number) => {
-        return FS.deleteAsync(getImageDir(imageID), { idempotent: true })
+        await FS.deleteAsync(getImageDir(imageID), { idempotent: true })
     }
 
     export const copyImage = async (uri: string, imageID: number) => {
