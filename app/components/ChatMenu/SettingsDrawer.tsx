@@ -7,7 +7,7 @@ import { Characters, Style } from '@globals'
 import appConfig from 'app.config'
 import { useRouter } from 'expo-router'
 import { SetStateAction } from 'react'
-import { Text, TouchableOpacity, StyleSheet, View } from 'react-native'
+import { Text, TouchableOpacity, StyleSheet, View, ScrollView } from 'react-native'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 import Animated, { SlideInLeft, Easing } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
@@ -125,7 +125,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
     if (showModal)
         return (
             <Drawer setShowDrawer={setShowModal} drawerStyle={{ width: '60%' }}>
-                <View style={{ justifyContent: 'space-between', flex: 1 }}>
+                <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                     <View>
                         <View style={styles.userContainer}>
                             <Avatar
@@ -197,7 +197,8 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                             style={{
                                 alignSelf: 'center',
                                 color: Style.getColor('primary-text2'),
-                                marginTop: 8,
+                                marginTop: 12,
+                                marginBottom: 24,
                             }}>
                             {__DEV__ && 'DEV BUILD\t'}
                             {devMode && 'DEV MODE\t'}
@@ -205,7 +206,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
                         </Text>
                     </View>
                     <SupportButton />
-                </View>
+                </ScrollView>
             </Drawer>
         )
 }
