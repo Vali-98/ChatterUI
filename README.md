@@ -2,7 +2,7 @@
 
 ChatterUI is a native mobile frontend for LLMs.
 
-Run LLMs on device or connect to various commercial or open source APIs. ChatterUI aims to provide a mobile friendly experience to inferface with Large Language models, while also providing low level control on how your chats are structured.
+Run LLMs on device or connect to various commercial or open source APIs. ChatterUI aims to provide a mobile friendly experience to interface with Large Language models, while also providing low level control on how your chats are structured.
 
 If you like the app, feel free support me here:
 
