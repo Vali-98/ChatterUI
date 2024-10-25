@@ -185,6 +185,16 @@ export const startupApp = () => {
         })
     }
 
+    // Fix for 0.7.10 -> 0.8.0 LocalModel data
+
+    try {
+        const model = mmkv.getString(Global.LocalModel)
+        if (model) JSON.parse(model)
+    } catch (e) {
+        Logger.log('Model could not be parsed, resetting')
+        mmkv.delete(Global.LocalModel)
+    }
+
     Logger.log('Resetting state values for startup.')
     SystemUI.setBackgroundColorAsync(Style.getColor('primary-surface1'))
 }
