@@ -2,7 +2,7 @@
 
 ChatterUI is a native mobile frontend for LLMs.
 
-Run LLMs on device or connect to various commercial or open source APIs. ChatterUI aims to provide a mobile friendly experience to inferface with Large Language models, while also providing low level control on how your chats are structured.
+Run LLMs on device or connect to various commercial or open source APIs. ChatterUI aims to provide a mobile-friendly interface with fine-grained control over chat structuring.
 
 If you like the app, feel free support me here:
 
@@ -37,13 +37,13 @@ Personalize yourself
 -   Chat with characters. (Supports the Character Card v2 specification.)
 -   Create and manage multiple chats per character.
 -   Customize Sampler fields and Instruct formatting
--   Integrates your on-device TTS engine for TTS support.
+-   Integrates with your device’s TTS engine for text-to-speech (TTS) support
 
 <br/>
 
 # Usage
 
-Download the and install latest APK from the [releases](https://github.com/Vali-98/ChatterUI/releases/latest) page.
+Download and install latest APK from the [releases](https://github.com/Vali-98/ChatterUI/releases/latest) page.
 
 <i>IOS is Currently unavailable, I do not have the hardware for IOS development</i>
 
@@ -53,8 +53,8 @@ ChatterUI uses a [llama.cpp](https://github.com/ggerganov/llama.cpp) under the h
 
 To use on-device inferencing, first enable Local Mode, then go to Models > Import Model / Use External Model and choose a gguf model that can fit on your device's memory. The importing functions are as follows:
 
--   Import Model: Copies the model file into ChatterUI - this may speed up the startup process
--   Use External Model: Uses a model from your device storage directly - this removes the need to copy large files into ChatterUI, but loads models slightly slower
+-   Import Model: Copies the model file into ChatterUI, potentially speeding up startup time.
+-   Use External Model: Uses a model from your device storage directly, removing the need to copy large files into ChatterUI but with a slight delay in load times.
 
 After that, you can load the model and begin chatting!
 
