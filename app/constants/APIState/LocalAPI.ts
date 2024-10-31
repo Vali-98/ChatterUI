@@ -49,22 +49,23 @@ class LocalAPI extends APIBase {
 
     inference = async () => {
         let context = Llama.useLlama.getState().context
-        if (!context && mmkv.getBoolean(AppSettings.AutoLoadLocal)) {
-            let model: undefined | ModelDataType = undefined
 
-            try {
-                const modelString = mmkv.getString(Global.LocalModel)
-                if (!modelString) {
-                    Logger.log('No Auto-Load Model Set', true)
-                    return
-                }
-                model = JSON.parse(modelString)
-            } catch (e) {
-                Logger.log('Failed to Auto-Load Model', true)
+        let model: undefined | ModelDataType = undefined
+
+        try {
+            const modelString = mmkv.getString(Global.LocalModel)
+            if (!modelString) {
+                Logger.log('No Auto-Load Model Set', true)
+                return
             }
+            model = JSON.parse(modelString)
+        } catch (e) {
+            Logger.log('Failed to Auto-Load Model', true)
+        }
 
+        if (model && !context && mmkv.getBoolean(AppSettings.AutoLoadLocal)) {
             const params = this.getObject(Global.LocalPreset)
-            if (model && params) {
+            if (params) {
                 Logger.log(`Auto-loading: ${model.name}`, true)
                 await Llama.useLlama.getState().load(model)
                 context = Llama.useLlama.getState().context
@@ -80,7 +81,7 @@ class LocalAPI extends APIBase {
         const loadKV =
             mmkv.getBoolean(AppSettings.SaveLocalKV) && !mmkv.getBoolean(Global.LocalSessionLoaded)
 
-        if (loadKV) {
+        if (loadKV && model?.id === Llama.useLlama.getState().model?.id) {
             await Llama.useLlama.getState().loadKV()
             mmkv.set(Global.LocalSessionLoaded, true)
         }
