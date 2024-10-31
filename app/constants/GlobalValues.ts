@@ -78,8 +78,11 @@ export const enum Global {
 
     // Local
 
+    // object containing model info object based on db schema, needed for auto-loading
     LocalModel = 'localmodel',
+    // preset values for model cpu specs
     LocalPreset = 'localpreset',
+    // whether or not a KV cache has been loaded
     LocalSessionLoaded = 'localsessionloaded',
 
     OpenRouterModel = 'openroutermodel',
