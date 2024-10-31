@@ -1,12 +1,13 @@
+import { Alert } from '@components/Alert'
 import SectionTitle from '@components/SectionTitle'
 import SliderItem from '@components/SliderItem'
 import SwitchTitle from '@components/SwitchTitle'
 import SwitchWithDescription from '@components/SwitchWithDescription'
-import { LlamaPreset } from '@constants/LlamaLocal'
-import { AppSettings, Global, Style } from '@globals'
+import { Llama, LlamaPreset, readableFileSize } from '@constants/LlamaLocal'
+import { AppSettings, Global, Logger, Style } from '@globals'
 import { useFocusEffect } from 'expo-router'
-import React from 'react'
-import { Platform, View, Text, StyleSheet, BackHandler } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Platform, View, Text, StyleSheet, BackHandler, TouchableOpacity } from 'react-native'
 import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 import Animated, { SlideInRight, SlideOutRight, Easing } from 'react-native-reanimated'
 
@@ -29,6 +30,17 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
     const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
     const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)
 
+    const [kvSize, setKVSize] = useState(0)
+
+    const getKVSize = async () => {
+        const size = await Llama.getKVSize()
+        setKVSize(size)
+    }
+
+    useEffect(() => {
+        getKVSize()
+    }, [])
+
     const backAction = () => {
         exit()
         return true
@@ -38,6 +50,25 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
         const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
         return () => handler.remove()
     })
+
+    const handleDeleteKV = () => {
+        Alert.alert({
+            title: 'Delete KV Cache',
+            description: `Are you sure you want to delete the KV Cache? This cannot be undone. \n\n This will clear up ${readableFileSize(kvSize)} of space.`,
+            buttons: [
+                { label: 'Cancel' },
+                {
+                    label: 'Delete KV Cache',
+                    onPress: async () => {
+                        await Llama.deleteKV()
+                        Logger.log('KV Cache deleted!', true)
+                        getKVSize()
+                    },
+                    type: 'warning',
+                },
+            ],
+        })
+    }
 
     return (
         <Animated.ScrollView
@@ -120,8 +151,26 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                 title="Save Local KV"
                 value={saveKV}
                 onValueChange={setSaveKV}
-                description="Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV cache file may be very big and negatively impact battery life!"
+                description={
+                    saveKV
+                        ? ''
+                        : 'Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV cache file may be very big and negatively impact battery life!'
+                }
             />
+
+            {saveKV && (
+                <TouchableOpacity
+                    onPress={handleDeleteKV}
+                    disabled={kvSize === 0}
+                    style={kvSize === 0 ? styles.purgeButtonDisabled : styles.purgeButton}>
+                    <Text
+                        style={{
+                            color: Style.getColor(kvSize === 0 ? 'primary-text3' : 'primary-text1'),
+                        }}>
+                        Purge KV Cache {'(' + readableFileSize(kvSize) + ')'}
+                    </Text>
+                </TouchableOpacity>
+            )}
         </Animated.ScrollView>
     )
 }
@@ -144,5 +193,24 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingTop: 4,
         paddingBottom: 8,
+    },
+
+    purgeButton: {
+        marginTop: 12,
+        backgroundColor: Style.getColor('destructive-brand'),
+        borderWidth: 1,
+        borderColor: Style.getColor('destructive-brand'),
+        alignItems: 'center',
+        paddingVertical: 8,
+        borderRadius: 12,
+    },
+
+    purgeButtonDisabled: {
+        marginTop: 12,
+        borderWidth: 1,
+        borderColor: Style.getColor('primary-text3'),
+        alignItems: 'center',
+        paddingVertical: 8,
+        borderRadius: 12,
     },
 })

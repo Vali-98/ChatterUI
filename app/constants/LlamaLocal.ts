@@ -178,7 +178,7 @@ export namespace Llama {
                     ? 'Failed to save KV cache'
                     : `Saved KV in ${Math.floor(performance.now() - now)}ms with ${data} tokens`
             )
-            Logger.log(`Current KV Size is: ${await getKVSizeMB()}MB`)
+            Logger.log(`Current KV Size is: ${readableFileSize(await getKVSize())}`)
         },
         loadKV: async () => {
             const llamaContext = get().context
@@ -451,12 +451,9 @@ export namespace Llama {
         })
     }
 
-    export const getKVSizeMB = async () => {
+    export const getKVSize = async () => {
         const data = await FS.getInfoAsync(sessionFile)
-        if (!data.exists) {
-            return 0
-        }
-        return Math.floor(data.size * 0.000001)
+        return data.exists ? data.size : 0
     }
 
     export const deleteKV = async () => {
@@ -576,6 +573,11 @@ export const GGMLNameMap = {
 const gb = 1024 ** 3
 const mb = 1024 ** 2
 
+/**
+ * Gets a human friendly version of file size
+ * @param size size in bytes
+ * @returns string containing readable file size
+ */
 export const readableFileSize = (size: number) => {
     if (size < gb) {
         const sizeInMB = size / mb
