@@ -12,14 +12,16 @@ const SwitchWithDescription: React.FC<SwitchWithDescriptionProps> = ({ descripti
     return (
         <View>
             <SwitchComponent {...rest} />
-            <Text
-                style={{
-                    color: Style.getColor('primary-text2'),
-                    paddingBottom: 2,
-                    marginBottom: 8,
-                }}>
-                {description}
-            </Text>
+            {description && (
+                <Text
+                    style={{
+                        color: Style.getColor('primary-text2'),
+                        paddingBottom: 2,
+                        marginBottom: 8,
+                    }}>
+                    {description}
+                </Text>
+            )}
         </View>
     )
 }
