@@ -6,6 +6,7 @@ import { Global } from '../GlobalValues'
 
 class ChatCompletionsAPI extends APIBase {
     samplers: APISampler[] = [
+        { externalName: 'max_context_length', samplerID: SamplerID.CONTEXT_LENGTH },
         { externalName: 'max_tokens', samplerID: SamplerID.GENERATED_LENGTH },
         { externalName: 'stream', samplerID: SamplerID.STREAMING },
         { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
@@ -17,12 +18,18 @@ class ChatCompletionsAPI extends APIBase {
 
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
-        const max_length = (payloadFields?.['max_tokens'] ?? 0) as number
-        const messages = this.buildChatCompletionContext(max_length)
-        const model = this.getObject(Global.ChatCompletionsModel)
 
+        // assumed this field exists
+        //@ts-ignore
+        const { max_context_length, ...rest } = payloadFields
+
+        // NOTE: This 8192 value is arbitrary, as setting it to 0 results poor responses
+        const length = max_context_length ?? 8192
+
+        const messages = this.buildChatCompletionContext(length)
+        const model = this.getObject(Global.ChatCompletionsModel)
         return {
-            ...payloadFields,
+            ...rest,
             messages: messages,
             model: model.id,
             stop: this.constructStopSequence(),

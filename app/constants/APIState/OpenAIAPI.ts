@@ -21,7 +21,7 @@ class OpenAIAPI extends APIBase {
         //@ts-ignore
         const { max_context_length, ...rest } = payloadFields
 
-        // NOTE: This 8192 value is arbitrary, as setting it to 0 breaks the fields
+        // NOTE: This 8192 value is arbitrary, as setting it to 0 results poor responses
         const length = max_context_length ?? 8192
 
         const openAIModel = this.getObject(Global.OpenAIModel)
