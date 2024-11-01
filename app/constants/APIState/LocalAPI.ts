@@ -81,7 +81,7 @@ class LocalAPI extends APIBase {
         const loadKV =
             mmkv.getBoolean(AppSettings.SaveLocalKV) && !mmkv.getBoolean(Global.LocalSessionLoaded)
 
-        if (loadKV && model?.id === Llama.useLlama.getState().model?.id) {
+        if (loadKV) {
             await Llama.useLlama.getState().loadKV()
             mmkv.set(Global.LocalSessionLoaded, true)
         }

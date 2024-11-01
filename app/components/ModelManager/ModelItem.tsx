@@ -118,8 +118,8 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         disabled={disable}
                         onPress={async () => {
                             setModelLoading(true)
-                            setAutoLoad(item)
                             await loadModel(item)
+                            setAutoLoad(item)
                             setModelLoading(false)
                         }}>
                         <AntDesign

@@ -99,7 +99,21 @@ export namespace Llama {
                 use_mlock: true,
             }
 
-            mmkv.set(Global.LocalSessionLoaded, false)
+            let setAutoLoad = false
+
+            try {
+                const modelString = mmkv.getString(Global.LocalModel)
+                if (modelString) {
+                    const oldmodel: ModelDataType | undefined = JSON.parse(modelString)
+                    setAutoLoad = oldmodel?.id !== model.id
+                }
+            } catch (e) {}
+            // When LocalSessionLoaded is set to false, it will load KV cache.
+            // We check if the model id is the same as above, if not, set to true to skip kv-cache load
+            // This probably should be changed as the parameter name is somewhat confusing
+            // TODO: Investigate why KV cache is loaded on chat instead of on model start
+            mmkv.set(Global.LocalSessionLoaded, setAutoLoad)
+
             Logger.log(
                 `Starting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}`
             )
@@ -112,13 +126,13 @@ export namespace Llama {
                 Logger.log(`Could Not Load Model: ${error} `, true)
             })
 
-            if (llamaContext) {
-                set((state) => ({
-                    ...state,
-                    context: llamaContext,
-                    model: model,
-                }))
-            }
+            if (!llamaContext) return
+
+            set((state) => ({
+                ...state,
+                context: llamaContext,
+                model: model,
+            }))
         },
         setLoadProgress: (progress: number) => {
             set((state) => ({ ...state, loadProgress: progress }))
@@ -355,15 +369,7 @@ export namespace Llama {
         })
     }
 
-    type ModelData = {
-        context_length?: string
-        file: string
-        name?: string
-        file_size?: number
-        params?: string
-        quantization?: string
-        architecture?: string
-    }
+    type ModelData = Omit<ModelDataType, 'id' | 'create_date' | 'last_modified'>
 
     export const createModelData = async (filename: string, deleteOnFailure: boolean = false) => {
         const newdir = `${model_dir}${filename}`
