@@ -122,6 +122,7 @@ const ModelManager = () => {
                     <FlatList
                         style={styles.list}
                         data={data}
+                        showsHorizontalScrollIndicator={false}
                         renderItem={({ item, index }) => (
                             <ModelItem
                                 item={item}
