@@ -124,8 +124,8 @@ const AppSettingsMenu = () => {
 
             <SwitchWithDescription
                 title="Bypass Context Length"
-                value={printContext}
-                onValueChange={setPrintContext}
+                value={bypassContextLength}
+                onValueChange={setBypassContextLength}
                 description="Ignores context length limits when building prompts"
             />
 
