@@ -6,6 +6,7 @@ import { APIBase, APISampler } from './BaseAPI'
 
 class OpenAIAPI extends APIBase {
     samplers: APISampler[] = [
+        { externalName: 'max_context_length', samplerID: SamplerID.CONTEXT_LENGTH },
         { externalName: 'max_tokens', samplerID: SamplerID.GENERATED_LENGTH },
         { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
         { externalName: 'presence_penalty', samplerID: SamplerID.PRESENCE_PENALTY },
@@ -15,13 +16,18 @@ class OpenAIAPI extends APIBase {
     ]
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
-        const length =
-            typeof payloadFields?.['max_context_length'] === 'number'
-                ? payloadFields?.['max_context_length']
-                : 0
+
+        // assumed this field exists
+        //@ts-ignore
+        const { max_context_length, ...rest } = payloadFields
+
+        // NOTE: This 8192 value is arbitrary, as setting it to 0 breaks the fields
+        const length = max_context_length ?? 8192
+
         const openAIModel = this.getObject(Global.OpenAIModel)
+
         return {
-            ...payloadFields,
+            ...rest,
             model: openAIModel.id,
             stream: true,
             messages: this.buildChatCompletionContext(length),
