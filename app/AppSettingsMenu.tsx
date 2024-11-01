@@ -65,6 +65,9 @@ const AppSettingsMenu = () => {
     const [chatOnStartup, setChatOnStartup] = useMMKVBoolean(AppSettings.ChatOnStartup)
     const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
     const [sendOnEnter, setSendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
+    const [bypassContextLength, setBypassContextLength] = useMMKVBoolean(
+        AppSettings.BypassContextLength
+    )
 
     return (
         <ScrollView style={styles.mainContainer}>
@@ -117,6 +120,13 @@ const AppSettingsMenu = () => {
                 value={printContext}
                 onValueChange={setPrintContext}
                 description="Prints the generation context to logs for debugging"
+            />
+
+            <SwitchWithDescription
+                title="Bypass Context Length"
+                value={printContext}
+                onValueChange={setPrintContext}
+                description="Ignores context length limits when building prompts"
             />
 
             <SectionTitle>Character Management</SectionTitle>

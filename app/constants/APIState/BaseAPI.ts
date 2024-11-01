@@ -123,6 +123,9 @@ export abstract class APIBase implements IAPIBase {
         // this is needed to check if examples should be added
         let first_message_reached = false
 
+        // check the limit bypass
+        const bypassContextLength = mmkv.getBoolean(AppSettings.BypassContextLength)
+
         // we require lengths for names if use_names is enabled
         for (const message of messages.reverse()) {
             const swipe_len = Chats.useChat.getState().getTokenCount(index)
@@ -156,7 +159,10 @@ export abstract class APIBase implements IAPIBase {
                 swipe_len + instruct_len + name_length + timestamp_length + wrap_length
 
             // check if within context window
-            if (message_acc_length + payload_length + shard_length > max_length) {
+            if (
+                message_acc_length + payload_length + shard_length > max_length &&
+                !bypassContextLength
+            ) {
                 break
             }
 
@@ -262,6 +268,9 @@ export abstract class APIBase implements IAPIBase {
         const payload = [{ role: systemRole, content: replaceMacros(initial) }]
         const messageBuffer = []
 
+        // check the limit bypass
+        const bypassContextLength = mmkv.getBoolean(AppSettings.BypassContextLength)
+
         let index = messages.length - 1
         for (const message of messages.reverse()) {
             const swipe_data = message.swipes[message.swipe_id]
@@ -277,7 +286,7 @@ export abstract class APIBase implements IAPIBase {
                 total_length +
                 name_length +
                 timestamp_length
-            if (len > max_length) break
+            if (len > max_length && !bypassContextLength) break
             messageBuffer.push({
                 role: message.is_user ? userRole : assistantRole,
                 content: replaceMacros(message.swipes[message.swipe_id].swipe),

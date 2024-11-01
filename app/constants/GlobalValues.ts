@@ -131,9 +131,29 @@ export enum AppSettings {
     SaveLocalKV = 'savelocalkv',
     PrintContext = 'printcontext',
     CreateDefaultCard = 'createdefaultcard',
+    BypassContextLength = 'bypasscontextlength',
 }
 
 export enum AppMode {
     LOCAL = 'local',
     REMOTE = 'remote',
+}
+
+/**
+ * Default settings on first install
+ */
+export const AppSettingsDefault: Record<AppSettings, boolean | number> = {
+    [AppSettings.AnimateEditor]: true,
+    [AppSettings.AutoLoadLocal]: false,
+    [AppSettings.AutoScroll]: true,
+    [AppSettings.ChatOnStartup]: false,
+    [AppSettings.CreateFirstMes]: true,
+    [AppSettings.DarkMode]: true,
+    [AppSettings.DevMode]: false,
+    [AppSettings.PrimaryHue]: 240,
+    [AppSettings.SendOnEnter]: false,
+    [AppSettings.SaveLocalKV]: false,
+    [AppSettings.PrintContext]: false,
+    [AppSettings.CreateDefaultCard]: true,
+    [AppSettings.BypassContextLength]: false,
 }

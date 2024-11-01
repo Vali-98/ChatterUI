@@ -9,7 +9,7 @@ import { Platform } from 'react-native'
 import { API } from './API'
 import { Characters } from './Characters'
 import { Chats } from './Chat'
-import { Global, AppSettings, AppMode } from './GlobalValues'
+import { Global, AppSettings, AppMode, AppSettingsDefault } from './GlobalValues'
 import { Instructs } from './Instructs'
 import { Llama } from './LlamaLocal'
 import { Logger } from './Logger'
@@ -81,24 +81,6 @@ export const saveStringToDownload = async (
     encoding: 'ascii' | 'base64' | `utf8`
 ) => {
     await writeFile(`${DownloadDirectoryPath}/${filename}`, data, encoding)
-}
-
-/**
- * Default settings on first install
- */
-const AppSettingsDefault: Record<AppSettings, boolean | number> = {
-    [AppSettings.AnimateEditor]: true,
-    [AppSettings.AutoLoadLocal]: false,
-    [AppSettings.AutoScroll]: true,
-    [AppSettings.ChatOnStartup]: false,
-    [AppSettings.CreateFirstMes]: true,
-    [AppSettings.DarkMode]: true,
-    [AppSettings.DevMode]: false,
-    [AppSettings.PrimaryHue]: 270,
-    [AppSettings.SendOnEnter]: false,
-    [AppSettings.SaveLocalKV]: false,
-    [AppSettings.PrintContext]: false,
-    [AppSettings.CreateDefaultCard]: true,
 }
 
 const loadChatOnInit = async () => {
