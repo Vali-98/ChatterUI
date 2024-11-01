@@ -2,7 +2,7 @@ module.exports = {
     expo: {
         name: 'ChatterUI',
         slug: 'ChatterUI',
-        version: '0.8.0',
+        version: '0.8.1',
         orientation: 'portrait',
         icon: './assets/images/icon.png',
         scheme: 'chatterui',
