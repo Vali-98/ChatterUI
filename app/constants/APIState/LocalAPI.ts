@@ -15,7 +15,7 @@ class LocalAPI extends APIBase {
         { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
         { externalName: 'top_p', samplerID: SamplerID.TOP_P },
         { externalName: 'top_k', samplerID: SamplerID.TOP_K },
-        { externalName: 'tfs_z', samplerID: SamplerID.TAIL_FREE_SAMPLING },
+        // { externalName: 'tfs_z', samplerID: SamplerID.TAIL_FREE_SAMPLING },
         { externalName: 'min_p', samplerID: SamplerID.MIN_P },
         { externalName: 'typical_p', samplerID: SamplerID.TYPICAL },
         { externalName: 'mirostat', samplerID: SamplerID.MIROSTAT_MODE },
