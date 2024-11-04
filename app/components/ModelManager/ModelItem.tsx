@@ -86,6 +86,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 </Text>
             </View>
             <Text style={styles.subtitle}>Context Length: {item.context_length}</Text>
+            <Text style={styles.subtitle}>File: {item.file.replace('.gguf', '')}</Text>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     disabled={disableEdit}

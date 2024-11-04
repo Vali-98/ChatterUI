@@ -364,7 +364,7 @@ export namespace Llama {
                 return
             }
             // database routine here
-            if (await createModelDataExternal(file.uri, true))
+            if (await createModelDataExternal(file.uri, file.name, true))
                 Logger.log(`Model Imported Sucessfully!`, true)
         })
     }
@@ -402,9 +402,9 @@ export namespace Llama {
 
     export const createModelDataExternal = async (
         newdir: string,
+        filename: string,
         deleteOnFailure: boolean = false
     ) => {
-        const filename = newdir.split('/').pop()
         if (!filename) {
             Logger.log('Filename invalid, Import Failed', true)
             return
