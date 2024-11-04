@@ -101,7 +101,7 @@ export abstract class APIBase implements IAPIBase {
             payload_length += characterCache.scenario_length
         }
 
-        if (currentInstruct.scenario && currentCard?.personality) {
+        if (currentInstruct.personality && currentCard?.personality) {
             payload += currentCard.personality
             payload_length += characterCache.personality_length
         }
@@ -260,7 +260,7 @@ export abstract class APIBase implements IAPIBase {
             total_length += characterCache.scenario_length
         }
 
-        if (currentInstruct.scenario && currentCard?.personality) {
+        if (currentInstruct.personality && currentCard?.personality) {
             initial += currentCard.personality
             total_length += characterCache.personality_length
         }
