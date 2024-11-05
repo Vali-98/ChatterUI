@@ -142,10 +142,7 @@ const ChatMenu = () => {
                     options={{
                         title: '',
                         headerLeft: () => headerViewLeft,
-
-                        headerRight: () => {
-                            if (chat) return headerViewRight
-                        },
+                        ...(chat ? { headerRight: () => headerViewRight } : {}),
                     }}
                 />
 
