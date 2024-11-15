@@ -8,11 +8,11 @@ module.exports = {
         icon: './assets/images/icon.png',
         scheme: 'chatterui',
         userInterfaceStyle: 'automatic',
-        splash: {
+        /*splash: {
             image: './assets/images/splash.png',
-            resizeMode: 'contain',
+            resizeMode: 'cover',
             backgroundColor: '#000000',
-        },
+        },*/
         assetBundlePatterns: ['**/*'],
         ios: {
             supportsTablet: true,
@@ -26,11 +26,11 @@ module.exports = {
             },
             package: 'com.Vali98.ChatterUI',
 
-            splash: {
+            /*splash: {
                 image: './assets/images/splash.png',
-                resizeMode: 'contain',
+                resizeMode: 'cover',
                 backgroundColor: '#000000',
-            },
+            },*/
             userInterfaceStyle: 'dark',
             permissions: [
                 'android.permission.FOREGROUND_SERVICE',
@@ -72,13 +72,21 @@ module.exports = {
                     },
                 },
             ],
+            [
+                'expo-splash-screen',
+                {
+                    backgroundColor: '#000000',
+                    image: './assets/images/adaptive-icon.png',
+                    imageWidth: 200,
+                },
+            ],
             './expo-build-plugins/bgactions.plugin.js',
             './expo-build-plugins/copyjni.plugin.js',
             './expo-build-plugins/usercert.plugin.js',
         ],
         experiments: {
             typedRoutes: true,
-            reactCompiler: true,
+            // reactCompiler: true,
         },
         extra: {
             router: {
