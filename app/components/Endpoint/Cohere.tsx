@@ -31,9 +31,7 @@ const Cohere = () => {
 
     const getModelList = async () => {
         try {
-            const url = new URL(
-                'https://api.cohere.com/v1/models?page_size=1000&endpoint=chat'
-            ).toString()
+            const url = new URL('https://api.cohere.com/v1/models').toString()
 
             const response = await fetch(url, {
                 headers: {

@@ -83,16 +83,18 @@ export type SamplerItem = {
     internalID: SamplerID
     friendlyName: string
     inputType: InputType
+    macro: string
     values: SamplerItemValues
 }
 
-export const Samplers = {
+export const Samplers: Record<SamplerID, SamplerItem> = {
     /*Default Sampler definitions here*/
 
     [SamplerID.CONTEXT_LENGTH]: {
         internalID: SamplerID.CONTEXT_LENGTH,
         friendlyName: 'Max Context',
         inputType: 'slider',
+        macro: '{{max_context_length}}',
         values: {
             type: 'integer',
             min: 1024,
@@ -106,6 +108,7 @@ export const Samplers = {
         internalID: SamplerID.STREAMING,
         friendlyName: 'Streaming',
         inputType: 'checkbox',
+        macro: '{{stream}}',
         values: {
             type: 'boolean',
             default: true,
@@ -115,6 +118,7 @@ export const Samplers = {
         internalID: SamplerID.GENERATED_LENGTH,
         friendlyName: 'Generated Tokens',
         inputType: 'slider',
+        macro: '{{generted_length}}',
         values: {
             type: 'integer',
             min: 16,
@@ -128,6 +132,7 @@ export const Samplers = {
         internalID: SamplerID.TEMPERATURE,
         friendlyName: 'Temperature',
         inputType: 'slider',
+        macro: '{{temp}}',
         values: {
             type: 'float',
             min: 0.01,
@@ -141,6 +146,7 @@ export const Samplers = {
         internalID: SamplerID.DYNATEMP_RANGE,
         friendlyName: 'Dynamic Temperature Range',
         inputType: 'slider',
+        macro: '{{dynatemp_range}}',
         values: {
             type: 'float',
             min: 0.01,
@@ -154,6 +160,7 @@ export const Samplers = {
         internalID: SamplerID.MIN_P,
         friendlyName: 'Min P',
         inputType: 'slider',
+        macro: '{{min_p}}',
         values: {
             type: 'float',
             min: 0,
@@ -167,6 +174,7 @@ export const Samplers = {
         internalID: SamplerID.XTC_PROBABILITY,
         friendlyName: 'XTC Probability',
         inputType: 'slider',
+        macro: '{{xtc_p}}',
         values: {
             type: 'float',
             min: 0,
@@ -180,6 +188,7 @@ export const Samplers = {
         internalID: SamplerID.XTC_THRESHOLD,
         friendlyName: 'XTC Threshold',
         inputType: 'slider',
+        macro: '{{xtc_t}}',
         values: {
             type: 'float',
             min: 0,
@@ -193,6 +202,7 @@ export const Samplers = {
         internalID: SamplerID.TOP_P,
         friendlyName: 'Top P',
         inputType: 'slider',
+        macro: '{{top_p}}',
         values: {
             type: 'float',
             min: 0,
@@ -206,6 +216,7 @@ export const Samplers = {
         internalID: SamplerID.TOP_A,
         friendlyName: 'Top A',
         inputType: 'slider',
+        macro: '{{top_a}}',
         values: {
             type: 'float',
             min: 0,
@@ -219,6 +230,7 @@ export const Samplers = {
         internalID: SamplerID.TOP_K,
         friendlyName: 'Top K',
         inputType: 'slider',
+        macro: '{{top_k}}',
         values: {
             type: 'integer',
             min: 0,
@@ -232,6 +244,7 @@ export const Samplers = {
         internalID: SamplerID.REPETITION_PENALTY,
         friendlyName: 'Repetition Penalty',
         inputType: 'slider',
+        macro: '{{rep_pen}}',
         values: {
             type: 'float',
             min: 1,
@@ -245,6 +258,7 @@ export const Samplers = {
         internalID: SamplerID.REPETITION_PENALTY_RANGE,
         friendlyName: 'Repetition Penalty Range',
         inputType: 'slider',
+        macro: '{{rep_pen_range}}',
         values: {
             type: 'integer',
             min: 1,
@@ -258,6 +272,7 @@ export const Samplers = {
         internalID: SamplerID.REPETITION_PENALTY_SLOPE,
         friendlyName: 'Repetition Penalty Slope',
         inputType: 'slider',
+        macro: '{{rep_pen_slope}}',
         values: {
             type: 'float',
             min: 1,
@@ -271,6 +286,7 @@ export const Samplers = {
         internalID: SamplerID.ENCODER_REPETITION_PENALTY,
         friendlyName: 'Encoder Repetition Penalty',
         inputType: 'slider',
+        macro: '{{enc_rep_pen}}',
         values: {
             type: 'float',
             min: 0.8,
@@ -284,6 +300,7 @@ export const Samplers = {
         internalID: SamplerID.FREQUENCY_PENALTY,
         friendlyName: 'Frequency Penalty',
         inputType: 'slider',
+        macro: '{{freq_pen}}',
         values: {
             type: 'float',
             min: -2,
@@ -297,6 +314,7 @@ export const Samplers = {
         internalID: SamplerID.PRESENCE_PENALTY,
         friendlyName: 'Presence Penalty',
         inputType: 'slider',
+        macro: '{{pres_pen}}',
         values: {
             type: 'float',
             min: -2,
@@ -310,6 +328,7 @@ export const Samplers = {
         internalID: SamplerID.NO_REPEAT_NGRAM_SIZE,
         friendlyName: 'No Repeat Ngram Size',
         inputType: 'slider',
+        macro: '{{nrepeat_ngram_size}}',
         values: {
             type: 'integer',
             min: 0,
@@ -323,6 +342,7 @@ export const Samplers = {
         internalID: SamplerID.MIN_LENGTH,
         friendlyName: 'Minimum Length',
         inputType: 'slider',
+        macro: '{{min_length}}',
         values: {
             type: 'integer',
             min: 0,
@@ -336,6 +356,7 @@ export const Samplers = {
         internalID: SamplerID.SMOOTHING_FACTOR,
         friendlyName: 'Smoothing Factor',
         inputType: 'slider',
+        macro: '{{smooth_factor}}',
         values: {
             type: 'float',
             min: 0,
@@ -349,6 +370,7 @@ export const Samplers = {
         internalID: SamplerID.TYPICAL,
         friendlyName: 'Typical Sampling',
         inputType: 'slider',
+        macro: '{{typ}}',
         values: {
             type: 'float',
             min: 0,
@@ -362,6 +384,7 @@ export const Samplers = {
         internalID: SamplerID.TAIL_FREE_SAMPLING,
         friendlyName: 'Tail-Free Sampling',
         inputType: 'slider',
+        macro: '{{tfs}}',
         values: {
             type: 'float',
             min: 0,
@@ -375,6 +398,7 @@ export const Samplers = {
         internalID: SamplerID.EPSILON_CUTOFF,
         friendlyName: 'Epsilon Cutoff',
         inputType: 'slider',
+        macro: '{{eps_cutoff}}',
         values: {
             type: 'float',
             min: 0,
@@ -388,6 +412,7 @@ export const Samplers = {
         internalID: SamplerID.ETA_CUTOFF,
         friendlyName: 'Eta Cutoff',
         inputType: 'slider',
+        macro: '{{eta_cutoff}}',
         values: {
             type: 'float',
             min: 0,
@@ -401,6 +426,7 @@ export const Samplers = {
         internalID: SamplerID.MIROSTAT_MODE,
         friendlyName: 'Mirostat Mode',
         inputType: 'slider',
+        macro: '{{miro_mode}}',
         values: {
             type: 'integer',
             min: 0,
@@ -414,6 +440,7 @@ export const Samplers = {
         internalID: SamplerID.MIROSTAT_TAU,
         friendlyName: 'Mirostat Tau',
         inputType: 'slider',
+        macro: '{{miro_tau}}',
         values: {
             type: 'float',
             min: 0,
@@ -427,6 +454,7 @@ export const Samplers = {
         internalID: SamplerID.MIROSTAT_ETA,
         friendlyName: 'Mirostat Eta',
         inputType: 'slider',
+        macro: '{{miro_eta}}',
         values: {
             type: 'float',
             min: 0,
@@ -440,6 +468,7 @@ export const Samplers = {
         internalID: SamplerID.BAN_EOS_TOKEN,
         friendlyName: 'Ban EOS tokens',
         inputType: 'checkbox',
+        macro: '{{ban_eos}}',
         values: {
             type: 'boolean',
             default: false,
@@ -449,6 +478,7 @@ export const Samplers = {
         internalID: SamplerID.ADD_BOS_TOKEN,
         friendlyName: 'Add BOS Token',
         inputType: 'checkbox',
+        macro: '{{add_bos}}',
         values: {
             type: 'boolean',
             default: true,
@@ -458,6 +488,7 @@ export const Samplers = {
         internalID: SamplerID.DO_SAMPLE,
         friendlyName: 'Do Sample',
         inputType: 'checkbox',
+        macro: '{{do_sample}}',
         values: {
             type: 'boolean',
             default: false,
@@ -467,6 +498,7 @@ export const Samplers = {
         internalID: SamplerID.SKIP_SPECIAL_TOKENS,
         friendlyName: 'Skip Special Token',
         inputType: 'checkbox',
+        macro: '{{skip_special}}',
         values: {
             type: 'boolean',
             default: false,
@@ -476,6 +508,7 @@ export const Samplers = {
         internalID: SamplerID.SINGLE_LINE,
         friendlyName: 'Single Line',
         inputType: 'checkbox',
+        macro: '{{single_line}}',
         values: {
             type: 'boolean',
             default: false,
@@ -485,6 +518,7 @@ export const Samplers = {
         internalID: SamplerID.GRAMMAR_STRING,
         friendlyName: 'Grammar',
         inputType: 'textinput',
+        macro: '{{grammar}}',
         values: {
             type: 'string',
             default: '',
@@ -494,6 +528,7 @@ export const Samplers = {
         internalID: SamplerID.SEED,
         friendlyName: 'Seed',
         inputType: 'slider',
+        macro: '{{seed}}',
         values: {
             type: 'integer',
             default: -1,
@@ -508,6 +543,7 @@ export const Samplers = {
         internalID: SamplerID.BANNED_TOKENS,
         friendlyName: 'Banned Tokens',
         inputType: 'textinput',
+        macro: '{{banned_tokens}}',
         values: {
             type: 'string',
             default: '',
@@ -517,6 +553,7 @@ export const Samplers = {
         internalID: SamplerID.GUIDANCE_SCALE,
         friendlyName: 'CFG Scale',
         inputType: 'slider',
+        macro: '{{guidance_scale}}',
         values: {
             type: 'float',
             min: 0.01,
@@ -530,6 +567,7 @@ export const Samplers = {
         internalID: SamplerID.NEGATIVE_PROMPT,
         friendlyName: 'Negative Prompt',
         inputType: 'textinput',
+        macro: '{{negative_prompt}}',
         values: {
             type: 'string',
             default: '',
@@ -539,6 +577,7 @@ export const Samplers = {
         internalID: SamplerID.NUM_BEAMS,
         friendlyName: 'Number of Beams',
         inputType: 'slider',
+        macro: '{{num_beams}}',
         values: {
             type: 'integer',
             min: 1,
@@ -552,6 +591,7 @@ export const Samplers = {
         internalID: SamplerID.EARLY_STOPPING,
         friendlyName: 'Early Stopping',
         inputType: 'checkbox',
+        macro: '{{early_stopping}}',
         values: {
             type: 'boolean',
             default: false,
@@ -561,6 +601,7 @@ export const Samplers = {
         internalID: SamplerID.LENGTH_PENALTY,
         friendlyName: 'Length Penalty',
         inputType: 'slider',
+        macro: '{{length_pen}}',
         values: {
             type: 'float',
             min: -5,
@@ -574,6 +615,7 @@ export const Samplers = {
         internalID: SamplerID.PENALTY_ALPHA,
         friendlyName: 'Penalty Alpha',
         inputType: 'slider',
+        macro: '{{alpha_pen}}',
         values: {
             type: 'float',
             min: 0,
@@ -587,6 +629,7 @@ export const Samplers = {
         internalID: SamplerID.DRY_MULTIPLIER,
         friendlyName: 'Dry Multiplier',
         inputType: 'slider',
+        macro: '{{dry_mult}}',
         values: {
             type: 'float',
             min: 0,
@@ -600,6 +643,7 @@ export const Samplers = {
         internalID: SamplerID.DRY_BASE,
         friendlyName: 'Dry Base',
         inputType: 'slider',
+        macro: '{{dry_base}}',
         values: {
             type: 'float',
             min: 0,
@@ -613,6 +657,7 @@ export const Samplers = {
         internalID: SamplerID.DRY_ALLOWED_LENGTH,
         friendlyName: 'Dry Allowed Length',
         inputType: 'slider',
+        macro: '{{dry_length}}',
         values: {
             type: 'integer',
             min: 0,
@@ -626,6 +671,7 @@ export const Samplers = {
         internalID: SamplerID.DRY_SEQUENCE_BREAK,
         friendlyName: 'Dry Sequence Break',
         inputType: 'textinput',
+        macro: '{{dry_break}}',
         values: {
             type: 'string',
             default: '',

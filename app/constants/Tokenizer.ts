@@ -1,4 +1,4 @@
-import { copyFileRes } from '@dr.pogodin/react-native-fs'
+import { copyFileRes } from 'cui-fs'
 import { initLlama, LlamaContext } from 'cui-llama.rn'
 import { deleteAsync, documentDirectory, getInfoAsync, makeDirectoryAsync } from 'expo-file-system'
 import { create } from 'zustand'

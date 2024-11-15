@@ -12,7 +12,7 @@ import { MenuProvider } from 'react-native-popup-menu'
 import migrations from '../db/migrations/migrations'
 
 const DevDB = () => {
-    useDrizzleStudio(rawdb)
+    // useDrizzleStudio(rawdb)
     return <></>
 }
 

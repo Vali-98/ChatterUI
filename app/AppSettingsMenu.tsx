@@ -1,15 +1,15 @@
 import { Alert } from '@components/Alert'
 import SectionTitle from '@components/SectionTitle'
 import SwitchWithDescription from '@components/SwitchWithDescription'
-import { copyFile, DocumentDirectoryPath, DownloadDirectoryPath } from '@dr.pogodin/react-native-fs'
 import { Style, AppSettings, Logger, Characters } from '@globals'
 import appConfig from 'app.config'
+import { copyFile, DocumentDirectoryPath, DownloadDirectoryPath } from 'cui-fs'
 import { reloadAppAsync } from 'expo'
 import { getDocumentAsync } from 'expo-document-picker'
 import { documentDirectory, copyAsync, deleteAsync } from 'expo-file-system'
 import { Stack, useRouter } from 'expo-router'
 import React from 'react'
-import { StyleSheet, Text, View, Switch, TouchableOpacity, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 const appVersion = appConfig.expo.version

@@ -94,7 +94,7 @@ const ChracterEditor = () => {
         if (characterCard && charId)
             return Characters.db.mutate.updateCard(characterCard, charId).then(() => {
                 setCurrentCard(charId)
-                setEdited(false)
+                setEdited(() => false)
                 Logger.log('Card Saved!', true)
             })
     }

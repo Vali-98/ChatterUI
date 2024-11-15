@@ -26,7 +26,6 @@ class OllamaAPI extends APIBase {
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
         const length = payloadFields?.['num_ctx']
-        //const stream = payloadFields?.['stream']
         const modelname = this.getObject(Global.OllamaModel).name
         return {
             model: modelname,

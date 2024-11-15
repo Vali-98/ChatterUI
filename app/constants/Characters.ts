@@ -1,5 +1,5 @@
 import { db as database } from '@db'
-import { copyFileRes, writeFile } from '@dr.pogodin/react-native-fs'
+import { copyFileRes, writeFile } from 'cui-fs'
 import {
     characterGreetings,
     characterTags,

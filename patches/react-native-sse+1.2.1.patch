@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-sse/src/EventSource.js b/node_modules/react-native-sse/src/EventSource.js
-index 6a7b146..a28a025 100644
+index 6a7b146..fd0b3d5 100644
 --- a/node_modules/react-native-sse/src/EventSource.js
 +++ b/node_modules/react-native-sse/src/EventSource.js
 @@ -36,7 +36,7 @@ class EventSource {
@@ -53,7 +53,7 @@ index 6a7b146..a28a025 100644
        } else if (line.startsWith('id')) {
          id = line.replace(/id:?\s*/, '');
          if (id !== '') {
-@@ -224,19 +234,23 @@ class EventSource {
+@@ -224,19 +234,24 @@ class EventSource {
          }
        } else if (line === '') {
          if (data.length > 0) {
@@ -75,12 +75,13 @@ index 6a7b146..a28a025 100644
 +      } else if(this.singleLine) {
 +        try {
 +          const e = JSON.parse(line)
-+          if (e?.model) data.push(line)
++          // if a parse is successful, push the line
++          data.push(line)
 +        } catch(e) {}
        }
      }
    }
-@@ -254,13 +268,23 @@ class EventSource {
+@@ -254,13 +269,23 @@ class EventSource {
    _getLastDoubleNewlineIndex(response) {
      const doubleLineEndingCharacter = this.lineEndingCharacter + this.lineEndingCharacter;
      const lastIndex = response.lastIndexOf(doubleLineEndingCharacter);

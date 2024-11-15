@@ -1,4 +1,4 @@
-import { DownloadDirectoryPath, writeFile } from '@dr.pogodin/react-native-fs'
+import { DownloadDirectoryPath, writeFile } from 'cui-fs'
 import { getCpuFeatures } from 'cui-llama.rn'
 import * as Crypto from 'expo-crypto'
 import * as FS from 'expo-file-system'

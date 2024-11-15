@@ -1,6 +1,7 @@
 module.exports = {
     expo: {
         name: 'ChatterUI',
+        newArchEnabled: true,
         slug: 'ChatterUI',
         version: '0.8.2',
         orientation: 'portrait',
@@ -77,6 +78,7 @@ module.exports = {
         ],
         experiments: {
             typedRoutes: true,
+            reactCompiler: true,
         },
         extra: {
             router: {

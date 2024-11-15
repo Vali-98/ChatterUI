@@ -7,7 +7,7 @@ export namespace MarkdownStyle {
     const speechStyle = { color: '#e69d17' }
     export const Rules = {
         order: SimpleMarkdown.defaultRules.em.order + 0.6,
-        match(source: string, state: any, lookbehind: any) {
+        match(source: string) {
             return /^"([\s\S]+?)"(?!")/.exec(source)
         },
         parse(capture: any, parse: any, state: any) {
@@ -56,7 +56,7 @@ export namespace MarkdownStyle {
             color: Style.getColor('primary-text3'),
         },
         listItemNumber: {
-            color: Style.getColor('primary-text3'),
+            color: Style.getColor('primary-brand'),
         },
 
         inlineCode: {

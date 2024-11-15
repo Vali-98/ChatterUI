@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
     },
 
     popupButton: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         columnGap: 12,

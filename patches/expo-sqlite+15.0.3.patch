@@ -1,8 +1,8 @@
-diff --git a/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModuleNext.kt b/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModuleNext.kt
-index fca87f0..f06add1 100644
---- a/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModuleNext.kt
-+++ b/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModuleNext.kt
-@@ -220,6 +220,7 @@ class SQLiteModuleNext : Module() {
+diff --git a/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt b/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt
+index 12cd12b..f2fefbc 100644
+--- a/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt
++++ b/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt
+@@ -237,6 +237,7 @@ class SQLiteModule : Module() {
      if (database.openOptions.enableChangeListener) {
        addUpdateHook(database)
      }
@@ -10,7 +10,7 @@ index fca87f0..f06add1 100644
    }
  
    @Throws(AccessClosedResourceException::class, SQLiteErrorException::class)
-@@ -352,6 +353,18 @@ class SQLiteModuleNext : Module() {
+@@ -369,6 +370,18 @@ class SQLiteModule : Module() {
      }
    }
  
