@@ -1,0 +1,28 @@
+diff --git a/node_modules/react-native-popup-menu/build/rnpm.js b/node_modules/react-native-popup-menu/build/rnpm.js
+index 1111c2d..68fed34 100644
+--- a/node_modules/react-native-popup-menu/build/rnpm.js
++++ b/node_modules/react-native-popup-menu/build/rnpm.js
+@@ -3211,8 +3211,8 @@
+         wY = windowLayout.y,
+         wWidth = windowLayout.width,
+         wHeight = windowLayout.height;
+-    var tX = triggerLayout.x,
+-        tY = triggerLayout.y,
++    var tX = triggerLayout.y < 0 ? 340 : triggerLayout.y,
++        tY = triggerLayout.y < 0 ? triggerLayout.y + 680 - triggerLayout.width : triggerLayout.y,
+         tHeight = triggerLayout.height,
+         tWidth = triggerLayout.width;
+     var oHeight = optionsLayout.height,
+@@ -3311,12 +3311,10 @@
+           }],
+           opacity: this.state.scaleAnim
+         };
+-
+         var _computeProperties = computeProperties(layouts, userPlacement, preferredPlacement, isRTL),
+             position = _computeProperties.position,
+             placement = _computeProperties.placement,
+             offset = _computeProperties.offset;
+-
+         return /*#__PURE__*/React__default.createElement(reactNative.Animated.View, {
+           style: [styles$6.animated, animation, position, getContainerStyle({
+             placement: placement,

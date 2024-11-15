@@ -134,15 +134,13 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
                 renderer={Popover}
                 rendererProps={{ placement: 'bottom', anchorStyle: styles.anchor }}>
                 <MenuTrigger>
-                    <View>
-                        <Animated.View style={styles.headerButtonContainer} entering={ZoomIn}>
-                            <AntDesign
-                                name="adduser"
-                                size={28}
-                                color={Style.getColor(showMenu ? 'primary-text2' : 'primary-text1')}
-                            />
-                        </Animated.View>
-                    </View>
+                    <Animated.View style={styles.headerButtonContainer} entering={ZoomIn}>
+                        <AntDesign
+                            name="adduser"
+                            size={28}
+                            color={Style.getColor(showMenu ? 'primary-text2' : 'primary-text1')}
+                        />
+                    </Animated.View>
                 </MenuTrigger>
                 <MenuOptions customStyles={menustyle}>
                     <PopupOption
