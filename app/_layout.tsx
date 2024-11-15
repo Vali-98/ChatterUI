@@ -4,6 +4,7 @@ import { Style, initializeApp, startupApp } from '@globals'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 import { SplashScreen, Stack } from 'expo-router'
+import { setOptions } from 'expo-splash-screen'
 import { useEffect, useState } from 'react'
 import { View, Text } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -17,6 +18,10 @@ const DevDB = () => {
 }
 
 SplashScreen.preventAutoHideAsync()
+setOptions({
+    fade: true,
+    duration: 700,
+})
 
 const Layout = () => {
     const [firstRender, setFirstRender] = useState<boolean>(true)
@@ -54,6 +59,8 @@ const Layout = () => {
                             headerTintColor: Style.getColor('primary-text1'),
                             contentStyle: { backgroundColor: Style.getColor('primary-surface1') },
                             headerShadowVisible: false,
+                            presentation: 'transparentModal',
+                            statusBarBackgroundColor: Style.getColor('primary-surface1'),
                         }}>
                         <Stack.Screen name="index" options={{ animation: 'fade' }} />
                     </Stack>

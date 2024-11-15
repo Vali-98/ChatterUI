@@ -177,8 +177,8 @@ export const startupApp = () => {
         mmkv.delete(Global.LocalModel)
     }
 
-    Logger.log('Resetting state values for startup.')
     SystemUI.setBackgroundColorAsync(Style.getColor('primary-surface1'))
+    Logger.log('Resetting state values for startup.')
 }
 
 // creates default dirs and default objects
