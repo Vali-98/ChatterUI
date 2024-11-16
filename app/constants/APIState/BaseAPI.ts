@@ -152,7 +152,7 @@ export abstract class APIBase implements IAPIBase {
             const timestamp_string = `[${swipe_data.send_date.toString().split(' ')[0]} ${swipe_data.send_date.toLocaleTimeString()}]\n`
             const timestamp_length = currentInstruct.timestamp ? tokenizer(timestamp_string) : 0
 
-            const name_string = `${message.name} :`
+            const name_string = `${message.name}: `
             const name_length = currentInstruct.names ? tokenizer(name_string) : 0
 
             const shard_length =
@@ -278,7 +278,7 @@ export abstract class APIBase implements IAPIBase {
             const timestamp_string = `[${swipe_data.send_date.toString().split(' ')[0]} ${swipe_data.send_date.toLocaleTimeString()}]\n`
             const timestamp_length = currentInstruct.timestamp ? tokenizer(timestamp_string) : 0
 
-            const name_string = `${message.name} :`
+            const name_string = `${message.name}: `
             const name_length = currentInstruct.names ? tokenizer(name_string) : 0
 
             const len =
