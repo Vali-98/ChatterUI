@@ -13,7 +13,13 @@ import {
     TouchableOpacity,
     TextInput,
 } from 'react-native'
-import Animated, { FadeInUp, FadeOutUp, ZoomIn, ZoomOut } from 'react-native-reanimated'
+import Animated, {
+    FadeInUp,
+    FadeOutUp,
+    LinearTransition,
+    ZoomIn,
+    ZoomOut,
+} from 'react-native-reanimated'
 
 import CharacterListing from './CharacterListing'
 import CharacterNewMenu from './CharacterNewMenu'
@@ -232,7 +238,8 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                             </View>
                         </Animated.View>
                     )}
-                    <FlatList
+                    <Animated.FlatList
+                        itemLayoutAnimation={LinearTransition}
                         showsVerticalScrollIndicator={false}
                         data={characterList}
                         keyExtractor={(item) => item.id.toString()}
