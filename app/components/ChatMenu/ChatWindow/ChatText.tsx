@@ -1,7 +1,8 @@
 import { Chats, MarkdownStyle } from '@globals'
 import React, { useEffect, useRef } from 'react'
-import { Animated, Easing, LayoutChangeEvent } from 'react-native'
+import { View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 
 type ChatTextProps = {
     nowGenerating: boolean
@@ -15,57 +16,43 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
                 .swipe ?? ''
     )
 
-    const animatedHeight = useRef(new Animated.Value(-1)).current
-    const height = useRef(-1)
-
-    const handleAnimateHeight = (newheight: number) => {
-        animatedHeight.stopAnimation(() =>
-            Animated.timing(animatedHeight, {
-                toValue: newheight,
-                duration: 200,
-                useNativeDriver: false,
-                easing: Easing.inOut((x) => x * x),
-            }).start()
-        )
-    }
-
-    const handleContentSizeChange = (event: LayoutChangeEvent) => {
-        const newHeight = event.nativeEvent.layout.height
+    const animHeight = useSharedValue(-1)
+    const targetHeight = useSharedValue(-1)
+    const heightStyle = useAnimatedStyle(() =>
+        animHeight.value < 0
+            ? {}
+            : {
+                  height: withTiming(animHeight.value, { duration: 100 }),
+              }
+    )
+    const viewRef = useRef<View>(null)
+    const updateHeight = () => {
         const oveflowPadding = 12
 
-        if (height.current === -1) {
-            height.current = newHeight
-            animatedHeight.setValue(newHeight)
-            return
+        if (viewRef.current) {
+            viewRef.current.measure((x, y, width, measuredHeight) => {
+                const newHeight = measuredHeight
+                if (targetHeight.value === newHeight) return
+                animHeight.value = newHeight
+                targetHeight.value = newHeight
+            })
         }
-
-        if (height.current === newHeight) return
-        height.current = newHeight
-        handleAnimateHeight(newHeight)
     }
+
     useEffect(() => {
-        if (!nowGenerating && height.current !== -1) {
-            handleAnimateHeight(height.current)
-        } else if (nowGenerating && !mes) {
-            // NOTE: this assumes that mes is empty due to a swipe and may break, but unlikely
-            height.current = 0
-            handleAnimateHeight(height.current)
-        }
-    }, [nowGenerating])
+        requestAnimationFrame(() => updateHeight())
+    }, [mes])
 
     return (
-        <Animated.View
-            onLayout={handleContentSizeChange}
-            style={{
-                height: __DEV__ ? 'auto' : animatedHeight, // dev fix for slow emulator animations
-                overflow: 'scroll',
-            }}>
-            <Markdown
-                markdownit={MarkdownStyle.Rules}
-                rules={MarkdownStyle.RenderRules}
-                style={MarkdownStyle.Styles}>
-                {mes.trim()}
-            </Markdown>
+        <Animated.View style={[heightStyle, { overflow: 'scroll' }]}>
+            <View style={{ minHeight: 10 }} ref={viewRef}>
+                <Markdown
+                    markdownit={MarkdownStyle.Rules}
+                    rules={MarkdownStyle.RenderRules}
+                    style={MarkdownStyle.Styles}>
+                    {mes.trim()}
+                </Markdown>
+            </View>
         </Animated.View>
     )
 }

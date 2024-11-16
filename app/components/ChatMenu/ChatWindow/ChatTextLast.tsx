@@ -1,8 +1,9 @@
 import { useInference } from '@constants/Chat'
 import { Chats, Style, MarkdownStyle } from '@globals'
-import React, { useEffect, useRef } from 'react'
-import { Easing, LayoutChangeEvent, Animated, View, StyleSheet, Platform } from 'react-native'
+import { useEffect, useRef } from 'react'
+import { LayoutChangeEvent, View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 //@ts-expect-error
 import AnimatedEllipsis from 'rn-animated-ellipsis'
 import { useShallow } from 'zustand/react/shallow'
@@ -31,6 +32,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
         }))
     )
 
+    /*
     const animatedHeight = useRef(new Animated.Value(-1)).current
     const height = useRef(-1)
     const handleAnimateHeight = (newheight: number) => {
@@ -69,38 +71,54 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
             height.current = 0
             handleAnimateHeight(height.current)
         }
-    }, [nowGenerating])
+    }, [nowGenerating])*/
+
+    const animHeight = useSharedValue(-1)
+    const targetHeight = useSharedValue(-1)
+    const heightStyle = useAnimatedStyle(() =>
+        animHeight.value < 0
+            ? {}
+            : {
+                  height: withTiming(animHeight.value, { duration: 100 }),
+              }
+    )
+    const viewRef = useRef<View>(null)
+    const updateHeight = () => {
+        const oveflowPadding = 12
+        const showPadding = nowGenerating && buffer !== ''
+
+        if (viewRef.current) {
+            viewRef.current.measure((x, y, width, measuredHeight) => {
+                const newHeight = measuredHeight + (showPadding ? oveflowPadding : 0)
+                if (targetHeight.value === newHeight) return
+                animHeight.value = newHeight
+                targetHeight.value = newHeight
+            })
+        }
+    }
+
+    useEffect(() => {
+        requestAnimationFrame(() => updateHeight())
+    }, [buffer, mes])
 
     return (
-        <Animated.View
-            style={{
-                height: animatedHeight,
-                overflow: 'scroll',
-            }}>
-            {swipeId === currentSwipeId && nowGenerating && buffer === '' && (
-                <AnimatedEllipsis
-                    style={{
-                        color: Style.getColor('primary-text2'),
-                        fontSize: 20,
-                    }}
-                />
-            )}
-            <Markdown
-                markdownit={MarkdownStyle.Rules}
-                rules={{
-                    ...MarkdownStyle.RenderRules,
-                    body: (node: any, children: any, parent: any, styles: any) => (
-                        <View
-                            key={node.key}
-                            style={styles._VIEW_SAFE_body}
-                            onLayout={handleContentSizeChange}>
-                            {children}
-                        </View>
-                    ),
-                }}
-                style={MarkdownStyle.Styles}>
-                {nowGenerating && swipeId === currentSwipeId ? buffer.trim() : mes.trim()}
-            </Markdown>
+        <Animated.View style={[heightStyle, { overflow: 'scroll' }]}>
+            <View style={{ minHeight: 10 }} ref={viewRef}>
+                {swipeId === currentSwipeId && nowGenerating && buffer === '' && (
+                    <AnimatedEllipsis
+                        style={{
+                            color: Style.getColor('primary-text2'),
+                            fontSize: 20,
+                        }}
+                    />
+                )}
+                <Markdown
+                    markdownit={MarkdownStyle.Rules}
+                    rules={MarkdownStyle.RenderRules}
+                    style={MarkdownStyle.Styles}>
+                    {nowGenerating && swipeId === currentSwipeId ? buffer.trim() : mes.trim()}
+                </Markdown>
+            </View>
         </Animated.View>
     )
 }
