@@ -61,7 +61,7 @@ const AvatarViewer = ({ editorButton = true }) => {
                 <Animated.View style={styles.bodyContainer} entering={FadeInDown}>
                     <Avatar
                         targetImage={Characters.getImageDir(imageId ?? -1)}
-                        style={{ ...styles.avatar, aspectRatio: aspectRatio }}
+                        style={[styles.avatar, { aspectRatio: aspectRatio }]}
                     />
                     <Text style={styles.name}>{name}</Text>
                     <View style={styles.buttonContainer}>

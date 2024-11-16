@@ -74,7 +74,8 @@
     "react-native-sse": "^1.2.1",
     "rn-animated-ellipsis": "^2.1.3",
     "upgrade": "^1.1.0",
-    "zustand": "^4.5.0"
+    "zustand": "^4.5.0",
+    "expo-image": "~2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",

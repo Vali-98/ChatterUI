@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import { Image, ImageProps, ImageSourcePropType, StyleSheet } from 'react-native'
+import { Image, ImageProps } from 'expo-image'
 
 interface FallbackImageProps extends Omit<ImageProps, 'source' | 'onError'> {
     targetImage: string
@@ -8,16 +7,7 @@ interface FallbackImageProps extends Omit<ImageProps, 'source' | 'onError'> {
 const Avatar: React.FC<FallbackImageProps> = ({ targetImage, ...rest }) => {
     const fallbackImage = require('@assets/user.png')
 
-    const [imageSource, setImageSource] = useState<ImageSourcePropType>({ uri: targetImage })
-    useEffect(() => {
-        setImageSource({ uri: targetImage })
-    }, [targetImage])
-
-    const handleError = () => {
-        setImageSource(fallbackImage)
-    }
-
-    return <Image source={imageSource} onError={handleError} {...rest} />
+    return <Image {...rest} source={{ uri: targetImage }} placeholder={fallbackImage} />
 }
 
 export default Avatar
