@@ -12,8 +12,7 @@ import { Stack } from 'expo-router'
 import { useState } from 'react'
 import { View, SafeAreaView, TouchableOpacity, StyleSheet, ScrollView, Text } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
-//@ts-expect-error
-import Markdown from 'react-native-markdown-package'
+import Markdown from 'react-native-markdown-display'
 
 const Instruct = () => {
     const { currentInstruct, loadInstruct, setCurrentInstruct } = Instructs.useInstruct(
@@ -396,8 +395,9 @@ const Instruct = () => {
                             </Text>
                             <View style={styles.exampleContainer}>
                                 <Markdown
-                                    rules={{ rules: MarkdownStyle.Rules }}
-                                    styles={MarkdownStyle.Format}>
+                                    markdownit={MarkdownStyle.Rules}
+                                    rules={MarkdownStyle.RenderRules}
+                                    style={MarkdownStyle.Styles}>
                                     {
                                         [
                                             '*<No Formatting>*',
