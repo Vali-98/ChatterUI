@@ -1,7 +1,6 @@
 import React from 'react'
 import { Platform, StyleSheet, Text } from 'react-native'
 import { MarkdownIt } from 'react-native-markdown-display'
-import SimpleMarkdown from 'simple-markdown'
 
 import doubleQuotePlugin from './MarkdownQuotePlugin'
 import { Style } from './Style'
