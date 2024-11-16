@@ -20,7 +20,7 @@ const DevDB = () => {
 SplashScreen.preventAutoHideAsync()
 setOptions({
     fade: true,
-    duration: 700,
+    duration: 350,
 })
 
 const Layout = () => {
