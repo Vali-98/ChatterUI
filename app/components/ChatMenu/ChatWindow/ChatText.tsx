@@ -1,8 +1,7 @@
 import { Chats, MarkdownStyle } from '@globals'
 import React, { useEffect, useRef } from 'react'
 import { Animated, Easing, LayoutChangeEvent } from 'react-native'
-//@ts-expect-error
-import Markdown from 'react-native-markdown-package'
+import Markdown from 'react-native-markdown-display'
 
 type ChatTextProps = {
     nowGenerating: boolean
@@ -10,14 +9,14 @@ type ChatTextProps = {
 }
 
 const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
-    const animatedHeight = useRef(new Animated.Value(-1)).current
-    const height = useRef(-1)
-
     const mes = Chats.useChat(
         (state) =>
             state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
                 .swipe ?? ''
     )
+
+    const animatedHeight = useRef(new Animated.Value(-1)).current
+    const height = useRef(-1)
 
     const handleAnimateHeight = (newheight: number) => {
         animatedHeight.stopAnimation(() =>
@@ -56,14 +55,15 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
 
     return (
         <Animated.View
+            onLayout={handleContentSizeChange}
             style={{
                 height: __DEV__ ? 'auto' : animatedHeight, // dev fix for slow emulator animations
                 overflow: 'scroll',
             }}>
             <Markdown
-                onLayout={handleContentSizeChange}
-                rules={{ rules: MarkdownStyle.Rules }}
-                styles={MarkdownStyle.Format}>
+                markdownit={MarkdownStyle.Rules}
+                rules={MarkdownStyle.RenderRules}
+                style={MarkdownStyle.Styles}>
                 {mes.trim()}
             </Markdown>
         </Animated.View>

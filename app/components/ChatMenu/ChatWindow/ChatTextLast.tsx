@@ -1,9 +1,8 @@
 import { useInference } from '@constants/Chat'
 import { Chats, Style, MarkdownStyle } from '@globals'
 import React, { useEffect, useRef } from 'react'
-import { Easing, LayoutChangeEvent, Animated } from 'react-native'
-//@ts-expect-error
-import Markdown from 'react-native-markdown-package'
+import { Easing, LayoutChangeEvent, Animated, View, StyleSheet, Platform } from 'react-native'
+import Markdown from 'react-native-markdown-display'
 //@ts-expect-error
 import AnimatedEllipsis from 'rn-animated-ellipsis'
 import { useShallow } from 'zustand/react/shallow'
@@ -46,9 +45,10 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     }
 
     const handleContentSizeChange = (event: LayoutChangeEvent) => {
+        console.log('handle')
         const newHeight = event.nativeEvent.layout.height
         const oveflowPadding = 12
-
+        console.log(newHeight)
         if (height.current === -1) {
             height.current = newHeight
             animatedHeight.setValue(newHeight)
@@ -74,7 +74,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     return (
         <Animated.View
             style={{
-                height: __DEV__ ? 'auto' : animatedHeight, // dev fix for slow emulator animations
+                height: animatedHeight,
                 overflow: 'scroll',
             }}>
             {swipeId === currentSwipeId && nowGenerating && buffer === '' && (
@@ -85,11 +85,20 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
                     }}
                 />
             )}
-
             <Markdown
-                onLayout={handleContentSizeChange}
-                rules={{ rules: MarkdownStyle.Rules }}
-                styles={MarkdownStyle.Format}>
+                markdownit={MarkdownStyle.Rules}
+                rules={{
+                    ...MarkdownStyle.RenderRules,
+                    body: (node: any, children: any, parent: any, styles: any) => (
+                        <View
+                            key={node.key}
+                            style={styles._VIEW_SAFE_body}
+                            onLayout={handleContentSizeChange}>
+                            {children}
+                        </View>
+                    ),
+                }}
+                style={MarkdownStyle.Styles}>
                 {nowGenerating && swipeId === currentSwipeId ? buffer.trim() : mes.trim()}
             </Markdown>
         </Animated.View>

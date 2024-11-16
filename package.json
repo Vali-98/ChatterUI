@@ -48,6 +48,7 @@
     "expo-router": "~4.0.5",
     "expo-sharing": "~13.0.0",
     "expo-speech": "~13.0.0",
+    "expo-splash-screen": "~0.29.10",
     "expo-sqlite": "~15.0.3",
     "expo-status-bar": "~2.0.0",
     "expo-system-ui": "~4.0.3",
@@ -59,8 +60,10 @@
     "react-native-collapsible": "^1.6.1",
     "react-native-element-dropdown": "^2.10.0",
     "react-native-gesture-handler": "~2.20.2",
+    "react-native-markdown-display": "^7.0.2",
     "react-native-markdown-package": "^1.8.2",
     "react-native-mmkv": "^3.1.0",
+    "react-native-popover-view": "^5.1.9",
     "react-native-popup-menu": "^0.16.1",
     "react-native-progress": "^5.0.1",
     "react-native-quick-base64": "^2.1.2",
@@ -71,8 +74,7 @@
     "react-native-sse": "^1.2.1",
     "rn-animated-ellipsis": "^2.1.3",
     "upgrade": "^1.1.0",
-    "zustand": "^4.5.0",
-    "expo-splash-screen": "~0.29.10"
+    "zustand": "^4.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",
