@@ -1,8 +1,8 @@
-import { AppSettings, Characters, Chats } from '@globals'
-import { StyleSheet, FlatList, View } from 'react-native'
+import { AppSettings, Chats } from '@globals'
+import { StyleSheet, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
+import Animated, { LinearTransition } from 'react-native-reanimated'
 
-import AvatarViewer from './AvatarViewer'
 import { ChatItem } from './ChatItem'
 
 type ListItem = {
@@ -37,20 +37,22 @@ const ChatWindow = () => {
 
     return (
         <View style={styles.chatHistory}>
-            <FlatList
-                style={styles.chatHistory}
-                maintainVisibleContentPosition={
-                    autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
-                }
-                keyboardShouldPersistTaps="handled"
-                removeClippedSubviews={false}
-                inverted
-                windowSize={2}
-                data={list}
-                keyExtractor={(item) => item.key}
-                renderItem={renderItems}
-            />
-            <AvatarViewer />
+            <View style={styles.chatHistory}>
+                <Animated.FlatList
+                    layout={LinearTransition}
+                    style={styles.chatHistory}
+                    maintainVisibleContentPosition={
+                        autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
+                    }
+                    keyboardShouldPersistTaps="handled"
+                    removeClippedSubviews={false}
+                    inverted
+                    windowSize={2}
+                    data={list}
+                    keyExtractor={(item) => item.key}
+                    renderItem={renderItems}
+                />
+            </View>
         </View>
     )
 }

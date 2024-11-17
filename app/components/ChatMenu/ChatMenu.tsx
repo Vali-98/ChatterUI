@@ -1,15 +1,16 @@
 import CharacterList from '@components/CharacterMenu/CharacterList'
-import { Ionicons, FontAwesome } from '@expo/vector-icons'
-import { Logger, Style, Characters, Chats } from '@globals'
+import { Ionicons } from '@expo/vector-icons'
+import { Characters, Chats, Logger, Style } from '@globals'
 import { Stack, useFocusEffect, useRouter } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
-import { View, SafeAreaView, TouchableOpacity, StyleSheet, BackHandler } from 'react-native'
+import { BackHandler, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Menu } from 'react-native-popup-menu'
 import Animated, { runOnJS, ZoomIn } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import ChatInput from './ChatInput'
+import AvatarViewer from './ChatWindow/AvatarViewer'
 import { ChatWindow } from './ChatWindow/ChatWindow'
 import ChatsDrawer from './ChatsDrawer'
 import OptionsMenu from './OptionsMenu'
@@ -150,8 +151,9 @@ const ChatMenu = () => {
                 {chat && (
                     <View style={styles.container}>
                         <ChatWindow />
-
                         <View style={styles.inputContainer}>
+                            {/**TODO: This might be bad */}
+                            <AvatarViewer />
                             <OptionsMenu menuRef={menuRef} showChats={setShowChats} />
                             <ChatInput />
                         </View>
