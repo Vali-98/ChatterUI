@@ -1,5 +1,5 @@
 import { Style } from '@globals'
-import CheckBox from '@react-native-community/checkbox'
+import CheckBox from 'expo-checkbox'
 import { View, Text } from 'react-native'
 
 type CheckboxTitleProps = {
@@ -20,12 +20,7 @@ const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
     return (
         <View style={{ flexDirection: `row`, alignItems: `center`, paddingVertical: 4 }}>
             <CheckBox
-                tintColors={{
-                    false: Style.getColor('primary-brand'),
-                    true: Style.getColor('primary-brand'),
-                }}
-                onFillColor={Style.getColor('primary-brand')}
-                onCheckColor={Style.getColor('primary-brand')}
+                color={Style.getColor('primary-brand')}
                 value={body[varname]}
                 onValueChange={
                     onChange !== undefined
