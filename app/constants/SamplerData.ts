@@ -50,6 +50,7 @@ export enum SamplerID {
     DRY_BASE = 'dry_base',
     DRY_ALLOWED_LENGTH = 'dry_allowed_length',
     DRY_SEQUENCE_BREAK = 'dry_sequence_break',
+    DRY_PENALTY_LAST_N = 'dry_penalty_last_n',
 
     XTC_THRESHOLD = 'xtc_threshold',
     XTC_PROBABILITY = 'xtc_probability',
@@ -675,6 +676,20 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
         values: {
             type: 'string',
             default: '',
+        },
+    },
+    [SamplerID.DRY_PENALTY_LAST_N]: {
+        internalID: SamplerID.DRY_PENALTY_LAST_N,
+        friendlyName: 'Dry Penalty Last N',
+        inputType: 'slider',
+        macro: '{{dry_penalty_last_n}}',
+        values: {
+            type: 'integer',
+            min: -1,
+            max: 8196,
+            default: 0,
+            step: 1,
+            precision: 1,
         },
     },
 } as const
