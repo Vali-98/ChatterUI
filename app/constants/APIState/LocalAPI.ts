@@ -15,7 +15,6 @@ class LocalAPI extends APIBase {
         { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
         { externalName: 'top_p', samplerID: SamplerID.TOP_P },
         { externalName: 'top_k', samplerID: SamplerID.TOP_K },
-        // { externalName: 'tfs_z', samplerID: SamplerID.TAIL_FREE_SAMPLING },
         { externalName: 'min_p', samplerID: SamplerID.MIN_P },
         { externalName: 'typical_p', samplerID: SamplerID.TYPICAL },
         { externalName: 'mirostat', samplerID: SamplerID.MIROSTAT_MODE },
@@ -29,6 +28,11 @@ class LocalAPI extends APIBase {
         { externalName: 'xtc_t', samplerID: SamplerID.XTC_THRESHOLD },
         { externalName: 'xtc_p', samplerID: SamplerID.XTC_PROBABILITY },
         { externalName: 'seed', samplerID: SamplerID.SEED },
+        { externalName: 'dry_base', samplerID: SamplerID.DRY_BASE },
+        { externalName: 'dry_allowed_length', samplerID: SamplerID.DRY_ALLOWED_LENGTH },
+        { externalName: 'dry_multiplier', samplerID: SamplerID.DRY_MULTIPLIER },
+        { externalName: 'dry_sequence_breakers', samplerID: SamplerID.DRY_SEQUENCE_BREAK },
+        { externalName: 'dry_allowed_length', samplerID: SamplerID.DRY_ALLOWED_LENGTH },
     ]
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
