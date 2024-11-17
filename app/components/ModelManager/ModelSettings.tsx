@@ -101,7 +101,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                 setValue={setPreset}
                 varname="context_length"
                 min={1024}
-                max={32768}
+                max={131072}
                 step={1024}
                 disabled={modelImporting || modelLoading}
             />
@@ -122,7 +122,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                 setValue={setPreset}
                 varname="batch"
                 min={16}
-                max={512}
+                max={4096}
                 step={16}
                 disabled={modelImporting || modelLoading}
             />
