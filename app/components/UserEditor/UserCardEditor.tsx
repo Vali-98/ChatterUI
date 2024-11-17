@@ -12,12 +12,13 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Dimensions } from 
 import { useShallow } from 'zustand/react/shallow'
 
 const UserCardEditor = () => {
-    const { userCard, imageID, id, setCard } = Characters.useUserCard(
+    const { userCard, imageID, id, setCard, updateImage } = Characters.useUserCard(
         useShallow((state) => ({
             userCard: state.card,
             imageID: state.card?.image_id ?? 0,
             id: state.id,
             setCard: state.setCard,
+            updateImage: state.updateImage,
         }))
     )
 
@@ -42,7 +43,7 @@ const UserCardEditor = () => {
             type: 'image/*',
         }).then((result) => {
             if (result.canceled) return
-            if (id) Characters.useUserCard.getState().updateImage(result.assets[0].uri)
+            if (id) updateImage(result.assets[0].uri)
         })
     }
 
@@ -55,7 +56,7 @@ const UserCardEditor = () => {
                 {
                     label: 'Delete Image',
                     onPress: () => {
-                        if (currentCard) Characters.deleteImage(currentCard.image_id)
+                        Characters.deleteImage(imageID)
                     },
                     type: 'warning',
                 },
@@ -97,7 +98,7 @@ const UserCardEditor = () => {
                         },
                     ]}>
                     <Avatar
-                        targetImage={Characters.getImageDir(currentCard?.image_id ?? -1)}
+                        targetImage={Characters.getImageDir(imageID)}
                         style={styles.userImage}
                     />
                     <AntDesign
