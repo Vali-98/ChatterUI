@@ -320,7 +320,7 @@ const Instruct = () => {
                                 />*/}
                             </View>
 
-                            <View style={{ flexDirection: 'row', columnGap: 32, marginBottom: 36 }}>
+                            <View style={{ flexDirection: 'row', columnGap: 16, marginBottom: 16 }}>
                                 <View>
                                     <CheckboxTitle
                                         name="Wrap In Newline"
