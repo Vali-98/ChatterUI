@@ -47,13 +47,16 @@ module.exports = function doubleQuotePlugin(md) {
                                 content: child.content.slice(lastIndex),
                             })
                         }
-
                         // Convert parts into tokens and replace the child tokens
-                        token.children = parts.map((part) => {
-                            const newToken = new state.Token(part.type, '', 0)
-                            newToken.content = part.content
-                            return newToken
-                        })
+                        token.children.splice(
+                            j,
+                            1,
+                            ...parts.map((part) => {
+                                const newToken = new state.Token(part.type, '', 0)
+                                newToken.content = part.content
+                                return newToken
+                            })
+                        )
                     }
                 }
             }
