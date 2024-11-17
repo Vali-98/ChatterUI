@@ -41,6 +41,9 @@ export abstract class APIBase implements IAPIBase {
                     if (item.samplerID === 'max_length' && max_length) {
                         cleanvalue = Math.min(value, max_length)
                     } else if (samplerItem.values.type === 'integer') cleanvalue = Math.floor(value)
+                if (item.samplerID === SamplerID.DRY_SEQUENCE_BREAK) {
+                    cleanvalue = (value as string).split(',')
+                }
                 return { [item.externalName as SamplerID]: cleanvalue }
             })
             .reduce((acc, obj) => Object.assign(acc, obj), {})
