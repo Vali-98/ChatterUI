@@ -98,7 +98,6 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
                 style={{ flex: 1 }}>
                 <FadeScreen handleOverlayClick={handleOverlayClick}>
                     <Animated.View
-                        entering={SlideInDown.duration(100)}
                         exiting={SlideOutDown.duration(100)}
                         style={styles.editorContainer}>
                         <View style={styles.topText}>
