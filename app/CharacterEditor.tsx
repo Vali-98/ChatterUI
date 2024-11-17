@@ -52,12 +52,14 @@ const ChracterEditor = () => {
                     label: 'Save',
                     onPress: async () => {
                         await savecard()
+                        if (!chat) unloadCharacter()
                         exitCallback()
                     },
                 },
                 {
                     label: 'Discard Changes',
                     onPress: () => {
+                        if (!chat) unloadCharacter()
                         exitCallback()
                     },
                     type: 'warning',
@@ -67,27 +69,32 @@ const ChracterEditor = () => {
         return true
     }
 
-    const initialRender = useRef(true)
+    const defaultListener = () => {
+        const removeListener = navigation.addListener('beforeRemove', (e) => {
+            if (!chat) unloadCharacter()
+            navigation.dispatch(e.data.action)
+        })
+        return removeListener
+    }
+
+    const removeListener = useRef(defaultListener())
+    const firstRender = useRef(true)
 
     useEffect(() => {
-        if (initialRender.current) {
-            initialRender.current = false
-            const removeListener = navigation.addListener('beforeRemove', (e) => {
-                if (!chat) unloadCharacter()
-                navigation.dispatch(e.data.action)
-            })
-            return () => removeListener()
+        if (firstRender.current) {
+            firstRender.current = false
+            return
         }
+        if (edited) return
         setEdited(true)
-
-        const removeListener = navigation.addListener('beforeRemove', (e) => {
+        removeListener.current()
+        removeListener.current = navigation.addListener('beforeRemove', (e) => {
             e.preventDefault()
             editedBackAction(() => {
                 if (!chat) unloadCharacter()
                 navigation.dispatch(e.data.action)
             })
         })
-        return () => removeListener()
     }, [characterCard])
 
     const savecard = async () => {
@@ -95,6 +102,8 @@ const ChracterEditor = () => {
             return Characters.db.mutate.updateCard(characterCard, charId).then(() => {
                 setCurrentCard(charId)
                 setEdited(() => false)
+                removeListener.current()
+                removeListener.current = defaultListener()
                 Logger.log('Card Saved!', true)
             })
     }
