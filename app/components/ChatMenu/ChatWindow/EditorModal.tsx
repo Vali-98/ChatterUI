@@ -11,7 +11,7 @@ import {
     View,
     TextInput,
 } from 'react-native'
-import Animated, { SlideInDown, SlideInUp, SlideOutDown } from 'react-native-reanimated'
+import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 type EditorButtonProps = {
@@ -97,7 +97,10 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
                 onRequestClose={handleClose}
                 style={{ flex: 1 }}>
                 <FadeScreen handleOverlayClick={handleOverlayClick}>
-                    <Animated.View exiting={SlideOutDown} style={styles.editorContainer}>
+                    <Animated.View
+                        entering={SlideInDown.duration(100)}
+                        exiting={SlideOutDown.duration(100)}
+                        style={styles.editorContainer}>
                         <View style={styles.topText}>
                             <Text style={styles.nameText}>{message?.name}</Text>
                             <Text style={styles.timeText}>
