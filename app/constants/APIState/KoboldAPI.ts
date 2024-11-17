@@ -36,16 +36,11 @@ class KoboldAPI extends APIBase {
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
         const length = payloadFields?.['max_context_length']
-        const dry_sequence_break = payloadFields?.['dry_sequence_break'] as string
-
-        const seq_break_array = dry_sequence_break ? dry_sequence_break.split(',') : []
-
         return {
             ...payloadFields,
             samplerOrder: [6, 0, 1, 3, 4, 2, 5],
             prompt: this.buildTextCompletionContext(typeof length === 'number' ? length : 0),
             stop_sequence: this.constructStopSequence(),
-            dry_sequence_break: seq_break_array,
         }
     }
     inference = async () => {
