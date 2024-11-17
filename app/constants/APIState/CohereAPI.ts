@@ -52,7 +52,7 @@ class CohereAPI extends APIBase {
             'https://api.cohere.com/v1/chat',
             JSON.stringify(this.buildPayload()),
             (item) => {
-                return item
+                return JSON.parse(item).text
             },
             () => {},
             { Authorization: `Bearer ${this.getString(Global.CohereKey)}` }
