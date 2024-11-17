@@ -409,7 +409,7 @@ const ChracterEditor = () => {
                                 color: Style.getColor('primary-text2'),
                                 fontStyle: 'italic',
                             }}>
-                            No Alernate Greetings
+                            No Alternate Greetings
                         </Text>
                     )}
 
