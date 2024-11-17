@@ -12,7 +12,7 @@ type AvatarViewerProps = {
     editorButton?: boolean
 }
 
-const AvatarViewer = ({ editorButton = true }) => {
+const AvatarViewer: React.FC<AvatarViewerProps> = ({ editorButton = true }) => {
     const router = useRouter()
 
     const { show, setShow, isUser } = useViewerState((state) => ({
@@ -60,6 +60,7 @@ const AvatarViewer = ({ editorButton = true }) => {
             <View style={styles.mainContainer}>
                 <Animated.View style={styles.bodyContainer} entering={FadeInDown}>
                     <Avatar
+                        contentFit="cover"
                         targetImage={Characters.getImageDir(imageId ?? -1)}
                         style={[styles.avatar, { aspectRatio: aspectRatio }]}
                     />
@@ -130,7 +131,6 @@ const styles = StyleSheet.create({
     avatar: {
         height: undefined,
         width: '70%',
-        resizeMode: 'contain',
         borderRadius: 16,
         borderWidth: 2,
         borderColor: Style.getColor('primary-brand'),
