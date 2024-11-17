@@ -50,8 +50,8 @@ const Layout = () => {
         return (
             <GestureHandlerRootView style={{ flex: 1 }}>
                 {__DEV__ && <DevDB />}
+                <AlertBox />
                 <MenuProvider>
-                    <AlertBox />
                     <Stack
                         screenOptions={{
                             headerStyle: { backgroundColor: Style.getColor('primary-surface1') },
