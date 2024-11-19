@@ -101,8 +101,11 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
         requestAnimationFrame(() => updateHeight())
     }, [buffer, mes])
 
+    // TODO: Remove conditional styling once this is fixed
+    // https://github.com/software-mansion/react-native-reanimated/issues/6659
+
     return (
-        <Animated.View style={[heightStyle, { overflow: 'scroll' }]}>
+        <Animated.View style={[nowGenerating ? heightStyle : {}, { overflow: 'scroll' }]}>
             <View style={{ minHeight: 10 }} ref={viewRef}>
                 {swipeId === currentSwipeId && nowGenerating && buffer === '' && (
                     <AnimatedEllipsis

@@ -15,7 +15,11 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
             state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
                 .swipe ?? ''
     )
+    const viewRef = useRef<View>(null)
 
+    /* TODO: Reenable once this is fixed:
+    // https://github.com/software-mansion/react-native-reanimated/issues/6659
+    
     const animHeight = useSharedValue(-1)
     const targetHeight = useSharedValue(-1)
     const heightStyle = useAnimatedStyle(() =>
@@ -25,10 +29,8 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
                   height: withTiming(animHeight.value, { duration: 200 }),
               }
     )
-    const viewRef = useRef<View>(null)
+    
     const updateHeight = () => {
-        const oveflowPadding = 12
-
         if (viewRef.current) {
             viewRef.current.measure((x, y, width, measuredHeight) => {
                 const newHeight = measuredHeight
@@ -41,10 +43,10 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
 
     useEffect(() => {
         requestAnimationFrame(() => updateHeight())
-    }, [mes])
+    }, [mes])*/
 
     return (
-        <Animated.View style={[heightStyle, { overflow: 'scroll' }]}>
+        <Animated.View style={[{ overflow: 'scroll' }]}>
             <View style={{ minHeight: 10 }} ref={viewRef}>
                 <Markdown
                     markdownit={MarkdownStyle.Rules}
