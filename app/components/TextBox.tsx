@@ -16,7 +16,7 @@ const TextBox: React.FC<TextBoxProps> = ({
     body,
     varname,
     setValue,
-    lines = 1,
+    lines = 0,
     keyboardType = 'default',
     multiline = false,
 }) => {

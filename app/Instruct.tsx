@@ -208,15 +208,16 @@ const Instruct = () => {
                         </TouchableOpacity>
                     </View>
 
-                    <ScrollView showsVerticalScrollIndicator={false}>
+                    <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
                         <View
                             style={{
+                                flex: 1,
                                 paddingVertical: 20,
                             }}>
                             <TextBox
                                 name="System Sequence"
                                 varname="system_prompt"
-                                lines={3}
+                                lines={5}
                                 body={currentInstruct}
                                 setValue={setCurrentInstruct}
                                 multiline
@@ -320,7 +321,13 @@ const Instruct = () => {
                                 />*/}
                             </View>
 
-                            <View style={{ flexDirection: 'row', columnGap: 16, marginBottom: 16 }}>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    columnGap: 16,
+                                    marginBottom: 16,
+                                    justifyContent: 'space-evenly',
+                                }}>
                                 <View>
                                     <CheckboxTitle
                                         name="Wrap In Newline"
