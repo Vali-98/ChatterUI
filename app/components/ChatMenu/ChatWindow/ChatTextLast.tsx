@@ -1,7 +1,8 @@
 import { useInference } from '@constants/Chat'
-import { Chats, Style, MarkdownStyle } from '@globals'
+import { Chats, MarkdownStyle, Style } from '@globals'
+import { usePathname } from 'expo-router'
 import { useEffect, useRef } from 'react'
-import { LayoutChangeEvent, View } from 'react-native'
+import { View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 //@ts-expect-error
@@ -23,6 +24,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
             state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1].id ??
             -1,
     }))
+    const viewRef = useRef<View>(null)
 
     const currentSwipeId = useInference((state) => state.currentSwipeId)
 
@@ -31,47 +33,6 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
             buffer: state.buffer,
         }))
     )
-
-    /*
-    const animatedHeight = useRef(new Animated.Value(-1)).current
-    const height = useRef(-1)
-    const handleAnimateHeight = (newheight: number) => {
-        animatedHeight.stopAnimation(() =>
-            Animated.timing(animatedHeight, {
-                toValue: newheight,
-                duration: 200,
-                useNativeDriver: false,
-                easing: Easing.inOut((x) => x * x),
-            }).start()
-        )
-    }
-
-    const handleContentSizeChange = (event: LayoutChangeEvent) => {
-        console.log('handle')
-        const newHeight = event.nativeEvent.layout.height
-        const oveflowPadding = 12
-        console.log(newHeight)
-        if (height.current === -1) {
-            height.current = newHeight
-            animatedHeight.setValue(newHeight)
-            return
-        }
-
-        if (height.current === newHeight) return
-        height.current = newHeight
-        const showPadding = nowGenerating && buffer !== ''
-        handleAnimateHeight(newHeight + (showPadding ? oveflowPadding : 0))
-    }
-
-    useEffect(() => {
-        if (!nowGenerating && height.current !== -1) {
-            handleAnimateHeight(height.current)
-        } else if (nowGenerating && !mes) {
-            // NOTE: this assumes that mes is empty due to a swipe and may break, but unlikely
-            height.current = 0
-            handleAnimateHeight(height.current)
-        }
-    }, [nowGenerating])*/
 
     const animHeight = useSharedValue(-1)
     const targetHeight = useSharedValue(-1)
@@ -82,7 +43,6 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
                   height: withTiming(animHeight.value, { duration: 200 }),
               }
     )
-    const viewRef = useRef<View>(null)
     const updateHeight = () => {
         const oveflowPadding = 12
         const showPadding = nowGenerating && buffer !== ''
@@ -101,11 +61,13 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
         requestAnimationFrame(() => updateHeight())
     }, [buffer, mes])
 
-    // TODO: Remove conditional styling once this is fixed
+    // TODO: Remove once this is fixed:
     // https://github.com/software-mansion/react-native-reanimated/issues/6659
 
+    const path = usePathname()
+
     return (
-        <Animated.View style={[nowGenerating ? heightStyle : {}, { overflow: 'scroll' }]}>
+        <Animated.View style={[path === '/' ? heightStyle : {}, { overflow: 'scroll' }]}>
             <View style={{ minHeight: 10 }} ref={viewRef}>
                 {swipeId === currentSwipeId && nowGenerating && buffer === '' && (
                     <AnimatedEllipsis

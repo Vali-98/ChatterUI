@@ -1,4 +1,5 @@
 import { Chats, MarkdownStyle } from '@globals'
+import { usePathname } from 'expo-router'
 import React, { useEffect, useRef } from 'react'
 import { View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
@@ -17,9 +18,6 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     )
     const viewRef = useRef<View>(null)
 
-    /* TODO: Reenable once this is fixed:
-    // https://github.com/software-mansion/react-native-reanimated/issues/6659
-    
     const animHeight = useSharedValue(-1)
     const targetHeight = useSharedValue(-1)
     const heightStyle = useAnimatedStyle(() =>
@@ -29,7 +27,7 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
                   height: withTiming(animHeight.value, { duration: 200 }),
               }
     )
-    
+
     const updateHeight = () => {
         if (viewRef.current) {
             viewRef.current.measure((x, y, width, measuredHeight) => {
@@ -43,10 +41,15 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
 
     useEffect(() => {
         requestAnimationFrame(() => updateHeight())
-    }, [mes])*/
+    }, [mes])
+
+    // TODO: Remove once this is fixed:
+    // https://github.com/software-mansion/react-native-reanimated/issues/6659
+
+    const path = usePathname()
 
     return (
-        <Animated.View style={[{ overflow: 'scroll' }]}>
+        <Animated.View style={[path === '/' ? heightStyle : {}, { overflow: 'scroll' }]}>
             <View style={{ minHeight: 10 }} ref={viewRef}>
                 <Markdown
                     markdownit={MarkdownStyle.Rules}
