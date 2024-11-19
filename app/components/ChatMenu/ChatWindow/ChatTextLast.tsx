@@ -79,7 +79,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
         animHeight.value < 0
             ? {}
             : {
-                  height: withTiming(animHeight.value, { duration: 100 }),
+                  height: withTiming(animHeight.value, { duration: 200 }),
               }
     )
     const viewRef = useRef<View>(null)
