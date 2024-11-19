@@ -43,11 +43,12 @@ class CohereAPI extends APIBase {
             preamble: preamble.message,
             chat_history: chat_history,
             stop: this.constructStopSequence(),
+            stream: true,
         }
         return payload
     }
     inference = async () => {
-        Logger.log(`Using endpoint: OpenAI`)
+        Logger.log(`Using endpoint: Cohere`)
         this.readableStreamResponse(
             'https://api.cohere.com/v1/chat',
             JSON.stringify(this.buildPayload()),
