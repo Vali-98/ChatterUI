@@ -1,6 +1,7 @@
+import Avatar from '@components/Avatar'
 import { CharInfo } from '@constants/Characters'
 import { Characters, Chats, Logger, Style } from '@globals'
-import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
 
 import CharacterEditPopup from './CharacterEditPopup'
 
@@ -72,12 +73,11 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                 style={styles.longButton}
                 disabled={nowLoading}
                 onPress={() => setCurrentCharacter(character.id)}>
-                <Image
-                    source={{
-                        uri: Characters.getImageDir(character.image_id),
-                    }}
+                <Avatar
+                    targetImage={Characters.getImageDir(character.image_id)}
                     style={styles.avatar}
                 />
+
                 <View style={{ flex: 1, paddingLeft: 12 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={styles.nametag} numberOfLines={2}>
