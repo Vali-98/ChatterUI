@@ -5,7 +5,6 @@ import { Logger } from 'app/constants/Logger'
 import { mmkv } from 'app/constants/MMKV'
 import { SamplerID } from 'app/constants/SamplerData'
 import { ModelDataType } from 'db/schema'
-import BackgroundService from 'react-native-background-actions'
 
 import { APIBase, APISampler } from './BaseAPI'
 
@@ -115,34 +114,13 @@ class LocalAPI extends APIBase {
             this.stopGenerating()
         }
 
-        const completionTask = async () => {
-            await Llama.useLlama
-                .getState()
-                .completion(payload, outputStream, outputCompleted)
-                .catch((error) => {
-                    Logger.log(`Failed to generate locally: ${error}`, true)
-                    this.stopGenerating()
-                })
-        }
-
-        const options = {
-            taskName: 'rn_llama_completion',
-            taskTitle: 'Running completion...',
-            taskDesc: 'ChatterUI is running a completion task',
-            taskIcon: {
-                name: 'ic_launcher',
-                type: 'mipmap',
-            },
-            color: '#403737',
-            linkingURI: 'chatterui://',
-            progressBar: {
-                max: 1,
-                value: 0,
-                indeterminate: true,
-            },
-        }
-
-        await BackgroundService.start(completionTask, options)
+        await Llama.useLlama
+            .getState()
+            .completion(payload, outputStream, outputCompleted)
+            .catch((error) => {
+                Logger.log(`Failed to generate locally: ${error}`, true)
+                this.stopGenerating()
+            })
     }
 }
 

@@ -1,4 +1,5 @@
 import { Chats, useInference } from 'app/constants/Chat'
+import BackgroundService from 'react-native-background-actions'
 
 import { API } from './API'
 import { APIState } from './APIState'
@@ -12,7 +13,7 @@ export const regenerateResponse = async (swipeId: number, regenCache: boolean = 
     const messagesLength = Chats.useChat.getState()?.data?.messages?.length ?? -1
     const message = Chats.useChat.getState()?.data?.messages?.[messagesLength - 1]
 
-    Logger.log('Regenerate Response' + (!regenCache && ' , Resetting Message'))
+    Logger.log('Regenerate Response' + (regenCache ? '' : ' , Resetting Message'))
 
     if (message?.is_user) {
         await Chats.useChat.getState().addEntry(charName ?? '', true, '')
@@ -35,6 +36,23 @@ export const continueResponse = async (swipeId: number) => {
     await generateResponse(swipeId)
 }
 
+const completionTaskOptions = {
+    taskName: 'chatterui_completion_task',
+    taskTitle: 'Running completion...',
+    taskDesc: 'ChatterUI is running a completion task',
+    taskIcon: {
+        name: 'ic_launcher',
+        type: 'mipmap',
+    },
+    color: '#403737',
+    linkingURI: 'chatterui://',
+    progressBar: {
+        max: 1,
+        value: 0,
+        indeterminate: true,
+    },
+}
+
 export const generateResponse = async (swipeId: number) => {
     if (useInference.getState().nowGenerating) {
         Logger.log('Generation already in progress', true)
@@ -46,7 +64,7 @@ export const generateResponse = async (swipeId: number) => {
     const appMode = getString(Global.AppMode)
     const APIType = getString(Global.APIType)
     const apiState = appMode === AppMode.LOCAL ? APIState[API.LOCAL] : APIState?.[APIType as API]
-    if (apiState) await apiState.inference()
+    if (apiState) await BackgroundService.start(apiState.inference, completionTaskOptions)
     else {
         Logger.log('An invalid API was somehow chosen, this is bad!', true)
     }
