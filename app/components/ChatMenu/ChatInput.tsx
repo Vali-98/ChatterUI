@@ -52,7 +52,7 @@ const ChatInput = () => {
                 value={newMessage}
                 onChangeText={(text) => setNewMessage(text)}
                 multiline
-                blurOnSubmit={sendOnEnter}
+                submitBehavior={sendOnEnter ? 'blurAndSubmit' : 'newline'}
                 onSubmitEditing={sendOnEnter ? handleSend : undefined}
             />
 
