@@ -47,9 +47,9 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     // https://github.com/software-mansion/react-native-reanimated/issues/6659
 
     const path = usePathname()
-
+    if (path !== '/') return
     return (
-        <Animated.View style={[path === '/' ? heightStyle : {}, { overflow: 'scroll' }]}>
+        <Animated.View style={[heightStyle, { overflow: 'scroll' }]}>
             <View style={{ minHeight: 10 }} ref={viewRef}>
                 <Markdown
                     markdownit={MarkdownStyle.Rules}
