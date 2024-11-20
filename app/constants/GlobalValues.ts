@@ -132,6 +132,9 @@ export enum AppSettings {
     PrintContext = 'printcontext',
     CreateDefaultCard = 'createdefaultcard',
     BypassContextLength = 'bypasscontextlength',
+    NotifyOnComplete = 'notifyOnComplete',
+    PlayNotificationSound = 'notifySound',
+    VibrateNotification = 'notifyvibrate',
 }
 
 export enum AppMode {
@@ -156,4 +159,7 @@ export const AppSettingsDefault: Record<AppSettings, boolean | number> = {
     [AppSettings.PrintContext]: false,
     [AppSettings.CreateDefaultCard]: true,
     [AppSettings.BypassContextLength]: false,
+    [AppSettings.NotifyOnComplete]: false,
+    [AppSettings.PlayNotificationSound]: false,
+    [AppSettings.VibrateNotification]: false,
 }

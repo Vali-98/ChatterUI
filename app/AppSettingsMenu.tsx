@@ -1,6 +1,7 @@
 import { Alert } from '@components/Alert'
 import SectionTitle from '@components/SectionTitle'
 import SwitchWithDescription from '@components/SwitchWithDescription'
+import { registerForPushNotificationsAsync } from '@constants/Notifications'
 import { Style, AppSettings, Logger, Characters } from '@globals'
 import appConfig from 'app.config'
 import { copyFile, DocumentDirectoryPath, DownloadDirectoryPath } from 'cui-fs'
@@ -68,6 +69,15 @@ const AppSettingsMenu = () => {
     const [bypassContextLength, setBypassContextLength] = useMMKVBoolean(
         AppSettings.BypassContextLength
     )
+    const [notificationOnGenerate, setNotificationOnGenerate] = useMMKVBoolean(
+        AppSettings.NotifyOnComplete
+    )
+    const [notificationSound, setNotificationSound] = useMMKVBoolean(
+        AppSettings.PlayNotificationSound
+    )
+    const [notificationVibrate, setNotificationVibrate] = useMMKVBoolean(
+        AppSettings.VibrateNotification
+    )
 
     return (
         <ScrollView style={styles.mainContainer}>
@@ -128,6 +138,41 @@ const AppSettingsMenu = () => {
                 onValueChange={setBypassContextLength}
                 description="Ignores context length limits when building prompts"
             />
+
+            <SwitchWithDescription
+                title="Send Notification on Completed Generation"
+                value={notificationOnGenerate}
+                onValueChange={async (value) => {
+                    if (!value) {
+                        setNotificationOnGenerate(false)
+                        return
+                    }
+
+                    const granted = await registerForPushNotificationsAsync()
+                    if (granted) {
+                        setNotificationOnGenerate(true)
+                    }
+                }}
+                description=""
+            />
+
+            {notificationOnGenerate && (
+                <View>
+                    <SwitchWithDescription
+                        title="Notification Sound"
+                        value={notificationSound}
+                        onValueChange={setNotificationSound}
+                        description=""
+                    />
+
+                    <SwitchWithDescription
+                        title="Notification Vibration"
+                        value={notificationVibrate}
+                        onValueChange={setNotificationVibrate}
+                        description=""
+                    />
+                </View>
+            )}
 
             <SectionTitle>Character Management</SectionTitle>
             <TouchableOpacity

@@ -1,6 +1,7 @@
 import { db as database } from '@db'
 import { chatEntries, chatSwipes, chats } from 'db/schema'
 import { count, desc, eq, getTableColumns } from 'drizzle-orm'
+import * as Notifications from 'expo-notifications'
 import { create } from 'zustand'
 
 import { API } from './API'
@@ -42,8 +43,6 @@ export type ChatData = {
     messages: ChatEntry[] | undefined
 }
 
-type AbortFunction = () => void
-
 export interface ChatState {
     data: ChatData | undefined
     buffer: string
@@ -73,7 +72,7 @@ export interface ChatState {
     startGenerating: (swipeId: number) => void
 }
 
-type AbortFunctionType = {
+type InferenceStateType = {
     abortFunction: () => void | Promise<void>
     nowGenerating: boolean
     currentSwipeId?: number
@@ -82,7 +81,29 @@ type AbortFunctionType = {
     setAbort: (fn: () => void | Promise<void>) => void
 }
 
-export const useInference = create<AbortFunctionType>((set, get) => ({
+export const sendGenerateCompleteNotification = async () => {
+    Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+            shouldShowAlert: false,
+            shouldPlaySound: false,
+            shouldSetBadge: false,
+        }),
+    })
+
+    Notifications.scheduleNotificationAsync({
+        content: {
+            title: 'Response Complete.',
+            body: 'ChatterUI has finished a response.',
+            sound: !!mmkv.getBoolean(AppSettings.PlayNotificationSound),
+            vibrate: mmkv.getBoolean(AppSettings.VibrateNotification) ? [250, 125, 250] : undefined,
+            badge: 0,
+        },
+        trigger: null,
+    })
+    Notifications.setBadgeCountAsync(0)
+}
+
+export const useInference = create<InferenceStateType>((set, get) => ({
     abortFunction: () => {
         get().stopGenerating()
     },
@@ -90,10 +111,11 @@ export const useInference = create<AbortFunctionType>((set, get) => ({
     currentSwipeId: undefined,
     startGenerating: (swipeId: number) =>
         set((state) => ({ ...state, currentSwipeId: swipeId, nowGenerating: true })),
-    stopGenerating: () =>
-        set((state) => ({ ...state, nowGenerating: false, currentSwipeId: undefined })),
+    stopGenerating: () => {
+        set((state) => ({ ...state, nowGenerating: false, currentSwipeId: undefined }))
+        if (mmkv.getBoolean(AppSettings.NotifyOnComplete)) sendGenerateCompleteNotification()
+    },
     setAbort: (fn) => {
-        Logger.debug('Setting abort function')
         set((state) => ({
             ...state,
             abortFunction: async () => {
