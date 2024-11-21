@@ -16,7 +16,7 @@ const TextBox: React.FC<TextBoxProps> = ({
     body,
     varname,
     setValue,
-    lines = 0,
+    lines = undefined,
     keyboardType = 'default',
     multiline = false,
 }) => {
@@ -24,11 +24,11 @@ const TextBox: React.FC<TextBoxProps> = ({
         <View style={styles.mainContainer}>
             <Text style={styles.title}>{name}</Text>
             <TextInput
-                multiline={lines > 1 || multiline}
+                multiline={(!!lines && lines > 1) || multiline}
                 numberOfLines={lines}
                 style={{
                     ...styles.input,
-                    textAlignVertical: lines > 1 ? `top` : `center`,
+                    textAlignVertical: lines && lines > 1 ? `top` : `center`,
                 }}
                 value={body[varname]?.toString() ?? ''}
                 onChangeText={(value) => {
