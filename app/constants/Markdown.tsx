@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { Platform, StyleSheet, Text } from 'react-native'
 import { MarkdownIt } from 'react-native-markdown-display'
 
@@ -14,7 +14,7 @@ export namespace MarkdownStyle {
         double_quote: (node: any, children: any, parent: any, styles: any) => {
             return (
                 <Text key={node.key} style={styles.double_quote}>
-                    {node.content}
+                    "{children}"
                 </Text>
             )
         },
