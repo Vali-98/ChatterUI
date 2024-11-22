@@ -1,12 +1,11 @@
+import AnimatedEllipsis from '@components/AnimatedEllipsis'
 import { useInference } from '@constants/Chat'
-import { Chats, MarkdownStyle, Style } from '@globals'
+import { Chats, MarkdownStyle } from '@globals'
 import { usePathname } from 'expo-router'
 import { useEffect, useRef } from 'react'
 import { View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
-//@ts-expect-error
-import AnimatedEllipsis from 'rn-animated-ellipsis'
 import { useShallow } from 'zustand/react/shallow'
 
 type ChatTextProps = {
@@ -70,12 +69,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
         <Animated.View style={[heightStyle, { overflow: 'scroll' }]}>
             <View style={{ minHeight: 10 }} ref={viewRef}>
                 {swipeId === currentSwipeId && nowGenerating && buffer === '' && (
-                    <AnimatedEllipsis
-                        style={{
-                            color: Style.getColor('primary-text2'),
-                            fontSize: 20,
-                        }}
-                    />
+                    <AnimatedEllipsis />
                 )}
                 <Markdown
                     markdownit={MarkdownStyle.Rules}
