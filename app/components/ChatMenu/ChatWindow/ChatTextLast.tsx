@@ -58,7 +58,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
 
     useEffect(() => {
         requestAnimationFrame(() => updateHeight())
-    }, [buffer, mes])
+    }, [buffer, mes, nowGenerating])
 
     // TODO: Remove once this is fixed:
     // https://github.com/software-mansion/react-native-reanimated/issues/6659
