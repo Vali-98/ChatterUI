@@ -637,7 +637,7 @@ export namespace Characters {
             let binaryString = ''
             dataArray.forEach((byte) => (binaryString += String.fromCharCode(byte)))
             const cardCacheDir = `${FS.cacheDirectory}${randomUUID()}.png`
-            await writeFile(cardCacheDir, btoa(binaryString), 'base64')
+            await writeFile(cardCacheDir, btoa(binaryString), { encoding: 'base64' })
             return createCharacterFromImage(cardCacheDir)
         } catch (error) {
             Logger.log(`Could not retreive card. ${error}`)
@@ -673,7 +673,9 @@ export namespace Characters {
         dataArray.forEach((byte) => (binaryString += String.fromCharCode(byte)))
         const uuid = randomUUID()
 
-        await writeFile(`${FS.cacheDirectory}${uuid}.png`, btoa(binaryString), 'base64')
+        await writeFile(`${FS.cacheDirectory}${uuid}.png`, btoa(binaryString), {
+            encoding: 'base64',
+        })
         await db.mutate.createCharacter(character, `${FS.cacheDirectory}${uuid}.png`)
         Logger.log('Imported Character: ' + character.data.name)
     }
