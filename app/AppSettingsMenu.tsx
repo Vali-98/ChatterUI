@@ -79,6 +79,8 @@ const AppSettingsMenu = () => {
         AppSettings.VibrateNotification
     )
 
+    const [authLocal, setAuthLocal] = useMMKVBoolean(AppSettings.LocallyAuthenticateUser)
+
     return (
         <ScrollView style={styles.mainContainer}>
             <Stack.Screen options={{ title: 'App Settings' }} />
@@ -232,6 +234,15 @@ const AppSettingsMenu = () => {
                 }}>
                 <Text style={styles.buttonText}>Import Database</Text>
             </TouchableOpacity>
+
+            <SectionTitle>Security</SectionTitle>
+            <SwitchWithDescription
+                title="Lock App"
+                value={authLocal}
+                onValueChange={setAuthLocal}
+                description="Requires user authentication to open the app. This will not work if you have no device locks enabled."
+            />
+
             <View style={{ paddingVertical: 60 }} />
         </ScrollView>
     )
