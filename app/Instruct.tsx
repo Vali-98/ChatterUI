@@ -320,7 +320,7 @@ const Instruct = () => {
                                         stop_sequence: data.join(','),
                                     })
                                 }}
-                                replaceNewLine="\\n"
+                                replaceNewLine="\n"
                             />
 
                             <View
