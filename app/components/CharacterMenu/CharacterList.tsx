@@ -3,15 +3,15 @@ import { AntDesign } from '@expo/vector-icons'
 import { Characters, Style } from '@globals'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
+    BackHandler,
     SafeAreaView,
-    View,
-    Text,
     StyleSheet,
-    FlatList,
-    TouchableOpacity,
+    Text,
     TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native'
 import Animated, {
     FadeInUp,
@@ -24,6 +24,7 @@ import Animated, {
 import CharacterListing from './CharacterListing'
 import CharacterNewMenu from './CharacterNewMenu'
 import CharactersEmpty from './CharactersEmpty'
+import CharactersSearchEmpty from './CharactersSearchEmpty'
 
 enum SortType {
     RECENT_ASC,
@@ -123,6 +124,16 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
         .sort(sortList[sortType ?? SortType.RECENT_DESC])
         .filter((item) => !textFilter || item.name.toLowerCase().includes(textFilter.toLowerCase()))
 
+    useEffect(() => {
+        if (!showSearch) return
+        const handler = BackHandler.addEventListener('hardwareBackPress', () => {
+            setTextFilter('')
+            setShowSearch(false)
+            return true
+        })
+        return () => handler.remove()
+    }, [showSearch])
+
     return (
         <SafeAreaView style={{ paddingVertical: 16, paddingHorizontal: 8, flex: 1 }}>
             <Stack.Screen
@@ -143,9 +154,9 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                 }}
             />
 
-            {characterList.length === 0 && <CharactersEmpty />}
+            {characterList.length === 0 && !showSearch && <CharactersEmpty />}
 
-            {characterList.length !== 0 && (
+            {(characterList.length !== 0 || showSearch) && (
                 <View>
                     <View
                         style={{
@@ -236,6 +247,11 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                                     onChangeText={setTextFilter}
                                 />
                             </View>
+                            {textFilter && (
+                                <Text style={styles.resultText}>
+                                    Results: {characterList.length}
+                                </Text>
+                            )}
                         </Animated.View>
                     )}
                     <Animated.FlatList
@@ -255,6 +271,8 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                     />
                 </View>
             )}
+
+            {characterList.length === 0 && showSearch && <CharactersSearchEmpty />}
         </SafeAreaView>
     )
 }
@@ -287,6 +305,11 @@ const styles = StyleSheet.create({
     sortButtonTextActive: {
         marginLeft: 4,
         color: Style.getColor('primary-text1'),
+    },
+
+    resultText: {
+        marginTop: 8,
+        color: Style.getColor('primary-text2'),
     },
 
     searchInput: {
