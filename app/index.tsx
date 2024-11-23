@@ -4,11 +4,13 @@ import { db } from '@db'
 import { AntDesign } from '@expo/vector-icons'
 import { Style, initializeApp, startupApp } from '@globals'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
-import { SplashScreen } from 'expo-router'
+import { SplashScreen, Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import migrations from '../db/migrations/migrations'
+
+const BlankTitle = () => <Stack.Screen options={{ title: '' }} />
 
 const Home = () => {
     const { success, error } = useMigrations(db, migrations)
@@ -29,6 +31,7 @@ const Home = () => {
     if (error)
         return (
             <View style={styles.centeredContainer}>
+                <BlankTitle />
                 <Text style={styles.title}>Database Migration Failed!</Text>
             </View>
         )
@@ -36,6 +39,7 @@ const Home = () => {
     if (!authorized)
         return (
             <View style={styles.centeredContainer}>
+                <BlankTitle />
                 <AntDesign
                     name="lock"
                     size={120}
