@@ -57,9 +57,13 @@ export enum SamplerID {
     //...
 }
 
-type InputType = 'slider' | 'textinput' | 'checkbox' | 'custom'
+type InputType = 'slider' | 'textinput' | 'checkbox' | 'custom' | 'split'
 
 type SamplerStringItem = { type: 'string'; default: string }
+
+type SamplerObjectItem = { type: 'object'; default: object }
+
+type SamplerBooleanItem = { type: 'boolean'; default: boolean }
 
 type SamplerNumberItem = {
     type: 'integer' | 'float'
@@ -70,15 +74,18 @@ type SamplerNumberItem = {
     precision?: number
 }
 
-type SamplerObjectItem = { type: 'object'; default: object }
-
-type SamplerBooleanItem = { type: 'boolean'; default: boolean }
+type SamplerStringArray = {
+    type: 'string_array'
+    default: string
+    splitToken: string
+}
 
 type SamplerItemValues =
     | SamplerStringItem
     | SamplerBooleanItem
     | SamplerNumberItem
     | SamplerObjectItem
+    | SamplerStringArray
 
 export type SamplerItem = {
     internalID: SamplerID

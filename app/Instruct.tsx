@@ -2,6 +2,7 @@ import { Alert } from '@components/Alert'
 import CheckboxTitle from '@components/CheckboxTitle'
 import FadeDownView from '@components/FadeDownView'
 import SliderItem from '@components/SliderItem'
+import StringArrayEditor from '@components/StringArrayEditor'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
 import useAutosave from '@constants/AutoSave'
@@ -304,22 +305,19 @@ const Instruct = () => {
                                     multiline
                                 />*/}
                             </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <TextBox
-                                    name="Stop Sequence"
-                                    varname="stop_sequence"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />
-                                {/*<TextBox
-                                    name="Separator Sequence"
-                                    varname="separator_sequence"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />*/}
-                            </View>
+
+                            <StringArrayEditor
+                                style={{ marginBottom: 12 }}
+                                title="Stop Sequence"
+                                value={currentInstruct.stop_sequence.split(',')}
+                                setValue={(data) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        stop_sequence: data.join(','),
+                                    })
+                                }}
+                                replaceNewLine="\\n"
+                            />
 
                             <View
                                 style={{

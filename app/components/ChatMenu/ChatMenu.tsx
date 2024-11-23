@@ -1,7 +1,7 @@
 import CharacterList from '@components/CharacterMenu/CharacterList'
 import { Ionicons } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
-import { Stack, useFocusEffect, useRouter } from 'expo-router'
+import { Stack, useFocusEffect } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
 import { BackHandler, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
@@ -17,7 +17,6 @@ import OptionsMenu from './OptionsMenu'
 import SettingsDrawer from './SettingsDrawer'
 
 const ChatMenu = () => {
-    const router = useRouter()
     const { unloadCharacter } = Characters.useCharacterCard(
         useShallow((state) => ({
             unloadCharacter: state.unloadCard,
