@@ -309,7 +309,11 @@ const Instruct = () => {
                             <StringArrayEditor
                                 style={{ marginBottom: 12 }}
                                 title="Stop Sequence"
-                                value={currentInstruct.stop_sequence.split(',')}
+                                value={
+                                    currentInstruct.stop_sequence
+                                        ? currentInstruct.stop_sequence.split(',')
+                                        : []
+                                }
                                 setValue={(data) => {
                                     setCurrentInstruct({
                                         ...currentInstruct,
