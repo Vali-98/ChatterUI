@@ -1,18 +1,18 @@
 import { AlertBox } from '@components/Alert'
+import useLocalAuth from '@constants/LocalAuth'
 import { db, rawdb } from '@db'
+import { AntDesign } from '@expo/vector-icons'
 import { Style, initializeApp, startupApp } from '@globals'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 import { SplashScreen, Stack } from 'expo-router'
 import { setOptions } from 'expo-splash-screen'
 import { useEffect, useState } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { MenuProvider } from 'react-native-popup-menu'
 
 import migrations from '../db/migrations/migrations'
-import useLocalAuth from '@constants/LocalAuth'
-import { AntDesign } from '@expo/vector-icons'
 
 const DevDB = () => {
     useDrizzleStudio(rawdb)
@@ -52,8 +52,8 @@ const Layout = () => {
             <View style={styles.centeredContainer}>
                 <AntDesign
                     name="lock"
-                    size={180}
-                    style={{ marginBottom: 30 }}
+                    size={120}
+                    style={{ marginBottom: 12 }}
                     color={Style.getColor('primary-text3')}
                 />
                 <Text style={styles.title}>Authentication Required</Text>
@@ -105,11 +105,12 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        marginTop: 20,
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        marginTop: 120,
         columnGap: 8,
-        borderRadius: 8,
-        backgroundColor: Style.getColor('primary-surface4'),
+        borderRadius: 32,
+        borderWidth: 2,
+        borderColor: Style.getColor('primary-surface4'),
     },
 })

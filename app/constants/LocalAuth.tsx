@@ -15,8 +15,10 @@ const useLocalAuth = () => {
     }, [retryCount])
 
     useEffect(() => {
-        if (enabled)
-            authenticateAsync().then((result) => {
+        if (enabled && !success)
+            authenticateAsync({
+                promptMessage: 'ChatterUI requires authentication',
+            }).then((result) => {
                 setSuccess(result.success)
             })
     }, [retryCount])
