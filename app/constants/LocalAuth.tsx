@@ -1,11 +1,5 @@
 import { AppSettings } from '@globals'
-import {
-    authenticateAsync,
-    getEnrolledLevelAsync,
-    hasHardwareAsync,
-    isEnrolledAsync,
-    SecurityLevel,
-} from 'expo-local-authentication'
+import { authenticateAsync, getEnrolledLevelAsync, SecurityLevel } from 'expo-local-authentication'
 import { useCallback, useEffect, useState } from 'react'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
