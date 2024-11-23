@@ -3,7 +3,7 @@ module.exports = {
         name: 'ChatterUI',
         newArchEnabled: true,
         slug: 'ChatterUI',
-        version: '0.8.2',
+        version: '0.8.3',
         orientation: 'portrait',
         icon: './assets/images/icon.png',
         scheme: 'chatterui',
