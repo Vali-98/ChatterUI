@@ -73,6 +73,12 @@ module.exports = {
                     imageWidth: 200,
                 },
             ],
+            [
+                'expo-notifications',
+                {
+                    icon: './assets/images/notification.png',
+                },
+            ],
             './expo-build-plugins/bgactions.plugin.js',
             './expo-build-plugins/copyjni.plugin.js',
             './expo-build-plugins/usercert.plugin.js',

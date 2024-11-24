@@ -83,7 +83,7 @@ type InferenceStateType = {
 
 export const sendGenerateCompleteNotification = async () => {
     const showMessage = mmkv.getBoolean(AppSettings.ShowNotificationText)
-    console.log(showMessage)
+
     const notificationTitle = showMessage
         ? (Characters.useCharacterCard.getState().card?.name ?? '')
         : 'Response Complete'
