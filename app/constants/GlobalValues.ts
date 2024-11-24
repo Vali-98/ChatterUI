@@ -135,6 +135,7 @@ export enum AppSettings {
     NotifyOnComplete = 'notifyOnComplete',
     PlayNotificationSound = 'notifySound',
     VibrateNotification = 'notifyvibrate',
+    ShowNotificationText = 'shownotificationtext',
     LocallyAuthenticateUser = 'localauthuser',
 }
 
@@ -164,4 +165,5 @@ export const AppSettingsDefault: Record<AppSettings, boolean | number> = {
     [AppSettings.PlayNotificationSound]: false,
     [AppSettings.VibrateNotification]: false,
     [AppSettings.LocallyAuthenticateUser]: false,
+    [AppSettings.ShowNotificationText]: false,
 }

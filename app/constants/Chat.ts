@@ -82,6 +82,16 @@ type InferenceStateType = {
 }
 
 export const sendGenerateCompleteNotification = async () => {
+    const showMessage = mmkv.getBoolean(AppSettings.ShowNotificationText)
+    console.log(showMessage)
+    const notificationTitle = showMessage
+        ? (Characters.useCharacterCard.getState().card?.name ?? '')
+        : 'Response Complete'
+
+    const notificationText = showMessage
+        ? Chats.useChat.getState().buffer
+        : 'ChatterUI has finished a response.'
+
     Notifications.setNotificationHandler({
         handleNotification: async () => ({
             shouldShowAlert: false,
@@ -92,8 +102,8 @@ export const sendGenerateCompleteNotification = async () => {
 
     Notifications.scheduleNotificationAsync({
         content: {
-            title: 'Response Complete.',
-            body: 'ChatterUI has finished a response.',
+            title: notificationTitle,
+            body: notificationText,
             sound: !!mmkv.getBoolean(AppSettings.PlayNotificationSound),
             vibrate: mmkv.getBoolean(AppSettings.VibrateNotification) ? [250, 125, 250] : undefined,
             badge: 0,

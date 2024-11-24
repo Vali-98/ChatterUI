@@ -79,6 +79,10 @@ const AppSettingsMenu = () => {
         AppSettings.VibrateNotification
     )
 
+    const [showNotificationText, setShowNotificationText] = useMMKVBoolean(
+        AppSettings.ShowNotificationText
+    )
+
     const [authLocal, setAuthLocal] = useMMKVBoolean(AppSettings.LocallyAuthenticateUser)
 
     return (
@@ -141,8 +145,10 @@ const AppSettingsMenu = () => {
                 description="Ignores context length limits when building prompts"
             />
 
+            <SectionTitle>Notifications</SectionTitle>
+
             <SwitchWithDescription
-                title="Send Notification on Completed Generation"
+                title="Enable Notifications"
                 value={notificationOnGenerate}
                 onValueChange={async (value) => {
                     if (!value) {
@@ -155,7 +161,7 @@ const AppSettingsMenu = () => {
                         setNotificationOnGenerate(true)
                     }
                 }}
-                description=""
+                description="Sends notifications when the app is in the background"
             />
 
             {notificationOnGenerate && (
@@ -172,6 +178,13 @@ const AppSettingsMenu = () => {
                         value={notificationVibrate}
                         onValueChange={setNotificationVibrate}
                         description=""
+                    />
+
+                    <SwitchWithDescription
+                        title="Show Text In Notification"
+                        value={showNotificationText}
+                        onValueChange={setShowNotificationText}
+                        description="Shows generated messages in notifications"
                     />
                 </View>
             )}
