@@ -31,7 +31,6 @@ class LocalAPI extends APIBase {
         { externalName: 'dry_allowed_length', samplerID: SamplerID.DRY_ALLOWED_LENGTH },
         { externalName: 'dry_multiplier', samplerID: SamplerID.DRY_MULTIPLIER },
         { externalName: 'dry_sequence_breakers', samplerID: SamplerID.DRY_SEQUENCE_BREAK },
-        { externalName: 'dry_allowed_length', samplerID: SamplerID.DRY_ALLOWED_LENGTH },
     ]
     buildPayload = () => {
         const payloadFields = this.getSamplerFields()
