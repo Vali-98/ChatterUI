@@ -1,9 +1,7 @@
 import { Chats, MarkdownStyle } from '@globals'
-import { usePathname } from 'expo-router'
 import React, { useEffect, useRef } from 'react'
-import { View } from 'react-native'
+import { View, Animated, Easing, useAnimatedValue } from 'react-native'
 import Markdown from 'react-native-markdown-display'
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 
 type ChatTextProps = {
     nowGenerating: boolean
@@ -18,23 +16,26 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     )
     const viewRef = useRef<View>(null)
 
-    const animHeight = useSharedValue(-1)
-    const targetHeight = useSharedValue(-1)
-    const heightStyle = useAnimatedStyle(() =>
-        animHeight.value < 0
-            ? {}
-            : {
-                  height: withTiming(animHeight.value, { duration: 200 }),
-              }
-    )
+    const animHeight = useAnimatedValue(-1)
+    const targetHeight = useRef(-1)
+
+    const handleAnimateHeight = (newheight: number) => {
+        animHeight.stopAnimation(() =>
+            Animated.timing(animHeight, {
+                toValue: newheight,
+                duration: 150,
+                useNativeDriver: false,
+                easing: Easing.inOut((x) => x * x),
+            }).start()
+        )
+    }
 
     const updateHeight = () => {
         if (viewRef.current) {
             viewRef.current.measure((x, y, width, measuredHeight) => {
-                const newHeight = measuredHeight
-                if (targetHeight.value === newHeight) return
-                animHeight.value = newHeight
-                targetHeight.value = newHeight
+                if (targetHeight.current === measuredHeight) return
+                handleAnimateHeight(measuredHeight)
+                targetHeight.current = measuredHeight
             })
         }
     }
@@ -43,13 +44,8 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
         requestAnimationFrame(() => updateHeight())
     }, [mes])
 
-    // TODO: Remove once this is fixed:
-    // https://github.com/software-mansion/react-native-reanimated/issues/6659
-
-    const path = usePathname()
-    if (path !== '/') return
     return (
-        <Animated.View style={[heightStyle, { overflow: 'scroll' }]}>
+        <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
             <View style={{ minHeight: 10 }} ref={viewRef}>
                 <Markdown
                     markdownit={MarkdownStyle.Rules}

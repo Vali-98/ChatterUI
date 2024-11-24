@@ -1,11 +1,9 @@
 import AnimatedEllipsis from '@components/AnimatedEllipsis'
 import { useInference } from '@constants/Chat'
 import { Chats, MarkdownStyle } from '@globals'
-import { usePathname } from 'expo-router'
 import { useEffect, useRef } from 'react'
-import { View } from 'react-native'
+import { View, Animated, Easing, useAnimatedValue } from 'react-native'
 import Markdown from 'react-native-markdown-display'
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 type ChatTextProps = {
@@ -33,15 +31,20 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
         }))
     )
 
-    const animHeight = useSharedValue(-1)
-    const targetHeight = useSharedValue(-1)
-    const heightStyle = useAnimatedStyle(() =>
-        animHeight.value < 0
-            ? {}
-            : {
-                  height: withTiming(animHeight.value, { duration: 200 }),
-              }
-    )
+    const animHeight = useAnimatedValue(-1)
+    const targetHeight = useRef(-1)
+
+    const handleAnimateHeight = (newheight: number) => {
+        animHeight.stopAnimation(() =>
+            Animated.timing(animHeight, {
+                toValue: newheight,
+                duration: 150,
+                useNativeDriver: false,
+                easing: Easing.inOut((x) => x * x),
+            }).start()
+        )
+    }
+
     const updateHeight = () => {
         const oveflowPadding = 12
         const showPadding = nowGenerating && buffer !== ''
@@ -49,9 +52,9 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
         if (viewRef.current) {
             viewRef.current.measure((x, y, width, measuredHeight) => {
                 const newHeight = measuredHeight + (showPadding ? oveflowPadding : 0)
-                if (targetHeight.value === newHeight) return
-                animHeight.value = newHeight
-                targetHeight.value = newHeight
+                if (targetHeight.current === newHeight) return
+                handleAnimateHeight(newHeight)
+                targetHeight.current = newHeight
             })
         }
     }
@@ -60,13 +63,8 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
         requestAnimationFrame(() => updateHeight())
     }, [buffer, mes, nowGenerating])
 
-    // TODO: Remove once this is fixed:
-    // https://github.com/software-mansion/react-native-reanimated/issues/6659
-
-    const path = usePathname()
-    if (path !== '/') return
     return (
-        <Animated.View style={[heightStyle, { overflow: 'scroll' }]}>
+        <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
             <View style={{ minHeight: 10 }} ref={viewRef}>
                 {swipeId === currentSwipeId && nowGenerating && buffer === '' && (
                     <AnimatedEllipsis />
