@@ -10,7 +10,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated'
 
-const translateMax = -15
+const translateMax = -10
 
 type DotProps = {
     dx: SharedValue<number>
@@ -24,7 +24,7 @@ const Dot: React.FC<DotProps> = ({ dx, offset }) => {
 
     return (
         <Animated.View style={[animatedStyle]}>
-            <Octicons name="dot-fill" size={8} color={Style.getColor('primary-text2')} />
+            <Octicons name="dot-fill" size={4} color={Style.getColor('primary-text2')} />
         </Animated.View>
     )
 }
@@ -42,7 +42,7 @@ const AnimatedEllipsis = () => {
                 flexDirection: 'row',
                 paddingTop: 20,
                 paddingBottom: 8,
-                paddingHorizontal: 12,
+                paddingHorizontal: 4,
                 columnGap: 8,
             }}>
             <Dot dx={dx} offset={1.2} />
