@@ -41,7 +41,7 @@ const AnimatedEllipsis = () => {
             style={{
                 flexDirection: 'row',
                 paddingTop: 20,
-                paddingBottom: 8,
+                paddingBottom: 2,
                 paddingHorizontal: 4,
                 columnGap: 8,
             }}>
