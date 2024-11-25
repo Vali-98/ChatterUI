@@ -18,10 +18,9 @@ module.exports = function doubleQuotePlugin(md) {
                     (match, openQuote, text, closeQuote, offset) => {
                         // Push the text before the match as a plain text token
                         if (offset > lastIndex) {
-                            parts.push({
-                                type: 'text',
-                                content: token.content.slice(lastIndex, offset),
-                            })
+                            parts.push(
+                                ...md.parseInline(token.content.slice(lastIndex, offset), state.env)
+                            )
                         }
 
                         // Push a double-quote token for the matched quote and its content
