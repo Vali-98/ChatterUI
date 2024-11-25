@@ -24,7 +24,7 @@ const Dot: React.FC<DotProps> = ({ dx, offset }) => {
 
     return (
         <Animated.View style={[animatedStyle]}>
-            <Octicons name="dot-fill" size={4} color={Style.getColor('primary-text2')} />
+            <Octicons name="dot-fill" size={4} color={Style.getColor('primary-text1')} />
         </Animated.View>
     )
 }
