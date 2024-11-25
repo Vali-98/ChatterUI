@@ -137,6 +137,7 @@ export enum AppSettings {
     VibrateNotification = 'notifyvibrate',
     ShowNotificationText = 'shownotificationtext',
     LocallyAuthenticateUser = 'localauthuser',
+    UnlockOrientation = 'unlockorientation',
 }
 
 export enum AppMode {
@@ -166,4 +167,5 @@ export const AppSettingsDefault: Record<AppSettings, boolean | number> = {
     [AppSettings.VibrateNotification]: false,
     [AppSettings.LocallyAuthenticateUser]: false,
     [AppSettings.ShowNotificationText]: false,
+    [AppSettings.UnlockOrientation]: false,
 }

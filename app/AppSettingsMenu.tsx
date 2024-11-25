@@ -2,7 +2,14 @@ import { Alert } from '@components/Alert'
 import SectionTitle from '@components/SectionTitle'
 import SwitchWithDescription from '@components/SwitchWithDescription'
 import { registerForPushNotificationsAsync } from '@constants/Notifications'
-import { Style, AppSettings, Logger, Characters } from '@globals'
+import {
+    Style,
+    AppSettings,
+    Logger,
+    Characters,
+    unlockScreenOrientation,
+    lockScreenOrientation,
+} from '@globals'
 import appConfig from 'app.config'
 import { copyFile, DocumentDirectoryPath, DownloadDirectoryPath } from 'cui-fs'
 import { reloadAppAsync } from 'expo'
@@ -84,6 +91,8 @@ const AppSettingsMenu = () => {
     )
 
     const [authLocal, setAuthLocal] = useMMKVBoolean(AppSettings.LocallyAuthenticateUser)
+
+    const [unlockOrientation, setUnlockOrientation] = useMMKVBoolean(AppSettings.UnlockOrientation)
 
     return (
         <ScrollView style={styles.mainContainer}>
@@ -254,6 +263,14 @@ const AppSettingsMenu = () => {
                 value={authLocal}
                 onValueChange={setAuthLocal}
                 description="Requires user authentication to open the app. This will not work if you have no device locks enabled."
+            />
+
+            <SectionTitle>Screen</SectionTitle>
+            <SwitchWithDescription
+                title="Unlock Orientation"
+                value={unlockOrientation}
+                onValueChange={setUnlockOrientation}
+                description="Allows landscape on phones (App restart required)"
             />
 
             <View style={{ paddingVertical: 60 }} />

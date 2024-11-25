@@ -1,7 +1,9 @@
 import { DownloadDirectoryPath, writeFile } from 'cui-fs'
 import { getCpuFeatures } from 'cui-llama.rn'
 import * as Crypto from 'expo-crypto'
+import { DeviceType, getDeviceTypeAsync } from 'expo-device'
 import * as FS from 'expo-file-system'
+import { lockAsync, OrientationLock } from 'expo-screen-orientation'
 import * as Sharing from 'expo-sharing'
 import * as SystemUI from 'expo-system-ui'
 import { Platform } from 'react-native'
@@ -9,7 +11,7 @@ import { Platform } from 'react-native'
 import { API } from './API'
 import { Characters } from './Characters'
 import { Chats } from './Chat'
-import { Global, AppSettings, AppMode, AppSettingsDefault } from './GlobalValues'
+import { AppMode, AppSettings, AppSettingsDefault, Global } from './GlobalValues'
 import { Instructs } from './Instructs'
 import { Llama } from './LlamaLocal'
 import { Logger } from './Logger'
@@ -20,18 +22,18 @@ import { Style } from './Style'
 import { humanizedISO8601DateTime } from './Utils'
 
 export {
-    mmkv,
-    Presets,
-    Instructs,
+    API,
+    AppSettings,
     Characters,
     Chats,
     Global,
-    AppSettings,
-    API,
     humanizedISO8601DateTime,
+    Instructs,
     Logger,
-    Style,
     MarkdownStyle,
+    mmkv,
+    Presets,
+    Style,
 }
 
 // GENERAL FUNCTIONS
@@ -96,12 +98,23 @@ const createDefaultUserData = async () => {
     })
 }
 
+export const lockScreenOrientation = async () => {
+    const result = await getDeviceTypeAsync()
+    const unlock = mmkv.getBoolean(AppSettings.UnlockOrientation)
+    if (unlock ?? result === DeviceType.TABLET) return
+    lockAsync(OrientationLock.PORTRAIT)
+}
+
+export const unlockScreenOrientation = async () => {
+    await unlockScreenOrientation()
+}
+
 /**
  * Runs every app start
  */
 export const startupApp = () => {
     console.log('[APP STARTED]: T1APT')
-
+    lockScreenOrientation()
     // Only for dev to properly reset
     Chats.useChat.getState().reset()
     Characters.useCharacterCard.getState().unloadCard()

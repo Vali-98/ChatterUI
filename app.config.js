@@ -4,7 +4,7 @@ module.exports = {
         newArchEnabled: true,
         slug: 'ChatterUI',
         version: '0.8.3',
-        orientation: 'portrait',
+        orientation: 'default',
         icon: './assets/images/icon.png',
         scheme: 'chatterui',
         userInterfaceStyle: 'automatic',

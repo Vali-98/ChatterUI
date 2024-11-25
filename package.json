@@ -71,7 +71,9 @@
     "react-native-sse": "^1.2.1",
     "upgrade": "^1.1.0",
     "zustand": "^4.5.0",
-    "expo-local-authentication": "~15.0.1"
+    "expo-local-authentication": "~15.0.1",
+    "expo-device": "~7.0.1",
+    "expo-screen-orientation": "~8.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",
