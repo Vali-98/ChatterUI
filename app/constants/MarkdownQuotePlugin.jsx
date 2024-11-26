@@ -40,10 +40,7 @@ module.exports = function doubleQuotePlugin(md) {
 
                 // Add any remaining text after the last match
                 if (lastIndex < token.content.length) {
-                    parts.push({
-                        type: 'text',
-                        content: token.content.slice(lastIndex),
-                    })
+                    parts.push(...md.parseInline(token.content.slice(lastIndex), state.env))
                 }
                 // Convert parts into tokens and replace the child tokens
                 state.tokens.splice(
