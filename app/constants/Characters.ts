@@ -68,7 +68,7 @@ export namespace Characters {
                 tokenCache: undefined,
                 setCard: async (id: number) => {
                     const card = await db.query.card(id)
-                    db.mutate.updateModified(id)
+                    // db.mutate.updateModified(id)
                     set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
                     mmkv.set(Global.UserID, id)
                     return card?.name

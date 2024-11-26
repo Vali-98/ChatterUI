@@ -156,16 +156,12 @@ export namespace Chats {
             }
         },
         load: async (chatId: number) => {
-            //let start = performance.now()
             const data = await db.query.chat(chatId)
-            //Logger.debug(`[Chats] time for database query: ${performance.now() - start}`)
-            //start = performance.now()
             set((state: ChatState) => ({
                 ...state,
                 data: data,
             }))
-            //Logger.debug(`[Chats] time for zustand set: ${performance.now() - start}`)
-            db.mutate.updateChatModified(chatId)
+            //db.mutate.updateChatModified(chatId)
         },
 
         delete: async (chatId: number) => {
