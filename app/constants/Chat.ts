@@ -80,7 +80,7 @@ type InferenceStateType = {
     stopGenerating: () => void
     setAbort: (fn: () => void | Promise<void>) => void
 }
-
+// TODO: Functionalize and move elsewhere
 export const sendGenerateCompleteNotification = async () => {
     const showMessage = mmkv.getBoolean(AppSettings.ShowNotificationText)
 
@@ -89,7 +89,7 @@ export const sendGenerateCompleteNotification = async () => {
         : 'Response Complete'
 
     const notificationText = showMessage
-        ? Chats.useChat.getState().buffer
+        ? Chats.useChat.getState().buffer.trim()
         : 'ChatterUI has finished a response.'
 
     Notifications.setNotificationHandler({
