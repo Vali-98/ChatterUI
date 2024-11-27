@@ -11,7 +11,15 @@ import { Instructs, Logger, MarkdownStyle, Style, saveStringToDownload } from '@
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
-import { View, SafeAreaView, TouchableOpacity, StyleSheet, ScrollView, Text } from 'react-native'
+import {
+    View,
+    SafeAreaView,
+    TouchableOpacity,
+    StyleSheet,
+    ScrollView,
+    Text,
+    Pressable,
+} from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import Markdown from 'react-native-markdown-display'
 
@@ -62,15 +70,15 @@ const Instruct = () => {
                             title: `Instruct`,
                             animation: 'fade',
                             headerRight: () => (
-                                <TouchableOpacity
+                                <Pressable
                                     style={{ paddingTop: 8, paddingRight: 8 }}
-                                    onPress={regenerateDefaults}>
+                                    onPressIn={regenerateDefaults}>
                                     <FontAwesome
                                         name="repeat"
                                         color={Style.getColor('primary-text1')}
                                         size={24}
                                     />
-                                </TouchableOpacity>
+                                </Pressable>
                             ),
                         }}
                     />

@@ -5,7 +5,7 @@ import { ColorId, Style } from 'app/constants/Style'
 import { reloadAppAsync } from 'expo'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
-import { View, Text, TouchableOpacity, Switch, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, Switch, ScrollView, Pressable } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 const ColorSettings = () => {
@@ -38,8 +38,8 @@ const ColorSettings = () => {
                 options={{
                     title: 'Color Settings',
                     headerRight: () => (
-                        <TouchableOpacity
-                            onPress={() => {
+                        <Pressable
+                            onPressIn={() => {
                                 setEdited(true)
                                 setPrimary(
                                     Style.defaultBrandColor.h,
@@ -52,7 +52,7 @@ const ColorSettings = () => {
                                 color={getColor('primary-text1')}
                                 size={24}
                             />
-                        </TouchableOpacity>
+                        </Pressable>
                     ),
                 }}
             />
@@ -85,7 +85,7 @@ const ColorSettings = () => {
                     style={{ flex: 1 }}
                     step={1}
                     value={color.h}
-                    onValueChange={(value) => {
+                    onSlidingComplete={(value) => {
                         setEdited(true)
                         setPrimary(value, color.s, color.l)
                     }}
@@ -104,7 +104,7 @@ const ColorSettings = () => {
                         style={{ flex: 1 }}
                         step={1}
                         value={color.s}
-                        onValueChange={(value) => {
+                        onSlidingComplete={(value) => {
                             setPrimary(color.h, value, color.l)
                         }}
                         maximumTrackTintColor={getColor('primary-surface2')}
@@ -125,7 +125,7 @@ const ColorSettings = () => {
                         style={{ flex: 1 }}
                         step={1}
                         value={color.l}
-                        onValueChange={(value) => {
+                        onSlidingComplete={(value) => {
                             setPrimary(color.h, color.s, value)
                         }}
                         maximumTrackTintColor={getColor('primary-surface2')}

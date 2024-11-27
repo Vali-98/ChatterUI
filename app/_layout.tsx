@@ -31,6 +31,7 @@ const Layout = () => {
                         headerTintColor: Style.getColor('primary-text1'),
                         contentStyle: { backgroundColor: Style.getColor('primary-surface1') },
                         headerShadowVisible: false,
+                        headerTitleAlign: 'center',
                         presentation: 'transparentModal',
                         statusBarBackgroundColor: Style.getColor('primary-surface1'),
                     }}>

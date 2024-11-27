@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Characters, Chats, Logger, Style } from '@globals'
 import { Stack, useFocusEffect } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
-import { BackHandler, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { BackHandler, Pressable, SafeAreaView, StyleSheet, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Menu } from 'react-native-popup-menu'
 import Animated, { runOnJS, ZoomIn } from 'react-native-reanimated'
@@ -92,9 +92,9 @@ const ChatMenu = () => {
 
     const headerViewRight = (
         <View style={styles.headerButtonContainer}>
-            <TouchableOpacity
+            <Pressable
                 style={styles.headerButtonRight}
-                onPress={() => {
+                onPressIn={() => {
                     setShowChats(!showChats)
                 }}>
                 {showChats && (
@@ -111,14 +111,14 @@ const ChatMenu = () => {
                         />
                     </Animated.View>
                 )}
-            </TouchableOpacity>
+            </Pressable>
         </View>
     )
 
     const headerViewLeft = !showChats && (
-        <TouchableOpacity
+        <Pressable
             style={styles.headerButtonLeft}
-            onPress={() => {
+            onPressIn={() => {
                 setShowDrawer(!showDrawer)
             }}>
             {showDrawer && (
@@ -132,7 +132,7 @@ const ChatMenu = () => {
                     <Ionicons name="menu" size={28} color={Style.getColor('primary-text1')} />
                 </Animated.View>
             )}
-        </TouchableOpacity>
+        </Pressable>
     )
 
     return (

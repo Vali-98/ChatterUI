@@ -4,7 +4,7 @@ import { FontAwesome } from '@expo/vector-icons'
 import { Global, Logger, Style, saveStringToDownload } from '@globals'
 import { FlashList } from '@shopify/flash-list'
 import { Stack } from 'expo-router'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useMMKVObject } from 'react-native-mmkv'
 
 const Logs = () => {
@@ -48,24 +48,24 @@ const Logs = () => {
                     animation: 'fade',
                     headerRight: () => (
                         <View style={{ flexDirection: 'row' }}>
-                            <TouchableOpacity
+                            <Pressable
                                 style={{ marginRight: 30, marginTop: 12 }}
-                                onPress={handleFlushLogs}>
+                                onPressIn={handleFlushLogs}>
                                 <FontAwesome
                                     name="trash"
                                     size={28}
                                     color={Style.getColor('primary-text1')}
                                 />
-                            </TouchableOpacity>
-                            <TouchableOpacity
+                            </Pressable>
+                            <Pressable
                                 style={{ marginRight: 20, marginTop: 12 }}
-                                onPress={handleExportLogs}>
+                                onPressIn={handleExportLogs}>
                                 <FontAwesome
                                     name="download"
                                     size={28}
                                     color={Style.getColor('primary-text1')}
                                 />
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
                     ),
                 }}

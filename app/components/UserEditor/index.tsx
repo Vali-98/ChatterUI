@@ -2,7 +2,7 @@ import { AntDesign } from '@expo/vector-icons'
 import { Style } from '@globals'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
-import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Pressable } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
 
@@ -42,13 +42,13 @@ const UserEditor = () => {
                         title: 'Edit User',
                         animation: 'simple_push',
                         headerRight: () => (
-                            <TouchableOpacity onPress={() => setShowDrawer(!showDrawer)}>
+                            <Pressable onPressIn={() => setShowDrawer(!showDrawer)}>
                                 <AntDesign
                                     name={showDrawer ? 'menu-fold' : 'menu-unfold'}
                                     color={Style.getColor('primary-text1')}
                                     size={24}
                                 />
-                            </TouchableOpacity>
+                            </Pressable>
                         ),
                     }}
                 />
