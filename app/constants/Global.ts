@@ -82,7 +82,7 @@ export const saveStringToDownload = async (
     filename: string,
     encoding: 'ascii' | 'base64' | `utf8`
 ) => {
-    await writeFile(`${DownloadDirectoryPath}/${filename}`, data, encoding)
+    await writeFile(`${DownloadDirectoryPath}/${filename}`, data, { encoding: encoding })
 }
 
 const loadChatOnInit = async () => {
