@@ -34,17 +34,18 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const [autoLoad, setAutoLoad] = useMMKVObject<ModelDataType>(Global.LocalModel)
     //@ts-ignore
     const quant: string = item.quantization && GGMLNameMap[item.quantization]
-    const disable = modelLoading || modelImporting || modelId !== undefined
     const disableDelete = modelId === item.id || modelLoading
-    const disableEdit = modelId === item.id || modelLoading
+    const isInvalid = Llama.isInitialEntry(item)
 
     const handleDeleteModel = () => {
         Alert.alert({
             title: 'Delete Model',
             description:
                 `Are you sure you want to delete "${item.name}"?\n\nThis cannot be undone!` +
-                (!item.file_path.startsWith('content')
-                    ? `\n\nThis operation will clear up ${readableFileSize(item.file_size)}`
+                (!isInvalid
+                    ? !item.file_path.startsWith('content')
+                        ? `\n\nThis operation will clear up ${readableFileSize(item.file_size)}`
+                        : '\n\n(This will not delete external model files, just this entry)'
                     : ''),
             buttons: [
                 { label: 'Cancel' },
@@ -59,6 +60,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
         })
     }
 
+    const disable = modelLoading || modelImporting || modelId !== undefined || isInvalid
+    const disableEdit = modelId === item.id || modelLoading || isInvalid
+
     return (
         <Animated.View
             style={styles.modelContainer}
@@ -72,20 +76,29 @@ const ModelItem: React.FC<ModelItemProps> = ({
             />
 
             <Text style={styles.title}>{item.name}</Text>
-            <View style={styles.tagContainer}>
-                <Text style={styles.tag}>
-                    {item.params === 'N/A' ? 'No Param Size' : item.params}
-                </Text>
-                <Text style={styles.tag}>{quant}</Text>
-                <Text style={styles.tag}>{readableFileSize(item.file_size)}</Text>
-                <Text style={{ ...styles.tag, textTransform: 'capitalize' }}>
-                    {item.architecture}
-                </Text>
-                <Text style={styles.tag}>
-                    {item.file_path.startsWith('content') ? 'External' : 'Internal'}
-                </Text>
-            </View>
-            <Text style={styles.subtitle}>Context Length: {item.context_length}</Text>
+            {!isInvalid && (
+                <View style={styles.tagContainer}>
+                    <Text style={styles.tag}>
+                        {item.params === 'N/A' ? 'No Param Size' : item.params}
+                    </Text>
+                    <Text style={styles.tag}>{quant}</Text>
+                    <Text style={styles.tag}>{readableFileSize(item.file_size)}</Text>
+                    <Text style={{ ...styles.tag, textTransform: 'capitalize' }}>
+                        {item.architecture}
+                    </Text>
+                    <Text style={styles.tag}>
+                        {item.file_path.startsWith('content') ? 'External' : 'Internal'}
+                    </Text>
+                </View>
+            )}
+            {isInvalid && (
+                <View style={styles.tagContainer}>
+                    <Text style={styles.tag}>Model is Invalid</Text>
+                </View>
+            )}
+            {!isInvalid && (
+                <Text style={styles.subtitle}>Context Length: {item.context_length}</Text>
+            )}
             <Text style={styles.subtitle}>File: {item.file.replace('.gguf', '')}</Text>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity

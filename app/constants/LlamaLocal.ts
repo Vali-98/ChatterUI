@@ -373,13 +373,28 @@ export namespace Llama {
 
     export const createModelData = async (filename: string, deleteOnFailure: boolean = false) => {
         const newdir = `${model_dir}${filename}`
+        const initialModelEntry = {
+            context_length: 0,
+            file: filename,
+            file_path: newdir,
+            name: 'N/A',
+            file_size: 0,
+            params: 'N/A',
+            quantization: '-1',
+            architecture: 'N/A',
+        }
+        const [{ id }, ...rest] = await db
+            .insert(model_data)
+            .values(initialModelEntry)
+            .returning({ id: model_data.id })
+
         try {
             const modelContext = await initLlama({ model: newdir, vocab_only: true })
             const modelInfo: any = modelContext.model
             const modelType = modelInfo.metadata?.['general.architecture']
             const fileInfo = await FS.getInfoAsync(newdir)
             const modelDataEntry = {
-                context_length: modelInfo.metadata?.[modelType + '.context_length'] ?? '0',
+                context_length: modelInfo.metadata?.[modelType + '.context_length'] ?? 0,
                 file: filename,
                 file_path: newdir,
                 name: modelInfo.metadata?.['general.name'] ?? 'N/A',
@@ -390,8 +405,7 @@ export namespace Llama {
             }
             Logger.log(`New Model Data:\n${modelDataText(modelDataEntry)}`)
             await modelContext.release()
-
-            await db.insert(model_data).values(modelDataEntry)
+            await db.update(model_data).set(modelDataEntry).where(eq(model_data.id, id))
             return true
         } catch (e) {
             Logger.log(`Failed to create data: ${e}`, true)
@@ -409,13 +423,29 @@ export namespace Llama {
             Logger.log('Filename invalid, Import Failed', true)
             return
         }
+
+        const initialModelEntry = {
+            context_length: 0,
+            file: filename,
+            file_path: newdir,
+            name: 'N/A',
+            file_size: 0,
+            params: 'N/A',
+            quantization: '-1',
+            architecture: 'N/A',
+        }
+        const [{ id }, ...rest] = await db
+            .insert(model_data)
+            .values(initialModelEntry)
+            .returning({ id: model_data.id })
+
         try {
             const modelContext = await initLlama({ model: newdir, vocab_only: true })
             const modelInfo: any = modelContext.model
             const modelType = modelInfo.metadata?.['general.architecture']
             const fileInfo = await FS.getInfoAsync(newdir)
             const modelDataEntry = {
-                context_length: modelInfo.metadata?.[modelType + '.context_length'] ?? '0',
+                context_length: modelInfo.metadata?.[modelType + '.context_length'] ?? 0,
                 file: filename,
                 file_path: newdir,
                 name: modelInfo.metadata?.['general.name'] ?? 'N/A',
@@ -427,7 +457,7 @@ export namespace Llama {
             Logger.log(`New Model Data:\n${modelDataText(modelDataEntry)}`)
             await modelContext.release()
 
-            await db.insert(model_data).values(modelDataEntry)
+            await db.update(model_data).set(modelDataEntry).where(eq(model_data.id, id))
             return true
         } catch (e) {
             Logger.log(`Failed to create data: ${e}`, true)
@@ -492,6 +522,27 @@ export namespace Llama {
 
     export const updateName = async (name: string, id: number) => {
         await db.update(model_data).set({ name: name }).where(eq(model_data.id, id))
+    }
+
+    export const isInitialEntry = (data: ModelData) => {
+        const initial: ModelData = {
+            file: '',
+            file_path: '',
+            context_length: 0,
+            name: 'N/A',
+            file_size: 0,
+            params: 'N/A',
+            quantization: '-1',
+            architecture: 'N/A',
+        }
+
+        for (const key in initial) {
+            if (key === 'file' || key === 'file_path') continue
+            const initialV = initial[key as keyof ModelData]
+            const dataV = data[key as keyof ModelData]
+            if (initialV !== dataV) return false
+        }
+        return true
     }
 }
 
