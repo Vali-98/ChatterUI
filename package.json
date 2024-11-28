@@ -44,6 +44,7 @@
     "expo-linking": "~7.0.3",
     "expo-local-authentication": "~15.0.1",
     "expo-notifications": "~0.29.8",
+    "expo-router": "~4.0.9",
     "expo-screen-orientation": "~8.0.0",
     "expo-sharing": "~13.0.0",
     "expo-speech": "~13.0.0",
@@ -70,8 +71,7 @@
     "react-native-simple-toast": "^3.2.0",
     "react-native-sse": "^1.2.1",
     "upgrade": "^1.1.0",
-    "zustand": "^4.5.0",
-    "expo-router": "~4.0.9"
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",
