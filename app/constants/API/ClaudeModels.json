@@ -1,0 +1,7 @@
+{
+    "models": [
+        { "name": "claude-3-5-sonnet-latest" },
+        { "name": "claude-3-5-haiku-latest" },
+        { "name": "claude-3-opus-latest" }
+    ]
+}

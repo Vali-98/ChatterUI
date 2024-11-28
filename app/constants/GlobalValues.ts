@@ -138,6 +138,7 @@ export enum AppSettings {
     ShowNotificationText = 'shownotificationtext',
     LocallyAuthenticateUser = 'localauthuser',
     UnlockOrientation = 'unlockorientation',
+    UseLegacyAPI = 'uselegacyapi',
 }
 
 export enum AppMode {
@@ -168,4 +169,5 @@ export const AppSettingsDefault: Record<AppSettings, boolean | number> = {
     [AppSettings.LocallyAuthenticateUser]: false,
     [AppSettings.ShowNotificationText]: false,
     [AppSettings.UnlockOrientation]: false,
+    [AppSettings.UseLegacyAPI]: false,
 }
