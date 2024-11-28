@@ -1,7 +1,6 @@
 import { AppSettings, Chats } from '@globals'
-import { StyleSheet, View } from 'react-native'
+import { FlatList, StyleSheet, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
-import Animated, { LinearTransition } from 'react-native-reanimated'
 
 import { ChatItem } from './ChatItem'
 
@@ -38,8 +37,7 @@ const ChatWindow = () => {
     return (
         <View style={styles.chatHistory}>
             <View style={styles.chatHistory}>
-                <Animated.FlatList
-                    layout={LinearTransition}
+                <FlatList
                     style={styles.chatHistory}
                     maintainVisibleContentPosition={
                         autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
