@@ -1,4 +1,7 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
-    "java.compile.nullAnalysis.mode": "disabled"
+    "java.compile.nullAnalysis.mode": "disabled",
+    "workbench.tree.indent": 24,
+    "breadcrumbs.symbolSortOrder": "position",
+    "explorer.sortOrder": "filesFirst"
 }
