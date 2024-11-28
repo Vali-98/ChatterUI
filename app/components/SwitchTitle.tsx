@@ -3,7 +3,7 @@ import React from 'react'
 import { Switch, Text, View } from 'react-native'
 
 export interface SwitchTitleProps {
-    title: string
+    title?: string
     value: boolean | undefined
     onValueChange: (b: boolean) => void | Promise<void> | undefined
 }
@@ -23,13 +23,15 @@ const SwitchComponent: React.FC<SwitchTitleProps> = ({ title, value, onValueChan
                 onValueChange={onValueChange}
                 value={value}
             />
-            <Text
-                style={{
-                    marginLeft: 16,
-                    color: Style.getColor(value ? 'primary-text1' : 'primary-text3'),
-                }}>
-                {title}
-            </Text>
+            {title && (
+                <Text
+                    style={{
+                        marginLeft: 16,
+                        color: Style.getColor(value ? 'primary-text1' : 'primary-text3'),
+                    }}>
+                    {title}
+                </Text>
+            )}
         </View>
     )
 }
