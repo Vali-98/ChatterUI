@@ -61,7 +61,7 @@ const ChatInput = () => {
                     <MaterialIcons
                         name="stop"
                         color={Style.getColor('destructive-text1')}
-                        size={28}
+                        size={24}
                     />
                 </TouchableOpacity>
             ) : (
@@ -69,7 +69,7 @@ const ChatInput = () => {
                     <MaterialIcons
                         name="send"
                         color={Style.getColor('primary-surface1')}
-                        size={28}
+                        size={24}
                     />
                 </TouchableOpacity>
             )}
@@ -82,7 +82,7 @@ export default ChatInput
 const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
-        alignItems: 'flex-end',
+        alignItems: 'center',
         flex: 1,
     },
 
@@ -100,16 +100,12 @@ const styles = StyleSheet.create({
 
     sendButton: {
         borderRadius: 8,
-        minWidth: 44,
-        minHeight: 44,
         backgroundColor: Style.getColor('primary-brand'),
         padding: 8,
     },
 
     stopButton: {
         borderRadius: 8,
-        minWidth: 44,
-        minHeight: 44,
         backgroundColor: Style.getColor('destructive-brand'),
         padding: 8,
     },
