@@ -1,17 +1,19 @@
 import { Alert } from '@components/Alert'
 import FadeDownView from '@components/FadeDownView'
-import { AppMode } from '@constants/GlobalValues'
+import { defaultTemplates } from '@constants/API/DefaultAPI'
+import { AppMode, AppSettings } from '@constants/GlobalValues'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Presets, saveStringExternal, Logger, Style, API } from '@globals'
+import { API, Global, Logger, Presets, saveStringExternal, Style } from '@globals'
+import { APIState as APIStateNew } from 'app/constants/API/APIManagerState'
 import { APIState } from 'app/constants/APIState'
-import { Samplers, SamplerPreset } from 'app/constants/SamplerData'
+import { SamplerPreset, Samplers } from 'app/constants/SamplerData'
 import { Stack } from 'expo-router'
-import { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
+import { useEffect, useState } from 'react'
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
-import { useMMKVObject, useMMKVString } from 'react-native-mmkv'
+import { useMMKVBoolean, useMMKVObject, useMMKVString } from 'react-native-mmkv'
 
-import { TextBoxModal, SliderItem, TextBox, CheckboxTitle } from './components'
+import { CheckboxTitle, SliderItem, TextBox, TextBoxModal } from './components'
 
 type PresetLabel = {
     label: string
@@ -45,8 +47,19 @@ const SamplerMenu = () => {
         loadPresetList(presetName ?? '')
     }, [])
 
+    // TODO: Figure this out
+    const [legacy, setLegacy] = useMMKVBoolean(AppSettings.UseLegacyAPI)
+    const apiValues = APIStateNew.useAPIState((state) => state.values)
+
     const samplerList =
-        appMode === AppMode.LOCAL ? APIState[API.LOCAL].samplers : APIState[APIType as API].samplers
+        appMode === AppMode.LOCAL
+            ? APIState[API.LOCAL].samplers
+            : legacy
+              ? APIState[APIType as API].samplers
+              : // This is bad
+                (defaultTemplates.filter(
+                    (item) => item.name === apiValues.filter((item) => item.active)[0].configName
+                )[0].request.samplerFields ?? [])
 
     return (
         <FadeDownView style={{ flex: 1 }}>

@@ -85,14 +85,12 @@ const AppSettingsMenu = () => {
     const [notificationVibrate, setNotificationVibrate] = useMMKVBoolean(
         AppSettings.VibrateNotification
     )
-
     const [showNotificationText, setShowNotificationText] = useMMKVBoolean(
         AppSettings.ShowNotificationText
     )
-
     const [authLocal, setAuthLocal] = useMMKVBoolean(AppSettings.LocallyAuthenticateUser)
-
     const [unlockOrientation, setUnlockOrientation] = useMMKVBoolean(AppSettings.UnlockOrientation)
+    const [useLegacyAPI, setUseLegacyAPI] = useMMKVBoolean(AppSettings.UseLegacyAPI)
 
     return (
         <ScrollView style={styles.mainContainer}>
@@ -152,6 +150,13 @@ const AppSettingsMenu = () => {
                 value={bypassContextLength}
                 onValueChange={setBypassContextLength}
                 description="Ignores context length limits when building prompts"
+            />
+
+            <SwitchWithDescription
+                title="Use Legacy API System"
+                value={useLegacyAPI}
+                onValueChange={setUseLegacyAPI}
+                description="Use old API system"
             />
 
             <SectionTitle>Notifications</SectionTitle>

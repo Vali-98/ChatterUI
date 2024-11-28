@@ -2,9 +2,10 @@ import { Chats, useInference } from 'app/constants/Chat'
 import BackgroundService from 'react-native-background-actions'
 
 import { API } from './API'
+import { buildAndSendRequest } from './API/APIBuilder'
 import { APIState } from './APIState'
 import { Characters } from './Characters'
-import { AppMode, Global } from './GlobalValues'
+import { AppMode, AppSettings, Global } from './GlobalValues'
 import { Logger } from './Logger'
 import { mmkv } from './MMKV'
 
@@ -63,10 +64,15 @@ export const generateResponse = async (swipeId: number) => {
     const data = performance.now()
     const appMode = getString(Global.AppMode)
     const APIType = getString(Global.APIType)
+    const legacy = mmkv.getBoolean(AppSettings.UseLegacyAPI)
     const apiState = appMode === AppMode.LOCAL ? APIState[API.LOCAL] : APIState?.[APIType as API]
-    if (apiState) await BackgroundService.start(apiState.inference, completionTaskOptions)
-    else {
-        Logger.log('An invalid API was somehow chosen, this is bad!', true)
+    if (legacy) {
+        if (apiState) await BackgroundService.start(apiState.inference, completionTaskOptions)
+        else {
+            Logger.log('An invalid API was somehow chosen, this is bad!', true)
+        }
+    } else {
+        buildAndSendRequest()
     }
 
     Logger.debug(`Time taken for generateResponse(): ${(performance.now() - data).toFixed(2)}ms`)
