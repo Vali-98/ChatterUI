@@ -1,4 +1,4 @@
-import ButtonPrimary from '@components/General/ButtonPrimary'
+import ButtonPrimary from '@components/Buttons/ButtonPrimary'
 import { APIManagerValue, APIState } from '@constants/API/APIManagerState'
 import claudeModels from '@constants/API/ClaudeModels.json'
 import { defaultTemplates } from '@constants/API/DefaultAPI'

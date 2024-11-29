@@ -1,4 +1,4 @@
-import ButtonPrimary from '@components/General/ButtonPrimary'
+import ButtonPrimary from '@components/Buttons/ButtonPrimary'
 import { APIState } from '@constants/API/APIManagerState'
 import { Style } from '@constants/Style'
 import { Ionicons } from '@expo/vector-icons'
@@ -20,7 +20,7 @@ const APIManager = () => {
             {apiValues.length > 0 && (
                 <FlatList
                     data={apiValues}
-                    keyExtractor={(item) => item.configName}
+                    keyExtractor={(item, index) => item.configName + index}
                     renderItem={({ item, index }) => <APIValueItem item={item} index={index} />}
                 />
             )}

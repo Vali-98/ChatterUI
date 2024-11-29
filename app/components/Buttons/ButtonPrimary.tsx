@@ -66,15 +66,7 @@ const ButtonPrimary: React.FC<ButtonPrimaryProps> = ({
                     transform: [{ scaleX: 0.99 }],
                 },
             ])}>
-            {label && (
-                <Text
-                    style={[
-                        labelStyle,
-                        { textAlign: 'center', color: Style.getColor('primary-text1') },
-                    ]}>
-                    {label}
-                </Text>
-            )}
+            {label && <Text style={[labelStyle, { textAlign: 'center' }]}>{label}</Text>}
         </AnimatedPressable>
     )
 }
