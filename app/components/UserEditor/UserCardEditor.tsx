@@ -1,4 +1,4 @@
-import { Alert } from '@components/Alert'
+import Alert from '@components/Alert'
 import Avatar from '@components/Avatar'
 import AvatarViewer from '@components/ChatMenu/ChatWindow/AvatarViewer'
 import PopupMenu from '@components/PopupMenu'

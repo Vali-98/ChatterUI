@@ -1,4 +1,4 @@
-import { Alert } from '@components/Alert'
+import Alert from '@components/Alert'
 import SectionTitle from '@components/SectionTitle'
 import SwitchWithDescription from '@components/SwitchWithDescription'
 import { registerForPushNotificationsAsync } from '@constants/Notifications'

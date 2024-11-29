@@ -26,11 +26,13 @@ type AlertState = {
     show: (props: AlertProps) => void
 }
 
-export namespace Alert {
+namespace Alert {
     export const alert = (props: AlertProps) => {
         useAlert.getState().show(props)
     }
 }
+
+export default Alert
 
 const useAlert = create<AlertState>()((set, get) => ({
     visible: false,

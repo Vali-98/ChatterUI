@@ -30,7 +30,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ id, isLastMessage, isGreeting }) =>
     )
 }
 
-export { ChatItem }
+export default ChatItem
 
 const styles = StyleSheet.create({
     chatItem: {

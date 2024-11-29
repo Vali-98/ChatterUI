@@ -1,4 +1,4 @@
-import { Alert } from '@components/Alert'
+import Alert from '@components/Alert'
 import SectionTitle from '@components/SectionTitle'
 import SliderItem from '@components/SliderItem'
 import SwitchTitle from '@components/SwitchTitle'

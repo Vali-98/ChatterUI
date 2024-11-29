@@ -1,4 +1,4 @@
-import { Alert } from '@components/Alert'
+import Alert from '@components/Alert'
 import FadeDownView from '@components/FadeDownView'
 import { defaultTemplates } from '@constants/API/DefaultAPI'
 import { AppMode, AppSettings } from '@constants/GlobalValues'
@@ -47,19 +47,21 @@ const SamplerMenu = () => {
         loadPresetList(presetName ?? '')
     }, [])
 
-    // TODO: Figure this out
     const [legacy, setLegacy] = useMMKVBoolean(AppSettings.UseLegacyAPI)
-    const apiValues = APIStateNew.useAPIState((state) => state.values)
+    const { apiValues, activeIndex } = APIStateNew.useAPIState((state) => ({
+        apiValues: state.values,
+        activeIndex: state.activeIndex,
+    }))
 
     const samplerList =
         appMode === AppMode.LOCAL
             ? APIState[API.LOCAL].samplers
             : legacy
               ? APIState[APIType as API].samplers
-              : // This is bad
-                (defaultTemplates.filter(
-                    (item) => item.name === apiValues.filter((item) => item.active)[0].configName
-                )[0].request.samplerFields ?? [])
+              : activeIndex !== -1
+                ? defaultTemplates.find((item) => item.name === apiValues[activeIndex].configName)
+                      ?.request.samplerFields
+                : []
 
     return (
         <FadeDownView style={{ flex: 1 }}>

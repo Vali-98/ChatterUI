@@ -1,4 +1,4 @@
-import { Alert } from '@components/Alert'
+import Alert from '@components/Alert'
 import CheckboxTitle from '@components/CheckboxTitle'
 import FadeDownView from '@components/FadeDownView'
 import SliderItem from '@components/SliderItem'

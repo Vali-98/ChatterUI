@@ -1,4 +1,4 @@
-import { Alert } from '@components/Alert'
+import Alert from '@components/Alert'
 import FadeDownView from '@components/FadeDownView'
 import { FontAwesome } from '@expo/vector-icons'
 import { Global, Logger, Style, saveStringToDownload } from '@globals'

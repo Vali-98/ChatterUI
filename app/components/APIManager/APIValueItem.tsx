@@ -1,4 +1,4 @@
-import { Alert } from '@components/Alert'
+import Alert from '@components/Alert'
 import SwitchComponent from '@components/SwitchTitle'
 import { APIManagerValue, APIState } from '@constants/API/APIManagerState'
 import { AntDesign } from '@expo/vector-icons'

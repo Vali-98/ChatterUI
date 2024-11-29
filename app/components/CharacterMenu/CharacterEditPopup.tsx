@@ -1,4 +1,4 @@
-import { Alert } from '@components/Alert'
+import Alert from '@components/Alert'
 import PopupMenu, { MenuRef } from '@components/PopupMenu'
 import { CharInfo } from '@constants/Characters'
 import { Characters } from '@globals'

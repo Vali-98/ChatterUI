@@ -1,4 +1,4 @@
-import { Alert } from '@components/Alert'
+import Alert from '@components/Alert'
 import TextBoxModal from '@components/TextBoxModal'
 import { GGMLNameMap, Llama, readableFileSize } from '@constants/LlamaLocal'
 import { AntDesign } from '@expo/vector-icons'

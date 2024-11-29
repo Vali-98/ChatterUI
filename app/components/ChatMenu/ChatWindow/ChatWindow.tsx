@@ -2,7 +2,7 @@ import { AppSettings, Chats } from '@globals'
 import { FlatList, StyleSheet, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
-import { ChatItem } from './ChatItem'
+import ChatItem from './ChatItem'
 
 type ListItem = {
     index: number
