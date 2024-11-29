@@ -85,3 +85,21 @@ export namespace APIState {
         )
     )
 }
+
+// recursively fill json in case it is incorrect
+const verifyJSON = (source: any, target: any): any => {
+    const fillFields = (sourceObj: any, targetObj: any): any => {
+        if (typeof sourceObj !== 'object' || sourceObj === null) {
+            sourceObj = Array.isArray(targetObj) ? [] : {}
+        }
+        for (const key of Object.keys(targetObj)) {
+            if (!(key in sourceObj)) {
+                sourceObj[key] = targetObj[key]
+            } else if (typeof targetObj[key] === 'object' && targetObj[key] !== null) {
+                sourceObj[key] = fillFields(sourceObj[key], targetObj[key])
+            }
+        }
+        return sourceObj
+    }
+    return fillFields(source, target)
+}
