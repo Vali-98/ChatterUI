@@ -47,7 +47,7 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
     }, [])
 
     const handleGetModelList = async () => {
-        if (!template.features.useModel) return
+        if (!template.features.useModel || !show) return
         if (template.defaultValues.modelEndpoint === '{{CLAUDE}}') {
             setModelList(claudeModels.models)
             return

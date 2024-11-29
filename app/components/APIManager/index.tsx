@@ -48,9 +48,9 @@ export default APIManager
 
 const styles = StyleSheet.create({
     mainContainer: {
-        marginVertical: 16,
-        paddingVertical: 16,
-        paddingHorizontal: 20,
+        paddingTop: 16,
+        paddingHorizontal: 16,
+        paddingBottom: 24,
         flex: 1,
     },
 

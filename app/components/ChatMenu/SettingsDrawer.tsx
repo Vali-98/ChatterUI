@@ -1,15 +1,15 @@
 import Avatar from '@components/Avatar'
 import Drawer from '@components/Drawer'
 import SupportButton from '@components/SupportButton'
-import { AppMode, AppSettings, Global } from 'constants/GlobalValues'
 import { AntDesign } from '@expo/vector-icons'
-import { Characters, Style } from 'constants/Global'
 import appConfig from 'app.config'
+import { Characters, Style } from 'constants/Global'
+import { AppMode, AppSettings, Global } from 'constants/GlobalValues'
 import { useRouter } from 'expo-router'
 import { SetStateAction } from 'react'
-import { Text, TouchableOpacity, StyleSheet, View, ScrollView } from 'react-native'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
-import Animated, { SlideInLeft, Easing } from 'react-native-reanimated'
+import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 type SettingsDrawerProps = {
@@ -23,6 +23,10 @@ type ButtonData = {
 }
 
 const paths_dev: ButtonData[] = [
+    {
+        name: '[DEV] Components',
+        path: '/ComponentTest',
+    },
     {
         name: '[DEV] Lorebooks',
         path: '/LorebookMenu',

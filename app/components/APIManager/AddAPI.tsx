@@ -1,4 +1,5 @@
 import ButtonPrimary from '@components/Buttons/ButtonPrimary'
+import DropdownSheet from '@components/DropdownSheet'
 import claudeModels from '@constants/API/ClaudeModels.json'
 import { MaterialIcons } from '@expo/vector-icons'
 import { APIManagerValue, APIState } from 'constants/API/APIManagerState'
@@ -65,13 +66,13 @@ const AddAPI = () => {
     return (
         <View style={styles.mainContainer}>
             <Stack.Screen options={{ title: 'Add Connection' }} />
-            <ScrollView style={{ flex: 1 }}>
-                <Dropdown
-                    value={template}
+            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+                <DropdownSheet
+                    style={{ marginBottom: 8 }}
                     data={getTemplates()}
-                    labelField="name"
-                    valueField="name"
-                    onChange={(item) => {
+                    labelExtractor={(template) => template.name}
+                    selected={template}
+                    onChangeValue={(item) => {
                         setTemplate(item)
                         setValues({
                             ...item.defaultValues,
@@ -80,8 +81,8 @@ const AddAPI = () => {
                             configName: item.name,
                         })
                     }}
-                    placeholder="Select API Type"
-                    {...Style.drawer.default}
+                    modalTitle="Select Connection Type"
+                    search
                 />
 
                 <View>
@@ -152,17 +153,17 @@ const AddAPI = () => {
                     <View style={styles.dropdownContainer}>
                         <Text style={styles.title}>Model</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Dropdown
-                                value={values.model}
+                            <DropdownSheet
+                                selected={values.model}
                                 data={modelList}
-                                labelField={template.model.nameParser}
-                                valueField={template.model.nameParser}
-                                onChange={(item) => {
-                                    // if same return
+                                labelExtractor={(value) => {
+                                    return getNestedValue(value, template.model.nameParser)
+                                }}
+                                onChangeValue={(item) => {
                                     setValues({ ...values, model: item })
                                 }}
-                                placeholder="Select Model"
-                                {...Style.drawer.default}
+                                search={modelList.length > 10}
+                                modalTitle="Select Model"
                             />
                             <TouchableOpacity
                                 style={styles.button}
