@@ -10,6 +10,7 @@ export interface APIManagerValue extends APIValues {
 }
 
 type APIStateProps = {
+    activeIndex: number
     values: APIManagerValue[]
     customTemplates: APIConfiguration[]
     addValue: (template: APIManagerValue) => void
@@ -24,6 +25,7 @@ export namespace APIState {
     export const useAPIState = create<APIStateProps>()(
         persist(
             (set, get) => ({
+                activeIndex: -1,
                 values: [],
                 customTemplates: [],
                 addValue: (value) => {
@@ -52,8 +54,19 @@ export namespace APIState {
                 },
                 editValue: (newValue, index) => {
                     const values = get().values
+                    const oldValue = values[index]
                     values[index] = newValue
-                    set((state) => ({ ...state, values: values }))
+                    let active = {}
+                    if (newValue.active && !oldValue.active) {
+                        values.forEach((item, newindex) => {
+                            item.active = newindex === index
+                        })
+                        active = { activeIndex: index }
+                    }
+                    if (!newValue.active && oldValue.active) {
+                        active = { activeIndex: -1 }
+                    }
+                    set((state) => ({ ...state, values: values, ...active }))
                 },
             }),
             {

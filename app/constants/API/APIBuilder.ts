@@ -12,7 +12,9 @@ export const buildAndSendRequest = () => {
     // probably store all APIValues and custom configs in a persist zustand store, as they have so few keys
     // and are not prone to changes
     // TODO : Change this to state
-    const requestValues = APIState.useAPIState.getState().values.filter((item) => item.active)[0]
+    const requestValues = APIState.useAPIState
+        .getState()
+        .values.find((item, index) => index === APIState.useAPIState.getState().activeIndex)
 
     if (!requestValues) {
         Logger.log('No API Configuration found', true)
