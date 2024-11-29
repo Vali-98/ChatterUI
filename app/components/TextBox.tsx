@@ -1,4 +1,4 @@
-import { Style } from '@globals'
+import { Style } from 'constants/Global'
 import { View, Text, StyleSheet, TextInput, KeyboardTypeOptions } from 'react-native'
 
 type TextBoxProps = {

@@ -1,5 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Logger, Style } from '@globals'
+import { Global, Logger, Style } from 'constants/Global'
 import { useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'

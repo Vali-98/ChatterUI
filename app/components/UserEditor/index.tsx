@@ -1,5 +1,5 @@
 import { AntDesign } from '@expo/vector-icons'
-import { Style } from '@globals'
+import { Style } from 'constants/Global'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
 import { StyleSheet, View, Pressable } from 'react-native'

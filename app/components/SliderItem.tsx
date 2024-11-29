@@ -1,4 +1,4 @@
-import { Style } from '@globals'
+import { Style } from 'constants/Global'
 import Slider from '@react-native-community/slider'
 import { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, TextInput } from 'react-native'

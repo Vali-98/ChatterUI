@@ -1,7 +1,7 @@
 import CheckboxTitle from '@components/CheckboxTitle'
 import SliderItem from '@components/SliderItem'
 import { FontAwesome } from '@expo/vector-icons'
-import { Style, Logger } from '@globals'
+import { Style, Logger } from 'constants/Global'
 import { useState, useRef } from 'react'
 import { Text, View, TouchableOpacity, TextInput, StyleSheet } from 'react-native'
 import Collapsible from 'react-native-collapsible'

@@ -1,23 +1,16 @@
 import Alert from '@components/Alert'
 import SectionTitle from '@components/SectionTitle'
 import SwitchWithDescription from '@components/SwitchWithDescription'
-import { registerForPushNotificationsAsync } from '@constants/Notifications'
-import {
-    Style,
-    AppSettings,
-    Logger,
-    Characters,
-    unlockScreenOrientation,
-    lockScreenOrientation,
-} from '@globals'
 import appConfig from 'app.config'
+import { AppSettings, Characters, Logger, Style } from 'constants/Global'
+import { registerForPushNotificationsAsync } from 'constants/Notifications'
 import { copyFile, DocumentDirectoryPath, DownloadDirectoryPath } from 'cui-fs'
 import { reloadAppAsync } from 'expo'
 import { getDocumentAsync } from 'expo-document-picker'
-import { documentDirectory, copyAsync, deleteAsync } from 'expo-file-system'
+import { copyAsync, deleteAsync, documentDirectory } from 'expo-file-system'
 import { Stack, useRouter } from 'expo-router'
 import React from 'react'
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 const appVersion = appConfig.expo.version

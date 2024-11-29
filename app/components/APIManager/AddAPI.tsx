@@ -1,9 +1,8 @@
 import ButtonPrimary from '@components/Buttons/ButtonPrimary'
-import { APIManagerValue, APIState } from '@constants/API/APIManagerState'
 import claudeModels from '@constants/API/ClaudeModels.json'
-import { defaultTemplates } from '@constants/API/DefaultAPI'
 import { MaterialIcons } from '@expo/vector-icons'
-import { Logger, Style } from '@globals'
+import { APIManagerValue, APIState } from 'constants/API/APIManagerState'
+import { Logger, Style } from 'constants/Global'
 import { Stack, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
@@ -25,9 +24,12 @@ export interface APIValues {
 
 const AddAPI = () => {
     const router = useRouter()
-    const addValue = APIState.useAPIState((state) => state.addValue)
+    const { addValue, getTemplates } = APIState.useAPIState((state) => ({
+        getTemplates: state.getTemplates,
+        addValue: state.addValue,
+    }))
 
-    const [template, setTemplate] = useState(defaultTemplates[0])
+    const [template, setTemplate] = useState(getTemplates()[0])
     const [values, setValues] = useState<APIManagerValue>({
         ...template.defaultValues,
         configName: template.name,
@@ -66,7 +68,7 @@ const AddAPI = () => {
             <ScrollView style={{ flex: 1 }}>
                 <Dropdown
                     value={template}
-                    data={defaultTemplates}
+                    data={getTemplates()}
                     labelField="name"
                     valueField="name"
                     onChange={(item) => {

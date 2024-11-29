@@ -1,7 +1,7 @@
-import { Global } from '@constants/GlobalValues'
-import { Chats, useInference } from 'app/constants/Chat'
-import { Logger } from 'app/constants/Logger'
-import { SamplerID } from 'app/constants/SamplerData'
+import { Global } from 'constants/GlobalValues'
+import { Chats, useInference } from 'constants/Chat'
+import { Logger } from 'constants/Logger'
+import { SamplerID } from 'constants/SamplerData'
 import { nativeApplicationVersion } from 'expo-application'
 
 import { APIBase, APISampler } from './BaseAPI'

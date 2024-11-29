@@ -1,6 +1,6 @@
 import Avatar from '@components/Avatar'
-import { CharInfo } from '@constants/Characters'
-import { Characters, Chats, Logger, Style } from '@globals'
+import { CharInfo } from 'constants/Characters'
+import { Characters, Chats, Logger, Style } from 'constants/Global'
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
 
 import CharacterEditPopup from './CharacterEditPopup'

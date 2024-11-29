@@ -1,6 +1,6 @@
-import { APISampler } from '@constants/APIState/BaseAPI'
-import { SamplerID, SamplerPreset, Samplers } from '@constants/SamplerData'
-import { Global, Instructs, mmkv } from '@globals'
+import { APISampler } from 'constants/APIState/BaseAPI'
+import { SamplerID, SamplerPreset, Samplers } from 'constants/SamplerData'
+import { Global, Instructs, mmkv } from 'constants/Global'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import { buildChatCompletionContext, buildTextCompletionContext } from './ContextBuilder'

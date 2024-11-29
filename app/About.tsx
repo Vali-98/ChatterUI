@@ -1,11 +1,11 @@
 import SupportButton from '@components/SupportButton'
-import { AppSettings } from '@constants/GlobalValues'
 import { FontAwesome } from '@expo/vector-icons'
-import { Logger, Style } from '@globals'
 import appConfig from 'app.config'
+import { Logger, Style } from 'constants/Global'
+import { AppSettings } from 'constants/GlobalValues'
 import { Stack } from 'expo-router'
 import React, { useState } from 'react'
-import { View, Image, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native'
+import { Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 const About = () => {

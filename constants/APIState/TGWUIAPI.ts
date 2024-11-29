@@ -1,5 +1,5 @@
-import { Global } from '@constants/GlobalValues'
-import { SamplerID } from 'app/constants/SamplerData'
+import { Global } from 'constants/GlobalValues'
+import { SamplerID } from 'constants/SamplerData'
 
 import { APIBase, APISampler } from './BaseAPI'
 

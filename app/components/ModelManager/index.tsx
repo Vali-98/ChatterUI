@@ -1,6 +1,6 @@
-import { Llama } from '@constants/LlamaLocal'
+import { Llama } from 'constants/LlamaLocal'
 import { AntDesign } from '@expo/vector-icons'
-import { Style } from '@globals'
+import { Style } from 'constants/Global'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
 import React, { useState } from 'react'

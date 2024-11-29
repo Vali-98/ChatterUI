@@ -11,7 +11,7 @@ export type SamplerField = keyof SamplerPreset
 export namespace Presets {
     const presetdir = `${FS.documentDirectory}presets/`
 
-    const getPresetDir = (name: string) => `${presetdir}${name}.json`
+    export const getPresetDir = (name: string) => `${presetdir}${name}.json`
 
     export const defaultPreset = (Object.keys(Samplers) as SamplerID[])
         .map((key) => ({ id: key, value: Samplers[key].values.default }))

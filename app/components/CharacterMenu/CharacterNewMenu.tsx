@@ -1,7 +1,7 @@
 import { MenuRef } from '@components/PopupMenu'
 import TextBoxModal from '@components/TextBoxModal'
 import { AntDesign } from '@expo/vector-icons'
-import { Characters, Chats, Logger, Style } from '@globals'
+import { Characters, Chats, Logger, Style } from 'constants/Global'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { useRef, useState } from 'react'
 import { StyleSheet, TouchableOpacity, Text, BackHandler, View } from 'react-native'

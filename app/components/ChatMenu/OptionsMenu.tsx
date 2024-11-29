@@ -1,5 +1,5 @@
 import { AntDesign, Ionicons } from '@expo/vector-icons'
-import { Characters, Chats, Style } from '@globals'
+import { Characters, Chats, Style } from 'constants/Global'
 import { useRouter } from 'expo-router'
 import { View, Text, StyleSheet } from 'react-native'
 import {

@@ -1,19 +1,20 @@
 import Alert from '@components/Alert'
+import CheckboxTitle from '@components/CheckboxTitle'
 import FadeDownView from '@components/FadeDownView'
-import { defaultTemplates } from '@constants/API/DefaultAPI'
-import { AppMode, AppSettings } from '@constants/GlobalValues'
+import SliderItem from '@components/SliderItem'
+import TextBox from '@components/TextBox'
+import TextBoxModal from '@components/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { API, Global, Logger, Presets, saveStringExternal, Style } from '@globals'
-import { APIState as APIStateNew } from 'app/constants/API/APIManagerState'
-import { APIState } from 'app/constants/APIState'
-import { SamplerPreset, Samplers } from 'app/constants/SamplerData'
+import { APIState as APIStateNew } from 'constants/API/APIManagerState'
+import { APIState } from 'constants/APIState'
+import { API, Global, Logger, Presets, saveStringToDownload, Style } from 'constants/Global'
+import { AppMode, AppSettings } from 'constants/GlobalValues'
+import { SamplerPreset, Samplers } from 'constants/SamplerData'
 import { Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVBoolean, useMMKVObject, useMMKVString } from 'react-native-mmkv'
-
-import { CheckboxTitle, SliderItem, TextBox, TextBoxModal } from './components'
 
 type PresetLabel = {
     label: string
@@ -48,9 +49,10 @@ const SamplerMenu = () => {
     }, [])
 
     const [legacy, setLegacy] = useMMKVBoolean(AppSettings.UseLegacyAPI)
-    const { apiValues, activeIndex } = APIStateNew.useAPIState((state) => ({
+    const { apiValues, activeIndex, getTemplates } = APIStateNew.useAPIState((state) => ({
         apiValues: state.values,
         activeIndex: state.activeIndex,
+        getTemplates: state.getTemplates,
     }))
 
     const samplerList =
@@ -59,7 +61,7 @@ const SamplerMenu = () => {
             : legacy
               ? APIState[APIType as API].samplers
               : activeIndex !== -1
-                ? defaultTemplates.find((item) => item.name === apiValues[activeIndex].configName)
+                ? getTemplates().find((item) => item.name === apiValues[activeIndex].configName)
                       ?.request.samplerFields
                 : []
 
@@ -182,7 +184,13 @@ const SamplerMenu = () => {
                     <TouchableOpacity
                         style={styles.button}
                         onPress={async () => {
-                            saveStringExternal(`${presetName}.json`, JSON.stringify(currentPreset))
+                            saveStringToDownload(
+                                JSON.stringify(currentPreset),
+                                `${presetName}.json`,
+                                'utf8'
+                            ).then(() => {
+                                Logger.log('Downloaded Sampler Preset!')
+                            })
                         }}>
                         <FontAwesome
                             size={24}

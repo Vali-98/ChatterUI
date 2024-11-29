@@ -1,4 +1,4 @@
-import { Chats, useInference } from 'app/constants/Chat'
+import { Chats, useInference } from 'constants/Chat'
 import BackgroundService from 'react-native-background-actions'
 
 import { API } from './API'

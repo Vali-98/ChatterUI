@@ -1,6 +1,6 @@
 import FadeDownView from '@components/FadeDownView'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Logger, Style } from '@globals'
+import { Global, Logger, Style } from 'constants/Global'
 import { Stack } from 'expo-router'
 import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'

@@ -1,7 +1,7 @@
 import Alert from '@components/Alert'
 import PopupMenu, { MenuRef } from '@components/PopupMenu'
-import { CharInfo } from '@constants/Characters'
-import { Characters } from '@globals'
+import { CharInfo } from 'constants/Characters'
+import { Characters } from 'constants/Global'
 import { useRouter } from 'expo-router'
 
 type CharacterEditPopupProps = {

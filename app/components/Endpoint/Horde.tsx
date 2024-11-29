@@ -1,6 +1,6 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
-import { Global, Logger, Style } from '@globals'
-import { hordeHeader } from 'app/constants/APIState/HordeAPI'
+import { Global, Logger, Style } from 'constants/Global'
+import { hordeHeader } from 'constants/APIState/HordeAPI'
 import { useState, useEffect, useRef } from 'react'
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import { MultiSelect } from 'react-native-element-dropdown'

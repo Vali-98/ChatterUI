@@ -1,4 +1,4 @@
-import { Chats, Style } from '@globals'
+import { Chats, Style } from 'constants/Global'
 import React, { useState } from 'react'
 import { View, TouchableOpacity, StyleSheet } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'

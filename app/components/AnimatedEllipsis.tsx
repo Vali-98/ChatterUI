@@ -1,5 +1,5 @@
 import { Octicons } from '@expo/vector-icons'
-import { Style } from '@globals'
+import { Style } from 'constants/Global'
 import { useEffect } from 'react'
 import { View } from 'react-native'
 import Animated, {

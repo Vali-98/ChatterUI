@@ -5,20 +5,20 @@ import SliderItem from '@components/SliderItem'
 import StringArrayEditor from '@components/StringArrayEditor'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
-import useAutosave from '@constants/AutoSave'
 import { FontAwesome } from '@expo/vector-icons'
-import { Instructs, Logger, MarkdownStyle, Style, saveStringToDownload } from '@globals'
+import useAutosave from 'constants/AutoSave'
+import { Instructs, Logger, MarkdownStyle, Style, saveStringToDownload } from 'constants/Global'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
 import {
-    View,
-    SafeAreaView,
-    TouchableOpacity,
-    StyleSheet,
-    ScrollView,
-    Text,
     Pressable,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import Markdown from 'react-native-markdown-display'

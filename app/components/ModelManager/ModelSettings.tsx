@@ -3,13 +3,13 @@ import SectionTitle from '@components/SectionTitle'
 import SliderItem from '@components/SliderItem'
 import SwitchTitle from '@components/SwitchTitle'
 import SwitchWithDescription from '@components/SwitchWithDescription'
-import { Llama, LlamaPreset, readableFileSize } from '@constants/LlamaLocal'
-import { AppSettings, Global, Logger, Style } from '@globals'
+import { AppSettings, Global, Logger, Style } from 'constants/Global'
+import { Llama, LlamaPreset, readableFileSize } from 'constants/LlamaLocal'
 import { useFocusEffect } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { Platform, View, Text, StyleSheet, BackHandler, TouchableOpacity } from 'react-native'
+import { BackHandler, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-import Animated, { SlideInRight, SlideOutRight, Easing } from 'react-native-reanimated'
+import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated'
 
 type ModelSettingsProp = {
     modelImporting: boolean

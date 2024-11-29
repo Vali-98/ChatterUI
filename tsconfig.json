@@ -4,10 +4,10 @@
         "strict": true,
         "baseUrl": ".",
         "paths": {
-            "@globals": ["app/constants/Global"],
+            "@globals": ["constants/Global"],
             "@components/*": ["app/components/*"],
             "@components": ["app/components"],
-            "@constants/*": ["app/constants/*"],
+            "@constants/*": ["constants/*"],
             "@assets/*": ["assets/*"],
             "@public/*": ["public/*"],
             "@lib/*": ["lib/*"],

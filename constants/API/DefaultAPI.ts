@@ -1,4 +1,4 @@
-import { SamplerID } from '@constants/SamplerData'
+import { SamplerID } from 'constants/SamplerData'
 
 import { APIConfiguration } from './APIBuilder.types'
 

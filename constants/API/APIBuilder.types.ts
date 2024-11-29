@@ -1,4 +1,4 @@
-import { APISampler } from '@constants/APIState/BaseAPI'
+import { APISampler } from 'constants/APIState/BaseAPI'
 
 // These are for ChatterUI's interface
 // When a user wishes to add new 'X' API, we can control which fields remain default, and which can be edited

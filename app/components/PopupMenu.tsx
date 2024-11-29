@@ -1,5 +1,5 @@
 import { AntDesign } from '@expo/vector-icons'
-import { Style } from '@globals'
+import { Style } from 'constants/Global'
 import { useFocusEffect } from 'expo-router'
 import React, { ReactNode, useRef, useState } from 'react'
 import { StyleSheet, TouchableOpacity, Text, BackHandler } from 'react-native'

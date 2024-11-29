@@ -1,4 +1,4 @@
-import { AppSettings, Chats } from '@globals'
+import { AppSettings, Chats } from 'constants/Global'
 import { FlatList, StyleSheet, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
@@ -55,7 +55,7 @@ const ChatWindow = () => {
     )
 }
 
-export { ChatWindow }
+export default ChatWindow
 
 const styles = StyleSheet.create({
     chatHistory: {

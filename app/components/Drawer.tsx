@@ -1,4 +1,4 @@
-import { Style } from '@globals'
+import { Style } from 'constants/Global'
 import { useFocusEffect } from 'expo-router'
 import React, { ReactNode } from 'react'
 import { StyleSheet, ViewStyle, View, BackHandler } from 'react-native'

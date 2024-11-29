@@ -1,6 +1,6 @@
 import AnimatedEllipsis from '@components/AnimatedEllipsis'
-import { useInference } from '@constants/Chat'
-import { Chats, MarkdownStyle } from '@globals'
+import { useInference } from 'constants/Chat'
+import { Chats, MarkdownStyle } from 'constants/Global'
 import { useEffect, useRef } from 'react'
 import { View, Animated, Easing, useAnimatedValue } from 'react-native'
 import Markdown from 'react-native-markdown-display'

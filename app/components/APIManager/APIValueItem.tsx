@@ -1,15 +1,9 @@
 import Alert from '@components/Alert'
 import SwitchComponent from '@components/SwitchTitle'
-import { APIManagerValue, APIState } from '@constants/API/APIManagerState'
 import { AntDesign } from '@expo/vector-icons'
-import { Style } from '@globals'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import Animated, {
-    interpolateColor,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
-} from 'react-native-reanimated'
+import { APIManagerValue, APIState } from 'constants/API/APIManagerState'
+import { Style } from 'constants/Global'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 type APIValueItemProps = {
     item: APIManagerValue
@@ -40,7 +34,7 @@ const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
     }
 
     return (
-        <Animated.View style={item.active ? styles.longContainer : styles.longContainerInactive}>
+        <View style={item.active ? styles.longContainer : styles.longContainerInactive}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <SwitchComponent
                     value={item.active}
@@ -70,7 +64,7 @@ const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
                     <AntDesign name="edit" color={Style.getColor('primary-text1')} size={24} />
                 </TouchableOpacity>
             </View>
-        </Animated.View>
+        </View>
     )
 }
 

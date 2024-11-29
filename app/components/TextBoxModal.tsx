@@ -1,5 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Logger, Style } from '@globals'
+import { Logger, Style } from 'constants/Global'
 import { getStringAsync } from 'expo-clipboard'
 import { useState, useEffect } from 'react'
 import {

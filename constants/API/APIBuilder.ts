@@ -1,10 +1,9 @@
-import { useInference } from '@constants/Chat'
-import { Instructs, InstructType } from '@constants/Instructs'
-import { Characters, Chats, Logger } from '@globals'
+import { useInference } from 'constants/Chat'
+import { Instructs, InstructType } from 'constants/Instructs'
+import { Characters, Chats, Logger } from 'constants/Global'
 import EventSource from 'react-native-sse'
 
 import { APIState } from './APIManagerState'
-import { defaultTemplates } from './DefaultAPI'
 import { buildRequest } from './RequestBuilder'
 
 export const buildAndSendRequest = () => {
@@ -22,7 +21,10 @@ export const buildAndSendRequest = () => {
         return
     }
 
-    const configs = defaultTemplates.filter((item) => item.name === requestValues.configName)
+    const configs = APIState.useAPIState
+        .getState()
+        .getTemplates()
+        .filter((item) => item.name === requestValues.configName)
 
     const config = configs[0]
     if (!config) {

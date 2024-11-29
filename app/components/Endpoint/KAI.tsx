@@ -1,4 +1,4 @@
-import { Global, Style } from '@globals'
+import { Global, Style } from 'constants/Global'
 import { useEffect } from 'react'
 import { View, Text, TextInput, StyleSheet } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'

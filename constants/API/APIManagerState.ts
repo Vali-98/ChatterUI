@@ -1,8 +1,9 @@
-import { mmkvStorage } from '@constants/MMKV'
+import { mmkvStorage } from 'constants/MMKV'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
+import { defaultTemplates } from './DefaultAPI'
 
 export interface APIManagerValue extends APIValues {
     active: boolean
@@ -19,6 +20,7 @@ type APIStateProps = {
     removeValue: (index: number) => void
     removeTemplate: (index: number) => void
     editValue: (value: APIManagerValue, index: number) => void
+    getTemplates: () => APIConfiguration[]
 }
 
 export namespace APIState {
@@ -29,9 +31,12 @@ export namespace APIState {
                 values: [],
                 customTemplates: [],
                 addValue: (value) => {
+                    const values = get().values
+                    values.forEach((item) => (item.active = false))
+                    values.push(value)
                     set((state) => ({
                         ...state,
-                        values: [...state.values, { ...value, active: true }],
+                        values: values,
                     }))
                 },
                 renameValue: (friendlyName, index) => {},
@@ -67,6 +72,9 @@ export namespace APIState {
                         active = { activeIndex: -1 }
                     }
                     set((state) => ({ ...state, values: values, ...active }))
+                },
+                getTemplates: () => {
+                    return [...get().customTemplates, ...defaultTemplates]
                 },
             }),
             {

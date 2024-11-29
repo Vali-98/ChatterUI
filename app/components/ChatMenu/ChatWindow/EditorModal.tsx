@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import { Chats, Style } from '@globals'
-import { ColorId } from 'app/constants/Style'
+import { Chats, Style } from 'constants/Global'
+import { ColorId } from 'constants/Style'
 import { ReactElement, useState } from 'react'
 import {
     GestureResponderEvent,

@@ -1,4 +1,4 @@
-import { Style } from '@globals'
+import { Style } from 'constants/Global'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 

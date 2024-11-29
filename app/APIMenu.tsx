@@ -1,21 +1,18 @@
-import {
-    KAI,
-    Horde,
-    TGWUI,
-    Mancer,
-    TextCompletions,
-    OpenRouter,
-    OpenAI,
-    Ollama,
-    Claude,
-    ChatCompletions,
-    Cohere,
-} from '@components/Endpoint'
+import ChatCompletions from '@components/Endpoint/ChatCompletions'
+import Claude from '@components/Endpoint/Claude'
+import Cohere from '@components/Endpoint/Cohere'
+import Horde from '@components/Endpoint/Horde'
+import KAI from '@components/Endpoint/KAI'
+import Mancer from '@components/Endpoint/Mancer'
+import Ollama from '@components/Endpoint/Ollama'
+import OpenAI from '@components/Endpoint/OpenAI'
+import OpenRouter from '@components/Endpoint/OpenRouter'
+import TGWUI from '@components/Endpoint/TGWUI'
+import TextCompletions from '@components/Endpoint/TextCompletions'
 import FadeDownView from '@components/FadeDownView'
-import { Global, API, Style } from '@globals'
+import { API, Global, Style } from 'constants/Global'
 import { Stack } from 'expo-router'
-import { useEffect } from 'react'
-import { SafeAreaView, Text, StyleSheet, View, ScrollView } from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
 import { useMMKVString } from 'react-native-mmkv'
 

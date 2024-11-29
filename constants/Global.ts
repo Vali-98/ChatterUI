@@ -114,7 +114,6 @@ export const unlockScreenOrientation = async () => {
  */
 export const startupApp = () => {
     console.log('[APP STARTED]: T1APT')
-    lockScreenOrientation()
     // Only for dev to properly reset
     Chats.useChat.getState().reset()
     Characters.useCharacterCard.getState().unloadCard()
@@ -189,7 +188,7 @@ export const startupApp = () => {
         Logger.log('Model could not be parsed, resetting')
         mmkv.delete(Global.LocalModel)
     }
-
+    lockScreenOrientation()
     SystemUI.setBackgroundColorAsync(Style.getColor('primary-surface1'))
     Logger.log('Resetting state values for startup.')
 }

@@ -1,7 +1,7 @@
-import { Global } from '@constants/GlobalValues'
-import { Logger } from 'app/constants/Logger'
-import { mmkv } from 'app/constants/MMKV'
-import { SamplerID } from 'app/constants/SamplerData'
+import { Global } from 'constants/GlobalValues'
+import { Logger } from 'constants/Logger'
+import { mmkv } from 'constants/MMKV'
+import { SamplerID } from 'constants/SamplerData'
 
 import { APIBase, APISampler } from './BaseAPI'
 

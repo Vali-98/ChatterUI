@@ -1,5 +1,5 @@
-import { Logger } from '@constants/Logger'
-import { SamplerID } from '@constants/SamplerData'
+import { Logger } from 'constants/Logger'
+import { SamplerID } from 'constants/SamplerData'
 
 import { APIBase, APISampler } from './BaseAPI'
 import { Global } from '../GlobalValues'

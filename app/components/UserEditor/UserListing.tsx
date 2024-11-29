@@ -1,7 +1,7 @@
 import Alert from '@components/Alert'
 import Avatar from '@components/Avatar'
 import PopupMenu from '@components/PopupMenu'
-import { Characters, Style } from '@globals'
+import { Characters, Style } from 'constants/Global'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Menu } from 'react-native-popup-menu'
 

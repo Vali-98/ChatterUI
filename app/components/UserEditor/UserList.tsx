@@ -1,6 +1,6 @@
 import TextBoxModal from '@components/TextBoxModal'
 import { AntDesign } from '@expo/vector-icons'
-import { Characters, Style } from '@globals'
+import { Characters, Style } from 'constants/Global'
 import { FlashList } from '@shopify/flash-list'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import React, { useState } from 'react'

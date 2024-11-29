@@ -1,9 +1,9 @@
 import ButtonPrimary from '@components/Buttons/ButtonPrimary'
-import { APIState } from '@constants/API/APIManagerState'
-import { Style } from '@constants/Style'
 import { Ionicons } from '@expo/vector-icons'
+import { APIState } from 'constants/API/APIManagerState'
+import { Style } from 'constants/Style'
 import { Stack, useRouter } from 'expo-router'
-import { FlatList, StyleSheet, View, Text } from 'react-native'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
 
 import APIValueItem from './APIValueItem'
 

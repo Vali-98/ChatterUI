@@ -1,6 +1,6 @@
 import Drawer from '@components/Drawer'
 import { Ionicons } from '@expo/vector-icons'
-import { Characters, Chats, Style } from '@globals'
+import { Characters, Chats, Style } from 'constants/Global'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { SetStateAction, useState } from 'react'
 import { Text, TouchableOpacity, StyleSheet, View, FlatList } from 'react-native'

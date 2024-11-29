@@ -1,6 +1,6 @@
-import { API } from 'app/constants/API'
-import { useInference } from 'app/constants/Chat'
-import { Logger } from 'app/constants/Logger'
+import { API } from 'constants/API'
+import { useInference } from 'constants/Chat'
+import { Logger } from 'constants/Logger'
 
 import { APIBase } from './BaseAPI'
 import chatCompletionsAPI from './ChatCompletionsAPI'

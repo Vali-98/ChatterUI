@@ -1,6 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Logger, Style } from '@globals'
-import { Chats, useInference } from 'app/constants/Chat'
+import { Global, Logger, Style } from 'constants/Global'
+import { Chats, useInference } from 'constants/Chat'
 import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'
 import { View, TouchableOpacity } from 'react-native'

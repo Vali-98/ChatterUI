@@ -1,5 +1,5 @@
 import { AntDesign } from '@expo/vector-icons'
-import { Style } from '@globals'
+import { Style } from 'constants/Global'
 import { Text, Pressable, ViewStyle } from 'react-native'
 import Animated, {
     BounceIn,

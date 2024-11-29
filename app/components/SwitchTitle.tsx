@@ -1,4 +1,4 @@
-import { Style } from '@globals'
+import { Style } from 'constants/Global'
 import React from 'react'
 import { Switch, Text, View } from 'react-native'
 

@@ -1,5 +1,5 @@
 import Drawer from '@components/Drawer'
-import { Style } from '@globals'
+import { Style } from 'constants/Global'
 import { SetStateAction } from 'react'
 import { StyleSheet } from 'react-native'
 
