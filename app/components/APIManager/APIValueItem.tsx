@@ -3,7 +3,10 @@ import SwitchComponent from '@components/SwitchTitle'
 import { AntDesign } from '@expo/vector-icons'
 import { APIManagerValue, APIState } from 'constants/API/APIManagerState'
 import { Style } from 'constants/Global'
+import { useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+
+import EditAPIModal from './EditAPIModal'
 
 type APIValueItemProps = {
     item: APIManagerValue
@@ -11,6 +14,7 @@ type APIValueItemProps = {
 }
 
 const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
+    const [showEditor, setShowEditor] = useState(false)
     const { removeValue, editValue } = APIState.useAPIState((state) => ({
         removeValue: state.removeValue,
         editValue: state.editValue,
@@ -35,6 +39,14 @@ const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
 
     return (
         <View style={item.active ? styles.longContainer : styles.longContainerInactive}>
+            <EditAPIModal
+                index={index}
+                originalValues={item}
+                show={showEditor}
+                close={() => {
+                    setShowEditor(false)
+                }}
+            />
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <SwitchComponent
                     value={item.active}
@@ -60,7 +72,7 @@ const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
                         size={24}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowEditor(true)}>
                     <AntDesign name="edit" color={Style.getColor('primary-text1')} size={24} />
                 </TouchableOpacity>
             </View>

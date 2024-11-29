@@ -64,7 +64,7 @@ const AddAPI = () => {
 
     return (
         <View style={styles.mainContainer}>
-            <Stack.Screen options={{ title: 'New API' }} />
+            <Stack.Screen options={{ title: 'Add Connection' }} />
             <ScrollView style={{ flex: 1 }}>
                 <Dropdown
                     value={template}

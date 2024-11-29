@@ -13,8 +13,7 @@ import {
 interface ButtonPrimaryProps extends Omit<PressableProps, 'style'> {
     labelStyle?: TextStyle
     label?: string
-    pressStyle?: ViewStyle
-    unpressStyle?: ViewStyle
+    buttonStyle?: ViewStyle
     opacity?: number
 }
 
@@ -23,8 +22,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 const ButtonPrimary: React.FC<ButtonPrimaryProps> = ({
     labelStyle,
     label,
-    pressStyle,
-    unpressStyle,
+    buttonStyle,
     children,
     onPressIn,
     opacity = 1,
@@ -57,7 +55,7 @@ const ButtonPrimary: React.FC<ButtonPrimaryProps> = ({
             }}
             {...rest}
             style={StyleSheet.flatten([
-                pressStyle,
+                buttonStyle,
                 {
                     backgroundColor: Style.getColor('primary-brand'),
                     padding: 8,
