@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     },
 
     longContainerInactive: {
-        borderColor: Style.getColor('primary-surface4'),
+        borderColor: Style.getColor('primary-surface1'),
         borderWidth: 2,
         flexDirection: 'row',
         marginBottom: 8,
