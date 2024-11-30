@@ -112,7 +112,7 @@ const AppSettingsMenu = () => {
                 title="Use First Message"
                 value={firstMes}
                 onValueChange={setFirstMes}
-                description=" This will make new chats start blank, needed by specific models"
+                description="Disabling this will make new chats start blank, needed by specific models"
             />
 
             <SwitchWithDescription
