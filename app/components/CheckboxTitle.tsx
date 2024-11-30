@@ -40,6 +40,7 @@ const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
 
     return (
         <Pressable
+            style={{ flexDirection: 'row', alignItems: 'center' }}
             onPress={() => {
                 if (onChange) {
                     onChange(!body[varname])
@@ -53,9 +54,8 @@ const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
                     {
                         flexDirection: 'row',
                         alignItems: `center`,
-                        paddingHorizontal: 12,
-                        paddingVertical: 8,
-                        borderRadius: 12,
+                        padding: 6,
+                        borderRadius: 8,
                         borderColor: Style.getColor('primary-brand'),
                         borderWidth: 1,
                         marginVertical: 8,
@@ -67,31 +67,22 @@ const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
                     <Animated.View
                         entering={BounceIn.duration(150)}
                         exiting={ZoomOut.duration(150)}>
-                        <AntDesign
-                            name="checkcircleo"
-                            color={Style.getColor('primary-text1')}
-                            size={20}
-                        />
+                        <AntDesign name="check" color={Style.getColor('primary-text1')} size={20} />
                     </Animated.View>
                 )}
                 {!body[varname] && (
                     <Animated.View entering={ZoomIn.duration(150)} exiting={ZoomOut.duration(150)}>
-                        <AntDesign
-                            name="closecircleo"
-                            color={Style.getColor('primary-text2')}
-                            size={20}
-                        />
+                        <AntDesign name="close" color={Style.getColor('primary-text2')} size={20} />
                     </Animated.View>
                 )}
-
-                <Text
-                    style={{
-                        paddingLeft: 12,
-                        color: Style.getColor(body[varname] ? 'primary-text1' : 'primary-text2'),
-                    }}>
-                    {name}
-                </Text>
             </Animated.View>
+            <Text
+                style={{
+                    paddingLeft: 12,
+                    color: Style.getColor(body[varname] ? 'primary-text1' : 'primary-text2'),
+                }}>
+                {name}
+            </Text>
         </Pressable>
     )
 }
