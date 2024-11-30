@@ -1,0 +1,66 @@
+{
+    "version": 1,
+    "name": "OpenAI",
+
+    "defaultValues": {
+        "endpoint": "https://api.openai.com/v1/chat/completions",
+        "modelEndpoint": "https://api.openai.com/v1/models",
+        "prefill": "",
+        "firstMessage": "",
+        "key": "",
+        "model": ""
+    },
+
+    "features": {
+        "usePrefill": false,
+        "useFirstMessage": false,
+        "useKey": true,
+        "useModel": true,
+        "multipleModels": false
+    },
+
+    "request": {
+        "requestType": "stream",
+        "samplerFields": [
+            { "externalName": "max_context_length", "samplerID": "max_length" },
+            { "externalName": "max_tokens", "samplerID": "genamt" },
+            { "externalName": "stream", "samplerID": "streaming" },
+            { "externalName": "temperature", "samplerID": "temp" },
+            { "externalName": "top_p", "samplerID": "top_p" },
+            { "externalName": "presence_penalty", "samplerID": "presence_pen" },
+            { "externalName": "frequency_penalty", "samplerID": "freq_pen" },
+            { "externalName": "seed", "samplerID": "seed" }
+        ],
+        "completionType": {
+            "type": "chatCompletions",
+            "userRole": "user",
+            "systemRole": "system",
+            "assistantRole": "assistant",
+            "contentName": "content"
+        },
+        "authHeader": "Authorization",
+        "authPrefix": "Bearer ",
+        "responseParsePattern": "choices.0.message.content",
+        "useStop": true,
+        "stopKey": "stop",
+        "promptKey": "messages",
+        "removeLength": true
+    },
+
+    "payload": {
+        "type": "openai"
+    },
+
+    "model": {
+        "useModelContextLength": false,
+        "nameParser": "",
+        "contextSizeParser": "",
+        "modelListParser": ""
+    },
+
+    "ui": {
+        "editableCompletionPath": false,
+        "editableModelPath": false,
+        "selectableModel": false
+    }
+}
