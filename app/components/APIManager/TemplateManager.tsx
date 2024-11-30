@@ -1,66 +1,70 @@
 import ButtonPrimary from '@components/Buttons/ButtonPrimary'
-import { AntDesign, Ionicons } from '@expo/vector-icons'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { Logger } from '@globals'
 import { APIState } from 'constants/API/APIManagerState'
 import { Style } from 'constants/Style'
-import { Stack, useRouter } from 'expo-router'
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { getDocumentAsync } from 'expo-document-picker'
+import { readAsStringAsync } from 'expo-file-system'
+import { Stack } from 'expo-router'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
 
-import APIValueItem from './APIValueItem'
+import TemplateItem from './TemplateItem'
 
-const APIManager = () => {
+const TemplateManager = () => {
     // eslint-disable-next-line react-compiler/react-compiler
     'use no memo'
-    const { apiValues } = APIState.useAPIState((state) => ({
-        apiValues: state.values,
+    const { templates, addTemplate } = APIState.useAPIState((state) => ({
+        templates: state.customTemplates,
+        addTemplate: state.addTemplate,
     }))
-    const router = useRouter()
+
     return (
         <View style={styles.mainContainer}>
             <Stack.Screen
                 options={{
-                    title: 'API Manager',
-                    headerRight: () => (
-                        <TouchableOpacity
-                            onPress={() => {
-                                router.push('/components/APIManager/TemplateManager')
-                            }}>
-                            <AntDesign
-                                name="setting"
-                                color={Style.getColor('primary-text2')}
-                                size={26}
-                            />
-                        </TouchableOpacity>
-                    ),
+                    title: 'Template Manager',
                 }}
             />
-            {apiValues.length > 0 && (
+            {templates.length > 0 && (
                 <FlatList
-                    data={apiValues}
-                    keyExtractor={(item, index) => item.configName + index}
-                    renderItem={({ item, index }) => <APIValueItem item={item} index={index} />}
+                    data={templates}
+                    keyExtractor={(item, index) => item.name}
+                    renderItem={({ item, index }) => <TemplateItem item={item} index={index} />}
                 />
             )}
 
-            {apiValues.length === 0 && (
+            {templates.length === 0 && (
                 <View style={styles.emptyListContainer}>
-                    <Ionicons
-                        name="cloud-offline-outline"
+                    <MaterialCommunityIcons
+                        name="file-question-outline"
                         size={64}
                         color={Style.getColor('primary-text3')}
                     />
-                    <Text style={styles.emptyListText}>No Connections Added</Text>
+                    <Text style={styles.emptyListText}>No Custom Templates Added</Text>
                 </View>
             )}
 
             <ButtonPrimary
-                onPress={() => router.push('/components/APIManager/AddAPI')}
-                label="Add Connection"
+                onPress={async () => {
+                    const result = await getDocumentAsync()
+                    if (result.canceled) return
+
+                    const uri = result.assets[0].uri
+                    const data = await readAsStringAsync(uri, { encoding: 'utf8' })
+                    try {
+                        const jsonData = JSON.parse(data)
+                        addTemplate(jsonData)
+                    } catch (e) {
+                        Logger.log('Failed to Import', true)
+                    }
+                }}
+                label="Add Template"
             />
         </View>
     )
 }
 
-export default APIManager
+export default TemplateManager
 
 const styles = StyleSheet.create({
     mainContainer: {

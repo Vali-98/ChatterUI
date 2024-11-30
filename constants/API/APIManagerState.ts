@@ -16,7 +16,6 @@ type APIStateProps = {
     values: APIManagerValue[]
     customTemplates: APIConfiguration[]
     addValue: (template: APIManagerValue) => void
-    renameValue: (friendlyName: string, index: number) => void
     addTemplate: (values: APIConfiguration) => void
     removeValue: (index: number) => void
     removeTemplate: (index: number) => void
@@ -40,7 +39,6 @@ export namespace APIState {
                         values: values,
                     }))
                 },
-                renameValue: (friendlyName, index) => {},
 
                 addTemplate: (template) => {
                     const templates = get().getTemplates()
@@ -52,9 +50,10 @@ export namespace APIState {
                         Logger.log(`Name exists, renaming to: ${newName}`)
                         template.name = newName
                     }
+                    const output = verifyJSON(template, defaultTemplates[0])
                     set((state) => ({
                         ...state,
-                        customTemplates: [...state.customTemplates, template],
+                        customTemplates: [...state.customTemplates, output],
                     }))
                 },
                 removeValue: (index) => {
@@ -84,7 +83,7 @@ export namespace APIState {
                     set((state) => ({ ...state, values: values, ...active }))
                 },
                 getTemplates: () => {
-                    return [...get().customTemplates, ...defaultTemplates]
+                    return [...defaultTemplates, ...get().customTemplates]
                 },
             }),
             {
@@ -113,8 +112,6 @@ const verifyJSON = (source: any, target: any): any => {
     }
     return fillFields(source, target)
 }
-
-// todo move to file utils
 
 function generateUniqueName(baseName: string, names: string[]) {
     const regex = new RegExp(`^${baseName}\\s\\((\\d+)\\)$`)

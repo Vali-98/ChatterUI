@@ -215,7 +215,8 @@ const SamplerMenu = () => {
                 <ScrollView>
                     <View style={styles.mainContainer}>
                         {samplerList?.map((item, index) => {
-                            const samplerItem = Samplers[item.samplerID]
+                            const samplerItem = Samplers?.[item.samplerID]
+                            if (!samplerItem) return
                             switch (samplerItem.inputType) {
                                 case 'slider':
                                     return (
