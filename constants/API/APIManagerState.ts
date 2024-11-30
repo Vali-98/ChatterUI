@@ -1,3 +1,4 @@
+import { Logger } from '@constants/Logger'
 import { mmkvStorage } from 'constants/MMKV'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
@@ -42,6 +43,15 @@ export namespace APIState {
                 renameValue: (friendlyName, index) => {},
 
                 addTemplate: (template) => {
+                    const templates = get().getTemplates()
+                    if (templates.some((item) => item.name === template.name)) {
+                        const newName = generateUniqueName(
+                            template.name,
+                            templates.map((item) => item.name)
+                        )
+                        Logger.log(`Name exists, renaming to: ${newName}`)
+                        template.name = newName
+                    }
                     set((state) => ({
                         ...state,
                         customTemplates: [...state.customTemplates, template],
@@ -102,4 +112,18 @@ const verifyJSON = (source: any, target: any): any => {
         return sourceObj
     }
     return fillFields(source, target)
+}
+
+// todo move to file utils
+
+function generateUniqueName(baseName: string, names: string[]) {
+    const regex = new RegExp(`^${baseName}\\s\\((\\d+)\\)$`)
+    const existingNumbers = names
+        .map((item) => {
+            const match = item.match(regex)
+            return match ? parseInt(match[1], 10) : null
+        })
+        .filter((num) => num !== null)
+    const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1
+    return `${baseName} (${nextNumber})`
 }
