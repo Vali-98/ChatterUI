@@ -1,5 +1,6 @@
 import ButtonPrimary from '@components/Buttons/ButtonPrimary'
 import DropdownSheet from '@components/DropdownSheet'
+import MultiDropdownSheet from '@components/MultiDropdownSheet'
 import claudeModels from '@constants/API/ClaudeModels.json'
 import { MaterialIcons } from '@expo/vector-icons'
 import { APIManagerValue, APIState } from 'constants/API/APIManagerState'
@@ -153,18 +154,34 @@ const AddAPI = () => {
                     <View style={styles.dropdownContainer}>
                         <Text style={styles.title}>Model</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <DropdownSheet
-                                selected={values.model}
-                                data={modelList}
-                                labelExtractor={(value) => {
-                                    return getNestedValue(value, template.model.nameParser)
-                                }}
-                                onChangeValue={(item) => {
-                                    setValues({ ...values, model: item })
-                                }}
-                                search={modelList.length > 10}
-                                modalTitle="Select Model"
-                            />
+                            {!template.features.multipleModels && (
+                                <DropdownSheet
+                                    selected={values.model}
+                                    data={modelList}
+                                    labelExtractor={(value) => {
+                                        return getNestedValue(value, template.model.nameParser)
+                                    }}
+                                    onChangeValue={(item) => {
+                                        setValues({ ...values, model: item })
+                                    }}
+                                    search={modelList.length > 10}
+                                    modalTitle="Select Model"
+                                />
+                            )}
+                            {template.features.multipleModels && (
+                                <MultiDropdownSheet
+                                    selected={values.model}
+                                    data={modelList}
+                                    labelExtractor={(value) => {
+                                        return getNestedValue(value, template.model.nameParser)
+                                    }}
+                                    onChangeValue={(item) => {
+                                        setValues({ ...values, model: item })
+                                    }}
+                                    search={modelList.length > 10}
+                                    modalTitle="Select Model"
+                                />
+                            )}
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
