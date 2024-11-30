@@ -85,11 +85,9 @@ const styles = StyleSheet.create({
     },
 
     contentContainer: {
-        paddingHorizontal: 12,
-        paddingVertical: 16,
         borderRadius: 8,
-        borderWidth: 1,
-        borderColor: Style.getColor('primary-brand'),
+        //borderWidth: 1,
+        //borderColor: Style.getColor('primary-brand'),
     },
 
     title: {
@@ -131,7 +129,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         color: Style.getColor('primary-text1'),
         backgroundColor: Style.getColor('primary-surface1'),
-        borderColor: Style.getColor('primary-surface4'),
+        borderColor: Style.getColor('primary-surface3'),
         marginTop: 12,
         marginBottom: 4,
         marginRight: 12,
