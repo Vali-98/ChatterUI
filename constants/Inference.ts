@@ -72,7 +72,7 @@ export const generateResponse = async (swipeId: number) => {
             Logger.log('An invalid API was somehow chosen, this is bad!', true)
         }
     } else {
-        buildAndSendRequest()
+        BackgroundService.start(buildAndSendRequest, completionTaskOptions)
     }
 
     Logger.debug(`Time taken for generateResponse(): ${(performance.now() - data).toFixed(2)}ms`)

@@ -1,12 +1,12 @@
 import { useInference } from 'constants/Chat'
-import { Instructs, InstructType } from 'constants/Instructs'
 import { Characters, Chats, Logger } from 'constants/Global'
+import { Instructs, InstructType } from 'constants/Instructs'
 import EventSource from 'react-native-sse'
 
 import { APIState } from './APIManagerState'
 import { buildRequest } from './RequestBuilder'
 
-export const buildAndSendRequest = () => {
+export const buildAndSendRequest = async () => {
     // get values from some global API values state
     // probably store all APIValues and custom configs in a persist zustand store, as they have so few keys
     // and are not prone to changes
