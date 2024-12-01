@@ -4,6 +4,7 @@ import FadeDownView from '@components/FadeDownView'
 import SliderItem from '@components/SliderItem'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
+import { APISampler } from '@constants/APIState/BaseAPI'
 import { FontAwesome } from '@expo/vector-icons'
 import { APIState as APIStateNew } from 'constants/API/APIManagerState'
 import { APIState } from 'constants/APIState'
@@ -46,6 +47,7 @@ const SamplerMenu = () => {
 
     useEffect(() => {
         loadPresetList(presetName ?? '')
+        setSamplerList(getSamplerList())
     }, [])
 
     const [legacy, setLegacy] = useMMKVBoolean(AppSettings.UseLegacyAPI)
@@ -55,15 +57,23 @@ const SamplerMenu = () => {
         getTemplates: state.getTemplates,
     }))
 
-    const samplerList =
-        appMode === AppMode.LOCAL
-            ? APIState[API.LOCAL].samplers
-            : legacy
-              ? APIState[APIType as API].samplers
-              : activeIndex !== -1
-                ? getTemplates().find((item) => item.name === apiValues[activeIndex].configName)
-                      ?.request.samplerFields
-                : []
+    const [samplerList, setSamplerList] = useState<APISampler[]>([])
+
+    const getSamplerList = (): APISampler[] => {
+        if (appMode === AppMode.LOCAL) return APIState[API.LOCAL].samplers
+        if (legacy) {
+            return APIState[APIType as API].samplers
+        }
+        if (activeIndex !== -1) {
+            const template = getTemplates().find(
+                (item) => item.name === apiValues[activeIndex].configName
+            )
+            if (!template) return []
+            return template.request.samplerFields
+        }
+        console.log('no active index')
+        return []
+    }
 
     return (
         <FadeDownView style={{ flex: 1 }}>
@@ -216,7 +226,12 @@ const SamplerMenu = () => {
                     <View style={styles.mainContainer}>
                         {samplerList?.map((item, index) => {
                             const samplerItem = Samplers?.[item.samplerID]
-                            if (!samplerItem) return
+                            if (!samplerItem)
+                                return (
+                                    <Text style={styles.unsupported}>
+                                        Sampler ID {`[${item.samplerID}]`} Not Supported
+                                    </Text>
+                                )
                             switch (samplerItem.inputType) {
                                 case 'slider':
                                     return (
@@ -314,5 +329,14 @@ const styles = StyleSheet.create({
         padding: 8,
         margin: 16,
         borderRadius: 8,
+    },
+
+    unsupported: {
+        color: Style.getColor('primary-text2'),
+        textAlign: 'center',
+        paddingVertical: 8,
+        marginVertical: 8,
+        borderRadius: 8,
+        backgroundColor: Style.getColor('primary-surface2'),
     },
 })
