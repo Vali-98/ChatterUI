@@ -37,6 +37,7 @@ export namespace APIState {
                     set((state) => ({
                         ...state,
                         values: values,
+                        activeIndex: values.length - 1,
                     }))
                 },
 
@@ -58,8 +59,12 @@ export namespace APIState {
                 },
                 removeValue: (index) => {
                     const values = get().values
+                    let activeIndex = get().activeIndex
+                    if (index === activeIndex) {
+                        activeIndex = -1
+                    }
                     values.splice(index, 1)
-                    set((state) => ({ ...state, values: values }))
+                    set((state) => ({ ...state, values: values, activeIndex: activeIndex }))
                 },
                 removeTemplate: (index) => {
                     const templates = get().customTemplates
