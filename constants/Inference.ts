@@ -66,7 +66,7 @@ export const generateResponse = async (swipeId: number) => {
     const APIType = getString(Global.APIType)
     const legacy = mmkv.getBoolean(AppSettings.UseLegacyAPI)
     const apiState = appMode === AppMode.LOCAL ? APIState[API.LOCAL] : APIState?.[APIType as API]
-    if (legacy ?? appMode === AppMode.LOCAL) {
+    if (appMode === AppMode.LOCAL || legacy) {
         if (apiState) await BackgroundService.start(apiState.inference, completionTaskOptions)
         else {
             Logger.log('An invalid API was somehow chosen, this is bad!', true)
