@@ -49,7 +49,7 @@ Below is an explanation of what each field does:
             -   `contentName: string` - the key of the [CONTENT] field
         -   `type: textCompletions` - Use this if the API uses text completions
     -   `authHeader: 'Authorization' | 'X-API-KEY' | string` - The header key for authorization
-    -   `authPrefix: 'Bearer ' | string` - A prefix before the key value in the authorization header
+    -   `authPrefix: 'Bearer ' | string` - A prefix before the API key value in the authorization header
     -   `removeLength: boolean` - when `max_length` is defined as a sampler, it can be used for controlling context size client-side, even if the API used doesn't support it. This allows you to remove the `max_length` field from the final request body in case the API used does not allow unsupported fields.
     -   `removeSeedifNegative?: boolean` - Some APIs only allow seed values of at least 0, and prefer an undefined seed for random seed values. This will remove the seed value if it is `-1` from the final request body.
 -   `APIPayloadFormat` - Refer to [RequestBuilder.ts](https://github.com/Vali-98/ChatterUI/blob/master/constants/API/RequestBuilder.ts) for how the request body is constructed
