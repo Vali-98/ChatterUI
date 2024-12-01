@@ -27,7 +27,16 @@ export const defaultTemplates: APIConfiguration[] = [
 
         request: {
             requestType: 'stream',
-            samplerFields: [],
+            samplerFields: [
+                { externalName: 'max_context_length', samplerID: SamplerID.CONTEXT_LENGTH },
+                { externalName: 'max_tokens', samplerID: SamplerID.GENERATED_LENGTH },
+                { externalName: 'stream', samplerID: SamplerID.STREAMING },
+                { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
+                { externalName: 'top_p', samplerID: SamplerID.TOP_P },
+                { externalName: 'presence_penalty', samplerID: SamplerID.PRESENCE_PENALTY },
+                { externalName: 'frequency_penalty', samplerID: SamplerID.FREQUENCY_PENALTY },
+                { externalName: 'seed', samplerID: SamplerID.SEED },
+            ],
             completionType: {
                 type: 'chatCompletions',
                 userRole: 'user',
