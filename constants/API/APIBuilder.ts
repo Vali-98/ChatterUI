@@ -16,7 +16,7 @@ export const buildAndSendRequest = async () => {
         .values.find((item, index) => index === APIState.useAPIState.getState().activeIndex)
 
     if (!requestValues) {
-        Logger.log('No API Configuration found', true)
+        Logger.log(`No Active API`, true)
         Chats.useChat.getState().stopGenerating()
         return
     }
@@ -28,7 +28,7 @@ export const buildAndSendRequest = async () => {
 
     const config = configs[0]
     if (!config) {
-        Logger.log('API Configuration not found!')
+        Logger.log(`Configuration "${requestValues?.configName}" found`, true)
         Chats.useChat.getState().stopGenerating()
         return
     }
