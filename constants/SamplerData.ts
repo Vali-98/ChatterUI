@@ -716,3 +716,12 @@ type SamplerValueMap = {
 export type SamplerPreset = {
     -readonly [ID in keyof SamplerValueMap]: SamplerValueMap[ID]
 }
+
+export const createMarkdownRows = () => {
+    const items: any = []
+    Object.entries(Samplers).map(([k, v]) => {
+        items.push('|' + v.friendlyName + '|' + v.internalID + '|' + v.macro + '|')
+    })
+    const out = items.join('\n')
+    console.log(out)
+}
