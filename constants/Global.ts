@@ -7,6 +7,7 @@ import { lockAsync, OrientationLock } from 'expo-screen-orientation'
 import * as Sharing from 'expo-sharing'
 import * as SystemUI from 'expo-system-ui'
 import { Platform } from 'react-native'
+import { btoa } from 'react-native-quick-base64'
 
 import { API } from './API'
 import { Characters } from './Characters'
@@ -82,6 +83,7 @@ export const saveStringToDownload = async (
     filename: string,
     encoding: 'ascii' | 'base64' | `utf8`
 ) => {
+    if (encoding === 'utf8') data = btoa(data)
     await writeFile(`${DownloadDirectoryPath}/${filename}`, data, { encoding: encoding })
 }
 
