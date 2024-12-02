@@ -3,7 +3,7 @@ import { AntDesign, Ionicons } from '@expo/vector-icons'
 import { APIState } from 'constants/API/APIManagerState'
 import { Style } from 'constants/Style'
 import { Stack, useRouter } from 'expo-router'
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 
 import APIValueItem from './APIValueItem'
 
@@ -20,8 +20,8 @@ const APIManager = () => {
                 options={{
                     title: 'API Manager',
                     headerRight: () => (
-                        <TouchableOpacity
-                            onPress={() => {
+                        <Pressable
+                            onPressIn={() => {
                                 router.push('/components/APIManager/TemplateManager')
                             }}>
                             <AntDesign
@@ -29,7 +29,7 @@ const APIManager = () => {
                                 color={Style.getColor('primary-text2')}
                                 size={26}
                             />
-                        </TouchableOpacity>
+                        </Pressable>
                     ),
                 }}
             />
