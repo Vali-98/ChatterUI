@@ -1,6 +1,6 @@
 {
     "version": 1,
-    "name": "OpenAI",
+    "name": "Chat Completion Example",
 
     "defaultValues": {
         "endpoint": "https://api.openai.com/v1/chat/completions",
@@ -40,7 +40,7 @@
         },
         "authHeader": "Authorization",
         "authPrefix": "Bearer ",
-        "responseParsePattern": "choices.0.message.content",
+        "responseParsePattern": "choices.0.delta.content",
         "useStop": true,
         "stopKey": "stop",
         "promptKey": "messages",
