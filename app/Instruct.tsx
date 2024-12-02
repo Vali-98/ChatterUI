@@ -341,42 +341,66 @@ const Instruct = () => {
                                 <View>
                                     <CheckboxTitle
                                         name="Wrap In Newline"
-                                        varname="wrap"
-                                        body={currentInstruct}
-                                        setValue={setCurrentInstruct}
+                                        value={currentInstruct.wrap}
+                                        onChangeValue={(b) => {
+                                            setCurrentInstruct({
+                                                ...currentInstruct,
+                                                wrap: b,
+                                            })
+                                        }}
                                     />
                                     <CheckboxTitle
                                         name="Include Names"
-                                        varname="names"
-                                        body={currentInstruct}
-                                        setValue={setCurrentInstruct}
+                                        value={currentInstruct.names}
+                                        onChangeValue={(b) => {
+                                            setCurrentInstruct({
+                                                ...currentInstruct,
+                                                names: b,
+                                            })
+                                        }}
                                     />
                                     <CheckboxTitle
                                         name="Add Timestamp"
-                                        varname="timestamp"
-                                        body={currentInstruct}
-                                        setValue={setCurrentInstruct}
+                                        value={currentInstruct.timestamp}
+                                        onChangeValue={(b) => {
+                                            setCurrentInstruct({
+                                                ...currentInstruct,
+                                                timestamp: b,
+                                            })
+                                        }}
                                     />
                                 </View>
                                 <View>
                                     <CheckboxTitle
                                         name="Use Examples"
-                                        varname="examples"
-                                        body={currentInstruct}
-                                        setValue={setCurrentInstruct}
+                                        value={currentInstruct.examples}
+                                        onChangeValue={(b) => {
+                                            setCurrentInstruct({
+                                                ...currentInstruct,
+                                                examples: b,
+                                            })
+                                        }}
                                     />
                                     <CheckboxTitle
                                         name="Use Scenario"
-                                        varname="scenario"
-                                        body={currentInstruct}
-                                        setValue={setCurrentInstruct}
+                                        value={currentInstruct.scenario}
+                                        onChangeValue={(b) => {
+                                            setCurrentInstruct({
+                                                ...currentInstruct,
+                                                scenario: b,
+                                            })
+                                        }}
                                     />
 
                                     <CheckboxTitle
                                         name="Use Personality"
-                                        varname="personality"
-                                        body={currentInstruct}
-                                        setValue={setCurrentInstruct}
+                                        value={currentInstruct.personality}
+                                        onChangeValue={(b) => {
+                                            setCurrentInstruct({
+                                                ...currentInstruct,
+                                                personality: b,
+                                            })
+                                        }}
                                     />
                                 </View>
                             </View>
