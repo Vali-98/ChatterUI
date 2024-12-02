@@ -142,8 +142,8 @@ export namespace MarkdownStyle {
             borderWidth: 1,
             borderColor: Style.getColor('primary-surface1'),
             backgroundColor: Style.getColor('primary-surface2'),
-            padding: 10,
-            borderRadius: 4,
+            padding: 4,
+            borderRadius: 8,
             ...Platform.select({
                 ios: {
                     fontFamily: 'Courier',
@@ -152,14 +152,12 @@ export namespace MarkdownStyle {
                     fontFamily: 'monospace',
                 },
             }),
-            marginBottom: 8,
         },
         fence: {
             color: Style.getColor('primary-text2'),
             borderWidth: 1,
             borderColor: Style.getColor('primary-surface1'),
             backgroundColor: Style.getColor('primary-surface2'),
-            padding: 10,
             borderRadius: 4,
             ...Platform.select({
                 ios: {
@@ -169,7 +167,7 @@ export namespace MarkdownStyle {
                     fontFamily: 'monospace',
                 },
             }),
-            marginBottom: 8,
+            marginVertical: 4,
         },
 
         // Tables
