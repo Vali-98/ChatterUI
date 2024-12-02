@@ -68,7 +68,7 @@ const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
                 )}
                 {!value && (
                     <Animated.View entering={ZoomIn.duration(150)} exiting={ZoomOut.duration(150)}>
-                        <AntDesign name="close" color={Style.getColor('primary-text1')} size={20} />
+                        <AntDesign name="close" color={Style.getColor('primary-text2')} size={20} />
                     </Animated.View>
                 )}
             </Animated.View>
