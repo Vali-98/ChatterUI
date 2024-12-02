@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
         marginTop: 12,
         marginBottom: 4,
         marginRight: 12,
-        paddingVertical: 4,
+        paddingVertical: 6,
         paddingHorizontal: 8,
         borderRadius: 8,
     },
