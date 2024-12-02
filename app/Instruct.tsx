@@ -1,6 +1,8 @@
 import Alert from '@components/Alert'
 import CheckboxTitle from '@components/CheckboxTitle'
+import DropdownSheet from '@components/DropdownSheet'
 import FadeDownView from '@components/FadeDownView'
+import PopupMenu from '@components/PopupMenu'
 import SliderItem from '@components/SliderItem'
 import StringArrayEditor from '@components/StringArrayEditor'
 import TextBox from '@components/TextBox'
@@ -11,16 +13,7 @@ import { Instructs, Logger, MarkdownStyle, Style, saveStringToDownload } from '@
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
-import {
-    View,
-    SafeAreaView,
-    TouchableOpacity,
-    StyleSheet,
-    ScrollView,
-    Text,
-    Pressable,
-} from 'react-native'
-import { Dropdown } from 'react-native-element-dropdown'
+import { View, SafeAreaView, TouchableOpacity, StyleSheet, ScrollView, Text } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 
 const Instruct = () => {
@@ -43,7 +36,7 @@ const Instruct = () => {
             Instructs.db.mutate.updateInstruct(instructID, currentInstruct)
     }
 
-    const regenerateDefaults = () => {
+    const handleRegenerateDefaults = () => {
         Alert.alert({
             title: `Regenerate Default Instructs`,
             description: `Are you sure you want to regenerate default Instructs'?`,
@@ -59,6 +52,86 @@ const Instruct = () => {
         })
     }
 
+    const handleExportPreset = async () => {
+        if (!instructID) return
+        const name = (currentInstruct?.name ?? 'Default') + '.json'
+        await saveStringToDownload(JSON.stringify(currentInstruct), name, 'utf8')
+        Logger.log(`Saved "${name}" to Downloads`, true)
+    }
+
+    const handleDeletePreset = () => {
+        if (instructList.length === 1) {
+            Logger.log(`Cannot delete last Instruct preset.`, true)
+            return
+        }
+
+        Alert.alert({
+            title: `Delete Preset`,
+            description: `Are you sure you want to delete '${currentInstruct?.name}'?`,
+            buttons: [
+                { label: 'Cancel' },
+                {
+                    label: 'Delete Instruct',
+                    onPress: async () => {
+                        if (!instructID) return
+                        const leftover = data.filter((item) => item.id !== instructID)
+                        if (leftover.length === 0) {
+                            Logger.log('Cannot delete last instruct', true)
+                            return
+                        }
+                        Instructs.db.mutate.deleteInstruct(instructID)
+                        loadInstruct(leftover[0].id)
+                    },
+                    type: 'warning',
+                },
+            ],
+        })
+    }
+
+    const headerRight = () => (
+        <PopupMenu
+            icon="setting"
+            iconSize={24}
+            placement="bottom"
+            options={[
+                {
+                    label: 'Create Preset',
+                    icon: 'addfile',
+                    onPress: (menu) => {
+                        setShowNewInstruct(true)
+
+                        menu.current?.close()
+                    },
+                },
+                {
+                    label: 'Export Preset',
+                    icon: 'download',
+                    onPress: (menu) => {
+                        handleExportPreset()
+                        menu.current?.close()
+                    },
+                },
+                {
+                    label: 'Delete Preset',
+                    icon: 'delete',
+                    onPress: (menu) => {
+                        handleDeletePreset()
+                        menu.current?.close()
+                    },
+                    warning: true,
+                },
+                {
+                    label: 'Regenerate Default',
+                    icon: 'reload1',
+                    onPress: (menu) => {
+                        handleRegenerateDefaults()
+                        menu.current?.close()
+                    },
+                },
+            ]}
+        />
+    )
+
     useAutosave({ data: currentInstruct, onSave: () => handleSaveInstruct(false), interval: 3000 })
 
     if (currentInstruct)
@@ -69,17 +142,7 @@ const Instruct = () => {
                         options={{
                             title: `Instruct`,
                             animation: 'fade',
-                            headerRight: () => (
-                                <Pressable
-                                    style={{ paddingTop: 8, paddingRight: 8 }}
-                                    onPressIn={regenerateDefaults}>
-                                    <FontAwesome
-                                        name="repeat"
-                                        color={Style.getColor('primary-text1')}
-                                        size={24}
-                                    />
-                                </Pressable>
-                            ),
+                            headerRight: headerRight,
                         }}
                     />
 
@@ -102,16 +165,16 @@ const Instruct = () => {
                     />
 
                     <View style={styles.dropdownContainer}>
-                        <Dropdown
-                            value={selectedItem ?? ''}
+                        <DropdownSheet
+                            selected={selectedItem}
                             data={instructList}
-                            labelField="name"
-                            valueField="id"
-                            onChange={(item) => {
+                            labelExtractor={(item) => item.name}
+                            onChangeValue={(item) => {
                                 if (item.id === instructID) return
                                 loadInstruct(item.id)
                             }}
-                            {...Style.drawer.default}
+                            modalTitle="Select Preset"
+                            search
                         />
                         <TouchableOpacity
                             style={styles.button}
@@ -121,97 +184,6 @@ const Instruct = () => {
                             <FontAwesome
                                 size={24}
                                 name="save"
-                                color={Style.getColor('primary-text1')}
-                            />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {
-                                if (instructList.length === 1) {
-                                    Logger.log(`Cannot delete last Instruct preset.`, true)
-                                    return
-                                }
-
-                                Alert.alert({
-                                    title: `Delete Preset`,
-                                    description: `Are you sure you want to delete '${currentInstruct?.name}'?`,
-                                    buttons: [
-                                        { label: 'Cancel' },
-                                        {
-                                            label: 'Delete Instruct',
-                                            onPress: async () => {
-                                                if (!instructID) return
-                                                const leftover = data.filter(
-                                                    (item) => item.id !== instructID
-                                                )
-                                                if (leftover.length === 0) {
-                                                    Logger.log('Cannot delete last instruct', true)
-                                                    return
-                                                }
-                                                Instructs.db.mutate.deleteInstruct(instructID)
-                                                loadInstruct(leftover[0].id)
-                                            },
-                                            type: 'warning',
-                                        },
-                                    ],
-                                })
-                            }}>
-                            <FontAwesome
-                                size={24}
-                                name="trash"
-                                color={Style.getColor('primary-text1')}
-                            />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {
-                                Logger.log('Not implemented', true)
-                                //TODO: Import
-                                /*Instructs.uploadFile().then((name) => {
-                                if (name === undefined) {
-                                    return
-                                }
-                                Instructs.loadFile(name).then((instruct) => {
-                                    setCurrentInstruct(JSON.parse(instruct))
-                                    setInstructName(name)
-                                    loadInstructList(name)
-                                })
-                            })*/
-                            }}>
-                            <FontAwesome
-                                size={24}
-                                name="upload"
-                                color={Style.getColor('primary-text1')}
-                            />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={async () => {
-                                if (instructID)
-                                    saveStringToDownload(
-                                        (currentInstruct?.name ?? 'Default') + '.json',
-                                        JSON.stringify(currentInstruct),
-                                        'utf8'
-                                    )
-                            }}>
-                            <FontAwesome
-                                size={24}
-                                name="download"
-                                color={Style.getColor('primary-text1')}
-                            />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {
-                                setShowNewInstruct(true)
-                            }}>
-                            <FontAwesome
-                                size={24}
-                                name="plus"
                                 color={Style.getColor('primary-text1')}
                             />
                         </TouchableOpacity>
@@ -493,7 +465,8 @@ export default Instruct
 
 const styles = StyleSheet.create({
     mainContainer: {
-        padding: 16,
+        marginVertical: 16,
+        paddingHorizontal: 20,
         flex: 1,
     },
 

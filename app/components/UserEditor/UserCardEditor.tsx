@@ -84,7 +84,7 @@ const UserCardEditor = () => {
                             icon: 'search1',
                             onPress: (menu) => {
                                 menu.current?.close()
-                                setShowViewer(true)
+                                setShowViewer(true, true)
                             },
                         },
                         {

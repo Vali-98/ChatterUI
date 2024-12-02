@@ -2,7 +2,7 @@ import { AntDesign } from '@expo/vector-icons'
 import { Style } from 'constants/Global'
 import { useFocusEffect } from 'expo-router'
 import React, { ReactNode, useRef, useState } from 'react'
-import { StyleSheet, TouchableOpacity, Text, BackHandler } from 'react-native'
+import { StyleSheet, TouchableOpacity, Text, BackHandler, TextStyle } from 'react-native'
 import {
     Menu,
     MenuOption,
@@ -29,6 +29,8 @@ type MenuOptionProp = Omit<PopupOptionProps, 'menuRef'>
 type PopupMenuProps = {
     disabled?: boolean
     icon?: keyof typeof AntDesign.glyphMap
+    iconSize?: number
+    style?: TextStyle
     options: MenuOptionProp[]
     placement?: 'top' | 'right' | 'bottom' | 'left' | 'auto'
     children?: ReactNode
@@ -65,6 +67,8 @@ const PopupOption: React.FC<PopupOptionProps> = ({
 const PopupMenu: React.FC<PopupMenuProps> = ({
     disabled,
     icon,
+    iconSize = 26,
+    style = {},
     options,
     children,
     placement = 'left',
@@ -99,10 +103,10 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
             <MenuTrigger disabled={disabled}>
                 {icon && (
                     <AntDesign
-                        style={styles.triggerButton}
+                        style={style}
                         color={Style.getColor(showMenu ? 'primary-text3' : 'primary-text2')}
                         name={icon}
-                        size={26}
+                        size={iconSize}
                     />
                 )}
                 {children}
@@ -145,11 +149,6 @@ const styles = StyleSheet.create({
     optionLabelWarning: {
         fontWeight: '500',
         color: '#d2574b',
-    },
-
-    triggerButton: {
-        paddingHorizontal: 12,
-        paddingVertical: 20,
     },
 })
 

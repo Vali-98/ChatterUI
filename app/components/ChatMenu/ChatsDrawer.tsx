@@ -118,8 +118,9 @@ const styles = StyleSheet.create({
     },
 
     chatItem: {
-        paddingHorizontal: 8,
+        alignItems: 'center',
         flexDirection: 'row',
+        paddingHorizontal: 8,
         flex: 1,
         marginBottom: 8,
         borderRadius: 8,
@@ -128,8 +129,9 @@ const styles = StyleSheet.create({
     },
 
     chatItemActive: {
-        paddingHorizontal: 8,
+        alignItems: 'center',
         flexDirection: 'row',
+        paddingHorizontal: 8,
         flex: 1,
         marginBottom: 8,
         borderRadius: 8,

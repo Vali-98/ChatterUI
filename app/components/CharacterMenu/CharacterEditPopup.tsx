@@ -72,6 +72,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
 
     return (
         <PopupMenu
+            style={{ paddingHorizontal: 8 }}
             disabled={nowLoading}
             icon="edit"
             options={[

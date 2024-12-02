@@ -98,16 +98,27 @@ const UserListing: React.FC<CharacterListingProps> = ({
                     setShowModal(false)
                     setNowLoading(false)
                 }}>
-                <Avatar targetImage={Characters.getImageDir(user.image_id)} style={styles.avatar} />
-                <View style={{ flex: 1, paddingLeft: 12 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={styles.nametag}>{user.name}</Text>
-                        <Text style={styles.timestamp}>
-                            {user.last_modified && getTimeStamp(user.last_modified)}
-                        </Text>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        flex: 1,
+                    }}>
+                    <Avatar
+                        targetImage={Characters.getImageDir(user.image_id)}
+                        style={styles.avatar}
+                    />
+                    <View style={{ flex: 1, paddingLeft: 12 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={styles.nametag}>{user.name}</Text>
+                            <Text style={styles.timestamp}>
+                                {user.last_modified && getTimeStamp(user.last_modified)}
+                            </Text>
+                        </View>
                     </View>
                 </View>
+
                 <PopupMenu
+                    style={{ paddingHorizontal: 8 }}
                     disabled={false}
                     icon="edit"
                     options={[
@@ -134,6 +145,7 @@ export default UserListing
 const styles = StyleSheet.create({
     longButton: {
         flexDirection: 'row',
+        alignItems: 'center',
         flex: 1,
         padding: 8,
     },
