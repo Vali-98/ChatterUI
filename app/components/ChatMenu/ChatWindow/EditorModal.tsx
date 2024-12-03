@@ -2,7 +2,7 @@ import FadeBackrop from '@components/FadeBackdrop'
 import { MaterialIcons } from '@expo/vector-icons'
 import { Chats, Style } from 'constants/Global'
 import { ColorId } from 'constants/Style'
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import {
     GestureResponderEvent,
     Modal,
