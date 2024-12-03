@@ -71,7 +71,6 @@ const SamplerMenu = () => {
             if (!template) return []
             return template.request.samplerFields
         }
-        console.log('no active index')
         return []
     }
 
