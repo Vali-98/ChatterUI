@@ -1,17 +1,18 @@
+import FadeBackrop from '@components/FadeBackdrop'
 import { MaterialIcons } from '@expo/vector-icons'
 import { Chats, Style } from 'constants/Global'
 import { ColorId } from 'constants/Style'
-import { ReactElement, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
     GestureResponderEvent,
     Modal,
     StyleSheet,
     Text,
+    TextInput,
     TouchableOpacity,
     View,
-    TextInput,
 } from 'react-native'
-import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated'
+import Animated, { SlideOutDown } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 type EditorButtonProps = {
@@ -45,18 +46,6 @@ type EditorProps = {
     editMode: boolean
 }
 
-type FadeScreenProps = {
-    handleOverlayClick?: (e: GestureResponderEvent) => void
-    children: ReactElement
-}
-const FadeScreen: React.FC<FadeScreenProps> = ({ handleOverlayClick, children }) => {
-    return (
-        <TouchableOpacity activeOpacity={1} onPress={handleOverlayClick} style={styles.absolute}>
-            {children}
-        </TouchableOpacity>
-    )
-}
-
 const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, editMode }) => {
     const { updateChat, deleteChat } = Chats.useChat(
         useShallow((state) => ({
@@ -88,55 +77,64 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
         if (e.target === e.currentTarget) handleClose()
     }
 
+    const inputRef = React.createRef<TextInput>()
+
+    const handleAutoFocus = () => {
+        setTimeout(() => {
+            inputRef.current?.focus()
+            inputRef.current?.setSelection(placeholderText.length, placeholderText.length)
+        }, 1)
+    }
+
     return (
         <View>
             <Modal
                 visible={editMode}
                 animationType="fade"
                 transparent
+                onShow={handleAutoFocus}
                 onRequestClose={handleClose}
                 style={{ flex: 1 }}>
-                <FadeScreen handleOverlayClick={handleOverlayClick}>
-                    <Animated.View
-                        exiting={SlideOutDown.duration(100)}
-                        style={styles.editorContainer}>
-                        <View style={styles.topText}>
-                            <Text style={styles.nameText}>{message?.name}</Text>
-                            <Text style={styles.timeText}>
-                                {message?.swipes[message.swipe_id].send_date.toLocaleTimeString()}
-                            </Text>
-                        </View>
+                <FadeBackrop handleOverlayClick={handleOverlayClick} />
+                <View style={{ flex: 1 }} />
+                <Animated.View exiting={SlideOutDown.duration(100)} style={styles.editorContainer}>
+                    <View style={styles.topText}>
+                        <Text style={styles.nameText}>{message?.name}</Text>
+                        <Text style={styles.timeText}>
+                            {message?.swipes[message.swipe_id].send_date.toLocaleTimeString()}
+                        </Text>
+                    </View>
 
-                        <TextInput
-                            style={styles.messageInput}
-                            value={placeholderText}
-                            onChangeText={setPlaceholderText}
-                            textBreakStrategy="simple"
-                            multiline
+                    <TextInput
+                        ref={inputRef}
+                        style={styles.messageInput}
+                        value={placeholderText}
+                        onChangeText={setPlaceholderText}
+                        textBreakStrategy="simple"
+                        multiline
+                    />
+
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            marginTop: 8,
+                        }}>
+                        <EditorButton
+                            name="delete"
+                            label="Delete"
+                            onPress={handleDeleteMessage}
+                            color="destructive-brand"
                         />
 
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                marginTop: 8,
-                            }}>
-                            <EditorButton
-                                name="delete"
-                                label="Delete"
-                                onPress={handleDeleteMessage}
-                                color="destructive-brand"
-                            />
-
-                            <EditorButton
-                                name="check"
-                                label="Confirm"
-                                onPress={handleEditMessage}
-                                color="primary-text1"
-                            />
-                        </View>
-                    </Animated.View>
-                </FadeScreen>
+                        <EditorButton
+                            name="check"
+                            label="Confirm"
+                            onPress={handleEditMessage}
+                            color="primary-text1"
+                        />
+                    </View>
+                </Animated.View>
             </Modal>
         </View>
     )
@@ -145,12 +143,6 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
 export default EditorModal
 
 const styles = StyleSheet.create({
-    absolute: {
-        height: '100%',
-        justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-
     editorContainer: {
         backgroundColor: Style.getColor('primary-surface2'),
         flexShrink: 1,
