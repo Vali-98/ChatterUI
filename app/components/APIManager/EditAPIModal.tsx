@@ -17,7 +17,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native'
-import { Dropdown } from 'react-native-element-dropdown'
+import Animated, { SlideOutDown } from 'react-native-reanimated'
 
 type EditAPIModalProps = {
     index: number
@@ -84,8 +84,9 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
                     close()
                 }}
             />
+
             <View style={{ flex: 1 }} />
-            <View style={styles.mainContainer}>
+            <Animated.View style={styles.mainContainer} exiting={SlideOutDown.duration(300)}>
                 <Text
                     style={{
                         color: Style.getColor('primary-text1'),
@@ -251,7 +252,7 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
                         close()
                     }}
                 />
-            </View>
+            </Animated.View>
         </Modal>
     )
 }
