@@ -76,23 +76,6 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             style={{ flex: 1 }}
             entering={SlideInRight.easing(Easing.inOut(Easing.cubic))}
             exiting={SlideOutRight.easing(Easing.inOut(Easing.cubic))}>
-            <View style={{ marginBottom: 16 }}>
-                <SectionTitle>Supported Quantizations</SectionTitle>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        columnGap: 8,
-                        marginTop: 8,
-                    }}>
-                    <Text style={cpuFeatures?.dotprod ? styles.greenTag : styles.redTag}>
-                        Q4_0_4_4 {!cpuFeatures?.dotprod && 'Not '}Available
-                    </Text>
-                    <Text style={cpuFeatures?.i8mm ? styles.greenTag : styles.redTag}>
-                        Q4_0_4_8 {!cpuFeatures?.i8mm && 'Not '}Available
-                    </Text>
-                </View>
-            </View>
-
             <SectionTitle>CPU Settings</SectionTitle>
             <View style={{ marginTop: 16 }} />
             <SliderItem
