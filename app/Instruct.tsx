@@ -189,69 +189,64 @@ const Instruct = () => {
                         </TouchableOpacity>
                     </View>
 
-                    <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
-                        <View
-                            style={{
-                                flex: 1,
-                                paddingVertical: 20,
-                            }}>
+                    <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollContainer}>
+                        <TextBox
+                            name="System Sequence"
+                            varname="system_prompt"
+                            lines={5}
+                            body={currentInstruct}
+                            setValue={setCurrentInstruct}
+                            multiline
+                        />
+                        <View style={{ flexDirection: 'row' }}>
                             <TextBox
-                                name="System Sequence"
-                                varname="system_prompt"
-                                lines={5}
+                                name="System Prefix"
+                                varname="system_prefix"
                                 body={currentInstruct}
                                 setValue={setCurrentInstruct}
                                 multiline
                             />
-                            <View style={{ flexDirection: 'row' }}>
-                                <TextBox
-                                    name="System Prefix"
-                                    varname="system_prefix"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />
-                                <TextBox
-                                    name="System Suffix"
-                                    varname="system_suffix"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <TextBox
-                                    name="Input Prefix"
-                                    varname="input_prefix"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />
-                                <TextBox
-                                    name="Input Suffix"
-                                    varname="input_suffix"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <TextBox
-                                    name="Output Prefix"
-                                    varname="output_prefix"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />
-                                <TextBox
-                                    name="Output Suffix"
-                                    varname="output_suffix"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />
-                            </View>
-                            {/* Unused Sequences
+                            <TextBox
+                                name="System Suffix"
+                                varname="system_suffix"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />
+                        </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <TextBox
+                                name="Input Prefix"
+                                varname="input_prefix"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />
+                            <TextBox
+                                name="Input Suffix"
+                                varname="input_suffix"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />
+                        </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <TextBox
+                                name="Output Prefix"
+                                varname="output_prefix"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />
+                            <TextBox
+                                name="Output Suffix"
+                                varname="output_suffix"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />
+                        </View>
+                        {/* Unused Sequences
                             <View style={{ flexDirection: 'row' }}>
                                 <TextBox
                                     name="First Output Sequence"
@@ -269,159 +264,158 @@ const Instruct = () => {
                                 />
                             </View>
                             */}
-                            <View style={{ flexDirection: 'row' }}>
-                                <TextBox
-                                    name="Last Output Prefix"
-                                    varname="last_output_prefix"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />
-                                {/*<TextBox
+                        <View style={{ flexDirection: 'row' }}>
+                            <TextBox
+                                name="Last Output Prefix"
+                                varname="last_output_prefix"
+                                body={currentInstruct}
+                                setValue={setCurrentInstruct}
+                                multiline
+                            />
+                            {/*<TextBox
                                     name="Separator Sequence"
                                     varname="separator_sequence"
                                     body={currentInstruct}
                                     setValue={setCurrentInstruct}
                                     multiline
                                 />*/}
+                        </View>
+
+                        <StringArrayEditor
+                            style={{ marginBottom: 12 }}
+                            title="Stop Sequence"
+                            value={
+                                currentInstruct.stop_sequence
+                                    ? currentInstruct.stop_sequence.split(',')
+                                    : []
+                            }
+                            setValue={(data) => {
+                                setCurrentInstruct({
+                                    ...currentInstruct,
+                                    stop_sequence: data.join(','),
+                                })
+                            }}
+                            replaceNewLine="\n"
+                        />
+
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                columnGap: 16,
+                                marginBottom: 16,
+                                justifyContent: 'space-evenly',
+                            }}>
+                            <View>
+                                <CheckboxTitle
+                                    name="Wrap In Newline"
+                                    value={currentInstruct.wrap}
+                                    onChangeValue={(b) => {
+                                        setCurrentInstruct({
+                                            ...currentInstruct,
+                                            wrap: b,
+                                        })
+                                    }}
+                                />
+                                <CheckboxTitle
+                                    name="Include Names"
+                                    value={currentInstruct.names}
+                                    onChangeValue={(b) => {
+                                        setCurrentInstruct({
+                                            ...currentInstruct,
+                                            names: b,
+                                        })
+                                    }}
+                                />
+                                <CheckboxTitle
+                                    name="Add Timestamp"
+                                    value={currentInstruct.timestamp}
+                                    onChangeValue={(b) => {
+                                        setCurrentInstruct({
+                                            ...currentInstruct,
+                                            timestamp: b,
+                                        })
+                                    }}
+                                />
                             </View>
+                            <View>
+                                <CheckboxTitle
+                                    name="Use Examples"
+                                    value={currentInstruct.examples}
+                                    onChangeValue={(b) => {
+                                        setCurrentInstruct({
+                                            ...currentInstruct,
+                                            examples: b,
+                                        })
+                                    }}
+                                />
+                                <CheckboxTitle
+                                    name="Use Scenario"
+                                    value={currentInstruct.scenario}
+                                    onChangeValue={(b) => {
+                                        setCurrentInstruct({
+                                            ...currentInstruct,
+                                            scenario: b,
+                                        })
+                                    }}
+                                />
 
-                            <StringArrayEditor
-                                style={{ marginBottom: 12 }}
-                                title="Stop Sequence"
-                                value={
-                                    currentInstruct.stop_sequence
-                                        ? currentInstruct.stop_sequence.split(',')
-                                        : []
-                                }
-                                setValue={(data) => {
-                                    setCurrentInstruct({
-                                        ...currentInstruct,
-                                        stop_sequence: data.join(','),
-                                    })
-                                }}
-                                replaceNewLine="\n"
-                            />
-
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    columnGap: 16,
-                                    marginBottom: 16,
-                                    justifyContent: 'space-evenly',
-                                }}>
-                                <View>
-                                    <CheckboxTitle
-                                        name="Wrap In Newline"
-                                        value={currentInstruct.wrap}
-                                        onChangeValue={(b) => {
-                                            setCurrentInstruct({
-                                                ...currentInstruct,
-                                                wrap: b,
-                                            })
-                                        }}
-                                    />
-                                    <CheckboxTitle
-                                        name="Include Names"
-                                        value={currentInstruct.names}
-                                        onChangeValue={(b) => {
-                                            setCurrentInstruct({
-                                                ...currentInstruct,
-                                                names: b,
-                                            })
-                                        }}
-                                    />
-                                    <CheckboxTitle
-                                        name="Add Timestamp"
-                                        value={currentInstruct.timestamp}
-                                        onChangeValue={(b) => {
-                                            setCurrentInstruct({
-                                                ...currentInstruct,
-                                                timestamp: b,
-                                            })
-                                        }}
-                                    />
-                                </View>
-                                <View>
-                                    <CheckboxTitle
-                                        name="Use Examples"
-                                        value={currentInstruct.examples}
-                                        onChangeValue={(b) => {
-                                            setCurrentInstruct({
-                                                ...currentInstruct,
-                                                examples: b,
-                                            })
-                                        }}
-                                    />
-                                    <CheckboxTitle
-                                        name="Use Scenario"
-                                        value={currentInstruct.scenario}
-                                        onChangeValue={(b) => {
-                                            setCurrentInstruct({
-                                                ...currentInstruct,
-                                                scenario: b,
-                                            })
-                                        }}
-                                    />
-
-                                    <CheckboxTitle
-                                        name="Use Personality"
-                                        value={currentInstruct.personality}
-                                        onChangeValue={(b) => {
-                                            setCurrentInstruct({
-                                                ...currentInstruct,
-                                                personality: b,
-                                            })
-                                        }}
-                                    />
-                                </View>
+                                <CheckboxTitle
+                                    name="Use Personality"
+                                    value={currentInstruct.personality}
+                                    onChangeValue={(b) => {
+                                        setCurrentInstruct({
+                                            ...currentInstruct,
+                                            personality: b,
+                                        })
+                                    }}
+                                />
                             </View>
+                        </View>
 
-                            <SliderItem
-                                name="Autoformat New Chats"
-                                varname="format_type"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                                min={0}
-                                max={3}
-                                step={1}
-                                showInput={false}
-                            />
-                            <Text
-                                style={{ color: Style.getColor('primary-text2'), marginLeft: 16 }}>
-                                Mode: {currentInstruct.format_type} -
-                                {' ' +
+                        <SliderItem
+                            name="Autoformat New Chats"
+                            varname="format_type"
+                            body={currentInstruct}
+                            setValue={setCurrentInstruct}
+                            min={0}
+                            max={3}
+                            step={1}
+                            showInput={false}
+                        />
+                        <Text style={{ color: Style.getColor('primary-text2'), marginLeft: 16 }}>
+                            Mode: {currentInstruct.format_type} -
+                            {' ' +
+                                [
+                                    'Autoformatting Disabled',
+                                    'Plain Action, Quote Speech',
+                                    'Asterisk Action, Plain Speech',
+                                    'Asterisk Action, Quote Speech',
+                                ][currentInstruct.format_type]}
+                        </Text>
+                        <Text
+                            style={{
+                                color: Style.getColor('primary-text2'),
+                                marginLeft: 16,
+                                marginTop: 8,
+                            }}>
+                            Example:
+                        </Text>
+                        <View style={styles.exampleContainer}>
+                            <Markdown
+                                markdownit={MarkdownStyle.Rules}
+                                rules={MarkdownStyle.RenderRules}
+                                style={MarkdownStyle.Styles}>
+                                {
                                     [
-                                        'Autoformatting Disabled',
-                                        'Plain Action, Quote Speech',
-                                        'Asterisk Action, Plain Speech',
-                                        'Asterisk Action, Quote Speech',
-                                    ][currentInstruct.format_type]}
-                            </Text>
-                            <Text
-                                style={{
-                                    color: Style.getColor('primary-text2'),
-                                    marginLeft: 16,
-                                    marginTop: 8,
-                                }}>
-                                Example:
-                            </Text>
-                            <View style={styles.exampleContainer}>
-                                <Markdown
-                                    markdownit={MarkdownStyle.Rules}
-                                    rules={MarkdownStyle.RenderRules}
-                                    style={MarkdownStyle.Styles}>
-                                    {
-                                        [
-                                            '*<No Formatting>*',
-                                            'Some action, "Some speech"',
-                                            '*Some action* Some speech',
-                                            '*Some action* "Some speech"',
-                                        ][currentInstruct.format_type]
-                                    }
-                                </Markdown>
-                            </View>
-                            {/* @TODO: Macros are always replaced - people may want this to be changed
+                                        '*<No Formatting>*',
+                                        'Some action, "Some speech"',
+                                        '*Some action* Some speech',
+                                        '*Some action* "Some speech"',
+                                    ][currentInstruct.format_type]
+                                }
+                            </Markdown>
+                        </View>
+                        {/* @TODO: Macros are always replaced - people may want this to be changed
                             <CheckboxTitle
                                 name="Replace Macro In Sequences"
                                 varname="macro"
@@ -430,7 +424,7 @@ const Instruct = () => {
                             />
                             */}
 
-                            {/*  Groups are not implemented - leftover from ST
+                        {/*  Groups are not implemented - leftover from ST
                             <CheckboxTitle
                                 name="Force for Groups and Personas"
                                 varname="names_force_groups"
@@ -438,7 +432,7 @@ const Instruct = () => {
                                 setValue={setCurrentInstruct}
                             />
                             */}
-                            {/* Activates Instruct when model is loaded with specific name that matches regex
+                        {/* Activates Instruct when model is loaded with specific name that matches regex
                     
                             <TextBox
                                 name="Activation Regex"
@@ -446,7 +440,7 @@ const Instruct = () => {
                                 body={currentInstruct}
                                 setValue={setCurrentInstruct}
                             />*/}
-                            {/*    User Alignment Messages may be needed in future, might be removed on CCv3
+                        {/*    User Alignment Messages may be needed in future, might be removed on CCv3
                             <TextBox
                                 name="User Alignment"
                                 varname="user_alignment_message"
@@ -454,7 +448,6 @@ const Instruct = () => {
                                 setValue={setCurrentInstruct}
                                 multiline
                             />*/}
-                        </View>
                     </ScrollView>
                 </SafeAreaView>
             </FadeDownView>
@@ -466,15 +459,21 @@ export default Instruct
 const styles = StyleSheet.create({
     mainContainer: {
         marginVertical: 16,
-        paddingHorizontal: 20,
         flex: 1,
     },
 
     dropdownContainer: {
+        paddingHorizontal: 20,
         marginTop: 16,
         flexDirection: 'row',
         paddingBottom: 12,
         alignItems: 'center',
+    },
+
+    scrollContainer: {
+        flex: 1,
+        paddingVertical: 20,
+        paddingHorizontal: 20,
     },
 
     selected: {
