@@ -33,8 +33,9 @@ export const buildAndSendRequest = async () => {
         return
     }
 
-    let payload: any = undefined
+    Logger.log(`Using Configuration ${requestValues.configName}`)
 
+    let payload: any = undefined
     payload = buildRequest(config, requestValues)
 
     if (!payload) {
