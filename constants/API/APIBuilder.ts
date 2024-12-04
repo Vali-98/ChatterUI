@@ -92,12 +92,12 @@ const readableStreamResponse = async (
     const closeStream = () => {
         Logger.debug('Running close stream')
         Chats.useChat.getState().stopGenerating()
-        sse.abort()
     }
 
     useInference.getState().setAbort(async () => {
         Logger.debug('Running abort')
         closeStream()
+        sse.abort()
     })
 
     sse.setOnEvent((data) => {
@@ -107,10 +107,7 @@ const readableStreamResponse = async (
     })
 
     sse.setOnError(() => {
-        // if ('message' in event) {
         Logger.log('Generation Failed', true)
-        // Logger.log(`An error occured : ${event?.message ?? ''}`)
-
         closeStream()
     })
 

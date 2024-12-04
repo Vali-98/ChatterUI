@@ -30,6 +30,7 @@ export class SSEFetch {
         }).then(async (res) => {
             if (res.status !== 200 || !res.body) return this.onError()
             for await (const chunk of res.body) {
+                if (this.abortController.signal.aborted) break
                 const data = this.decoder.decode(chunk)
                 const output = parseSSE(data)
                 output.forEach((item) => this.onEvent(item))
