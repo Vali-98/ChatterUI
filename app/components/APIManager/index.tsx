@@ -35,6 +35,9 @@ const APIManager = () => {
             />
             {apiValues.length > 0 && (
                 <FlatList
+                    style={{
+                        paddingHorizontal: 16,
+                    }}
                     data={apiValues}
                     keyExtractor={(item, index) => item.configName + index}
                     renderItem={({ item, index }) => <APIValueItem item={item} index={index} />}
@@ -53,6 +56,9 @@ const APIManager = () => {
             )}
 
             <ButtonPrimary
+                buttonStyle={{
+                    marginHorizontal: 16,
+                }}
                 onPress={() => router.push('/components/APIManager/AddAPI')}
                 label="Add Connection"
             />
@@ -65,7 +71,6 @@ export default APIManager
 const styles = StyleSheet.create({
     mainContainer: {
         paddingTop: 16,
-        paddingHorizontal: 16,
         paddingBottom: 24,
         flex: 1,
     },
