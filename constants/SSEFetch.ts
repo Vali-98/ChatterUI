@@ -19,6 +19,7 @@ export class SSEFetch {
     }
 
     public async start(values: SSEValues) {
+        this.abortController = new AbortController()
         const body = values.method === 'POST' ? { body: values.body } : {}
 
         fetch(values.endpoint, {
