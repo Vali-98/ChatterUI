@@ -33,6 +33,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
 
     const animHeight = useAnimatedValue(-1)
     const targetHeight = useRef(-1)
+    const firstRender = useRef(true)
 
     const handleAnimateHeight = (newheight: number) => {
         animHeight.stopAnimation(() =>
@@ -60,6 +61,10 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
     }
 
     useEffect(() => {
+        if (firstRender.current) {
+            firstRender.current = false
+            return
+        }
         requestAnimationFrame(() => updateHeight())
     }, [buffer, mes, nowGenerating])
 
