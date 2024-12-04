@@ -1,16 +1,16 @@
-import { AppSettings, Global } from 'constants/GlobalValues'
-import { Llama } from 'constants/LlamaLocal'
-import { Tokenizer } from 'constants/Tokenizer'
-import { API } from 'constants/Global'
+import { SSEFetch } from '@constants/SSEFetch'
 import { Characters } from 'constants/Characters'
 import { Chats, useInference } from 'constants/Chat'
+import { API } from 'constants/Global'
+import { AppSettings, Global } from 'constants/GlobalValues'
 import { InstructType, Instructs } from 'constants/Instructs'
+import { Llama } from 'constants/LlamaLocal'
 import { Logger } from 'constants/Logger'
 import { mmkv } from 'constants/MMKV'
+import { Tokenizer } from 'constants/Tokenizer'
 import { replaceMacros } from 'constants/Utils'
-import EventSource from 'react-native-sse'
 
-import { SamplerID, Samplers, SamplerPreset } from '../SamplerData'
+import { SamplerID, SamplerPreset, Samplers } from '../SamplerData'
 
 export type APISampler = {
     samplerID: SamplerID
@@ -317,52 +317,47 @@ export abstract class APIBase implements IAPIBase {
             'g'
         )
 
-        const es = new EventSource(endpoint, {
-            method: 'POST',
-            body: payload,
-            headers: {
-                accept: 'application/json',
-                'Content-Type': 'application/json',
-                ...header,
-            },
-            pollingInterval: 0,
-            withCredentials:
-                header?.['X-API-KEY'] !== undefined || header?.Authorization !== undefined,
-        })
+        const sse = new SSEFetch()
 
         const closeStream = () => {
             Logger.debug('Running close stream')
-            this.stopGenerating()
-            es.removeAllEventListeners()
-            es.close()
+            Chats.useChat.getState().stopGenerating()
+            sse.abort()
         }
 
         useInference.getState().setAbort(async () => {
             Logger.debug('Running abort')
             closeStream()
-            abort_func()
         })
 
-        es.addEventListener('message', (event) => {
-            if (event.data === `[DONE]`) {
-                es.close()
-                return
-            }
-            const text = jsonreader(event.data) ?? ''
+        sse.setOnEvent((data) => {
+            const text = jsonreader(data) ?? ''
             const output = Chats.useChat.getState().buffer + text
             Chats.useChat.getState().setBuffer(output.replaceAll(replace, ''))
         })
 
-        es.addEventListener('error', (event) => {
-            if ('message' in event) {
-                Logger.log('Generation Failed. Check Logs', true)
-                Logger.log(`An error occured : ${event?.message ?? ''}`)
-            }
+        sse.setOnError(() => {
+            // if ('message' in event) {
+            Logger.log('Generation Failed', true)
+            // Logger.log(`An error occured : ${event?.message ?? ''}`)
+
             closeStream()
         })
-        es.addEventListener('close', (event) => {
+
+        sse.setOnClose(() => {
             closeStream()
-            Logger.log('EventSource closed')
+            Logger.log('Stream closed')
+        })
+
+        sse.start({
+            endpoint: endpoint,
+            body: payload,
+            method: 'POST',
+            headers: {
+                accept: 'application/json',
+                'Content-Type': 'application/json',
+                ...header,
+            },
         })
     }
 

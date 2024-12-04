@@ -1,7 +1,7 @@
+import { SSEFetch } from '@constants/SSEFetch'
 import { useInference } from 'constants/Chat'
 import { Characters, Chats, Logger } from 'constants/Global'
 import { Instructs, InstructType } from 'constants/Instructs'
-import EventSource from 'react-native-sse'
 
 import { APIState } from './APIManagerState'
 import { buildRequest } from './RequestBuilder'
@@ -53,6 +53,7 @@ export const buildAndSendRequest = async () => {
             [config.request.authHeader]: config.request.authPrefix + requestValues.key,
         }
     }
+
     readableStreamResponse(
         requestValues.endpoint,
         payload,
@@ -85,23 +86,12 @@ const readableStreamResponse = async (
         'g'
     )
 
-    const es = new EventSource(endpoint, {
-        method: 'POST',
-        body: payload,
-        headers: {
-            accept: 'application/json',
-            'Content-Type': 'application/json',
-            ...header,
-        },
-        pollingInterval: 0,
-        withCredentials: header?.['X-API-KEY'] !== undefined || header?.Authorization !== undefined,
-    })
+    const sse = new SSEFetch()
 
     const closeStream = () => {
         Logger.debug('Running close stream')
         Chats.useChat.getState().stopGenerating()
-        es.removeAllEventListeners()
-        es.close()
+        sse.abort()
     }
 
     useInference.getState().setAbort(async () => {
@@ -109,29 +99,36 @@ const readableStreamResponse = async (
         closeStream()
     })
 
-    es.addEventListener('message', (event) => {
-        if (event.data === `[DONE]`) {
-            es.close()
-            return
-        }
-        const text = jsonreader(event.data) ?? ''
+    sse.setOnEvent((data) => {
+        const text = jsonreader(data) ?? ''
         const output = Chats.useChat.getState().buffer + text
         Chats.useChat.getState().setBuffer(output.replaceAll(replace, ''))
     })
 
-    es.addEventListener('error', (event) => {
-        if ('message' in event) {
-            Logger.log('Generation Failed. Check Logs', true)
-            Logger.log(`An error occured : ${event?.message ?? ''}`)
-        }
+    sse.setOnError(() => {
+        // if ('message' in event) {
+        Logger.log('Generation Failed', true)
+        // Logger.log(`An error occured : ${event?.message ?? ''}`)
+
         closeStream()
     })
-    es.addEventListener('close', (event) => {
+
+    sse.setOnClose(() => {
         closeStream()
-        Logger.log('EventSource closed')
+        Logger.log('Stream closed')
+    })
+
+    sse.start({
+        endpoint: endpoint,
+        body: payload,
+        method: 'POST',
+        headers: {
+            accept: 'application/json',
+            'Content-Type': 'application/json',
+            ...header,
+        },
     })
 }
-
 const constructReplaceStrings = (): string[] => {
     const currentInstruct: InstructType = Instructs.useInstruct.getState().replacedMacros()
     // default stop strings defined instructs
