@@ -96,7 +96,6 @@ const readableStreamResponse = async (
 
     useInference.getState().setAbort(async () => {
         Logger.debug('Running abort')
-        closeStream()
         sse.abort()
     })
 

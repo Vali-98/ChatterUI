@@ -1,3 +1,4 @@
+import { Logger } from '@globals'
 import { fetch } from 'expo/fetch'
 
 type SSEValues = {
@@ -25,12 +26,13 @@ export class SSEFetch {
         this.abortController = new AbortController()
         const body = values.method === 'POST' ? { body: values.body } : {}
 
-        fetch(values.endpoint, {
+        const res = await fetch(values.endpoint, {
             signal: this.abortController.signal,
             method: values.method,
             headers: values.headers,
             ...body,
-        }).then(async (res) => {
+        })
+        try {
             if (res.status !== 200 || !res.body) return this.onError()
             this.closeStream = res.body.cancel
             for await (const chunk of res.body) {
@@ -38,8 +40,13 @@ export class SSEFetch {
                 const output = parseSSE(data)
                 output.forEach((item) => this.onEvent(item))
             }
+        } catch (e) {
+            if (this.abortController.signal.aborted) {
+                Logger.debug('Abort caught')
+            }
+        } finally {
             this.onClose()
-        })
+        }
     }
 
     public setOnEvent(callback: (data: string) => void) {

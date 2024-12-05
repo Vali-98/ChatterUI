@@ -1,0 +1,97 @@
+diff --git a/node_modules/expo/android/src/main/java/expo/modules/fetch/NativeResponse.kt b/node_modules/expo/android/src/main/java/expo/modules/fetch/NativeResponse.kt
+index 8254d15..64554a4 100644
+--- a/node_modules/expo/android/src/main/java/expo/modules/fetch/NativeResponse.kt
++++ b/node_modules/expo/android/src/main/java/expo/modules/fetch/NativeResponse.kt
+@@ -68,6 +68,7 @@ internal class NativeResponse(appContext: AppContext, private val coroutineScope
+     if (isInvalidState(ResponseState.BODY_STREAMING_STARTED)) {
+       return
+     }
++    
+     state = ResponseState.BODY_STREAMING_CANCELLED
+   }
+ 
+@@ -118,7 +119,6 @@ internal class NativeResponse(appContext: AppContext, private val coroutineScope
+       val stream = response.body?.source() ?: return@launch
+       pumpResponseBodyStream(stream)
+       response.close()
+-
+       if (this@NativeResponse.state == ResponseState.BODY_STREAMING_STARTED) {
+         emit("didComplete")
+       }
+@@ -157,7 +157,7 @@ internal class NativeResponse(appContext: AppContext, private val coroutineScope
+     )
+   }
+ 
+-  private fun pumpResponseBodyStream(stream: BufferedSource) {
++  /*private fun pumpResponseBodyStream(stream: BufferedSource) {
+     while (!stream.exhausted()) {
+       if (isInvalidState(
+           ResponseState.RESPONSE_RECEIVED,
+@@ -165,6 +165,7 @@ internal class NativeResponse(appContext: AppContext, private val coroutineScope
+           ResponseState.BODY_STREAMING_CANCELLED
+         )
+       ) {
++        Log.w(TAG, "State is Invalid")
+         break
+       }
+       if (state == ResponseState.RESPONSE_RECEIVED) {
+@@ -175,7 +176,45 @@ internal class NativeResponse(appContext: AppContext, private val coroutineScope
+         break
+       }
+     }
+-  }
++  }*/
++
++  private fun pumpResponseBodyStream(stream: BufferedSource) {
++    try {
++        while (!stream.exhausted()) {
++            if (isInvalidState(
++                    ResponseState.RESPONSE_RECEIVED,
++                    ResponseState.BODY_STREAMING_STARTED,
++                    ResponseState.BODY_STREAMING_CANCELLED
++                )
++            ) {
++                break
++            }
++            if (state == ResponseState.RESPONSE_RECEIVED) {
++                sink.appendBufferBody(stream.buffer.readByteArray())
++            } else if (state == ResponseState.BODY_STREAMING_STARTED) {
++                emit("didReceiveResponseData", stream.buffer.readByteArray())
++            } else {
++                break
++            }
++        }
++    } catch (e: IOException) {
++        Log.e(TAG, "Error while pumping response body stream: ${e.message}", e)
++        state = ResponseState.ERROR_RECEIVED
++        error = e
++        emit("didFailWithError", e)
++    } catch (e: Exception) {
++        Log.e(TAG, "Unexpected error while pumping response body stream: ${e.message}", e)
++        state = ResponseState.ERROR_RECEIVED
++        error = e
++        emit("didFailWithError", e)
++    } finally {
++        try {
++            stream.close()
++        } catch (e: IOException) {
++            Log.w(TAG, "Error while closing the stream: ${e.message}", e)
++        }
++    }
++}
+ 
+   //endregion Internals
+ 
+diff --git a/node_modules/expo/src/winter/fetch/fetch.ts b/node_modules/expo/src/winter/fetch/fetch.ts
+index e7a515b..0a0f8ea 100644
+--- a/node_modules/expo/src/winter/fetch/fetch.ts
++++ b/node_modules/expo/src/winter/fetch/fetch.ts
+@@ -38,7 +38,7 @@ export async function fetch(url: string, init?: FetchRequestInit): Promise<Fetch
+       throw new FetchError(String(e));
+     }
+   } finally {
+-    init?.signal?.removeEventListener('abort', abortHandler);
++    // init?.signal?.removeEventListener('abort', abortHandler);
+   }
+   return response;
+ }
