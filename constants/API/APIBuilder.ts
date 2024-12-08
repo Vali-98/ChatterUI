@@ -90,12 +90,12 @@ const readableStreamResponse = async (
     const sse = new SSEFetch()
 
     const closeStream = () => {
-        Logger.debug('Running close stream')
+        Logger.debug('Running Close Stream')
         Chats.useChat.getState().stopGenerating()
     }
 
     useInference.getState().setAbort(async () => {
-        Logger.debug('Running abort')
+        Logger.debug('Running Abort')
         sse.abort()
     })
 
@@ -111,8 +111,8 @@ const readableStreamResponse = async (
     })
 
     sse.setOnClose(() => {
+        Logger.log('Stream Closed')
         closeStream()
-        Logger.log('Stream closed')
     })
 
     sse.start({
