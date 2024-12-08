@@ -144,7 +144,7 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
         values: {
             type: 'float',
             min: 0.01,
-            max: 10,
+            max: 3,
             default: 1,
             step: 0.01,
             precision: 2,
