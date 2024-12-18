@@ -77,7 +77,7 @@ const MultiDropdownSheet = <T,>({
                         renderItem={({ item, index }) => (
                             <DropdownItem
                                 label={labelExtractor(item)}
-                                active={selected.some(
+                                active={selected?.some(
                                     (e) => labelExtractor(e) === labelExtractor(item)
                                 )}
                                 onValueChange={(active) => {

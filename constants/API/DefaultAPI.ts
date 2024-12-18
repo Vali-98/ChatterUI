@@ -488,6 +488,72 @@ export const defaultTemplates: APIConfiguration[] = [
             selectableModel: true,
         },
     },
+    // Horde
+    {
+        version: 1,
+        name: 'Horde',
+
+        defaultValues: {
+            endpoint: 'https://aihorde.net/api/v2/',
+            modelEndpoint: 'https://aihorde.net/api/v2/status/models?type=text&model_state=all',
+            prefill: '',
+            firstMessage: '',
+            key: '0000000000',
+            model: [],
+        },
+
+        features: {
+            useKey: true,
+            useModel: true,
+            usePrefill: false,
+            useFirstMessage: false,
+            multipleModels: true,
+        },
+
+        request: {
+            requestType: 'horde',
+            samplerFields: [
+                { externalName: 'max_context_length', samplerID: SamplerID.CONTEXT_LENGTH },
+                { externalName: 'max_length', samplerID: SamplerID.GENERATED_LENGTH },
+                { externalName: 'rep_pen', samplerID: SamplerID.REPETITION_PENALTY },
+                { externalName: 'rep_pen_range', samplerID: SamplerID.REPETITION_PENALTY_RANGE },
+                { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
+                { externalName: 'tfs', samplerID: SamplerID.TAIL_FREE_SAMPLING },
+                { externalName: 'top_a', samplerID: SamplerID.TOP_A },
+                { externalName: 'top_p', samplerID: SamplerID.TOP_P },
+                { externalName: 'top_k', samplerID: SamplerID.TOP_K },
+                { externalName: 'typical', samplerID: SamplerID.TYPICAL },
+                { externalName: 'singleline', samplerID: SamplerID.SINGLE_LINE },
+                { externalName: 'min_p', samplerID: SamplerID.MIN_P },
+                { externalName: 'use_default_badwordids', samplerID: SamplerID.BAN_EOS_TOKEN },
+            ],
+            completionType: { type: 'textCompletions' },
+            authHeader: 'apikey',
+            authPrefix: '',
+            responseParsePattern: '',
+            useStop: true,
+            stopKey: 'stop_sequence',
+            promptKey: 'prompt',
+            removeLength: true,
+        },
+
+        payload: {
+            type: 'horde',
+        },
+
+        model: {
+            useModelContextLength: false,
+            nameParser: 'name',
+            contextSizeParser: '',
+            modelListParser: '',
+        },
+
+        ui: {
+            editableCompletionPath: false,
+            editableModelPath: false,
+            selectableModel: true,
+        },
+    },
     // Chat Completions
     {
         version: 1,

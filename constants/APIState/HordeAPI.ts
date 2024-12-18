@@ -1,5 +1,5 @@
-import { Global } from 'constants/GlobalValues'
 import { Chats, useInference } from 'constants/Chat'
+import { Global } from 'constants/GlobalValues'
 import { Logger } from 'constants/Logger'
 import { SamplerID } from 'constants/SamplerData'
 import { nativeApplicationVersion } from 'expo-application'
@@ -22,6 +22,7 @@ class HordeAPI extends APIBase {
         { externalName: 'tfs', samplerID: SamplerID.TAIL_FREE_SAMPLING },
         { externalName: 'top_a', samplerID: SamplerID.TOP_A },
         { externalName: 'top_p', samplerID: SamplerID.TOP_P },
+        { externalName: 'min_p', samplerID: SamplerID.MIN_P },
         { externalName: 'top_k', samplerID: SamplerID.TOP_K },
         { externalName: 'typical', samplerID: SamplerID.TYPICAL },
         { externalName: 'singleline', samplerID: SamplerID.SINGLE_LINE },

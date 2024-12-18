@@ -1,6 +1,6 @@
 import { APISampler } from 'constants/APIState/BaseAPI'
-import { SamplerID, SamplerPreset, Samplers } from 'constants/SamplerData'
 import { Global, Instructs, mmkv } from 'constants/Global'
+import { SamplerID, SamplerPreset, Samplers } from 'constants/SamplerData'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import { buildChatCompletionContext, buildTextCompletionContext } from './ContextBuilder'
@@ -13,6 +13,8 @@ export const buildRequest = (config: APIConfiguration, values: APIValues) => {
             return ollamaRequest(config, values)
         case 'cohere':
             return cohereRequest(config, values)
+        case 'horde':
+            return hordeRequest(config, values)
         case 'custom':
             return customRequest(config, values)
     }
@@ -67,6 +69,28 @@ const cohereRequest = (config: APIConfiguration, values: APIValues) => {
         preamble: preamble.message,
         chat_history: history,
         [config.request.promptKey]: last?.message ?? '',
+    }
+}
+
+const hordeRequest = (config: APIConfiguration, values: APIValues) => {
+    const { payloadFields, model, stop, prompt } = buildFields(config, values)
+    return {
+        params: {
+            ...payloadFields,
+            n: 1,
+            frmtadsnsp: false,
+            frmtrmblln: false,
+            frmtrmspch: false,
+            frmttriminc: true,
+            ...stop,
+        },
+        ...prompt,
+        trusted_workers: false,
+        slow_workers: true,
+        workers: [],
+        worker_blacklist: false,
+        models: model.model,
+        dry_run: false,
     }
 }
 
@@ -162,9 +186,7 @@ const getNestedValue = (obj: any, path: string) => {
 const getModelName = (config: APIConfiguration, values: APIValues) => {
     let model = undefined
     if (config.features.multipleModels) {
-        model = JSON.stringify(
-            values.model.map((item: any) => getNestedValue(item, config.model.nameParser))
-        )
+        model = values.model.map((item: any) => getNestedValue(item, config.model.nameParser))
     } else {
         model = getNestedValue(values.model, config.model.nameParser)
     }

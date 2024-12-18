@@ -8,7 +8,6 @@ import { Logger, Style } from 'constants/Global'
 import { Stack, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import { Dropdown } from 'react-native-element-dropdown'
 
 /*
 export interface APIValues {
@@ -170,7 +169,7 @@ const AddAPI = () => {
                             )}
                             {template.features.multipleModels && (
                                 <MultiDropdownSheet
-                                    selected={values.model}
+                                    selected={values?.model ?? []}
                                     data={modelList}
                                     labelExtractor={(value) => {
                                         return getNestedValue(value, template.model.nameParser)

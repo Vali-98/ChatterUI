@@ -53,10 +53,11 @@ Below is an explanation of what each field does:
     -   `removeLength: boolean` - when `max_length` is defined as a sampler, it can be used for controlling context size client-side, even if the API used doesn't support it. This allows you to remove the `max_length` field from the final request body in case the API used does not allow unsupported fields.
     -   `removeSeedifNegative?: boolean` - Some APIs only allow seed values of at least 0, and prefer an undefined seed for random seed values. This will remove the seed value if it is `-1` from the final request body.
 -   `APIPayloadFormat` - Refer to [RequestBuilder.ts](https://github.com/Vali-98/ChatterUI/blob/master/constants/API/RequestBuilder.ts) for how the request body is constructed
-    -   `type: 'openai' | 'ollama' | 'cohere'`
+    -   `type: 'openai' | 'ollama' | 'cohere' | 'horde'`
         -   openai - This is the general case request body type, that simply throws all the fields into the base object
         -   ollama - This wraps the samplers and stop sequence in an `options` object
         -   cohere - This is a unique structure for Cohere, however they also support the OpenAI spec, so it isn't actually used.
+        -   horde - Only used for horde, do not use otherwise
     -   `type: custom`
         -   `customPayload: string` - This is a very experimental feature, it allows you to define a string with macros that will define the JSON body of the request.
             -   This payload supports sampler macros as listed below in the Samplers table using the `Macro` values.

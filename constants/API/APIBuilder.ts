@@ -174,7 +174,7 @@ const hordeResponse = async (
 
     const request = await fetch(`${hordeURL}generate/text/async`, {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: payload,
         headers: {
             ...header,
             'Client-Agent': `ChatterUI:${nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
