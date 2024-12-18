@@ -1,5 +1,6 @@
 import DropdownSheet from '@components/DropdownSheet'
 import MultiDropdownSheet from '@components/MultiDropdownSheet'
+import SliderInput from '@components/SliderInput'
 import React, { useState } from 'react'
 import { View } from 'react-native'
 
@@ -17,7 +18,7 @@ const data = [
 
 const ComponentTest = () => {
     const [selected, setSelected] = useState<typeof data>([])
-
+    const [slider, setSlider] = useState(0)
     return (
         <View style={{ flex: 1, padding: 16 }}>
             <MultiDropdownSheet
@@ -29,6 +30,15 @@ const ComponentTest = () => {
                 }}
                 modalTitle="Test Selector"
                 search
+            />
+            <SliderInput
+                value={slider}
+                onValueChange={setSlider}
+                label="Slider Test"
+                step={1}
+                min={0}
+                max={30}
+                precision={1}
             />
         </View>
     )
