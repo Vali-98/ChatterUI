@@ -33,14 +33,13 @@ const SliderInput: React.FC<SliderInputProps> = ({
 
     const handleSliderChange = (v: number) => {
         if (!isNaN(clamp(v, min, max, precision))) onValueChange(v)
-        setTextValue(value.toString())
+        setTextValue(v.toString())
     }
 
     const handleTextInputChange = (t: string) => {
         let v = 0
         setTextValue(t)
         v = parseFloat(t)
-
         if (!isNaN(v)) onValueChange(clamp(v, min, max, precision))
     }
 
