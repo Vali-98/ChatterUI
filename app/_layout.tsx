@@ -4,6 +4,8 @@ import { Style } from '@globals'
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 import { SplashScreen, Stack } from 'expo-router'
 import { setOptions } from 'expo-splash-screen'
+import { useEffect } from 'react'
+import { Keyboard } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { MenuProvider } from 'react-native-popup-menu'
 
@@ -13,15 +15,20 @@ setOptions({
     duration: 350,
 })
 
-const DevDB = () => {
-    useDrizzleStudio(rawdb)
-    return <></>
-}
-
 const Layout = () => {
+    useDrizzleStudio(rawdb)
+
+    useEffect(() => {
+        const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+            Keyboard.dismiss()
+        })
+        return () => {
+            hideSubscription.remove()
+        }
+    }, [])
+
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            {__DEV__ && <DevDB />}
             <AlertBox />
             <MenuProvider>
                 <Stack
