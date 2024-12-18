@@ -320,14 +320,13 @@ export abstract class APIBase implements IAPIBase {
         const sse = new SSEFetch()
 
         const closeStream = () => {
-            Logger.debug('Running close stream')
+            Logger.debug('Running Close Stream')
             Chats.useChat.getState().stopGenerating()
-            sse.abort()
         }
 
         useInference.getState().setAbort(async () => {
-            Logger.debug('Running abort')
-            closeStream()
+            Logger.debug('Running Abort')
+            sse.abort()
         })
 
         sse.setOnEvent((data) => {
@@ -337,16 +336,13 @@ export abstract class APIBase implements IAPIBase {
         })
 
         sse.setOnError(() => {
-            // if ('message' in event) {
             Logger.log('Generation Failed', true)
-            // Logger.log(`An error occured : ${event?.message ?? ''}`)
-
             closeStream()
         })
 
         sse.setOnClose(() => {
+            Logger.log('Stream Closed')
             closeStream()
-            Logger.log('Stream closed')
         })
 
         sse.start({
