@@ -130,7 +130,7 @@ export const useInference = create<InferenceStateType>((set, get) => ({
             ...state,
             abortFunction: async () => {
                 await fn()
-                get().stopGenerating()
+                // get().stopGenerating()
             },
         }))
     },
