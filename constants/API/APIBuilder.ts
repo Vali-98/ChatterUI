@@ -2,6 +2,7 @@ import { SSEFetch } from '@constants/SSEFetch'
 import { useInference } from 'constants/Chat'
 import { Characters, Chats, Logger } from 'constants/Global'
 import { Instructs, InstructType } from 'constants/Instructs'
+import { nativeApplicationVersion } from 'expo-application'
 
 import { APIState } from './APIManagerState'
 import { buildRequest } from './RequestBuilder'
@@ -55,19 +56,35 @@ export const buildAndSendRequest = async () => {
         }
     }
 
-    readableStreamResponse(
-        requestValues.endpoint,
-        payload,
-        (responseString) => {
-            try {
-                return getNestedValue(
-                    JSON.parse(responseString),
-                    config.request.responseParsePattern
-                )
-            } catch (e) {}
-        },
-        header
-    )
+    if (config.request.requestType === 'stream')
+        readableStreamResponse(
+            requestValues.endpoint,
+            payload,
+            (responseString) => {
+                try {
+                    return getNestedValue(
+                        JSON.parse(responseString),
+                        config.request.responseParsePattern
+                    )
+                } catch (e) {}
+            },
+            header
+        )
+    else {
+        hordeResponse(
+            requestValues.endpoint,
+            payload,
+            (responseString) => {
+                try {
+                    return getNestedValue(
+                        JSON.parse(responseString),
+                        config.request.responseParsePattern
+                    )
+                } catch (e) {}
+            },
+            header
+        )
+    }
 }
 
 type KeyHeader = {
@@ -126,6 +143,101 @@ const readableStreamResponse = async (
         },
     })
 }
+
+const hordeResponse = async (
+    endpoint: string,
+    payload: string,
+    jsonreader: (event: any) => string,
+    header: KeyHeader = {}
+) => {
+    const hordeURL = `https://aihorde.net/api/v2/`
+    let generation_id = ''
+    let aborted = false
+
+    useInference.getState().setAbort(() => {
+        aborted = true
+        if (generation_id !== null)
+            fetch(`${hordeURL}generate/text/status/${generation_id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Client-Agent': `ChatterUI:${nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
+                    accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).catch((error) => {
+                Logger.log(error)
+            })
+        Chats.useChat.getState().stopGenerating()
+    })
+
+    Logger.log(`Using Horde`)
+
+    const request = await fetch(`${hordeURL}generate/text/async`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+            ...header,
+            'Client-Agent': `ChatterUI:${nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
+            accept: 'application/json',
+            'content-type': 'application/json',
+        },
+    })
+
+    if (request.status === 401) {
+        Logger.log(`Invalid API Key`, true)
+        Chats.useChat.getState().stopGenerating()
+        return
+    }
+    if (request.status !== 202) {
+        Logger.log(`Request failed.`)
+        Chats.useChat.getState().stopGenerating()
+        const body = await request.json()
+        Logger.log(JSON.stringify(body))
+        for (const e of body.errors) Logger.log(e)
+        return
+    }
+
+    const body = await request.json()
+    generation_id = body.id
+    let result = undefined
+
+    do {
+        await new Promise((resolve) => setTimeout(resolve, 5000))
+        if (aborted) return
+
+        Logger.log(`Checking...`)
+        const response = await fetch(`${hordeURL}generate/text/status/${generation_id}`, {
+            method: 'GET',
+            headers: {
+                'Client-Agent': `ChatterUI:${nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
+                accept: 'application/json',
+                'content-type': 'application/json',
+            },
+        })
+
+        if (response.status === 400) {
+            Logger.log(`Response failed.`)
+            Chats.useChat.getState().stopGenerating()
+            Logger.log((await response.json())?.message)
+            return
+        }
+
+        result = await response.json()
+    } while (!result.done)
+
+    if (aborted) return
+
+    const replace = RegExp(
+        constructReplaceStrings()
+            .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+            .join(`|`),
+        'g'
+    )
+
+    Chats.useChat.getState().setBuffer(result.generations[0].text.replaceAll(replace, ''))
+    Chats.useChat.getState().stopGenerating()
+}
+
 const constructReplaceStrings = (): string[] => {
     const currentInstruct: InstructType = Instructs.useInstruct.getState().replacedMacros()
     // default stop strings defined instructs
