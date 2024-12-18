@@ -473,8 +473,8 @@ const styles = StyleSheet.create({
 
     scrollContainer: {
         flex: 1,
-        paddingVertical: 20,
         paddingHorizontal: 20,
+        marginTop: 16,
     },
 
     selected: {
