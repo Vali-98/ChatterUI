@@ -1,6 +1,6 @@
 import Alert from '@components/Alert'
 import SectionTitle from '@components/SectionTitle'
-import SliderItem from '@components/SliderItem'
+import SliderInput from '@components/SliderInput'
 import SwitchTitle from '@components/SwitchTitle'
 import SwitchWithDescription from '@components/SwitchWithDescription'
 import { AppSettings, Global, Logger, Style } from 'constants/Global'
@@ -78,58 +78,55 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             exiting={SlideOutRight.easing(Easing.inOut(Easing.cubic))}>
             <SectionTitle>CPU Settings</SectionTitle>
             <View style={{ marginTop: 16 }} />
-            <SliderItem
-                name="Max Context"
-                body={preset}
-                setValue={setPreset}
-                varname="context_length"
-                min={1024}
-                max={32768}
-                step={1024}
-                disabled={modelImporting || modelLoading}
-            />
-            <SliderItem
-                name="Threads"
-                body={preset}
-                setValue={setPreset}
-                varname="threads"
-                min={1}
-                max={8}
-                step={1}
-                disabled={modelImporting || modelLoading}
-            />
+            {preset && (
+                <View>
+                    <SliderInput
+                        label="Max Context"
+                        value={preset.context_length}
+                        onValueChange={(value) => setPreset({ ...preset, context_length: value })}
+                        min={1024}
+                        max={32768}
+                        step={1024}
+                        disabled={modelImporting || modelLoading}
+                    />
+                    <SliderInput
+                        label="Threads"
+                        value={preset.threads}
+                        onValueChange={(value) => setPreset({ ...preset, threads: value })}
+                        min={1}
+                        max={8}
+                        step={1}
+                        disabled={modelImporting || modelLoading}
+                    />
 
-            <SliderItem
-                name="Batch"
-                body={preset}
-                setValue={setPreset}
-                varname="batch"
-                min={16}
-                max={512}
-                step={16}
-                disabled={modelImporting || modelLoading}
-            />
-            {/* Note: llama.rn does not have any Android gpu acceleration */}
-            {Platform.OS === 'ios' && (
-                <SliderItem
-                    name="GPU Layers"
-                    body={preset}
-                    setValue={setPreset}
-                    varname="gpu_layers"
-                    min={0}
-                    max={100}
-                    step={1}
-                />
+                    <SliderInput
+                        label="Batch"
+                        value={preset.batch}
+                        onValueChange={(value) => setPreset({ ...preset, batch: value })}
+                        min={16}
+                        max={512}
+                        step={16}
+                        disabled={modelImporting || modelLoading}
+                    />
+                    {/* Note: llama.rn does not have any Android gpu acceleration */}
+                    {Platform.OS === 'ios' && (
+                        <SliderInput
+                            label="GPU Layers"
+                            value={preset.gpu_layers}
+                            onValueChange={(value) => setPreset({ ...preset, gpu_layers: value })}
+                            min={0}
+                            max={100}
+                            step={1}
+                        />
+                    )}
+                </View>
             )}
-
             <SectionTitle>Advanced Settings</SectionTitle>
-
             <SwitchTitle
                 title="Automatically Load Model on Chat"
                 value={autoloadLocal}
                 onValueChange={setAutoloadLocal}
             />
-
             <SwitchWithDescription
                 title="Save Local KV"
                 value={saveKV}
@@ -140,7 +137,6 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                         : 'Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV cache file may be very big and negatively impact battery life!'
                 }
             />
-
             {saveKV && (
                 <TouchableOpacity
                     onPress={handleDeleteKV}

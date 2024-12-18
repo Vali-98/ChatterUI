@@ -1,7 +1,7 @@
 import Alert from '@components/Alert'
 import CheckboxTitle from '@components/CheckboxTitle'
 import FadeDownView from '@components/FadeDownView'
-import SliderItem from '@components/SliderItem'
+import SliderInput from '@components/SliderInput'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
 import { APISampler } from '@constants/APIState/BaseAPI'
@@ -237,12 +237,20 @@ const SamplerMenu = () => {
                                         return (
                                             (samplerItem.values.type === 'float' ||
                                                 samplerItem.values.type === 'integer') && (
-                                                <SliderItem
+                                                <SliderInput
                                                     key={item.samplerID}
-                                                    varname={samplerItem.internalID}
-                                                    body={currentPreset}
-                                                    setValue={setCurrentPreset}
-                                                    name={samplerItem.friendlyName}
+                                                    value={
+                                                        currentPreset[
+                                                            samplerItem.internalID
+                                                        ] as number
+                                                    }
+                                                    onValueChange={(value) => {
+                                                        setCurrentPreset({
+                                                            ...currentPreset,
+                                                            [samplerItem.internalID]: value,
+                                                        })
+                                                    }}
+                                                    label={samplerItem.friendlyName}
                                                     min={samplerItem.values.min}
                                                     max={samplerItem.values.max}
                                                     step={samplerItem.values.step}

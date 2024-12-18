@@ -3,7 +3,7 @@ import CheckboxTitle from '@components/CheckboxTitle'
 import DropdownSheet from '@components/DropdownSheet'
 import FadeDownView from '@components/FadeDownView'
 import PopupMenu from '@components/PopupMenu'
-import SliderItem from '@components/SliderItem'
+import SliderInput from '@components/SliderInput'
 import StringArrayEditor from '@components/StringArrayEditor'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
@@ -372,11 +372,12 @@ const Instruct = () => {
                             </View>
                         </View>
 
-                        <SliderItem
-                            name="Autoformat New Chats"
-                            varname="format_type"
-                            body={currentInstruct}
-                            setValue={setCurrentInstruct}
+                        <SliderInput
+                            label="Autoformat New Chats"
+                            value={currentInstruct.format_type}
+                            onValueChange={(value) =>
+                                setCurrentInstruct({ ...currentInstruct, format_type: value })
+                            }
                             min={0}
                             max={3}
                             step={1}

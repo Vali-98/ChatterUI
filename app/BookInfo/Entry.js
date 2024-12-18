@@ -1,5 +1,4 @@
 import CheckboxTitle from '@components/CheckboxTitle'
-import SliderItem from '@components/SliderItem'
 import { FontAwesome } from '@expo/vector-icons'
 import { Style, Logger } from 'constants/Global'
 import { useState, useRef } from 'react'
@@ -105,27 +104,6 @@ const Entry = ({ data, datakey, updateBook }) => {
                     onChange={(value) => {
                         updateBook(datakey, 'disable', value)
                     }}
-                />
-                <SliderItem
-                    name="Position"
-                    body={data}
-                    varname="position"
-                    min={0}
-                    max={100}
-                    step={1}
-                    precision={0}
-                    onChange={(value) => updateBook(datakey, 'position', value)}
-                />
-
-                <SliderItem
-                    name="Order"
-                    body={data}
-                    varname="order"
-                    min={0}
-                    max={100}
-                    step={1}
-                    precision={0}
-                    onChange={(value) => updateBook(datakey, 'order', value)}
                 />
             </Collapsible>
         </View>
