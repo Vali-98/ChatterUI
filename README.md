@@ -58,7 +58,7 @@ To use on-device inferencing, first enable Local Mode, then go to Models > Impor
 
 After that, you can load the model and begin chatting!
 
-_Note: For devices with Snapdragon 8 Gen 1 and above or Exynos 2200+, it is recommended to use the Q4_0_4_8 quantization for enhanced prompt processing._
+_Note: For devices with Snapdragon 8 Gen 1 and above or Exynos 2200+, it is recommended to use the Q4_0 quantization for optimized performance._
 
 ## Remote Mode
 
@@ -79,7 +79,7 @@ Remote Mode allows you to connect to a few common APIs from both commercial and 
 -   Mancer
 -   AI Horde
 
-### Customizable backends:
+### Generic backends:
 
 -   Generic Text Completions
 -   Generic Chat Completions
