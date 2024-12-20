@@ -26,13 +26,14 @@ export class SSEFetch {
         this.abortController = new AbortController()
         const body = values.method === 'POST' ? { body: values.body } : {}
 
-        const res = await fetch(values.endpoint, {
-            signal: this.abortController.signal,
-            method: values.method,
-            headers: values.headers,
-            ...body,
-        })
         try {
+            const res = await fetch(values.endpoint, {
+                signal: this.abortController.signal,
+                method: values.method,
+                headers: values.headers,
+                ...body,
+            })
+
             if (res.status !== 200 || !res.body) return this.onError()
             this.closeStream = res.body.cancel
             for await (const chunk of res.body) {
