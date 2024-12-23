@@ -1,5 +1,6 @@
 import ButtonPrimary from '@components/Buttons/ButtonPrimary'
 import DropdownSheet from '@components/DropdownSheet'
+import HeartbeatButton from '@components/Endpoint/HeartbeatButton'
 import FadeBackrop from '@components/FadeBackdrop'
 import MultiDropdownSheet from '@components/MultiDropdownSheet'
 import { APIConfiguration } from '@constants/API/APIBuilder.types'
@@ -139,6 +140,18 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
                                 }}
                                 placeholder={template.defaultValues.modelEndpoint}
                                 placeholderTextColor={Style.getColor('primary-text2')}
+                            />
+                            <HeartbeatButton
+                                api={values.modelEndpoint ?? ''}
+                                apiFormat={(s) => s}
+                                headers={
+                                    template.features.useKey
+                                        ? {
+                                              [template.request.authHeader]:
+                                                  template.request.authPrefix + values.key,
+                                          }
+                                        : {}
+                                }
                             />
                         </View>
                     )}

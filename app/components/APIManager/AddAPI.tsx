@@ -1,5 +1,6 @@
 import ButtonPrimary from '@components/Buttons/ButtonPrimary'
 import DropdownSheet from '@components/DropdownSheet'
+import HeartbeatButton from '@components/Endpoint/HeartbeatButton'
 import MultiDropdownSheet from '@components/MultiDropdownSheet'
 import claudeModels from '@constants/API/ClaudeModels.json'
 import { MaterialIcons } from '@expo/vector-icons'
@@ -112,6 +113,18 @@ const AddAPI = () => {
                             }}
                             placeholder={template.defaultValues.modelEndpoint}
                             placeholderTextColor={Style.getColor('primary-text2')}
+                        />
+                        <HeartbeatButton
+                            api={values.modelEndpoint ?? ''}
+                            apiFormat={(s) => s}
+                            headers={
+                                template.features.useKey
+                                    ? {
+                                          [template.request.authHeader]:
+                                              template.request.authPrefix + values.key,
+                                      }
+                                    : {}
+                            }
                         />
                     </View>
                 )}
