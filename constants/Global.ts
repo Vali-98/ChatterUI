@@ -182,7 +182,7 @@ export const startupApp = () => {
     }
 
     // Fix for 0.7.10 -> 0.8.0 LocalModel data
-
+    // Attempt to parse model, if this fails, delete the key
     try {
         const model = mmkv.getString(Global.LocalModel)
         if (model) JSON.parse(model)

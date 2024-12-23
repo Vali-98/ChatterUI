@@ -61,6 +61,7 @@ const getMMKVObjectModel = (mmkvKey: string, field: string) => {
     return model
 }
 
+// TODO: remove this
 export const getCurrentModel = () => {
     const api = mmkv.getString(Global.APIType)
     switch (api) {

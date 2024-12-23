@@ -60,7 +60,6 @@ const importDB = async (uri: string, name: string) => {
 
 const AppSettingsMenu = () => {
     const router = useRouter()
-    //const [animateEditor, setAnimateEditor] = useMMKVBoolean(AppSettings.AnimateEditor)
     const [printContext, setPrintContext] = useMMKVBoolean(AppSettings.PrintContext)
     const [firstMes, setFirstMes] = useMMKVBoolean(AppSettings.CreateFirstMes)
     const [chatOnStartup, setChatOnStartup] = useMMKVBoolean(AppSettings.ChatOnStartup)

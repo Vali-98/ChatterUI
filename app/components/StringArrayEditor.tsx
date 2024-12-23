@@ -86,8 +86,6 @@ const styles = StyleSheet.create({
 
     contentContainer: {
         borderRadius: 8,
-        //borderWidth: 1,
-        //borderColor: Style.getColor('primary-brand'),
     },
 
     title: {

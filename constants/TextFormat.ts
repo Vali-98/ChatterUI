@@ -135,7 +135,6 @@ const constructString = (input: TextData[], format: Formats): string => {
     }
 
     input.forEach((data) => {
-        //formatter(data)
         result += formatters[data.type](data)
     })
 

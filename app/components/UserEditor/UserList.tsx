@@ -1,14 +1,12 @@
 import TextBoxModal from '@components/TextBoxModal'
 import { AntDesign } from '@expo/vector-icons'
-import { Characters, Style } from 'constants/Global'
 import { FlashList } from '@shopify/flash-list'
+import { Characters, Style } from 'constants/Global'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import React, { useState } from 'react'
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import UserListing from './UserListing'
-
-// type CharacterData = Awaited<ReturnType<typeof Characters.db.query.cardListQuery>>
 
 type UserListProps = {
     setShowModal: (b: boolean) => void

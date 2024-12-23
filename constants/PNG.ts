@@ -1,4 +1,4 @@
-import { atob, fromByteArray } from 'react-native-quick-base64'
+import { atob } from 'react-native-quick-base64'
 
 export const getPngChunkText = (filedata: string) => {
     const binaryString = atob(filedata)

@@ -9,20 +9,6 @@ import { Stack, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
-/*
-export interface APIValues {
-    endpoint: string
-    modelEndpoint: string
-    prefill: string
-    firstMessage: string
-    key: string
-    model: any
-    // config name is unique and defines which template to use on generation
-    configName: string
-}*/
-
-// TODO add case for claude
-
 const AddAPI = () => {
     const router = useRouter()
     const { addValue, getTemplates } = APIState.useAPIState((state) => ({

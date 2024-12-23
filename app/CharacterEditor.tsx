@@ -85,7 +85,6 @@ const ChracterEditor = () => {
             firstRender.current = false
             return
         }
-        //  if (edited) return
         setEdited(true)
         removeListener.current()
         removeListener.current = navigation.addListener('beforeRemove', (e) => {

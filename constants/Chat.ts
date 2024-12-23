@@ -130,7 +130,6 @@ export const useInference = create<InferenceStateType>((set, get) => ({
             ...state,
             abortFunction: async () => {
                 await fn()
-                // get().stopGenerating()
             },
         }))
     },
@@ -161,7 +160,6 @@ export namespace Chats {
                 ...state,
                 data: data,
             }))
-            //db.mutate.updateChatModified(chatId)
         },
 
         delete: async (chatId: number) => {
@@ -422,6 +420,7 @@ export namespace Chats {
         }
         export namespace mutate {
             //TODO : refactor this, the requirement to pull charID is not needed, no error handling either
+            //TODO : perhaps pull data from DB instead of useCharacterCard, currently reliable BUT may fail in future
             export const createChat = async (charId: number) => {
                 const card = { ...Characters.useCharacterCard.getState().card }
                 const charName = card?.name

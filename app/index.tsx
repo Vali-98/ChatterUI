@@ -19,7 +19,12 @@ const Home = () => {
     const [firstRender, setFirstRender] = useState<boolean>(true)
 
     useEffect(() => {
-        // reset
+        /**
+         * Startup Routine:
+         * - wait for useMigration success
+         * - startupApp() - creates defaults
+         * - initializeApp() - creates default dirs and files
+         */
         if (success) {
             startupApp()
             initializeApp()

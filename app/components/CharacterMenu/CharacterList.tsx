@@ -1,5 +1,5 @@
-import { CharInfo } from 'constants/Characters'
 import { AntDesign } from '@expo/vector-icons'
+import { CharInfo } from 'constants/Characters'
 import { Characters, Style } from 'constants/Global'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
@@ -103,7 +103,6 @@ type CharacterListProps = {
 }
 
 const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
-    // const [characterList, setCharacterList] = useState<CharInfo[]>([])
     const [nowLoading, setNowLoading] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
     const [showMenu, setShowMenu] = useState(false)
