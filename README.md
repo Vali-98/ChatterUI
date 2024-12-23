@@ -19,12 +19,12 @@ Use on-device Models or APIs
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/models.png" width="150" > 
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/api.png" width="150" > 
 <br/>
-Modify and customize to your liking
+Modify And Customize
 <br/>
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/charactereditor.png" width="150" > 
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/settings.png" width="150" >
 <br/>
-Personalize yourself
+Personalize Yourself
 <br/>
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/usereditor.png" width="150" > 
 <img src ="https://github.com/Vali-98/ChatterUI/blob/master/assets/screenshots/userlist.png" width="150" >
@@ -37,7 +37,7 @@ Personalize yourself
 -   Chat with characters. (Supports the Character Card v2 specification.)
 -   Create and manage multiple chats per character.
 -   Customize Sampler fields and Instruct formatting
--   Integrates with your device’s TTS engine for text-to-speech (TTS) support
+-   Integrates with your device’s text-to-speech (TTS) engine
 
 <br/>
 
@@ -45,7 +45,7 @@ Personalize yourself
 
 Download and install latest APK from the [releases](https://github.com/Vali-98/ChatterUI/releases/latest) page.
 
-<i>IOS is Currently unavailable, I do not have the hardware for IOS development</i>
+<i>iOS is Currently unavailable due to lacking iOS hardware for development</i>
 
 ## Local Mode
 
@@ -86,6 +86,12 @@ Remote Mode allows you to connect to a few common APIs from both commercial and 
 
 _These should be compliant with any Text Completion/Chat Completion backends such as Groq or Infermatic._
 
+### Custom APIs:
+
+Is your API provider missing? ChatterUI allows you to define APIs using its template system.
+
+Read more about it [here!](https://github.com/Vali-98/ChatterUI/discussions/126)
+
 ## Development
 
 ### Android
@@ -123,24 +129,14 @@ eas build --platform android --local
 
 ### IOS
 
-Currently untested as I do have the resources to develop for IoS. Assistance here would be greatly appreciated!
+Currently untested as I do not own hardware for iOS development. Assistance here would be greatly appreciated!
 
-### Fix For Text Streaming in Development
+Possible issues:
 
-(Note: This is only applicable for versions prior to Expo SDK 51 in 20fbff2fb6375cfd0d76acf06a9cd13ae9126c57)
-
-ReactNativeFlipper causes streaming to break on Android development builds. To fix this, navigate to:
-
-`android/app/src/main/java/com/Vali98/ChatterUI/MainApplication.kt`
-
-Then comment out the following:
-
-```
-if (BuildConfig.DEBUG) {
-    // hacky fix for: https://github.com/react-native-community/fetch
-    // ReactNativeFlipper.initializeFlipper(this, reactNativeHost.reactInstanceManager)
-}
-```
+-   cui-llama.rn lacking Swift implementation for cui-specific functions
+-   cui-fs having no Swift integration
+-   Platform specific shadows
+-   Exporting files not using shareAsync
 
 ## Acknowledgement
 
