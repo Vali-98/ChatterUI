@@ -2,21 +2,10 @@ import { atob } from 'react-native-quick-base64'
 
 export const getPngChunkText = (filedata: string) => {
     const binaryString = atob(filedata)
-
-    const bytes = new Uint8Array(binaryString.length).map(
-        (item, index) => (item = binaryString.charCodeAt(index))
-    )
-    // gets tEXt chunk, returns UInt8Array
+    const bytes = Uint8Array.from(binaryString, (a) => a.charCodeAt(0))
     const chunk = extractChunks(bytes)
-
-    // decodePNG returns
-    const decodeText = atob(decodePNG(chunk).text)
-
-    const bytes2 = new Uint8Array(decodeText.length).map(
-        (item, index) => (item = decodeText.charCodeAt(index))
-    )
-
-    return JSON.parse(utf8Decode(bytes2))
+    const raw = atob(utf8Decode(decodePNG(chunk).text))
+    return JSON.parse(utf8Decode(Uint8Array.from(raw, (a) => a.charCodeAt(0))))
 }
 
 /// PNG DATA
@@ -100,35 +89,13 @@ function extractChunks(data: Uint8Array) {
 }
 
 function decodePNG(data: Uint8Array) {
-    let naming = true
-    const textBytes: number[] = []
-    let name = ''
+    const index = data.indexOf(0)
 
-    for (let i = 0; i < data.length; i++) {
-        const code = data[i]
-
-        if (naming) {
-            if (code) {
-                name += String.fromCharCode(code)
-            } else {
-                naming = false
-            }
-        } else {
-            if (code) {
-                textBytes.push(code)
-            } else {
-                throw new Error(
-                    'Invalid NULL character found. 0x00 character is not permitted in tEXt content'
-                )
-            }
-        }
-    }
-
-    const textUint8Array = new Uint8Array(textBytes)
-    const text = utf8Decode(textUint8Array)
+    const name = data.slice(0, index)
+    const textUint8Array = data.slice(index + 1)
     return {
         keyword: name,
-        text: text,
+        text: textUint8Array,
     }
 }
 
