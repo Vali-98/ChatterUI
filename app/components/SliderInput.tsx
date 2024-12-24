@@ -1,6 +1,6 @@
 import Slider from '@react-native-community/slider'
 import { Style } from 'constants/Global'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TextInput } from 'react-native'
 
 type SliderInputProps = {
@@ -30,6 +30,11 @@ const SliderInput: React.FC<SliderInputProps> = ({
     disabled = false,
 }) => {
     const [textValue, setTextValue] = useState(value.toString())
+
+    // This effect ensures that if `value` updates from the parent, this text is properly updated
+    useEffect(() => {
+        if (parseFloat(textValue) !== value) setTextValue(value.toString())
+    }, [value])
 
     const handleSliderChange = (v: number) => {
         if (!isNaN(clamp(v, min, max, precision))) onValueChange(v)
