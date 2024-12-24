@@ -34,7 +34,10 @@ export class SSEFetch {
                 ...body,
             })
 
-            if (res.status !== 200 || !res.body) return this.onError()
+            if (res.status !== 200 || !res.body) {
+                Logger.log(await res.text())
+                return this.onError()
+            }
             this.closeStream = res.body.cancel
             for await (const chunk of res.body) {
                 const data = this.decoder.decode(chunk)

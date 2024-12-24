@@ -107,6 +107,7 @@ const verifyJSON = (source: any, target: any): any => {
             sourceObj = Array.isArray(targetObj) ? [] : {}
         }
         for (const key of Object.keys(targetObj)) {
+            if (key === 'samplerFields') continue
             if (!(key in sourceObj)) {
                 sourceObj[key] = targetObj[key]
             } else if (typeof targetObj[key] === 'object' && targetObj[key] !== null) {
