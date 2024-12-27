@@ -4,7 +4,6 @@ import { Chats, MarkdownStyle } from 'constants/Global'
 import { useEffect, useRef } from 'react'
 import { View, Animated, Easing, useAnimatedValue } from 'react-native'
 import Markdown from 'react-native-markdown-display'
-import { useShallow } from 'zustand/react/shallow'
 
 type ChatTextProps = {
     nowGenerating: boolean
