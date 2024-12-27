@@ -94,7 +94,7 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
                 <Animated.View exiting={SlideOutDown.duration(100)} style={styles.editorContainer}>
                     <View style={styles.topText}>
                         <Text style={styles.nameText}>{entry?.name}</Text>
-                        <Text style={styles.timeText}>{swipe.send_date.toLocaleTimeString()}</Text>
+                        <Text style={styles.timeText}>{swipe?.send_date.toLocaleTimeString()}</Text>
                     </View>
 
                     <TextInput
