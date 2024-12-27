@@ -639,9 +639,10 @@ export namespace Chats {
 
     export const useSwipeData = (index: number) => {
         const message = useEntryData(index)
-        const swipeId = message.swipe_id
-        const swipe = message.swipes?.[swipeId]
+        const swipe_index = message.swipe_id
+        const swipe = message.swipes?.[swipe_index]
         const swipeText = swipe?.swipe
+        const swipeId = swipe?.id
         return { swipeId, swipe, swipeText }
     }
 
