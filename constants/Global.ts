@@ -91,7 +91,7 @@ const loadChatOnInit = async () => {
     const newestChat = await Chats.db.query.chatNewest()
     if (!newestChat) return
     await Characters.useCharacterCard.getState().setCard(newestChat.character_id)
-    await Chats.useChat.getState().load(newestChat.id)
+    await Chats.useChatState.getState().load(newestChat.id)
 }
 
 const createDefaultUserData = async () => {
@@ -117,7 +117,7 @@ export const unlockScreenOrientation = async () => {
 export const startupApp = () => {
     console.log('[APP STARTED]: T1APT')
     // Only for dev to properly reset
-    Chats.useChat.getState().reset()
+    Chats.useChatState.getState().reset()
     Characters.useCharacterCard.getState().unloadCard()
 
     // Resets horde state, may be better if left active

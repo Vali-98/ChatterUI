@@ -1,11 +1,10 @@
 import Avatar from '@components/Avatar'
 import { useViewerState } from 'constants/AvatarViewer'
-import { Characters, Global, Style } from 'constants/Global'
 import { Chats } from 'constants/Chat'
+import { Characters, Global, Style } from 'constants/Global'
 import { ReactNode } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
-import { useShallow } from 'zustand/react/shallow'
 
 import TTSMenu from './TTS'
 
@@ -17,11 +16,7 @@ type ChatFrameProps = {
 }
 
 const ChatFrame: React.FC<ChatFrameProps> = ({ children, id, nowGenerating, isLast }) => {
-    const { message } = Chats.useChat(
-        useShallow((state) => ({
-            message: state?.data?.messages?.[id] ?? Chats.dummyEntry,
-        }))
-    )
+    const message = Chats.useEntryData(id)
 
     const setShowViewer = useViewerState((state) => state.setShow)
 

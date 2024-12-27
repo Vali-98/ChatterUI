@@ -66,7 +66,7 @@ export abstract class APIBase implements IAPIBase {
                 ? Llama.useLlama.getState().tokenLength
                 : Tokenizer.useTokenizer.getState().getTokenCount
 
-        const messages = [...(Chats.useChat.getState().data?.messages ?? [])]
+        const messages = [...(Chats.useChatState.getState().data?.messages ?? [])]
 
         const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
 
@@ -131,7 +131,7 @@ export abstract class APIBase implements IAPIBase {
 
         // we require lengths for names if use_names is enabled
         for (const message of messages.reverse()) {
-            const swipe_len = Chats.useChat.getState().getTokenCount(index)
+            const swipe_len = Chats.useChatState.getState().getTokenCount(index)
             const swipe_data = message.swipes[message.swipe_id]
 
             /** Accumulate total string length
@@ -233,7 +233,7 @@ export abstract class APIBase implements IAPIBase {
                 ? Llama.useLlama.getState().tokenLength
                 : Tokenizer.useTokenizer.getState().getTokenCount
 
-        const messages = [...(Chats.useChat.getState().data?.messages ?? [])]
+        const messages = [...(Chats.useChatState.getState().data?.messages ?? [])]
         const userCard = { ...Characters.useUserCard.getState().card }
         const currentCard = { ...Characters.useCharacterCard.getState().card }
         const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
@@ -245,7 +245,7 @@ export abstract class APIBase implements IAPIBase {
         const userCache = Characters.useUserCard.getState().getCache(charName)
         const instructCache = Instructs.useInstruct.getState().getCache(charName, userName)
 
-        const buffer = Chats.useChat.getState().buffer
+        const buffer = Chats.useChatState.getState().buffer
 
         // Logic here is that if the buffer is empty, this is not a regen, hence can popped
         if (!buffer) messages.pop()
@@ -285,7 +285,7 @@ export abstract class APIBase implements IAPIBase {
             const name_length = currentInstruct.names ? tokenizer(name_string) : 0
 
             const len =
-                Chats.useChat.getState().getTokenCount(index) +
+                Chats.useChatState.getState().getTokenCount(index) +
                 total_length +
                 name_length +
                 timestamp_length
@@ -321,7 +321,7 @@ export abstract class APIBase implements IAPIBase {
 
         const closeStream = () => {
             Logger.debug('Running Close Stream')
-            Chats.useChat.getState().stopGenerating()
+            Chats.useChatState.getState().stopGenerating()
         }
 
         useInference.getState().setAbort(async () => {
@@ -331,8 +331,8 @@ export abstract class APIBase implements IAPIBase {
 
         sse.setOnEvent((data) => {
             const text = jsonreader(data) ?? ''
-            const output = Chats.useChat.getState().buffer + text
-            Chats.useChat.getState().setBuffer(output.replaceAll(replace, ''))
+            const output = Chats.useChatState.getState().buffer + text
+            Chats.useChatState.getState().setBuffer(output.replaceAll(replace, ''))
         })
 
         sse.setOnError(() => {
@@ -380,7 +380,7 @@ export abstract class APIBase implements IAPIBase {
         return mmkv.getString(key) ?? ''
     }
     stopGenerating = () => {
-        Chats.useChat.getState().stopGenerating()
+        Chats.useChatState.getState().stopGenerating()
     }
 }
 

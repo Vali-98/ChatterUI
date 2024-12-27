@@ -180,7 +180,7 @@ class HordeAPI extends APIBase {
             'g'
         )
 
-        Chats.useChat.getState().setBuffer(result.generations[0].text.replaceAll(replace, ''))
+        Chats.useChatState.getState().setBuffer(result.generations[0].text.replaceAll(replace, ''))
         this.stopGenerating()
     }
 }

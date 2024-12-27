@@ -1,18 +1,16 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import { AppSettings, Characters, Chats, Logger, Style } from 'constants/Global'
 import { useInference } from 'constants/Chat'
+import { AppSettings, Characters, Chats, Logger, Style } from 'constants/Global'
 import { generateResponse } from 'constants/Inference'
 import React, { useState } from 'react'
-import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
 const ChatInput = () => {
     const [sendOnEnter, setSendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
 
-    const { insertEntry } = Chats.useChat((state) => ({
-        insertEntry: state.addEntry,
-    }))
+    const { addEntry } = Chats.useEntry()
 
     const { nowGenerating, abortFunction } = useInference((state) => ({
         nowGenerating: state.nowGenerating,
@@ -37,8 +35,8 @@ const ChatInput = () => {
     }
 
     const handleSend = async () => {
-        if (newMessage.trim() !== '') await insertEntry(userName ?? '', true, newMessage)
-        const swipeId = await insertEntry(charName ?? '', false, '')
+        if (newMessage.trim() !== '') await addEntry(userName ?? '', true, newMessage)
+        const swipeId = await addEntry(charName ?? '', false, '')
         setNewMessage((message) => '')
         if (swipeId) generateResponse(swipeId)
     }

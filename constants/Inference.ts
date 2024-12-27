@@ -11,29 +11,29 @@ import { mmkv } from './MMKV'
 
 export const regenerateResponse = async (swipeId: number, regenCache: boolean = true) => {
     const charName = Characters.useCharacterCard.getState().card?.name
-    const messagesLength = Chats.useChat.getState()?.data?.messages?.length ?? -1
-    const message = Chats.useChat.getState()?.data?.messages?.[messagesLength - 1]
+    const messagesLength = Chats.useChatState.getState()?.data?.messages?.length ?? -1
+    const message = Chats.useChatState.getState()?.data?.messages?.[messagesLength - 1]
 
     Logger.log('Regenerate Response' + (regenCache ? '' : ' , Resetting Message'))
 
     if (message?.is_user) {
-        await Chats.useChat.getState().addEntry(charName ?? '', true, '')
+        await Chats.useChatState.getState().addEntry(charName ?? '', true, '')
     } else if (messagesLength && messagesLength !== 1) {
         let replacement = ''
 
         if (regenCache) replacement = message?.swipes[message.swipe_id].regen_cache ?? ''
-        else Chats.useChat.getState().resetRegenCache()
+        else Chats.useChatState.getState().resetRegenCache()
 
-        if (replacement) Chats.useChat.getState().setBuffer(replacement)
-        await Chats.useChat.getState().updateEntry(messagesLength - 1, replacement, true, true)
+        if (replacement) Chats.useChatState.getState().setBuffer(replacement)
+        await Chats.useChatState.getState().updateEntry(messagesLength - 1, replacement, true, true)
     }
     await generateResponse(swipeId)
 }
 
 export const continueResponse = async (swipeId: number) => {
     Logger.log(`Continuing Response`)
-    Chats.useChat.getState().setRegenCache()
-    Chats.useChat.getState().insertLastToBuffer()
+    Chats.useChatState.getState().setRegenCache()
+    Chats.useChatState.getState().insertLastToBuffer()
     await generateResponse(swipeId)
 }
 
@@ -59,7 +59,7 @@ export const generateResponse = async (swipeId: number) => {
         Logger.log('Generation already in progress', true)
         return
     }
-    Chats.useChat.getState().startGenerating(swipeId)
+    Chats.useChatState.getState().startGenerating(swipeId)
     Logger.log(`Obtaining response.`)
     const data = performance.now()
     const appMode = getString(Global.AppMode)

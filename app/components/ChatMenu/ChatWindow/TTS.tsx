@@ -1,9 +1,9 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Logger, Style } from 'constants/Global'
 import { Chats, useInference } from 'constants/Chat'
+import { Global, Logger, Style } from 'constants/Global'
 import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'
-import { View, TouchableOpacity } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 
 type TTSProps = {
@@ -18,10 +18,7 @@ const TTS: React.FC<TTSProps> = ({ id, isLast }) => {
     const [start, setStart] = useMMKVBoolean(Global.TTSAutoStart)
     const nowGenerating = useInference((state) => state.nowGenerating)
 
-    const { message } = Chats.useChat((state) => ({
-        message:
-            state.data?.messages?.[id]?.swipes[state.data?.messages?.[id].swipe_id].swipe ?? '',
-    }))
+    const { swipeText } = Chats.useSwipeData(id)
 
     useEffect(() => {
         if (nowGenerating && isSpeaking) handleStopSpeaking()
@@ -42,14 +39,14 @@ const TTS: React.FC<TTSProps> = ({ id, isLast }) => {
         setIsSpeaking(true)
         const filter = /([!?.,*"])/
         const filteredchunks: string[] = []
-        const chunks = message.split(filter)
+        const chunks = swipeText.split(filter)
         chunks.forEach((item, index) => {
             if (!filter.test(item) && item) return filteredchunks.push(item)
             if (index > 0)
                 filteredchunks[filteredchunks.length - 1] =
                     filteredchunks[filteredchunks.length - 1] + item
         })
-        if (filteredchunks.length === 0) filteredchunks.push(message)
+        if (filteredchunks.length === 0) filteredchunks.push(swipeText)
 
         const cleanedchunks = filteredchunks.map((item) => item.replaceAll(/[*"]/g, '').trim())
         Logger.debug('TTS started with ' + cleanedchunks.length + ' chunks')

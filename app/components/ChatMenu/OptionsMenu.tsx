@@ -30,7 +30,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef, showChats }) => {
         unloadCharacter: state.unloadCard,
     }))
 
-    const unloadChat = Chats.useChat((state) => state.reset)
+    const { unloadChat } = Chats.useChat()
 
     const menuoptions: MenuData[] = [
         {

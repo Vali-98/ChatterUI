@@ -31,10 +31,7 @@ const ChracterEditor = () => {
     const getTokenCount = Tokenizer.useTokenizer((state) => state.getTokenCount)
     const [characterCard, setCharacterCard] = useState<CharacterCardData | undefined>(currentCard)
 
-    const { chat, unloadChat } = Chats.useChat((state) => ({
-        chat: state.data,
-        unloadChat: state.reset,
-    }))
+    const { chat, unloadChat } = Chats.useChat()
 
     const setShowViewer = useViewerState((state) => state.setShow)
 

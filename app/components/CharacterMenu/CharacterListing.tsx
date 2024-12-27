@@ -34,7 +34,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
         setCurrentCard: state.setCard,
     }))
 
-    const loadChat = Chats.useChat((state) => state.load)
+    const { loadChat } = Chats.useChat()
 
     const setCurrentCharacter = async (charId: number) => {
         if (nowLoading) return

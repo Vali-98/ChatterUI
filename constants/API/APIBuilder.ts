@@ -18,7 +18,7 @@ export const buildAndSendRequest = async () => {
 
     if (!requestValues) {
         Logger.log(`No Active API`, true)
-        Chats.useChat.getState().stopGenerating()
+        Chats.useChatState.getState().stopGenerating()
         return
     }
 
@@ -30,7 +30,7 @@ export const buildAndSendRequest = async () => {
     const config = configs[0]
     if (!config) {
         Logger.log(`Configuration "${requestValues?.configName}" found`, true)
-        Chats.useChat.getState().stopGenerating()
+        Chats.useChatState.getState().stopGenerating()
         return
     }
 
@@ -41,7 +41,7 @@ export const buildAndSendRequest = async () => {
 
     if (!payload) {
         Logger.log('Something Went Wrong With Payload Construction', true)
-        Chats.useChat.getState().stopGenerating()
+        Chats.useChatState.getState().stopGenerating()
         return
     }
 
@@ -108,7 +108,7 @@ const readableStreamResponse = async (
 
     const closeStream = () => {
         Logger.debug('Running Close Stream')
-        Chats.useChat.getState().stopGenerating()
+        Chats.useChatState.getState().stopGenerating()
     }
 
     useInference.getState().setAbort(async () => {
@@ -118,8 +118,8 @@ const readableStreamResponse = async (
 
     sse.setOnEvent((data) => {
         const text = jsonreader(data) ?? ''
-        const output = Chats.useChat.getState().buffer + text
-        Chats.useChat.getState().setBuffer(output.replaceAll(replace, ''))
+        const output = Chats.useChatState.getState().buffer + text
+        Chats.useChatState.getState().setBuffer(output.replaceAll(replace, ''))
     })
 
     sse.setOnError(() => {
@@ -167,7 +167,7 @@ const hordeResponse = async (
             }).catch((error) => {
                 Logger.log(error)
             })
-        Chats.useChat.getState().stopGenerating()
+        Chats.useChatState.getState().stopGenerating()
     })
 
     Logger.log(`Using Horde`)
@@ -185,12 +185,12 @@ const hordeResponse = async (
 
     if (request.status === 401) {
         Logger.log(`Invalid API Key`, true)
-        Chats.useChat.getState().stopGenerating()
+        Chats.useChatState.getState().stopGenerating()
         return
     }
     if (request.status !== 202) {
         Logger.log(`Request failed.`)
-        Chats.useChat.getState().stopGenerating()
+        Chats.useChatState.getState().stopGenerating()
         const body = await request.json()
         Logger.log(JSON.stringify(body))
         for (const e of body.errors) Logger.log(e)
@@ -217,7 +217,7 @@ const hordeResponse = async (
 
         if (response.status === 400) {
             Logger.log(`Response failed.`)
-            Chats.useChat.getState().stopGenerating()
+            Chats.useChatState.getState().stopGenerating()
             Logger.log((await response.json())?.message)
             return
         }
@@ -234,8 +234,8 @@ const hordeResponse = async (
         'g'
     )
 
-    Chats.useChat.getState().setBuffer(result.generations[0].text.replaceAll(replace, ''))
-    Chats.useChat.getState().stopGenerating()
+    Chats.useChatState.getState().setBuffer(result.generations[0].text.replaceAll(replace, ''))
+    Chats.useChatState.getState().stopGenerating()
 }
 
 const constructReplaceStrings = (): string[] => {

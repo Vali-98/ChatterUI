@@ -1,8 +1,8 @@
 import { replaceMacros } from 'constants/Characters'
+import { Characters, Chats, Global, Instructs, Logger, mmkv } from 'constants/Global'
 import { AppMode, AppSettings } from 'constants/GlobalValues'
 import { Llama } from 'constants/LlamaLocal'
 import { Tokenizer } from 'constants/Tokenizer'
-import { Characters, Chats, Global, Instructs, Logger, mmkv } from 'constants/Global'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 
@@ -14,7 +14,7 @@ export const buildTextCompletionContext = (max_length: number) => {
             ? Llama.useLlama.getState().tokenLength
             : Tokenizer.useTokenizer.getState().getTokenCount
 
-    const messages = [...(Chats.useChat.getState().data?.messages ?? [])]
+    const messages = [...(Chats.useChatState.getState().data?.messages ?? [])]
 
     const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
 
@@ -76,7 +76,7 @@ export const buildTextCompletionContext = (max_length: number) => {
 
     // we require lengths for names if use_names is enabled
     for (const message of messages.reverse()) {
-        const swipe_len = Chats.useChat.getState().getTokenCount(index)
+        const swipe_len = Chats.useChatState.getState().getTokenCount(index)
         const swipe_data = message.swipes[message.swipe_id]
 
         /** Accumulate total string length
@@ -176,7 +176,7 @@ export const buildChatCompletionContext = (
             ? Llama.useLlama.getState().tokenLength
             : Tokenizer.useTokenizer.getState().getTokenCount
 
-    const messages = [...(Chats.useChat.getState().data?.messages ?? [])]
+    const messages = [...(Chats.useChatState.getState().data?.messages ?? [])]
     const userCard = { ...Characters.useUserCard.getState().card }
     const currentCard = { ...Characters.useCharacterCard.getState().card }
     const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
@@ -188,7 +188,7 @@ export const buildChatCompletionContext = (
     const userCache = Characters.useUserCard.getState().getCache(charName)
     const instructCache = Instructs.useInstruct.getState().getCache(charName, userName)
 
-    const buffer = Chats.useChat.getState().buffer
+    const buffer = Chats.useChatState.getState().buffer
 
     // Logic here is that if the buffer is empty, this is not a regen, hence can popped
     if (!buffer) messages.pop()
@@ -230,7 +230,7 @@ export const buildChatCompletionContext = (
         const name_length = currentInstruct.names ? tokenizer(name_string) : 0
 
         const len =
-            Chats.useChat.getState().getTokenCount(index) +
+            Chats.useChatState.getState().getTokenCount(index) +
             total_length +
             name_length +
             timestamp_length

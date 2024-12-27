@@ -47,20 +47,15 @@ type EditorProps = {
 }
 
 const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, editMode }) => {
-    const { updateChat, deleteChat } = Chats.useChat(
-        useShallow((state) => ({
-            updateChat: state.updateEntry,
-            deleteChat: state.deleteEntry,
-        }))
-    )
-    const message = Chats.useChat((state) => state?.data?.messages?.[id])
+    const { deleteChat } = Chats.useChat()
+    const { updateEntry } = Chats.useEntry()
+    const { swipeText } = Chats.useSwipeData(id)
+    const entry = Chats.useEntryData(id)
 
-    const [placeholderText, setPlaceholderText] = useState(
-        message?.swipes[message?.swipe_id]?.swipe ?? ''
-    )
+    const [placeholderText, setPlaceholderText] = useState(swipeText)
 
     const handleEditMessage = () => {
-        updateChat(id, placeholderText, false)
+        updateEntry(id, placeholderText, false)
         setEditMode(false)
     }
 
@@ -99,9 +94,9 @@ const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, ed
                 <View style={{ flex: 1 }} />
                 <Animated.View exiting={SlideOutDown.duration(100)} style={styles.editorContainer}>
                     <View style={styles.topText}>
-                        <Text style={styles.nameText}>{message?.name}</Text>
+                        <Text style={styles.nameText}>{entry?.name}</Text>
                         <Text style={styles.timeText}>
-                            {message?.swipes[message.swipe_id].send_date.toLocaleTimeString()}
+                            {entry?.swipes[entry.swipe_id].send_date.toLocaleTimeString()}
                         </Text>
                     </View>
 

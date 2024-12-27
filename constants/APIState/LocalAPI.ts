@@ -102,13 +102,13 @@ class LocalAPI extends APIBase {
         const payload = this.buildPayload()
 
         const outputStream = (text: string) => {
-            const output = Chats.useChat.getState().buffer + text
-            Chats.useChat.getState().setBuffer(output.replaceAll(replace, ''))
+            const output = Chats.useChatState.getState().buffer + text
+            Chats.useChatState.getState().setBuffer(output.replaceAll(replace, ''))
         }
 
         const outputCompleted = (text: string) => {
-            const regenCache = Chats.useChat.getState().getRegenCache()
-            Chats.useChat.getState().setBuffer((regenCache + text).replaceAll(replace, ''))
+            const regenCache = Chats.useChatState.getState().getRegenCache()
+            Chats.useChatState.getState().setBuffer((regenCache + text).replaceAll(replace, ''))
             if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.log(`Completion Output:\n${text}`)
             this.stopGenerating()
         }

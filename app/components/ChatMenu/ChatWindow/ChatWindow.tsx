@@ -12,15 +12,15 @@ type ListItem = {
 }
 
 const ChatWindow = () => {
-    const data = Chats.useChat((state) => state.data)
+    const { chat } = Chats.useChat()
     const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
 
-    const list: ListItem[] = (data?.messages ?? [])
+    const list: ListItem[] = (chat?.messages ?? [])
         .map((item, index) => ({
             index: index,
             key: item.id.toString(),
             isGreeting: index === 0,
-            isLastMessage: !!data?.messages && index === data?.messages.length - 1,
+            isLastMessage: !!chat?.messages && index === chat?.messages.length - 1,
         }))
         .reverse()
 

@@ -12,25 +12,11 @@ type ChatTextProps = {
 }
 
 const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
-    const { mes, swipeId } = Chats.useChat((state) => ({
-        mes:
-            state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
-                .swipe ?? '',
+    const { swipeText, swipeId } = Chats.useSwipeData(id)
+    const { buffer } = Chats.useBuffer()
 
-        swipeId:
-            state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1].id ??
-            -1,
-    }))
     const viewRef = useRef<View>(null)
-
     const currentSwipeId = useInference((state) => state.currentSwipeId)
-
-    const { buffer } = Chats.useChat(
-        useShallow((state) => ({
-            buffer: state.buffer,
-        }))
-    )
-
     const animHeight = useAnimatedValue(-1)
     const targetHeight = useRef(-1)
     const firstRender = useRef(true)
@@ -66,7 +52,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
             return
         }
         requestAnimationFrame(() => updateHeight())
-    }, [buffer, mes, nowGenerating])
+    }, [buffer, swipeText, nowGenerating])
 
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
@@ -78,7 +64,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
                     markdownit={MarkdownStyle.Rules}
                     rules={MarkdownStyle.RenderRules}
                     style={MarkdownStyle.Styles}>
-                    {nowGenerating && swipeId === currentSwipeId ? buffer.trim() : mes.trim()}
+                    {nowGenerating && swipeId === currentSwipeId ? buffer.trim() : swipeText.trim()}
                 </Markdown>
             </View>
         </Animated.View>

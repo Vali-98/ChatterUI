@@ -1,10 +1,9 @@
 import { AntDesign } from '@expo/vector-icons'
-import { Style } from 'constants/Global'
 import { Chats } from 'constants/Chat'
+import { Style } from 'constants/Global'
 import { continueResponse, generateResponse, regenerateResponse } from 'constants/Inference'
 import React from 'react'
-import { View, Text, StyleSheet, TouchableHighlight } from 'react-native'
-import { useShallow } from 'zustand/react/shallow'
+import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 
 type SwipesProps = {
     nowGenerating: boolean
@@ -13,16 +12,8 @@ type SwipesProps = {
 }
 
 const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => {
-    const { swipeChat, addSwipe } = Chats.useChat(
-        useShallow((state) => ({
-            swipeChat: state.swipe,
-            addSwipe: state.addSwipe,
-        }))
-    )
-
-    const { message } = Chats.useChat((state) => ({
-        message: state?.data?.messages?.[index] ?? Chats.dummyEntry,
-    }))
+    const { swipeChat, addSwipe } = Chats.useSwipes()
+    const entry = Chats.useEntryData(index)
 
     const handleSwipeLeft = () => {
         swipeChat(index, -1)
@@ -38,19 +29,19 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
         }
     }
 
-    const isLastAltGreeting = isGreeting && message.swipe_id === message.swipes.length - 1
+    const isLastAltGreeting = isGreeting && entry.swipe_id === entry.swipes.length - 1
 
     return (
         <View style={styles.swipesItem}>
             <TouchableHighlight
                 style={styles.swipeButton}
                 onPress={handleSwipeLeft}
-                disabled={nowGenerating || message.swipe_id === 0}>
+                disabled={nowGenerating || entry.swipe_id === 0}>
                 <AntDesign
                     name="left"
                     size={20}
                     color={
-                        message.swipe_id === 0 || nowGenerating
+                        entry.swipe_id === 0 || nowGenerating
                             ? Style.getColor('primary-text3')
                             : Style.getColor('primary-text1')
                     }
@@ -59,10 +50,8 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
 
             {index !== 0 && (
                 <TouchableHighlight
-                    onPress={() => regenerateResponse(message.swipes[message.swipe_id].id)}
-                    onLongPress={() =>
-                        regenerateResponse(message.swipes[message.swipe_id].id, false)
-                    }
+                    onPress={() => regenerateResponse(entry.swipes[entry.swipe_id].id)}
+                    onLongPress={() => regenerateResponse(entry.swipes[entry.swipe_id].id, false)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
                     <AntDesign
@@ -78,12 +67,12 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
             )}
 
             <Text style={styles.swipeText}>
-                {message.swipe_id + 1} / {message.swipes.length}
+                {entry.swipe_id + 1} / {entry.swipes.length}
             </Text>
 
             {index !== 0 && (
                 <TouchableHighlight
-                    onPress={() => continueResponse(message.swipes[message.swipe_id].id)}
+                    onPress={() => continueResponse(entry.swipes[entry.swipe_id].id)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
                     <AntDesign
@@ -101,9 +90,7 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
             <TouchableHighlight
                 style={styles.swipeButton}
                 onPress={() => handleSwipeRight('')}
-                onLongPress={() =>
-                    handleSwipeRight(message?.swipes?.[message.swipe_id]?.swipe ?? '')
-                }
+                onLongPress={() => handleSwipeRight(entry?.swipes?.[entry.swipe_id]?.swipe ?? '')}
                 disabled={nowGenerating || isLastAltGreeting}>
                 <AntDesign
                     name="right"

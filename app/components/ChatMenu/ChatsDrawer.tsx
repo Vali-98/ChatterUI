@@ -25,10 +25,7 @@ const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShow
     const [nowLoading, setNowLoading] = useState<boolean>(false)
     const { data } = useLiveQuery(Chats.db.query.chatListQuery(charId ?? 0))
 
-    const { loadChat, currentChatId } = Chats.useChat((state) => ({
-        loadChat: state.load,
-        currentChatId: state.data?.id,
-    }))
+    const { loadChat, chatId } = Chats.useChat()
 
     const handleLoadChat = async (chatId: number) => {
         await loadChat(chatId)
@@ -45,7 +42,7 @@ const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShow
     const renderChat = (item: ListItem, index: number) => {
         const date = new Date(item.last_modified ?? 0)
         return (
-            <View style={item.id === currentChatId ? styles.chatItemActive : styles.chatItem}>
+            <View style={item.id === chatId ? styles.chatItemActive : styles.chatItem}>
                 <TouchableOpacity
                     style={{ flex: 1, paddingHorizontal: 2, paddingVertical: 8 }}
                     onPress={() => handleLoadChat(item.id)}>

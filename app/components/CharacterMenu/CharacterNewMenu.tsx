@@ -68,7 +68,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
             id: state.id,
         }))
     )
-    const loadChat = Chats.useChat((state) => state.load)
+    const { loadChat } = Chats.useChat()
 
     const router = useRouter()
     const [showNewChar, setShowNewChar] = useState<boolean>(false)

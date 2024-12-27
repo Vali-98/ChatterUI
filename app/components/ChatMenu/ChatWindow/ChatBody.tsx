@@ -1,7 +1,6 @@
 import { Chats, Style } from 'constants/Global'
 import React, { useState } from 'react'
-import { View, TouchableOpacity, StyleSheet } from 'react-native'
-import { useShallow } from 'zustand/react/shallow'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import ChatText from './ChatText'
 import ChatTextLast from './ChatTextLast'
@@ -16,11 +15,7 @@ type ChatTextProps = {
 }
 
 const ChatBody: React.FC<ChatTextProps> = ({ id, nowGenerating, isLastMessage, isGreeting }) => {
-    const { message } = Chats.useChat(
-        useShallow((state) => ({
-            message: state?.data?.messages?.[id] ?? Chats.dummyEntry,
-        }))
-    )
+    const message = Chats.useEntryData(id)
     const [editMode, setEditMode] = useState(false)
 
     const handleEnableEdit = () => {

@@ -9,11 +9,7 @@ type ChatTextProps = {
 }
 
 const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
-    const mes = Chats.useChat(
-        (state) =>
-            state?.data?.messages?.[id]?.swipes?.[state?.data?.messages?.[id].swipe_id ?? -1]
-                .swipe ?? ''
-    )
+    const { swipeText } = Chats.useSwipeData(id)
     const viewRef = useRef<View>(null)
 
     const animHeight = useAnimatedValue(-1)
@@ -47,7 +43,7 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
             return
         }
         requestAnimationFrame(() => updateHeight())
-    }, [mes])
+    }, [swipeText])
 
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
@@ -56,7 +52,7 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
                     markdownit={MarkdownStyle.Rules}
                     rules={MarkdownStyle.RenderRules}
                     style={MarkdownStyle.Styles}>
-                    {mes.trim()}
+                    {swipeText.trim()}
                 </Markdown>
             </View>
         </Animated.View>

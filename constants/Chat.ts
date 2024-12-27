@@ -3,6 +3,7 @@ import { chatEntries, chatSwipes, chats } from 'db/schema'
 import { count, desc, eq, getTableColumns } from 'drizzle-orm'
 import * as Notifications from 'expo-notifications'
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 
 import { API } from './API'
 import { Characters } from './Characters'
@@ -89,7 +90,7 @@ export const sendGenerateCompleteNotification = async () => {
         : 'Response Complete'
 
     const notificationText = showMessage
-        ? Chats.useChat.getState().buffer.trim()
+        ? Chats.useChatState.getState().buffer.trim()
         : 'ChatterUI has finished a response.'
 
     Notifications.setNotificationHandler({
@@ -136,12 +137,13 @@ export const useInference = create<InferenceStateType>((set, get) => ({
 }))
 
 export namespace Chats {
-    export const useChat = create<ChatState>((set, get: () => ChatState) => ({
+    export const useChatState = create<ChatState>((set, get: () => ChatState) => ({
         data: undefined,
         buffer: '',
         startGenerating: (swipeId: number) => {
             useInference.getState().startGenerating(swipeId)
         },
+        // TODO : Replace this function
         stopGenerating: async () => {
             const cachedSwipeId = useInference.getState().currentSwipeId
             Logger.log(`Saving Chat`)
@@ -419,11 +421,13 @@ export namespace Chats {
             }
         }
         export namespace mutate {
-            //TODO : refactor this, the requirement to pull charID is not needed, no error handling either
-            //TODO : perhaps pull data from DB instead of useCharacterCard, currently reliable BUT may fail in future
             export const createChat = async (charId: number) => {
-                const card = { ...Characters.useCharacterCard.getState().card }
-                const charName = card?.name
+                const card = await Characters.db.query.card(charId)
+                if (!card) {
+                    Logger.error('Character does not exist!')
+                    return
+                }
+                const charName = card.name
                 return await database.transaction(async (tx) => {
                     if (!card || !charName) return
                     const [{ chatId }, ..._] = await tx
@@ -615,6 +619,63 @@ export namespace Chats {
                 await database.update(chats).set({ name: name }).where(eq(chats.id, chatId))
             }
         }
+    }
+
+    export const useEntryData = (index: number) => {
+        // TODO: Investigate if dummyEntry is dangerous
+        const entry = useChatState((state) => state?.data?.messages?.[index] ?? dummyEntry)
+        return entry
+    }
+
+    export const useSwipes = () => {
+        const { swipeChat, addSwipe } = Chats.useChatState(
+            useShallow((state) => ({
+                swipeChat: state.swipe,
+                addSwipe: state.addSwipe,
+            }))
+        )
+        return { swipeChat, addSwipe }
+    }
+
+    export const useSwipeData = (index: number) => {
+        const message = useEntryData(index)
+        const swipeId = message.swipe_id
+        const swipe = message.swipes?.[swipeId]
+        const swipeText = swipe?.swipe
+        return { swipeId, swipe, swipeText }
+    }
+
+    export const useChat = () => {
+        const { loadChat, unloadChat, chat, chatId, deleteChat } = Chats.useChatState(
+            useShallow((state) => ({
+                loadChat: state.load,
+                unloadChat: state.reset,
+                chat: state.data,
+                chatId: state.data?.id,
+                deleteChat: state.delete,
+            }))
+        )
+        return { chat, loadChat, unloadChat, deleteChat, chatId }
+    }
+
+    export const useEntry = () => {
+        const { addEntry, deleteEntry, updateEntry } = Chats.useChatState(
+            useShallow((state) => ({
+                addEntry: state.addEntry,
+                deleteEntry: state.deleteEntry,
+                updateEntry: state.updateEntry,
+            }))
+        )
+        return { addEntry, deleteEntry, updateEntry }
+    }
+
+    export const useBuffer = () => {
+        const { buffer } = Chats.useChatState(
+            useShallow((state) => ({
+                buffer: state.buffer,
+            }))
+        )
+        return { buffer }
     }
 
     export const dummyEntry: ChatEntry = {
