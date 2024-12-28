@@ -13,7 +13,7 @@ type SwipesProps = {
 
 const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => {
     const { swipeChat, addSwipe } = Chats.useSwipes()
-    const entry = Chats.useEntryData(index)
+    const { swipeText, swipeId, swipeIndex, swipesLength } = Chats.useSwipeData(index)
 
     const handleSwipeLeft = () => {
         swipeChat(index, -1)
@@ -29,19 +29,19 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
         }
     }
 
-    const isLastAltGreeting = isGreeting && entry.swipe_id === entry.swipes.length - 1
+    const isLastAltGreeting = isGreeting && swipeIndex === swipesLength - 1
 
     return (
         <View style={styles.swipesItem}>
             <TouchableHighlight
                 style={styles.swipeButton}
                 onPress={handleSwipeLeft}
-                disabled={nowGenerating || entry.swipe_id === 0}>
+                disabled={nowGenerating || swipeIndex === 0}>
                 <AntDesign
                     name="left"
                     size={20}
                     color={
-                        entry.swipe_id === 0 || nowGenerating
+                        swipeIndex === 0 || nowGenerating
                             ? Style.getColor('primary-text3')
                             : Style.getColor('primary-text1')
                     }
@@ -50,8 +50,8 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
 
             {index !== 0 && (
                 <TouchableHighlight
-                    onPress={() => regenerateResponse(entry.swipes[entry.swipe_id].id)}
-                    onLongPress={() => regenerateResponse(entry.swipes[entry.swipe_id].id, false)}
+                    onPress={() => swipeId && regenerateResponse(swipeId)}
+                    onLongPress={() => swipeId && regenerateResponse(swipeId, false)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
                     <AntDesign
@@ -67,12 +67,12 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
             )}
 
             <Text style={styles.swipeText}>
-                {entry.swipe_id + 1} / {entry.swipes.length}
+                {swipeIndex + 1} / {swipesLength}
             </Text>
 
             {index !== 0 && (
                 <TouchableHighlight
-                    onPress={() => continueResponse(entry.swipes[entry.swipe_id].id)}
+                    onPress={() => swipeId && continueResponse(swipeId)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
                     <AntDesign
@@ -90,7 +90,7 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
             <TouchableHighlight
                 style={styles.swipeButton}
                 onPress={() => handleSwipeRight('')}
-                onLongPress={() => handleSwipeRight(entry?.swipes?.[entry.swipe_id]?.swipe ?? '')}
+                onLongPress={() => handleSwipeRight(swipeText ?? '')}
                 disabled={nowGenerating || isLastAltGreeting}>
                 <AntDesign
                     name="right"
