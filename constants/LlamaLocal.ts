@@ -97,6 +97,7 @@ export namespace Llama {
                 n_batch: preset.batch,
                 n_gpu_layers: Platform.OS === 'ios' ? preset.gpu_layers : 0,
                 use_mlock: true,
+                use_mmap: false,
             }
 
             let setAutoLoad = false
