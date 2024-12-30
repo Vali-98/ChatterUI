@@ -1,73 +1,26 @@
+import { useTTS } from '@constants/TTS'
 import { FontAwesome } from '@expo/vector-icons'
-import { Chats, useInference } from 'constants/Chat'
-import { Global, Logger, Style } from 'constants/Global'
-import * as Speech from 'expo-speech'
-import { useEffect, useState } from 'react'
+import { Chats } from 'constants/Chat'
+import { Logger, Style } from 'constants/Global'
 import { TouchableOpacity, View } from 'react-native'
-import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 
 type TTSProps = {
-    id: number
-    isLast?: boolean
+    index: number
 }
 
-const TTS: React.FC<TTSProps> = ({ id, isLast }) => {
-    const [isSpeaking, setIsSpeaking] = useState<boolean>(false)
-    const [currentSpeaker, setCurrentSpeaker] = useMMKVObject<Speech.Voice>(Global.TTSSpeaker)
-    const [autoTTS, setAutoTTS] = useMMKVBoolean(Global.TTSAuto)
-    const [start, setStart] = useMMKVBoolean(Global.TTSAutoStart)
-    const nowGenerating = useInference((state) => state.nowGenerating)
-
-    const { swipeText } = Chats.useSwipeData(id)
-
-    useEffect(() => {
-        if (nowGenerating && isSpeaking) handleStopSpeaking()
-    }, [nowGenerating])
-
-    useEffect(() => {
-        if (autoTTS && isLast && start) handleSpeak()
-    }, [start])
+const TTS: React.FC<TTSProps> = ({ index }) => {
+    const { startTTS, activeChatIndex, stopTTS } = useTTS()
+    const { swipeText } = Chats.useSwipeData(index)
+    const isSpeaking = index === activeChatIndex
 
     const handleSpeak = async () => {
         Logger.log('Starting TTS')
-        setStart(false)
-        if (currentSpeaker === undefined) {
-            Logger.log(`No Speaker Chosen`, true)
-            return
-        }
-        if (await Speech.isSpeakingAsync()) await Speech.stop()
-        setIsSpeaking(true)
-        const filter = /([!?.,*"])/
-        const filteredchunks: string[] = []
-        const chunks = swipeText.split(filter)
-        chunks.forEach((item, index) => {
-            if (!filter.test(item) && item) return filteredchunks.push(item)
-            if (index > 0)
-                filteredchunks[filteredchunks.length - 1] =
-                    filteredchunks[filteredchunks.length - 1] + item
-        })
-        if (filteredchunks.length === 0) filteredchunks.push(swipeText)
-
-        const cleanedchunks = filteredchunks.map((item) => item.replaceAll(/[*"]/g, '').trim())
-        Logger.debug('TTS started with ' + cleanedchunks.length + ' chunks')
-
-        cleanedchunks.forEach((chunk, index) =>
-            Speech.speak(chunk, {
-                language: currentSpeaker?.language,
-                voice: currentSpeaker?.identifier,
-                onDone: () => {
-                    index === cleanedchunks.length - 1 && setIsSpeaking(false)
-                },
-                onStopped: () => setIsSpeaking(false),
-            })
-        )
-        if (cleanedchunks.length === 0) setIsSpeaking(false)
+        await startTTS(swipeText, index)
     }
 
     const handleStopSpeaking = async () => {
         Logger.log('TTS stopped')
-        await Speech.stop()
-        setIsSpeaking(false)
+        await stopTTS()
     }
 
     return (

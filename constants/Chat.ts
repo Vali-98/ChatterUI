@@ -11,6 +11,7 @@ import { AppSettings, Global } from './GlobalValues'
 import { Llama } from './LlamaLocal'
 import { Logger } from './Logger'
 import { mmkv } from './MMKV'
+import { useTTSState } from './TTS'
 import { convertToFormatInstruct } from './TextFormat'
 import { Tokenizer } from './Tokenizer'
 import { replaceMacros } from './Utils'
@@ -152,8 +153,12 @@ export namespace Chats {
             get().setBuffer('')
 
             if (mmkv.getBoolean(Global.TTSEnable) && mmkv.getBoolean(Global.TTSAuto)) {
-                Logger.log(`Automatically using TTS`)
-                mmkv.set(Global.TTSAutoStart, JSON.stringify(true))
+                const length = get().data?.messages?.length
+                if (!length) return
+                const message = get().data?.messages?.[length - 1]
+                if (!message) return
+                await useTTSState.getState().stopTTS()
+                useTTSState.getState().startTTS(message.swipes[message.swipe_id].swipe, length - 1)
             }
         },
         load: async (chatId: number) => {

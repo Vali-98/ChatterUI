@@ -6,21 +6,21 @@ import ChatBody from './ChatBody'
 import ChatFrame from './ChatFrame'
 
 type ChatItemProps = {
-    id: number
+    index: number
     isLastMessage: boolean
     isGreeting: boolean
 }
 
-const ChatItem: React.FC<ChatItemProps> = ({ id, isLastMessage, isGreeting }) => {
+const ChatItem: React.FC<ChatItemProps> = ({ index, isLastMessage, isGreeting }) => {
     const nowGenerating = useInference((state) => state.nowGenerating)
 
     return (
         <FadeDownView>
             <View style={styles.chatItem}>
-                <ChatFrame id={id} nowGenerating={nowGenerating} isLast={isLastMessage}>
+                <ChatFrame index={index} nowGenerating={nowGenerating} isLast={isLastMessage}>
                     <ChatBody
                         nowGenerating={nowGenerating}
-                        id={id}
+                        index={index}
                         isLastMessage={isLastMessage}
                         isGreeting={isGreeting}
                     />

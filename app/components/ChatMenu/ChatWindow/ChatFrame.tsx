@@ -10,13 +10,13 @@ import TTSMenu from './TTS'
 
 type ChatFrameProps = {
     children?: ReactNode
-    id: number
+    index: number
     nowGenerating: boolean
     isLast?: boolean
 }
 
-const ChatFrame: React.FC<ChatFrameProps> = ({ children, id, nowGenerating, isLast }) => {
-    const message = Chats.useEntryData(id)
+const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, isLast }) => {
+    const message = Chats.useEntryData(index)
 
     const setShowViewer = useViewerState((state) => state.setShow)
 
@@ -49,11 +49,11 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, id, nowGenerating, isLa
                     />
                 </TouchableOpacity>
 
-                <Text style={styles.graytext}>#{id}</Text>
-                {deltaTime !== undefined && !message.is_user && id !== 0 && (
+                <Text style={styles.graytext}>#{index}</Text>
+                {deltaTime !== undefined && !message.is_user && index !== 0 && (
                     <Text style={styles.graytext}>{deltaTime}s</Text>
                 )}
-                {TTSenabled && <TTSMenu id={id} isLast={isLast} />}
+                {TTSenabled && <TTSMenu index={index} />}
             </View>
             <View style={{ flex: 1, flexDirection: 'column' }}>
                 <View style={{ flex: 1 }}>

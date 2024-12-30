@@ -5,11 +5,11 @@ import Markdown from 'react-native-markdown-display'
 
 type ChatTextProps = {
     nowGenerating: boolean
-    id: number
+    index: number
 }
 
-const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, id }) => {
-    const { swipeText } = Chats.useSwipeData(id)
+const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
+    const { swipeText } = Chats.useSwipeData(index)
     const viewRef = useRef<View>(null)
 
     const animHeight = useAnimatedValue(-1)

@@ -108,7 +108,7 @@ export const enum Global {
     TTSSpeaker = 'ttsspeaker',
     TTSEnable = 'ttsenable',
     TTSAuto = `ttsauto`,
-    TTSAutoStart = 'ttsautostart',
+    // TTSAutoStart = 'ttsautostart', // moved autoTTS to zustand state
 }
 
 export enum GenerationSettings {

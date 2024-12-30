@@ -8,14 +8,14 @@ import EditorModal from './EditorModal'
 import Swipes from './Swipes'
 
 type ChatTextProps = {
-    id: number
+    index: number
     nowGenerating: boolean
     isLastMessage: boolean
     isGreeting: boolean
 }
 
-const ChatBody: React.FC<ChatTextProps> = ({ id, nowGenerating, isLastMessage, isGreeting }) => {
-    const message = Chats.useEntryData(id)
+const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage, isGreeting }) => {
+    const message = Chats.useEntryData(index)
     const [editMode, setEditMode] = useState(false)
 
     const handleEnableEdit = () => {
@@ -29,7 +29,7 @@ const ChatBody: React.FC<ChatTextProps> = ({ id, nowGenerating, isLastMessage, i
         <View>
             {editMode && (
                 <EditorModal
-                    id={id}
+                    index={index}
                     isLastMessage={isLastMessage}
                     setEditMode={setEditMode}
                     editMode={editMode}
@@ -41,14 +41,14 @@ const ChatBody: React.FC<ChatTextProps> = ({ id, nowGenerating, isLastMessage, i
                 activeOpacity={0.7}
                 onLongPress={handleEnableEdit}>
                 {isLastMessage ? (
-                    <ChatTextLast nowGenerating={nowGenerating} id={id} />
+                    <ChatTextLast nowGenerating={nowGenerating} index={index} />
                 ) : (
-                    <ChatText nowGenerating={nowGenerating} id={id} />
+                    <ChatText nowGenerating={nowGenerating} index={index} />
                 )}
             </TouchableOpacity>
 
             {showSwipe && (
-                <Swipes index={id} nowGenerating={nowGenerating} isGreeting={isGreeting} />
+                <Swipes index={index} nowGenerating={nowGenerating} isGreeting={isGreeting} />
             )}
         </View>
     )

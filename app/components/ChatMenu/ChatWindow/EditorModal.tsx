@@ -40,26 +40,26 @@ const EditorButton = ({ name, onPress, label, color }: EditorButtonProps) => (
 )
 
 type EditorProps = {
-    id: number
+    index: number
     isLastMessage: boolean
     setEditMode: React.Dispatch<React.SetStateAction<boolean>>
     editMode: boolean
 }
 
-const EditorModal: React.FC<EditorProps> = ({ id, isLastMessage, setEditMode, editMode }) => {
+const EditorModal: React.FC<EditorProps> = ({ index, isLastMessage, setEditMode, editMode }) => {
     const { updateEntry, deleteEntry } = Chats.useEntry()
-    const { swipeText, swipe } = Chats.useSwipeData(id)
-    const entry = Chats.useEntryData(id)
+    const { swipeText, swipe } = Chats.useSwipeData(index)
+    const entry = Chats.useEntryData(index)
 
     const [placeholderText, setPlaceholderText] = useState(swipeText)
 
     const handleEditMessage = () => {
-        updateEntry(id, placeholderText, false)
+        updateEntry(index, placeholderText, false)
         setEditMode(false)
     }
 
     const handleDeleteMessage = () => {
-        deleteEntry(id)
+        deleteEntry(index)
         setEditMode(false)
     }
 
