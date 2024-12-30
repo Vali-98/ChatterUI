@@ -118,14 +118,13 @@ const styles = StyleSheet.create({
 
     swipeText: {
         color: Style.getColor('primary-text2'),
-        borderRadius: 20,
         paddingVertical: 6,
         paddingHorizontal: 8,
     },
 
     swipeButton: {
         alignItems: 'center',
-        paddingHorizontal: 24,
+        flex: 1,
         paddingVertical: 4,
     },
 })
