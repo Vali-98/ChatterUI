@@ -76,7 +76,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, setNowLoading, nowL
     }
 
     const handleExportChat = async (menuRef: MenuRef) => {
-        const name = `Chatlogs-${charName}-${item.id}.txt`.replaceAll(' ', '_')
+        const name = `Chatlogs-${charName}-${item.id}.json`.replaceAll(' ', '_')
         await saveStringToDownload(JSON.stringify(await Chats.db.query.chat(item.id)), name, 'utf8')
         menuRef.current?.close()
         Logger.log(`File: ${name} saved to downloads!`, true)
