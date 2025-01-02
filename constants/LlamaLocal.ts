@@ -4,7 +4,6 @@ import { model_data, ModelDataType } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import { getDocumentAsync } from 'expo-document-picker'
 import * as FS from 'expo-file-system'
-import { Platform } from 'react-native'
 import { create } from 'zustand'
 
 import { AppSettings, Global } from './GlobalValues'
@@ -81,6 +80,10 @@ export namespace Llama {
                 return Logger.log('Model Already Loaded!', true)
             }
 
+            if (checkGGMLDeprecated(model)) {
+                return Logger.log('Quantization No Longer Supported!', true)
+            }
+
             if (!(await FS.getInfoAsync(model.file_path)).exists) {
                 Logger.log('Model Does Not Exist!', true)
                 return
@@ -95,9 +98,6 @@ export namespace Llama {
                 n_ctx: preset.context_length,
                 n_threads: preset.threads,
                 n_batch: preset.batch,
-                n_gpu_layers: Platform.OS === 'ios' ? preset.gpu_layers : 0,
-                use_mlock: true,
-                use_mmap: false,
             }
 
             let setAutoLoad = false
@@ -393,13 +393,12 @@ export namespace Llama {
             const modelContext = await initLlama({ model: newdir, vocab_only: true })
             const modelInfo: any = modelContext.model
             const modelType = modelInfo.metadata?.['general.architecture']
-            const fileInfo = await FS.getInfoAsync(newdir)
             const modelDataEntry = {
                 context_length: modelInfo.metadata?.[modelType + '.context_length'] ?? 0,
                 file: filename,
                 file_path: newdir,
                 name: modelInfo.metadata?.['general.name'] ?? 'N/A',
-                file_size: fileInfo.exists ? fileInfo.size : 0,
+                file_size: modelInfo.size ?? 0,
                 params: modelInfo.metadata?.['general.size_label'] ?? 'N/A',
                 quantization: modelInfo.metadata?.['general.file_type'] ?? '-1',
                 architecture: modelType ?? 'N/A',
@@ -444,13 +443,12 @@ export namespace Llama {
             const modelContext = await initLlama({ model: newdir, vocab_only: true })
             const modelInfo: any = modelContext.model
             const modelType = modelInfo.metadata?.['general.architecture']
-            const fileInfo = await FS.getInfoAsync(newdir)
             const modelDataEntry = {
                 context_length: modelInfo.metadata?.[modelType + '.context_length'] ?? 0,
                 file: filename,
                 file_path: newdir,
                 name: modelInfo.metadata?.['general.name'] ?? 'N/A',
-                file_size: fileInfo.exists ? fileInfo.size : 0,
+                file_size: modelInfo.size ?? 0,
                 params: modelInfo.metadata?.['general.size_label'] ?? 'N/A',
                 quantization: modelInfo.metadata?.['general.file_type'] ?? '-1',
                 architecture: modelType ?? 'N/A',
@@ -628,8 +626,8 @@ export const GGMLNameMap = {
     [GGMLType.LLAMA_FTYPE_MOSTLY_TQ2_0]: 'TQ2_0',
 }
 
-const gb = 1024 ** 3
-const mb = 1024 ** 2
+const gb = 1000 ** 3
+const mb = 1000 ** 2
 
 /**
  * Gets a human friendly version of file size
@@ -644,4 +642,13 @@ export const readableFileSize = (size: number) => {
         const sizeInGB = size / gb
         return `${sizeInGB.toFixed(2)} GB`
     }
+}
+
+const checkGGMLDeprecated = (model: ModelDataType) => {
+    const type = parseInt(model.quantization)
+    return (
+        type === GGMLType.LLAMA_FTYPE_MOSTLY_Q4_0_4_4 ||
+        type === GGMLType.LLAMA_FTYPE_MOSTLY_Q4_0_4_8 ||
+        type === GGMLType.LLAMA_FTYPE_MOSTLY_Q4_0_8_8
+    )
 }
