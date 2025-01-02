@@ -1,6 +1,8 @@
+const IS_DEV = process.env.APP_VARIANT === 'development'
+
 module.exports = {
     expo: {
-        name: 'ChatterUI',
+        name: IS_DEV ? 'ChatterUI (DEV)' : 'ChatterUI',
         newArchEnabled: true,
         slug: 'ChatterUI',
         version: '0.8.3',
@@ -16,6 +18,7 @@ module.exports = {
         assetBundlePatterns: ['**/*'],
         ios: {
             supportsTablet: true,
+            package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
         },
         android: {
             adaptiveIcon: {
@@ -24,7 +27,7 @@ module.exports = {
                 monochromeImage: './assets/images/adaptive-icon-foreground.png',
                 backgroundColor: '#000',
             },
-            package: 'com.Vali98.ChatterUI',
+            package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
 
             /*splash: {
                 image: './assets/images/splash.png',

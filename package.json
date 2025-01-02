@@ -10,6 +10,7 @@
     "test": "jest --watchAll",
     "postinstall": "patch-package",
     "lint": "eslint .",
+    "dev": "npx cross-env APP_VARIANT=development expo run:android",
     "migrate": "npx drizzle-kit generate",
     "patchsql": "npx patch-package expo-sqlite --exclude \"\\.project|\\.cxx|build|bin\" --case-sensitive-path-filtering",
     "patchfetch": "npx patch-package expo --include '\".*fetch\\.ts$|.*NativeResponse\\.kt$\"'"
@@ -77,6 +78,7 @@
     "@types/base-64": "^1.0.2",
     "@types/react": "~18.3.12",
     "babel-preset-expo": "^12.0.1",
+    "cross-env": "^7.0.3",
     "drizzle-kit": "^0.24.2",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
