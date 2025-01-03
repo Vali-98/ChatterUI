@@ -19,6 +19,7 @@ import { Logger } from './Logger'
 import { mmkv } from './MMKV'
 import { MarkdownStyle } from './Markdown'
 import { Presets } from './Presets'
+import { SamplersManager } from './SamplerState'
 import { Style } from './Style'
 import { humanizedISO8601DateTime } from './Utils'
 
@@ -201,14 +202,14 @@ export const startupApp = () => {
 export const initializeApp = async () => {
     await generateDefaultDirectories()
 
-    await Presets.getFileList()
+    /*await Presets.getFileList()
         .then((files) => {
             if (files.length > 0) return
             mmkv.set(Global.PresetData, JSON.stringify(Presets.defaultPreset))
             Presets.saveFile('Default', Presets.defaultPreset)
             Logger.log('Created default Preset')
         })
-        .catch((error) => Logger.log(`Could not generate default Preset. Reason: ${error}`))
+        .catch((error) => Logger.log(`Could not generate default Preset. Reason: ${error}`))*/
 
     const userList = await Characters.db.query.cardList('user')
     if (!userList) {
@@ -231,12 +232,13 @@ export const initializeApp = async () => {
     })
 
     await migratePresets()
+    await migratePresets2()
     await Llama.verifyModelList()
 }
 
 export const generateDefaultDirectories = async () => {
-    // Removed: 'characters', 'instruct', 'persona',
-    const dirs = ['presets', 'lorebooks', 'models']
+    // Removed: 'characters', 'instruct', 'persona', 'presets'
+    const dirs = ['lorebooks', 'models']
 
     dirs.map(async (dir: string) => {
         await FS.makeDirectoryAsync(`${FS.documentDirectory}${dir}`, {})
@@ -284,4 +286,21 @@ export const migratePresets = async () => {
         .catch(() => {})
 }
 
-const migratePresets2 = async () => {}
+const migratePresets2 = async () => {
+    const presetDir = `${FS.documentDirectory}presets`
+    const files = await FS.readDirectoryAsync(presetDir)
+    if (files.length === 0) return
+
+    files.map(async (item) => {
+        try {
+            const data = await FS.readAsStringAsync(`${presetDir}/${item}`)
+            SamplersManager.useSamplerState.getState().addSamplerConfig({
+                data: JSON.parse(data),
+                name: item.replace('.json', ''),
+            })
+        } catch (e) {
+            Logger.log(`Failed to migrate preset ${item}: ${e}`)
+        }
+    })
+    await FS.deleteAsync(presetDir)
+}
