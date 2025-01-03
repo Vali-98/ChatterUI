@@ -1,0 +1,31 @@
+diff --git a/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt b/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt
+index 12cd12b..f2fefbc 100644
+--- a/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt
++++ b/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt
+@@ -237,6 +237,7 @@ class SQLiteModule : Module() {
+     if (database.openOptions.enableChangeListener) {
+       addUpdateHook(database)
+     }
++    loadSQLiteVecExtension(database)
+   }
+ 
+   @Throws(AccessClosedResourceException::class, SQLiteErrorException::class)
+@@ -369,6 +370,18 @@ class SQLiteModule : Module() {
+     }
+   }
+ 
++  private fun loadSQLiteVecExtension(database: NativeDatabase) {
++    var errCode = database.ref.sqlite3_enable_load_extension(1)
++    if (errCode != NativeDatabaseBinding.SQLITE_OK) {
++      Log.e(TAG, "Failed to enable sqlite3 extensions - errCode[$errCode]")
++      return
++    }
++    errCode = database.ref.sqlite3_load_extension("libsqlitevec", "sqlite3_vec_init")
++    if (errCode != NativeDatabaseBinding.SQLITE_OK) {
++      Log.e(TAG, "Failed to load crsqlite extension - errCode[$errCode]")
++    }
++  }
++
+   private fun addUpdateHook(database: NativeDatabase) {
+     database.ref.enableUpdateHook { databaseName, tableName, operationType, rowID ->
+       if (!hasListeners) {
