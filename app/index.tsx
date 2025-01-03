@@ -58,6 +58,7 @@ const Home = () => {
             </View>
         )
     if (!firstRender && success) return <ChatMenu />
+    return <BlankTitle />
 }
 
 export default Home
