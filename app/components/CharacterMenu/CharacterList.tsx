@@ -1,3 +1,4 @@
+import FadeDownView from '@components/FadeDownView'
 import { AntDesign } from '@expo/vector-icons'
 import { CharInfo } from 'constants/Characters'
 import { Characters, Style } from 'constants/Global'
@@ -109,8 +110,9 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
     const [textFilter, setTextFilter] = useState('')
 
     const [sortType, setSortType] = useState<SortType>(SortType.RECENT_DESC)
-    const { data } = useLiveQuery(Characters.db.query.cardListQuery('character', 'modified'))
-
+    const { data, updatedAt } = useLiveQuery(
+        Characters.db.query.cardListQuery('character', 'modified')
+    )
     const characterList: CharInfo[] = data
         .map((item) => ({
             ...item,
@@ -153,10 +155,10 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                 }}
             />
 
-            {characterList.length === 0 && !showSearch && <CharactersEmpty />}
+            {characterList.length === 0 && !showSearch && updatedAt && <CharactersEmpty />}
 
             {(characterList.length !== 0 || showSearch) && (
-                <View>
+                <FadeDownView duration={100}>
                     <View
                         style={{
                             flexDirection: 'row',
@@ -171,7 +173,11 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                                 flexDirection: 'row',
                                 alignItems: 'center',
                             }}>
-                            <Text style={{ color: Style.getColor('primary-text2'), fontSize: 16 }}>
+                            <Text
+                                style={{
+                                    color: Style.getColor('primary-text2'),
+                                    fontSize: 16,
+                                }}>
                                 Sort By
                             </Text>
                             <SortButton
@@ -268,7 +274,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                             />
                         )}
                     />
-                </View>
+                </FadeDownView>
             )}
 
             {characterList.length === 0 && showSearch && <CharactersSearchEmpty />}
