@@ -33,25 +33,28 @@ const SliderInput: React.FC<SliderInputProps> = ({
 
     // This effect ensures that if `value` updates from the parent, this text is properly updated
     useEffect(() => {
-        if (parseFloat(textValue) !== value) setTextValue(value.toString())
+        if (parseFloat(textValue) !== value)
+            setTextValue(clamp(value, min, max, precision).toString())
     }, [value])
 
+    const clampSlider = (value: number) => clamp(value, min, max, precision)
+
     const handleSliderChange = (v: number) => {
-        if (!isNaN(clamp(v, min, max, precision))) onValueChange(v)
-        setTextValue(v.toString())
+        if (!isNaN(clampSlider(v))) onValueChange(clampSlider(v))
+        setTextValue(clampSlider(v).toString())
     }
 
     const handleTextInputChange = (t: string) => {
         let v = 0
         setTextValue(t)
         v = parseFloat(t)
-        if (!isNaN(v)) onValueChange(clamp(v, min, max, precision))
+        if (!isNaN(v)) onValueChange(clampSlider(v))
     }
 
     const handleEndEdit = () => {
         const v = parseFloat(textValue)
         if (!isNaN(v)) onValueChange(clamp(v, min, max, precision))
-        setTextValue(value.toString())
+        setTextValue(clampSlider(value).toString())
     }
 
     return (
