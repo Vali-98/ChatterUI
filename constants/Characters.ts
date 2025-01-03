@@ -69,7 +69,6 @@ export namespace Characters {
                 setCard: async (id: number) => {
                     const card = await db.query.card(id)
                     set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
-                    mmkv.set(Global.UserID, id)
                     return card?.name
                 },
                 unloadCard: () => {

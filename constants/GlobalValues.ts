@@ -19,9 +19,11 @@ export const enum Global {
 
     // NowGenerating = 'nowgenerating', // generation signal == removed since migrtion of generating state to db
 
-    // RecentMessages = 'recentmessages', == removed since character list rework to include last_modified
+    // RecentMessages = 'recentmessages', // removed since character list rework to include last_modified
 
-    // InstructID = 'instructid', == removed with instruct persist
+    // InstructID = 'instructid', // removed with instruct persist
+
+    // UserID = 'userid', // moved to zustand state
 
     // Management
 
@@ -32,15 +34,12 @@ export const enum Global {
     AppMode = 'appmode',
     // User
 
-    // TODO: use zustand persist to remove this
-    UserID = 'userid',
-
     // Chat
 
     // Instruct
 
     // Presets
-
+    // TODO: Remove once migration complete
     PresetID = 'presetID',
     PresetData = 'presetdata',
     PresetName = 'presetdame',
@@ -50,6 +49,11 @@ export const enum Global {
     LorebookNames = 'lorebooknames',
 
     // APIs
+
+    /**
+     * These values are now only used for the legacy system
+     * Will likely be removed in future
+     */
 
     APIType = 'endpointtype', // name of current api mode
 
@@ -76,20 +80,10 @@ export const enum Global {
     OpenAIKey = 'openaikey',
     OpenAIModel = 'openaimodel',
 
-    // Local
-
-    // object containing model info object based on db schema, needed for auto-loading
-    LocalModel = 'localmodel',
-    // preset values for model cpu specs
-    LocalPreset = 'localpreset',
-    // whether or not a KV cache has been loaded
-    LocalSessionLoaded = 'localsessionloaded',
-
     OpenRouterModel = 'openroutermodel',
     OpenRouterKey = 'openrouterkey',
 
     OllamaModel = 'ollamamodel',
-    //OllamaKey = 'ollamakey',
     OllamaEndpoint = 'ollamaendpoint',
 
     ClaudeModel = 'claudemodel',
@@ -105,6 +99,16 @@ export const enum Global {
     CohereKey = 'coherekey',
     CohereModel = 'coheremodel',
 
+    // Local
+
+    // object containing model info object based on db schema, needed for auto-loading
+    LocalModel = 'localmodel',
+    // preset values for model cpu specs
+    LocalPreset = 'localpreset',
+    // whether or not a KV cache has been loaded
+    LocalSessionLoaded = 'localsessionloaded',
+
+    // TODO move to AppSettings
     TTSSpeaker = 'ttsspeaker',
     TTSEnable = 'ttsenable',
     TTSAuto = `ttsauto`,
@@ -148,6 +152,7 @@ export enum AppMode {
 
 /**
  * Default settings on first install
+ * TODO: Remove primary hue to simply
  */
 export const AppSettingsDefault: Record<AppSettings, boolean | number> = {
     [AppSettings.AnimateEditor]: true,
