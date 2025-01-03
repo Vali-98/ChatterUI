@@ -372,46 +372,19 @@ export namespace Llama {
 
     type ModelData = Omit<ModelDataType, 'id' | 'create_date' | 'last_modified'>
 
-    export const createModelData = async (filename: string, deleteOnFailure: boolean = false) => {
-        const newdir = `${model_dir}${filename}`
-        const initialModelEntry = {
-            context_length: 0,
-            file: filename,
-            file_path: newdir,
-            name: 'N/A',
-            file_size: 0,
-            params: 'N/A',
-            quantization: '-1',
-            architecture: 'N/A',
-        }
-        const [{ id }, ...rest] = await db
-            .insert(model_data)
-            .values(initialModelEntry)
-            .returning({ id: model_data.id })
+    const initialModelEntry = (filename: string, file_path: string) => ({
+        context_length: 0,
+        file: filename,
+        file_path: file_path,
+        name: 'N/A',
+        file_size: 0,
+        params: 'N/A',
+        quantization: '-1',
+        architecture: 'N/A',
+    })
 
-        try {
-            const modelContext = await initLlama({ model: newdir, vocab_only: true })
-            const modelInfo: any = modelContext.model
-            const modelType = modelInfo.metadata?.['general.architecture']
-            const modelDataEntry = {
-                context_length: modelInfo.metadata?.[modelType + '.context_length'] ?? 0,
-                file: filename,
-                file_path: newdir,
-                name: modelInfo.metadata?.['general.name'] ?? 'N/A',
-                file_size: modelInfo.size ?? 0,
-                params: modelInfo.metadata?.['general.size_label'] ?? 'N/A',
-                quantization: modelInfo.metadata?.['general.file_type'] ?? '-1',
-                architecture: modelType ?? 'N/A',
-            }
-            Logger.log(`New Model Data:\n${modelDataText(modelDataEntry)}`)
-            await modelContext.release()
-            await db.update(model_data).set(modelDataEntry).where(eq(model_data.id, id))
-            return true
-        } catch (e) {
-            Logger.log(`Failed to create data: ${e}`, true)
-            if (deleteOnFailure) FS.deleteAsync(newdir, { idempotent: true })
-            return false
-        }
+    export const createModelData = async (filename: string, deleteOnFailure: boolean = false) => {
+        return setModelDataInternal(filename, `${model_dir}${filename}`, deleteOnFailure)
     }
 
     export const createModelDataExternal = async (
@@ -423,30 +396,27 @@ export namespace Llama {
             Logger.log('Filename invalid, Import Failed', true)
             return
         }
+        return setModelDataInternal(filename, newdir, deleteOnFailure)
+    }
 
-        const initialModelEntry = {
-            context_length: 0,
-            file: filename,
-            file_path: newdir,
-            name: 'N/A',
-            file_size: 0,
-            params: 'N/A',
-            quantization: '-1',
-            architecture: 'N/A',
-        }
-        const [{ id }, ...rest] = await db
-            .insert(model_data)
-            .values(initialModelEntry)
-            .returning({ id: model_data.id })
-
+    const setModelDataInternal = async (
+        filename: string,
+        file_path: string,
+        deleteOnFailure: boolean
+    ) => {
         try {
-            const modelContext = await initLlama({ model: newdir, vocab_only: true })
+            const [{ id }, ...rest] = await db
+                .insert(model_data)
+                .values(initialModelEntry(filename, file_path))
+                .returning({ id: model_data.id })
+
+            const modelContext = await initLlama({ model: file_path, vocab_only: true })
             const modelInfo: any = modelContext.model
             const modelType = modelInfo.metadata?.['general.architecture']
             const modelDataEntry = {
                 context_length: modelInfo.metadata?.[modelType + '.context_length'] ?? 0,
                 file: filename,
-                file_path: newdir,
+                file_path: file_path,
                 name: modelInfo.metadata?.['general.name'] ?? 'N/A',
                 file_size: modelInfo.size ?? 0,
                 params: modelInfo.metadata?.['general.size_label'] ?? 'N/A',
@@ -455,12 +425,11 @@ export namespace Llama {
             }
             Logger.log(`New Model Data:\n${modelDataText(modelDataEntry)}`)
             await modelContext.release()
-
             await db.update(model_data).set(modelDataEntry).where(eq(model_data.id, id))
             return true
         } catch (e) {
             Logger.log(`Failed to create data: ${e}`, true)
-            if (deleteOnFailure) FS.deleteAsync(newdir, { idempotent: true })
+            if (deleteOnFailure) FS.deleteAsync(file_path, { idempotent: true })
             return false
         }
     }
