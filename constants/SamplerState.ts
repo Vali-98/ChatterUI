@@ -1,9 +1,9 @@
-import { Logger } from '@globals'
 import { getDocumentAsync } from 'expo-document-picker'
 import { EncodingType, readAsStringAsync } from 'expo-file-system'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
+import { Logger } from './Logger'
 import { mmkvStorage } from './MMKV'
 import { defaultSamplerConfig, SamplerConfigData, SamplerID, Samplers } from './SamplerData'
 
@@ -29,6 +29,11 @@ export namespace SamplersManager {
                 currentConfigIndex: 0,
                 configList: [{ name: 'Default', data: defaultSamplerConfig }],
                 addSamplerConfig: (config) => {
+                    const configs = get().configList
+                    if (configs.some((item) => item.name === config.name)) {
+                        Logger.log(`Sampler Config "${config.name}" already exists!`, true)
+                        return
+                    }
                     config.data = fixSamplerConfig(config.data)
                     set((state) => ({
                         ...state,
@@ -153,12 +158,11 @@ export namespace SamplersManager {
 
 export const fixSamplerConfig = (config: SamplerConfigData) => {
     const existingKeys = Object.keys(config)
-    const defaultKeys = Object.keys(SamplerID) as SamplerID[]
+    const defaultKeys = Object.values(SamplerID) as SamplerID[]
     let samekeys = true
     defaultKeys.map((key) => {
         if (key === SamplerID.SEED && typeof config[key] === 'string')
             config[key] = parseInt(config[key])
-
         if (existingKeys.includes(key)) return
         const data = Samplers[key].values.default
         config[key] = data
