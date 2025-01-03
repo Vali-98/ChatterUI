@@ -129,14 +129,15 @@ export const startupApp = () => {
         mmkv.set(Global.OpenAIModel, JSON.stringify({}))
 
     // This was in case of initializing new data into Presets, may change with SQL migration
-    mmkv.set(
+    //@TODO: Migrate old preset system
+    /*mmkv.set(
         Global.PresetData,
         Presets.fixPreset(
             JSON.parse(mmkv.getString(Global.PresetData) ?? '{}'),
             mmkv.getString(Global.PresetName),
             true
         )
-    )
+    )*/
 
     // default horde [0000000000] key is needed
     if (!mmkv.getString(Global.HordeKey)) mmkv.set(Global.HordeKey, '0000000000')
@@ -283,4 +284,4 @@ export const migratePresets = async () => {
         .catch(() => {})
 }
 
-// TODO: Migrate to db
+const migratePresets2 = async () => {}

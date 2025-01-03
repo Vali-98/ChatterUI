@@ -5,17 +5,18 @@ import SliderInput from '@components/SliderInput'
 import TextBox from '@components/TextBox'
 import TextBoxModal from '@components/TextBoxModal'
 import { APISampler } from '@constants/APIState/BaseAPI'
+import { SamplersManager } from '@constants/SamplerState'
 import { FontAwesome } from '@expo/vector-icons'
 import { APIState as APIStateNew } from 'constants/API/APIManagerState'
 import { APIState } from 'constants/APIState'
-import { API, Global, Logger, Presets, saveStringToDownload, Style } from 'constants/Global'
+import { API, Global, Logger, saveStringToDownload, Style } from 'constants/Global'
 import { AppMode, AppSettings } from 'constants/GlobalValues'
-import { SamplerConfigData, Samplers } from 'constants/SamplerData'
+import { Samplers } from 'constants/SamplerData'
 import { Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
-import { useMMKVBoolean, useMMKVObject, useMMKVString } from 'react-native-mmkv'
+import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 
 type PresetLabel = {
     label: string
@@ -24,29 +25,19 @@ type PresetLabel = {
 const SamplerMenu = () => {
     const [APIType, setAPIType] = useMMKVString(Global.APIType)
     const [appMode, setAppMode] = useMMKVString(Global.AppMode)
-    const [presetName, setPresetName] = useMMKVString(Global.PresetName)
-    const [currentPreset, setCurrentPreset] = useMMKVObject<SamplerConfigData>(Global.PresetData)
-    const [presetList, setPresetList] = useState<PresetLabel[]>([])
     const [showNewPreset, setShowNewPreset] = useState<boolean>(false)
 
-    const loadPresetList = (name: string = '') => {
-        Presets.getFileList().then((list) => {
-            const cleanlist = list.map((item) => {
-                return item.replace(`.json`, '')
-            })
-            const mainlist: any = cleanlist.map((item) => {
-                return { label: item }
-            })
-            setPresetList(mainlist)
-            // after deletion, preset may not exist and needs to be changed
-            if (cleanlist.includes(name)) return
-            setPresetName(cleanlist[0])
-            Presets.loadFile(cleanlist[0]).then((text) => setCurrentPreset(JSON.parse(text)))
-        })
-    }
+    const {
+        addSamplerConfig,
+        deleteSamplerConfig,
+        changeConfig,
+        updateCurrentConfig,
+        currentConfigIndex,
+        currentConfig,
+        configList,
+    } = SamplersManager.useSamplers()
 
     useEffect(() => {
-        loadPresetList(presetName ?? '')
         setSamplerList(getSamplerList())
     }, [])
 
@@ -85,17 +76,12 @@ const SamplerMenu = () => {
                             return
                         }
 
-                        for (const item of presetList)
-                            if (item.label === text) {
+                        for (const item of configList)
+                            if (item.name === text) {
                                 Logger.log(`Preset name already exists.`, true)
                                 return
                             }
-                        if (currentPreset)
-                            Presets.saveFile(text, currentPreset).then(() => {
-                                Logger.log(`Preset created.`, true)
-                                loadPresetList(text)
-                                setPresetName((currentPreset) => text)
-                            })
+                        addSamplerConfig(currentConfig)
                     }}
                 />
 
@@ -108,26 +94,20 @@ const SamplerMenu = () => {
 
                 <View style={styles.dropdownContainer}>
                     <Dropdown
-                        value={presetName}
-                        data={presetList}
-                        valueField="label"
-                        labelField="label"
+                        value={currentConfig.name}
+                        data={configList}
+                        valueField="name"
+                        labelField="name"
                         onChange={(item) => {
-                            if (item.label === presetName) return
-                            setPresetName(item.label)
-                            Presets.loadFile(item.label).then((preset) => {
-                                setCurrentPreset(JSON.parse(preset))
-                            })
+                            if (item.name === currentConfig.name) return
+                            changeConfig(configList.indexOf(item))
                         }}
                         {...Style.drawer.default}
                     />
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
-                            if (presetName && currentPreset)
-                                Presets.saveFile(presetName, currentPreset).then(() =>
-                                    Logger.log(`Preset Updated!`, true)
-                                )
+                            //TODO: this may no longer be needed
                         }}>
                         <FontAwesome
                             size={24}
@@ -139,23 +119,20 @@ const SamplerMenu = () => {
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
-                            if (presetList.length === 1) {
+                            if (configList.length === 1) {
                                 Logger.log(`Cannot Delete Last Preset.`, true)
                                 return
                             }
 
                             Alert.alert({
                                 title: `Delete Preset`,
-                                description: `Are you sure you want to delete '${presetName}'?`,
+                                description: `Are you sure you want to delete '${currentConfig.name}'?`,
                                 buttons: [
                                     { label: 'Cancel' },
                                     {
                                         label: 'Delete Preset',
                                         onPress: async () => {
-                                            presetName &&
-                                                Presets.deleteFile(presetName).then(() => {
-                                                    loadPresetList()
-                                                })
+                                            deleteSamplerConfig(currentConfigIndex)
                                         },
                                         type: 'warning',
                                     },
@@ -172,16 +149,7 @@ const SamplerMenu = () => {
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
-                            Presets.uploadFile().then((name) => {
-                                if (name === undefined) {
-                                    return
-                                }
-                                Presets.loadFile(name).then((preset) => {
-                                    setCurrentPreset(JSON.parse(preset))
-                                    setPresetName(name)
-                                    loadPresetList(name)
-                                })
-                            })
+                            //`TODO`: new routine
                         }}>
                         <FontAwesome
                             size={24}
@@ -194,8 +162,8 @@ const SamplerMenu = () => {
                         style={styles.button}
                         onPress={async () => {
                             saveStringToDownload(
-                                JSON.stringify(currentPreset),
-                                `${presetName}.json`,
+                                JSON.stringify(currentConfig.data),
+                                `${currentConfig.name}.json`,
                                 'utf8'
                             ).then(() => {
                                 Logger.log('Downloaded Sampler Preset!')
@@ -223,7 +191,7 @@ const SamplerMenu = () => {
 
                 <ScrollView>
                     <View style={styles.mainContainer}>
-                        {currentPreset &&
+                        {currentConfig &&
                             samplerList?.map((item, index) => {
                                 const samplerItem = Samplers?.[item.samplerID]
                                 if (!samplerItem)
@@ -240,14 +208,17 @@ const SamplerMenu = () => {
                                                 <SliderInput
                                                     key={item.samplerID}
                                                     value={
-                                                        currentPreset[
+                                                        currentConfig.data[
                                                             samplerItem.internalID
                                                         ] as number
                                                     }
                                                     onValueChange={(value) => {
-                                                        setCurrentPreset({
-                                                            ...currentPreset,
-                                                            [samplerItem.internalID]: value,
+                                                        updateCurrentConfig({
+                                                            ...currentConfig,
+                                                            data: {
+                                                                ...currentConfig.data,
+                                                                [samplerItem.internalID]: value,
+                                                            },
                                                         })
                                                     }}
                                                     label={samplerItem.friendlyName}
@@ -261,12 +232,17 @@ const SamplerMenu = () => {
                                     case 'checkbox':
                                         return (
                                             <CheckboxTitle
-                                                value={currentPreset[item.samplerID] as boolean}
+                                                value={
+                                                    currentConfig.data[item.samplerID] as boolean
+                                                }
                                                 key={item.samplerID}
                                                 onChangeValue={(b) => {
-                                                    setCurrentPreset({
-                                                        ...currentPreset,
-                                                        [item.samplerID]: b,
+                                                    updateCurrentConfig({
+                                                        ...currentConfig,
+                                                        data: {
+                                                            ...currentConfig.data,
+                                                            [samplerItem.internalID]: b,
+                                                        },
                                                     })
                                                 }}
                                                 name={samplerItem.friendlyName}
@@ -277,8 +253,13 @@ const SamplerMenu = () => {
                                             <TextBox
                                                 key={item.samplerID}
                                                 varname={samplerItem.internalID}
-                                                body={currentPreset}
-                                                setValue={setCurrentPreset}
+                                                body={currentConfig.data}
+                                                setValue={(data) => {
+                                                    updateCurrentConfig({
+                                                        ...currentConfig,
+                                                        data: data,
+                                                    })
+                                                }}
                                                 name={samplerItem.friendlyName}
                                             />
                                         )

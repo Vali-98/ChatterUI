@@ -4,9 +4,9 @@ import * as FS from 'expo-file-system'
 import { Global } from './GlobalValues'
 import { Logger } from './Logger'
 import { mmkv } from './MMKV'
-import { SamplerID, SamplerPreset, Samplers } from './SamplerData'
+import { SamplerID, SamplerConfigData, Samplers } from './SamplerData'
 
-export type SamplerField = keyof SamplerPreset
+export type SamplerField = keyof SamplerConfigData
 
 export namespace Presets {
     const presetdir = `${FS.documentDirectory}presets/`
@@ -15,7 +15,7 @@ export namespace Presets {
 
     export const defaultPreset = (Object.keys(Samplers) as SamplerID[])
         .map((key) => ({ id: key, value: Samplers[key].values.default }))
-        .reduce((a, b) => (a = { ...a, [b.id]: b.value }), {}) as SamplerPreset
+        .reduce((a, b) => (a = { ...a, [b.id]: b.value }), {}) as SamplerConfigData
 
     export const fixPreset = (preset: any, presetname = '', fixmmkv = false) => {
         const existingKeys = Object.keys(preset)
@@ -46,7 +46,7 @@ export namespace Presets {
         })
     }
 
-    export const saveFile = async (name: string, preset: SamplerPreset) => {
+    export const saveFile = async (name: string, preset: SamplerConfigData) => {
         return FS.writeAsStringAsync(getPresetDir(name), JSON.stringify(preset), {
             encoding: FS.EncodingType.UTF8,
         })

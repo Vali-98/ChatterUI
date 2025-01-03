@@ -713,7 +713,7 @@ type SamplerValueMap = {
     [ID in keyof typeof Samplers]: ValueType<(typeof Samplers)[ID]['values']>
 }
 
-export type SamplerPreset = {
+export type SamplerConfigData = {
     -readonly [ID in keyof SamplerValueMap]: SamplerValueMap[ID]
 }
 
@@ -725,3 +725,7 @@ export const createMarkdownRows = () => {
     const out = items.join('\n')
     console.log(out)
 }
+
+export const defaultSamplerConfig = (Object.keys(Samplers) as SamplerID[])
+    .map((key) => ({ id: key, value: Samplers[key].values.default }))
+    .reduce((a, b) => (a = { ...a, [b.id]: b.value }), {}) as SamplerConfigData

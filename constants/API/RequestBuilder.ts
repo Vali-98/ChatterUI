@@ -1,6 +1,7 @@
+import { SamplersManager } from '@constants/SamplerState'
 import { APISampler } from 'constants/APIState/BaseAPI'
 import { Global, Instructs, mmkv } from 'constants/Global'
-import { SamplerID, SamplerPreset, Samplers } from 'constants/SamplerData'
+import { SamplerID, SamplerConfigData, Samplers } from 'constants/SamplerData'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import { buildChatCompletionContext, buildTextCompletionContext } from './ContextBuilder'
@@ -100,14 +101,7 @@ const customRequest = (config: APIConfiguration, values: APIValues) => {
 
     let length = 0
 
-    let sampler: SamplerPreset | undefined = undefined
-    const samplerRaw = mmkv.getString(Global.PresetData)
-    if (samplerRaw)
-        try {
-            sampler = JSON.parse(samplerRaw)
-            if (!sampler) return {}
-            length = sampler.max_length as number
-        } catch (e) {}
+    const sampler = SamplersManager.getCurrentSampler()
 
     if (config.model.useModelContextLength) {
         length = getModelContextLength(config, values) ?? 0
@@ -200,14 +194,11 @@ const getModelContextLength = (config: APIConfiguration, values: APIValues): num
 }
 
 const getSamplerFields = (config: APIConfiguration, values: APIValues) => {
-    //TODO: Get From Preset and construct
-    const data = mmkv.getString(Global.PresetData)
     let max_length = undefined
     if (config.model.useModelContextLength) {
         max_length = getModelContextLength(config, values)
     }
-    if (!data) return
-    const preset: SamplerPreset = JSON.parse(data)
+    const preset = SamplersManager.getCurrentSampler()
     return [...config.request.samplerFields]
         .map((item: APISampler) => {
             const value = preset[item.samplerID]

@@ -1,4 +1,5 @@
 import { SSEFetch } from '@constants/SSEFetch'
+import { SamplersManager } from '@constants/SamplerState'
 import { Characters } from 'constants/Characters'
 import { Chats, useInference } from 'constants/Chat'
 import { API } from 'constants/Global'
@@ -10,7 +11,7 @@ import { mmkv } from 'constants/MMKV'
 import { Tokenizer } from 'constants/Tokenizer'
 import { replaceMacros } from 'constants/Utils'
 
-import { SamplerID, SamplerPreset, Samplers } from '../SamplerData'
+import { SamplerID, SamplerConfigData, Samplers } from '../SamplerData'
 
 export type APISampler = {
     samplerID: SamplerID
@@ -28,10 +29,7 @@ export abstract class APIBase implements IAPIBase {
     samplers: APISampler[] = []
     buildPayload = () => {}
     getSamplerFields = (max_length?: number) => {
-        //TODO: Get From Preset and construct
-        const data = mmkv.getString(Global.PresetData)
-        if (!data) return
-        const preset: SamplerPreset = JSON.parse(data)
+        const preset: SamplerConfigData = SamplersManager.getCurrentSampler()
         return [...this.samplers]
             .map((item: APISampler) => {
                 const value = preset[item.samplerID]

@@ -8,10 +8,6 @@ import { APIState } from './APIManagerState'
 import { buildRequest } from './RequestBuilder'
 
 export const buildAndSendRequest = async () => {
-    // get values from some global API values state
-    // probably store all APIValues and custom configs in a persist zustand store, as they have so few keys
-    // and are not prone to changes
-    // TODO : Change this to state
     const requestValues = APIState.useAPIState
         .getState()
         .values.find((item, index) => index === APIState.useAPIState.getState().activeIndex)

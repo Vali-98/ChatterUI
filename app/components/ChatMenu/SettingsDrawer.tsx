@@ -86,7 +86,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
     const paths: ButtonData[] = [
         {
             name: 'Sampler',
-            path: '/SamplerMenu',
+            path: '/SamplerMenuNew',
             icon: 'barschart',
         },
         {
