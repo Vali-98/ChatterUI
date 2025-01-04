@@ -84,8 +84,8 @@ export namespace SamplersManager {
                 storage: createJSONStorage(() => mmkvStorage),
                 version: 1,
                 partialize: (state) => ({
-                    samplerConfig: state.configList,
-                    currentPresetIndex: state.currentConfigIndex,
+                    configList: state.configList,
+                    currentConfigIndex: state.currentConfigIndex,
                 }),
                 migrate: async (persistedState: any, version) => {
                     //no migrations yet
