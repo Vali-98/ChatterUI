@@ -232,7 +232,6 @@ export const initializeApp = async () => {
     })
 
     await migratePresets()
-    await migratePresets2()
     await Llama.verifyModelList()
 }
 
@@ -247,46 +246,7 @@ export const generateDefaultDirectories = async () => {
     })
 }
 
-// Migrate seperated presets from 0.4.2 to unified presets
-// few use, probably safe to delete
-export const migratePresets = async () => {
-    return FS.readDirectoryAsync(`${FS.documentDirectory}presets/kai`)
-        .then(async () => {
-            // move all files
-            // delete /kai /tgwui /novelai
-            const dirs = ['/kai', '/tgwui', '/novelai']
-            Logger.log('Migrating old presets.')
-            let count = 1
-            dirs.map(
-                async (dir) =>
-                    await FS.readDirectoryAsync(`${FS.documentDirectory}presets${dir}`).then(
-                        async (files) => {
-                            const names: any = []
-                            files.map(async (file) => {
-                                if (names.includes(file)) {
-                                    await FS.copyAsync({
-                                        from: `${FS.documentDirectory}presets${dir}/${file}`,
-                                        to: `${FS.documentDirectory}presets/${count}-${file}`,
-                                    })
-                                    count = count + 1
-                                } else {
-                                    names.push(file)
-                                    await FS.copyAsync({
-                                        from: `${FS.documentDirectory}presets${dir}/${file}`,
-                                        to: `${FS.documentDirectory}presets/${file}`,
-                                    })
-                                }
-                            })
-                            await FS.deleteAsync(`${FS.documentDirectory}presets${dir}`)
-                        }
-                    )
-            )
-            Logger.log('Migration successful.')
-        })
-        .catch(() => {})
-}
-
-const migratePresets2 = async () => {
+const migratePresets = async () => {
     const presetDir = `${FS.documentDirectory}presets`
     const files = await FS.readDirectoryAsync(presetDir)
     if (files.length === 0) return
