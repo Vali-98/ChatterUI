@@ -11,9 +11,8 @@ type TemplateItemProps = {
 }
 
 const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
-    const { removeTemplate, editValue } = APIState.useAPIState((state) => ({
+    const { removeTemplate } = APIState.useAPIState((state) => ({
         removeTemplate: state.removeTemplate,
-        editValue: state.editValue,
     }))
 
     const handleDelete = () => {
