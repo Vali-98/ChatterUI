@@ -15,7 +15,7 @@ import ModelNewMenu from './ModelNewMenu'
 import ModelSettings from './ModelSettings'
 
 const ModelManager = () => {
-    const { data } = useLiveQuery(Llama.getModelListQuery())
+    const { data, updatedAt } = useLiveQuery(Llama.getModelListQuery())
 
     const [showSettings, setShowSettings] = useState(false)
 
@@ -61,7 +61,7 @@ const ModelManager = () => {
                                 </Text>
                             </View>
                         )}
-                        {!modelImporting && !modelLoading && data.length === 0 && (
+                        {!modelImporting && !modelLoading && data.length === 0 && updatedAt && (
                             <View>
                                 <Text style={styles.hint}>
                                     Hint: Press <AntDesign name="addfile" size={16} /> and import a
@@ -117,7 +117,7 @@ const ModelManager = () => {
                         )}
                     </View>
 
-                    {data.length === 0 && <ModelEmpty />}
+                    {data.length === 0 && updatedAt && <ModelEmpty />}
 
                     <FlatList
                         style={styles.list}
