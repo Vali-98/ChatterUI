@@ -240,10 +240,13 @@ export namespace Chats {
                 updateFinished
             )
             if (!updateState) return
-            messages[index].swipes[messages[index].swipe_id].swipe = message
-            messages[index].swipes[messages[index].swipe_id].token_count = undefined
-            if (updateFinished) messages[index].swipes[messages[index].swipe_id].gen_finished = date
-            if (updateStarted) messages[index].swipes[messages[index].swipe_id].gen_started = date
+            const entry = messages[index].swipes[messages[index].swipe_id]
+            entry.swipe = message
+            entry.token_count = undefined
+            if (updateFinished) entry.gen_finished = date
+            if (updateStarted) entry.gen_started = date
+            messages[index].swipes[messages[index].swipe_id] = entry
+
             set((state) => ({
                 ...state,
                 data: state?.data ? { ...state.data, messages: messages } : state.data,
