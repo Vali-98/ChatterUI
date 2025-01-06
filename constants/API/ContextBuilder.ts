@@ -8,7 +8,7 @@ import { APIConfiguration, APIValues } from './APIBuilder.types'
 
 export const buildTextCompletionContext = (max_length: number) => {
     const delta = performance.now()
-
+    const bypassContextLength = mmkv.getBoolean(AppSettings.BypassContextLength)
     const tokenizer =
         mmkv.getString(Global.AppMode) === AppMode.LOCAL
             ? Llama.useLlama.getState().tokenLength
@@ -106,7 +106,10 @@ export const buildTextCompletionContext = (max_length: number) => {
         const shard_length = swipe_len + instruct_len + name_length + timestamp_length + wrap_length
 
         // check if within context window
-        if (message_acc_length + payload_length + shard_length > max_length) {
+        if (
+            message_acc_length + payload_length + shard_length > max_length &&
+            !bypassContextLength
+        ) {
             break
         }
 
@@ -169,6 +172,8 @@ export const buildChatCompletionContext = (
     config: APIConfiguration,
     values: APIValues
 ): Message[] | undefined => {
+    const delta = performance.now()
+    const bypassContextLength = mmkv.getBoolean(AppSettings.BypassContextLength)
     if (config.request.completionType.type !== 'chatCompletions') return
     const completionFeats = config.request.completionType
     const tokenizer =
@@ -228,13 +233,9 @@ export const buildChatCompletionContext = (
 
         const name_string = `${message.name} :`
         const name_length = currentInstruct.names ? tokenizer(name_string) : 0
-
         const len =
-            Chats.useChatState.getState().getTokenCount(index) +
-            total_length +
-            name_length +
-            timestamp_length
-        if (len > max_length) break
+            Chats.useChatState.getState().getTokenCount(index) + name_length + timestamp_length
+        if (len > max_length && !bypassContextLength) break
 
         const prefill = index === messages.length - 1 ? values.prefill : ''
 
@@ -247,6 +248,9 @@ export const buildChatCompletionContext = (
     }
     const output = [...payload, ...messageBuffer.reverse()]
 
+    Logger.log(`Approximate Context Size: ${total_length} tokens`)
+    Logger.log(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
     if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.log(JSON.stringify(output))
+
     return output
 }
