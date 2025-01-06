@@ -161,11 +161,13 @@ const buildFields = (config: APIConfiguration, values: APIValues) => {
         delete payloadFields?.[seedObject?.[0].externalName]
     }
 
+    const usedLength = config.model.useModelContextLength ? (modelLength ?? length) : length
+
     const prompt = {
         [config.request.promptKey]:
             config.request.completionType.type === 'chatCompletions'
-                ? buildChatCompletionContext(length, config, values)
-                : buildTextCompletionContext(length),
+                ? buildChatCompletionContext(usedLength, config, values)
+                : buildTextCompletionContext(usedLength),
     }
     return { payloadFields, model, stop, prompt, length }
 }
