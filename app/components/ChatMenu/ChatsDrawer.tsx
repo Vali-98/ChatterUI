@@ -71,6 +71,8 @@ const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShow
                 data={data}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item, index }) => renderChat(item, index)}
+                showsVerticalScrollIndicator={false}
+                removeClippedSubviews={false}
             />
             <TouchableOpacity onPress={handleCreateChat} style={styles.newButton}>
                 <Text style={{ color: Style.getColor('primary-surface2') }}>New Chat</Text>
