@@ -30,7 +30,7 @@ export const buildAndSendRequest = async () => {
         return
     }
 
-    Logger.log(`Using Configuration ${requestValues.configName}`)
+    Logger.log(`Using Configuration: ${requestValues.configName}`)
 
     let payload: any = undefined
     payload = buildRequest(config, requestValues)
