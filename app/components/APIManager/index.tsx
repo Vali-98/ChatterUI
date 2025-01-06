@@ -41,6 +41,8 @@ const APIManager = () => {
                     data={apiValues}
                     keyExtractor={(item, index) => item.configName + index}
                     renderItem={({ item, index }) => <APIValueItem item={item} index={index} />}
+                    removeClippedSubviews={false}
+                    showsVerticalScrollIndicator={false}
                 />
             )}
 

@@ -122,7 +122,6 @@ const ModelManager = () => {
                     <FlatList
                         style={styles.list}
                         data={data}
-                        showsHorizontalScrollIndicator={false}
                         renderItem={({ item, index }) => (
                             <ModelItem
                                 item={item}
@@ -136,6 +135,8 @@ const ModelManager = () => {
                             />
                         )}
                         keyExtractor={(item) => item.id.toString()}
+                        removeClippedSubviews={false}
+                        showsVerticalScrollIndicator={false}
                     />
                 </Animated.View>
             )}
