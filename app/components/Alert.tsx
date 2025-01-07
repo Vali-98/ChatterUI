@@ -73,27 +73,31 @@ export const AlertBox = () => {
     const { visible, props } = useAlert((state) => ({ visible: state.visible, props: state.props }))
 
     return (
-        <Modal
-            visible={visible}
-            transparent
-            style={styles.modal}
-            animationType="fade"
-            statusBarTranslucent
-            onRequestClose={() => useAlert.getState().hide()}>
-            <FadeBackrop handleOverlayClick={() => useAlert.getState().hide()}>
-                <Animated.View style={styles.textBoxContainer} entering={FadeInDown.duration(150)}>
-                    <View style={styles.textBox}>
-                        <Text style={styles.title}>{props.title}</Text>
-                        <Text style={styles.description}>{props.description}</Text>
-                        <View style={styles.buttonContainer}>
-                            {props.buttons.map((item, index) => (
-                                <AlertButton {...item} key={index} />
-                            ))}
+        <View>
+            <Modal
+                visible={visible}
+                transparent
+                style={styles.modal}
+                animationType="fade"
+                statusBarTranslucent
+                onRequestClose={() => useAlert.getState().hide()}>
+                <FadeBackrop handleOverlayClick={() => useAlert.getState().hide()}>
+                    <Animated.View
+                        style={styles.textBoxContainer}
+                        entering={FadeInDown.duration(150)}>
+                        <View style={styles.textBox}>
+                            <Text style={styles.title}>{props.title}</Text>
+                            <Text style={styles.description}>{props.description}</Text>
+                            <View style={styles.buttonContainer}>
+                                {props.buttons.map((item, index) => (
+                                    <AlertButton {...item} key={index} />
+                                ))}
+                            </View>
                         </View>
-                    </View>
-                </Animated.View>
-            </FadeBackrop>
-        </Modal>
+                    </Animated.View>
+                </FadeBackrop>
+            </Modal>
+        </View>
     )
 }
 
