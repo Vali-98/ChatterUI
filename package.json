@@ -29,7 +29,7 @@
     "babel-plugin-inline-import": "^3.0.0",
     "babel-plugin-react-compiler": "^19.0.0-beta-a7bf2bd-20241110",
     "cui-fs": "^0.1.2",
-    "cui-llama.rn": "^1.3.5",
+    "cui-llama.rn": "^1.3.6",
     "drizzle-orm": "^0.36.2",
     "eas-cli": "^9.1.0",
     "eslint-plugin-react-compiler": "^0.0.0-experimental-7c1344f-20241009",
@@ -46,6 +46,7 @@
     "expo-image": "~2.0.3",
     "expo-linking": "~7.0.3",
     "expo-local-authentication": "~15.0.1",
+    "expo-localization": "~16.0.0",
     "expo-notifications": "~0.29.11",
     "expo-router": "~4.0.15",
     "expo-screen-orientation": "~8.0.2",
@@ -74,8 +75,7 @@
     "react-native-screens": "~4.4.0",
     "react-native-simple-toast": "^3.2.0",
     "upgrade": "^1.1.0",
-    "zustand": "^4.5.5",
-    "expo-localization": "~16.0.0"
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",
