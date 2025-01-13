@@ -73,6 +73,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                     await Llama.updateName(name, item.id)
                 }}
                 title="Rename Model"
+                defaultValue={item.name}
             />
 
             <Text style={styles.title}>{item.name}</Text>

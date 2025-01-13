@@ -23,6 +23,7 @@ type TextBoxModalProps = {
     textCheck?: (text: string) => boolean
     errorMessage?: string
     autoFocus?: boolean
+    defaultValue?: string
 }
 
 const TextBoxModal: React.FC<TextBoxModalProps> = ({
@@ -35,12 +36,13 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
     textCheck = (text: string) => false,
     errorMessage = 'Name cannot be empty',
     autoFocus = false,
+    defaultValue = '',
 }) => {
-    const [text, setText] = useState('')
+    const [text, setText] = useState(defaultValue)
     const [showError, setShowError] = useState(false)
 
     useEffect(() => {
-        setText('')
+        setText(defaultValue)
     }, [showModal])
 
     const handleOverlayClick = (e: GestureResponderEvent) => {
