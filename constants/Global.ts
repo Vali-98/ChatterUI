@@ -161,7 +161,13 @@ export const startupApp = () => {
             typeof AppSettingsDefault[item as AppSettings] === 'boolean'
                 ? mmkv.getBoolean(item)
                 : mmkv.getNumber(item)
-        if (data === undefined) mmkv.set(item, AppSettingsDefault[item as AppSettings])
+        if (data === undefined) {
+            if (item === AppSettings.UnlockOrientation) {
+                getDeviceTypeAsync().then((result) => {
+                    mmkv.set(item, result === DeviceType.TABLET)
+                })
+            } else mmkv.set(item, AppSettingsDefault[item as AppSettings])
+        }
     })
     // Init step
     Llama.setLlamaPreset()
