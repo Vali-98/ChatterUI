@@ -130,6 +130,21 @@ const defaultInstructs: InstructType[] = [
         name: 'Mistral V1',
         ...defaultBooleans,
     },
+    {
+        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prefix: '',
+        system_suffix: '',
+        input_prefix: '<｜User｜>',
+        input_suffix: '',
+        output_prefix: '<｜Assistant｜>',
+        last_output_prefix: '<｜Assistant｜>',
+        output_suffix: '<<｜end▁of▁sentence｜>',
+        stop_sequence: '<｜end▁of▁sentence｜>',
+        user_alignment_message: '',
+        activation_regex: '',
+        name: 'DeepSeek-R1',
+        ...defaultBooleans,
+    },
 ]
 
 type InstructState = {
