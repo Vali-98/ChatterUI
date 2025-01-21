@@ -54,7 +54,6 @@ module.exports = {
                     assetsDirName: 'appAssets',
                 },
             ],
-            'expo-router',
             [
                 'expo-build-properties',
                 {
@@ -83,6 +82,8 @@ module.exports = {
                 },
             ],
             'expo-localization',
+            'expo-router',
+            'expo-sqlite',
             './expo-build-plugins/bgactions.plugin.js',
             './expo-build-plugins/copyjni.plugin.js',
             './expo-build-plugins/usercert.plugin.js',
