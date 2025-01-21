@@ -1,6 +1,6 @@
 module.exports = {
     input: ['app/**/*.{js,jsx,ts,tsx}'],
-    output: './locales',
+    output: '.app/locales',
     options: {
         debug: false,
         func: {
@@ -18,8 +18,8 @@ module.exports = {
         defaultLng: 'en',
         defaultNs: 'translation',
         resource: {
-            loadPath: 'locales/{{lng}}/{{ns}}.json',
-            savePath: 'locales/{{lng}}/{{ns}}.json',
+            loadPath: 'app/locales/{{lng}}/{{ns}}.json',
+            savePath: 'app/locales/{{lng}}/{{ns}}.json',
             jsonIndent: 4,
         },
         keySeparator: false,
