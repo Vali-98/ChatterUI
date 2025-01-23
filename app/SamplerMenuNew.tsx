@@ -1,17 +1,17 @@
-import Alert from '@components/Alert'
-import CheckboxTitle from '@components/CheckboxTitle'
-import FadeDownView from '@components/FadeDownView'
-import SliderInput from '@components/SliderInput'
-import TextBox from '@components/TextBox'
-import TextBoxModal from '@components/TextBoxModal'
-import { APISampler } from '@constants/APIState/BaseAPI'
-import { SamplersManager } from '@constants/SamplerState'
+import CheckboxTitle from '@components/input/CheckboxTitle'
+import SliderInput from '@components/input/SliderInput'
+import TextBox from '@components/input/TextBox'
+import Alert from '@components/views/Alert'
+import FadeDownView from '@components/views/FadeDownView'
+import TextBoxModal from '@components/views/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { APIState as APIStateNew } from 'constants/API/APIManagerState'
-import { APIState } from 'constants/APIState'
-import { API, Global, Logger, saveStringToDownload, Style } from 'constants/Global'
-import { AppMode, AppSettings } from 'constants/GlobalValues'
-import { Samplers } from 'constants/SamplerData'
+import { AppMode, AppSettings } from '@lib/constants/GlobalValues'
+import { Samplers } from '@lib/constants/SamplerData'
+import { APIState as APIStateNew } from '@lib/engine/API/APIManagerState'
+import { APIState } from '@lib/engine/APILegacy'
+import { APISampler } from '@lib/engine/APILegacy/BaseAPI'
+import { SamplersManager } from '@lib/storage/SamplerState'
+import { API, Global, Logger, saveStringToDownload, Style } from '@lib/utils/Global'
 import { Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -81,7 +81,7 @@ const SamplerMenu = () => {
                                 Logger.log(`Preset name already exists.`, true)
                                 return
                             }
-                        addSamplerConfig(currentConfig)
+                        addSamplerConfig({ name: text, data: currentConfig.data })
                     }}
                 />
 
@@ -166,7 +166,7 @@ const SamplerMenu = () => {
                                 `${currentConfig.name}.json`,
                                 'utf8'
                             ).then(() => {
-                                Logger.log('Downloaded Sampler Preset!')
+                                Logger.log('Downloaded Sampler Preset!', true)
                             })
                         }}>
                         <FontAwesome

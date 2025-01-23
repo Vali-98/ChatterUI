@@ -1,6 +1,6 @@
-import { AlertBox } from '@components/Alert'
+import { AlertBox } from '@components/views/Alert'
 import { rawdb } from '@db'
-import { Style } from '@globals'
+import { Style } from '@lib/utils/Global'
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 import { SplashScreen, Stack } from 'expo-router'
 import { setOptions } from 'expo-splash-screen'

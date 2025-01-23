@@ -1,4 +1,4 @@
-import { Style } from 'constants/Global'
+import { Style } from '@lib/utils/Global'
 import {
     Text,
     PressableProps,

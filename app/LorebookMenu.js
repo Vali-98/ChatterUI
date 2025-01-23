@@ -1,8 +1,8 @@
-import TextBoxModal from 'app/components/TextBoxModal'
-import { Lorebooks } from 'constants/Lorebooks'
+import TextBoxModal from '@components/views/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
+import { Lorebooks } from '@lib/storage/Lorebooks'
+import { Style } from '@lib/utils/Global'
 import { Stack, useRouter } from 'expo-router'
-import { Style } from 'constants/Global'
 import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native'
 

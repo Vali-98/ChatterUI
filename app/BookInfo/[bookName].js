@@ -1,6 +1,6 @@
-import { Style } from 'constants/Global'
+import { Lorebooks } from '@lib/storage/Lorebooks'
+import { Style } from '@lib/utils/Global'
 import { FlashList } from '@shopify/flash-list'
-import { Lorebooks } from 'constants/Lorebooks'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'

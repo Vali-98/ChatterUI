@@ -1,6 +1,6 @@
-import DropdownSheet from '@components/DropdownSheet'
-import MultiDropdownSheet from '@components/MultiDropdownSheet'
-import SliderInput from '@components/SliderInput'
+import DropdownSheet from '@components/input/DropdownSheet'
+import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
+import SliderInput from '@components/input/SliderInput'
 import React, { useState } from 'react'
 import { View } from 'react-native'
 

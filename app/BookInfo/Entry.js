@@ -1,6 +1,6 @@
-import CheckboxTitle from '@components/CheckboxTitle'
+import CheckboxTitle from '@components/input/CheckboxTitle'
 import { FontAwesome } from '@expo/vector-icons'
-import { Style, Logger } from 'constants/Global'
+import { Style, Logger } from '@lib/utils/Global'
 import { useState, useRef } from 'react'
 import { Text, View, TouchableOpacity, TextInput, StyleSheet } from 'react-native'
 import Collapsible from 'react-native-collapsible'
