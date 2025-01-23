@@ -1,6 +1,6 @@
 import { API } from '@lib/constants/API'
-import { useInference } from '@lib/storage/Chat'
-import { Logger } from '@lib/storage/Logger'
+import { useInference } from '@lib/state/Chat'
+import { Logger } from '@lib/state/Logger'
 
 import { APIBase } from './BaseAPI'
 import chatCompletionsAPI from './ChatCompletionsAPI'

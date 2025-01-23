@@ -1,4 +1,4 @@
-import { Logger } from '@lib/storage/Logger'
+import { Logger } from '@lib/state/Logger'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'

@@ -1,12 +1,12 @@
-import { Chats, useInference } from '@lib/storage/Chat'
+import { Chats, useInference } from '@lib/state/Chat'
 import BackgroundService from 'react-native-background-actions'
 
 import { API } from '../constants/API'
 import { buildAndSendRequest } from './API/APIBuilder'
 import { APIState } from './APILegacy'
-import { Characters } from '../storage/Characters'
 import { AppMode, AppSettings, Global } from '../constants/GlobalValues'
-import { Logger } from '../storage/Logger'
+import { Characters } from '../state/Characters'
+import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
 
 export const regenerateResponse = async (swipeId: number, regenCache: boolean = true) => {

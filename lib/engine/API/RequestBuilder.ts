@@ -1,6 +1,6 @@
 import { SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { APISampler } from '@lib/engine/APILegacy/BaseAPI'
-import { SamplersManager } from '@lib/storage/SamplerState'
+import { SamplersManager } from '@lib/state/SamplerState'
 import { Instructs } from '@lib/utils/Global'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'

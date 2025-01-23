@@ -1,10 +1,10 @@
-import * as FS from 'expo-file-system'
+import { Logger } from '@lib/state/Logger'
 import * as DocumentPicker from 'expo-document-picker'
-import { Logger } from '@lib/storage/Logger'
+import * as FS from 'expo-file-system'
 
 export namespace Lorebooks {
     type Entry = {
-        keys: Array<string>
+        keys: string[]
         content: string
         extensions: Record<string, any>
         enabled: boolean
@@ -19,7 +19,7 @@ export namespace Lorebooks {
         id?: number // not used in prompt engineering
         comment?: string // not used in prompt engineering
         selective?: boolean // if `true`, require a key from both `keys` and `secondary_keys` to trigger the entry
-        secondary_keys?: Array<string> // see field `selective`. ignored if selective == false
+        secondary_keys?: string[] // see field `selective`. ignored if selective == false
         constant?: boolean // if true, always inserted in the prompt (within budget limit)
         position?: 'before_char' | 'after_char' // whether the entry is placed before or after the character defs
     }
@@ -31,7 +31,7 @@ export namespace Lorebooks {
         token_budget?: number // agnai: "Memory: Context Limit"
         recursive_scanning?: boolean // no agnai equivalent. whether entry content can trigger other entries
         extensions: Record<string, any>
-        entries: Array<Entry>
+        entries: Entry[]
     }
 
     const lorebookdir = `${FS.documentDirectory}lorebooks/`
@@ -46,7 +46,7 @@ export namespace Lorebooks {
         })
     }
 
-    export const saveFile = async (name: string, lorebook: Object) => {
+    export const saveFile = async (name: string, lorebook: object) => {
         return FS.writeAsStringAsync(getLorebookDir(name), JSON.stringify(lorebook), {
             encoding: FS.EncodingType.UTF8,
         })
@@ -66,7 +66,7 @@ export namespace Lorebooks {
                 Logger.log(`Invalid File Type!`, true)
                 return
             }
-            let name = result.assets[0].name.replace(`.json`, '').replace('.settings', '')
+            const name = result.assets[0].name.replace(`.json`, '').replace('.settings', '')
             return FS.copyAsync({
                 from: result.assets[0].uri,
                 to: getLorebookDir(name),
@@ -88,7 +88,7 @@ export namespace Lorebooks {
         })
     }
 
-    export const getEntries = async (books: Array<string>) => {
+    export const getEntries = async (books: string[]) => {
         let entries = {}
         books.map(async (book: string) => {
             const bookfile: any = await loadFile(book)
@@ -97,9 +97,9 @@ export namespace Lorebooks {
         return entries
     }
 
-    export const getLoreEntries = (prompt: string, entries: Array<Entry>) => {
+    export const getLoreEntries = (prompt: string, entries: Entry[]) => {
         let lore = '' // append entries found  in prompt
-        let entrynames: Array<string> = []
+        const entrynames: string[] = []
 
         entries.map((entry: Entry) => {
             if (!entry.keys.some((key: string) => prompt.includes(key))) return

@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import { useInference } from '@lib/storage/Chat'
+import { useInference } from '@lib/state/Chat'
 import { AppSettings, Characters, Chats, Logger, Style } from '@lib/utils/Global'
 import { generateResponse } from '@lib/engine/Inference'
 import React, { useState } from 'react'

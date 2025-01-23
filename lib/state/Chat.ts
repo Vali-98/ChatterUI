@@ -1,6 +1,6 @@
 import { db as database } from '@db'
 import { Tokenizer } from '@lib/engine/Tokenizer'
-import { useTTSState } from '@lib/storage/TTS'
+import { useTTSState } from '@lib/state/TTS'
 import { convertToFormatInstruct } from '@lib/utils/TextFormat'
 import { replaceMacros } from '@lib/utils/Utils'
 import { chatEntries, chatSwipes, chats } from 'db/schema'
@@ -11,10 +11,10 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { Characters } from './Characters'
 import { Logger } from './Logger'
-import { mmkv } from './MMKV'
 import { API } from '../constants/API'
 import { AppSettings, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/LlamaLocal'
+import { mmkv } from '../storage/MMKV'
 
 export type ChatSwipe = {
     id: number

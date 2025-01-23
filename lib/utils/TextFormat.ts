@@ -1,4 +1,4 @@
-import { Instructs } from '@lib/storage/Instructs'
+import { Instructs } from '@lib/state/Instructs'
 
 export enum Formats {
     None,

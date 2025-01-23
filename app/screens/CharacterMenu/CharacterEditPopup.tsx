@@ -1,6 +1,6 @@
 import Alert from '@components/views/Alert'
 import PopupMenu, { MenuRef } from '@components/views/PopupMenu'
-import { CharInfo } from '@lib/storage/Characters'
+import { CharInfo } from '@lib/state/Characters'
 import { Characters } from '@lib/utils/Global'
 import { useRouter } from 'expo-router'
 

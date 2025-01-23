@@ -1,7 +1,7 @@
 import { AntDesign } from '@expo/vector-icons'
-import { Chats } from '@lib/storage/Chat'
-import { Style } from '@lib/utils/Global'
 import { continueResponse, generateResponse, regenerateResponse } from '@lib/engine/Inference'
+import { Chats } from '@lib/state/Chat'
+import { Style } from '@lib/utils/Global'
 import React from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 

@@ -1,5 +1,5 @@
 import { SamplerID } from '@lib/constants/SamplerData'
-import { Logger } from '@lib/storage/Logger'
+import { Logger } from '@lib/state/Logger'
 
 import { APIBase, APISampler } from './BaseAPI'
 import { Global } from '../../constants/GlobalValues'

@@ -1,5 +1,5 @@
 import Avatar from '@components/views/Avatar'
-import { CharInfo } from '@lib/storage/Characters'
+import { CharInfo } from '@lib/state/Characters'
 import { Characters, Chats, Logger, Style } from '@lib/utils/Global'
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
 

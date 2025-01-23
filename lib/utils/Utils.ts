@@ -1,6 +1,6 @@
 import { API } from '../constants/API'
 import { Global } from '../constants/GlobalValues'
-import { Characters } from '../storage/Characters'
+import { Characters } from '../state/Characters'
 import { mmkv } from '../storage/MMKV'
 
 export const humanizedISO8601DateTime = (date = '') => {

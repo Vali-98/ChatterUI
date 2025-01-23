@@ -1,6 +1,6 @@
 import Avatar from '@components/views/Avatar'
-import { useViewerState } from '@lib/storage/AvatarViewer'
-import { Chats } from '@lib/storage/Chat'
+import { useViewerState } from '@lib/state/AvatarViewer'
+import { Chats } from '@lib/state/Chat'
 import { Characters, Global, Style } from '@lib/utils/Global'
 import { ReactNode } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'

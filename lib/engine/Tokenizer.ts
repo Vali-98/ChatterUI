@@ -1,4 +1,4 @@
-import { Logger } from '@lib/storage/Logger'
+import { Logger } from '@lib/state/Logger'
 import { copyFileRes } from 'cui-fs'
 import { initLlama, LlamaContext } from 'cui-llama.rn'
 import { deleteAsync, documentDirectory, getInfoAsync, makeDirectoryAsync } from 'expo-file-system'

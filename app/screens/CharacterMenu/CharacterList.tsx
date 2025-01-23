@@ -1,6 +1,6 @@
 import FadeDownView from '@components/views/FadeDownView'
 import { AntDesign } from '@expo/vector-icons'
-import { CharInfo } from '@lib/storage/Characters'
+import { CharInfo } from '@lib/state/Characters'
 import { Characters, Style } from '@lib/utils/Global'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'

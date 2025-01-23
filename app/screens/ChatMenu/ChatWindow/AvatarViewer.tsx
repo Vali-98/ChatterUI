@@ -1,6 +1,6 @@
 import Avatar from '@components/views/Avatar'
 import FadeBackrop from '@components/views/FadeBackdrop'
-import { useViewerState } from '@lib/storage/AvatarViewer'
+import { useViewerState } from '@lib/state/AvatarViewer'
 import { AntDesign } from '@expo/vector-icons'
 import { Characters, Style } from '@lib/utils/Global'
 import { useRouter } from 'expo-router'

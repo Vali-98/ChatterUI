@@ -1,5 +1,5 @@
 import { Global } from '@lib/constants/GlobalValues'
-import { Logger } from '@lib/storage/Logger'
+import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'
 import { SamplerID } from '@lib/constants/SamplerData'
 

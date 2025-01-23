@@ -1,6 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons'
-import { Chats } from '@lib/storage/Chat'
-import { useTTS } from '@lib/storage/TTS'
+import { Chats } from '@lib/state/Chat'
+import { useTTS } from '@lib/state/TTS'
 import { Logger, Style } from '@lib/utils/Global'
 import { TouchableOpacity, View } from 'react-native'
 

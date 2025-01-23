@@ -1,7 +1,7 @@
 import Toast from 'react-native-simple-toast'
 
-import { mmkv } from './MMKV'
 import { AppSettings, Global } from '../constants/GlobalValues'
+import { mmkv } from '../storage/MMKV'
 
 export namespace Logger {
     const toastTime = 2000

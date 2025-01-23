@@ -6,7 +6,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { Logger } from './Logger'
-import { mmkv, mmkvStorage } from './MMKV'
+import { mmkv, mmkvStorage } from '../storage/MMKV'
 import { API } from '../constants/API'
 import { Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/LlamaLocal'

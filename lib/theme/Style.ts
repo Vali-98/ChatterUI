@@ -1,5 +1,5 @@
 import { AppSettings } from '@lib/constants/GlobalValues'
-import { Logger } from '@lib/storage/Logger'
+import { Logger } from '@lib/state/Logger'
 import { mmkv, mmkvStorage } from '@lib/storage/MMKV'
 import { StyleSheet } from 'react-native'
 import { create } from 'zustand'

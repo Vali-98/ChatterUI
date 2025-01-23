@@ -4,7 +4,7 @@ import {
     SamplerID,
     Samplers,
 } from '@lib/constants/SamplerData'
-import { Logger } from '@lib/storage/Logger'
+import { Logger } from '@lib/state/Logger'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import { getDocumentAsync } from 'expo-document-picker'
 import { EncodingType, readAsStringAsync } from 'expo-file-system'

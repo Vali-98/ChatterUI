@@ -7,7 +7,7 @@ import * as FS from 'expo-file-system'
 import { create } from 'zustand'
 
 import { AppSettings, Global } from '../constants/GlobalValues'
-import { Logger } from '../storage/Logger'
+import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
 
 type CompletionTimings = {

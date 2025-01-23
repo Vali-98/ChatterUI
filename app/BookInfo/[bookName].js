@@ -1,4 +1,4 @@
-import { Lorebooks } from '@lib/storage/Lorebooks'
+import { Lorebooks } from '@lib/state/Lorebooks'
 import { Style } from '@lib/utils/Global'
 import { FlashList } from '@shopify/flash-list'
 import { Stack, useLocalSearchParams } from 'expo-router'

@@ -1,6 +1,6 @@
 import { CohereModel } from '@screens/Endpoint/Cohere'
 import { Global } from '@lib/constants/GlobalValues'
-import { Logger } from '@lib/storage/Logger'
+import { Logger } from '@lib/state/Logger'
 import { SamplerID } from '@lib/constants/SamplerData'
 
 import { APIBase, APISampler } from './BaseAPI'
