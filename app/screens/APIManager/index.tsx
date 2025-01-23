@@ -1,4 +1,4 @@
-import ButtonPrimary from '@components/buttons2/ButtonPrimary'
+import ButtonPrimary from '@components/buttons/ButtonPrimary'
 import { AntDesign, Ionicons } from '@expo/vector-icons'
 import { APIState } from '@lib/engine/API/APIManagerState'
 import { Style } from '@lib/theme/Style'

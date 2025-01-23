@@ -1,4 +1,4 @@
-import SupportButton from '@components/buttons2/SupportButton'
+import SupportButton from '@components/buttons/SupportButton'
 import { FontAwesome } from '@expo/vector-icons'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { Logger, Style } from '@lib/utils/Global'

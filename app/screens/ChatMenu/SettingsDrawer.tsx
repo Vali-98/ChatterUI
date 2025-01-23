@@ -1,4 +1,4 @@
-import SupportButton from '@components/buttons2/SupportButton'
+import SupportButton from '@components/buttons/SupportButton'
 import Avatar from '@components/views/Avatar'
 import Drawer from '@components/views/Drawer'
 import { AntDesign } from '@expo/vector-icons'
