@@ -10,11 +10,6 @@ module.exports = {
         icon: './assets/images/icon.png',
         scheme: 'chatterui',
         userInterfaceStyle: 'automatic',
-        /*splash: {
-            image: './assets/images/splash.png',
-            resizeMode: 'cover',
-            backgroundColor: '#000000',
-        },*/
         assetBundlePatterns: ['**/*'],
         ios: {
             supportsTablet: true,
@@ -28,12 +23,6 @@ module.exports = {
                 backgroundColor: '#000',
             },
             package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
-
-            /*splash: {
-                image: './assets/images/splash.png',
-                resizeMode: 'cover',
-                backgroundColor: '#000000',
-            },*/
             userInterfaceStyle: 'dark',
             permissions: [
                 'android.permission.FOREGROUND_SERVICE',
@@ -90,7 +79,6 @@ module.exports = {
         ],
         experiments: {
             typedRoutes: true,
-            // reactCompiler: true,
         },
         extra: {
             router: {

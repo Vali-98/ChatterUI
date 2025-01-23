@@ -7,7 +7,6 @@
             "@globals": ["constants/Global"],
             "@components/*": ["app/components/*"],
             "@screens/*": ["app/screens/*"],
-            "@constants/*": ["constants/*"],
             "@lib/*": ["lib/*"],
             "@assets/*": ["assets/*"],
             "@public/*": ["public/*"],

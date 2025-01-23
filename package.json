@@ -31,7 +31,6 @@
     "cui-fs": "^0.1.2",
     "cui-llama.rn": "^1.4.1",
     "drizzle-orm": "^0.36.2",
-    "eas-cli": "^9.1.0",
     "eslint-plugin-react-compiler": "^0.0.0-experimental-7c1344f-20241009",
     "expo": "~52.0.26",
     "expo-application": "~6.0.2",
