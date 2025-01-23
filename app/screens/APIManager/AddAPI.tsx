@@ -1,4 +1,4 @@
-import ButtonPrimary from '@components/buttons/ButtonPrimary'
+import ButtonPrimary from '@components/buttons2/ButtonPrimary'
 import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import { MaterialIcons } from '@expo/vector-icons'

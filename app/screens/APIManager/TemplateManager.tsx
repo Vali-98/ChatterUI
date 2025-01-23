@@ -1,4 +1,4 @@
-import ButtonPrimary from '@components/buttons/ButtonPrimary'
+import ButtonPrimary from '@components/buttons2/ButtonPrimary'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Logger } from '@lib/utils/Global'
 import { APIState } from '@lib/engine/API/APIManagerState'
