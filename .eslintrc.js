@@ -9,8 +9,10 @@ module.exports = {
             },
         },
     ],
-    plugins: ['prettier', 'eslint-plugin-react-compiler'],
+
+    plugins: ['prettier', 'eslint-plugin-react-compiler', 'internal'],
     rules: {
+        'internal/enforce-spacing-values': 'error',
         'react-compiler/react-compiler': 'error',
         'prettier/prettier': [
             'error',
