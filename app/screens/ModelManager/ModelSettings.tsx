@@ -1,10 +1,9 @@
-import Alert from '@components/views/Alert'
+import ThemedSlider from '@components/input/ThemedSlider'
+import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
-import SliderInput from '@components/input/SliderInput'
-import SwitchTitle from '@components/input/SwitchTitle'
-import SwitchWithDescription from '@components/input/SwitchWithDescription'
-import { AppSettings, Global, Logger, Style } from '@lib/utils/Global'
+import Alert from '@components/views/Alert'
 import { Llama, LlamaPreset, readableFileSize } from '@lib/engine/LlamaLocal'
+import { AppSettings, Global, Logger, Style } from '@lib/utils/Global'
 import { useFocusEffect } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { BackHandler, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -80,7 +79,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             <View style={{ marginTop: 16 }} />
             {preset && (
                 <View>
-                    <SliderInput
+                    <ThemedSlider
                         label="Max Context"
                         value={preset.context_length}
                         onValueChange={(value) => setPreset({ ...preset, context_length: value })}
@@ -89,7 +88,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                         step={1024}
                         disabled={modelImporting || modelLoading}
                     />
-                    <SliderInput
+                    <ThemedSlider
                         label="Threads"
                         value={preset.threads}
                         onValueChange={(value) => setPreset({ ...preset, threads: value })}
@@ -99,7 +98,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                         disabled={modelImporting || modelLoading}
                     />
 
-                    <SliderInput
+                    <ThemedSlider
                         label="Batch"
                         value={preset.batch}
                         onValueChange={(value) => setPreset({ ...preset, batch: value })}
@@ -110,7 +109,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                     />
                     {/* Note: llama.rn does not have any Android gpu acceleration */}
                     {Platform.OS === 'ios' && (
-                        <SliderInput
+                        <ThemedSlider
                             label="GPU Layers"
                             value={preset.gpu_layers}
                             onValueChange={(value) => setPreset({ ...preset, gpu_layers: value })}
@@ -122,13 +121,13 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                 </View>
             )}
             <SectionTitle>Advanced Settings</SectionTitle>
-            <SwitchTitle
-                title="Automatically Load Model on Chat"
+            <ThemedSwitch
+                label="Automatically Load Model on Chat"
                 value={autoloadLocal}
                 onValueChange={setAutoloadLocal}
             />
-            <SwitchWithDescription
-                title="Save Local KV"
+            <ThemedSwitch
+                label="Save Local KV"
                 value={saveKV}
                 onValueChange={setSaveKV}
                 description={

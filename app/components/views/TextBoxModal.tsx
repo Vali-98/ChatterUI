@@ -1,5 +1,6 @@
+import ThemedButton from '@components/buttons/ThemedButton'
 import { FontAwesome } from '@expo/vector-icons'
-import { Logger, Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
 import { getStringAsync } from 'expo-clipboard'
 import { useState, useEffect } from 'react'
 import {
@@ -10,7 +11,6 @@ import {
     StyleSheet,
     TouchableOpacity,
     GestureResponderEvent,
-    Platform,
 } from 'react-native'
 
 type TextBoxModalProps = {
@@ -38,6 +38,8 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
     autoFocus = false,
     defaultValue = '',
 }) => {
+    const styles = useStyles()
+    const { color, spacing } = Theme.useTheme()
     const [text, setText] = useState(defaultValue)
     const [showError, setShowError] = useState(false)
 
@@ -79,7 +81,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                             value={text}
                             onChangeText={setText}
                             placeholder={placeholder}
-                            placeholderTextColor={Style.getColor('primary-text3')}
+                            placeholderTextColor={color.text._700}
                         />
                         {showPaste && !text && (
                             <TouchableOpacity
@@ -87,31 +89,38 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                                 onPress={async () => {
                                     setText(await getStringAsync())
                                 }}>
-                                <FontAwesome
-                                    name="paste"
-                                    size={24}
-                                    color={Style.getColor('primary-text1')}
-                                />
+                                <FontAwesome name="paste" size={24} color={color.text._100} />
                             </TouchableOpacity>
                         )}
                     </View>
                     {showError && <Text style={styles.errorMessage}>{errorMessage}</Text>}
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.cancelButton} onPress={() => handleClose()}>
-                            <Text style={{ color: Style.getColor('primary-text1') }}>Cancel</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.confirmButton}
-                            onPress={() => {
-                                if (textCheck(text)) {
-                                    setShowError(true)
-                                    return
-                                }
-                                onConfirm(text)
-                                handleClose()
-                            }}>
-                            <Text style={{ color: Style.getColor('primary-text1') }}>Confirm</Text>
-                        </TouchableOpacity>
+                    <View style={{ flexDirection: 'row' }}>
+                        <View style={styles.buttonContainer}>
+                            <ThemedButton
+                                label="Cancel"
+                                onPress={() => handleClose()}
+                                variant="secondary"
+                                buttonStyle={{
+                                    paddingVertical: spacing.l,
+                                    paddingHorizontal: spacing.xl,
+                                }}
+                            />
+                            <ThemedButton
+                                label="Confirm"
+                                onPress={() => {
+                                    if (textCheck(text)) {
+                                        setShowError(true)
+                                        return
+                                    }
+                                    onConfirm(text)
+                                    handleClose()
+                                }}
+                                buttonStyle={{
+                                    paddingVertical: spacing.l,
+                                    paddingHorizontal: spacing.xl,
+                                }}
+                            />
+                        </View>
                     </View>
                 </View>
             </TouchableOpacity>
@@ -121,77 +130,83 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
 
 export default TextBoxModal
 
-const styles = StyleSheet.create({
-    title: {
-        color: Style.getColor('primary-text1'),
-        marginBottom: 16,
-    },
-
-    modalview: {
-        margin: 20,
-        backgroundColor: Style.getColor('primary-surface2'),
-        borderRadius: 20,
-        paddingHorizontal: 32,
-        paddingTop: 30,
-        paddingBottom: 20,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
+const useStyles = () => {
+    const { color, spacing } = Theme.useTheme()
+    return StyleSheet.create({
+        title: {
+            color: color.text._100,
+            marginBottom: spacing.xl,
         },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
 
-    buttonContainer: {
-        paddingTop: 8,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
+        modalview: {
+            margin: spacing.xl2,
+            backgroundColor: color.neutral._200,
+            borderRadius: spacing.xl2,
+            paddingHorizontal: spacing.xl3,
+            paddingTop: spacing.xl3,
+            paddingBottom: spacing.xl2,
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 4,
+            elevation: spacing.m,
+        },
 
-    confirmButton: {
-        backgroundColor: Style.getColor('primary-surface4'),
-        paddingHorizontal: 24,
-        paddingVertical: 12,
-        borderRadius: 8,
-    },
+        buttonContainer: {
+            flex: 1,
+            columnGap: spacing.xl,
+            paddingRight: spacing.m,
+            paddingTop: spacing.m,
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+        },
 
-    cancelButton: {
-        marginLeft: 70,
-        marginRight: 20,
-        borderColor: Style.getColor('primary-surface4'),
-        borderWidth: 1,
-        paddingHorizontal: 24,
-        paddingVertical: 12,
-        borderRadius: 8,
-    },
+        confirmButton: {
+            backgroundColor: color.neutral._300,
+            paddingHorizontal: spacing.xl2,
+            paddingVertical: spacing.l,
+            borderRadius: spacing.m,
+        },
 
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: Style.getColor('primary-surface1'),
-        borderRadius: 8,
-        marginBottom: 8,
-    },
+        cancelButton: {
+            marginLeft: spacing._64,
+            marginRight: spacing.xl2,
+            borderColor: color.neutral._400,
+            borderWidth: 1,
+            paddingHorizontal: spacing.xl2,
+            paddingVertical: spacing.l,
+            borderRadius: spacing.m,
+        },
 
-    input: {
-        color: Style.getColor('primary-text1'),
-        backgroundColor: Style.getColor('primary-surface1'),
-        flex: 1,
-        borderRadius: 8,
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        margin: 8,
-    },
+        inputContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: color.neutral._100,
+            borderRadius: spacing.m,
+            marginBottom: spacing.m,
+        },
 
-    inputButton: {
-        marginLeft: 12,
-    },
+        input: {
+            color: color.text._100,
+            backgroundColor: color.neutral._100,
+            flex: 1,
+            borderRadius: spacing.m,
+            paddingHorizontal: spacing.m,
+            paddingVertical: spacing.xs,
+            margin: spacing.m,
+        },
 
-    errorMessage: {
-        color: Style.getColor('destructive-brand'),
-        marginBottom: 8,
-    },
-})
+        inputButton: {
+            marginLeft: spacing.l,
+        },
+
+        errorMessage: {
+            color: color.error._300,
+            marginBottom: spacing.m,
+        },
+    })
+}

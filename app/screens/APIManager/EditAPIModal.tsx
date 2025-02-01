@@ -1,4 +1,4 @@
-import ButtonPrimary from '@components/buttons/ButtonPrimary'
+import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import FadeBackrop from '@components/views/FadeBackdrop'
@@ -257,7 +257,7 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
                         </View>
                     )}
                 </ScrollView>
-                <ButtonPrimary
+                <ThemedButton
                     buttonStyle={{ marginTop: 8 }}
                     label="Save Changes"
                     onPress={() => {

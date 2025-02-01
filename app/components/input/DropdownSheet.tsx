@@ -1,10 +1,11 @@
 import { Entypo } from '@expo/vector-icons'
-import { Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
 import { useState } from 'react'
-import { Modal, Pressable, StyleSheet, Text, View, FlatList, ViewStyle } from 'react-native'
+import { FlatList, Modal, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { TextInput } from 'react-native-gesture-handler'
 
 import FadeBackrop from '../views/FadeBackdrop'
+
 type DropdownSheetProps<T> = {
     style?: ViewStyle
     data: T[]
@@ -30,8 +31,10 @@ const DropdownSheet = <T,>({
     search = false,
     closeOnSelect = true,
 }: DropdownSheetProps<T>) => {
+    const styles = useStyles()
     const [showList, setShowList] = useState(false)
     const [searchFilter, setSearchFilter] = useState('')
+    const theme = Theme.useTheme()
 
     return (
         <View style={{ flex: 1 }}>
@@ -74,7 +77,7 @@ const DropdownSheet = <T,>({
                     {search && (
                         <TextInput
                             placeholder="Filter..."
-                            placeholderTextColor={Style.getColor('primary-text3')}
+                            placeholderTextColor={theme.color.text._700}
                             style={styles.searchBar}
                             value={searchFilter}
                             onChangeText={setSearchFilter}
@@ -85,7 +88,7 @@ const DropdownSheet = <T,>({
             <Pressable style={[style, styles.button]} onPress={() => setShowList(true)}>
                 {selected && <Text style={styles.buttonText}>{labelExtractor(selected)}</Text>}
                 {!selected && <Text style={styles.placeholderText}>{placeholder}</Text>}
-                <Entypo name="chevron-down" color={Style.getColor('primary-text2')} size={18} />
+                <Entypo name="chevron-down" color={theme.color.primary._300} size={18} />
             </Pressable>
         </View>
     )
@@ -93,69 +96,70 @@ const DropdownSheet = <T,>({
 
 export default DropdownSheet
 
-const styles = StyleSheet.create({
-    button: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        alignItems: 'center',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        borderRadius: 8,
-        backgroundColor: Style.getColor('primary-surface2'),
-    },
-    buttonText: {
-        color: Style.getColor('primary-text1'),
-        fontSize: 16,
-    },
-    placeholderText: {
-        color: Style.getColor('primary-text3'),
-    },
+const useStyles = () => {
+    const { color, spacing } = Theme.useTheme()
+    return StyleSheet.create({
+        button: {
+            paddingHorizontal: spacing.xl,
+            paddingVertical: spacing.m,
+            alignItems: 'center',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            borderRadius: spacing.m,
+            backgroundColor: color.neutral._200,
+        },
+        buttonText: {
+            color: color.text._300,
+            fontSize: 16,
+        },
+        placeholderText: {
+            color: color.text._800,
+        },
 
-    modalTitle: {
-        color: Style.getColor('primary-text1'),
-        fontSize: 20,
-        fontWeight: '500',
-        paddingBottom: 24,
-    },
+        modalTitle: {
+            color: color.text._300,
+            fontSize: 20,
+            fontWeight: '500',
+            paddingBottom: spacing.xl2,
+        },
 
-    listContainer: {
-        marginVertical: 16,
-        paddingVertical: 24,
-        paddingHorizontal: 32,
-        flexShrink: 1,
-        maxHeight: '70%',
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        backgroundColor: Style.getColor('primary-surface1'),
-    },
+        listContainer: {
+            marginVertical: spacing.xl,
+            paddingVertical: spacing.xl2,
+            paddingHorizontal: spacing.xl3,
+            flexShrink: 1,
+            maxHeight: '70%',
+            borderTopLeftRadius: spacing.xl2,
+            borderTopRightRadius: spacing.xl2,
+            backgroundColor: color.neutral._200,
+        },
 
-    listItem: {
-        paddingVertical: 17,
-        paddingHorizontal: 12,
-        borderWidth: 1,
-        borderColor: Style.getColor('primary-surface1'),
-    },
+        listItem: {
+            paddingVertical: spacing.xl,
+            paddingHorizontal: spacing.xl2,
+        },
 
-    listItemSelected: {
-        paddingVertical: 17,
-        paddingHorizontal: 12,
-        borderWidth: 1,
-        borderRadius: 16,
-        borderColor: Style.getColor('primary-brand'),
-    },
+        listItemSelected: {
+            paddingVertical: spacing.xl,
+            paddingHorizontal: spacing.xl2,
+            backgroundColor: color.neutral._300,
+            borderRadius: spacing.xl,
+            borderWidth: 2,
+            borderColor: color.primary._300,
+        },
 
-    listItemText: {
-        color: Style.getColor('primary-text2'),
-        fontSize: 16,
-    },
+        listItemText: {
+            color: color.text._400,
+            fontSize: 16,
+        },
 
-    searchBar: {
-        marginTop: 12,
-        borderRadius: 8,
-        padding: 12,
-        borderColor: Style.getColor('primary-surface4'),
-        borderWidth: 1,
-        color: Style.getColor('primary-text1'),
-        backgroundColor: Style.getColor('primary-surface2'),
-    },
-})
+        searchBar: {
+            marginTop: spacing.l,
+            borderRadius: spacing.m,
+            padding: spacing.l,
+            borderColor: color.primary._100,
+            borderWidth: 1,
+            backgroundColor: color.neutral._300,
+        },
+    })
+}

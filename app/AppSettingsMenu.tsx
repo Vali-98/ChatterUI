@@ -1,4 +1,4 @@
-import SwitchWithDescription from '@components/input/SwitchWithDescription'
+import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
 import { registerForPushNotificationsAsync } from '@lib/notifications/Notifications'
@@ -100,29 +100,29 @@ const AppSettingsMenu = () => {
 
             <SectionTitle>Chat</SectionTitle>
 
-            <SwitchWithDescription
-                title="Auto Scroll"
+            <ThemedSwitch
+                label="Auto Scroll"
                 value={autoScroll}
                 onValueChange={setAutoScroll}
                 description="Autoscrolls text during generations"
             />
 
-            <SwitchWithDescription
-                title="Use First Message"
+            <ThemedSwitch
+                label="Use First Message"
                 value={firstMes}
                 onValueChange={setFirstMes}
                 description="Disabling this will make new chats start blank, needed by specific models"
             />
 
-            <SwitchWithDescription
-                title="Load Chat On Startup"
+            <ThemedSwitch
+                label="Load Chat On Startup"
                 value={chatOnStartup}
                 onValueChange={setChatOnStartup}
                 description="Loads the most recent chat on startup"
             />
 
-            <SwitchWithDescription
-                title="Send on Enter"
+            <ThemedSwitch
+                label="Send on Enter"
                 value={sendOnEnter}
                 onValueChange={setSendOnEnter}
                 description="Submits messages when Enter is pressed"
@@ -130,22 +130,22 @@ const AppSettingsMenu = () => {
 
             <SectionTitle>Generation</SectionTitle>
 
-            <SwitchWithDescription
-                title="Print Context"
+            <ThemedSwitch
+                label="Print Context"
                 value={printContext}
                 onValueChange={setPrintContext}
                 description="Prints the generation context to logs for debugging"
             />
 
-            <SwitchWithDescription
-                title="Bypass Context Length"
+            <ThemedSwitch
+                label="Bypass Context Length"
                 value={bypassContextLength}
                 onValueChange={setBypassContextLength}
                 description="Ignores context length limits when building prompts"
             />
 
-            <SwitchWithDescription
-                title="Use Legacy API System"
+            <ThemedSwitch
+                label="Use Legacy API System"
                 value={useLegacyAPI}
                 onValueChange={setUseLegacyAPI}
                 description="Use old API system"
@@ -153,8 +153,8 @@ const AppSettingsMenu = () => {
 
             <SectionTitle>Notifications</SectionTitle>
 
-            <SwitchWithDescription
-                title="Enable Notifications"
+            <ThemedSwitch
+                label="Enable Notifications"
                 value={notificationOnGenerate}
                 onValueChange={async (value) => {
                     if (!value) {
@@ -172,22 +172,22 @@ const AppSettingsMenu = () => {
 
             {notificationOnGenerate && (
                 <View>
-                    <SwitchWithDescription
-                        title="Notification Sound"
+                    <ThemedSwitch
+                        label="Notification Sound"
                         value={notificationSound}
                         onValueChange={setNotificationSound}
                         description=""
                     />
 
-                    <SwitchWithDescription
-                        title="Notification Vibration"
+                    <ThemedSwitch
+                        label="Notification Vibration"
                         value={notificationVibrate}
                         onValueChange={setNotificationVibrate}
                         description=""
                     />
 
-                    <SwitchWithDescription
-                        title="Show Text In Notification"
+                    <ThemedSwitch
+                        label="Show Text In Notification"
                         value={showNotificationText}
                         onValueChange={setShowNotificationText}
                         description="Shows generated messages in notifications"
@@ -255,16 +255,16 @@ const AppSettingsMenu = () => {
             </TouchableOpacity>
 
             <SectionTitle>Security</SectionTitle>
-            <SwitchWithDescription
-                title="Lock App"
+            <ThemedSwitch
+                label="Lock App"
                 value={authLocal}
                 onValueChange={setAuthLocal}
                 description="Requires user authentication to open the app. This will not work if you have no device locks enabled."
             />
 
             <SectionTitle>Screen</SectionTitle>
-            <SwitchWithDescription
-                title="Unlock Orientation"
+            <ThemedSwitch
+                label="Unlock Orientation"
                 value={unlockOrientation}
                 onValueChange={setUnlockOrientation}
                 description="Allows landscape on phones (App restart required)"

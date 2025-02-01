@@ -1,5 +1,5 @@
 import { Octicons } from '@expo/vector-icons'
-import { Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
 import { useEffect } from 'react'
 import { View } from 'react-native'
 import Animated, {
@@ -21,10 +21,10 @@ const Dot: React.FC<DotProps> = ({ dx, offset }) => {
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ translateY: Math.max(Math.sin(dx.value - offset), 0) * translateMax }],
     }))
-
+    const { color } = Theme.useTheme()
     return (
         <Animated.View style={[animatedStyle]}>
-            <Octicons name="dot-fill" size={4} color={Style.getColor('primary-text1')} />
+            <Octicons name="dot-fill" size={4} color={color.text._200} />
         </Animated.View>
     )
 }
@@ -40,7 +40,7 @@ const AnimatedEllipsis = () => {
         <View
             style={{
                 flexDirection: 'row',
-                paddingTop: 20,
+                paddingTop: 24,
                 paddingBottom: 2,
                 paddingHorizontal: 4,
                 columnGap: 8,

@@ -1,4 +1,4 @@
-import CheckboxTitle from '@components/input/CheckboxTitle'
+import ThemedCheckbox from '@components/input/ThemedCheckbox'
 import { FontAwesome } from '@expo/vector-icons'
 import { Style, Logger } from '@lib/utils/Global'
 import { useState, useRef } from 'react'
@@ -80,7 +80,7 @@ const Entry = ({ data, datakey, updateBook }) => {
                         }}
                     />
                 </View>
-                <CheckboxTitle
+                <ThemedCheckbox
                     name="Constant"
                     body={data}
                     varname={'constant'}
@@ -88,7 +88,7 @@ const Entry = ({ data, datakey, updateBook }) => {
                         updateBook(datakey, 'constant', value)
                     }}
                 />
-                <CheckboxTitle
+                <ThemedCheckbox
                     name="Selective"
                     body={data}
                     varname={'selective'}
@@ -97,7 +97,7 @@ const Entry = ({ data, datakey, updateBook }) => {
                     }}
                 />
 
-                <CheckboxTitle
+                <ThemedCheckbox
                     name="Disabled"
                     body={data}
                     varname={'disable'}

@@ -1,5 +1,5 @@
 import FadeBackrop from '@components/views/FadeBackdrop'
-import { Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
 import React, { ReactNode } from 'react'
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
@@ -57,6 +57,12 @@ type AlertProviderProps = {
 }
 
 const AlertButton: React.FC<AlertButtonProps> = ({ label, onPress, type = 'default' }) => {
+    const styles = useStyles()
+    const buttonStyleMap = {
+        warning: styles.buttonWarning,
+        default: styles.button,
+    }
+
     return (
         <TouchableOpacity
             onPress={async () => {
@@ -69,8 +75,9 @@ const AlertButton: React.FC<AlertButtonProps> = ({ label, onPress, type = 'defau
 }
 
 export const AlertBox = () => {
+    const styles = useStyles()
     const { visible, props } = useAlert((state) => ({ visible: state.visible, props: state.props }))
-
+    const hide = useAlert((state) => state.hide)
     return (
         <Modal
             visible={visible}
@@ -78,8 +85,8 @@ export const AlertBox = () => {
             style={styles.modal}
             animationType="fade"
             statusBarTranslucent
-            onRequestClose={() => useAlert.getState().hide()}>
-            <FadeBackrop handleOverlayClick={() => useAlert.getState().hide()}>
+            onRequestClose={() => hide()}>
+            <FadeBackrop handleOverlayClick={() => hide()}>
                 <Animated.View style={styles.textBoxContainer} entering={FadeInDown.duration(150)}>
                     <View style={styles.textBox}>
                         <Text style={styles.title}>{props.title}</Text>
@@ -105,59 +112,58 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({ children }) => {
     )
 }
 
-const styles = StyleSheet.create({
-    modal: {
-        flex: 1,
-    },
-    textBoxContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
+const useStyles = () => {
+    const { color, spacing } = Theme.useTheme()
 
-    textBox: {
-        backgroundColor: Style.getColor('primary-surface2'),
-        paddingHorizontal: 32,
-        paddingBottom: 16,
-        paddingTop: 24,
-        borderRadius: 16,
-        width: '90%',
-    },
+    return StyleSheet.create({
+        modal: {
+            flex: 1,
+        },
+        textBoxContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
 
-    title: {
-        color: Style.getColor('primary-text1'),
-        fontSize: 20,
-        fontWeight: '500',
-        marginBottom: 12,
-    },
+        textBox: {
+            backgroundColor: color.neutral._200,
+            paddingHorizontal: spacing.xl3,
+            paddingBottom: spacing.xl,
+            paddingTop: spacing.xl2,
+            borderRadius: spacing.xl,
+            width: '90%',
+        },
 
-    description: {
-        color: Style.getColor('primary-text1'),
-        marginBottom: 12,
-        fontSize: 16,
-    },
+        title: {
+            color: color.text._100,
+            fontSize: 20,
+            fontWeight: '500',
+            marginBottom: spacing.l,
+        },
 
-    buttonContainer: {
-        flexDirection: 'row',
-        columnGap: 24,
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-    },
+        description: {
+            color: color.text._100,
+            marginBottom: spacing.l,
+            fontSize: spacing.xl,
+        },
 
-    button: {
-        paddingHorizontal: 4,
-        paddingVertical: 8,
-        color: Style.getColor('primary-text2'),
-    },
+        buttonContainer: {
+            flexDirection: 'row',
+            columnGap: spacing.xl2,
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+        },
 
-    buttonWarning: {
-        paddingHorizontal: 4,
-        paddingVertical: 8,
-        color: '#d2574b',
-    },
-})
+        button: {
+            paddingHorizontal: spacing.s,
+            paddingVertical: spacing.m,
+            color: color.text._400,
+        },
 
-const buttonStyleMap = {
-    warning: styles.buttonWarning,
-    default: styles.button,
+        buttonWarning: {
+            paddingHorizontal: spacing.s,
+            paddingVertical: spacing.m,
+            color: color.error._300,
+        },
+    })
 }

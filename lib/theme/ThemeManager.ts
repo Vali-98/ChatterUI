@@ -29,16 +29,14 @@ export namespace Theme {
     // TODO: State-ify
     const useSpacingState = () => {
         const spacing = {
-            _2: 2,
-            _4: 4,
-            _6: 6,
-            _8: 8,
-            _12: 12,
-            _16: 16,
-            _24: 24,
-            _32: 32,
-            _48: 48,
-            _64: 64,
+            xs: 2,
+            s: 4,
+            sm: 6,
+            m: 8,
+            l: 12,
+            xl: 16,
+            xl2: 24,
+            xl3: 32,
         }
         return spacing
     }

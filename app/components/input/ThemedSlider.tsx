@@ -1,9 +1,9 @@
-import Slider from '@react-native-community/slider'
 import { Style } from '@lib/utils/Global'
+import Slider from '@react-native-community/slider'
 import { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, TextInput } from 'react-native'
+import { StyleSheet, Text, TextInput, View } from 'react-native'
 
-type SliderInputProps = {
+type ThemedSliderProps = {
     label: string
     value: number
     onValueChange: (value: number) => void
@@ -18,7 +18,7 @@ type SliderInputProps = {
 const clamp = (val: number, min: number, max: number, precision: number) =>
     Math.min(Math.max(parseFloat(val?.toFixed(precision) ?? 0), min), max)
 
-const SliderInput: React.FC<SliderInputProps> = ({
+const ThemedSlider: React.FC<ThemedSliderProps> = ({
     label,
     value,
     onValueChange,
@@ -59,7 +59,9 @@ const SliderInput: React.FC<SliderInputProps> = ({
 
     return (
         <View style={{ alignItems: `center` }}>
-            <Text style={disabled ? styles.itemNameDisabled : styles.itemName}>{label}</Text>
+            {label && (
+                <Text style={disabled ? styles.itemNameDisabled : styles.itemName}>{label}</Text>
+            )}
             <View style={styles.sliderContainer}>
                 <Slider
                     disabled={disabled}
@@ -91,7 +93,7 @@ const SliderInput: React.FC<SliderInputProps> = ({
     )
 }
 
-export default SliderInput
+export default ThemedSlider
 
 const styles = StyleSheet.create({
     itemName: {

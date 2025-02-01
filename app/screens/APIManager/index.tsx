@@ -1,4 +1,4 @@
-import ButtonPrimary from '@components/buttons/ButtonPrimary'
+import ThemedButton from '@components/buttons/ThemedButton'
 import { AntDesign, Ionicons } from '@expo/vector-icons'
 import { APIState } from '@lib/engine/API/APIManagerState'
 import { Style } from '@lib/theme/Style'
@@ -57,7 +57,7 @@ const APIManager = () => {
                 </View>
             )}
 
-            <ButtonPrimary
+            <ThemedButton
                 buttonStyle={{
                     marginHorizontal: 16,
                 }}

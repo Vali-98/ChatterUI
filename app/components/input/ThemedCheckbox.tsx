@@ -1,5 +1,5 @@
 import { AntDesign } from '@expo/vector-icons'
-import { Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
 import { useEffect } from 'react'
 import { Text, Pressable, ViewStyle } from 'react-native'
 import Animated, {
@@ -12,23 +12,24 @@ import Animated, {
     ZoomOut,
 } from 'react-native-reanimated'
 
-type CheckboxTitleProps = {
+type ThemedCheckboxProps = {
     name: string
     value: boolean
     onChangeValue?: (item: boolean) => void
     style?: ViewStyle
 }
 
-const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
+const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
     name,
     value,
     onChangeValue = () => {},
     style = {},
 }) => {
+    const theme = Theme.useTheme()
     const colorChange = useSharedValue(value ? 1 : 0)
 
-    const color1 = Style.getColor('primary-surface1')
-    const color2 = Style.getColor('primary-brand')
+    const color1 = theme.color.neutral._100
+    const color2 = theme.color.primary._500
     const animatedStyle = useAnimatedStyle(() => {
         return {
             backgroundColor: interpolateColor(colorChange.value, [0, 1], [color1, color2]),
@@ -52,7 +53,7 @@ const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
                         alignItems: `center`,
                         padding: 6,
                         borderRadius: 8,
-                        borderColor: Style.getColor('primary-brand'),
+                        borderColor: theme.color.primary._500,
                         borderWidth: 1,
                         marginVertical: 8,
                     },
@@ -63,19 +64,19 @@ const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
                     <Animated.View
                         entering={BounceIn.duration(150)}
                         exiting={ZoomOut.duration(150)}>
-                        <AntDesign name="check" color={Style.getColor('primary-text1')} size={20} />
+                        <AntDesign name="check" color={theme.color.text._100} size={20} />
                     </Animated.View>
                 )}
                 {!value && (
                     <Animated.View entering={ZoomIn.duration(150)} exiting={ZoomOut.duration(150)}>
-                        <AntDesign name="close" color={Style.getColor('primary-text2')} size={20} />
+                        <AntDesign name="close" color={theme.color.text._400} size={20} />
                     </Animated.View>
                 )}
             </Animated.View>
             <Text
                 style={{
                     paddingLeft: 12,
-                    color: Style.getColor(value ? 'primary-text1' : 'primary-text2'),
+                    color: value ? theme.color.text._100 : theme.color.text._400,
                 }}>
                 {name}
             </Text>
@@ -83,4 +84,4 @@ const CheckboxTitle: React.FC<CheckboxTitleProps> = ({
     )
 }
 
-export default CheckboxTitle
+export default ThemedCheckbox

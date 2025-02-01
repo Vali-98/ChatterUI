@@ -1,7 +1,7 @@
-import { Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
 import { useFocusEffect } from 'expo-router'
 import React, { ReactNode } from 'react'
-import { StyleSheet, ViewStyle, View, BackHandler } from 'react-native'
+import { BackHandler, StyleSheet, View, ViewStyle } from 'react-native'
 import Animated, {
     ComplexAnimationBuilder,
     Easing,
@@ -47,7 +47,7 @@ const Drawer: React.FC<DrawerProps> = ({
     children = undefined,
 }) => {
     const handleOverlayClick = () => setShowDrawer(false)
-
+    const styles = useStyles()
     const backAction = () => {
         setShowDrawer(false)
         return true
@@ -75,27 +75,30 @@ const Drawer: React.FC<DrawerProps> = ({
 
 export default Drawer
 
-const styles = StyleSheet.create({
-    absolute: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-    },
-    backdrop: {
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        justifyContent: 'center',
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-    },
+const useStyles = () => {
+    const { color, spacing } = Theme.useTheme()
+    return StyleSheet.create({
+        absolute: {
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+        },
+        backdrop: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            justifyContent: 'center',
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+        },
 
-    drawer: {
-        backgroundColor: Style.getColor('primary-surface1'),
-        shadowColor: Style.getColor('primary-shadow'),
-        width: '80%',
-        height: '100%',
-        borderTopWidth: 3,
-        elevation: 20,
-        position: 'absolute',
-    },
-})
+        drawer: {
+            backgroundColor: color.neutral._100,
+            shadowColor: '#000',
+            width: '80%',
+            height: '100%',
+            borderTopWidth: 3,
+            elevation: 20,
+            position: 'absolute',
+        },
+    })
+}

@@ -1,21 +1,34 @@
-import { Style } from '@lib/utils/Global'
 import React, { ReactNode } from 'react'
-import { Text } from 'react-native'
+import { TextProps, TextStyle } from 'react-native'
 
-const SectionTitle = ({ children }: { children: ReactNode }) => {
+import TText from './TText'
+import { Theme } from '@lib/theme/ThemeManager'
+
+const SectionTitle = ({
+    children,
+    style = undefined,
+    ...props
+}: {
+    props?: TextProps
+    children?: ReactNode
+    style?: TextStyle
+}) => {
+    const { color } = Theme.useTheme()
     return (
-        <Text
+        <TText
+            {...props}
             style={{
-                color: Style.getColor('primary-text1'),
-                paddingTop: 12,
+                color: color.text._100,
+                paddingTop: 3,
                 fontSize: 16,
                 paddingBottom: 6,
                 marginBottom: 8,
                 borderBottomWidth: 1,
-                borderColor: Style.getColor('primary-surface3'),
+                borderColor: color.primary._300,
+                ...style,
             }}>
             {children}
-        </Text>
+        </TText>
     )
 }
 

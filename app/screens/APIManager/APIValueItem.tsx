@@ -1,5 +1,5 @@
+import ThemedSwitch from '@components/input/ThemedSwitch'
 import Alert from '@components/views/Alert'
-import SwitchComponent from '@components/input/SwitchTitle'
 import { AntDesign } from '@expo/vector-icons'
 import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
 import { Style } from '@lib/utils/Global'
@@ -48,7 +48,7 @@ const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
                 }}
             />
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <SwitchComponent
+                <ThemedSwitch
                     value={item.active}
                     onValueChange={(value) => {
                         editValue({ ...item, active: value }, index)

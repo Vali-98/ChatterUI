@@ -1,10 +1,11 @@
+import ThemedButton from '@components/buttons/ThemedButton'
 import { AntDesign } from '@expo/vector-icons'
-import { Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
 import React, { useState } from 'react'
 import { Text, TextInput, TouchableOpacity, View, StyleSheet, ViewStyle } from 'react-native'
 
 type StringArrayEditorProps = {
-    style?: ViewStyle
+    containerStyle?: ViewStyle
     title: string
     value: string[]
     setValue: (newdata: string[]) => void
@@ -14,7 +15,7 @@ type StringArrayEditorProps = {
 }
 
 const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
-    style = undefined,
+    containerStyle = undefined,
     title,
     value,
     setValue,
@@ -22,6 +23,8 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
     allowDuplicates = false,
     allowBlank = false,
 }) => {
+    const { color } = Theme.useTheme()
+    const styles = useStyles()
     const [newData, setNewData] = useState('')
 
     const handleSplice = (index: number) => {
@@ -36,12 +39,12 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
     }
 
     return (
-        <View style={[styles.mainContainer, style]}>
+        <View style={[styles.mainContainer, containerStyle]}>
             <Text style={styles.title}>{title}</Text>
             <View style={styles.contentContainer}>
-                <View style={styles.tagContainer}>
-                    {value.length !== 0 &&
-                        value.map((item, index) => (
+                {value.length !== 0 && (
+                    <View style={styles.tagContainer}>
+                        {value.map((item, index) => (
                             <TouchableOpacity
                                 key={index}
                                 style={styles.tag}
@@ -49,15 +52,11 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
                                 <Text style={styles.tagText}>
                                     {item.replaceAll('\n', replaceNewLine ?? '\n')}
                                 </Text>
-                                <AntDesign
-                                    name="close"
-                                    size={16}
-                                    color={Style.getColor('primary-text2')}
-                                />
+                                <AntDesign name="close" size={16} color={color.text._400} />
                             </TouchableOpacity>
                         ))}
-                    {value.length === 0 && <Text style={styles.emptyTag}>{'<No Values>'}</Text>}
-                </View>
+                    </View>
+                )}
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
@@ -66,11 +65,10 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
                         keyboardType="default"
                         multiline
                         placeholder="Enter value..."
-                        placeholderTextColor={Style.getColor('primary-text3')}
+                        placeholderTextColor={color.text._700}
                     />
-                    <TouchableOpacity style={styles.button} onPress={() => addData(newData)}>
-                        <Text style={styles.buttonText}>Add</Text>
-                    </TouchableOpacity>
+
+                    <ThemedButton label="Add" onPress={() => addData(newData)} />
                 </View>
             </View>
         </View>
@@ -79,76 +77,76 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
 
 export default StringArrayEditor
 
-const styles = StyleSheet.create({
-    mainContainer: {
-        flex: 1,
-    },
+const useStyles = () => {
+    const { color, spacing } = Theme.useTheme()
 
-    contentContainer: {
-        borderRadius: 8,
-    },
+    return StyleSheet.create({
+        mainContainer: {
+            flex: 1,
+        },
 
-    title: {
-        color: Style.getColor('primary-text1'),
-        marginBottom: 12,
-    },
+        contentContainer: {
+            borderWidth: 1,
+            color: color.text._100,
+            borderColor: color.neutral._300,
+            marginBottom: spacing.s,
+            marginRight: spacing.l,
+            paddingHorizontal: spacing.s,
+            paddingVertical: spacing.m,
+            borderRadius: spacing.m,
+        },
 
-    tagContainer: {
-        flexDirection: 'row',
-        columnGap: 8,
-        rowGap: 8,
-        flexWrap: 'wrap',
-    },
+        title: {
+            color: color.text._100,
+            marginBottom: spacing.m,
+            fontSize: 16,
+        },
 
-    tag: {
-        backgroundColor: Style.getColor('primary-surface4'),
-        paddingVertical: 4,
-        paddingLeft: 12,
-        paddingRight: 8,
-        borderRadius: 8,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
+        tagContainer: {
+            flexDirection: 'row',
+            columnGap: spacing.m,
+            rowGap: spacing.m,
+            paddingBottom: spacing.m,
+            marginBottom: spacing.m,
+            borderBottomWidth: 1,
+            borderColor: color.primary._200,
+            flexWrap: 'wrap',
+        },
 
-    tagText: {
-        color: Style.getColor('primary-text1'),
-        marginRight: 8,
-    },
+        tag: {
+            borderColor: color.primary._700,
+            borderWidth: 1,
+            paddingVertical: 6,
+            paddingLeft: 12,
+            paddingRight: 8,
+            borderRadius: 8,
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
 
-    emptyTag: {
-        color: Style.getColor('primary-text2'),
-        paddingVertical: 4,
-        paddingHorizontal: 12,
-        fontStyle: 'italic',
-    },
+        tagText: {
+            color: color.text._100,
+            marginRight: 8,
+        },
 
-    input: {
-        flex: 1,
-        borderWidth: 1,
-        color: Style.getColor('primary-text1'),
-        backgroundColor: Style.getColor('primary-surface1'),
-        borderColor: Style.getColor('primary-surface3'),
-        marginTop: 12,
-        marginBottom: 4,
-        marginRight: 12,
-        paddingVertical: 6,
-        paddingHorizontal: 8,
-        borderRadius: 8,
-    },
+        emptyTag: {
+            color: color.text._400,
+            paddingVertical: 4,
+            paddingHorizontal: 12,
+            fontStyle: 'italic',
+        },
 
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
+        input: {
+            flex: 1,
+            color: color.text._100,
+            paddingVertical: 6,
+            paddingHorizontal: 8,
+            borderRadius: 8,
+        },
 
-    button: {
-        borderRadius: 8,
-        paddingVertical: 4,
-        paddingHorizontal: 12,
-        backgroundColor: Style.getColor('primary-brand'),
-    },
-
-    buttonText: {
-        color: Style.getColor('primary-text1'),
-    },
-})
+        inputContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
+    })
+}

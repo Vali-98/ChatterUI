@@ -1,4 +1,4 @@
-import ButtonPrimary from '@components/buttons/ButtonPrimary'
+import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import { MaterialIcons } from '@expo/vector-icons'
@@ -228,7 +228,7 @@ const AddAPI = () => {
                     </View>
                 )}
             </ScrollView>
-            <ButtonPrimary
+            <ThemedButton
                 label="Create API"
                 onPress={() => {
                     addValue(values)

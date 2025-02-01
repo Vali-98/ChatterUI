@@ -1,14 +1,14 @@
-import Alert from '@components/views/Alert'
-import CheckboxTitle from '@components/input/CheckboxTitle'
 import DropdownSheet from '@components/input/DropdownSheet'
+import StringArrayEditor from '@components/input/StringArrayEditor'
+import ThemedCheckbox from '@components/input/ThemedCheckbox'
+import ThemedSlider from '@components/input/ThemedSlider'
+import ThemedTextInput from '@components/input/ThemedTextInput'
+import Alert from '@components/views/Alert'
 import FadeDownView from '@components/views/FadeDownView'
 import PopupMenu from '@components/views/PopupMenu'
-import SliderInput from '@components/input/SliderInput'
-import StringArrayEditor from '@components/input/StringArrayEditor'
-import TextBox from '@components/input/TextBox'
 import TextBoxModal from '@components/views/TextBoxModal'
-import useAutosave from '@lib/hooks/AutoSave'
 import { FontAwesome } from '@expo/vector-icons'
+import useAutosave from '@lib/hooks/AutoSave'
 import { Instructs, Logger, MarkdownStyle, Style, saveStringToDownload } from '@lib/utils/Global'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
@@ -190,59 +190,93 @@ const Instruct = () => {
                     </View>
 
                     <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollContainer}>
-                        <TextBox
-                            name="System Sequence"
-                            varname="system_prompt"
-                            lines={5}
-                            body={currentInstruct}
-                            setValue={setCurrentInstruct}
+                        <ThemedTextInput
+                            label="System Sequence"
+                            value={currentInstruct.system_prompt}
+                            onChangeText={(text) => {
+                                setCurrentInstruct({
+                                    ...currentInstruct,
+                                    system_prompt: text,
+                                })
+                            }}
+                            numberOfLines={5}
                             multiline
                         />
                         <View style={{ flexDirection: 'row' }}>
-                            <TextBox
-                                name="System Prefix"
-                                varname="system_prefix"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
+                            <ThemedTextInput
+                                label="System Prefix"
+                                value={currentInstruct.system_prefix}
+                                onChangeText={(text) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        system_prefix: text,
+                                    })
+                                }}
+                                numberOfLines={5}
                                 multiline
                             />
-                            <TextBox
-                                name="System Suffix"
-                                varname="system_suffix"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                                multiline
-                            />
-                        </View>
-                        <View style={{ flexDirection: 'row' }}>
-                            <TextBox
-                                name="Input Prefix"
-                                varname="input_prefix"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                                multiline
-                            />
-                            <TextBox
-                                name="Input Suffix"
-                                varname="input_suffix"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
+                            <ThemedTextInput
+                                label="System Suffix"
+                                value={currentInstruct.system_suffix}
+                                onChangeText={(text) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        system_suffix: text,
+                                    })
+                                }}
+                                numberOfLines={5}
                                 multiline
                             />
                         </View>
                         <View style={{ flexDirection: 'row' }}>
-                            <TextBox
-                                name="Output Prefix"
-                                varname="output_prefix"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
+                            <ThemedTextInput
+                                label="Input Prefix"
+                                value={currentInstruct.input_prefix}
+                                onChangeText={(text) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        input_prefix: text,
+                                    })
+                                }}
+                                numberOfLines={5}
                                 multiline
                             />
-                            <TextBox
-                                name="Output Suffix"
-                                varname="output_suffix"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
+                            <ThemedTextInput
+                                label="Input Suffix"
+                                value={currentInstruct.input_suffix}
+                                onChangeText={(text) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        input_suffix: text,
+                                    })
+                                }}
+                                numberOfLines={5}
+                                multiline
+                            />
+                        </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <ThemedTextInput
+                                label="Output Prefix"
+                                value={currentInstruct.output_prefix}
+                                onChangeText={(text) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        output_prefix: text,
+                                    })
+                                }}
+                                numberOfLines={5}
+                                multiline
+                            />
+                            <ThemedTextInput
+                                label="Output Suffix"
+                                value={currentInstruct.output_suffix}
+                                onChangeText={(text) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        output_suffix: text,
+                                    })
+                                }}
+                                numberOfLines={5}
                                 multiline
                             />
                         </View>
@@ -265,11 +299,16 @@ const Instruct = () => {
                             </View>
                             */}
                         <View style={{ flexDirection: 'row' }}>
-                            <TextBox
-                                name="Last Output Prefix"
-                                varname="last_output_prefix"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
+                            <ThemedTextInput
+                                label="Last Output Prefix"
+                                value={currentInstruct.last_output_prefix}
+                                onChangeText={(text) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        last_output_prefix: text,
+                                    })
+                                }}
+                                numberOfLines={5}
                                 multiline
                             />
                             {/*<TextBox
@@ -282,7 +321,7 @@ const Instruct = () => {
                         </View>
 
                         <StringArrayEditor
-                            style={{ marginBottom: 12 }}
+                            containerStyle={{ marginBottom: 12 }}
                             title="Stop Sequence"
                             value={
                                 currentInstruct.stop_sequence
@@ -306,7 +345,7 @@ const Instruct = () => {
                                 justifyContent: 'space-evenly',
                             }}>
                             <View>
-                                <CheckboxTitle
+                                <ThemedCheckbox
                                     name="Wrap In Newline"
                                     value={currentInstruct.wrap}
                                     onChangeValue={(b) => {
@@ -316,7 +355,7 @@ const Instruct = () => {
                                         })
                                     }}
                                 />
-                                <CheckboxTitle
+                                <ThemedCheckbox
                                     name="Include Names"
                                     value={currentInstruct.names}
                                     onChangeValue={(b) => {
@@ -326,7 +365,7 @@ const Instruct = () => {
                                         })
                                     }}
                                 />
-                                <CheckboxTitle
+                                <ThemedCheckbox
                                     name="Add Timestamp"
                                     value={currentInstruct.timestamp}
                                     onChangeValue={(b) => {
@@ -338,7 +377,7 @@ const Instruct = () => {
                                 />
                             </View>
                             <View>
-                                <CheckboxTitle
+                                <ThemedCheckbox
                                     name="Use Examples"
                                     value={currentInstruct.examples}
                                     onChangeValue={(b) => {
@@ -348,7 +387,7 @@ const Instruct = () => {
                                         })
                                     }}
                                 />
-                                <CheckboxTitle
+                                <ThemedCheckbox
                                     name="Use Scenario"
                                     value={currentInstruct.scenario}
                                     onChangeValue={(b) => {
@@ -359,7 +398,7 @@ const Instruct = () => {
                                     }}
                                 />
 
-                                <CheckboxTitle
+                                <ThemedCheckbox
                                     name="Use Personality"
                                     value={currentInstruct.personality}
                                     onChangeValue={(b) => {
@@ -372,7 +411,7 @@ const Instruct = () => {
                             </View>
                         </View>
 
-                        <SliderInput
+                        <ThemedSlider
                             label="Autoformat New Chats"
                             value={currentInstruct.format_type}
                             onValueChange={(value) =>
@@ -464,7 +503,7 @@ const styles = StyleSheet.create({
     },
 
     dropdownContainer: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginTop: 16,
         flexDirection: 'row',
         paddingBottom: 12,
@@ -473,7 +512,7 @@ const styles = StyleSheet.create({
 
     scrollContainer: {
         flex: 1,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         marginTop: 16,
     },
 
@@ -482,7 +521,7 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        padding: 5,
+        padding: 4,
         borderRadius: 4,
         marginLeft: 8,
     },

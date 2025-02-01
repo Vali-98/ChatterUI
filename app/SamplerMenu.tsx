@@ -1,6 +1,6 @@
-import CheckboxTitle from '@components/input/CheckboxTitle'
-import SliderInput from '@components/input/SliderInput'
-import TextBox from '@components/input/TextBox'
+import ThemedCheckbox from '@components/input/ThemedCheckbox'
+import ThemedSlider from '@components/input/ThemedSlider'
+import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import FadeDownView from '@components/views/FadeDownView'
 import TextBoxModal from '@components/views/TextBoxModal'
@@ -205,7 +205,7 @@ const SamplerMenu = () => {
                                         return (
                                             (samplerItem.values.type === 'float' ||
                                                 samplerItem.values.type === 'integer') && (
-                                                <SliderInput
+                                                <ThemedSlider
                                                     key={item.samplerID}
                                                     value={
                                                         currentConfig.data[
@@ -231,7 +231,7 @@ const SamplerMenu = () => {
                                         )
                                     case 'checkbox':
                                         return (
-                                            <CheckboxTitle
+                                            <ThemedCheckbox
                                                 value={
                                                     currentConfig.data[item.samplerID] as boolean
                                                 }
@@ -250,17 +250,19 @@ const SamplerMenu = () => {
                                         )
                                     case 'textinput':
                                         return (
-                                            <TextBox
+                                            <ThemedTextInput
                                                 key={item.samplerID}
-                                                varname={samplerItem.internalID}
-                                                body={currentConfig.data}
-                                                setValue={(data) => {
+                                                value={currentConfig.data[item.samplerID] as string}
+                                                onChangeText={(text) => {
                                                     updateCurrentConfig({
                                                         ...currentConfig,
-                                                        data: data,
+                                                        data: {
+                                                            ...currentConfig.data,
+                                                            [item.samplerID]: text,
+                                                        },
                                                     })
                                                 }}
-                                                name={samplerItem.friendlyName}
+                                                label={samplerItem.friendlyName}
                                             />
                                         )
                                     //case 'custom':
@@ -283,8 +285,7 @@ export default SamplerMenu
 
 const styles = StyleSheet.create({
     mainContainer: {
-        margin: 16,
-        paddingBottom: 150,
+        padding: 16,
     },
 
     dropdownContainer: {
@@ -300,7 +301,7 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        padding: 5,
+        padding: 4,
         borderRadius: 4,
         marginLeft: 8,
     },

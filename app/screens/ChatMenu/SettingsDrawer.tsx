@@ -90,7 +90,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
     const paths: ButtonData[] = [
         {
             name: 'Sampler',
-            path: '/SamplerMenuNew',
+            path: '/SamplerMenu',
             icon: 'barschart',
         },
         {
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     userImage: {
         width: 80,
         height: 80,
-        borderRadius: 20,
+        borderRadius: 16,
         borderColor: Style.getColor('primary-brand'),
         borderWidth: 2,
     },
@@ -256,12 +256,12 @@ const styles = StyleSheet.create({
     largeButtonText: {
         fontSize: 18,
         paddingVertical: 12,
-        paddingLeft: 15,
+        paddingLeft: 16,
         color: Style.getColor('primary-text1'),
     },
 
     largeButton: {
-        paddingLeft: 15,
+        paddingLeft: 16,
         flexDirection: 'row',
         alignItems: 'center',
     },

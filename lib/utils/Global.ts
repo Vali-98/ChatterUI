@@ -1,5 +1,6 @@
 import { SamplersManager } from '@lib/state/SamplerState'
 import { Style } from '@lib/theme/Style'
+import { Theme } from '@lib/theme/ThemeManager'
 import { DownloadDirectoryPath, writeFile } from 'cui-fs'
 import { getCpuFeatures } from 'cui-llama.rn'
 import * as Crypto from 'expo-crypto'
@@ -7,7 +8,7 @@ import { DeviceType, getDeviceTypeAsync } from 'expo-device'
 import * as FS from 'expo-file-system'
 import { lockAsync, OrientationLock } from 'expo-screen-orientation'
 import * as Sharing from 'expo-sharing'
-import * as SystemUI from 'expo-system-ui'
+import { setBackgroundColorAsync } from 'expo-system-ui'
 import { Platform } from 'react-native'
 import { btoa } from 'react-native-quick-base64'
 
@@ -186,7 +187,7 @@ export const startupApp = () => {
         mmkv.delete(Global.LocalModel)
     }
     lockScreenOrientation()
-    SystemUI.setBackgroundColorAsync(Style.getColor('primary-surface1'))
+    setBackgroundColorAsync(Theme.useColorState.getState().color.neutral._100)
     Logger.log('Resetting state values for startup.')
 }
 

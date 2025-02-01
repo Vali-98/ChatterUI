@@ -1,4 +1,4 @@
-import ButtonPrimary from '@components/buttons/ButtonPrimary'
+import ThemedButton from '@components/buttons/ThemedButton'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { APIState } from '@lib/engine/API/APIManagerState'
 import { Style } from '@lib/theme/Style'
@@ -44,7 +44,7 @@ const TemplateManager = () => {
                 </View>
             )}
 
-            <ButtonPrimary
+            <ThemedButton
                 onPress={async () => {
                     const result = await getDocumentAsync()
                     if (result.canceled) return
