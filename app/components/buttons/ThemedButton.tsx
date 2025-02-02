@@ -1,6 +1,7 @@
 import TText from '@components/text/TText'
 import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
+import { ReactNode } from 'react'
 import {
     PressableProps,
     TextStyle,
@@ -19,9 +20,10 @@ interface ThemedButtonProps extends Omit<PressableProps, 'style'> {
     buttonStyle?: ViewStyle
     opacity?: number
     variant?: ButtonVariant
-    icon?: keyof typeof AntDesign.glyphMap
+    iconName?: keyof typeof AntDesign.glyphMap
     iconSize?: number
     iconStyle?: TextStyle
+    icon?: ReactNode
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
@@ -43,8 +45,9 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                     backgroundColor: theme.color.primary._500,
                     borderColor: theme.color.primary._100,
                     borderWidth: 1,
-                    padding: theme.spacing.m,
-                    borderRadius: theme.spacing.m,
+                    paddingVertical: theme.spacing.m,
+                    paddingHorizontal: theme.spacing.xl,
+                    borderRadius: theme.spacing.xl,
                 },
                 labelStyle: {
                     textAlign: 'center',
@@ -56,12 +59,13 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                 buttonStyle: {
                     borderColor: theme.color.primary._400,
                     borderWidth: 1,
-                    padding: theme.spacing.m,
-                    borderRadius: theme.spacing.m,
+                    paddingVertical: theme.spacing.m,
+                    paddingHorizontal: theme.spacing.xl,
+                    borderRadius: theme.spacing.xl,
                 },
                 labelStyle: {
                     textAlign: 'center',
-                    color: theme.color.primary._800,
+                    color: theme.color.text._300,
                 },
             }
         case 'tertiary':
@@ -81,8 +85,9 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                 buttonStyle: {
                     borderColor: theme.color.error._400,
                     borderWidth: 1,
-                    padding: theme.spacing.m,
-                    borderRadius: theme.spacing.m,
+                    paddingVertical: theme.spacing.m,
+                    paddingHorizontal: theme.spacing.xl,
+                    borderRadius: theme.spacing.xl,
                 },
                 labelStyle: {
                     textAlign: 'center',
@@ -94,8 +99,9 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                 buttonStyle: {
                     borderColor: theme.color.neutral._500,
                     borderWidth: 1,
-                    padding: theme.spacing.m,
-                    borderRadius: theme.spacing.m,
+                    paddingVertical: theme.spacing.m,
+                    paddingHorizontal: theme.spacing.xl,
+                    borderRadius: theme.spacing.xl,
                 },
                 labelStyle: {
                     textAlign: 'center',
@@ -114,9 +120,10 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
     opacity = 1,
     onPressOut,
     variant = 'primary',
-    icon = undefined,
+    iconName = undefined,
     iconSize = 24,
     iconStyle = undefined,
+    icon = undefined,
     ...rest
 }) => {
     const animOpacity = useAnimatedValue(1)
@@ -148,19 +155,23 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
             style={StyleSheet.flatten([
                 theme.buttonStyle,
                 {
+                    flexDirection: 'row',
+                    columnGap: 8,
+                    justifyContent: 'center',
                     opacity: animOpacity,
                     transform: [{ scaleX: 0.99 }],
                 },
                 buttonStyle,
             ])}>
-            {icon && (
+            {!icon && iconName && (
                 <AntDesign
-                    name={icon}
+                    name={iconName}
                     size={iconSize}
                     style={iconStyle}
-                    color={labelStyle?.color}
+                    color={theme.labelStyle.color}
                 />
             )}
+            {icon}
             {label && <TText style={[theme.labelStyle, labelStyle]}>{label}</TText>}
         </AnimatedPressable>
     )
