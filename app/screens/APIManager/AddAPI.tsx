@@ -80,7 +80,7 @@ const AddAPI = () => {
                         onChangeText={(value) => {
                             setValues({ ...values, friendlyName: value })
                         }}
-                        placeholder={template.defaultValues.endpoint}
+                        placeholder="New API..."
                         placeholderTextColor={Style.getColor('primary-text2')}
                     />
                 </View>
@@ -125,6 +125,7 @@ const AddAPI = () => {
                                       }
                                     : {}
                             }
+                            callback={handleGetModelList}
                         />
                     </View>
                 )}

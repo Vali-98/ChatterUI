@@ -12,6 +12,7 @@ type HeartbeatButtonProps = {
     api: string
     buttonText?: string
     apiFormat?: (url: string) => string
+    callback?: () => void
     messageNeutral?: string
     messageError?: string
     messageOK?: string
@@ -33,6 +34,7 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
     messageError = 'Failed To Connect',
     messageOK = 'Connected',
     headers = {},
+    callback = () => {},
 }) => {
     const [status, setStatus] = useState<ResponseStatus>(ResponseStatus.DEFAULT)
 
@@ -64,6 +66,7 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
                 headers: headers ?? {},
             }).catch(() => ({ status: 400 }))
             clearTimeout(timeout)
+            callback()
             setStatus(response.status === 200 ? ResponseStatus.OK : ResponseStatus.ERROR)
         } catch (error) {
             setStatus(ResponseStatus.ERROR)
