@@ -121,7 +121,7 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
     onPressOut,
     variant = 'primary',
     iconName = undefined,
-    iconSize = 24,
+    iconSize = 20,
     iconStyle = undefined,
     icon = undefined,
     ...rest

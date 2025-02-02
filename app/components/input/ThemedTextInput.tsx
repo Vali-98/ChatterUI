@@ -18,32 +18,32 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
     return (
         <View
             style={{
-                paddingBottom: 8,
                 flex: 1,
             }}>
-            <Text
-                style={{
-                    color: color.text._100,
-                }}>
-                {label}
-            </Text>
+            {label && (
+                <Text
+                    style={{
+                        color: color.text._100,
+                        marginBottom: 8,
+                    }}>
+                    {label}
+                </Text>
+            )}
             <TextInput
-                {...rest}
                 multiline={(!!numberOfLines && numberOfLines > 1) || multiline}
                 numberOfLines={numberOfLines}
                 style={{
                     color: color.text._100,
                     borderColor: color.neutral._300,
                     borderWidth: 1,
-                    paddingVertical: 4,
-                    paddingHorizontal: 8,
-                    marginVertical: 8,
-                    marginHorizontal: 4,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
                     borderRadius: 8,
                     textAlignVertical: numberOfLines && numberOfLines > 1 ? `top` : `center`,
                 }}
                 placeholder="----"
                 placeholderTextColor={color.text._400}
+                {...rest}
             />
         </View>
     )

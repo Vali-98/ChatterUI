@@ -89,8 +89,6 @@ const useStyles = () => {
             borderWidth: 1,
             color: color.text._100,
             borderColor: color.neutral._300,
-            marginBottom: spacing.s,
-            marginRight: spacing.l,
             paddingHorizontal: spacing.s,
             paddingVertical: spacing.m,
             borderRadius: spacing.m,
@@ -116,7 +114,7 @@ const useStyles = () => {
         tag: {
             borderColor: color.primary._700,
             borderWidth: 1,
-            paddingVertical: 6,
+            paddingVertical: 8,
             paddingLeft: 12,
             paddingRight: 8,
             borderRadius: 8,
@@ -139,7 +137,7 @@ const useStyles = () => {
         input: {
             flex: 1,
             color: color.text._100,
-            paddingVertical: 6,
+            paddingVertical: 4,
             paddingHorizontal: 8,
             borderRadius: 8,
         },

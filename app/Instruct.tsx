@@ -189,7 +189,10 @@ const Instruct = () => {
                         </TouchableOpacity>
                     </View>
 
-                    <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollContainer}>
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        style={styles.scrollContainer}
+                        contentContainerStyle={{ rowGap: 8 }}>
                         <ThemedTextInput
                             label="System Sequence"
                             value={currentInstruct.system_prompt}
@@ -202,7 +205,7 @@ const Instruct = () => {
                             numberOfLines={5}
                             multiline
                         />
-                        <View style={{ flexDirection: 'row' }}>
+                        <View style={{ flexDirection: 'row', columnGap: 8 }}>
                             <ThemedTextInput
                                 label="System Prefix"
                                 value={currentInstruct.system_prefix}
@@ -228,7 +231,7 @@ const Instruct = () => {
                                 multiline
                             />
                         </View>
-                        <View style={{ flexDirection: 'row' }}>
+                        <View style={{ flexDirection: 'row', columnGap: 8 }}>
                             <ThemedTextInput
                                 label="Input Prefix"
                                 value={currentInstruct.input_prefix}
@@ -254,7 +257,7 @@ const Instruct = () => {
                                 multiline
                             />
                         </View>
-                        <View style={{ flexDirection: 'row' }}>
+                        <View style={{ flexDirection: 'row', columnGap: 8 }}>
                             <ThemedTextInput
                                 label="Output Prefix"
                                 value={currentInstruct.output_prefix}
