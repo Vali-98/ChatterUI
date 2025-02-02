@@ -18,7 +18,7 @@ const ThemedSwitch: React.FC<ThemedSwitchProps> = ({
     const { color, spacing } = Theme.useTheme()
     return (
         <View>
-            <View style={{ flexDirection: 'row', paddingVertical: spacing.l }}>
+            <View style={{ flexDirection: 'row', paddingVertical: spacing.m }}>
                 <Switch
                     trackColor={{
                         false: color.neutral._200,
