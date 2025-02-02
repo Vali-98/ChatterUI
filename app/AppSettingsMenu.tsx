@@ -2,17 +2,18 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
+import HeaderTitle from '@components/views/HeaderTitle'
 import { registerForPushNotificationsAsync } from '@lib/notifications/Notifications'
 import { Theme } from '@lib/theme/ThemeManager'
-import { AppSettings, Characters, Logger, Style } from '@lib/utils/Global'
+import { AppSettings, Characters, Logger } from '@lib/utils/Global'
 import appConfig from 'app.config'
 import { copyFile, DocumentDirectoryPath, DownloadDirectoryPath } from 'cui-fs'
 import { reloadAppAsync } from 'expo'
 import { getDocumentAsync } from 'expo-document-picker'
 import { copyAsync, deleteAsync, documentDirectory } from 'expo-file-system'
-import { Stack, useRouter } from 'expo-router'
+import { useRouter } from 'expo-router'
 import React from 'react'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 const appVersion = appConfig.expo.version
@@ -95,7 +96,7 @@ const AppSettingsMenu = () => {
                 paddingBottom: spacing.xl3,
             }}
             contentContainerStyle={{ rowGap: spacing.sm }}>
-            <Stack.Screen options={{ title: 'App Settings' }} />
+            <HeaderTitle title="Settings" />
 
             <SectionTitle>Style</SectionTitle>
             <ThemedButton
