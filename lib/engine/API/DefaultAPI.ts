@@ -87,7 +87,7 @@ export const defaultTemplates: APIConfiguration[] = [
         features: {
             usePrefill: false,
             useFirstMessage: false,
-            useKey: false,
+            useKey: true,
             useModel: false,
             multipleModels: false,
         },
@@ -124,8 +124,8 @@ export const defaultTemplates: APIConfiguration[] = [
             completionType: {
                 type: 'textCompletions',
             },
-            authHeader: '',
-            authPrefix: '',
+            authHeader: 'Authorization',
+            authPrefix: 'Bearer ',
             responseParsePattern: 'token',
             useStop: true,
             stopKey: 'stop_sequence',
@@ -225,7 +225,7 @@ export const defaultTemplates: APIConfiguration[] = [
 
         defaultValues: {
             endpoint: 'http://127.0.0.1/api/generate',
-            modelEndpoint: 'http://127.0.0.1/api/models',
+            modelEndpoint: 'http://127.0.0.1/api/tags',
             prefill: '',
             firstMessage: '',
             key: '',
