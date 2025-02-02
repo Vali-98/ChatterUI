@@ -1,8 +1,8 @@
+import { Theme } from '@lib/theme/ThemeManager'
 import React, { ReactNode } from 'react'
 import { TextProps, TextStyle } from 'react-native'
 
 import TText from './TText'
-import { Theme } from '@lib/theme/ThemeManager'
 
 const SectionTitle = ({
     children,
@@ -13,18 +13,16 @@ const SectionTitle = ({
     children?: ReactNode
     style?: TextStyle
 }) => {
-    const { color } = Theme.useTheme()
+    const { color, spacing } = Theme.useTheme()
     return (
         <TText
             {...props}
             style={{
                 color: color.text._100,
-                paddingTop: 3,
                 fontSize: 16,
-                paddingBottom: 6,
-                marginBottom: 8,
+                paddingBottom: spacing.m,
                 borderBottomWidth: 1,
-                borderColor: color.primary._300,
+                borderColor: color.primary._200,
                 ...style,
             }}>
             {children}
