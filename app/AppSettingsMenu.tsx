@@ -1,7 +1,9 @@
+import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
 import { registerForPushNotificationsAsync } from '@lib/notifications/Notifications'
+import { Theme } from '@lib/theme/ThemeManager'
 import { AppSettings, Characters, Logger, Style } from '@lib/utils/Global'
 import appConfig from 'app.config'
 import { copyFile, DocumentDirectoryPath, DownloadDirectoryPath } from 'cui-fs'
@@ -10,7 +12,7 @@ import { getDocumentAsync } from 'expo-document-picker'
 import { copyAsync, deleteAsync, documentDirectory } from 'expo-file-system'
 import { Stack, useRouter } from 'expo-router'
 import React from 'react'
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 const appVersion = appConfig.expo.version
@@ -60,6 +62,7 @@ const importDB = async (uri: string, name: string) => {
 
 const AppSettingsMenu = () => {
     const router = useRouter()
+    const { color, spacing } = Theme.useTheme()
     const [printContext, setPrintContext] = useMMKVBoolean(AppSettings.PrintContext)
     const [firstMes, setFirstMes] = useMMKVBoolean(AppSettings.CreateFirstMes)
     const [chatOnStartup, setChatOnStartup] = useMMKVBoolean(AppSettings.ChatOnStartup)
@@ -85,18 +88,23 @@ const AppSettingsMenu = () => {
     const [useLegacyAPI, setUseLegacyAPI] = useMMKVBoolean(AppSettings.UseLegacyAPI)
 
     return (
-        <ScrollView style={styles.mainContainer}>
+        <ScrollView
+            style={{
+                marginVertical: spacing.xl2,
+                paddingHorizontal: spacing.xl2,
+                paddingBottom: spacing.xl3,
+            }}
+            contentContainerStyle={{ rowGap: spacing.sm }}>
             <Stack.Screen options={{ title: 'App Settings' }} />
 
-            <Text style={{ ...styles.sectionTitle, paddingTop: 0 }}>Style</Text>
-
-            <TouchableOpacity
-                style={styles.button}
+            <SectionTitle>Style</SectionTitle>
+            <ThemedButton
+                label="Customize Colors"
+                variant="secondary"
                 onPress={() => {
                     router.push('/ColorSettings')
-                }}>
-                <Text style={styles.buttonText}>Customize Colors</Text>
-            </TouchableOpacity>
+                }}
+            />
 
             <SectionTitle>Chat</SectionTitle>
 
@@ -196,8 +204,9 @@ const AppSettingsMenu = () => {
             )}
 
             <SectionTitle>Character Management</SectionTitle>
-            <TouchableOpacity
-                style={styles.button}
+            <ThemedButton
+                label="Regenerate Default Card"
+                variant="secondary"
                 onPress={() => {
                     Alert.alert({
                         title: `Regenerate Default Card`,
@@ -207,17 +216,21 @@ const AppSettingsMenu = () => {
                             { label: 'Create Default Card', onPress: Characters.createDefaultCard },
                         ],
                     })
-                }}>
-                <Text style={styles.buttonText}>Regenerate Default Card</Text>
-            </TouchableOpacity>
-
+                }}
+            />
             <SectionTitle>Database Management</SectionTitle>
 
-            <Text style={styles.subtitle}>
+            <Text
+                style={{
+                    color: color.text._500,
+                    paddingBottom: spacing.xs,
+                    marginBottom: spacing.m,
+                }}>
                 WARNING: only import if you are certain it's from the same version!
             </Text>
-            <TouchableOpacity
-                style={styles.button}
+            <ThemedButton
+                label="Export Database"
+                variant="secondary"
                 onPress={() => {
                     Alert.alert({
                         title: `Export Database`,
@@ -227,12 +240,12 @@ const AppSettingsMenu = () => {
                             { label: 'Export Database', onPress: exportDB },
                         ],
                     })
-                }}>
-                <Text style={styles.buttonText}>Export Database</Text>
-            </TouchableOpacity>
+                }}
+            />
 
-            <TouchableOpacity
-                style={styles.button}
+            <ThemedButton
+                label="Import Database"
+                variant="secondary"
                 onPress={async () => {
                     getDocumentAsync({ type: ['application/*'] }).then(async (result) => {
                         if (result.canceled) return
@@ -250,9 +263,8 @@ const AppSettingsMenu = () => {
                             ],
                         })
                     })
-                }}>
-                <Text style={styles.buttonText}>Import Database</Text>
-            </TouchableOpacity>
+                }}
+            />
 
             <SectionTitle>Security</SectionTitle>
             <ThemedSwitch
@@ -270,45 +282,9 @@ const AppSettingsMenu = () => {
                 description="Allows landscape on phones (App restart required)"
             />
 
-            <View style={{ paddingVertical: 60 }} />
+            <View style={{ paddingVertical: spacing.xl3 }} />
         </ScrollView>
     )
 }
 
 export default AppSettingsMenu
-
-const styles = StyleSheet.create({
-    mainContainer: {
-        marginTop: 16,
-        paddingHorizontal: 20,
-        paddingBottom: 20,
-    },
-
-    button: {
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        backgroundColor: Style.getColor('primary-surface3'),
-        borderRadius: 8,
-        marginVertical: 8,
-    },
-
-    buttonText: {
-        color: Style.getColor('primary-text1'),
-    },
-
-    sectionTitle: {
-        color: Style.getColor('primary-text1'),
-        paddingTop: 12,
-        fontSize: 16,
-        paddingBottom: 6,
-        marginBottom: 8,
-        borderBottomWidth: 1,
-        borderColor: Style.getColor('primary-surface3'),
-    },
-
-    subtitle: {
-        color: Style.getColor('primary-text2'),
-        paddingBottom: 2,
-        marginBottom: 8,
-    },
-})
