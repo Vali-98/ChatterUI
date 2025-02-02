@@ -51,9 +51,9 @@ const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
                     {
                         flexDirection: 'row',
                         alignItems: `center`,
-                        padding: 6,
+                        padding: 4,
                         borderRadius: 8,
-                        borderColor: theme.color.primary._500,
+                        borderColor: theme.color.neutral._500,
                         borderWidth: 1,
                         marginVertical: 8,
                     },
@@ -69,7 +69,7 @@ const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
                 )}
                 {!value && (
                     <Animated.View entering={ZoomIn.duration(150)} exiting={ZoomOut.duration(150)}>
-                        <AntDesign name="close" color={theme.color.text._400} size={20} />
+                        <AntDesign name="close" color={theme.color.text._600} size={20} />
                     </Animated.View>
                 )}
             </Animated.View>
