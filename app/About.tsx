@@ -106,18 +106,5 @@ const useStyles = () => {
             width: 120,
             height: 120,
         },
-        supportText: { color: color.text._400, paddingRight: spacing.s },
-
-        supportButton: {
-            marginTop: spacing.m,
-            alignSelf: 'center',
-            flexDirection: 'row',
-            alignItems: 'center',
-            borderColor: color.primary._500,
-            padding: spacing.m,
-            paddingHorizontal: spacing.xl,
-            borderWidth: 1,
-            borderRadius: spacing.xl,
-        },
     })
 }

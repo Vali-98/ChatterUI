@@ -40,17 +40,42 @@ export namespace Theme {
         }
         return spacing
     }
+
+    const useBorderWidthState = () => {
+        return {
+            s: 1,
+            m: 2,
+            l: 4,
+            xl: 8,
+        }
+    }
+
+    const useBorderRadiusState = () => {
+        return {
+            s: 4,
+            m: 8,
+            l: 12,
+            xl: 16,
+            xl2: 24,
+            xl3: 32,
+        }
+    }
     // TODO: Research fonts
     const useFontState = () => {
         return ''
+    }
+
+    const useFontSize = () => {
+        return { s: 10, m: 16, l: 20, xl: 24 }
     }
 
     export const useTheme = () => {
         const color = useColorState((state) => state.color)
         const spacing = useSpacingState()
         const font = useFontState()
-        const border = useSpacingState()
-
-        return { color, spacing, font, border }
+        const borderWidth = useBorderWidthState()
+        const borderRadius = useBorderRadiusState()
+        const fontSize = useFontSize()
+        return { color, spacing, font, borderWidth, fontSize, borderRadius }
     }
 }

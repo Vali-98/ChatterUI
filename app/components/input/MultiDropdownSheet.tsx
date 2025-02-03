@@ -143,7 +143,7 @@ const MultiDropdownSheet = <T,>({
                 {(!selected || selected.length === 0) && (
                     <Text style={styles.placeholderText}>{placeholder}</Text>
                 )}
-                <Entypo name="chevron-down" color={color.primary._300} size={18} />
+                <Entypo name="chevron-down" color={color.neutral._300} size={18} />
             </Pressable>
         </View>
     )
@@ -152,7 +152,7 @@ const MultiDropdownSheet = <T,>({
 export default MultiDropdownSheet
 
 const useStyles = () => {
-    const { color, spacing } = Theme.useTheme()
+    const { color, spacing, borderRadius } = Theme.useTheme()
     return StyleSheet.create({
         button: {
             paddingHorizontal: spacing.xl,
@@ -160,7 +160,7 @@ const useStyles = () => {
             alignItems: 'center',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            borderRadius: spacing.m,
+            borderRadius: borderRadius.m,
             backgroundColor: color.neutral._200,
         },
         buttonText: {
@@ -204,7 +204,7 @@ const useStyles = () => {
             paddingVertical: spacing.xl,
             paddingHorizontal: spacing.xl2,
             backgroundColor: color.neutral._300,
-            borderRadius: spacing.xl,
+            borderRadius: borderRadius.xl,
             borderWidth: 2,
             borderColor: color.primary._300,
         },
@@ -216,7 +216,7 @@ const useStyles = () => {
 
         searchBar: {
             marginTop: spacing.l,
-            borderRadius: spacing.m,
+            borderRadius: borderRadius.m,
             padding: spacing.l,
             borderColor: color.primary._100,
             borderWidth: 1,

@@ -78,7 +78,7 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
 export default StringArrayEditor
 
 const useStyles = () => {
-    const { color, spacing } = Theme.useTheme()
+    const { color, spacing, borderRadius } = Theme.useTheme()
 
     return StyleSheet.create({
         mainContainer: {
@@ -91,7 +91,7 @@ const useStyles = () => {
             borderColor: color.neutral._300,
             paddingHorizontal: spacing.s,
             paddingVertical: spacing.m,
-            borderRadius: spacing.m,
+            borderRadius: borderRadius.m,
         },
 
         title: {

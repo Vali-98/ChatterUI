@@ -413,7 +413,7 @@ const ChracterEditor = () => {
 }
 
 const useStyles = () => {
-    const { color, spacing } = Theme.useTheme()
+    const { color, spacing, borderRadius } = Theme.useTheme()
     return StyleSheet.create({
         mainContainer: {
             flex: 1,
@@ -423,7 +423,7 @@ const useStyles = () => {
 
         characterHeader: {
             alignContent: 'flex-start',
-            borderRadius: spacing.xl,
+            borderRadius: borderRadius.xl,
             flexDirection: 'row',
             alignItems: 'center',
         },
@@ -443,7 +443,7 @@ const useStyles = () => {
         avatar: {
             width: 80,
             height: 80,
-            borderRadius: spacing.xl2,
+            borderRadius: borderRadius.xl2,
             borderColor: color.primary._500,
             borderWidth: 2,
         },
@@ -456,7 +456,7 @@ const useStyles = () => {
             borderColor: color.text._700,
             borderWidth: 1,
             backgroundColor: color.primary._300,
-            borderRadius: spacing.l,
+            borderRadius: borderRadius.l,
         },
     })
 }

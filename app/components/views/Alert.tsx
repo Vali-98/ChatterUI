@@ -113,7 +113,7 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({ children }) => {
 }
 
 const useStyles = () => {
-    const { color, spacing } = Theme.useTheme()
+    const { color, spacing, borderRadius } = Theme.useTheme()
 
     return StyleSheet.create({
         modal: {
@@ -130,7 +130,7 @@ const useStyles = () => {
             paddingHorizontal: spacing.xl3,
             paddingBottom: spacing.xl,
             paddingTop: spacing.xl2,
-            borderRadius: spacing.xl,
+            borderRadius: borderRadius.xl,
             width: '90%',
         },
 

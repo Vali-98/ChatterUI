@@ -131,7 +131,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
 export default TextBoxModal
 
 const useStyles = () => {
-    const { color, spacing } = Theme.useTheme()
+    const { color, spacing, borderRadius } = Theme.useTheme()
     return StyleSheet.create({
         title: {
             color: color.text._100,
@@ -141,7 +141,7 @@ const useStyles = () => {
         modalview: {
             margin: spacing.xl2,
             backgroundColor: color.neutral._200,
-            borderRadius: spacing.xl2,
+            borderRadius: borderRadius.xl2,
             paddingHorizontal: spacing.xl3,
             paddingTop: spacing.xl3,
             paddingBottom: spacing.xl2,
@@ -169,24 +169,24 @@ const useStyles = () => {
             backgroundColor: color.neutral._300,
             paddingHorizontal: spacing.xl2,
             paddingVertical: spacing.l,
-            borderRadius: spacing.m,
+            borderRadius: borderRadius.m,
         },
 
         cancelButton: {
-            marginLeft: spacing._64,
+            marginLeft: spacing.xl3,
             marginRight: spacing.xl2,
             borderColor: color.neutral._400,
             borderWidth: 1,
             paddingHorizontal: spacing.xl2,
             paddingVertical: spacing.l,
-            borderRadius: spacing.m,
+            borderRadius: borderRadius.m,
         },
 
         inputContainer: {
             flexDirection: 'row',
             alignItems: 'center',
             backgroundColor: color.neutral._100,
-            borderRadius: spacing.m,
+            borderRadius: borderRadius.m,
             marginBottom: spacing.m,
         },
 
@@ -194,7 +194,7 @@ const useStyles = () => {
             color: color.text._100,
             backgroundColor: color.neutral._100,
             flex: 1,
-            borderRadius: spacing.m,
+            borderRadius: borderRadius.m,
             paddingHorizontal: spacing.m,
             paddingVertical: spacing.xs,
             margin: spacing.m,
