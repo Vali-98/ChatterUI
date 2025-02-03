@@ -1,9 +1,8 @@
 import { SamplerID, Samplers } from '@lib/constants/SamplerData'
-import { APISampler } from '@lib/engine/APILegacy/BaseAPI'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { Instructs } from '@lib/utils/Global'
 
-import { APIConfiguration, APIValues } from './APIBuilder.types'
+import { APIConfiguration, APISampler, APIValues } from './APIBuilder.types'
 import { buildChatCompletionContext, buildTextCompletionContext } from './ContextBuilder'
 
 export const buildRequest = (config: APIConfiguration, values: APIValues) => {

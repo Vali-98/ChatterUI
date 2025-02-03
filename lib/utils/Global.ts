@@ -119,7 +119,7 @@ export const startupApp = () => {
     // Only for dev to properly reset
     Chats.useChatState.getState().reset()
     Characters.useCharacterCard.getState().unloadCard()
-
+    /*
     // Resets horde state, may be better if left active
     mmkv.set(Global.HordeWorkers, JSON.stringify([]))
     mmkv.set(Global.HordeModels, JSON.stringify([]))
@@ -130,16 +130,13 @@ export const startupApp = () => {
 
     // default horde [0000000000] key is needed
     if (!mmkv.getString(Global.HordeKey)) mmkv.set(Global.HordeKey, '0000000000')
+    */
 
     // Init step, logs are never null
     if (!mmkv.getString(Global.Logs)) mmkv.set(Global.Logs, JSON.stringify([]))
 
     // Init step, names[] is never null
     if (!mmkv.getString(Global.LorebookNames)) mmkv.set(Global.LorebookNames, JSON.stringify([]))
-
-    // Init step, APIType is never null, if set to deprecated LOCAL mode, change to OpenAI
-    if (!mmkv.getString(Global.APIType) || mmkv.getString(Global.APIType) === API.LOCAL)
-        mmkv.set(Global.APIType, API.OPENAI)
 
     // Init step, appMode is never null
     if (!mmkv.getString(Global.AppMode)) mmkv.set(Global.AppMode, AppMode.LOCAL)

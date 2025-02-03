@@ -25,37 +25,15 @@ export const enum Global {
 
     // UserID = 'userid', // moved to zustand state
 
-    // Management
-
-    CpuFeatures = 'cpufeatures',
-
-    Logs = 'logs',
-
-    AppMode = 'appmode',
-    // User
-
-    // Chat
-
-    // Instruct
-
-    // Presets
-    // TODO: Remove once migration complete
-    PresetID = 'presetID',
-    PresetData = 'presetdata',
-    PresetName = 'presetdame',
-
-    // Lorebooks
-
-    LorebookNames = 'lorebooknames',
-
     // APIs
 
     /**
      * These values are now only used for the legacy system
      * Will likely be removed in future
+     * Updated: Deprecated in 0.8.5
      */
 
-    APIType = 'endpointtype', // name of current api mode
+    /* APIType = 'endpointtype', // name of current api mode
 
     KAIEndpoint = 'kaiendpoint', // kai api endpoint
 
@@ -97,7 +75,30 @@ export const enum Global {
     ChatCompletionsModel = 'chatcompletionsmodel',
 
     CohereKey = 'coherekey',
-    CohereModel = 'coheremodel',
+    CohereModel = 'coheremodel', */
+
+    // Management
+
+    CpuFeatures = 'cpufeatures',
+
+    Logs = 'logs',
+
+    AppMode = 'appmode',
+    // User
+
+    // Chat
+
+    // Instruct
+
+    // Presets
+    // TODO: Remove once migration complete
+    PresetID = 'presetID',
+    PresetData = 'presetdata',
+    PresetName = 'presetdame',
+
+    // Lorebooks
+
+    LorebookNames = 'lorebooknames',
 
     // Local
 

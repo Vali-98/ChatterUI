@@ -6,10 +6,9 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { Logger } from './Logger'
-import { mmkv, mmkvStorage } from '../storage/MMKV'
-import { API } from '../constants/API'
-import { Global } from '../constants/GlobalValues'
+import { AppMode, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/LlamaLocal'
+import { mmkv, mmkvStorage } from '../storage/MMKV'
 import { replaceMacros } from '../utils/Utils'
 
 const defaultBooleans = {
@@ -224,7 +223,7 @@ export namespace Instructs {
                             user_alignment_message_length: 0,
                         }
                     const getTokenCount =
-                        mmkv.getString(Global.APIType) === API.LOCAL
+                        mmkv.getString(Global.AppMode) === AppMode.LOCAL
                             ? Llama.useLlama.getState().tokenLength
                             : Tokenizer.useTokenizer.getState().getTokenCount
 

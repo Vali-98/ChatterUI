@@ -5,25 +5,24 @@ import Alert from '@components/views/Alert'
 import FadeDownView from '@components/views/FadeDownView'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { FontAwesome } from '@expo/vector-icons'
-import { AppMode, AppSettings } from '@lib/constants/GlobalValues'
+import { AppMode } from '@lib/constants/GlobalValues'
 import { Samplers } from '@lib/constants/SamplerData'
+import { APISampler } from '@lib/engine/API/APIBuilder.types'
 import { APIState as APIStateNew } from '@lib/engine/API/APIManagerState'
-import { APIState } from '@lib/engine/APILegacy'
-import { APISampler } from '@lib/engine/APILegacy/BaseAPI'
+import { localSamplerData } from '@lib/engine/LocalInference'
 import { SamplersManager } from '@lib/state/SamplerState'
-import { API, Global, Logger, saveStringToDownload, Style } from '@lib/utils/Global'
+import { Global, Logger, saveStringToDownload, Style } from '@lib/utils/Global'
 import { Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown'
-import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
+import { useMMKVString } from 'react-native-mmkv'
 
 type PresetLabel = {
     label: string
 }
 
 const SamplerMenu = () => {
-    const [APIType, setAPIType] = useMMKVString(Global.APIType)
     const [appMode, setAppMode] = useMMKVString(Global.AppMode)
     const [showNewPreset, setShowNewPreset] = useState<boolean>(false)
 
@@ -41,7 +40,6 @@ const SamplerMenu = () => {
         setSamplerList(getSamplerList())
     }, [])
 
-    const [legacy, setLegacy] = useMMKVBoolean(AppSettings.UseLegacyAPI)
     const { apiValues, activeIndex, getTemplates } = APIStateNew.useAPIState((state) => ({
         apiValues: state.values,
         activeIndex: state.activeIndex,
@@ -51,10 +49,7 @@ const SamplerMenu = () => {
     const [samplerList, setSamplerList] = useState<APISampler[]>([])
 
     const getSamplerList = (): APISampler[] => {
-        if (appMode === AppMode.LOCAL) return APIState[API.LOCAL].samplers
-        if (legacy) {
-            return APIState[APIType as API].samplers
-        }
+        if (appMode === AppMode.LOCAL) return localSamplerData
         if (activeIndex !== -1) {
             const template = getTemplates().find(
                 (item) => item.name === apiValues[activeIndex].configName

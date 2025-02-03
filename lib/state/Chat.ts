@@ -12,7 +12,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { Characters } from './Characters'
 import { Logger } from './Logger'
 import { API } from '../constants/API'
-import { AppSettings, Global } from '../constants/GlobalValues'
+import { AppMode, AppSettings, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/LlamaLocal'
 import { mmkv } from '../storage/MMKV'
 
@@ -300,7 +300,7 @@ export namespace Chats {
             const cached_token_count = messages[index].swipes[swipe_id].token_count
             if (cached_token_count) return cached_token_count
             const getTokenCount =
-                mmkv.getString(Global.APIType) === API.LOCAL
+                mmkv.getString(Global.AppMode) === AppMode.LOCAL
                     ? Llama.useLlama.getState().tokenLength
                     : Tokenizer.useTokenizer.getState().getTokenCount
 

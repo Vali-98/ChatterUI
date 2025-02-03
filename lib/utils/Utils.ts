@@ -61,18 +61,9 @@ const getMMKVObjectModel = (mmkvKey: string, field: string) => {
     return model
 }
 
-// TODO: remove this
-export const getCurrentModel = () => {
-    const api = mmkv.getString(Global.APIType)
-    switch (api) {
-        case API.CHATCOMPLETIONS: {
-            return getMMKVObjectModel(Global.ChatCompletionsModel, 'id')
-        }
-        case API.CLAUDE: {
-            return getMMKVObjectModel(Global.ClaudeModel, 'name')
-        }
-        // TODO: Finish this - need data for KAI api
-    }
+// TODO: rework this for new api system
+export const getModelName = () => {
+    return 'UNIMPLEMENTED'
 }
 
 const day_ms = 86400000

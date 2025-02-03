@@ -21,7 +21,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { Logger } from './Logger'
 import { API } from '../constants/API'
-import { Global } from '../constants/GlobalValues'
+import { AppMode, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/LlamaLocal'
 import { mmkv, mmkvStorage } from '../storage/MMKV'
 import { getPngChunkText } from '../utils/PNG'
@@ -119,7 +119,7 @@ export namespace Characters {
                     const scenario = replaceMacros(card.scenario)
 
                     const getTokenCount =
-                        mmkv.getString(Global.APIType) === API.LOCAL
+                        mmkv.getString(Global.AppMode) === AppMode.LOCAL
                             ? Llama.useLlama.getState().tokenLength
                             : Tokenizer.useTokenizer.getState().getTokenCount
 
@@ -210,7 +210,7 @@ export namespace Characters {
             const scenario = replaceMacros(card.scenario)
 
             const getTokenCount =
-                mmkv.getString(Global.APIType) === API.LOCAL
+                mmkv.getString(Global.AppMode) === AppMode.LOCAL
                     ? Llama.useLlama.getState().tokenLength
                     : Tokenizer.useTokenizer.getState().getTokenCount
 

@@ -1,13 +1,12 @@
 import { Chats, useInference } from '@lib/state/Chat'
 import BackgroundService from 'react-native-background-actions'
 
-import { API } from '../constants/API'
-import { buildAndSendRequest } from './API/APIBuilder'
-import { APIState } from './APILegacy'
-import { AppMode, AppSettings, Global } from '../constants/GlobalValues'
+import { AppMode, Global } from '../constants/GlobalValues'
 import { Characters } from '../state/Characters'
 import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
+import { buildAndSendRequest } from './API/APIBuilder'
+import { localInference } from './LocalInference'
 
 export const regenerateResponse = async (swipeId: number, regenCache: boolean = true) => {
     const charName = Characters.useCharacterCard.getState().card?.name
@@ -63,16 +62,11 @@ export const generateResponse = async (swipeId: number) => {
     Logger.log(`Obtaining response.`)
     const data = performance.now()
     const appMode = getString(Global.AppMode)
-    const APIType = getString(Global.APIType)
-    const legacy = mmkv.getBoolean(AppSettings.UseLegacyAPI)
-    const apiState = appMode === AppMode.LOCAL ? APIState[API.LOCAL] : APIState?.[APIType as API]
-    if (appMode === AppMode.LOCAL || legacy) {
-        if (apiState) await BackgroundService.start(apiState.inference, completionTaskOptions)
-        else {
-            Logger.log('An invalid API was somehow chosen, this is bad!', true)
-        }
+
+    if (appMode === AppMode.LOCAL) {
+        await BackgroundService.start(localInference, completionTaskOptions)
     } else {
-        BackgroundService.start(buildAndSendRequest, completionTaskOptions)
+        await BackgroundService.start(buildAndSendRequest, completionTaskOptions)
     }
 
     Logger.debug(`Time taken for generateResponse(): ${(performance.now() - data).toFixed(2)}ms`)

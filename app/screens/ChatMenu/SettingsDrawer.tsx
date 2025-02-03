@@ -57,7 +57,6 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
 
     const [devMode, setDevMode] = useMMKVBoolean(AppSettings.DevMode)
     const [appMode, setAppMode] = useMMKVString(Global.AppMode)
-    const [legacyAPI, setUseLegacyAPI] = useMMKVBoolean(AppSettings.UseLegacyAPI)
 
     const localMode = appMode === AppMode.LOCAL
     const remoteMode = appMode === AppMode.REMOTE
@@ -95,13 +94,13 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
         },
         {
             name: 'Formatting',
-            path: '/screens/FormattingManager',
+            path: '/screens/FormattingManager/index',
             icon: 'profile',
         },
         appMode === AppMode.REMOTE
             ? {
                   name: 'API',
-                  path: legacyAPI ? '/APIMenu' : '/screens/APIManager',
+                  path: '/screens/APIManager',
                   icon: 'link',
               }
             : {
