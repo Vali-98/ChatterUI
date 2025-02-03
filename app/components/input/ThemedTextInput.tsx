@@ -34,7 +34,7 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
                 numberOfLines={numberOfLines}
                 style={{
                     color: color.text._100,
-                    borderColor: color.neutral._300,
+                    borderColor: color.neutral._400,
                     borderWidth: 1,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
