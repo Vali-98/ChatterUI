@@ -1,5 +1,4 @@
 import { Theme } from '@lib/theme/ThemeManager'
-import { Style } from '@lib/utils/Global'
 import Slider from '@react-native-community/slider'
 import { useEffect, useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
@@ -137,40 +136,3 @@ const useStyles = () => {
         },
     })
 }
-
-const styles = StyleSheet.create({
-    itemName: {
-        color: Style.getColor('primary-text1'),
-    },
-
-    itemNameDisabled: {
-        color: Style.getColor('primary-text3'),
-    },
-
-    sliderContainer: {
-        flexDirection: `row`,
-    },
-
-    slider: {
-        flex: 9,
-        height: 40,
-    },
-
-    textBox: {
-        borderColor: Style.getColor('primary-surface4'),
-        color: Style.getColor('primary-text1'),
-        borderWidth: 1,
-        borderRadius: 12,
-        flex: 1.5,
-        textAlign: `center`,
-    },
-
-    textBoxDisabled: {
-        borderColor: Style.getColor('primary-surface4'),
-        color: Style.getColor('primary-text3'),
-        borderWidth: 1,
-        borderRadius: 12,
-        flex: 1.5,
-        textAlign: `center`,
-    },
-})
