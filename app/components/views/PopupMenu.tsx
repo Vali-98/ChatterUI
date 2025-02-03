@@ -1,5 +1,5 @@
 import { AntDesign } from '@expo/vector-icons'
-import { Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
 import { useFocusEffect } from 'expo-router'
 import React, { ReactNode, useRef, useState } from 'react'
 import { StyleSheet, TouchableOpacity, Text, BackHandler, TextStyle } from 'react-native'
@@ -43,6 +43,8 @@ const PopupOption: React.FC<PopupOptionProps> = ({
     menuRef,
     warning = false,
 }) => {
+    const styles = useStyles()
+    const { color } = Theme.useTheme()
     const handleOnPress = async () => {
         await onPress(menuRef)
     }
@@ -54,7 +56,7 @@ const PopupOption: React.FC<PopupOptionProps> = ({
                     style={{ minWidth: 20 }}
                     name={icon}
                     size={18}
-                    color={Style.getColor(warning ? 'destructive-brand' : 'primary-text2')}
+                    color={warning ? color.error._300 : color.text._100}
                 />
                 <Text style={warning ? styles.optionLabelWarning : styles.optionLabel}>
                     {label}
@@ -73,6 +75,9 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
     children,
     placement = 'left',
 }) => {
+    const styles = useStyles()
+    const { color } = Theme.useTheme()
+    const menuStyle = useMenuStyle()
     const [showMenu, setShowMenu] = useState<boolean>(false)
     const menuRef: MenuRef = useRef(null)
 
@@ -104,14 +109,14 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
                 {icon && (
                     <AntDesign
                         style={style}
-                        color={Style.getColor(showMenu ? 'primary-text3' : 'primary-text2')}
+                        color={showMenu ? color.text._700 : color.text._300}
                         name={icon}
                         size={iconSize}
                     />
                 )}
                 {children}
             </MenuTrigger>
-            <MenuOptions customStyles={menustyle}>
+            <MenuOptions customStyles={menuStyle}>
                 {options.map((item) => (
                     <PopupOption {...item} key={item.label} menuRef={menuRef} />
                 ))}
@@ -122,43 +127,50 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
 
 export default PopupMenu
 
-const styles = StyleSheet.create({
-    anchor: {
-        backgroundColor: Style.getColor('primary-surface3'),
-        padding: 4,
-    },
+const useMenuStyle = (): MenuOptionsCustomStyle => {
+    const { color, spacing, borderRadius } = Theme.useTheme()
+    return {
+        optionsContainer: {
+            backgroundColor: color.neutral._200,
+            padding: spacing.sm,
+            borderRadius: borderRadius.l,
+        },
+        optionsWrapper: {
+            backgroundColor: color.neutral._200,
+        },
+    }
+}
 
-    popupButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        columnGap: 12,
-        paddingVertical: 12,
-        paddingRight: 32,
-        paddingLeft: 12,
-        borderRadius: 12,
-    },
+const useStyles = () => {
+    const { color, spacing } = Theme.useTheme()
 
-    headerButtonContainer: {
-        flexDirection: 'row',
-    },
+    return StyleSheet.create({
+        anchor: {
+            backgroundColor: color.primary._300,
+            padding: 4,
+        },
 
-    optionLabel: {
-        color: Style.getColor('primary-text1'),
-    },
+        popupButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            columnGap: spacing.l,
+            paddingVertical: spacing.l,
+            paddingRight: spacing.xl2,
+            paddingLeft: spacing.l,
+            borderRadius: spacing.l,
+        },
 
-    optionLabelWarning: {
-        fontWeight: '500',
-        color: '#d2574b',
-    },
-})
+        headerButtonContainer: {
+            flexDirection: 'row',
+        },
 
-const menustyle: MenuOptionsCustomStyle = {
-    optionsContainer: {
-        backgroundColor: Style.getColor('primary-surface3'),
-        padding: 4,
-        borderRadius: 12,
-    },
-    optionsWrapper: {
-        backgroundColor: Style.getColor('primary-surface3'),
-    },
+        optionLabel: {
+            color: color.text._100,
+        },
+
+        optionLabelWarning: {
+            fontWeight: '500',
+            color: color.error._300,
+        },
+    })
 }
