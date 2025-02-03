@@ -8,7 +8,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { Global, Logger } from '@lib/utils/Global'
 import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 
 function groupBy(array: any[], key: string) {
