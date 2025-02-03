@@ -97,7 +97,6 @@ const useStyles = () => {
         title: {
             color: color.text._100,
             marginBottom: spacing.m,
-            fontSize: 16,
         },
 
         tagContainer: {
