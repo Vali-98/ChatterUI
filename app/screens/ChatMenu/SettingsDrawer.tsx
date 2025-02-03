@@ -94,8 +94,8 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
             icon: 'barschart',
         },
         {
-            name: 'Instruct',
-            path: '/Instruct',
+            name: 'Formatting',
+            path: '/screens/FormattingManager',
             icon: 'profile',
         },
         appMode === AppMode.REMOTE

@@ -1,22 +1,31 @@
+import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedCheckbox from '@components/input/ThemedCheckbox'
-import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedTextInput from '@components/input/ThemedTextInput'
+import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
 import FadeDownView from '@components/views/FadeDownView'
+import HeaderButton from '@components/views/HeaderButton'
+import HeaderTitle from '@components/views/HeaderTitle'
 import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
-import { FontAwesome } from '@expo/vector-icons'
 import useAutosave from '@lib/hooks/AutoSave'
-import { Instructs, Logger, MarkdownStyle, Style, saveStringToDownload } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
+import { Instructs, Logger, MarkdownStyle, saveStringToDownload } from '@lib/utils/Global'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
-import { Stack } from 'expo-router'
 import { useState } from 'react'
-import { View, SafeAreaView, TouchableOpacity, StyleSheet, ScrollView, Text } from 'react-native'
+import { SafeAreaView, ScrollView, Text, View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 
-const Instruct = () => {
+const autoformatterData = [
+    { label: 'Disabled', example: '*<No Formatting>*' },
+    { label: 'Plain Action, Quote Speech', example: 'Some action, "Some speech"' },
+    { label: 'Asterisk Action, Plain Speech', example: '*Some action* Some speech' },
+    { label: 'Asterisk Action, Quote Speech', example: '*Some action* "Some speech"' },
+]
+
+const FormattingManager = () => {
     const { currentInstruct, loadInstruct, setCurrentInstruct } = Instructs.useInstruct(
         (state) => ({
             currentInstruct: state.data,
@@ -25,7 +34,7 @@ const Instruct = () => {
         })
     )
     const instructID = currentInstruct?.id
-
+    const { color, spacing, borderRadius } = Theme.useTheme()
     const { data } = useLiveQuery(Instructs.db.query.instructListQuery())
     const instructList = data
     const selectedItem = data.filter((item) => item.id === instructID)?.[0]
@@ -137,15 +146,13 @@ const Instruct = () => {
     if (currentInstruct)
         return (
             <FadeDownView style={{ flex: 1 }}>
-                <SafeAreaView style={styles.mainContainer}>
-                    <Stack.Screen
-                        options={{
-                            title: `Instruct`,
-                            animation: 'fade',
-                            headerRight: headerRight,
-                        }}
-                    />
-
+                <SafeAreaView
+                    style={{
+                        marginVertical: spacing.xl,
+                        flex: 1,
+                    }}>
+                    <HeaderTitle title="Formatting" />
+                    <HeaderButton headerRight={headerRight} />
                     <TextBoxModal
                         booleans={[showNewInstruct, setShowNewInstruct]}
                         onConfirm={(text) => {
@@ -164,7 +171,14 @@ const Instruct = () => {
                         }}
                     />
 
-                    <View style={styles.dropdownContainer}>
+                    <View
+                        style={{
+                            paddingHorizontal: spacing.xl,
+                            marginTop: spacing.xl,
+                            paddingBottom: spacing.l,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                        }}>
                         <DropdownSheet
                             selected={selectedItem}
                             data={instructList}
@@ -176,23 +190,20 @@ const Instruct = () => {
                             modalTitle="Select Preset"
                             search
                         />
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {
-                                handleSaveInstruct(true)
-                            }}>
-                            <FontAwesome
-                                size={24}
-                                name="save"
-                                color={Style.getColor('primary-text1')}
-                            />
-                        </TouchableOpacity>
+                        <ThemedButton iconName="save" iconSize={28} variant="tertiary" />
                     </View>
 
                     <ScrollView
                         showsVerticalScrollIndicator={false}
-                        style={styles.scrollContainer}
-                        contentContainerStyle={{ rowGap: 8 }}>
+                        style={{
+                            flex: 1,
+                            marginTop: 16,
+                        }}
+                        contentContainerStyle={{
+                            rowGap: spacing.xl,
+                            paddingHorizontal: spacing.xl,
+                        }}>
+                        <SectionTitle>Instruct Formatting</SectionTitle>
                         <ThemedTextInput
                             label="System Sequence"
                             value={currentInstruct.system_prompt}
@@ -205,7 +216,7 @@ const Instruct = () => {
                             numberOfLines={5}
                             multiline
                         />
-                        <View style={{ flexDirection: 'row', columnGap: 8 }}>
+                        <View style={{ flexDirection: 'row', columnGap: spacing.m }}>
                             <ThemedTextInput
                                 label="System Prefix"
                                 value={currentInstruct.system_prefix}
@@ -231,7 +242,7 @@ const Instruct = () => {
                                 multiline
                             />
                         </View>
-                        <View style={{ flexDirection: 'row', columnGap: 8 }}>
+                        <View style={{ flexDirection: 'row', columnGap: spacing.m }}>
                             <ThemedTextInput
                                 label="Input Prefix"
                                 value={currentInstruct.input_prefix}
@@ -257,7 +268,7 @@ const Instruct = () => {
                                 multiline
                             />
                         </View>
-                        <View style={{ flexDirection: 'row', columnGap: 8 }}>
+                        <View style={{ flexDirection: 'row', columnGap: spacing.m }}>
                             <ThemedTextInput
                                 label="Output Prefix"
                                 value={currentInstruct.output_prefix}
@@ -283,24 +294,7 @@ const Instruct = () => {
                                 multiline
                             />
                         </View>
-                        {/* Unused Sequences
-                            <View style={{ flexDirection: 'row' }}>
-                                <TextBox
-                                    name="First Output Sequence"
-                                    varname="first_output_sequence"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />
-                                <TextBox
-                                    name="Last Output Sequence"
-                                    varname="last_output_sequence"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />
-                            </View>
-                            */}
+
                         <View style={{ flexDirection: 'row' }}>
                             <ThemedTextInput
                                 label="Last Output Prefix"
@@ -314,17 +308,10 @@ const Instruct = () => {
                                 numberOfLines={5}
                                 multiline
                             />
-                            {/*<TextBox
-                                    name="Separator Sequence"
-                                    varname="separator_sequence"
-                                    body={currentInstruct}
-                                    setValue={setCurrentInstruct}
-                                    multiline
-                                />*/}
                         </View>
 
                         <StringArrayEditor
-                            containerStyle={{ marginBottom: 12 }}
+                            containerStyle={{ marginBottom: spacing.l }}
                             title="Stop Sequence"
                             value={
                                 currentInstruct.stop_sequence
@@ -340,12 +327,13 @@ const Instruct = () => {
                             replaceNewLine="\n"
                         />
 
+                        <SectionTitle>Macros & Character Card</SectionTitle>
+
                         <View
                             style={{
                                 flexDirection: 'row',
-                                columnGap: 16,
-                                marginBottom: 16,
-                                justifyContent: 'space-evenly',
+                                columnGap: spacing.xl,
+                                justifyContent: 'space-around',
                             }}>
                             <View>
                                 <ThemedCheckbox
@@ -414,50 +402,47 @@ const Instruct = () => {
                             </View>
                         </View>
 
-                        <ThemedSlider
-                            label="Autoformat New Chats"
-                            value={currentInstruct.format_type}
-                            onValueChange={(value) =>
-                                setCurrentInstruct({ ...currentInstruct, format_type: value })
-                            }
-                            min={0}
-                            max={3}
-                            step={1}
-                            showInput={false}
-                        />
-                        <Text style={{ color: Style.getColor('primary-text2'), marginLeft: 16 }}>
-                            Mode: {currentInstruct.format_type} -
-                            {' ' +
-                                [
-                                    'Autoformatting Disabled',
-                                    'Plain Action, Quote Speech',
-                                    'Asterisk Action, Plain Speech',
-                                    'Asterisk Action, Quote Speech',
-                                ][currentInstruct.format_type]}
-                        </Text>
-                        <Text
-                            style={{
-                                color: Style.getColor('primary-text2'),
-                                marginLeft: 16,
-                                marginTop: 8,
-                            }}>
-                            Example:
-                        </Text>
-                        <View style={styles.exampleContainer}>
-                            <Markdown
-                                markdownit={MarkdownStyle.Rules}
-                                rules={MarkdownStyle.RenderRules}
-                                style={MarkdownStyle.Styles}>
-                                {
-                                    [
-                                        '*<No Formatting>*',
-                                        'Some action, "Some speech"',
-                                        '*Some action* Some speech',
-                                        '*Some action* "Some speech"',
-                                    ][currentInstruct.format_type]
-                                }
-                            </Markdown>
+                        <View style={{ rowGap: 8 }}>
+                            <SectionTitle>Text Formatter</SectionTitle>
+                            <Text
+                                style={{
+                                    color: color.text._400,
+                                }}>
+                                Automatically formats first message to the style below:
+                            </Text>
+                            <View
+                                style={{
+                                    backgroundColor: color.neutral._300,
+                                    marginTop: spacing.m,
+                                    paddingHorizontal: spacing.xl2,
+                                    alignItems: 'center',
+                                    borderRadius: borderRadius.m,
+                                }}>
+                                <Markdown
+                                    markdownit={MarkdownStyle.Rules}
+                                    rules={MarkdownStyle.RenderRules}
+                                    style={MarkdownStyle.Styles}>
+                                    {autoformatterData[currentInstruct.format_type].example}
+                                </Markdown>
+                            </View>
+                            <View>
+                                {autoformatterData.map((item, index) => (
+                                    <ThemedCheckbox
+                                        key={item.label}
+                                        name={item.label}
+                                        value={currentInstruct.format_type === index}
+                                        onChangeValue={(b) => {
+                                            if (b)
+                                                setCurrentInstruct({
+                                                    ...currentInstruct,
+                                                    format_type: index,
+                                                })
+                                        }}
+                                    />
+                                ))}
+                            </View>
                         </View>
+
                         {/* @TODO: Macros are always replaced - people may want this to be changed
                             <CheckboxTitle
                                 name="Replace Macro In Sequences"
@@ -497,43 +482,4 @@ const Instruct = () => {
         )
 }
 
-export default Instruct
-
-const styles = StyleSheet.create({
-    mainContainer: {
-        marginVertical: 16,
-        flex: 1,
-    },
-
-    dropdownContainer: {
-        paddingHorizontal: 16,
-        marginTop: 16,
-        flexDirection: 'row',
-        paddingBottom: 12,
-        alignItems: 'center',
-    },
-
-    scrollContainer: {
-        flex: 1,
-        paddingHorizontal: 16,
-        marginTop: 16,
-    },
-
-    selected: {
-        color: Style.getColor('primary-text1'),
-    },
-
-    button: {
-        padding: 4,
-        borderRadius: 4,
-        marginLeft: 8,
-    },
-
-    exampleContainer: {
-        backgroundColor: Style.getColor('primary-surface2'),
-        marginTop: 8,
-        paddingHorizontal: 24,
-        marginLeft: 16,
-        borderRadius: 8,
-    },
-})
+export default FormattingManager
