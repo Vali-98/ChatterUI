@@ -31,10 +31,6 @@ const paths_dev: ButtonData[] = [
         name: '[DEV] ColorTest',
         path: '/ColorTest',
     },
-    {
-        name: '[DEV] Lorebooks',
-        path: '/LorebookMenu',
-    },
     /*{
         name: '[DEV] Embedding',
         path: '/Embedding',
