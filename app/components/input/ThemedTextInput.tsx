@@ -12,6 +12,7 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
     description,
     numberOfLines,
     multiline = false,
+    style = undefined,
     ...rest
 }) => {
     const { color } = Theme.useTheme()
@@ -32,15 +33,18 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
             <TextInput
                 multiline={(!!numberOfLines && numberOfLines > 1) || multiline}
                 numberOfLines={numberOfLines}
-                style={{
-                    color: color.text._100,
-                    borderColor: color.neutral._400,
-                    borderWidth: 1,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    borderRadius: 8,
-                    textAlignVertical: numberOfLines && numberOfLines > 1 ? `top` : `center`,
-                }}
+                style={[
+                    {
+                        color: color.text._100,
+                        borderColor: color.neutral._400,
+                        borderWidth: 1,
+                        paddingVertical: 8,
+                        paddingHorizontal: 12,
+                        borderRadius: 8,
+                        textAlignVertical: numberOfLines && numberOfLines > 1 ? `top` : `center`,
+                    },
+                    style,
+                ]}
                 placeholder="----"
                 placeholderTextColor={color.text._400}
                 {...rest}
