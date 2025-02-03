@@ -1,3 +1,4 @@
+import HeartbeatButton from '@components/buttons/HeartbeatButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
@@ -7,7 +8,6 @@ import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
 import claudeModels from '@lib/engine/API/ClaudeModels.json'
 import { Logger, Style } from '@lib/utils/Global'
-import HeartbeatButton from '@screens/Endpoint/HeartbeatButton'
 import { useEffect, useState } from 'react'
 import {
     Modal,

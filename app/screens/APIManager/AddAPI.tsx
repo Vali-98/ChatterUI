@@ -1,3 +1,4 @@
+import HeartbeatButton from '@components/buttons/HeartbeatButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
@@ -5,7 +6,6 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
 import claudeModels from '@lib/engine/API/ClaudeModels.json'
 import { Logger, Style } from '@lib/utils/Global'
-import HeartbeatButton from '@screens/Endpoint/HeartbeatButton'
 import { Stack, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
@@ -155,6 +155,7 @@ const AddAPI = () => {
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             {!template.features.multipleModels && (
                                 <DropdownSheet
+                                    containerStyle={{ flex: 1 }}
                                     selected={values.model}
                                     data={modelList}
                                     labelExtractor={(value) => {
@@ -169,6 +170,7 @@ const AddAPI = () => {
                             )}
                             {template.features.multipleModels && (
                                 <MultiDropdownSheet
+                                    containerStyle={{ flex: 1 }}
                                     selected={values?.model ?? []}
                                     data={modelList}
                                     labelExtractor={(value) => {
@@ -246,7 +248,7 @@ const styles = StyleSheet.create({
     mainContainer: {
         marginVertical: 16,
         paddingVertical: 16,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         flex: 1,
     },
 
@@ -272,7 +274,7 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        padding: 5,
+        padding: 4,
         borderColor: Style.getColor('primary-brand'),
         borderWidth: 1,
         borderRadius: 4,
