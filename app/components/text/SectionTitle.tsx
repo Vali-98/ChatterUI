@@ -22,7 +22,7 @@ const SectionTitle = ({
                 fontSize: 16,
                 paddingBottom: spacing.m,
                 borderBottomWidth: 1,
-                borderColor: color.primary._200,
+                borderColor: color.neutral._300,
                 ...style,
             }}>
             {children}
