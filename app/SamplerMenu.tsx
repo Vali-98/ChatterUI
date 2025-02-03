@@ -69,19 +69,19 @@ const SamplerMenu = () => {
         Logger.log('Importing Not Implemented', true)
     }
 
-    const handleDeleteSampler = () => () => {
+    const handleDeleteSampler = () => {
         if (configList.length === 1) {
             Logger.log(`Cannot Delete Last Preset.`, true)
             return false
         }
 
         Alert.alert({
-            title: `Delete Preset`,
+            title: `Delete Sampler`,
             description: `Are you sure you want to delete '${currentConfig.name}'?`,
             buttons: [
                 { label: 'Cancel' },
                 {
-                    label: 'Delete Preset',
+                    label: 'Delete Sampler',
                     onPress: async () => {
                         deleteSamplerConfig(currentConfigIndex)
                     },
