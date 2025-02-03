@@ -143,7 +143,7 @@ const MultiDropdownSheet = <T,>({
                 {(!selected || selected.length === 0) && (
                     <Text style={styles.placeholderText}>{placeholder}</Text>
                 )}
-                <Entypo name="chevron-down" color={color.neutral._300} size={18} />
+                <Entypo name="chevron-down" color={color.neutral._500} size={18} />
             </Pressable>
         </View>
     )

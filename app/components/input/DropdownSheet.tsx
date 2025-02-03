@@ -88,7 +88,7 @@ const DropdownSheet = <T,>({
             <Pressable style={[style, styles.button]} onPress={() => setShowList(true)}>
                 {selected && <Text style={styles.buttonText}>{labelExtractor(selected)}</Text>}
                 {!selected && <Text style={styles.placeholderText}>{placeholder}</Text>}
-                <Entypo name="chevron-down" color={theme.color.primary._300} size={18} />
+                <Entypo name="chevron-down" color={theme.color.neutral._500} size={18} />
             </Pressable>
         </View>
     )
