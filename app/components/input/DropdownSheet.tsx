@@ -79,7 +79,7 @@ const DropdownSheet = <T,>({
                     {search && (
                         <TextInput
                             placeholder="Filter..."
-                            placeholderTextColor={theme.color.text._700}
+                            placeholderTextColor={theme.color.text._600}
                             style={styles.searchBar}
                             value={searchFilter}
                             onChangeText={setSearchFilter}
@@ -115,7 +115,7 @@ const useStyles = () => {
             fontSize: 16,
         },
         placeholderText: {
-            color: color.text._800,
+            color: color.text._700,
         },
 
         modalTitle: {
@@ -157,9 +157,7 @@ const useStyles = () => {
             marginTop: spacing.l,
             borderRadius: borderRadius.m,
             padding: spacing.l,
-            borderColor: color.primary._100,
-            borderWidth: 1,
-            backgroundColor: color.neutral._300,
+            backgroundColor: color.neutral._100,
         },
     })
 }
