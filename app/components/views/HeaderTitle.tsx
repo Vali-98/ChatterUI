@@ -5,7 +5,7 @@ type HeaderTitleProps = {
 }
 
 const HeaderTitle: React.FC<HeaderTitleProps> = ({ title = '' }) => {
-    return <Stack.Screen options={{ title: title }} />
+    return <Stack.Screen options={{ title: title, animation: 'fade_from_bottom' }} />
 }
 
 export default HeaderTitle
