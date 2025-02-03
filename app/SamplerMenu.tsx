@@ -24,7 +24,7 @@ const SamplerMenu = () => {
     const styles = useStyles()
     const { spacing } = Theme.useTheme()
     const [appMode, setAppMode] = useMMKVString(Global.AppMode)
-    const [showNewPreset, setShowNewPreset] = useState<boolean>(false)
+    const [showNewSampler, setShowNewSampler] = useState<boolean>(false)
 
     const {
         addSamplerConfig,
@@ -60,7 +60,7 @@ const SamplerMenu = () => {
             `${currentConfig.name}.json`,
             'utf8'
         ).then(() => {
-            Logger.log('Downloaded Sampler Preset!', true)
+            Logger.log('Downloaded Sampler Configuration!', true)
         })
     }
 
@@ -71,7 +71,7 @@ const SamplerMenu = () => {
 
     const handleDeleteSampler = () => {
         if (configList.length === 1) {
-            Logger.log(`Cannot Delete Last Preset.`, true)
+            Logger.log(`Cannot Delete Last Configuration`, true)
             return false
         }
 
@@ -102,8 +102,7 @@ const SamplerMenu = () => {
                     label: 'Create Sampler',
                     icon: 'addfile',
                     onPress: (menu) => {
-                        setShowNewPreset(true)
-
+                        setShowNewSampler(true)
                         menu.current?.close()
                     },
                 },
@@ -138,16 +137,16 @@ const SamplerMenu = () => {
     return (
         <FadeDownView style={{ flex: 1 }}>
             <TextBoxModal
-                booleans={[showNewPreset, setShowNewPreset]}
+                booleans={[showNewSampler, setShowNewSampler]}
                 onConfirm={(text: string) => {
                     if (text === '') {
-                        Logger.log(`Preset name cannot be empty`, true)
+                        Logger.log(`Sampler name cannot be empty`, true)
                         return
                     }
 
                     for (const item of configList)
                         if (item.name === text) {
-                            Logger.log(`Preset name already exists.`, true)
+                            Logger.log(`Sampler name already exists.`, true)
                             return
                         }
                     addSamplerConfig({ name: text, data: currentConfig.data })
