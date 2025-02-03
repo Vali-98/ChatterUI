@@ -33,6 +33,7 @@ const DropdownItem: React.FC<DropdownItemProps> = ({ label, active, onValueChang
 }
 
 type DropdownSheetProps<T> = {
+    containerStyle?: ViewStyle
     style?: ViewStyle
     data: T[]
     selected: T[]
@@ -45,6 +46,7 @@ type DropdownSheetProps<T> = {
 }
 
 const MultiDropdownSheet = <T,>({
+    containerStyle = undefined,
     onChangeValue,
     style,
     selected,
@@ -62,7 +64,7 @@ const MultiDropdownSheet = <T,>({
     const [showList, setShowList] = useState(false)
     const [searchFilter, setSearchFilter] = useState('')
     return (
-        <View style={{ flex: 1 }}>
+        <View style={containerStyle}>
             <Modal
                 transparent
                 onRequestClose={() => setShowList(false)}

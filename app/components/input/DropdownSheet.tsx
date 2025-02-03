@@ -7,6 +7,7 @@ import { TextInput } from 'react-native-gesture-handler'
 import FadeBackrop from '../views/FadeBackdrop'
 
 type DropdownSheetProps<T> = {
+    containerStyle?: ViewStyle
     style?: ViewStyle
     data: T[]
     selected?: T | undefined
@@ -19,6 +20,7 @@ type DropdownSheetProps<T> = {
 }
 
 const DropdownSheet = <T,>({
+    containerStyle = undefined,
     onChangeValue,
     style,
     selected = undefined,
@@ -37,7 +39,7 @@ const DropdownSheet = <T,>({
     const theme = Theme.useTheme()
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={containerStyle}>
             <Modal
                 transparent
                 onRequestClose={() => setShowList(false)}
