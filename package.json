@@ -63,7 +63,6 @@
     "react-native": "0.76.6",
     "react-native-background-actions": "^4.0.1",
     "react-native-collapsible": "^1.6.1",
-    "react-native-element-dropdown": "^2.12.2",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-markdown-display": "^7.0.2",
     "react-native-mmkv": "^3.1.0",
