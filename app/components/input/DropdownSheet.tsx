@@ -146,8 +146,6 @@ const useStyles = () => {
             paddingHorizontal: spacing.xl2,
             backgroundColor: color.neutral._300,
             borderRadius: borderRadius.xl,
-            borderWidth: 2,
-            borderColor: color.primary._300,
         },
 
         listItemText: {
