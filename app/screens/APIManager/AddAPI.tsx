@@ -66,11 +66,13 @@ const AddAPI = () => {
                     selected={template}
                     onChangeValue={(item) => {
                         setTemplate(item)
+                        setModelList([])
                         setValues({
                             ...item.defaultValues,
                             friendlyName: values.friendlyName,
                             active: true,
                             configName: item.name,
+                            model: undefined,
                         })
                     }}
                     modalTitle="Select Connection Type"
