@@ -296,7 +296,7 @@ const ChracterEditor = () => {
                             justifyContent: 'space-between',
                         }}>
                         <Text style={{ color: color.text._100 }}>
-                            Alternate Greetings ({characterCard.alternate_greetings.length})
+                            Alternate Greetings
                             {characterCard.alternate_greetings.length !== 0 && (
                                 <Text
                                     style={{
@@ -361,7 +361,11 @@ const ChracterEditor = () => {
                     ) : (
                         <Text
                             style={{
-                                color: color.text._100,
+                                borderColor: color.neutral._400,
+                                borderWidth: 1,
+                                borderRadius: 8,
+                                padding: spacing.m,
+                                color: color.text._500,
                                 fontStyle: 'italic',
                             }}>
                             No Alternate Greetings
