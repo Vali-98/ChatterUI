@@ -1,3 +1,4 @@
+import { Theme } from '@lib/theme/ThemeManager'
 import { Style } from '@lib/utils/Global'
 import Slider from '@react-native-community/slider'
 import { useEffect, useState } from 'react'
@@ -29,6 +30,8 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
     showInput = true,
     disabled = false,
 }) => {
+    const styles = useStyles()
+    const { color } = Theme.useTheme()
     const [textValue, setTextValue] = useState(value.toString())
 
     // This effect ensures that if `value` updates from the parent, this text is properly updated
@@ -71,9 +74,9 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
                     maximumValue={max}
                     value={value}
                     onSlidingComplete={handleSliderChange}
-                    minimumTrackTintColor={Style.getColor('primary-surface4')}
-                    maximumTrackTintColor={Style.getColor('primary-surface3')}
-                    thumbTintColor={Style.getColor('primary-brand')}
+                    minimumTrackTintColor={color.primary._400}
+                    maximumTrackTintColor={color.neutral._600}
+                    thumbTintColor={color.primary._500}
                 />
                 {showInput && (
                     <TextInput
@@ -94,6 +97,46 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
 }
 
 export default ThemedSlider
+
+const useStyles = () => {
+    const { color, spacing } = Theme.useTheme()
+    return StyleSheet.create({
+        itemName: {
+            color: color.text._100,
+        },
+
+        itemNameDisabled: {
+            color: color.text._700,
+        },
+
+        sliderContainer: {
+            flexDirection: `row`,
+        },
+
+        slider: {
+            flex: 9,
+            height: 36,
+        },
+
+        textBox: {
+            borderColor: color.neutral._400,
+            color: color.text._100,
+            borderWidth: 1,
+            borderRadius: spacing.l,
+            flex: 1.5,
+            textAlign: `center`,
+        },
+
+        textBoxDisabled: {
+            borderColor: color.neutral._700,
+            color: color.neutral._700,
+            borderWidth: 1,
+            borderRadius: spacing.l,
+            flex: 1.5,
+            textAlign: `center`,
+        },
+    })
+}
 
 const styles = StyleSheet.create({
     itemName: {
