@@ -180,6 +180,7 @@ const FormattingManager = () => {
                             alignItems: 'center',
                         }}>
                         <DropdownSheet
+                            containerStyle={{ flex: 1 }}
                             selected={selectedItem}
                             data={instructList}
                             labelExtractor={(item) => item.name}
