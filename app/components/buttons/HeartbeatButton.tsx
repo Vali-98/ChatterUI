@@ -1,6 +1,8 @@
-import { Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { Text, View } from 'react-native'
+
+import ThemedButton from './ThemedButton'
 
 const enum ResponseStatus {
     DEFAULT,
@@ -36,6 +38,7 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
     headers = {},
     callback = () => {},
 }) => {
+    const { color, spacing } = Theme.useTheme()
     const [status, setStatus] = useState<ResponseStatus>(ResponseStatus.DEFAULT)
 
     useEffect(() => {
@@ -76,11 +79,11 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
     const getButtonColor = () => {
         switch (status) {
             case ResponseStatus.DEFAULT:
-                return Style.getColor('primary-surface1')
+                return color.neutral._200
             case ResponseStatus.ERROR:
-                return Style.getColor('destructive-brand')
+                return color.error._400
             case ResponseStatus.OK:
-                return Style.getColor('confirm-brand')
+                return color.primary._500
         }
     }
 
@@ -88,17 +91,13 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
 
     return (
         <View style={{ flexDirection: 'row', marginTop: 8 }}>
-            <TouchableOpacity style={styles.button} onPress={handleCheck}>
-                <Text style={styles.buttonText}>{buttonText}</Text>
-            </TouchableOpacity>
+            <ThemedButton label="Test" onPress={handleCheck} variant="secondary" />
             <View
                 style={{
                     marginLeft: 4,
                     backgroundColor: buttonColor,
                     borderColor:
-                        status === ResponseStatus.DEFAULT
-                            ? Style.getColor('primary-surface2')
-                            : buttonColor,
+                        status === ResponseStatus.DEFAULT ? color.neutral._100 : buttonColor,
                     padding: 8,
                     minWidth: 160,
                     alignItems: 'center',
@@ -108,7 +107,7 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
                 }}>
                 <Text
                     style={{
-                        color: Style.getColor('primary-text1'),
+                        color: color.text._100,
                     }}>
                     {StatusMessage()}
                 </Text>
@@ -118,16 +117,3 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
 }
 
 export default HeartbeatButton
-
-const styles = StyleSheet.create({
-    button: {
-        backgroundColor: Style.getColor('primary-surface4'),
-        padding: 8,
-        paddingHorizontal: 16,
-        borderRadius: 8,
-    },
-
-    buttonText: {
-        color: Style.getColor('primary-text1'),
-    },
-})
