@@ -1,28 +1,28 @@
+import DropdownSheet from '@components/input/DropdownSheet'
 import ThemedCheckbox from '@components/input/ThemedCheckbox'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import FadeDownView from '@components/views/FadeDownView'
+import HeaderButton from '@components/views/HeaderButton'
+import HeaderTitle from '@components/views/HeaderTitle'
+import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
-import { FontAwesome } from '@expo/vector-icons'
 import { AppMode } from '@lib/constants/GlobalValues'
 import { Samplers } from '@lib/constants/SamplerData'
 import { APISampler } from '@lib/engine/API/APIBuilder.types'
 import { APIState as APIStateNew } from '@lib/engine/API/APIManagerState'
 import { localSamplerData } from '@lib/engine/LocalInference'
 import { SamplersManager } from '@lib/state/SamplerState'
-import { Global, Logger, saveStringToDownload, Style } from '@lib/utils/Global'
-import { Stack } from 'expo-router'
-import { useEffect, useState } from 'react'
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { Dropdown } from 'react-native-element-dropdown'
+import { Theme } from '@lib/theme/ThemeManager'
+import { Global, Logger, saveStringToDownload } from '@lib/utils/Global'
+import { useState } from 'react'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useMMKVString } from 'react-native-mmkv'
 
-type PresetLabel = {
-    label: string
-}
-
 const SamplerMenu = () => {
+    const styles = useStyles()
+    const { spacing } = Theme.useTheme()
     const [appMode, setAppMode] = useMMKVString(Global.AppMode)
     const [showNewPreset, setShowNewPreset] = useState<boolean>(false)
 
@@ -36,17 +36,11 @@ const SamplerMenu = () => {
         configList,
     } = SamplersManager.useSamplers()
 
-    useEffect(() => {
-        setSamplerList(getSamplerList())
-    }, [])
-
     const { apiValues, activeIndex, getTemplates } = APIStateNew.useAPIState((state) => ({
         apiValues: state.values,
         activeIndex: state.activeIndex,
         getTemplates: state.getTemplates,
     }))
-
-    const [samplerList, setSamplerList] = useState<APISampler[]>([])
 
     const getSamplerList = (): APISampler[] => {
         if (appMode === AppMode.LOCAL) return localSamplerData
@@ -60,272 +54,239 @@ const SamplerMenu = () => {
         return []
     }
 
+    const handleExportSampler = () => {
+        saveStringToDownload(
+            JSON.stringify(currentConfig.data),
+            `${currentConfig.name}.json`,
+            'utf8'
+        ).then(() => {
+            Logger.log('Downloaded Sampler Preset!', true)
+        })
+    }
+
+    const handleImportSampler = () => {
+        //TODO : Implement
+        Logger.log('Importing Not Implemented', true)
+    }
+
+    const handleDeleteSampler = () => () => {
+        if (configList.length === 1) {
+            Logger.log(`Cannot Delete Last Preset.`, true)
+            return false
+        }
+
+        Alert.alert({
+            title: `Delete Preset`,
+            description: `Are you sure you want to delete '${currentConfig.name}'?`,
+            buttons: [
+                { label: 'Cancel' },
+                {
+                    label: 'Delete Preset',
+                    onPress: async () => {
+                        deleteSamplerConfig(currentConfigIndex)
+                    },
+                    type: 'warning',
+                },
+            ],
+        })
+        return true
+    }
+
+    const headerRight = () => (
+        <PopupMenu
+            icon="setting"
+            iconSize={24}
+            placement="bottom"
+            options={[
+                {
+                    label: 'Create Sampler',
+                    icon: 'addfile',
+                    onPress: (menu) => {
+                        setShowNewPreset(true)
+
+                        menu.current?.close()
+                    },
+                },
+                {
+                    label: 'Export Sampler',
+                    icon: 'download',
+                    onPress: (menu) => {
+                        handleExportSampler()
+                        menu.current?.close()
+                    },
+                },
+                /*{
+                    label: 'Import Sampler',
+                    icon: 'upload',
+                    onPress: (menu) => {
+                        handleImportSampler()
+                        menu.current?.close()
+                    },
+                },*/
+                {
+                    label: 'Delete Sampler',
+                    icon: 'delete',
+                    onPress: (menu) => {
+                        if (handleDeleteSampler()) menu.current?.close()
+                    },
+                    warning: true,
+                },
+            ]}
+        />
+    )
+
     return (
         <FadeDownView style={{ flex: 1 }}>
-            <SafeAreaView>
-                <TextBoxModal
-                    booleans={[showNewPreset, setShowNewPreset]}
-                    onConfirm={(text: string) => {
-                        if (text === '') {
-                            Logger.log(`Preset name cannot be empty`, true)
+            <TextBoxModal
+                booleans={[showNewPreset, setShowNewPreset]}
+                onConfirm={(text: string) => {
+                    if (text === '') {
+                        Logger.log(`Preset name cannot be empty`, true)
+                        return
+                    }
+
+                    for (const item of configList)
+                        if (item.name === text) {
+                            Logger.log(`Preset name already exists.`, true)
                             return
                         }
+                    addSamplerConfig({ name: text, data: currentConfig.data })
+                }}
+            />
 
-                        for (const item of configList)
-                            if (item.name === text) {
-                                Logger.log(`Preset name already exists.`, true)
-                                return
-                            }
-                        addSamplerConfig({ name: text, data: currentConfig.data })
-                    }}
-                />
+            <HeaderTitle title="Samplers" />
+            <HeaderButton headerRight={headerRight} />
 
-                <Stack.Screen
-                    options={{
-                        animation: 'fade',
-                        title: `Samplers`,
-                    }}
-                />
+            <DropdownSheet
+                containerStyle={{ marginHorizontal: spacing.xl, paddingVertical: spacing.m }}
+                selected={currentConfig}
+                data={configList}
+                onChangeValue={(item) => {
+                    if (item.name === currentConfig.name) return
+                    changeConfig(configList.indexOf(item))
+                }}
+                labelExtractor={(item) => item.name}
+            />
 
-                <View style={styles.dropdownContainer}>
-                    <Dropdown
-                        value={currentConfig.name}
-                        data={configList}
-                        valueField="name"
-                        labelField="name"
-                        onChange={(item) => {
-                            if (item.name === currentConfig.name) return
-                            changeConfig(configList.indexOf(item))
-                        }}
-                        {...Style.drawer.default}
-                    />
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => {
-                            //TODO: this may no longer be needed
-                        }}>
-                        <FontAwesome
-                            size={24}
-                            name="save"
-                            color={Style.getColor('primary-text1')}
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => {
-                            if (configList.length === 1) {
-                                Logger.log(`Cannot Delete Last Preset.`, true)
-                                return
-                            }
-
-                            Alert.alert({
-                                title: `Delete Preset`,
-                                description: `Are you sure you want to delete '${currentConfig.name}'?`,
-                                buttons: [
-                                    { label: 'Cancel' },
-                                    {
-                                        label: 'Delete Preset',
-                                        onPress: async () => {
-                                            deleteSamplerConfig(currentConfigIndex)
-                                        },
-                                        type: 'warning',
-                                    },
-                                ],
-                            })
-                        }}>
-                        <FontAwesome
-                            size={24}
-                            name="trash"
-                            color={Style.getColor('primary-text1')}
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => {
-                            //`TODO`: new routine
-                        }}>
-                        <FontAwesome
-                            size={24}
-                            name="upload"
-                            color={Style.getColor('primary-text1')}
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={async () => {
-                            saveStringToDownload(
-                                JSON.stringify(currentConfig.data),
-                                `${currentConfig.name}.json`,
-                                'utf8'
-                            ).then(() => {
-                                Logger.log('Downloaded Sampler Preset!', true)
-                            })
-                        }}>
-                        <FontAwesome
-                            size={24}
-                            name="download"
-                            color={Style.getColor('primary-text1')}
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => {
-                            setShowNewPreset(true)
-                        }}>
-                        <FontAwesome
-                            size={24}
-                            name="plus"
-                            color={Style.getColor('primary-text1')}
-                        />
-                    </TouchableOpacity>
-                </View>
-
-                <ScrollView>
-                    <View style={styles.mainContainer}>
-                        {currentConfig &&
-                            samplerList?.map((item, index) => {
-                                const samplerItem = Samplers?.[item.samplerID]
-                                if (!samplerItem)
-                                    return (
-                                        <Text style={styles.unsupported}>
-                                            Sampler ID {`[${item.samplerID}]`} Not Supported
-                                        </Text>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                {currentConfig &&
+                    getSamplerList().map((item, index) => {
+                        const samplerItem = Samplers?.[item.samplerID]
+                        if (!samplerItem)
+                            return (
+                                <Text style={styles.unsupported}>
+                                    Sampler ID {`[${item.samplerID}]`} Not Supported
+                                </Text>
+                            )
+                        switch (samplerItem.inputType) {
+                            case 'slider':
+                                return (
+                                    (samplerItem.values.type === 'float' ||
+                                        samplerItem.values.type === 'integer') && (
+                                        <ThemedSlider
+                                            key={item.samplerID}
+                                            value={
+                                                currentConfig.data[samplerItem.internalID] as number
+                                            }
+                                            onValueChange={(value) => {
+                                                updateCurrentConfig({
+                                                    ...currentConfig,
+                                                    data: {
+                                                        ...currentConfig.data,
+                                                        [samplerItem.internalID]: value,
+                                                    },
+                                                })
+                                            }}
+                                            label={samplerItem.friendlyName}
+                                            min={samplerItem.values.min}
+                                            max={samplerItem.values.max}
+                                            step={samplerItem.values.step}
+                                            precision={samplerItem.values.precision ?? 2}
+                                        />
                                     )
-                                switch (samplerItem.inputType) {
-                                    case 'slider':
-                                        return (
-                                            (samplerItem.values.type === 'float' ||
-                                                samplerItem.values.type === 'integer') && (
-                                                <ThemedSlider
-                                                    key={item.samplerID}
-                                                    value={
-                                                        currentConfig.data[
-                                                            samplerItem.internalID
-                                                        ] as number
-                                                    }
-                                                    onValueChange={(value) => {
-                                                        updateCurrentConfig({
-                                                            ...currentConfig,
-                                                            data: {
-                                                                ...currentConfig.data,
-                                                                [samplerItem.internalID]: value,
-                                                            },
-                                                        })
-                                                    }}
-                                                    label={samplerItem.friendlyName}
-                                                    min={samplerItem.values.min}
-                                                    max={samplerItem.values.max}
-                                                    step={samplerItem.values.step}
-                                                    precision={samplerItem.values.precision ?? 2}
-                                                />
-                                            )
-                                        )
-                                    case 'checkbox':
-                                        return (
-                                            <ThemedCheckbox
-                                                value={
-                                                    currentConfig.data[item.samplerID] as boolean
-                                                }
-                                                key={item.samplerID}
-                                                onChangeValue={(b) => {
-                                                    updateCurrentConfig({
-                                                        ...currentConfig,
-                                                        data: {
-                                                            ...currentConfig.data,
-                                                            [samplerItem.internalID]: b,
-                                                        },
-                                                    })
-                                                }}
-                                                name={samplerItem.friendlyName}
-                                            />
-                                        )
-                                    case 'textinput':
-                                        return (
-                                            <ThemedTextInput
-                                                key={item.samplerID}
-                                                value={currentConfig.data[item.samplerID] as string}
-                                                onChangeText={(text) => {
-                                                    updateCurrentConfig({
-                                                        ...currentConfig,
-                                                        data: {
-                                                            ...currentConfig.data,
-                                                            [item.samplerID]: text,
-                                                        },
-                                                    })
-                                                }}
-                                                label={samplerItem.friendlyName}
-                                            />
-                                        )
-                                    //case 'custom':
-                                    default:
-                                        return (
-                                            <Text style={styles.warningText}>
-                                                Invalid Sampler Field!
-                                            </Text>
-                                        )
-                                }
-                            })}
-                    </View>
-                </ScrollView>
-            </SafeAreaView>
+                                )
+                            case 'checkbox':
+                                return (
+                                    <ThemedCheckbox
+                                        value={currentConfig.data[item.samplerID] as boolean}
+                                        key={item.samplerID}
+                                        onChangeValue={(b) => {
+                                            updateCurrentConfig({
+                                                ...currentConfig,
+                                                data: {
+                                                    ...currentConfig.data,
+                                                    [samplerItem.internalID]: b,
+                                                },
+                                            })
+                                        }}
+                                        name={samplerItem.friendlyName}
+                                    />
+                                )
+                            case 'textinput':
+                                return (
+                                    <ThemedTextInput
+                                        key={item.samplerID}
+                                        value={currentConfig.data[item.samplerID] as string}
+                                        onChangeText={(text) => {
+                                            updateCurrentConfig({
+                                                ...currentConfig,
+                                                data: {
+                                                    ...currentConfig.data,
+                                                    [item.samplerID]: text,
+                                                },
+                                            })
+                                        }}
+                                        label={samplerItem.friendlyName}
+                                    />
+                                )
+                            //case 'custom':
+                            default:
+                                return (
+                                    <Text style={styles.warningText}>Invalid Sampler Field!</Text>
+                                )
+                        }
+                    })}
+            </ScrollView>
         </FadeDownView>
     )
 }
 
 export default SamplerMenu
 
-const styles = StyleSheet.create({
-    mainContainer: {
-        padding: 16,
-    },
+const useStyles = () => {
+    const { color, spacing } = Theme.useTheme()
+    return StyleSheet.create({
+        scrollContainer: {
+            paddingHorizontal: spacing.xl,
+            paddingVertical: spacing.xl2,
+            rowGap: spacing.xl,
+        },
 
-    dropdownContainer: {
-        marginHorizontal: 16,
-        marginTop: 16,
-        flexDirection: 'row',
-        paddingBottom: 12,
-        alignItems: 'center',
-    },
+        dropdownContainer: {
+            marginHorizontal: spacing.xl,
+        },
 
-    selected: {
-        color: Style.getColor('primary-text1'),
-    },
+        button: {
+            padding: spacing.s,
+            borderRadius: spacing.s,
+            marginLeft: spacing.m,
+        },
 
-    button: {
-        padding: 4,
-        borderRadius: 4,
-        marginLeft: 8,
-    },
+        warningText: {
+            color: color.text._100,
+            backgroundColor: color.error._500,
+            padding: spacing.m,
+            margin: spacing.xl,
+            borderRadius: spacing.m,
+        },
 
-    input: {
-        color: Style.getColor('primary-text1'),
-        backgroundColor: Style.getColor('primary-surface1'),
-        borderColor: Style.getColor('primary-surface4'),
-        borderWidth: 1,
-        paddingVertical: 4,
-        paddingHorizontal: 8,
-        marginVertical: 8,
-        marginHorizontal: 4,
-        borderRadius: 8,
-    },
-    warningText: {
-        color: Style.getColor('primary-text1'),
-        backgroundColor: Style.getColor('destructive-brand'),
-        padding: 8,
-        margin: 16,
-        borderRadius: 8,
-    },
-
-    unsupported: {
-        color: Style.getColor('primary-text2'),
-        textAlign: 'center',
-        paddingVertical: 8,
-        marginVertical: 8,
-        borderRadius: 8,
-        backgroundColor: Style.getColor('primary-surface2'),
-    },
-})
+        unsupported: {
+            color: color.text._400,
+            textAlign: 'center',
+            paddingVertical: spacing.m,
+            marginVertical: spacing.m,
+            borderRadius: spacing.m,
+            backgroundColor: color.neutral._300,
+        },
+    })
+}
