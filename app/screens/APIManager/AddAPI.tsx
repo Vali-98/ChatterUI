@@ -2,15 +2,17 @@ import HeartbeatButton from '@components/buttons/HeartbeatButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
-import { MaterialIcons } from '@expo/vector-icons'
+import ThemedTextInput from '@components/input/ThemedTextInput'
 import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
 import claudeModels from '@lib/engine/API/ClaudeModels.json'
-import { Logger, Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
+import { Logger } from '@lib/utils/Global'
 import { Stack, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 
 const AddAPI = () => {
+    const styles = useStyles()
     const router = useRouter()
     const { addValue, getTemplates } = APIState.useAPIState((state) => ({
         getTemplates: state.getTemplates,
@@ -53,7 +55,10 @@ const AddAPI = () => {
     return (
         <View style={styles.mainContainer}>
             <Stack.Screen options={{ title: 'Add Connection' }} />
-            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                style={{ flex: 1 }}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ rowGap: 16, paddingBottom: 24 }}>
                 <DropdownSheet
                     style={{ marginBottom: 8 }}
                     data={getTemplates()}
@@ -72,47 +77,35 @@ const AddAPI = () => {
                     search
                 />
 
-                <View>
-                    <Text style={styles.title}>Friendly Name</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={values.friendlyName}
-                        onChangeText={(value) => {
-                            setValues({ ...values, friendlyName: value })
-                        }}
-                        placeholder="New API..."
-                        placeholderTextColor={Style.getColor('primary-text2')}
-                    />
-                </View>
+                <ThemedTextInput
+                    label="Friendly Name"
+                    value={values.friendlyName}
+                    onChangeText={(value) => {
+                        setValues({ ...values, friendlyName: value })
+                    }}
+                />
 
                 {template.ui.editableCompletionPath && (
                     <View>
-                        <Text style={styles.title}>Completion URL</Text>
-                        <Text style={styles.subtitle}>Note: Use full URL path</Text>
-                        <TextInput
-                            style={styles.input}
+                        <ThemedTextInput
+                            label="Completion URL"
                             value={values.endpoint}
                             onChangeText={(value) => {
                                 setValues({ ...values, endpoint: value })
                             }}
-                            placeholder={template.defaultValues.endpoint}
-                            placeholderTextColor={Style.getColor('primary-text2')}
                         />
+                        <Text style={styles.hintText}>Note: Use full URL path</Text>
                     </View>
                 )}
 
                 {template.ui.editableModelPath && (
                     <View>
-                        <Text style={styles.title}>Model URL</Text>
-                        <Text style={styles.subtitle}>Note: Use full URL path</Text>
-                        <TextInput
-                            style={styles.input}
+                        <ThemedTextInput
+                            label="Model URL"
                             value={values.modelEndpoint}
                             onChangeText={(value) => {
                                 setValues({ ...values, modelEndpoint: value })
                             }}
-                            placeholder={template.defaultValues.modelEndpoint}
-                            placeholderTextColor={Style.getColor('primary-text2')}
                         />
                         <HeartbeatButton
                             api={values.modelEndpoint ?? ''}
@@ -131,28 +124,25 @@ const AddAPI = () => {
                 )}
 
                 {template.features.useKey && (
-                    <View>
-                        <Text style={styles.title}>API Key</Text>
-                        <Text style={styles.subtitle}>Key will not be shown</Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <TextInput
-                                style={styles.input}
-                                value={values.key}
-                                onChangeText={(value) => {
-                                    setValues({ ...values, key: value })
-                                }}
-                                placeholder="Press save to confirm key"
-                                placeholderTextColor={Style.getColor('primary-text2')}
-                                secureTextEntry
-                            />
-                        </View>
-                    </View>
+                    <ThemedTextInput
+                        label="API Key"
+                        value={values.key}
+                        onChangeText={(value) => {
+                            setValues({ ...values, key: value })
+                        }}
+                    />
                 )}
 
                 {template.features.useModel && (
-                    <View style={styles.dropdownContainer}>
+                    <View>
                         <Text style={styles.title}>Model</Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                columnGap: 8,
+                                marginTop: 8,
+                            }}>
                             {!template.features.multipleModels && (
                                 <DropdownSheet
                                     containerStyle={{ flex: 1 }}
@@ -183,51 +173,40 @@ const AddAPI = () => {
                                     modalTitle="Select Model"
                                 />
                             )}
-                            <TouchableOpacity
-                                style={styles.button}
+                            <ThemedButton
                                 onPress={() => {
                                     handleGetModelList()
-                                }}>
-                                <MaterialIcons
-                                    name="refresh"
-                                    color={Style.getColor('primary-text1')}
-                                    size={24}
-                                />
-                            </TouchableOpacity>
+                                }}
+                                iconName="reload1"
+                                iconSize={18}
+                                variant="secondary"
+                            />
                         </View>
                     </View>
                 )}
 
                 {template.features.useFirstMessage && (
                     <View>
-                        <Text style={styles.title}>First Message</Text>
-                        <Text style={styles.subtitle}>Default first message sent to Claude</Text>
-                        <TextInput
-                            style={{ ...styles.input, textAlignVertical: 'top' }}
+                        <ThemedTextInput
+                            label="First Message"
                             value={values.firstMessage}
                             onChangeText={(value) => {
                                 setValues({ ...values, firstMessage: value })
                             }}
-                            numberOfLines={4}
-                            placeholder="..."
-                            placeholderTextColor={Style.getColor('primary-text2')}
                         />
+                        <Text style={styles.hintText}>Default first message sent to Claude</Text>
                     </View>
                 )}
                 {template.features.usePrefill && (
                     <View>
-                        <Text style={styles.title}>Prefill</Text>
-                        <Text style={styles.subtitle}>Leave blank to use default endpoint</Text>
-                        <TextInput
-                            style={{ ...styles.input, textAlignVertical: 'top' }}
+                        <ThemedTextInput
+                            label="Prefill"
                             value={values.prefill}
                             onChangeText={(value) => {
                                 setValues({ ...values, prefill: value })
                             }}
-                            numberOfLines={4}
-                            placeholder="This prefill occurs on the final assistant message"
-                            placeholderTextColor={Style.getColor('primary-text2')}
                         />
+                        <Text style={styles.hintText}>Leave blank to use default endpoint</Text>
                     </View>
                 )}
             </ScrollView>
@@ -244,56 +223,37 @@ const AddAPI = () => {
 
 export default AddAPI
 
-const styles = StyleSheet.create({
-    mainContainer: {
-        marginVertical: 16,
-        paddingVertical: 16,
-        paddingHorizontal: 16,
-        flex: 1,
-    },
+const useStyles = () => {
+    const { color, spacing } = Theme.useTheme()
+    return StyleSheet.create({
+        mainContainer: {
+            marginVertical: spacing.xl,
+            paddingVertical: spacing.xl,
+            paddingHorizontal: spacing.xl,
+            flex: 1,
+        },
 
-    title: {
-        paddingTop: 8,
-        color: Style.getColor('primary-text1'),
-        fontSize: 16,
-    },
+        title: {
+            paddingTop: spacing.m,
+            color: color.text._100,
+            fontSize: spacing.xl,
+        },
 
-    subtitle: {
-        color: Style.getColor('primary-text2'),
-    },
+        hintText: {
+            marginTop: spacing.s,
+            color: color.text._400,
+        },
 
-    input: {
-        flex: 1,
-        color: Style.getColor('primary-text1'),
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 1,
-        paddingHorizontal: 8,
-        paddingVertical: 8,
-        marginVertical: 8,
-        borderRadius: 8,
-    },
-
-    button: {
-        padding: 4,
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 1,
-        borderRadius: 4,
-        marginLeft: 8,
-    },
-
-    dropdownContainer: {
-        marginTop: 16,
-    },
-
-    modelInfo: {
-        borderRadius: 8,
-        backgroundColor: Style.getColor('primary-surface2'),
-        flex: 1,
-        paddingHorizontal: 16,
-        paddingTop: 12,
-        paddingBottom: 24,
-    },
-})
+        modelInfo: {
+            borderRadius: spacing.m,
+            backgroundColor: color.neutral._200,
+            flex: 1,
+            paddingHorizontal: spacing.xl,
+            paddingTop: spacing.l,
+            paddingBottom: spacing.xl2,
+        },
+    })
+}
 
 const getNestedValue = (obj: any, path: string) => {
     if (path === '') return obj
