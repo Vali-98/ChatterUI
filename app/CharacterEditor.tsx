@@ -296,7 +296,7 @@ const ChracterEditor = () => {
                             justifyContent: 'space-between',
                         }}>
                         <Text style={{ color: color.text._100 }}>
-                            Alternate Greetings
+                            Alternate Greetings{' '}
                             {characterCard.alternate_greetings.length !== 0 && (
                                 <Text
                                     style={{
@@ -313,14 +313,20 @@ const ChracterEditor = () => {
                                     <AntDesign color={color.error._400} name="delete" size={20} />
                                 )}
                             </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => setAltSwipeIndex(Math.max(altSwipeIndex - 1, 0))}>
-                                <AntDesign
-                                    color={altSwipeIndex === 0 ? color.text._700 : color.text._100}
-                                    name="left"
-                                    size={20}
-                                />
-                            </TouchableOpacity>
+                            {characterCard.alternate_greetings.length > 0 && (
+                                <TouchableOpacity
+                                    onPress={() =>
+                                        setAltSwipeIndex(Math.max(altSwipeIndex - 1, 0))
+                                    }>
+                                    <AntDesign
+                                        color={
+                                            altSwipeIndex === 0 ? color.text._700 : color.text._100
+                                        }
+                                        name="left"
+                                        size={20}
+                                    />
+                                </TouchableOpacity>
+                            )}
                             {altSwipeIndex === characterCard.alternate_greetings.length - 1 ||
                             characterCard.alternate_greetings.length === 0 ? (
                                 <TouchableOpacity onPress={handleAddAltMessage}>
@@ -345,7 +351,7 @@ const ChracterEditor = () => {
                     {characterCard.alternate_greetings.length !== 0 ? (
                         <ThemedTextInput
                             multiline
-                            numberOfLines={2}
+                            numberOfLines={8}
                             onChangeText={(mes) => {
                                 const greetings = [...characterCard.alternate_greetings]
                                 greetings[altSwipeIndex].greeting = mes
