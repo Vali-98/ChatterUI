@@ -96,7 +96,9 @@ const MultiDropdownSheet = <T,>({
                     <FlatList
                         showsVerticalScrollIndicator={false}
                         data={data.filter((item) =>
-                            labelExtractor(item).toLowerCase().includes(searchFilter.toLowerCase())
+                            labelExtractor(item)
+                                ?.toLowerCase()
+                                .includes(searchFilter.toLowerCase() ?? true)
                         )}
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({ item, index }) => (
