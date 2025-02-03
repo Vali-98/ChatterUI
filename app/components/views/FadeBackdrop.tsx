@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { GestureResponderEvent, TouchableOpacity, StyleSheet } from 'react-native'
+import { GestureResponderEvent, Pressable, StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
 type FadeScreenProps = {
@@ -14,9 +14,9 @@ const FadeBackrop: React.FC<FadeScreenProps> = ({ handleOverlayClick, children }
 
     return (
         <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.absolute}>
-            <TouchableOpacity activeOpacity={1} onPress={onBackdropPress} style={styles.absolute}>
+            <Pressable onPress={onBackdropPress} style={styles.absolute}>
                 {children}
-            </TouchableOpacity>
+            </Pressable>
         </Animated.View>
     )
 }
