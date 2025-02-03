@@ -47,7 +47,7 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                     borderWidth: 1,
                     paddingVertical: theme.spacing.m,
                     paddingHorizontal: theme.spacing.xl,
-                    borderRadius: theme.spacing.xl,
+                    borderRadius: theme.borderRadius.l,
                 },
                 labelStyle: {
                     textAlign: 'center',
@@ -61,7 +61,7 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                     borderWidth: 1,
                     paddingVertical: theme.spacing.m,
                     paddingHorizontal: theme.spacing.xl,
-                    borderRadius: theme.spacing.xl,
+                    borderRadius: theme.borderRadius.l,
                 },
                 labelStyle: {
                     textAlign: 'center',
@@ -87,7 +87,7 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                     borderWidth: 1,
                     paddingVertical: theme.spacing.m,
                     paddingHorizontal: theme.spacing.xl,
-                    borderRadius: theme.spacing.xl,
+                    borderRadius: theme.borderRadius.l,
                 },
                 labelStyle: {
                     textAlign: 'center',
@@ -101,7 +101,7 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                     borderWidth: 1,
                     paddingVertical: theme.spacing.m,
                     paddingHorizontal: theme.spacing.xl,
-                    borderRadius: theme.spacing.xl,
+                    borderRadius: theme.borderRadius.l,
                 },
                 labelStyle: {
                     textAlign: 'center',
