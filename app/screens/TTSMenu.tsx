@@ -118,6 +118,11 @@ const TTSMenu = () => {
                 onChangeValue={(item) => setCurrentSpeaker(item)}
             />
             <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 16 }}>
+                <ThemedTextInput
+                    value={testAudioText}
+                    onChangeText={setTestAudioText}
+                    style={{ color: color.text._400, fontStyle: 'italic', flex: 1 }}
+                />
                 <ThemedButton
                     label="Test"
                     variant="secondary"
@@ -131,11 +136,6 @@ const TTSMenu = () => {
                             voice: currentSpeaker.identifier,
                         })
                     }}
-                />
-                <ThemedTextInput
-                    value={testAudioText}
-                    onChangeText={setTestAudioText}
-                    style={{ color: color.text._400, fontStyle: 'italic', flex: 1 }}
                 />
             </View>
         </View>
