@@ -45,7 +45,7 @@ const ComponentTest = () => {
             </View>
 
             <StringArrayEditor title="Test Input Label" value={data} setValue={setData} />
-            <ThemedCheckbox name="Test Checkbox" value={checkbox} onChangeValue={setCheckbox} />
+            <ThemedCheckbox label="Test Checkbox" value={checkbox} onChangeValue={setCheckbox} />
             <ThemedSwitch label="Test Switch" value={sw} onChangeValue={setSw} />
             <ThemedSlider
                 value={slider}

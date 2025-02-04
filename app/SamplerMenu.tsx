@@ -218,7 +218,7 @@ const SamplerMenu = () => {
                                                 },
                                             })
                                         }}
-                                        name={samplerItem.friendlyName}
+                                        label={samplerItem.friendlyName}
                                     />
                                 )
                             case 'textinput':

@@ -338,7 +338,7 @@ const FormattingManager = () => {
                             }}>
                             <View>
                                 <ThemedCheckbox
-                                    name="Wrap In Newline"
+                                    label="Wrap In Newline"
                                     value={currentInstruct.wrap}
                                     onChangeValue={(b) => {
                                         setCurrentInstruct({
@@ -348,7 +348,7 @@ const FormattingManager = () => {
                                     }}
                                 />
                                 <ThemedCheckbox
-                                    name="Include Names"
+                                    label="Include Names"
                                     value={currentInstruct.names}
                                     onChangeValue={(b) => {
                                         setCurrentInstruct({
@@ -358,7 +358,7 @@ const FormattingManager = () => {
                                     }}
                                 />
                                 <ThemedCheckbox
-                                    name="Add Timestamp"
+                                    label="Add Timestamp"
                                     value={currentInstruct.timestamp}
                                     onChangeValue={(b) => {
                                         setCurrentInstruct({
@@ -370,7 +370,7 @@ const FormattingManager = () => {
                             </View>
                             <View>
                                 <ThemedCheckbox
-                                    name="Use Examples"
+                                    label="Use Examples"
                                     value={currentInstruct.examples}
                                     onChangeValue={(b) => {
                                         setCurrentInstruct({
@@ -380,7 +380,7 @@ const FormattingManager = () => {
                                     }}
                                 />
                                 <ThemedCheckbox
-                                    name="Use Scenario"
+                                    label="Use Scenario"
                                     value={currentInstruct.scenario}
                                     onChangeValue={(b) => {
                                         setCurrentInstruct({
@@ -391,7 +391,7 @@ const FormattingManager = () => {
                                 />
 
                                 <ThemedCheckbox
-                                    name="Use Personality"
+                                    label="Use Personality"
                                     value={currentInstruct.personality}
                                     onChangeValue={(b) => {
                                         setCurrentInstruct({
@@ -430,7 +430,7 @@ const FormattingManager = () => {
                                 {autoformatterData.map((item, index) => (
                                     <ThemedCheckbox
                                         key={item.label}
-                                        name={item.label}
+                                        label={item.label}
                                         value={currentInstruct.format_type === index}
                                         onChangeValue={(b) => {
                                             if (b)

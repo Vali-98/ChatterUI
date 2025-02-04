@@ -13,14 +13,14 @@ import Animated, {
 } from 'react-native-reanimated'
 
 type ThemedCheckboxProps = {
-    name: string
+    label?: string
     value: boolean
     onChangeValue?: (item: boolean) => void
     style?: ViewStyle
 }
 
 const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
-    name,
+    label = undefined,
     value,
     onChangeValue = () => {},
     style = {},
@@ -73,13 +73,15 @@ const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
                     </Animated.View>
                 )}
             </Animated.View>
-            <Text
-                style={{
-                    paddingLeft: 12,
-                    color: value ? theme.color.text._100 : theme.color.text._400,
-                }}>
-                {name}
-            </Text>
+            {label && (
+                <Text
+                    style={{
+                        paddingLeft: 12,
+                        color: value ? theme.color.text._100 : theme.color.text._400,
+                    }}>
+                    {label}
+                </Text>
+            )}
         </Pressable>
     )
 }
