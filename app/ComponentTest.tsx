@@ -34,10 +34,10 @@ const ComponentTest = () => {
 
     return (
         <ScrollView
-            style={{ flex: 1, padding: 16 }}
-            contentContainerStyle={{ rowGap: 16 }}
+            style={{ flex: 1 }}
+            contentContainerStyle={{ rowGap: 16, padding: 16 }}
             keyboardShouldPersistTaps="always">
-            <View style={{ rowGap: 8, marginBottom: 16 }}>
+            <View style={{ rowGap: 8 }}>
                 {buttonVariants.map((item) => (
                     //@ts-ignore
                     <ThemedButton variant={item} key={item} label={`Button Variant: ${item}`} />
