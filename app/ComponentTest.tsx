@@ -1,8 +1,15 @@
 import ThemedButton from '@components/buttons/ThemedButton'
+import DropdownSheet from '@components/input/DropdownSheet'
+import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import StringArrayEditor from '@components/input/StringArrayEditor'
+import ThemedCheckbox from '@components/input/ThemedCheckbox'
+import ThemedSlider from '@components/input/ThemedSlider'
+import ThemedSwitch from '@components/input/ThemedSwitch'
+import ThemedTextInput from '@components/input/ThemedTextInput'
 import React, { useState } from 'react'
 import { ScrollView, View } from 'react-native'
-const data = [
+
+const selectorData = [
     { label: 'Item 0', value: '1' },
     { label: 'Item 1', value: '1' },
     { label: 'Item 2', value: '2' },
@@ -17,20 +24,54 @@ const data = [
 const buttonVariants = ['primary', 'secondary', 'tertiary', 'critical', 'disabled']
 
 const ComponentTest = () => {
-    const [selected, setSelected] = useState<typeof data>([])
+    const [selected, setSelected] = useState<(typeof selectorData)[0]>(selectorData[0])
+    const [selectedM, setSelectedM] = useState<typeof selectorData>([])
     const [slider, setSlider] = useState(0)
     const [data, setData] = useState<string[]>([])
+    const [textInputData, setTextInputData] = useState('')
+    const [checkbox, setCheckbox] = useState(true)
+    const [sw, setSw] = useState(true)
 
     return (
-        <ScrollView style={{ flex: 1, padding: 16 }} keyboardShouldPersistTaps="always">
-            <View style={{ rowGap: 20, marginBottom: 20 }}>
+        <ScrollView
+            style={{ flex: 1, padding: 16 }}
+            contentContainerStyle={{ rowGap: 16 }}
+            keyboardShouldPersistTaps="always">
+            <View style={{ rowGap: 8, marginBottom: 16 }}>
                 {buttonVariants.map((item) => (
                     //@ts-ignore
-                    <ThemedButton variant={item} key={item} label={`Variant: ${item}`} />
+                    <ThemedButton variant={item} key={item} label={`Button Variant: ${item}`} />
                 ))}
             </View>
 
             <StringArrayEditor title="Test Input Label" value={data} setValue={setData} />
+            <ThemedCheckbox name="Test Checkbox" value={checkbox} onChangeValue={setCheckbox} />
+            <ThemedSwitch label="Test Switch" value={sw} onValueChange={setSw} />
+            <ThemedSlider
+                value={slider}
+                onValueChange={setSlider}
+                min={0}
+                max={10}
+                step={1}
+                label="Test Slider"
+            />
+            <ThemedTextInput
+                label="Test Text"
+                value={textInputData}
+                onChangeText={setTextInputData}
+            />
+            <DropdownSheet
+                data={selectorData}
+                selected={selected}
+                onChangeValue={setSelected}
+                labelExtractor={(item) => item.label}
+            />
+            <MultiDropdownSheet
+                data={selectorData}
+                selected={selectedM}
+                onChangeValue={setSelectedM}
+                labelExtractor={(item) => item.label}
+            />
         </ScrollView>
     )
 }
