@@ -44,7 +44,7 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                 buttonStyle: {
                     backgroundColor: theme.color.primary._500,
                     borderColor: theme.color.primary._100,
-                    borderWidth: 1,
+                    borderWidth: theme.borderWidth.m,
                     paddingVertical: theme.spacing.m,
                     paddingHorizontal: theme.spacing.xl,
                     borderRadius: theme.borderRadius.m,
@@ -58,20 +58,20 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
             return {
                 buttonStyle: {
                     borderColor: theme.color.primary._400,
-                    borderWidth: 1,
+                    borderWidth: theme.borderWidth.m,
                     paddingVertical: theme.spacing.m,
                     paddingHorizontal: theme.spacing.xl,
                     borderRadius: theme.borderRadius.m,
                 },
                 labelStyle: {
                     textAlign: 'center',
-                    color: theme.color.text._300,
+                    color: theme.color.primary._700,
                 },
             }
         case 'tertiary':
             return {
                 buttonStyle: {
-                    borderWidth: 1,
+                    borderWidth: theme.borderWidth.m,
                     borderColor: 'rgba(0, 0, 0, 0)',
                     padding: theme.spacing.m,
                 },
@@ -84,7 +84,7 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
             return {
                 buttonStyle: {
                     borderColor: theme.color.error._400,
-                    borderWidth: 1,
+                    borderWidth: theme.borderWidth.m,
                     paddingVertical: theme.spacing.m,
                     paddingHorizontal: theme.spacing.xl,
                     borderRadius: theme.borderRadius.m,
@@ -98,7 +98,7 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
             return {
                 buttonStyle: {
                     borderColor: theme.color.neutral._500,
-                    borderWidth: 1,
+                    borderWidth: theme.borderWidth.m,
                     paddingVertical: theme.spacing.m,
                     paddingHorizontal: theme.spacing.xl,
                     borderRadius: theme.borderRadius.m,
