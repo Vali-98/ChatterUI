@@ -20,7 +20,7 @@ type DropdownItemProps = {
 }
 
 const DropdownItem: React.FC<DropdownItemProps> = ({ label, active, onValueChange }) => {
-    const styles = useStyles()
+    const styles = useDropdownStyles()
     return (
         <Pressable
             style={active ? styles.listItemSelected : styles.listItem}
@@ -59,10 +59,16 @@ const MultiDropdownSheet = <T,>({
     search = false,
     closeOnSelect = true,
 }: DropdownSheetProps<T>) => {
-    const styles = useStyles()
+    const styles = useDropdownStyles()
     const { color, spacing } = Theme.useTheme()
     const [showList, setShowList] = useState(false)
     const [searchFilter, setSearchFilter] = useState('')
+
+    const items = data.filter((item) =>
+        labelExtractor(item)
+            ?.toLowerCase()
+            .includes(searchFilter.toLowerCase() ?? true)
+    )
     return (
         <View style={containerStyle}>
             <Modal
@@ -93,46 +99,48 @@ const MultiDropdownSheet = <T,>({
                                 : 'No items selected'}
                         </Text>
                     </View>
-                    <FlatList
-                        showsVerticalScrollIndicator={false}
-                        data={data.filter((item) =>
-                            labelExtractor(item)
-                                ?.toLowerCase()
-                                .includes(searchFilter.toLowerCase() ?? true)
-                        )}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={({ item, index }) => (
-                            <DropdownItem
-                                label={labelExtractor(item)}
-                                active={selected?.some(
-                                    (e) => labelExtractor(e) === labelExtractor(item)
-                                )}
-                                onValueChange={(active) => {
-                                    if (!active && selected.length > 0) {
-                                        const data = selected.filter(
-                                            (e) => labelExtractor(e) !== labelExtractor(item)
-                                        )
-                                        onChangeValue(data)
-                                    } else {
-                                        // we duplicate for a fresh reference
-                                        const data = [...selected]
-                                        if (
-                                            selected.some(
-                                                (e) => labelExtractor(e) === labelExtractor(item)
+                    {items.length > 0 ? (
+                        <FlatList
+                            contentContainerStyle={{ rowGap: 2 }}
+                            showsVerticalScrollIndicator={false}
+                            data={items}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={({ item, index }) => (
+                                <DropdownItem
+                                    label={labelExtractor(item)}
+                                    active={selected?.some(
+                                        (e) => labelExtractor(e) === labelExtractor(item)
+                                    )}
+                                    onValueChange={(active) => {
+                                        if (!active && selected.length > 0) {
+                                            const data = selected.filter(
+                                                (e) => labelExtractor(e) !== labelExtractor(item)
                                             )
-                                        )
-                                            return
-                                        data.push(item)
-                                        onChangeValue(data)
-                                    }
-                                }}
-                            />
-                        )}
-                    />
+                                            onChangeValue(data)
+                                        } else {
+                                            // we duplicate for a fresh reference
+                                            const data = [...selected]
+                                            if (
+                                                selected.some(
+                                                    (e) =>
+                                                        labelExtractor(e) === labelExtractor(item)
+                                                )
+                                            )
+                                                return
+                                            data.push(item)
+                                            onChangeValue(data)
+                                        }
+                                    }}
+                                />
+                            )}
+                        />
+                    ) : (
+                        <Text style={styles.emptyText}>No Items</Text>
+                    )}
                     {search && (
                         <TextInput
                             placeholder="Filter..."
-                            placeholderTextColor={color.text._700}
+                            placeholderTextColor={color.text._300}
                             style={styles.searchBar}
                             value={searchFilter}
                             onChangeText={setSearchFilter}
@@ -147,7 +155,7 @@ const MultiDropdownSheet = <T,>({
                 {(!selected || selected.length === 0) && (
                     <Text style={styles.placeholderText}>{placeholder}</Text>
                 )}
-                <Entypo name="chevron-down" color={color.neutral._500} size={18} />
+                <Entypo name="chevron-down" color={color.primary._800} size={18} />
             </Pressable>
         </View>
     )
@@ -155,7 +163,7 @@ const MultiDropdownSheet = <T,>({
 
 export default MultiDropdownSheet
 
-const useStyles = () => {
+export const useDropdownStyles = () => {
     const { color, spacing, borderRadius } = Theme.useTheme()
     return StyleSheet.create({
         button: {
@@ -165,14 +173,13 @@ const useStyles = () => {
             flexDirection: 'row',
             justifyContent: 'space-between',
             borderRadius: borderRadius.m,
-            backgroundColor: color.neutral._200,
+            backgroundColor: color.primary._300,
         },
         buttonText: {
-            color: color.text._300,
-            fontSize: 16,
+            color: color.text._100,
         },
         placeholderText: {
-            color: color.text._800,
+            color: color.text._300,
         },
 
         modalTitle: {
@@ -182,21 +189,14 @@ const useStyles = () => {
             paddingBottom: spacing.xl2,
         },
 
-        counterText: {
-            color: color.text._800,
-            fontSize: 14,
-            paddingBottom: spacing.xl2,
-        },
-
         listContainer: {
-            marginVertical: spacing.xl,
             paddingVertical: spacing.xl2,
             paddingHorizontal: spacing.xl3,
             flexShrink: 1,
             maxHeight: '70%',
             borderTopLeftRadius: spacing.xl2,
             borderTopRightRadius: spacing.xl2,
-            backgroundColor: color.neutral._200,
+            backgroundColor: color.neutral._100,
         },
 
         listItem: {
@@ -207,12 +207,17 @@ const useStyles = () => {
         listItemSelected: {
             paddingVertical: spacing.xl,
             paddingHorizontal: spacing.xl2,
-            backgroundColor: color.neutral._300,
+            backgroundColor: color.primary._200,
             borderRadius: borderRadius.xl,
         },
 
-        listItemText: {
+        emptyText: {
             color: color.text._400,
+            padding: spacing.xl,
+        },
+
+        listItemText: {
+            color: color.text._200,
             fontSize: 16,
         },
 
@@ -220,9 +225,13 @@ const useStyles = () => {
             marginTop: spacing.l,
             borderRadius: borderRadius.m,
             padding: spacing.l,
-            borderColor: color.primary._100,
-            borderWidth: 1,
-            backgroundColor: color.neutral._300,
+            backgroundColor: color.neutral._200,
+        },
+
+        counterText: {
+            color: color.text._800,
+            fontSize: 14,
+            paddingBottom: spacing.xl2,
         },
     })
 }
