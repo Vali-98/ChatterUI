@@ -50,7 +50,7 @@ const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <ThemedSwitch
                     value={item.active}
-                    onValueChange={(value) => {
+                    onChangeValue={(value) => {
                         editValue({ ...item, active: value }, index)
                     }}
                 />

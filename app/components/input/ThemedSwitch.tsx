@@ -6,14 +6,14 @@ interface ThemedSwitchProps {
     description?: string
     label?: string
     value: boolean | undefined
-    onValueChange: (b: boolean) => void
+    onChangeValue: (b: boolean) => void
 }
 
 const ThemedSwitch: React.FC<ThemedSwitchProps> = ({
     description,
     label,
     value,
-    onValueChange,
+    onChangeValue,
 }) => {
     const { color, spacing } = Theme.useTheme()
     return (
@@ -27,7 +27,7 @@ const ThemedSwitch: React.FC<ThemedSwitchProps> = ({
                     }}
                     thumbColor={value ? color.primary._500 : color.neutral._400}
                     ios_backgroundColor="#3e3e3e"
-                    onValueChange={onValueChange}
+                    onValueChange={onChangeValue}
                     value={value}
                 />
                 {label && (

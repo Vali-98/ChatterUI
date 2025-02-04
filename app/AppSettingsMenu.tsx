@@ -111,28 +111,28 @@ const AppSettingsMenu = () => {
             <ThemedSwitch
                 label="Auto Scroll"
                 value={autoScroll}
-                onValueChange={setAutoScroll}
+                onChangeValue={setAutoScroll}
                 description="Autoscrolls text during generations"
             />
 
             <ThemedSwitch
                 label="Use First Message"
                 value={firstMes}
-                onValueChange={setFirstMes}
+                onChangeValue={setFirstMes}
                 description="Disabling this will make new chats start blank, needed by specific models"
             />
 
             <ThemedSwitch
                 label="Load Chat On Startup"
                 value={chatOnStartup}
-                onValueChange={setChatOnStartup}
+                onChangeValue={setChatOnStartup}
                 description="Loads the most recent chat on startup"
             />
 
             <ThemedSwitch
                 label="Send on Enter"
                 value={sendOnEnter}
-                onValueChange={setSendOnEnter}
+                onChangeValue={setSendOnEnter}
                 description="Submits messages when Enter is pressed"
             />
 
@@ -141,14 +141,14 @@ const AppSettingsMenu = () => {
             <ThemedSwitch
                 label="Print Context"
                 value={printContext}
-                onValueChange={setPrintContext}
+                onChangeValue={setPrintContext}
                 description="Prints the generation context to logs for debugging"
             />
 
             <ThemedSwitch
                 label="Bypass Context Length"
                 value={bypassContextLength}
-                onValueChange={setBypassContextLength}
+                onChangeValue={setBypassContextLength}
                 description="Ignores context length limits when building prompts"
             />
 
@@ -157,7 +157,7 @@ const AppSettingsMenu = () => {
             <ThemedSwitch
                 label="Enable Notifications"
                 value={notificationOnGenerate}
-                onValueChange={async (value) => {
+                onChangeValue={async (value) => {
                     if (!value) {
                         setNotificationOnGenerate(false)
                         return
@@ -176,21 +176,21 @@ const AppSettingsMenu = () => {
                     <ThemedSwitch
                         label="Notification Sound"
                         value={notificationSound}
-                        onValueChange={setNotificationSound}
+                        onChangeValue={setNotificationSound}
                         description=""
                     />
 
                     <ThemedSwitch
                         label="Notification Vibration"
                         value={notificationVibrate}
-                        onValueChange={setNotificationVibrate}
+                        onChangeValue={setNotificationVibrate}
                         description=""
                     />
 
                     <ThemedSwitch
                         label="Show Text In Notification"
                         value={showNotificationText}
-                        onValueChange={setShowNotificationText}
+                        onChangeValue={setShowNotificationText}
                         description="Shows generated messages in notifications"
                     />
                 </View>
@@ -263,7 +263,7 @@ const AppSettingsMenu = () => {
             <ThemedSwitch
                 label="Lock App"
                 value={authLocal}
-                onValueChange={setAuthLocal}
+                onChangeValue={setAuthLocal}
                 description="Requires user authentication to open the app. This will not work if you have no device locks enabled."
             />
 
@@ -271,7 +271,7 @@ const AppSettingsMenu = () => {
             <ThemedSwitch
                 label="Unlock Orientation"
                 value={unlockOrientation}
-                onValueChange={setUnlockOrientation}
+                onChangeValue={setUnlockOrientation}
                 description="Allows landscape on phones (App restart required)"
             />
 

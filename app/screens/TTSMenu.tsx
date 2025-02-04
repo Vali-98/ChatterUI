@@ -67,7 +67,7 @@ const TTSMenu = () => {
             <ThemedSwitch
                 label="Enable"
                 value={enableTTS}
-                onValueChange={(value) => {
+                onChangeValue={(value) => {
                     if (value) {
                         getVoices(true)
                     } else Speech.stop()
@@ -77,7 +77,7 @@ const TTSMenu = () => {
 
             <ThemedSwitch
                 value={autoTTS}
-                onValueChange={setAutoTTS}
+                onChangeValue={setAutoTTS}
                 label="Automatically TTS On Inference"
             />
 

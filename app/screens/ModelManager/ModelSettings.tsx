@@ -124,12 +124,12 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             <ThemedSwitch
                 label="Automatically Load Model on Chat"
                 value={autoloadLocal}
-                onValueChange={setAutoloadLocal}
+                onChangeValue={setAutoloadLocal}
             />
             <ThemedSwitch
                 label="Save Local KV"
                 value={saveKV}
-                onValueChange={setSaveKV}
+                onChangeValue={setSaveKV}
                 description={
                     saveKV
                         ? ''
