@@ -208,7 +208,7 @@ const AddAPI = () => {
                                 setValues({ ...values, prefill: value })
                             }}
                         />
-                        <Text style={styles.hintText}>Leave blank to use default endpoint</Text>
+                        <Text style={styles.hintText}>Prefill before model response</Text>
                     </View>
                 )}
             </ScrollView>
