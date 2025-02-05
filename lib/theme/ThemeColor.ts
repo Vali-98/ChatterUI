@@ -187,8 +187,8 @@ export namespace DefaultColorSchemes {
         },
         neutral: {
             _100: '#efefef',
-            _200: '#b4b4b4',
-            _300: '#999999',
+            _200: '#d5d5d5',
+            _300: '#a0a0a0',
             _400: '#8e8e8e',
             _500: '#737373',
             _600: '#585858',
