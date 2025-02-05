@@ -1,11 +1,12 @@
+import ThemedButton from '@components/buttons/ThemedButton'
+import HeaderButton from '@components/views/HeaderButton'
+import HeaderTitle from '@components/views/HeaderTitle'
 import { AntDesign } from '@expo/vector-icons'
-import { Style } from '@lib/utils/Global'
 import { Llama } from '@lib/engine/LlamaLocal'
+import { Theme } from '@lib/theme/ThemeManager'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
-import { Stack } from 'expo-router'
-import React, { useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { FlatList } from 'react-native-gesture-handler'
+import { useState } from 'react'
+import { StyleSheet, Text, View, FlatList } from 'react-native'
 import * as Progress from 'react-native-progress'
 import Animated, { Easing, SlideInLeft, SlideOutLeft } from 'react-native-reanimated'
 
@@ -15,6 +16,9 @@ import ModelNewMenu from './ModelNewMenu'
 import ModelSettings from './ModelSettings'
 
 const ModelManager = () => {
+    const styles = useStyles()
+    const { color } = Theme.useTheme()
+
     const { data, updatedAt } = useLiveQuery(Llama.getModelListQuery())
 
     const [showSettings, setShowSettings] = useState(false)
@@ -30,18 +34,16 @@ const ModelManager = () => {
 
     return (
         <View style={styles.mainContainer}>
-            <Stack.Screen
-                options={{
-                    title: showSettings ? 'Model Settings' : 'Models',
-                    animation: 'fade',
-                    headerRight: () =>
-                        !showSettings && (
-                            <ModelNewMenu
-                                modelImporting={modelImporting}
-                                setModelImporting={setModelImporting}
-                            />
-                        ),
-                }}
+            <HeaderTitle title={showSettings ? 'Model Settings' : 'Models'} />
+            <HeaderButton
+                headerRight={() =>
+                    !showSettings && (
+                        <ModelNewMenu
+                            modelImporting={modelImporting}
+                            setModelImporting={setModelImporting}
+                        />
+                    )
+                }
             />
 
             {!showSettings && (
@@ -76,8 +78,8 @@ const ModelManager = () => {
                                     style={{ flex: 5 }}
                                     indeterminate
                                     indeterminateAnimationDuration={2000}
-                                    color={Style.getColor('primary-brand')}
-                                    borderColor={Style.getColor('primary-surface3')}
+                                    color={color.primary._500}
+                                    borderColor={color.neutral._300}
                                     height={12}
                                     borderRadius={12}
                                     width={null}
@@ -86,7 +88,7 @@ const ModelManager = () => {
                                 <Text
                                     style={{
                                         flex: 2,
-                                        color: Style.getColor('primary-text1'),
+                                        color: color.text._100,
                                         textAlign: 'center',
                                     }}>
                                     Importing...
@@ -99,8 +101,8 @@ const ModelManager = () => {
                                 <Progress.Bar
                                     style={{ flex: 5 }}
                                     progress={loadProgress / 100}
-                                    color={Style.getColor('primary-brand')}
-                                    borderColor={Style.getColor('primary-surface3')}
+                                    color={color.primary._500}
+                                    borderColor={color.neutral._300}
                                     height={12}
                                     borderRadius={12}
                                     width={null}
@@ -108,7 +110,7 @@ const ModelManager = () => {
                                 <Text
                                     style={{
                                         flex: 1,
-                                        color: Style.getColor('primary-text1'),
+                                        color: color.text._100,
                                         textAlign: 'center',
                                     }}>
                                     {loadProgress}%
@@ -148,60 +150,55 @@ const ModelManager = () => {
                     exit={() => setShowSettings(false)}
                 />
             )}
-
-            <TouchableOpacity
-                style={styles.settingsButton}
-                onPress={() => setShowSettings(!showSettings)}>
-                <Text>{showSettings ? 'Back To Models' : 'Show Settings'}</Text>
-            </TouchableOpacity>
+            <ThemedButton
+                label={showSettings ? 'Back To Models' : 'Show Settings'}
+                onPress={() => setShowSettings(!showSettings)}
+            />
         </View>
     )
 }
 
 export default ModelManager
 
-const styles = StyleSheet.create({
-    mainContainer: {
-        paddingTop: 16,
-        paddingHorizontal: 16,
-        paddingBottom: 24,
-        flex: 1,
-    },
+export const useStyles = () => {
+    // todo: find common items to add here
+    const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
 
-    list: {
-        flex: 1,
-    },
+    return StyleSheet.create({
+        mainContainer: {
+            paddingTop: spacing.xl,
+            paddingHorizontal: spacing.xl,
+            paddingBottom: spacing.xl2,
+            flex: 1,
+        },
 
-    modelContainer: {
-        borderRadius: 12,
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        backgroundColor: Style.getColor('primary-surface2'),
-        marginBottom: 12,
-    },
+        list: {
+            flex: 1,
+        },
 
-    title: {
-        fontSize: 16,
-        color: Style.getColor('primary-text1'),
-    },
+        modelContainer: {
+            borderRadius: borderRadius.l,
+            paddingVertical: spacing.l,
+            paddingHorizontal: spacing.xl2,
+            backgroundColor: color.neutral._200,
+            marginBottom: spacing.l,
+        },
 
-    modelTitle: {
-        color: Style.getColor('primary-text1'),
-    },
+        title: {
+            fontSize: fontSize.l,
+            color: color.text._100,
+        },
 
-    subtitle: {
-        color: Style.getColor('primary-text2'),
-    },
+        modelTitle: {
+            color: color.text._100,
+        },
 
-    hint: {
-        color: Style.getColor('primary-text2'),
-    },
+        subtitle: {
+            color: color.text._400,
+        },
 
-    settingsButton: {
-        marginTop: 12,
-        backgroundColor: Style.getColor('primary-brand'),
-        alignItems: 'center',
-        paddingVertical: 8,
-        borderRadius: 12,
-    },
-})
+        hint: {
+            color: color.text._400,
+        },
+    })
+}

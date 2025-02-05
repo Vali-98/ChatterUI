@@ -1,6 +1,7 @@
 import { FontAwesome } from '@expo/vector-icons'
 import { Chats } from '@lib/state/Chat'
 import { useTTS } from '@lib/state/TTS'
+import { Theme } from '@lib/theme/ThemeManager'
 import { Logger, Style } from '@lib/utils/Global'
 import { TouchableOpacity, View } from 'react-native'
 
@@ -9,6 +10,7 @@ type TTSProps = {
 }
 
 const TTS: React.FC<TTSProps> = ({ index }) => {
+    const { color } = Theme.useTheme()
     const { startTTS, activeChatIndex, stopTTS } = useTTS()
     const { swipeText } = Chats.useSwipeData(index)
     const isSpeaking = index === activeChatIndex
@@ -24,22 +26,14 @@ const TTS: React.FC<TTSProps> = ({ index }) => {
     }
 
     return (
-        <View style={{ marginTop: 2 }}>
+        <View style={{ paddingTop: 4 }}>
             {isSpeaking ? (
                 <TouchableOpacity onPress={handleStopSpeaking}>
-                    <FontAwesome
-                        name="stop"
-                        size={20}
-                        color={Style.getColor('destructive-brand')}
-                    />
+                    <FontAwesome name="stop" size={20} color={color.error._500} />
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity onPress={handleSpeak}>
-                    <FontAwesome
-                        name="volume-down"
-                        size={28}
-                        color={Style.getColor('primary-text2')}
-                    />
+                    <FontAwesome name="volume-down" size={28} color={color.text._400} />
                 </TouchableOpacity>
             )}
         </View>

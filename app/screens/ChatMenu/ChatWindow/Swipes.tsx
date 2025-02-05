@@ -1,6 +1,7 @@
 import { AntDesign } from '@expo/vector-icons'
 import { continueResponse, generateResponse, regenerateResponse } from '@lib/engine/Inference'
 import { Chats } from '@lib/state/Chat'
+import { Theme } from '@lib/theme/ThemeManager'
 import { Style } from '@lib/utils/Global'
 import React from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
@@ -12,6 +13,9 @@ type SwipesProps = {
 }
 
 const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => {
+    const styles = useStyles()
+    const { color } = Theme.useTheme()
+
     const { swipeChat, addSwipe } = Chats.useSwipes()
     const { swipeText, swipeId, swipeIndex, swipesLength } = Chats.useSwipeData(index)
 
@@ -40,11 +44,7 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
                 <AntDesign
                     name="left"
                     size={20}
-                    color={
-                        swipeIndex === 0 || nowGenerating
-                            ? Style.getColor('primary-text3')
-                            : Style.getColor('primary-text1')
-                    }
+                    color={swipeIndex === 0 || nowGenerating ? color.text._700 : color.text._100}
                 />
             </TouchableHighlight>
 
@@ -57,11 +57,7 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
                     <AntDesign
                         name="retweet"
                         size={20}
-                        color={
-                            nowGenerating
-                                ? Style.getColor('primary-text3')
-                                : Style.getColor('primary-text1')
-                        }
+                        color={nowGenerating ? color.text._700 : color.text._100}
                     />
                 </TouchableHighlight>
             )}
@@ -78,11 +74,7 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
                     <AntDesign
                         name="forward"
                         size={20}
-                        color={
-                            nowGenerating
-                                ? Style.getColor('primary-text3')
-                                : Style.getColor('primary-text1')
-                        }
+                        color={nowGenerating ? color.text._700 : color.text._100}
                     />
                 </TouchableHighlight>
             )}
@@ -95,11 +87,7 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
                 <AntDesign
                     name="right"
                     size={20}
-                    color={
-                        isLastAltGreeting || nowGenerating
-                            ? Style.getColor('primary-text3')
-                            : Style.getColor('primary-text1')
-                    }
+                    color={isLastAltGreeting || nowGenerating ? color.text._700 : color.text._100}
                 />
             </TouchableHighlight>
         </View>
@@ -108,23 +96,26 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
 
 export default Swipes
 
-const styles = StyleSheet.create({
-    swipesItem: {
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        flex: 1,
-        marginTop: 4,
-    },
+const useStyles = () => {
+    const { color, spacing } = Theme.useTheme()
+    return StyleSheet.create({
+        swipesItem: {
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            flex: 1,
+            marginTop: spacing.sm,
+        },
 
-    swipeText: {
-        color: Style.getColor('primary-text2'),
-        paddingVertical: 6,
-        paddingHorizontal: 8,
-    },
+        swipeText: {
+            color: color.text._400,
+            paddingVertical: spacing.sm,
+            paddingHorizontal: spacing.m,
+        },
 
-    swipeButton: {
-        alignItems: 'center',
-        flex: 1,
-        paddingVertical: 4,
-    },
-})
+        swipeButton: {
+            alignItems: 'center',
+            flex: 1,
+            paddingVertical: spacing.sm,
+        },
+    })
+}

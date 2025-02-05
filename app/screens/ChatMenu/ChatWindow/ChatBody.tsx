@@ -1,6 +1,7 @@
-import { Chats, Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
+import { Chats } from '@lib/utils/Global'
 import React, { useState } from 'react'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 
 import ChatText from './ChatText'
 import ChatTextLast from './ChatTextLast'
@@ -17,7 +18,7 @@ type ChatTextProps = {
 const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage, isGreeting }) => {
     const message = Chats.useEntryData(index)
     const [editMode, setEditMode] = useState(false)
-
+    const { color, spacing, borderRadius } = Theme.useTheme()
     const handleEnableEdit = () => {
         setEditMode(!nowGenerating)
     }
@@ -37,7 +38,14 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
             )}
 
             <TouchableOpacity
-                style={styles.messageTextContainer}
+                style={{
+                    backgroundColor: color.primary._100,
+                    paddingHorizontal: spacing.m,
+                    minHeight: 40,
+                    borderRadius: borderRadius.m,
+                    shadowColor: color.shadow,
+                    elevation: 2,
+                }}
                 activeOpacity={0.7}
                 onLongPress={handleEnableEdit}>
                 {isLastMessage ? (
@@ -55,15 +63,3 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
 }
 
 export default ChatBody
-
-const styles = StyleSheet.create({
-    messageTextContainer: {
-        backgroundColor: Style.getColor('primary-surface3'),
-        paddingHorizontal: 8,
-        minHeight: 40,
-        borderRadius: 8,
-        textAlignVertical: 'center',
-        shadowColor: Style.getColor('primary-shadow'),
-        elevation: 4,
-    },
-})

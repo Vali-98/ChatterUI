@@ -1,10 +1,11 @@
 import Alert from '@components/views/Alert'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { AntDesign } from '@expo/vector-icons'
-import { Global, Style } from '@lib/utils/Global'
 import { GGMLNameMap, Llama, readableFileSize } from '@lib/engine/LlamaLocal'
+import { Theme } from '@lib/theme/ThemeManager'
+import { Global } from '@lib/utils/Global'
 import { ModelDataType } from 'db/schema'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVObject } from 'react-native-mmkv'
 import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
@@ -24,6 +25,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
     setModelLoading,
     index,
 }) => {
+    const styles = useStyles()
+    const { color } = Theme.useTheme()
+
     const { loadModel, unloadModel, modelId } = Llama.useLlama((state) => ({
         loadModel: state.load,
         unloadModel: state.unload,
@@ -111,7 +115,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         name="edit"
                         style={styles.button}
                         size={24}
-                        color={Style.getColor(disableEdit ? 'primary-text3' : 'primary-text1')}
+                        color={disableEdit ? color.text._600 : color.text._100}
                     />
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -123,9 +127,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         name="delete"
                         style={styles.button}
                         size={24}
-                        color={Style.getColor(
-                            disableDelete ? 'primary-text3' : 'destructive-brand'
-                        )}
+                        color={disableDelete ? color.text._600 : color.error._500}
                     />
                 </TouchableOpacity>
                 {modelId !== item.id && (
@@ -141,7 +143,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                             name="playcircleo"
                             style={styles.button}
                             size={24}
-                            color={Style.getColor(disable ? 'primary-text3' : 'primary-text1')}
+                            color={disable ? color.text._600 : color.text._100}
                         />
                     </TouchableOpacity>
                 )}
@@ -155,7 +157,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                             name="closecircleo"
                             style={styles.button}
                             size={24}
-                            color={Style.getColor('primary-text1')}
+                            color={color.text._100}
                         />
                     </TouchableOpacity>
                 )}
@@ -166,52 +168,55 @@ const ModelItem: React.FC<ModelItemProps> = ({
 
 export default ModelItem
 
-const styles = StyleSheet.create({
-    modelContainer: {
-        borderRadius: 12,
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        backgroundColor: Style.getColor('primary-surface2'),
-        marginBottom: 12,
-    },
+const useStyles = () => {
+    const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
 
-    tagContainer: {
-        paddingTop: 12,
-        paddingBottom: 8,
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        flexWrap: 'wrap',
-    },
+    return StyleSheet.create({
+        modelContainer: {
+            borderRadius: spacing.l,
+            paddingVertical: spacing.l,
+            paddingHorizontal: spacing.xl2,
+            backgroundColor: color.neutral._200,
+            marginBottom: spacing.l,
+        },
 
-    tag: {
-        borderRadius: 4,
-        borderColor: Style.getColor('primary-surface4'),
-        borderWidth: 1,
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        marginRight: 4,
-        color: Style.getColor('primary-text2'),
-    },
-    title: {
-        fontSize: 16,
-        color: Style.getColor('primary-text1'),
-    },
+        tagContainer: {
+            paddingTop: spacing.m,
+            paddingBottom: spacing.m,
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            flexWrap: 'wrap',
+        },
 
-    subtitle: {
-        color: Style.getColor('primary-text2'),
-    },
+        tag: {
+            borderRadius: borderRadius.m,
+            borderColor: color.neutral._400,
+            borderWidth: 1,
+            paddingHorizontal: spacing.m,
+            paddingVertical: spacing.s,
+            color: color.text._400,
+        },
+        title: {
+            fontSize: fontSize.l,
+            color: color.text._100,
+        },
 
-    buttonContainer: {
-        flexDirection: 'row',
-        flex: 1,
-        justifyContent: 'space-between',
-        marginTop: 12,
-        borderColor: Style.getColor('primary-surface3'),
-    },
+        subtitle: {
+            color: color.text._400,
+        },
 
-    button: {
-        flex: 1,
-        paddingVertical: 8,
-        paddingHorizontal: 32,
-    },
-})
+        buttonContainer: {
+            flexDirection: 'row',
+            flex: 1,
+            justifyContent: 'space-between',
+            marginTop: spacing.l,
+            borderColor: color.neutral._300,
+        },
+
+        button: {
+            flex: 1,
+            paddingVertical: spacing.m,
+            paddingHorizontal: spacing.xl3,
+        },
+    })
+}

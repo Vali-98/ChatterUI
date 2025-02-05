@@ -1,8 +1,8 @@
 import { AntDesign } from '@expo/vector-icons'
-import { Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
 import { Stack } from 'expo-router'
 import { useState } from 'react'
-import { StyleSheet, View, Pressable } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
 
@@ -10,6 +10,7 @@ import UserCardEditor from './UserCardEditor'
 import UserDrawer from './UserDrawer'
 
 const UserEditor = () => {
+    const { color } = Theme.useTheme()
     const [showDrawer, setShowDrawer] = useState(false)
 
     const handleLeftFling = () => {
@@ -36,7 +37,10 @@ const UserEditor = () => {
 
     return (
         <GestureDetector gesture={gesture}>
-            <View style={styles.mainContainer}>
+            <View
+                style={{
+                    flex: 1,
+                }}>
                 <Stack.Screen
                     options={{
                         title: 'Edit User',
@@ -45,7 +49,7 @@ const UserEditor = () => {
                             <Pressable onPressIn={() => setShowDrawer(!showDrawer)}>
                                 <AntDesign
                                     name={showDrawer ? 'menu-fold' : 'menu-unfold'}
-                                    color={Style.getColor('primary-text1')}
+                                    color={color.text._100}
                                     size={24}
                                 />
                             </Pressable>
@@ -60,9 +64,3 @@ const UserEditor = () => {
 }
 
 export default UserEditor
-
-const styles = StyleSheet.create({
-    mainContainer: {
-        flex: 1,
-    },
-})

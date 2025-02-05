@@ -1,9 +1,10 @@
 import Avatar from '@components/views/Avatar'
 import { useViewerState } from '@lib/state/AvatarViewer'
 import { Chats } from '@lib/state/Chat'
-import { Characters, Global, Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
+import { Characters, Global } from '@lib/utils/Global'
 import { ReactNode } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 import TTSMenu from './TTS'
@@ -16,10 +17,10 @@ type ChatFrameProps = {
 }
 
 const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, isLast }) => {
+    const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
+
     const message = Chats.useEntryData(index)
-
     const setShowViewer = useViewerState((state) => state.setShow)
-
     const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
     const charImageId = Characters.useCharacterCard((state) => state.card?.image_id) ?? 0
     const userImageId = Characters.useUserCard((state) => state.card?.image_id) ?? 0
@@ -42,31 +43,50 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
             <View style={{ alignItems: 'center' }}>
                 <TouchableOpacity onPress={() => setShowViewer(true, message.is_user)}>
                     <Avatar
-                        style={styles.avatar}
+                        style={{
+                            width: 48,
+                            height: 48,
+                            borderRadius: borderRadius.xl,
+                            marginBottom: spacing.sm,
+                            marginLeft: spacing.sm,
+                            marginRight: spacing.m,
+                        }}
                         targetImage={Characters.getImageDir(
                             message.is_user ? userImageId : charImageId
                         )}
                     />
                 </TouchableOpacity>
 
-                <Text style={styles.graytext}>#{index}</Text>
+                <Text
+                    style={{
+                        color: color.text._400,
+                        paddingTop: spacing.sm,
+                    }}>
+                    #{index}
+                </Text>
                 {deltaTime !== undefined && !message.is_user && index !== 0 && (
-                    <Text style={styles.graytext}>{deltaTime}s</Text>
+                    <Text
+                        style={{
+                            color: color.text._400,
+                            paddingTop: spacing.sm,
+                        }}>
+                        {deltaTime}s
+                    </Text>
                 )}
                 {TTSenabled && <TTSMenu index={index} />}
             </View>
-            <View style={{ flex: 1, flexDirection: 'column' }}>
+            <View style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
-                    <View style={{ marginBottom: 8 }}>
+                    <View style={{ marginBottom: spacing.m }}>
                         <Text
                             style={{
-                                fontSize: 16,
-                                color: Style.getColor('primary-text1'),
-                                marginRight: 4,
+                                fontSize: fontSize.l,
+                                color: color.text._100,
+                                marginRight: spacing.sm,
                             }}>
                             {message.name}
                         </Text>
-                        <Text style={{ fontSize: 10, color: Style.getColor('primary-text2') }}>
+                        <Text style={{ fontSize: fontSize.s, color: color.text._400 }}>
                             {swipe.gen_finished.toLocaleTimeString()}
                         </Text>
                     </View>
@@ -78,19 +98,3 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
 }
 
 export default ChatFrame
-
-const styles = StyleSheet.create({
-    avatar: {
-        width: 48,
-        height: 48,
-        borderRadius: 16,
-        marginBottom: 4,
-        marginLeft: 4,
-        marginRight: 8,
-    },
-
-    graytext: {
-        color: Style.getColor('primary-text2'),
-        paddingTop: 4,
-    },
-})

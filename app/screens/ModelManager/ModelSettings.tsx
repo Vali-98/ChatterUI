@@ -1,8 +1,10 @@
+import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
 import { Llama, LlamaPreset, readableFileSize } from '@lib/engine/LlamaLocal'
+import { Theme } from '@lib/theme/ThemeManager'
 import { AppSettings, Global, Logger, Style } from '@lib/utils/Global'
 import { useFocusEffect } from 'expo-router'
 import React, { useEffect, useState } from 'react'
@@ -137,58 +139,15 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                 }
             />
             {saveKV && (
-                <TouchableOpacity
+                <ThemedButton
+                    buttonStyle={{ marginTop: 8 }}
+                    label={'Purge KV Cache (' + readableFileSize(kvSize) + ')'}
                     onPress={handleDeleteKV}
-                    disabled={kvSize === 0}
-                    style={kvSize === 0 ? styles.purgeButtonDisabled : styles.purgeButton}>
-                    <Text
-                        style={{
-                            color: Style.getColor(kvSize === 0 ? 'primary-text3' : 'primary-text1'),
-                        }}>
-                        Purge KV Cache {'(' + readableFileSize(kvSize) + ')'}
-                    </Text>
-                </TouchableOpacity>
+                    variant={kvSize === 0 ? 'disabled' : 'critical'}
+                />
             )}
         </Animated.ScrollView>
     )
 }
 
 export default ModelSettings
-
-const styles = StyleSheet.create({
-    greenTag: {
-        color: Style.getColor('primary-text1'),
-        backgroundColor: Style.getColor('confirm-brand'),
-        borderRadius: 8,
-        paddingHorizontal: 12,
-        paddingVertical: 4,
-    },
-
-    redTag: {
-        color: Style.getColor('primary-text1'),
-        backgroundColor: Style.getColor('destructive-brand'),
-        borderRadius: 8,
-        paddingHorizontal: 12,
-        paddingTop: 4,
-        paddingBottom: 8,
-    },
-
-    purgeButton: {
-        marginTop: 12,
-        backgroundColor: Style.getColor('destructive-brand'),
-        borderWidth: 1,
-        borderColor: Style.getColor('destructive-brand'),
-        alignItems: 'center',
-        paddingVertical: 8,
-        borderRadius: 12,
-    },
-
-    purgeButtonDisabled: {
-        marginTop: 12,
-        borderWidth: 1,
-        borderColor: Style.getColor('primary-text3'),
-        alignItems: 'center',
-        paddingVertical: 8,
-        borderRadius: 12,
-    },
-})

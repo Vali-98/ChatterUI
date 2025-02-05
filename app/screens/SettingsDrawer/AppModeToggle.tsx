@@ -101,7 +101,7 @@ const useStyles = () => {
         },
 
         modeTextInactive: {
-            color: color.text._700,
+            color: color.text._500,
         },
 
         appModeText: {
