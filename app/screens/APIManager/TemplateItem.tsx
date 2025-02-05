@@ -1,7 +1,9 @@
+import ThemedButton from '@components/buttons/ThemedButton'
 import Alert from '@components/views/Alert'
-import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { AntDesign } from '@expo/vector-icons'
+import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { APIState } from '@lib/engine/API/APIManagerState'
+import { Theme } from '@lib/theme/ThemeManager'
 import { Logger, saveStringToDownload, Style } from '@lib/utils/Global'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
@@ -11,6 +13,8 @@ type TemplateItemProps = {
 }
 
 const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
+    const { color, spacing, borderWidth, fontSize, borderRadius } = Theme.useTheme()
+
     const { removeTemplate } = APIState.useAPIState((state) => ({
         removeTemplate: state.removeTemplate,
     }))
@@ -32,69 +36,50 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
         })
     }
 
+    const handleExport = () => {
+        saveStringToDownload(JSON.stringify(item), `${item.name}.json`, 'utf8').then(() => {
+            Logger.log(`Saved ${item.name}.json To Downloads`, true)
+        })
+    }
+
     return (
-        <View style={styles.longContainer}>
+        <View
+            style={{
+                borderColor: color.neutral._300,
+                borderWidth: borderWidth.m,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderRadius: borderRadius.xl,
+                flex: 1,
+                paddingLeft: spacing.l,
+                paddingRight: spacing.xl2,
+                paddingVertical: spacing.xl,
+            }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={{ marginLeft: 18 }}>
-                    <Text style={styles.name}>{item.name}</Text>
+                <View style={{ marginLeft: spacing.xl }}>
+                    <Text style={{ color: color.text._100, fontSize: fontSize.m }}>
+                        {item.name}
+                    </Text>
                 </View>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 16 }}>
-                <TouchableOpacity onPress={handleDelete}>
-                    <AntDesign
-                        name="delete"
-                        color={Style.getColor('destructive-brand')}
-                        size={24}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => {}}>
-                    <AntDesign name="edit" color={Style.getColor('primary-text2')} size={24} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => {
-                        saveStringToDownload(
-                            JSON.stringify(item),
-                            `${item.name}.json`,
-                            'utf8'
-                        ).then(() => {
-                            Logger.log(`Saved ${item.name}.json To Downloads`, true)
-                        })
-                    }}>
-                    <AntDesign name="download" color={Style.getColor('primary-text2')} size={24} />
-                </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <ThemedButton
+                    onPress={handleDelete}
+                    iconName="delete"
+                    iconSize={24}
+                    variant="critical"
+                    buttonStyle={{ borderWidth: 0 }}
+                />
+                <ThemedButton
+                    onPress={handleExport}
+                    iconName="download"
+                    iconSize={24}
+                    variant="tertiary"
+                />
             </View>
         </View>
     )
 }
 
 export default TemplateItem
-
-const styles = StyleSheet.create({
-    longContainer: {
-        backgroundColor: Style.getColor('primary-surface2'),
-        borderColor: Style.getColor('primary-surface2'),
-        borderWidth: 2,
-        flexDirection: 'row',
-        marginBottom: 8,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderRadius: 16,
-        flex: 1,
-        paddingLeft: 12,
-        paddingRight: 24,
-        paddingVertical: 16,
-    },
-
-    name: {
-        fontSize: 17,
-        color: Style.getColor('primary-text1'),
-    },
-
-    config: {
-        color: Style.getColor('primary-text2'),
-    },
-
-    configInactive: {
-        color: Style.getColor('primary-text3'),
-    },
-})

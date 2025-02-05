@@ -73,7 +73,6 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                 buttonStyle: {
                     borderWidth: theme.borderWidth.m,
                     borderColor: 'rgba(0, 0, 0, 0)',
-                    padding: theme.spacing.m,
                 },
                 labelStyle: {
                     textAlign: 'center',

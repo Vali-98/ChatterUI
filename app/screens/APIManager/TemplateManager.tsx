@@ -1,7 +1,7 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { APIState } from '@lib/engine/API/APIManagerState'
-import { Style } from '@lib/theme/Style'
+import { Theme } from '@lib/theme/ThemeManager'
 import { Logger } from '@lib/utils/Global'
 import { getDocumentAsync } from 'expo-document-picker'
 import { readAsStringAsync } from 'expo-file-system'
@@ -18,8 +18,16 @@ const TemplateManager = () => {
         addTemplate: state.addTemplate,
     }))
 
+    const { color, spacing } = Theme.useTheme()
+
     return (
-        <View style={styles.mainContainer}>
+        <View
+            style={{
+                paddingTop: spacing.xl,
+                paddingHorizontal: spacing.xl,
+                paddingBottom: spacing.xl2,
+                flex: 1,
+            }}>
             <Stack.Screen
                 options={{
                     title: 'Template Manager',
@@ -27,6 +35,7 @@ const TemplateManager = () => {
             />
             {templates.length > 0 && (
                 <FlatList
+                    contentContainerStyle={{ rowGap: 4 }}
                     data={templates}
                     keyExtractor={(item, index) => item.name}
                     renderItem={({ item, index }) => <TemplateItem item={item} index={index} />}
@@ -34,13 +43,25 @@ const TemplateManager = () => {
             )}
 
             {templates.length === 0 && (
-                <View style={styles.emptyListContainer}>
+                <View
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}>
                     <MaterialCommunityIcons
                         name="file-question-outline"
                         size={64}
-                        color={Style.getColor('primary-text3')}
+                        color={color.text._700}
                     />
-                    <Text style={styles.emptyListText}>No Custom Templates Added</Text>
+                    <Text
+                        style={{
+                            color: color.text._400,
+                            fontStyle: 'italic',
+                            marginTop: spacing.l,
+                        }}>
+                        No Custom Templates Added
+                    </Text>
                 </View>
             )}
 
@@ -65,66 +86,3 @@ const TemplateManager = () => {
 }
 
 export default TemplateManager
-
-const styles = StyleSheet.create({
-    mainContainer: {
-        paddingTop: 16,
-        paddingHorizontal: 16,
-        paddingBottom: 24,
-        flex: 1,
-    },
-
-    emptyListContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    emptyListText: {
-        color: Style.getColor('primary-text2'),
-        fontStyle: 'italic',
-        marginTop: 12,
-    },
-
-    title: {
-        paddingTop: 8,
-        color: Style.getColor('primary-text1'),
-        fontSize: 16,
-    },
-
-    subtitle: {
-        color: Style.getColor('primary-text2'),
-    },
-
-    input: {
-        flex: 1,
-        color: Style.getColor('primary-text1'),
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 1,
-        paddingHorizontal: 8,
-        paddingVertical: 8,
-        marginVertical: 8,
-        borderRadius: 8,
-    },
-
-    button: {
-        padding: 5,
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 1,
-        borderRadius: 4,
-        marginLeft: 8,
-    },
-
-    dropdownContainer: {
-        marginTop: 16,
-    },
-
-    modelInfo: {
-        borderRadius: 8,
-        backgroundColor: Style.getColor('primary-surface2'),
-        flex: 1,
-        paddingHorizontal: 16,
-        paddingTop: 12,
-        paddingBottom: 24,
-    },
-})

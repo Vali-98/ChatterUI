@@ -1,9 +1,9 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import { AntDesign, Ionicons } from '@expo/vector-icons'
 import { APIState } from '@lib/engine/API/APIManagerState'
-import { Style } from '@lib/theme/Style'
+import { Theme } from '@lib/theme/ThemeManager'
 import { Stack, useRouter } from 'expo-router'
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Pressable, Text, View } from 'react-native'
 
 import APIValueItem from './APIValueItem'
 
@@ -13,9 +13,16 @@ const APIManager = () => {
     const { apiValues } = APIState.useAPIState((state) => ({
         apiValues: state.values,
     }))
+    const { color, spacing } = Theme.useTheme()
+
     const router = useRouter()
     return (
-        <View style={styles.mainContainer}>
+        <View
+            style={{
+                paddingTop: spacing.xl,
+                paddingBottom: spacing.xl2,
+                flex: 1,
+            }}>
             <Stack.Screen
                 options={{
                     title: 'API Manager',
@@ -24,11 +31,7 @@ const APIManager = () => {
                             onPressIn={() => {
                                 router.push('/screens/APIManager/TemplateManager')
                             }}>
-                            <AntDesign
-                                name="setting"
-                                color={Style.getColor('primary-text2')}
-                                size={26}
-                            />
+                            <AntDesign name="setting" color={color.text._400} size={26} />
                         </Pressable>
                     ),
                 }}
@@ -36,8 +39,9 @@ const APIManager = () => {
             {apiValues.length > 0 && (
                 <FlatList
                     style={{
-                        paddingHorizontal: 16,
+                        paddingHorizontal: spacing.xl,
                     }}
+                    contentContainerStyle={{ rowGap: 4 }}
                     data={apiValues}
                     keyExtractor={(item, index) => item.configName + index}
                     renderItem={({ item, index }) => <APIValueItem item={item} index={index} />}
@@ -47,19 +51,22 @@ const APIManager = () => {
             )}
 
             {apiValues.length === 0 && (
-                <View style={styles.emptyListContainer}>
-                    <Ionicons
-                        name="cloud-offline-outline"
-                        size={64}
-                        color={Style.getColor('primary-text3')}
-                    />
-                    <Text style={styles.emptyListText}>No Connections Added</Text>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                    <Ionicons name="cloud-offline-outline" size={64} color={color.text._700} />
+                    <Text
+                        style={{
+                            color: color.text._400,
+                            fontStyle: 'italic',
+                            marginTop: spacing.l,
+                        }}>
+                        No Connections Added
+                    </Text>
                 </View>
             )}
 
             <ThemedButton
                 buttonStyle={{
-                    marginHorizontal: 16,
+                    marginHorizontal: spacing.xl,
                 }}
                 onPress={() => router.push('/screens/APIManager/AddAPI')}
                 label="Add Connection"
@@ -69,65 +76,3 @@ const APIManager = () => {
 }
 
 export default APIManager
-
-const styles = StyleSheet.create({
-    mainContainer: {
-        paddingTop: 16,
-        paddingBottom: 24,
-        flex: 1,
-    },
-
-    emptyListContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    emptyListText: {
-        color: Style.getColor('primary-text2'),
-        fontStyle: 'italic',
-        marginTop: 12,
-    },
-
-    title: {
-        paddingTop: 8,
-        color: Style.getColor('primary-text1'),
-        fontSize: 16,
-    },
-
-    subtitle: {
-        color: Style.getColor('primary-text2'),
-    },
-
-    input: {
-        flex: 1,
-        color: Style.getColor('primary-text1'),
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 1,
-        paddingHorizontal: 8,
-        paddingVertical: 8,
-        marginVertical: 8,
-        borderRadius: 8,
-    },
-
-    button: {
-        padding: 5,
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 1,
-        borderRadius: 4,
-        marginLeft: 8,
-    },
-
-    dropdownContainer: {
-        marginTop: 16,
-    },
-
-    modelInfo: {
-        borderRadius: 8,
-        backgroundColor: Style.getColor('primary-surface2'),
-        flex: 1,
-        paddingHorizontal: 16,
-        paddingTop: 12,
-        paddingBottom: 24,
-    },
-})
