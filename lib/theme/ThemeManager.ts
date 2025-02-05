@@ -9,6 +9,11 @@ interface ColorStateProps {
     setColor: (colorScheme: ColorScheme) => void
 }
 
+export const useGlobalStyles = () => {
+    // todo: find common items to add here
+    const { color, spacing, borderWidth, borderRadius } = Theme.useTheme()
+}
+
 export namespace Theme {
     export const useColorState = create<ColorStateProps>()(
         persist(
@@ -65,7 +70,7 @@ export namespace Theme {
     }
 
     const useFontSize = () => {
-        return { s: 12, m: 14, l: 16, xl: 20, xl2: 24 }
+        return { s: 12, m: 14, l: 16, xl: 18, xl2: 20, xl3: 24 }
     }
 
     export const useTheme = () => {

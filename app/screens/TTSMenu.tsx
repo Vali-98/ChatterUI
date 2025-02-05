@@ -117,7 +117,7 @@ const TTSMenu = () => {
                 placeholder="Select Speaker"
                 onChangeValue={(item) => setCurrentSpeaker(item)}
             />
-            <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 16 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}>
                 <ThemedTextInput
                     value={testAudioText}
                     onChangeText={setTestAudioText}

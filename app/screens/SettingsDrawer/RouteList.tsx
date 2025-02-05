@@ -59,7 +59,7 @@ const useStyles = () => {
     const { color, spacing, fontSize } = Theme.useTheme()
     return StyleSheet.create({
         largeButtonText: {
-            fontSize: fontSize.l,
+            fontSize: fontSize.xl,
             paddingVertical: spacing.l,
             paddingLeft: spacing.xl,
             color: color.text._100,
