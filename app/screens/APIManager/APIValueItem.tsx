@@ -1,10 +1,10 @@
+import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import Alert from '@components/views/Alert'
-import { AntDesign } from '@expo/vector-icons'
 import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
-import { Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
 import { useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 
 import EditAPIModal from './EditAPIModal'
 
@@ -14,6 +14,8 @@ type APIValueItemProps = {
 }
 
 const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
+    const { spacing } = Theme.useTheme()
+    const styles = useStyles()
     const [showEditor, setShowEditor] = useState(false)
     const { removeValue, editValue } = APIState.useAPIState((state) => ({
         removeValue: state.removeValue,
@@ -55,7 +57,7 @@ const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
                     }}
                 />
 
-                <View style={{ marginLeft: 18 }}>
+                <View style={{ marginLeft: spacing.xl }}>
                     <Text style={item.active ? styles.name : styles.nameInactive}>
                         {item.friendlyName}
                     </Text>
@@ -64,17 +66,21 @@ const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
                     </Text>
                 </View>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 16 }}>
-                <TouchableOpacity onPress={handleDelete}>
-                    <AntDesign
-                        name="delete"
-                        color={Style.getColor('destructive-brand')}
-                        size={24}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowEditor(true)}>
-                    <AntDesign name="edit" color={Style.getColor('primary-text1')} size={24} />
-                </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <ThemedButton
+                    onPress={handleDelete}
+                    variant="critical"
+                    iconName="delete"
+                    iconSize={24}
+                    buttonStyle={{ borderWidth: 0 }}
+                />
+                <ThemedButton
+                    onPress={() => setShowEditor(true)}
+                    variant="tertiary"
+                    iconName="edit"
+                    iconSize={24}
+                    buttonStyle={{ borderWidth: 0 }}
+                />
             </View>
         </View>
     )
@@ -82,51 +88,53 @@ const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
 
 export default APIValueItem
 
-const styles = StyleSheet.create({
-    longContainer: {
-        backgroundColor: Style.getColor('primary-surface2'),
-        borderColor: Style.getColor('primary-surface2'),
-        borderWidth: 2,
-        flexDirection: 'row',
-        marginBottom: 8,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderRadius: 16,
-        flex: 1,
-        paddingLeft: 12,
-        paddingRight: 24,
-        paddingVertical: 16,
-    },
+const useStyles = () => {
+    const { color, spacing, borderWidth, fontSize } = Theme.useTheme()
+    return StyleSheet.create({
+        longContainer: {
+            borderColor: color.primary._500,
+            borderWidth: borderWidth.m,
+            flexDirection: 'row',
+            marginBottom: spacing.m,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: spacing.xl,
+            flex: 1,
+            paddingLeft: spacing.xl,
+            paddingRight: spacing.xl,
+            paddingVertical: spacing.xl,
+        },
 
-    longContainerInactive: {
-        borderColor: Style.getColor('primary-surface1'),
-        borderWidth: 2,
-        flexDirection: 'row',
-        marginBottom: 8,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderRadius: 16,
-        flex: 1,
-        paddingHorizontal: 12,
-        paddingRight: 24,
-        paddingVertical: 16,
-    },
+        longContainerInactive: {
+            borderColor: color.neutral._200,
+            borderWidth: borderWidth.m,
+            flexDirection: 'row',
+            marginBottom: spacing.m,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: spacing.xl,
+            flex: 1,
+            paddingLeft: spacing.xl,
+            paddingRight: spacing.xl,
+            paddingVertical: spacing.xl,
+        },
 
-    name: {
-        fontSize: 17,
-        color: Style.getColor('primary-text1'),
-    },
+        name: {
+            fontSize: fontSize.m,
+            color: color.text._100,
+        },
 
-    nameInactive: {
-        fontSize: 17,
-        color: Style.getColor('primary-text2'),
-    },
+        nameInactive: {
+            fontSize: fontSize.m,
+            color: color.text._400,
+        },
 
-    config: {
-        color: Style.getColor('primary-text2'),
-    },
+        config: {
+            color: color.text._400,
+        },
 
-    configInactive: {
-        color: Style.getColor('primary-text3'),
-    },
-})
+        configInactive: {
+            color: color.text._700,
+        },
+    })
+}
