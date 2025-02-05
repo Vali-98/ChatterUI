@@ -1,0 +1,26 @@
+diff --git a/node_modules/react-native-markdown-display/src/lib/AstRenderer.js b/node_modules/react-native-markdown-display/src/lib/AstRenderer.js
+index 608e945..e1474f7 100644
+--- a/node_modules/react-native-markdown-display/src/lib/AstRenderer.js
++++ b/node_modules/react-native-markdown-display/src/lib/AstRenderer.js
+@@ -180,7 +180,7 @@ export default class AstRenderer {
+    * @return {*}
+    */
+   render = (nodes) => {
+-    const root = {type: 'body', key: getUniqueID(), children: nodes};
++    const root = {type: 'body', key: 'root', children: nodes};
+     return this.renderNode(root, [], true);
+   };
+ }
+diff --git a/node_modules/react-native-markdown-display/src/lib/util/tokensToAST.js b/node_modules/react-native-markdown-display/src/lib/util/tokensToAST.js
+index b0ed265..9b1dc5f 100644
+--- a/node_modules/react-native-markdown-display/src/lib/util/tokensToAST.js
++++ b/node_modules/react-native-markdown-display/src/lib/util/tokensToAST.js
+@@ -27,7 +27,7 @@ function createNode(token, tokenIndex) {
+     sourceMeta: token.meta,
+     block: token.block,
+     markup: token.markup,
+-    key: getUniqueID() + '_' + type,
++    key: tokenIndex,
+     content,
+     tokenIndex,
+     index: 0,
