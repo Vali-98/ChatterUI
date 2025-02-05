@@ -15,7 +15,7 @@ const SupportButton = () => {
             }}
             variant="secondary"
             label="Support ChatterUI"
-            icon={<FontAwesome name="coffee" size={16} color={theme.color.text._100} />}
+            icon={<FontAwesome name="coffee" size={16} color={theme.color.primary._700} />}
         />
     )
 }
