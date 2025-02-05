@@ -1,10 +1,10 @@
 import SupportButton from '@components/buttons/SupportButton'
 import ThemedButton from '@components/buttons/ThemedButton'
+import HeaderTitle from '@components/views/HeaderTitle'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { Theme } from '@lib/theme/ThemeManager'
 import { Logger } from '@lib/utils/Global'
 import appConfig from 'app.config'
-import { Stack } from 'expo-router'
 import React, { useState } from 'react'
 import { Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -27,12 +27,7 @@ const About = () => {
     const version = 'v' + appConfig.expo.version
     return (
         <View style={styles.container}>
-            <Stack.Screen
-                options={{
-                    title: 'About',
-                    animation: 'fade',
-                }}
-            />
+            <HeaderTitle title="About" />
             <TouchableOpacity activeOpacity={0.8} onPress={updateCounter}>
                 <Image source={require('../assets/images/icon.png')} style={styles.icon} />
             </TouchableOpacity>
