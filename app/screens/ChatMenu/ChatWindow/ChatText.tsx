@@ -9,6 +9,8 @@ type ChatTextProps = {
 }
 
 const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
+    const markdownStyle = MarkdownStyle.useMarkdownStyle()
+
     const { swipeText } = Chats.useSwipeData(index)
     const viewRef = useRef<View>(null)
 
@@ -51,7 +53,7 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
                 <Markdown
                     markdownit={MarkdownStyle.Rules}
                     rules={MarkdownStyle.RenderRules}
-                    style={MarkdownStyle.Styles}>
+                    style={markdownStyle}>
                     {swipeText.trim()}
                 </Markdown>
             </View>

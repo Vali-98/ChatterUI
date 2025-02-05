@@ -26,6 +26,7 @@ const autoformatterData = [
 ]
 
 const FormattingManager = () => {
+    const markdownStyle = MarkdownStyle.useMarkdownStyle()
     const { currentInstruct, loadInstruct, setCurrentInstruct } = Instructs.useInstruct(
         (state) => ({
             currentInstruct: state.data,
@@ -422,7 +423,7 @@ const FormattingManager = () => {
                                 <Markdown
                                     markdownit={MarkdownStyle.Rules}
                                     rules={MarkdownStyle.RenderRules}
-                                    style={MarkdownStyle.Styles}>
+                                    style={markdownStyle}>
                                     {autoformatterData[currentInstruct.format_type].example}
                                 </Markdown>
                             </View>

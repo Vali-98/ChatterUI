@@ -11,6 +11,8 @@ type ChatTextProps = {
 }
 
 const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
+    const markdownStyle = MarkdownStyle.useMarkdownStyle()
+
     const { swipeText, swipeId } = Chats.useSwipeData(index)
     const { buffer } = Chats.useBuffer()
 
@@ -62,7 +64,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
                 <Markdown
                     markdownit={MarkdownStyle.Rules}
                     rules={MarkdownStyle.RenderRules}
-                    style={MarkdownStyle.Styles}>
+                    style={markdownStyle}>
                     {nowGenerating && swipeId === currentSwipeId ? buffer.trim() : swipeText.trim()}
                 </Markdown>
             </View>
