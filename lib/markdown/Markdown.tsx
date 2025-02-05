@@ -1,13 +1,15 @@
+import Accordion from '@components/views/Accordion'
 import { Style } from '@lib/theme/Style'
 import { Platform, StyleSheet, Text } from 'react-native'
 import { MarkdownIt } from 'react-native-markdown-display'
 
 import doubleQuotePlugin from './MarkdownQuotePlugin'
+import thinkPlugin from './MarkdownThinkPlugin'
 
 export namespace MarkdownStyle {
     const speechStyle = { color: '#e69d17' }
 
-    export const Rules = MarkdownIt({ typographer: true }).use(doubleQuotePlugin)
+    export const Rules = MarkdownIt({ typographer: true }).use(thinkPlugin).use(doubleQuotePlugin)
 
     export const RenderRules = {
         double_quote: (node: any, children: any, parent: any, styles: any) => {
@@ -15,6 +17,17 @@ export namespace MarkdownStyle {
                 <Text key={node.key} style={styles.double_quote}>
                     "{children}"
                 </Text>
+            )
+        },
+        think: (node: any, children: any, parent: any, styles: any) => {
+            return (
+                <Accordion
+                    key={node.key}
+                    label="Thinking..."
+                    //TODO: Figure out better fix for width
+                    style={{ flex: 1, paddingVertical: 2, width: 5000 }}>
+                    {children}
+                </Accordion>
             )
         },
     }
