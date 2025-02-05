@@ -38,7 +38,7 @@ const About = () => {
             </Text>
             {devMode && (
                 <ThemedButton
-                    label="Disabled Dev Mode"
+                    label="Disable Dev Mode"
                     variant="critical"
                     buttonStyle={{
                         marginTop: spacing.xl,
