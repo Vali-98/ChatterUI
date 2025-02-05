@@ -1,24 +1,25 @@
 import { Ionicons } from '@expo/vector-icons'
-import { Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
 import { View, Text } from 'react-native'
 
 const CharactersEmpty = () => {
+    const { color, spacing, fontSize } = Theme.useTheme()
     return (
         <View
             style={{
-                paddingVertical: 16,
-                paddingHorizontal: 8,
+                paddingVertical: spacing.xl,
+                paddingHorizontal: spacing.m,
                 flex: 1,
                 alignItems: 'center',
-                marginTop: 30,
+                marginTop: spacing.xl3,
             }}>
-            <Ionicons name="person-outline" color={Style.getColor('primary-text2')} size={60} />
+            <Ionicons name="person-outline" color={color.text._400} size={60} />
             <Text
                 style={{
-                    color: Style.getColor('primary-text2'),
-                    marginTop: 16,
+                    color: color.text._400,
+                    marginTop: spacing.xl,
                     fontStyle: 'italic',
-                    fontSize: 16,
+                    fontSize: fontSize.l,
                 }}>
                 No Characters Found. Try Importing Some!
             </Text>
