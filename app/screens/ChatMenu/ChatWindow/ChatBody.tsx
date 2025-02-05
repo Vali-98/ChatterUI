@@ -39,7 +39,7 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
 
             <TouchableOpacity
                 style={{
-                    backgroundColor: color.primary._100,
+                    backgroundColor: color.neutral._300,
                     paddingHorizontal: spacing.m,
                     minHeight: 40,
                     borderRadius: borderRadius.m,

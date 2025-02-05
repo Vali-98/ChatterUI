@@ -48,7 +48,7 @@ const ChatInput = () => {
             <TextInput
                 style={{
                     color: color.text._100,
-                    backgroundColor: color.neutral._200,
+                    backgroundColor: color.neutral._100,
                     flex: 1,
                     borderWidth: 1,
                     borderColor: color.primary._300,
