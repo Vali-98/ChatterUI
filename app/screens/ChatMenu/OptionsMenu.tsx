@@ -1,5 +1,6 @@
 import { AntDesign, Ionicons } from '@expo/vector-icons'
-import { Characters, Chats, Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
+import { Characters, Chats } from '@lib/utils/Global'
 import { useRouter } from 'expo-router'
 import { View, Text, StyleSheet } from 'react-native'
 import {
@@ -25,6 +26,10 @@ type OptionsMenuProps = {
 }
 
 const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef, showChats }) => {
+    const styles = useStyles()
+    const menuStyle = useMenuStyle()
+    const { color, spacing } = Theme.useTheme()
+
     const router = useRouter()
     const { unloadCharacter } = Characters.useCharacterCard((state) => ({
         unloadCharacter: state.unloadCard,
@@ -64,10 +69,10 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef, showChats }) => {
                     name="ellipsis-vertical-circle"
                     style={styles.optionsButton}
                     size={32}
-                    color={Style.getColor('primary-text2')}
+                    color={color.text._400}
                 />
             </MenuTrigger>
-            <MenuOptions customStyles={menustyle}>
+            <MenuOptions customStyles={menuStyle}>
                 {menuoptions.map((item, index) => (
                     <MenuOption key={index} onSelect={item.callback}>
                         <View
@@ -77,9 +82,9 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef, showChats }) => {
                                     : styles.optionItem
                             }>
                             <AntDesign
-                                style={{ minWidth: 25, marginLeft: 5 }}
+                                style={{ minWidth: 25, marginLeft: spacing.m }}
                                 name={item.button}
-                                color={Style.getColor('primary-text2')}
+                                color={color.text._400}
                                 size={24}
                             />
                             <Text style={styles.optionText}>{item.text}</Text>
@@ -93,34 +98,44 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef, showChats }) => {
 
 export default OptionsMenu
 
-const styles = StyleSheet.create({
-    optionsButton: {
-        paddingBottom: 6,
-    },
+const useMenuStyle = () => {
+    const { color, spacing } = Theme.useTheme()
 
-    optionItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingBottom: 8,
-        borderBottomColor: Style.getColor('primary-surface3'),
-        borderBottomWidth: 1,
-    },
+    const menuStyle: MenuOptionsCustomStyle = {
+        optionsContainer: {
+            backgroundColor: color.neutral._100,
+            padding: spacing.sm,
+            borderRadius: spacing.m,
+        },
+    }
 
-    optionItemLast: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
+    return menuStyle
+}
 
-    optionText: {
-        color: Style.getColor('primary-text1'),
-        marginLeft: 16,
-    },
-})
+const useStyles = () => {
+    const { color, spacing, borderWidth } = Theme.useTheme()
 
-const menustyle: MenuOptionsCustomStyle = {
-    optionsContainer: {
-        backgroundColor: Style.getColor('primary-surface1'),
-        padding: 4,
-        borderRadius: 8,
-    },
+    return StyleSheet.create({
+        optionsButton: {
+            paddingBottom: spacing.m,
+        },
+
+        optionItem: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingBottom: spacing.m,
+            borderBottomColor: color.neutral._300,
+            borderBottomWidth: borderWidth.m,
+        },
+
+        optionItemLast: {
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
+
+        optionText: {
+            color: color.text._100,
+            marginLeft: spacing.xl,
+        },
+    })
 }

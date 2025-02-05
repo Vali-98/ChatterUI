@@ -1,13 +1,15 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import { useInference } from '@lib/state/Chat'
-import { AppSettings, Characters, Chats, Logger, Style } from '@lib/utils/Global'
 import { generateResponse } from '@lib/engine/Inference'
+import { useInference } from '@lib/state/Chat'
+import { Theme } from '@lib/theme/ThemeManager'
+import { AppSettings, Characters, Chats, Logger } from '@lib/utils/Global'
 import React, { useState } from 'react'
-import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
+import { TextInput, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
 const ChatInput = () => {
+    const { color, borderRadius, spacing } = Theme.useTheme()
     const [sendOnEnter, setSendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
 
     const { addEntry } = Chats.useEntry()
@@ -42,11 +44,21 @@ const ChatInput = () => {
     }
 
     return (
-        <View style={styles.inputContainer}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
             <TextInput
-                style={styles.input}
+                style={{
+                    color: color.text._100,
+                    backgroundColor: color.neutral._200,
+                    flex: 1,
+                    borderWidth: 1,
+                    borderColor: color.primary._300,
+                    borderRadius: borderRadius.l,
+                    paddingHorizontal: spacing.xl,
+                    paddingVertical: spacing.m,
+                    marginHorizontal: spacing.m,
+                }}
                 placeholder="Message..."
-                placeholderTextColor={Style.getColor('primary-text2')}
+                placeholderTextColor={color.text._700}
                 value={newMessage}
                 onChangeText={(text) => setNewMessage(text)}
                 multiline
@@ -55,20 +67,25 @@ const ChatInput = () => {
             />
 
             {nowGenerating ? (
-                <TouchableOpacity style={styles.stopButton} onPress={abortResponse}>
-                    <MaterialIcons
-                        name="stop"
-                        color={Style.getColor('destructive-text1')}
-                        size={24}
-                    />
+                <TouchableOpacity
+                    style={{
+                        borderRadius: borderRadius.m,
+                        borderColor: color.error._500,
+                        borderWidth: 2,
+                        padding: spacing.m,
+                    }}
+                    onPress={abortResponse}>
+                    <MaterialIcons name="stop" color={color.error._500} size={24} />
                 </TouchableOpacity>
             ) : (
-                <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-                    <MaterialIcons
-                        name="send"
-                        color={Style.getColor('primary-surface1')}
-                        size={24}
-                    />
+                <TouchableOpacity
+                    style={{
+                        borderRadius: borderRadius.m,
+                        backgroundColor: color.primary._500,
+                        padding: spacing.m,
+                    }}
+                    onPress={handleSend}>
+                    <MaterialIcons name="send" color={color.neutral._100} size={24} />
                 </TouchableOpacity>
             )}
         </View>
@@ -76,35 +93,3 @@ const ChatInput = () => {
 }
 
 export default ChatInput
-
-const styles = StyleSheet.create({
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1,
-    },
-
-    input: {
-        color: Style.getColor('primary-text1'),
-        backgroundColor: Style.getColor('primary-surface1'),
-        flex: 1,
-        borderWidth: 1,
-        borderColor: Style.getColor('primary-brand'),
-        borderRadius: 12,
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        marginHorizontal: 8,
-    },
-
-    sendButton: {
-        borderRadius: 8,
-        backgroundColor: Style.getColor('primary-brand'),
-        padding: 8,
-    },
-
-    stopButton: {
-        borderRadius: 8,
-        backgroundColor: Style.getColor('destructive-brand'),
-        padding: 8,
-    },
-})

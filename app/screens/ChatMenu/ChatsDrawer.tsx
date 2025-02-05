@@ -1,6 +1,8 @@
+import ThemedButton from '@components/buttons/ThemedButton'
 import Drawer from '@components/views/Drawer'
 import { Ionicons } from '@expo/vector-icons'
-import { Characters, Chats, Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
+import { Characters, Chats } from '@lib/utils/Global'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { SetStateAction, useState } from 'react'
 import { Text, TouchableOpacity, StyleSheet, View, FlatList } from 'react-native'
@@ -21,6 +23,9 @@ type ListItem = {
 }
 
 const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShowModal] }) => {
+    const styles = useStyles()
+    const { color, spacing } = Theme.useTheme()
+
     const { charId } = Characters.useCharacterCard((state) => ({ charId: state.id }))
     const [nowLoading, setNowLoading] = useState<boolean>(false)
     const { data } = useLiveQuery(Chats.db.query.chatListQuery(charId ?? 0))
@@ -44,15 +49,16 @@ const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShow
         return (
             <View style={item.id === chatId ? styles.chatItemActive : styles.chatItem}>
                 <TouchableOpacity
-                    style={{ flex: 1, paddingHorizontal: 2, paddingVertical: 8 }}
+                    style={{ flex: 1, paddingHorizontal: spacing.xs, paddingVertical: spacing.m }}
                     onPress={() => handleLoadChat(item.id)}>
                     <Text style={styles.title}>{item.name}</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
-                        <Ionicons
-                            name="chatbox"
-                            size={20}
-                            color={Style.getColor('primary-text2')}
-                        />
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginTop: spacing.xl,
+                        }}>
+                        <Ionicons name="chatbox" size={20} color={color.text._400} />
                         <Text style={styles.smallTextChat}>{item.entryCount}</Text>
                         <Text style={styles.smallText}>{date.toLocaleDateString()}</Text>
                         <Text style={styles.smallText}>{date.toLocaleTimeString()}</Text>
@@ -74,81 +80,75 @@ const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShow
                 showsVerticalScrollIndicator={false}
                 removeClippedSubviews={false}
             />
-            <TouchableOpacity onPress={handleCreateChat} style={styles.newButton}>
-                <Text style={{ color: Style.getColor('primary-surface2') }}>New Chat</Text>
-            </TouchableOpacity>
+            <ThemedButton label="New Chat" onPress={handleCreateChat} />
         </Drawer>
     )
 }
 
 export default ChatsDrawer
 
-const styles = StyleSheet.create({
-    drawer: {
-        backgroundColor: Style.getColor('primary-surface1'),
-        width: '80%',
-        shadowColor: Style.getColor('primary-shadow'),
-        left: '20%',
-        borderTopWidth: 3,
-        elevation: 20,
-        position: 'absolute',
-        height: '100%',
-        paddingHorizontal: 16,
-        paddingTop: 16,
-        paddingBottom: 32,
-    },
+const useStyles = () => {
+    const { color, spacing, borderWidth, borderRadius, fontSize } = Theme.useTheme()
 
-    drawerTitle: {
-        color: Style.getColor('primary-text2'),
-        fontSize: 18,
-        paddingLeft: 16,
-    },
+    return StyleSheet.create({
+        drawer: {
+            backgroundColor: color.neutral._100,
+            width: '80%',
+            shadowColor: color.shadow,
+            left: '20%',
+            borderTopWidth: 3,
+            elevation: 20,
+            position: 'absolute',
+            height: '100%',
+            paddingHorizontal: spacing.xl,
+            paddingTop: spacing.xl,
+            paddingBottom: spacing.xl2,
+        },
 
-    title: {
-        color: Style.getColor('primary-text1'),
-        fontSize: 16,
-    },
+        drawerTitle: {
+            color: color.text._300,
+            fontSize: fontSize.xl,
+            paddingLeft: spacing.xl,
+        },
 
-    listContainer: {
-        flex: 1,
-        marginTop: 16,
-        marginBottom: 8,
-        borderRadius: 8,
-    },
+        title: {
+            color: color.text._100,
+            fontSize: fontSize.l,
+        },
 
-    chatItem: {
-        alignItems: 'center',
-        flexDirection: 'row',
-        paddingHorizontal: 8,
-        flex: 1,
-        marginBottom: 8,
-        borderRadius: 8,
-        borderWidth: 2,
-        borderColor: Style.getColor('primary-surface1'),
-    },
+        listContainer: {
+            flex: 1,
+            marginTop: spacing.xl,
+            marginBottom: spacing.l,
+        },
 
-    chatItemActive: {
-        alignItems: 'center',
-        flexDirection: 'row',
-        paddingHorizontal: 8,
-        flex: 1,
-        marginBottom: 8,
-        borderRadius: 8,
-        borderWidth: 2,
-        borderColor: Style.getColor('primary-brand'),
-    },
-    smallText: { color: Style.getColor('primary-text2'), marginLeft: 12 },
-    smallTextChat: { color: Style.getColor('primary-text2'), marginLeft: 4 },
+        chatItem: {
+            alignItems: 'center',
+            flexDirection: 'row',
+            paddingHorizontal: spacing.m,
+            flex: 1,
+            marginBottom: spacing.m,
+            borderRadius: borderRadius.m,
+            borderWidth: borderWidth.m,
+            borderColor: color.neutral._100,
+        },
 
-    editButton: {
-        paddingHorizontal: 8,
-        justifyContent: 'center',
-    },
+        chatItemActive: {
+            alignItems: 'center',
+            flexDirection: 'row',
+            paddingHorizontal: spacing.m,
+            flex: 1,
+            marginBottom: spacing.m,
+            borderRadius: spacing.m,
+            borderWidth: borderWidth.m,
+            borderColor: color.primary._500,
+        },
+        smallText: { color: color.text._400, marginLeft: spacing.l },
+        smallTextChat: { color: color.text._400, marginLeft: spacing.sm },
 
-    newButton: {
-        backgroundColor: Style.getColor('primary-brand'),
-        alignItems: 'center',
-        paddingVertical: 8,
-        borderRadius: 12,
-    },
-})
+        editButton: {
+            paddingHorizontal: spacing.m,
+            justifyContent: 'center',
+        },
+    })
+}

@@ -1,9 +1,10 @@
-import CharacterList from '@screens/CharacterMenu/CharacterList'
 import { Ionicons } from '@expo/vector-icons'
-import { Characters, Chats, Logger, Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
+import { Characters, Chats, Logger } from '@lib/utils/Global'
+import CharacterList from '@screens/CharacterMenu/CharacterList'
 import { Stack, useFocusEffect } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
-import { BackHandler, Pressable, SafeAreaView, StyleSheet, View } from 'react-native'
+import { BackHandler, Pressable, SafeAreaView, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Menu } from 'react-native-popup-menu'
 import Animated, { runOnJS, ZoomIn } from 'react-native-reanimated'
@@ -17,6 +18,7 @@ import OptionsMenu from './OptionsMenu'
 import SettingsDrawer from './SettingsDrawer'
 
 const ChatMenu = () => {
+    const { color, spacing } = Theme.useTheme()
     const { unloadCharacter } = Characters.useCharacterCard(
         useShallow((state) => ({
             unloadCharacter: state.unloadCard,
@@ -86,45 +88,37 @@ const ChatMenu = () => {
     const gesture = Gesture.Exclusive(swipeDrawer, swipeChats)
 
     const headerViewRight = (
-        <View style={styles.headerButtonContainer}>
-            <Pressable
-                style={styles.headerButtonRight}
-                onPressIn={() => {
-                    setShowChats(!showChats)
-                }}>
-                {showChats && (
-                    <Animated.View entering={ZoomIn}>
-                        <Ionicons name="close" size={28} color={Style.getColor('primary-text1')} />
-                    </Animated.View>
-                )}
-                {!showChats && (
-                    <Animated.View entering={ZoomIn}>
-                        <Ionicons
-                            name="chatbox"
-                            size={28}
-                            color={Style.getColor('primary-text1')}
-                        />
-                    </Animated.View>
-                )}
-            </Pressable>
-        </View>
+        <Pressable
+            onPressIn={() => {
+                setShowChats(!showChats)
+            }}>
+            {showChats && (
+                <Animated.View entering={ZoomIn}>
+                    <Ionicons name="close" size={28} color={color.text._100} />
+                </Animated.View>
+            )}
+            {!showChats && (
+                <Animated.View entering={ZoomIn}>
+                    <Ionicons name="chatbox" size={28} color={color.text._100} />
+                </Animated.View>
+            )}
+        </Pressable>
     )
 
     const headerViewLeft = !showChats && (
         <Pressable
-            style={styles.headerButtonLeft}
             onPressIn={() => {
                 setShowDrawer(!showDrawer)
             }}>
             {showDrawer && (
                 <Animated.View entering={ZoomIn}>
-                    <Ionicons name="close" size={28} color={Style.getColor('primary-text1')} />
+                    <Ionicons name="close" size={28} color={color.text._100} />
                 </Animated.View>
             )}
 
             {!showDrawer && (
                 <Animated.View entering={ZoomIn}>
-                    <Ionicons name="menu" size={28} color={Style.getColor('primary-text1')} />
+                    <Ionicons name="menu" size={28} color={color.text._100} />
                 </Animated.View>
             )}
         </Pressable>
@@ -132,7 +126,11 @@ const ChatMenu = () => {
 
     return (
         <GestureDetector gesture={gesture}>
-            <SafeAreaView style={styles.safeArea}>
+            <SafeAreaView
+                style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                }}>
                 <Stack.Screen
                     options={{
                         title: '',
@@ -143,9 +141,19 @@ const ChatMenu = () => {
 
                 {!chat && <CharacterList showHeader={!showDrawer} />}
                 {chat && (
-                    <View style={styles.container}>
+                    <View
+                        style={{
+                            flex: 1,
+                        }}>
                         <ChatWindow />
-                        <View style={styles.inputContainer}>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                marginVertical: spacing.m,
+                                paddingHorizontal: spacing.l,
+                            }}>
                             {/**TODO: This might be bad */}
                             <AvatarViewer />
                             <OptionsMenu menuRef={menuRef} showChats={setShowChats} />
@@ -159,50 +167,5 @@ const ChatMenu = () => {
         </GestureDetector>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-
-    safeArea: {
-        flex: 1,
-        flexDirection: 'row',
-    },
-
-    welcometext: {
-        justifyContent: 'center',
-        margin: 30,
-        flex: 1,
-        fontSize: 20,
-        color: Style.getColor('primary-text1'),
-    },
-
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        justifyContent: 'space-between',
-        marginVertical: 8,
-        paddingHorizontal: 12,
-    },
-
-    optionsButton: {
-        paddingBottom: 6,
-    },
-
-    headerButtonRight: {
-        marginLeft: 20,
-        marginRight: 4,
-    },
-
-    headerButtonLeft: {
-        marginRight: 20,
-        padding: 2,
-    },
-
-    headerButtonContainer: {
-        flexDirection: 'row',
-    },
-})
 
 export default ChatMenu
