@@ -6,8 +6,9 @@ import ThemedCheckbox from '@components/input/ThemedCheckbox'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
+import Accordion from '@components/views/Accordion'
 import React, { useState } from 'react'
-import { ScrollView, View } from 'react-native'
+import { ScrollView, Text, View } from 'react-native'
 
 const selectorData = [
     { label: 'Item 0', value: '1' },
@@ -43,7 +44,9 @@ const ComponentTest = () => {
                     <ThemedButton variant={item} key={item} label={`Button Variant: ${item}`} />
                 ))}
             </View>
-
+            <Accordion label="Test Accordion">
+                <Text style={{ color: 'yellow' }}>TEST TEXT</Text>
+            </Accordion>
             <StringArrayEditor title="Test Input Label" value={data} setValue={setData} />
             <ThemedCheckbox label="Test Checkbox" value={checkbox} onChangeValue={setCheckbox} />
             <ThemedSwitch label="Test Switch" value={sw} onChangeValue={setSw} />
