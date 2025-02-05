@@ -19,6 +19,7 @@ export interface ColorScheme {
     error: ColorGradient
     text: ColorGradient
     quote: string
+    shadow: string
 }
 
 export namespace DefaultColorSchemes {
@@ -91,6 +92,7 @@ export namespace DefaultColorSchemes {
             _900: '#000000',
         },
         quote: '#e69d17',
+        shadow: '#000000',
     }
 
     export const amoledNavyBlue: ColorScheme = {
@@ -162,6 +164,7 @@ export namespace DefaultColorSchemes {
             _900: '#141414',
         },
         quote: '#e69d17',
+        shadow: '#000000',
     }
 
     export const navyBlueLight: ColorScheme = {
@@ -233,5 +236,6 @@ export namespace DefaultColorSchemes {
             _900: '#f4f4f4',
         },
         quote: '#e69d17',
+        shadow: '#000000',
     }
 }
