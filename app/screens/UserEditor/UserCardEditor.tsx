@@ -1,17 +1,23 @@
+import ThemedButton from '@components/buttons/ThemedButton'
+import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
-import AvatarViewer from '@screens/ChatMenu/ChatWindow/AvatarViewer'
 import PopupMenu from '@components/views/PopupMenu'
 import { AntDesign } from '@expo/vector-icons'
 import { useViewerState } from '@lib/state/AvatarViewer'
 import { CharacterCardData } from '@lib/state/Characters'
+import { Theme } from '@lib/theme/ThemeManager'
 import { Characters, Style } from '@lib/utils/Global'
+import AvatarViewer from '@screens/ChatMenu/ChatWindow/AvatarViewer'
 import * as DocumentPicker from 'expo-document-picker'
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 const UserCardEditor = () => {
+    const styles = useStyles()
+    const { color, spacing } = Theme.useTheme()
+
     const { userCard, imageID, id, setCard, updateImage } = Characters.useUserCard(
         useShallow((state) => ({
             userCard: state.card,
@@ -67,7 +73,7 @@ const UserCardEditor = () => {
     return (
         <View style={styles.userContainer}>
             <AvatarViewer editorButton={false} />
-            <View style={styles.optionsBar}>
+            <View style={styles.nameBar}>
                 <PopupMenu
                     placement="right"
                     options={[
@@ -101,37 +107,27 @@ const UserCardEditor = () => {
                         targetImage={Characters.getImageDir(imageID)}
                         style={styles.userImage}
                     />
-                    <AntDesign
-                        name="edit"
-                        color={Style.getColor('primary-text1')}
-                        style={styles.editHover}
-                    />
+                    <AntDesign name="edit" color={color.text._100} style={styles.editHover} />
                 </PopupMenu>
-
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.inputDescription}>Name</Text>
-                    <TextInput
-                        style={styles.inputName}
-                        textAlignVertical="center"
-                        textAlign="center"
-                        value={currentCard?.name ?? ''}
-                        onChangeText={(text) => {
-                            if (currentCard)
-                                setCurrentCard({
-                                    ...currentCard,
-                                    name: text,
-                                })
-                        }}
-                        placeholder="Empty names are discouraged!"
-                        placeholderTextColor={Style.getColor('destructive-brand')}
-                    />
-                </View>
+                <ThemedTextInput
+                    multiline
+                    numberOfLines={10}
+                    label="Name"
+                    value={currentCard?.name ?? ''}
+                    onChangeText={(text) => {
+                        if (currentCard)
+                            setCurrentCard({
+                                ...currentCard,
+                                name: text,
+                            })
+                    }}
+                    placeholder="Empty names are discouraged!"
+                />
             </View>
-            <Text style={styles.inputDescription}>Description</Text>
-            <TextInput
-                style={styles.input}
+            <ThemedTextInput
                 multiline
                 numberOfLines={10}
+                label="Description"
                 value={currentCard?.description ?? ''}
                 onChangeText={(text) => {
                     if (currentCard)
@@ -141,116 +137,57 @@ const UserCardEditor = () => {
                         })
                 }}
                 placeholder="Describe this user..."
-                placeholderTextColor={Style.getColor('primary-text2')}
             />
+            <View style={{ flex: 1, paddingBottom: spacing.m }} />
             <Text
                 style={{
-                    color: Style.getColor('primary-text2'),
-                    marginTop: 24,
+                    color: color.text._400,
+                    marginTop: spacing.xl2,
                     alignSelf: 'center',
                 }}>
                 Hint: Swipe Left or press <AntDesign name="menu-unfold" size={16} /> to open the
                 Users drawer
             </Text>
-            <View style={{ flex: 1 }} />
-            <TouchableOpacity style={styles.buttonApprove} onPress={saveCard}>
-                <AntDesign
-                    style={styles.buttonIcon}
-                    size={20}
-                    name="save"
-                    color={Style.getColor('primary-text2')}
-                />
-                <Text style={{ color: Style.getColor('primary-text1') }}>Save</Text>
-            </TouchableOpacity>
+            <ThemedButton label="Save" onPress={saveCard} iconName="save" />
         </View>
     )
 }
 
 export default UserCardEditor
 
-const styles = StyleSheet.create({
-    userContainer: {
-        flex: 1,
-        paddingTop: 16,
-        paddingHorizontal: 16,
-    },
+const useStyles = () => {
+    const { color, spacing, borderWidth, borderRadius } = Theme.useTheme()
 
-    optionsBar: {
-        flexDirection: 'row',
-        columnGap: 24,
-    },
+    return StyleSheet.create({
+        userContainer: {
+            flex: 1,
+            paddingVertical: spacing.xl,
+            paddingHorizontal: spacing.xl,
+            rowGap: 16,
+        },
 
-    buttonContainer: {
-        marginTop: 32,
-        columnGap: 8,
-    },
+        nameBar: {
+            flexDirection: 'row',
+            columnGap: 24,
+        },
 
-    buttonIcon: {},
+        userImage: {
+            width: 84,
+            height: 84,
+            borderRadius: borderRadius.xl2,
+            borderColor: color.primary._500,
+            borderWidth: borderWidth.m,
+        },
 
-    button: {
-        marginTop: 12,
-        flexDirection: 'row',
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        columnGap: 8,
-        borderRadius: 8,
-        backgroundColor: Style.getColor('primary-surface4'),
-    },
-
-    buttonApprove: {
-        marginTop: 12,
-        flexDirection: 'row',
-        marginBottom: 24,
-        columnGap: 8,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderRadius: 8,
-        backgroundColor: Style.getColor('confirm-brand'),
-    },
-
-    userImage: {
-        width: 84,
-        height: 84,
-        borderRadius: 20,
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 2,
-    },
-
-    inputDescription: {
-        color: Style.getColor('primary-text2'),
-        marginTop: 8,
-        marginBottom: 4,
-    },
-
-    inputName: {
-        textAlign: 'center',
-        color: Style.getColor('primary-text1'),
-        textAlignVertical: 'top',
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 1,
-        padding: 8,
-        borderRadius: 8,
-    },
-
-    input: {
-        color: Style.getColor('primary-text1'),
-        textAlignVertical: 'top',
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 1,
-        padding: 8,
-        borderRadius: 8,
-    },
-
-    userListContainer: {},
-
-    editHover: {
-        position: 'absolute',
-        left: '75%',
-        top: '75%',
-        padding: 8,
-        borderColor: Style.getColor('primary-text3'),
-        borderWidth: 1,
-        backgroundColor: Style.getColor('primary-surface3'),
-        borderRadius: 12,
-    },
-})
+        editHover: {
+            position: 'absolute',
+            left: '75%',
+            top: '75%',
+            padding: spacing.m,
+            borderColor: color.primary._500,
+            borderWidth: borderWidth.s,
+            backgroundColor: color.neutral._200,
+            borderRadius: spacing.l,
+        },
+    })
+}

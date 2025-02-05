@@ -1,6 +1,7 @@
 import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
 import PopupMenu from '@components/views/PopupMenu'
+import { Theme } from '@lib/theme/ThemeManager'
 import { Characters, Style } from '@lib/utils/Global'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Menu } from 'react-native-popup-menu'
@@ -29,6 +30,9 @@ const UserListing: React.FC<CharacterListingProps> = ({
     setNowLoading,
     setShowModal,
 }) => {
+    const styles = useStyles()
+    const { spacing } = Theme.useTheme()
+
     const { userId, setCard } = Characters.useUserCard((state) => ({
         userId: state.id,
         setCard: state.setCard,
@@ -118,7 +122,7 @@ const UserListing: React.FC<CharacterListingProps> = ({
                 </View>
 
                 <PopupMenu
-                    style={{ paddingHorizontal: 8 }}
+                    style={{ paddingHorizontal: spacing.m }}
                     disabled={false}
                     icon="edit"
                     options={[
@@ -142,56 +146,58 @@ const UserListing: React.FC<CharacterListingProps> = ({
 
 export default UserListing
 
-const styles = StyleSheet.create({
-    longButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1,
-        padding: 8,
-    },
+const useStyles = () => {
+    const { color, spacing, borderWidth, borderRadius, fontSize } = Theme.useTheme()
 
-    longButtonContainer: {
-        backgroundColor: Style.getColor('primary-surface1'),
-        borderColor: Style.getColor('primary-surface1'),
-        borderWidth: 2,
-        flexDirection: 'row',
-        marginBottom: 8,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderRadius: 8,
-        flex: 1,
-    },
+    return StyleSheet.create({
+        longButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            flex: 1,
+            padding: spacing.m,
+        },
 
-    longButtonSelectedContainer: {
-        backgroundColor: Style.getColor('primary-surface1'),
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 2,
-        flexDirection: 'row',
-        marginBottom: 8,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderRadius: 8,
-        flex: 1,
-    },
+        longButtonContainer: {
+            borderColor: color.neutral._100,
+            borderWidth: borderWidth.m,
+            flexDirection: 'row',
+            marginBottom: spacing.m,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: spacing.m,
+            flex: 1,
+        },
 
-    avatar: {
-        width: 48,
-        height: 48,
-        borderRadius: 12,
-        margin: 4,
-        backgroundColor: Style.getColor('primary-surface2'),
-        borderWidth: 1,
-        borderColor: Style.getColor('primary-surface4'),
-    },
+        longButtonSelectedContainer: {
+            borderColor: color.primary._500,
+            borderWidth: borderWidth.m,
+            flexDirection: 'row',
+            marginBottom: spacing.m,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: spacing.m,
+            flex: 1,
+        },
 
-    nametag: {
-        fontSize: 16,
-        fontWeight: '500',
-        color: Style.getColor('primary-text1'),
-    },
+        avatar: {
+            width: 48,
+            height: 48,
+            borderRadius: borderRadius.l,
+            margin: spacing.sm,
+            backgroundColor: color.neutral._100,
+            borderWidth: borderWidth.s,
+            borderColor: color.primary._300,
+        },
 
-    timestamp: {
-        fontSize: 12,
-        color: Style.getColor('primary-text2'),
-    },
-})
+        nametag: {
+            fontSize: fontSize.l,
+            fontWeight: '500',
+            color: color.text._200,
+        },
+
+        timestamp: {
+            fontSize: fontSize.s,
+            color: color.text._400,
+        },
+    })
+}

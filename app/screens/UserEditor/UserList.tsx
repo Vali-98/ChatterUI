@@ -1,10 +1,11 @@
+import ThemedButton from '@components/buttons/ThemedButton'
 import TextBoxModal from '@components/views/TextBoxModal'
-import { AntDesign } from '@expo/vector-icons'
+import { Theme } from '@lib/theme/ThemeManager'
+import { Characters } from '@lib/utils/Global'
 import { FlashList } from '@shopify/flash-list'
-import { Characters, Style } from '@lib/utils/Global'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import React, { useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Text, View } from 'react-native'
 
 import UserListing from './UserListing'
 
@@ -13,6 +14,8 @@ type UserListProps = {
 }
 
 const UserList: React.FC<UserListProps> = ({ setShowModal }) => {
+    const { color, spacing, borderWidth, borderRadius, fontSize } = Theme.useTheme()
+
     const { data } = useLiveQuery(Characters.db.query.cardListQuery('user'))
 
     const [showNewUser, setShowNewUser] = useState(false)
@@ -25,7 +28,7 @@ const UserList: React.FC<UserListProps> = ({ setShowModal }) => {
     const currentIndex = data.findIndex((item) => item.id === id)
 
     return (
-        <View style={styles.mainContainer}>
+        <View style={{ flex: 1 }}>
             <TextBoxModal
                 autoFocus
                 booleans={[showNewUser, setShowNewUser]}
@@ -34,10 +37,22 @@ const UserList: React.FC<UserListProps> = ({ setShowModal }) => {
                     await setCard(id)
                 }}
             />
-            <View style={styles.listHeader}>
-                <Text style={styles.listTitle}>User Profiles ({data.length})</Text>
+            <View
+                style={{
+                    paddingHorizontal: spacing.xl,
+                    marginBottom: spacing.l,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                }}>
+                <Text
+                    style={{
+                        fontSize: fontSize.l,
+                        color: color.text._300,
+                    }}>
+                    User Profiles ({data.length})
+                </Text>
             </View>
-            <View style={styles.userListBorder}>
+            <View style={{ flex: 1 }}>
                 <FlashList
                     data={data}
                     showsVerticalScrollIndicator={false}
@@ -53,55 +68,10 @@ const UserList: React.FC<UserListProps> = ({ setShowModal }) => {
                     estimatedItemSize={100}
                     initialScrollIndex={Math.max(currentIndex, 0)}
                 />
-                <TouchableOpacity style={styles.newUserButton} onPress={() => setShowNewUser(true)}>
-                    <AntDesign name="plus" size={18} color={Style.getColor('primary-text2')} />
-                    <Text style={styles.buttonText}>New User</Text>
-                </TouchableOpacity>
+                <ThemedButton label="New User" onPress={() => setShowNewUser(true)} />
             </View>
         </View>
     )
 }
 
 export default UserList
-
-const styles = StyleSheet.create({
-    mainContainer: {
-        flex: 1,
-    },
-
-    userListBorder: {
-        flex: 1,
-    },
-
-    userListContainer: {
-        flex: 1,
-    },
-
-    listHeader: {
-        paddingHorizontal: 16,
-        marginBottom: 12,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-
-    listTitle: {
-        fontSize: 18,
-        color: Style.getColor('primary-text2'),
-    },
-
-    buttonText: {
-        fontSize: 16,
-        color: Style.getColor('primary-text1'),
-    },
-
-    newUserButton: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row',
-        paddingVertical: 8,
-        marginTop: 4,
-        columnGap: 8,
-        borderRadius: 8,
-        backgroundColor: Style.getColor('primary-surface4'),
-    },
-})
