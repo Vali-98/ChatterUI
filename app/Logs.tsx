@@ -1,13 +1,15 @@
 import Alert from '@components/views/Alert'
 import FadeDownView from '@components/views/FadeDownView'
 import { FontAwesome } from '@expo/vector-icons'
-import { Global, Logger, Style, saveStringToDownload } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
+import { Global, Logger, saveStringToDownload } from '@lib/utils/Global'
 import { FlashList } from '@shopify/flash-list'
 import { Stack } from 'expo-router'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import { useMMKVObject } from 'react-native-mmkv'
 
 const Logs = () => {
+    const { color } = Theme.useTheme()
     const [logs, setLogs] = useMMKVObject<string[]>(Global.Logs)
 
     const logitems = logs?.reverse().map((item, index) => ({ entry: item, key: index })) ?? []
@@ -49,35 +51,43 @@ const Logs = () => {
                     headerRight: () => (
                         <View style={{ flexDirection: 'row' }}>
                             <Pressable
-                                style={{ marginRight: 30, marginTop: 12 }}
+                                style={{ marginRight: 24, marginTop: 12 }}
                                 onPressIn={handleFlushLogs}>
-                                <FontAwesome
-                                    name="trash"
-                                    size={28}
-                                    color={Style.getColor('primary-text1')}
-                                />
+                                <FontAwesome name="trash" size={28} color={color.text._100} />
                             </Pressable>
                             <Pressable
-                                style={{ marginRight: 20, marginTop: 12 }}
+                                style={{ marginRight: 24, marginTop: 12 }}
                                 onPressIn={handleExportLogs}>
-                                <FontAwesome
-                                    name="download"
-                                    size={28}
-                                    color={Style.getColor('primary-text1')}
-                                />
+                                <FontAwesome name="download" size={28} color={color.text._100} />
                             </Pressable>
                         </View>
                     ),
                 }}
             />
 
-            <View style={styles.container}>
+            <View
+                style={{
+                    backgroundColor: 'black',
+                    borderColor: color.primary._500,
+                    borderWidth: 1,
+                    margin: 16,
+                    padding: 16,
+                    borderRadius: 16,
+                    flex: 1,
+                }}>
                 <FlashList
                     inverted
                     estimatedItemSize={30}
                     data={logitems}
                     keyExtractor={(item) => `${item.key}`}
-                    renderItem={({ item, index }) => <Text style={styles.entry}>{item.entry}</Text>}
+                    renderItem={({ item, index }) => (
+                        <Text
+                            style={{
+                                color: color.text._100,
+                            }}>
+                            {item.entry}
+                        </Text>
+                    )}
                 />
             </View>
         </FadeDownView>
@@ -85,18 +95,3 @@ const Logs = () => {
 }
 
 export default Logs
-
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: 'black',
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 1,
-        margin: 16,
-        padding: 16,
-        borderRadius: 16,
-        flex: 1,
-    },
-    entry: {
-        color: Style.getColor('primary-text1'),
-    },
-})
