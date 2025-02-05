@@ -157,6 +157,7 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
                     flexDirection: 'row',
                     columnGap: 8,
                     justifyContent: 'center',
+                    alignItems: 'center',
                     opacity: animOpacity,
                     transform: [{ scaleX: 0.99 }],
                 },
