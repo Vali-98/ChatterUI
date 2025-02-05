@@ -21,7 +21,6 @@ export namespace Theme {
             {
                 name: 'colorscheme-storage',
                 storage: createJSONStorage(() => mmkvStorage),
-                partialize: (state) => ({ color: state.color }),
                 version: 1,
             }
         )
@@ -66,7 +65,7 @@ export namespace Theme {
     }
 
     const useFontSize = () => {
-        return { s: 10, m: 16, l: 20, xl: 24 }
+        return { s: 12, m: 14, l: 16, xl: 20, xl2: 24 }
     }
 
     export const useTheme = () => {

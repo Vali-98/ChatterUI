@@ -58,7 +58,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
             }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ marginLeft: spacing.xl }}>
-                    <Text style={{ color: color.text._100, fontSize: fontSize.m }}>
+                    <Text style={{ color: color.text._100, fontSize: fontSize.l }}>
                         {item.name}
                     </Text>
                 </View>

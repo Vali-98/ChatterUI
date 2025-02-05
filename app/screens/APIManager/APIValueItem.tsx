@@ -118,12 +118,12 @@ const useStyles = () => {
         },
 
         name: {
-            fontSize: fontSize.m,
+            fontSize: fontSize.l,
             color: color.text._100,
         },
 
         nameInactive: {
-            fontSize: fontSize.m,
+            fontSize: fontSize.l,
             color: color.text._400,
         },
 

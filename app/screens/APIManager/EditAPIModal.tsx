@@ -87,7 +87,7 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
                 <Text
                     style={{
                         color: color.text._100,
-                        fontSize: fontSize.xl,
+                        fontSize: fontSize.xl2,
                         fontWeight: '500',
                         paddingBottom: spacing.xl2,
                     }}>

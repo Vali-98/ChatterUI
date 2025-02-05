@@ -76,7 +76,7 @@ const useStyles = () => {
 
         title: {
             color: color.text._300,
-            fontSize: fontSize.xl,
+            fontSize: fontSize.xl2,
         },
 
         buttonText: {
