@@ -62,7 +62,7 @@ const useStyles = () => {
             fontSize: fontSize.l,
             paddingVertical: spacing.l,
             paddingLeft: spacing.xl,
-            color: color.text._700,
+            color: color.text._100,
         },
 
         largeButton: {
