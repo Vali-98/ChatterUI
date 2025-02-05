@@ -1,22 +1,10 @@
-import { MenuRef } from '@components/views/PopupMenu'
+import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
-import { AntDesign } from '@expo/vector-icons'
-import { Characters, Chats, Logger, Style } from '@lib/utils/Global'
-import { useFocusEffect, useRouter } from 'expo-router'
-import { useRef, useState } from 'react'
-import { StyleSheet, TouchableOpacity, Text, BackHandler, View } from 'react-native'
-import {
-    Menu,
-    MenuOption,
-    MenuOptions,
-    MenuOptionsCustomStyle,
-    MenuTrigger,
-    renderers,
-} from 'react-native-popup-menu'
-import Animated, { ZoomIn } from 'react-native-reanimated'
+import { Characters, Chats, Logger } from '@lib/utils/Global'
+import { useRouter } from 'expo-router'
+import { useState } from 'react'
+import { View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
-
-const { Popover } = renderers
 
 type CharacterNewMenuProps = {
     nowLoading: boolean
@@ -25,43 +13,12 @@ type CharacterNewMenuProps = {
     setShowMenu: (b: boolean) => void
 }
 
-type PopupProps = {
-    onPress: () => void | Promise<void>
-    label: string
-    iconName: 'edit' | 'clouddownload' | 'upload'
-}
-
-const PopupOption: React.FC<PopupProps> = ({ onPress, label, iconName }) => {
-    return (
-        <MenuOption>
-            <TouchableOpacity style={styles.popupButton} onPress={onPress}>
-                <AntDesign name={iconName} size={28} color={Style.getColor('primary-text2')} />
-                <Text style={styles.optionLabel}>{label}</Text>
-            </TouchableOpacity>
-        </MenuOption>
-    )
-}
-
 const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
     nowLoading,
     setNowLoading,
     showMenu,
     setShowMenu,
 }) => {
-    const menuRef: MenuRef = useRef(null)
-
-    const backAction = () => {
-        if (!menuRef.current || !menuRef.current?.isOpen()) return false
-        menuRef.current?.close()
-        return true
-    }
-
-    useFocusEffect(() => {
-        BackHandler.removeEventListener('hardwareBackPress', backAction)
-        const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
-        return () => handler.remove()
-    })
-
     const { setCurrentCard } = Characters.useCharacterCard(
         useShallow((state) => ({
             setCurrentCard: state.setCard,
@@ -127,88 +84,39 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
                 showPaste
             />
 
-            <Menu
-                onOpen={() => setShowMenu(true)}
-                onClose={() => setShowMenu(false)}
-                ref={menuRef}
-                renderer={Popover}
-                rendererProps={{ placement: 'bottom', anchorStyle: styles.anchor }}>
-                <MenuTrigger>
-                    <Animated.View style={styles.headerButtonContainer} entering={ZoomIn}>
-                        <AntDesign
-                            name="adduser"
-                            size={28}
-                            color={Style.getColor(showMenu ? 'primary-text2' : 'primary-text1')}
-                        />
-                    </Animated.View>
-                </MenuTrigger>
-                <MenuOptions customStyles={menustyle}>
-                    <PopupOption
-                        onPress={() => {
-                            menuRef.current?.close()
+            <PopupMenu
+                icon="adduser"
+                options={[
+                    {
+                        label: 'Download',
+                        onPress: (menu) => {
+                            menu.current?.close()
                             setShowDownload(true)
-                        }}
-                        iconName="clouddownload"
-                        label="Download"
-                    />
-                    <PopupOption
-                        onPress={() => {
-                            menuRef.current?.close()
+                        },
+
+                        icon: 'clouddownload',
+                    },
+                    {
+                        label: 'Import From File',
+                        onPress: (menu) => {
                             Characters.importCharacterFromImage()
-                        }}
-                        iconName="upload"
-                        label="Import From File"
-                    />
-                    <PopupOption
-                        onPress={() => {
-                            menuRef.current?.close()
+                            menu.current?.close()
+                        },
+                        icon: 'upload',
+                    },
+                    {
+                        label: 'Create Character',
+                        onPress: (menu) => {
                             setShowNewChar(true)
-                        }}
-                        iconName="edit"
-                        label="Create Character"
-                    />
-                </MenuOptions>
-            </Menu>
+                            menu.current?.close()
+                        },
+                        icon: 'edit',
+                    },
+                ]}
+                placement="bottom"
+            />
         </View>
     )
 }
 
 export default CharacterNewMenu
-
-const styles = StyleSheet.create({
-    anchor: {
-        backgroundColor: Style.getColor('primary-surface3'),
-        padding: 8,
-    },
-
-    popupButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        columnGap: 12,
-        paddingVertical: 12,
-        paddingRight: 24,
-        paddingLeft: 12,
-        borderRadius: 12,
-    },
-
-    headerButtonContainer: {
-        flexDirection: 'row',
-    },
-
-    optionLabel: {
-        fontSize: 16,
-        fontWeight: '400',
-        color: Style.getColor('primary-text1'),
-    },
-})
-
-const menustyle: MenuOptionsCustomStyle = {
-    optionsContainer: {
-        backgroundColor: Style.getColor('primary-surface3'),
-        padding: 4,
-        borderRadius: 12,
-    },
-    optionsWrapper: {
-        backgroundColor: Style.getColor('primary-surface3'),
-    },
-}

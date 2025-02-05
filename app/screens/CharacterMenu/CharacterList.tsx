@@ -1,19 +1,13 @@
+import ThemedTextInput from '@components/input/ThemedTextInput'
 import FadeDownView from '@components/views/FadeDownView'
 import { AntDesign } from '@expo/vector-icons'
 import { CharInfo } from '@lib/state/Characters'
-import { Characters, Style } from '@lib/utils/Global'
+import { Theme } from '@lib/theme/ThemeManager'
+import { Characters } from '@lib/utils/Global'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Stack } from 'expo-router'
 import { useEffect, useState } from 'react'
-import {
-    BackHandler,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from 'react-native'
+import { BackHandler, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Animated, {
     FadeInUp,
     FadeOutUp,
@@ -79,6 +73,8 @@ type SortButtonProps = {
 }
 
 const SortButton: React.FC<SortButtonProps> = ({ sortTypes, currentSortType, label, onPress }) => {
+    const styles = useStyles()
+    const { color } = Theme.useTheme()
     const isCurrent = sortTypes.includes(currentSortType)
     const isAsc = sortTypes[0] === currentSortType
     return (
@@ -89,7 +85,7 @@ const SortButton: React.FC<SortButtonProps> = ({ sortTypes, currentSortType, lab
                 <AntDesign
                     size={14}
                     name={isAsc ? 'caretup' : 'caretdown'}
-                    color={Style.getColor('primary-text1')}
+                    color={color.text._100}
                 />
             )}
             <Text style={isCurrent ? styles.sortButtonTextActive : styles.sortButtonText}>
@@ -104,6 +100,9 @@ type CharacterListProps = {
 }
 
 const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
+    const styles = useStyles()
+    const { color } = Theme.useTheme()
+
     const [nowLoading, setNowLoading] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
     const [showMenu, setShowMenu] = useState(false)
@@ -175,7 +174,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                             }}>
                             <Text
                                 style={{
-                                    color: Style.getColor('primary-text2'),
+                                    color: color.text._400,
                                     fontSize: 16,
                                 }}>
                                 Sort By
@@ -202,7 +201,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                                 <TouchableOpacity>
                                     <AntDesign
                                         name="close"
-                                        color={Style.getColor('primary-text2')}
+                                        color={color.text._400}
                                         size={26}
                                         onPress={() => {
                                             if (showSearch) setTextFilter('')
@@ -217,7 +216,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                                 <TouchableOpacity>
                                     <AntDesign
                                         name="search1"
-                                        color={Style.getColor('primary-text2')}
+                                        color={color.text._400}
                                         size={26}
                                         onPress={() => {
                                             if (showSearch) setTextFilter('')
@@ -236,20 +235,16 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                             })}
                             exiting={FadeOutUp.duration(100)}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <TextInput
-                                    autoFocus
-                                    placeholder="Search Name..."
-                                    placeholderTextColor={Style.getColor('primary-text3')}
+                                <ThemedTextInput
                                     value={textFilter}
-                                    style={{
-                                        ...styles.searchInput,
-                                        color: Style.getColor(
-                                            characterList.length === 0
-                                                ? 'primary-text2'
-                                                : 'primary-text1'
-                                        ),
-                                    }}
                                     onChangeText={setTextFilter}
+                                    style={{
+                                        color:
+                                            characterList.length === 0
+                                                ? color.text._700
+                                                : color.text._100,
+                                    }}
+                                    placeholder="Search Name..."
                                 />
                             </View>
                             {textFilter && (
@@ -262,6 +257,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                     <Animated.FlatList
                         itemLayoutAnimation={LinearTransition}
                         showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ rowGap: 8 }}
                         data={characterList}
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item, index }) => (
@@ -284,45 +280,40 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
 
 export default CharacterList
 
-const styles = StyleSheet.create({
-    sortButton: {
-        alignItems: 'center',
-        flexDirection: 'row',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        backgroundColor: Style.getColor('primary-surface2'),
-        borderRadius: 16,
-    },
+const useStyles = () => {
+    const { color, spacing, borderWidth, borderRadius } = Theme.useTheme()
 
-    sortButtonActive: {
-        alignItems: 'center',
-        flexDirection: 'row',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        backgroundColor: Style.getColor('primary-surface3'),
-        borderRadius: 16,
-    },
+    return StyleSheet.create({
+        sortButton: {
+            alignItems: 'center',
+            flexDirection: 'row',
+            paddingHorizontal: spacing.xl,
+            paddingVertical: spacing.m,
+            backgroundColor: color.neutral._200,
+            borderRadius: borderRadius.xl,
+        },
 
-    sortButtonText: {
-        color: Style.getColor('primary-text2'),
-    },
+        sortButtonActive: {
+            alignItems: 'center',
+            flexDirection: 'row',
+            paddingHorizontal: spacing.xl,
+            paddingVertical: spacing.m,
+            backgroundColor: color.primary._300,
+            borderRadius: borderRadius.xl,
+        },
 
-    sortButtonTextActive: {
-        marginLeft: 4,
-        color: Style.getColor('primary-text1'),
-    },
+        sortButtonText: {
+            color: color.text._400,
+        },
 
-    resultText: {
-        marginTop: 8,
-        color: Style.getColor('primary-text2'),
-    },
+        sortButtonTextActive: {
+            marginLeft: 4,
+            color: color.text._100,
+        },
 
-    searchInput: {
-        borderRadius: 8,
-        flex: 1,
-        paddingVertical: 2,
-        paddingHorizontal: 12,
-        borderColor: Style.getColor('primary-brand'),
-        borderWidth: 2,
-    },
-})
+        resultText: {
+            marginTop: 8,
+            color: color.text._400,
+        },
+    })
+}
