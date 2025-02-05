@@ -154,6 +154,8 @@ const useStyles = () => {
             borderRadius: borderRadius.l,
             margin: spacing.sm,
             backgroundColor: color.neutral._200,
+            borderColor: color.text._100,
+            borderWidth: borderWidth.s,
         },
 
         nametag: {
@@ -170,7 +172,7 @@ const useStyles = () => {
 
         previewText: {
             marginTop: spacing.s,
-            color: color.text._700,
+            color: color.text._500,
         },
 
         tag: {
