@@ -15,7 +15,7 @@ import AvatarViewer from './ChatWindow/AvatarViewer'
 import ChatWindow from './ChatWindow/ChatWindow'
 import ChatsDrawer from './ChatsDrawer'
 import OptionsMenu from './OptionsMenu'
-import SettingsDrawer from './SettingsDrawer'
+import SettingsDrawer from '../SettingsDrawer/'
 
 const ChatMenu = () => {
     const { color, spacing } = Theme.useTheme()
