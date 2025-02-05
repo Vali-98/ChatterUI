@@ -2,7 +2,6 @@ import { AntDesign } from '@expo/vector-icons'
 import { continueResponse, generateResponse, regenerateResponse } from '@lib/engine/Inference'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Style } from '@lib/utils/Global'
 import React from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 

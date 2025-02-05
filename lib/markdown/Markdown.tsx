@@ -1,5 +1,4 @@
 import Accordion from '@components/views/Accordion'
-import { Style } from '@lib/theme/Style'
 import { Theme } from '@lib/theme/ThemeManager'
 import { Platform, StyleSheet, Text } from 'react-native'
 import { MarkdownIt } from 'react-native-markdown-display'

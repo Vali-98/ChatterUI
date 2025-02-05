@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Style } from '@lib/utils/Global'
 import { Text, View } from 'react-native'
 
 const CharSearchEmpty = () => {

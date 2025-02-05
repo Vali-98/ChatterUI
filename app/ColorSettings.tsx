@@ -179,7 +179,7 @@ const ColorSettings = () => {
                             </Text>
                         </TouchableOpacity>
                     ))}
-                    <View style={{ marginTop: 20 }}>
+                    <View style={{ marginTop: 24 }}>
                         <Text
                             style={{
                                 fontSize: 16,

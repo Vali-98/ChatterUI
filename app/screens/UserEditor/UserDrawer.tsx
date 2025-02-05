@@ -1,5 +1,4 @@
 import Drawer from '@components/views/Drawer'
-import { Style } from '@lib/utils/Global'
 import { SetStateAction } from 'react'
 import { StyleSheet } from 'react-native'
 
@@ -29,6 +28,6 @@ const styles = StyleSheet.create({
         height: '100%',
         paddingHorizontal: 16,
         paddingTop: 16,
-        paddingBottom: 32,
+        paddingBottom: 24,
     },
 })

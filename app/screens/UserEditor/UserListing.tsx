@@ -2,8 +2,8 @@ import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
 import PopupMenu from '@components/views/PopupMenu'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Characters, Style } from '@lib/utils/Global'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { Characters } from '@lib/utils/Global'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Menu } from 'react-native-popup-menu'
 
 type CharacterData = Awaited<ReturnType<typeof Characters.db.query.cardListQuery>>[0]

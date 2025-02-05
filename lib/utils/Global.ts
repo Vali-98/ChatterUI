@@ -1,5 +1,4 @@
 import { SamplersManager } from '@lib/state/SamplerState'
-import { Style } from '@lib/theme/Style'
 import { Theme } from '@lib/theme/ThemeManager'
 import { DownloadDirectoryPath, writeFile } from 'cui-fs'
 import { getCpuFeatures } from 'cui-llama.rn'
@@ -34,7 +33,6 @@ export {
     Logger,
     MarkdownStyle,
     mmkv,
-    Style,
 }
 
 // GENERAL FUNCTIONS

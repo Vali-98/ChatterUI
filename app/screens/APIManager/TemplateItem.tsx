@@ -1,11 +1,10 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import Alert from '@components/views/Alert'
-import { AntDesign } from '@expo/vector-icons'
 import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { APIState } from '@lib/engine/API/APIManagerState'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Logger, saveStringToDownload, Style } from '@lib/utils/Global'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Logger, saveStringToDownload } from '@lib/utils/Global'
+import { Text, View } from 'react-native'
 
 type TemplateItemProps = {
     item: APIConfiguration
