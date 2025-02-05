@@ -1,8 +1,7 @@
 import { Entypo } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useState } from 'react'
-import { FlatList, Modal, Pressable, Text, View, ViewStyle } from 'react-native'
-import { TextInput } from 'react-native-gesture-handler'
+import { FlatList, Modal, Pressable, Text, View, ViewStyle, TextInput } from 'react-native'
 
 import { useDropdownStyles } from './MultiDropdownSheet'
 import FadeBackrop from '../views/FadeBackdrop'
