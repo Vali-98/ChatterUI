@@ -25,6 +25,15 @@ export const enum Global {
 
     // UserID = 'userid', // moved to zustand state
 
+    // Presets
+    // Removed on preset rework
+    // PresetID = 'presetID',
+    // PresetData = 'presetdata',
+    // PresetName = 'presetdame',
+
+    // Lorebooks
+    // LorebookNames = 'lorebooknames',  // removed with temp menu
+
     // APIs
 
     /**
@@ -84,21 +93,6 @@ export const enum Global {
     Logs = 'logs',
 
     AppMode = 'appmode',
-    // User
-
-    // Chat
-
-    // Instruct
-
-    // Presets
-    // TODO: Remove once migration complete
-    PresetID = 'presetID',
-    PresetData = 'presetdata',
-    PresetName = 'presetdame',
-
-    // Lorebooks
-
-    LorebookNames = 'lorebooknames',
 
     // Local
 
@@ -109,7 +103,7 @@ export const enum Global {
     // whether or not a KV cache has been loaded
     LocalSessionLoaded = 'localsessionloaded',
 
-    // TODO move to AppSettings
+    // TODO move to zustaind state
     TTSSpeaker = 'ttsspeaker',
     TTSEnable = 'ttsenable',
     TTSAuto = `ttsauto`,

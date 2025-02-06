@@ -1,5 +1,6 @@
 import { db } from '@db'
-import { CompletionParams, ContextParams, LlamaContext, initLlama } from 'cui-llama.rn'
+import { readableFileSize } from '@lib/utils/File'
+import { CompletionParams, ContextParams, initLlama, LlamaContext } from 'cui-llama.rn'
 import { model_data, ModelDataType } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import { getDocumentAsync } from 'expo-document-picker'
@@ -411,6 +412,7 @@ export namespace Llama {
                 .returning({ id: model_data.id })
 
             const modelContext = await initLlama({ model: file_path, vocab_only: true })
+
             const modelInfo: any = modelContext.model
             const modelType = modelInfo.metadata?.['general.architecture']
             const modelDataEntry = {
@@ -593,24 +595,6 @@ export const GGMLNameMap = {
     [GGMLType.LLAMA_FTYPE_MOSTLY_Q4_0_8_8]: 'Q4_0_8_8',
     [GGMLType.LLAMA_FTYPE_MOSTLY_TQ1_0]: 'TQ1_0',
     [GGMLType.LLAMA_FTYPE_MOSTLY_TQ2_0]: 'TQ2_0',
-}
-
-const gb = 1000 ** 3
-const mb = 1000 ** 2
-
-/**
- * Gets a human friendly version of file size
- * @param size size in bytes
- * @returns string containing readable file size
- */
-export const readableFileSize = (size: number) => {
-    if (size < gb) {
-        const sizeInMB = size / mb
-        return `${sizeInMB.toFixed(2)} MB`
-    } else {
-        const sizeInGB = size / gb
-        return `${sizeInGB.toFixed(2)} GB`
-    }
 }
 
 const checkGGMLDeprecated = (model: ModelDataType) => {

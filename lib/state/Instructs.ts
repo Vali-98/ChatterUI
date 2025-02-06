@@ -9,7 +9,7 @@ import { Logger } from './Logger'
 import { AppMode, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/LlamaLocal'
 import { mmkv, mmkvStorage } from '../storage/MMKV'
-import { replaceMacros } from '../utils/Utils'
+import { replaceMacros } from '../utils/Macros'
 
 const defaultBooleans = {
     wrap: false,

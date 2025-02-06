@@ -5,23 +5,12 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import SectionTitle from '@components/text/SectionTitle'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { Theme } from '@lib/theme/ThemeManager'
+import { groupBy } from '@lib/utils/Array'
 import { Global, Logger } from '@lib/utils/Global'
 import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
-
-function groupBy(array: any[], key: string) {
-    if (array.length === 0) return []
-    return array.reduce((result, obj) => {
-        const keyValue = obj[key]
-        if (!result[keyValue]) {
-            result[keyValue] = []
-        }
-        result[keyValue].push(obj)
-        return result
-    }, {})
-}
 
 type LanguageListItem = {
     [key: string]: Speech.Voice[]

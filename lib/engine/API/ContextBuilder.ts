@@ -1,8 +1,8 @@
 import { AppMode, AppSettings } from '@lib/constants/GlobalValues'
 import { Llama } from '@lib/engine/LlamaLocal'
 import { Tokenizer } from '@lib/engine/Tokenizer'
-import { replaceMacros } from '@lib/state/Characters'
 import { Characters, Chats, Global, Instructs, Logger, mmkv } from '@lib/utils/Global'
+import { replaceMacros } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 

@@ -3,7 +3,8 @@ import Alert from '@components/views/Alert'
 import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { APIState } from '@lib/engine/API/APIManagerState'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Logger, saveStringToDownload } from '@lib/utils/Global'
+import { saveStringToDownload } from '@lib/utils/File'
+import { Logger } from '@lib/utils/Global'
 import { Text, View } from 'react-native'
 
 type TemplateItemProps = {

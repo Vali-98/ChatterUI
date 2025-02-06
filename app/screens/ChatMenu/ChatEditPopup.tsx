@@ -1,7 +1,8 @@
 import Alert from '@components/views/Alert'
 import PopupMenu, { MenuRef } from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
-import { Characters, Chats, Logger, saveStringToDownload } from '@lib/utils/Global'
+import { saveStringToDownload } from '@lib/utils/File'
+import { Characters, Chats, Logger } from '@lib/utils/Global'
 import React, { useState } from 'react'
 import { View } from 'react-native'
 

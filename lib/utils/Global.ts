@@ -1,17 +1,11 @@
 import { SamplersManager } from '@lib/state/SamplerState'
 import { Theme } from '@lib/theme/ThemeManager'
-import { DownloadDirectoryPath, writeFile } from 'cui-fs'
 import { getCpuFeatures } from 'cui-llama.rn'
-import * as Crypto from 'expo-crypto'
 import { DeviceType, getDeviceTypeAsync } from 'expo-device'
 import * as FS from 'expo-file-system'
 import { lockAsync, OrientationLock } from 'expo-screen-orientation'
-import * as Sharing from 'expo-sharing'
 import { setBackgroundColorAsync } from 'expo-system-ui'
-import { Platform } from 'react-native'
-import { btoa } from 'react-native-quick-base64'
 
-import { humanizedISO8601DateTime } from './Utils'
 import { API } from '../constants/API'
 import { AppMode, AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/LlamaLocal'
@@ -22,68 +16,7 @@ import { Instructs } from '../state/Instructs'
 import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
 
-export {
-    API,
-    AppSettings,
-    Characters,
-    Chats,
-    Global,
-    humanizedISO8601DateTime,
-    Instructs,
-    Logger,
-    MarkdownStyle,
-    mmkv,
-}
-
-// GENERAL FUNCTIONS
-
-// reencrypts mmkv cache, may not be useful
-
-export const resetEncryption = (value = 0) => {
-    mmkv.recrypt(Crypto.getRandomBytes(16).toString())
-}
-
-/** Exports a string to external storage, supports json
- * @deprecated
- */
-export const saveStringExternal = async (
-    filename: string,
-    filedata: string,
-    mimetype: 'application/x-sqlite3' | 'application/json' | string = 'application/json',
-    encoding: 'utf8' | 'base64' = 'utf8'
-) => {
-    if (Platform.OS === 'android') {
-        const permissions = await FS.StorageAccessFramework.requestDirectoryPermissionsAsync()
-        if (permissions.granted) {
-            const directoryUri = permissions.directoryUri
-            await FS.StorageAccessFramework.createFileAsync(directoryUri, filename, mimetype)
-                .then(async (fileUri) => {
-                    await FS.writeAsStringAsync(fileUri, filedata, {
-                        encoding,
-                    })
-                    Logger.log(`File saved sucessfully`, true)
-                })
-                .catch((e) => {
-                    Logger.log(e)
-                })
-        }
-    } else if (Platform.OS === 'ios') Sharing.shareAsync(filename)
-}
-
-/**
- *
- * @param data string data of file
- * @param filename filename to be written, include extension
- * @param encoding encoding of file
- */
-export const saveStringToDownload = async (
-    data: string,
-    filename: string,
-    encoding: 'ascii' | 'base64' | `utf8`
-) => {
-    if (encoding === 'utf8') data = btoa(data)
-    await writeFile(`${DownloadDirectoryPath}/${filename}`, data, { encoding: encoding })
-}
+export { API, AppSettings, Characters, Chats, Global, Instructs, Logger, MarkdownStyle, mmkv }
 
 const loadChatOnInit = async () => {
     const newestChat = await Chats.db.query.chatNewest()
@@ -117,24 +50,9 @@ export const startupApp = () => {
     // Only for dev to properly reset
     Chats.useChatState.getState().reset()
     Characters.useCharacterCard.getState().unloadCard()
-    /*
-    // Resets horde state, may be better if left active
-    mmkv.set(Global.HordeWorkers, JSON.stringify([]))
-    mmkv.set(Global.HordeModels, JSON.stringify([]))
-
-    // Init statea
-    if (mmkv.getString(Global.OpenAIModel) === undefined)
-        mmkv.set(Global.OpenAIModel, JSON.stringify({}))
-
-    // default horde [0000000000] key is needed
-    if (!mmkv.getString(Global.HordeKey)) mmkv.set(Global.HordeKey, '0000000000')
-    */
 
     // Init step, logs are never null
     if (!mmkv.getString(Global.Logs)) mmkv.set(Global.Logs, JSON.stringify([]))
-
-    // Init step, names[] is never null
-    if (!mmkv.getString(Global.LorebookNames)) mmkv.set(Global.LorebookNames, JSON.stringify([]))
 
     // Init step, appMode is never null
     if (!mmkv.getString(Global.AppMode)) mmkv.set(Global.AppMode, AppMode.LOCAL)
@@ -152,6 +70,7 @@ export const startupApp = () => {
             } else mmkv.set(item, AppSettingsDefault[item as AppSettings])
         }
     })
+
     // Init step
     Llama.setLlamaPreset()
 
@@ -216,8 +135,8 @@ export const initializeApp = async () => {
 }
 
 export const generateDefaultDirectories = async () => {
-    // Removed: 'characters', 'instruct', 'persona', 'presets'
-    const dirs = ['lorebooks', 'models']
+    // Removed: 'characters', 'instruct', 'persona', 'presets', 'lorebooks'
+    const dirs = ['models']
 
     dirs.map(async (dir: string) => {
         await FS.makeDirectoryAsync(`${FS.documentDirectory}${dir}`, {})
@@ -225,7 +144,9 @@ export const generateDefaultDirectories = async () => {
             .catch(() => {})
     })
 }
-
+/**
+ * Migrates presets from 0.8.3 to 0.8.4, deprecating old filesystem
+ */
 const migratePresets = async () => {
     const presetDir = `${FS.documentDirectory}presets`
     const files = await FS.readDirectoryAsync(presetDir)
