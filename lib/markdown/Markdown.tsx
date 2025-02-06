@@ -21,9 +21,8 @@ export namespace MarkdownStyle {
             return (
                 <Accordion
                     key={node.key}
-                    label="Thinking..."
-                    //TODO: Figure out better fix for width
-                    style={{ flex: 1, paddingVertical: 2, width: 5000 }}>
+                    label={node.sourceInfo ? 'Thought Process' : 'Thinking...'}
+                    style={{ flex: 1, paddingVertical: 2 }}>
                     {children}
                 </Accordion>
             )

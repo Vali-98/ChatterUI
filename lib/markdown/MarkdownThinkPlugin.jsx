@@ -1,36 +1,96 @@
 module.exports = function thinkPlugin(md) {
-    md.core.ruler.push('think', function (state) {
-        state.tokens.forEach((token, idx) => {
-            if (token.type !== 'inline' || !token.content.includes('<think>')) return
+    md.block.ruler.before('paragraph', 'think', function (state, startLine, endLine, silent) {
+        let thinkLine = -1
+        // Scan lines for '<think'
+        for (let i = startLine; i < endLine; i++) {
+            const pos = state.bMarks[i] + state.tShift[i]
+            const max = state.eMarks[i]
+            const line = state.src.slice(pos, max)
+            if (line.indexOf('<think') !== -1) {
+                thinkLine = i
+                break
+            }
+        }
+        if (thinkLine === -1) return false
 
-            const content = token.content
-            const newTokens = []
-            const regex = new RegExp('<think>(.*?)(?:</think>|$)', 'gs')
-            let match
-            let lastIndex = 0
+        if (thinkLine > startLine) {
+            // If line isn't first, we process previous lines first
+            state.lineMax = startLine
+            return false
+        }
+        // Begin accumulating <think lines
+        let pos = state.bMarks[thinkLine] + state.tShift[thinkLine]
+        let max = state.eMarks[thinkLine]
+        let line = state.src.slice(pos, max).trim()
+        const lineIndex = line.indexOf('<think')
 
-            while ((match = regex.exec(content)) !== null) {
-                if (match.index > lastIndex) {
-                    const textToken = new state.Token('text', '', 0)
-                    textToken.content = content.slice(lastIndex, match.index)
-                    newTokens.push(textToken)
+        // Early exit in case something went terribly wrong
+        if (lineIndex === -1) return false
+
+        // silent mode debug
+        if (silent) return true
+
+        // in cases where we have inline text before the tag, render it
+        if (lineIndex > 0) {
+            const textToken = state.push('paragraph', '', 0)
+            textToken.children = md.parse(line.slice(0, lineIndex), state.env)
+            line = line.slice(lineIndex)
+        }
+        let trailing = undefined
+        let hasCloseTag = false
+        let nextLine = thinkLine + 1
+        const contentLines = []
+
+        // Ignore space between tag open and close
+        const openTagStart = line.indexOf('<think')
+        const openTagEnd = line.indexOf('>', openTagStart)
+        if (openTagStart !== -1 && openTagEnd !== -1) {
+            const inlineContent = line.slice(openTagEnd + 1)
+            if (inlineContent.trim().length) {
+                contentLines.push(inlineContent)
+            }
+        }
+
+        // Accumulate until </think> is reached
+        while (nextLine < endLine) {
+            pos = state.bMarks[nextLine] + state.tShift[nextLine]
+            max = state.eMarks[nextLine]
+            line = state.src.slice(pos, max).trim()
+            if (line.includes('</think>')) {
+                const endThinkIndex = line.indexOf('</think>')
+                // if there is a leading string, push to content
+                if (endThinkIndex > 0) {
+                    contentLines.push(line.slice(0, endThinkIndex))
                 }
-
-                const thinkToken = new state.Token('think', '', 0)
-                thinkToken.hidden = true
-                thinkToken.children = md.parseInline(match[1], state.env)
-                newTokens.push(thinkToken)
-
-                lastIndex = regex.lastIndex
+                // if there is a trailing string, set to be rendered later
+                if (endThinkIndex + 8 < line.length) {
+                    trailing = line.slice(endThinkIndex + 8)
+                }
+                hasCloseTag = true
+                break
             }
+            contentLines.push(line)
+            nextLine++
+        }
 
-            if (lastIndex < content.length) {
-                const textToken = new state.Token('text', '', 0)
-                textToken.content = content.slice(lastIndex)
-                newTokens.push(textToken)
-            }
-            state.tokens[idx].content = ''
-            state.tokens[idx].children = newTokens
-        })
+        // Update line
+        state.line = hasCloseTag ? nextLine + 1 : endLine
+
+        // Create token
+        const token = state.push('think', '', 0)
+        token.hidden = true
+        token.map = [thinkLine, state.line]
+        token.info = hasCloseTag
+
+        // Parse all nodes within the block as children
+        token.children = md.parse(contentLines.join('\n').trim(), state.env)
+
+        // Parse any trailing text
+        if (trailing) {
+            const textToken = state.push('paragraph', '', 0)
+            textToken.children = md.parse(trailing, state.env)
+        }
+
+        return true
     })
 }
