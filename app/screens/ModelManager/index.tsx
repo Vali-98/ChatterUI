@@ -190,11 +190,11 @@ export const useStyles = () => {
         },
 
         modelTitle: {
-            color: color.text._100,
+            color: color.primary._700,
         },
 
         subtitle: {
-            color: color.text._400,
+            color: color.text._300,
         },
 
         hint: {

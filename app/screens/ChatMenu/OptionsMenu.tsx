@@ -66,7 +66,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef, showChats }) => {
         <Menu renderer={SlideInMenu} ref={menuRef}>
             <MenuTrigger>
                 <Ionicons
-                    name="ellipsis-vertical-circle"
+                    name="caret-up-circle"
                     style={styles.optionsButton}
                     size={32}
                     color={color.text._400}
@@ -103,6 +103,8 @@ const useMenuStyle = () => {
 
     const menuStyle: MenuOptionsCustomStyle = {
         optionsContainer: {
+            borderTopWidth: 1,
+            borderColor: color.neutral._300,
             backgroundColor: color.neutral._100,
             padding: spacing.sm,
             borderRadius: spacing.m,
@@ -117,7 +119,7 @@ const useStyles = () => {
 
     return StyleSheet.create({
         optionsButton: {
-            paddingBottom: spacing.m,
+            color: color.primary._500,
         },
 
         optionItem: {

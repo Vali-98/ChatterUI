@@ -3,7 +3,7 @@ import { continueResponse, generateResponse, regenerateResponse } from '@lib/eng
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 import React from 'react'
-import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 type SwipesProps = {
     nowGenerating: boolean
@@ -36,19 +36,19 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
 
     return (
         <View style={styles.swipesItem}>
-            <TouchableHighlight
+            <TouchableOpacity
                 style={styles.swipeButton}
                 onPress={handleSwipeLeft}
                 disabled={nowGenerating || swipeIndex === 0}>
                 <AntDesign
                     name="left"
                     size={20}
-                    color={swipeIndex === 0 || nowGenerating ? color.text._700 : color.text._100}
+                    color={swipeIndex === 0 || nowGenerating ? color.text._600 : color.text._300}
                 />
-            </TouchableHighlight>
+            </TouchableOpacity>
 
             {index !== 0 && (
-                <TouchableHighlight
+                <TouchableOpacity
                     onPress={() => swipeId && regenerateResponse(swipeId)}
                     onLongPress={() => swipeId && regenerateResponse(swipeId, false)}
                     disabled={nowGenerating}
@@ -56,9 +56,9 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
                     <AntDesign
                         name="retweet"
                         size={20}
-                        color={nowGenerating ? color.text._700 : color.text._100}
+                        color={nowGenerating ? color.text._600 : color.text._300}
                     />
-                </TouchableHighlight>
+                </TouchableOpacity>
             )}
 
             <Text style={styles.swipeText}>
@@ -66,19 +66,19 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
             </Text>
 
             {index !== 0 && (
-                <TouchableHighlight
+                <TouchableOpacity
                     onPress={() => swipeId && continueResponse(swipeId)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
                     <AntDesign
                         name="forward"
                         size={20}
-                        color={nowGenerating ? color.text._700 : color.text._100}
+                        color={nowGenerating ? color.text._600 : color.text._300}
                     />
-                </TouchableHighlight>
+                </TouchableOpacity>
             )}
 
-            <TouchableHighlight
+            <TouchableOpacity
                 style={styles.swipeButton}
                 onPress={() => handleSwipeRight('')}
                 onLongPress={() => handleSwipeRight(swipeText ?? '')}
@@ -86,9 +86,9 @@ const Swipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => 
                 <AntDesign
                     name="right"
                     size={20}
-                    color={isLastAltGreeting || nowGenerating ? color.text._700 : color.text._100}
+                    color={isLastAltGreeting || nowGenerating ? color.text._400 : color.text._300}
                 />
-            </TouchableHighlight>
+            </TouchableOpacity>
         </View>
     )
 }
@@ -106,7 +106,7 @@ const useStyles = () => {
         },
 
         swipeText: {
-            color: color.text._400,
+            color: color.text._200,
             paddingVertical: spacing.sm,
             paddingHorizontal: spacing.m,
         },

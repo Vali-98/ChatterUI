@@ -216,7 +216,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                                 <TouchableOpacity>
                                     <AntDesign
                                         name="search1"
-                                        color={color.text._400}
+                                        color={color.text._300}
                                         size={26}
                                         onPress={() => {
                                             if (showSearch) setTextFilter('')

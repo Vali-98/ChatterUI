@@ -68,7 +68,7 @@ const Logs = () => {
 
             <View
                 style={{
-                    backgroundColor: 'black',
+                    backgroundColor: color.neutral._200,
                     borderColor: color.primary._500,
                     borderWidth: 1,
                     margin: 16,

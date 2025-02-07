@@ -33,7 +33,7 @@ const TTS: React.FC<TTSProps> = ({ index }) => {
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity onPress={handleSpeak}>
-                    <FontAwesome name="volume-down" size={28} color={color.text._400} />
+                    <FontAwesome name="volume-down" size={28} color={color.primary._400} />
                 </TouchableOpacity>
             )}
         </View>

@@ -76,7 +76,7 @@ const Drawer: React.FC<DrawerProps> = ({
 export default Drawer
 
 const useStyles = () => {
-    const { color, spacing } = Theme.useTheme()
+    const { color } = Theme.useTheme()
     return StyleSheet.create({
         absolute: {
             position: 'absolute',
@@ -96,7 +96,7 @@ const useStyles = () => {
             shadowColor: '#000',
             width: '80%',
             height: '100%',
-            borderTopWidth: 3,
+            borderTopWidth: 1,
             elevation: 20,
             position: 'absolute',
         },

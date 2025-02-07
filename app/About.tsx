@@ -94,12 +94,15 @@ const useStyles = () => {
             alignItems: 'center',
             flex: 1,
         },
-        titleText: { color: color.text._100, fontSize: 32 },
+        titleText: { color: color.text._100, fontSize: 32, marginTop: 16 },
         subtitleText: { color: color.text._400 },
         body: { color: color.text._100, marginTop: spacing.l, textAlign: 'center' },
         icon: {
             width: 120,
             height: 120,
+            backgroundColor: 'black',
+            // eslint-disable-next-line internal/enforce-spacing-values
+            borderRadius: 60,
         },
     })
 }

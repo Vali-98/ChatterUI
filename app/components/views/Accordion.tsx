@@ -49,7 +49,7 @@ const Accordion: React.FC<AccordionProps> = ({
             {show && (
                 <View
                     style={{
-                        backgroundColor: color.neutral._200,
+                        backgroundColor: color.neutral._400,
                         paddingHorizontal: spacing.l,
                         paddingTop: spacing.l,
                         paddingBottom: spacing.m,

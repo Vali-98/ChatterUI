@@ -20,7 +20,7 @@ const AppModeToggle = () => {
                     style={localMode ? styles.modeButton : styles.modeButtonInactive}>
                     <AntDesign
                         name="mobile1"
-                        color={localMode ? color.text._100 : color.text._700}
+                        color={localMode ? color.text._100 : color.text._500}
                         size={18}
                     />
                     <Text style={localMode ? styles.modeText : styles.modeTextInactive}>Local</Text>
@@ -30,7 +30,7 @@ const AppModeToggle = () => {
                     style={remoteMode ? styles.modeButton : styles.modeButtonInactive}>
                     <AntDesign
                         name="cloudo"
-                        color={remoteMode ? color.text._100 : color.text._700}
+                        color={remoteMode ? color.text._100 : color.text._500}
                         size={18}
                     />
                     <Text style={remoteMode ? styles.modeText : styles.modeTextInactive}>
@@ -97,16 +97,16 @@ const useStyles = () => {
             paddingHorizontal: spacing.l,
             borderWidth: borderWidth.m,
             borderRadius: spacing.m,
-            borderColor: color.neutral._300,
+            borderColor: color.neutral._200,
         },
 
         modeTextInactive: {
-            color: color.text._500,
+            color: color.text._400,
         },
 
         appModeText: {
             marginLeft: spacing.m,
-            color: color.text._400,
+            color: color.text._300,
             marginBottom: spacing.m,
         },
     })

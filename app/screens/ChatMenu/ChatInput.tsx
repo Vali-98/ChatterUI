@@ -70,12 +70,11 @@ const ChatInput = () => {
                 <TouchableOpacity
                     style={{
                         borderRadius: borderRadius.m,
-                        borderColor: color.error._500,
-                        borderWidth: 2,
+                        backgroundColor: color.error._500,
                         padding: spacing.m,
                     }}
                     onPress={abortResponse}>
-                    <MaterialIcons name="stop" color={color.error._500} size={24} />
+                    <MaterialIcons name="stop" color={color.neutral._100} size={24} />
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity

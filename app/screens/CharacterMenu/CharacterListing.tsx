@@ -154,8 +154,8 @@ const useStyles = () => {
             borderRadius: borderRadius.l,
             margin: spacing.sm,
             backgroundColor: color.neutral._200,
-            borderColor: color.text._100,
-            borderWidth: borderWidth.s,
+            borderColor: color.neutral._200,
+            borderWidth: 1,
         },
 
         nametag: {

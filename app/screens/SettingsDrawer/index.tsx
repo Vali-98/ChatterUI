@@ -24,14 +24,17 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, s
         return (
             <Drawer
                 setShowDrawer={setShowModal}
-                drawerStyle={{ width: '60%', paddingBottom: spacing.xl2 }}>
+                drawerStyle={{
+                    width: '60%',
+                    paddingBottom: spacing.xl2,
+                }}>
                 <UserInfo />
                 <AppModeToggle />
                 <RouteList />
                 <Text
                     style={{
                         alignSelf: 'center',
-                        color: color.text._500,
+                        color: color.text._300,
                         marginTop: spacing.l,
                         marginBottom: spacing.xl2,
                     }}>

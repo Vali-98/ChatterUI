@@ -116,7 +116,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         name="edit"
                         style={styles.button}
                         size={24}
-                        color={disableEdit ? color.text._600 : color.text._100}
+                        color={disableEdit ? color.text._600 : color.text._300}
                     />
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -144,7 +144,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                             name="playcircleo"
                             style={styles.button}
                             size={24}
-                            color={disable ? color.text._600 : color.text._100}
+                            color={disable ? color.text._600 : color.text._300}
                         />
                     </TouchableOpacity>
                 )}
@@ -182,6 +182,8 @@ const useStyles = () => {
         },
 
         tagContainer: {
+            columnGap: 4,
+            rowGap: 4,
             paddingTop: spacing.m,
             paddingBottom: spacing.m,
             flexDirection: 'row',
@@ -191,11 +193,11 @@ const useStyles = () => {
 
         tag: {
             borderRadius: borderRadius.m,
-            borderColor: color.neutral._400,
+            borderColor: color.primary._300,
             borderWidth: 1,
             paddingHorizontal: spacing.m,
             paddingVertical: spacing.s,
-            color: color.text._400,
+            color: color.text._300,
         },
         title: {
             fontSize: fontSize.l,

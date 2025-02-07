@@ -46,7 +46,7 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
                     style,
                 ]}
                 placeholder="----"
-                placeholderTextColor={color.text._700}
+                placeholderTextColor={color.text._500}
                 {...rest}
             />
         </View>

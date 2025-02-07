@@ -94,12 +94,12 @@ const ChatMenu = () => {
             }}>
             {showChats && (
                 <Animated.View entering={ZoomIn}>
-                    <Ionicons name="close" size={28} color={color.text._100} />
+                    <Ionicons name="close" size={28} color={color.text._300} />
                 </Animated.View>
             )}
             {!showChats && (
                 <Animated.View entering={ZoomIn}>
-                    <Ionicons name="chatbox" size={28} color={color.text._100} />
+                    <Ionicons name="chatbox" size={28} color={color.text._300} />
                 </Animated.View>
             )}
         </Pressable>
@@ -112,13 +112,13 @@ const ChatMenu = () => {
             }}>
             {showDrawer && (
                 <Animated.View entering={ZoomIn}>
-                    <Ionicons name="close" size={28} color={color.text._100} />
+                    <Ionicons name="close" size={28} color={color.text._300} />
                 </Animated.View>
             )}
 
             {!showDrawer && (
                 <Animated.View entering={ZoomIn}>
-                    <Ionicons name="menu" size={28} color={color.text._100} />
+                    <Ionicons name="menu" size={28} color={color.text._300} />
                 </Animated.View>
             )}
         </Pressable>

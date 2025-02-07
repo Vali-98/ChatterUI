@@ -76,7 +76,7 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                 },
                 labelStyle: {
                     textAlign: 'center',
-                    color: theme.color.text._300,
+                    color: theme.color.text._200,
                 },
             }
         case 'critical':
