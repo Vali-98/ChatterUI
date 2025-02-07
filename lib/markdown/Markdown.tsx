@@ -178,7 +178,7 @@ export namespace MarkdownStyle {
                 color: color.text._400,
                 borderWidth: 1,
                 borderColor: color.neutral._300,
-                backgroundColor: color.neutral._200,
+                backgroundColor: color.neutral._300,
                 paddingHorizontal: spacing.l,
                 paddingVertical: spacing.m,
                 marginVertical: spacing.m,
