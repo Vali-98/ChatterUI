@@ -34,6 +34,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
     }
 
     const updateHeight = () => {
+        if (firstRender.current) return
         const oveflowPadding = 12
         const showPadding = nowGenerating && buffer !== ''
 
@@ -49,11 +50,12 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
 
     useEffect(() => {
         if (firstRender.current) {
-            firstRender.current = false
-            return
+            return () => {
+                firstRender.current = false
+            }
         }
         requestAnimationFrame(() => updateHeight())
-    }, [buffer, swipeText, nowGenerating])
+    }, [nowGenerating])
 
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>

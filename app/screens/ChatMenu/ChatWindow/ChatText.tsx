@@ -30,6 +30,7 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
     }
 
     const updateHeight = () => {
+        if (firstRender.current) return
         if (viewRef.current) {
             viewRef.current.measure((x, y, width, measuredHeight) => {
                 if (targetHeight.current === measuredHeight) return
@@ -41,10 +42,11 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
 
     useEffect(() => {
         if (firstRender.current) {
-            firstRender.current = false
-            return
+            return () => {
+                firstRender.current = false
+            }
         }
-        requestAnimationFrame(() => updateHeight())
+        // requestAnimationFrame(() => updateHeight())
     }, [swipeText])
 
     return (

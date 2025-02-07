@@ -141,10 +141,9 @@ export namespace MarkdownStyle {
 
             // Code
             code_inline: {
-                borderWidth: 1,
-                borderColor: color.neutral._100,
                 backgroundColor: color.neutral._200,
-                padding: spacing.m,
+                paddingHorizontal: spacing.m,
+                flex: 1,
                 borderRadius: 4,
                 ...Platform.select({
                     ios: {
@@ -245,7 +244,7 @@ export namespace MarkdownStyle {
                 justifyContent: 'flex-start',
                 width: '100%',
                 color: color.text._100,
-                marginBottom: spacing.m,
+                marginVertical: spacing.sm,
             },
 
             hardbreak: {
