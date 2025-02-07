@@ -26,6 +26,7 @@ export enum SamplerID {
     PRESENCE_PENALTY = 'presence_pen',
     DO_SAMPLE = 'do_sample',
     EARLY_STOPPING = 'early_stopping',
+    INCLUDE_REASONING = 'include_reasoning',
     ADD_BOS_TOKEN = 'add_bos_token',
     BAN_EOS_TOKEN = 'ban_eos_token',
     //TRUNCATION_LENGTH = 'truncation_length',
@@ -470,6 +471,16 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             default: 0,
             step: 0.01,
             precision: 2,
+        },
+    },
+    [SamplerID.INCLUDE_REASONING]: {
+        internalID: SamplerID.INCLUDE_REASONING,
+        friendlyName: 'Include Reasoning',
+        inputType: 'checkbox',
+        macro: '{{include_reasoning}}',
+        values: {
+            type: 'boolean',
+            default: false,
         },
     },
     [SamplerID.BAN_EOS_TOKEN]: {

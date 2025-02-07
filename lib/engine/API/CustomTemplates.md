@@ -116,6 +116,7 @@ Below is an explanation of what each field does:
 | Mirostat Mode              |    mirostat_mode     |     {{miro_mode}}      |
 | Mirostat Tau               |     mirostat_tau     |      {{miro_tau}}      |
 | Mirostat Eta               |     mirostat_eta     |      {{miro_eta}}      |
+| Include Reasoning          |  include_reasoning   | {{include_reasoning}}  |
 | Ban EOS tokens             |    ban_eos_token     |      {{ban_eos}}       |
 | Add BOS Token              |    add_bos_token     |      {{add_bos}}       |
 | Do Sample                  |      do_sample       |     {{do_sample}}      |
