@@ -45,14 +45,18 @@ module.exports = function thinkPlugin(md) {
         const openTagStart = line.indexOf('<think')
         const openTagEnd = line.indexOf('>', openTagStart)
         if (openTagStart !== -1 && openTagEnd !== -1) {
-            const inlineContent = line.slice(openTagEnd + 1)
+            let inlineContent = line.slice(openTagEnd + 1)
             if (inlineContent.trim().length) {
+                if (inlineContent.includes('</think>')) {
+                    inlineContent = inlineContent.replace('</think>', '')
+                    hasCloseTag = true
+                }
                 contentLines.push(inlineContent)
             }
         }
 
         // Accumulate until </think> is reached
-        while (nextLine < endLine) {
+        while (!hasCloseTag && nextLine < endLine) {
             pos = state.bMarks[nextLine] + state.tShift[nextLine]
             max = state.eMarks[nextLine]
             line = state.src.slice(pos, max).trim()
