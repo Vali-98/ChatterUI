@@ -126,4 +126,8 @@ const paths_dev: ButtonData[] = [
         name: '[DEV] ColorTest',
         path: '/ColorTest',
     },
+    {
+        name: '[DEV] Markdown',
+        path: '/screens/MarkdownTest',
+    },
 ]

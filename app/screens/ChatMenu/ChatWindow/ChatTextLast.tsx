@@ -62,6 +62,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
                     <AnimatedEllipsis />
                 )}
                 <Markdown
+                    mergeStyle={false}
                     markdownit={MarkdownStyle.Rules}
                     rules={MarkdownStyle.RenderRules}
                     style={markdownStyle}>

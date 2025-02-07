@@ -22,7 +22,7 @@ export namespace MarkdownStyle {
                 <Accordion
                     key={node.key}
                     label={node.sourceInfo ? 'Thought Process' : 'Thinking...'}
-                    style={{ flex: 1, paddingVertical: 2 }}>
+                    style={{ flex: 1, marginBottom: 8 }}>
                     {children}
                 </Accordion>
             )
@@ -30,7 +30,7 @@ export namespace MarkdownStyle {
     }
 
     export const useMarkdownStyle = () => {
-        const { color, spacing, borderWidth, borderRadius } = Theme.useTheme()
+        const { color, spacing, borderRadius } = Theme.useTheme()
 
         return StyleSheet.create({
             double_quote: { color: color.quote },
@@ -42,31 +42,37 @@ export namespace MarkdownStyle {
                 flexDirection: 'row',
                 fontSize: 32,
                 color: color.text._100,
+                fontWeight: '500',
             },
             heading2: {
                 flexDirection: 'row',
                 fontSize: 24,
                 color: color.text._100,
+                fontWeight: '500',
             },
             heading3: {
                 flexDirection: 'row',
                 fontSize: 18,
                 color: color.text._100,
+                fontWeight: '500',
             },
             heading4: {
                 flexDirection: 'row',
                 fontSize: 16,
                 color: color.text._100,
+                fontWeight: '500',
             },
             heading5: {
                 flexDirection: 'row',
                 fontSize: 13,
                 color: color.text._100,
+                fontWeight: '500',
             },
             heading6: {
                 flexDirection: 'row',
                 fontSize: 11,
                 color: color.text._100,
+                fontWeight: '500',
             },
 
             // Horizontal Rule
@@ -168,9 +174,12 @@ export namespace MarkdownStyle {
             fence: {
                 color: color.text._400,
                 borderWidth: 1,
-                borderColor: color.neutral._100,
+                borderColor: color.neutral._300,
                 backgroundColor: color.neutral._200,
-                borderRadius: 4,
+                paddingHorizontal: spacing.l,
+                paddingVertical: spacing.m,
+                marginVertical: spacing.m,
+                borderRadius: borderRadius.m,
                 ...Platform.select({
                     ios: {
                         fontFamily: 'Courier',
@@ -179,15 +188,15 @@ export namespace MarkdownStyle {
                         fontFamily: 'monospace',
                     },
                 }),
-                marginVertical: 4,
             },
 
             // Tables
             table: {
                 borderWidth: 1,
-                borderColor: color.primary._500,
-                borderRadius: 4,
-                marginBottom: 8,
+                borderColor: color.primary._200,
+                borderRadius: borderRadius.m,
+                marginBottom: spacing.m,
+                overflow: 'hidden',
             },
             thead: {
                 backgroundColor: color.neutral._100,
@@ -230,15 +239,15 @@ export namespace MarkdownStyle {
                 color: color.text._100,
             },
             paragraph: {
-                marginTop: 8,
-                marginBottom: 8,
                 flexWrap: 'wrap',
                 flexDirection: 'row',
                 alignItems: 'flex-start',
                 justifyContent: 'flex-start',
                 width: '100%',
                 color: color.text._100,
+                marginBottom: spacing.m,
             },
+
             hardbreak: {
                 width: '100%',
                 height: 1,

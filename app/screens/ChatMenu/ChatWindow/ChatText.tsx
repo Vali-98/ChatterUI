@@ -51,6 +51,7 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
             <View style={{ minHeight: 10 }} ref={viewRef} onLayout={() => updateHeight()}>
                 <Markdown
+                    mergeStyle={false}
                     markdownit={MarkdownStyle.Rules}
                     rules={MarkdownStyle.RenderRules}
                     style={markdownStyle}>
