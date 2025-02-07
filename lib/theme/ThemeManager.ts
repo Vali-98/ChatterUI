@@ -18,7 +18,7 @@ export namespace Theme {
     export const useColorState = create<ColorStateProps>()(
         persist(
             (set, get) => ({
-                color: DefaultColorSchemes.navyBlueDark,
+                color: DefaultColorSchemes.lavenderDark,
                 setColor: (color) => {
                     set((state) => ({ ...state, color: color }))
                 },
@@ -27,6 +27,7 @@ export namespace Theme {
                 name: 'colorscheme-storage',
                 storage: createJSONStorage(() => mmkvStorage),
                 version: 1,
+                partialize: (state) => ({ color: state.color }),
             }
         )
     )

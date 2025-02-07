@@ -23,7 +23,7 @@ export interface ColorScheme {
 }
 
 export namespace DefaultColorSchemes {
-    export const navyBlueDark: ColorScheme = {
+    export const lavenderDark: ColorScheme = {
         name: 'NavyBlueDark',
         primary: {
             _100: '#2a254d',
@@ -167,7 +167,7 @@ export namespace DefaultColorSchemes {
         shadow: '#000000',
     }
 
-    export const navyBlueLight: ColorScheme = {
+    export const lavenderLight: ColorScheme = {
         name: 'NavyBlueLight',
         primary: {
             _100: '#e8e6ff',
@@ -192,15 +192,15 @@ export namespace DefaultColorSchemes {
             _900: '#2e387b',
         },
         neutral: {
-            _100: '#f0e6f8',
-            _200: '#dccbf0',
-            _300: '#c3a8e0',
-            _400: '#ad89d0',
-            _500: '#976bbf',
-            _600: '#7a5299',
-            _700: '#62407a',
-            _800: '#482f5a',
-            _900: '#2e1c3a',
+            _100: '#EDEAF4', // Lightest - subtle lavender off-white
+            _200: '#D8D4E6',
+            _300: '#C4BED8',
+            _400: '#B0A8CA',
+            _500: '#9C92BB', // Midpoint - neutral gray with a lavender undertone
+            _600: '#7D759A',
+            _700: '#5E5878',
+            _800: '#3F3B55',
+            _900: '#211F33',
         },
         warning: {
             _100: '#fff5e6',

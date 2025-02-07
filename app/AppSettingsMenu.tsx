@@ -16,6 +16,8 @@ import React from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
+import DarkModeSwitch from './DarkModeSwitch'
+
 const appVersion = appConfig.expo.version
 
 const exportDB = async (notify: boolean = true) => {
@@ -98,14 +100,14 @@ const AppSettingsMenu = () => {
             <HeaderTitle title="Settings" />
 
             <SectionTitle>Style</SectionTitle>
-            <ThemedButton
+            {/*<ThemedButton
                 label="Customize Colors"
                 variant="secondary"
                 onPress={() => {
                     router.push('/ColorSettings')
                 }}
-            />
-
+            />*/}
+            <DarkModeSwitch />
             <SectionTitle>Chat</SectionTitle>
 
             <ThemedSwitch
