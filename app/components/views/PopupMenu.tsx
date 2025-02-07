@@ -109,7 +109,7 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
                 {icon && (
                     <AntDesign
                         style={style}
-                        color={showMenu ? color.text._700 : color.text._300}
+                        color={showMenu ? color.text._500 : color.primary._900}
                         name={icon}
                         size={iconSize}
                     />

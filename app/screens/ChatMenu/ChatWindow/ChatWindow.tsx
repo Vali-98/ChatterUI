@@ -1,5 +1,5 @@
 import { AppSettings, Chats } from '@lib/utils/Global'
-import { FlatList, StyleSheet, View } from 'react-native'
+import { FlatList } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 import ChatItem from './ChatItem'
@@ -35,30 +35,19 @@ const ChatWindow = () => {
     }
 
     return (
-        <View style={styles.chatHistory}>
-            <View style={styles.chatHistory}>
-                <FlatList
-                    style={styles.chatHistory}
-                    maintainVisibleContentPosition={
-                        autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
-                    }
-                    keyboardShouldPersistTaps="handled"
-                    removeClippedSubviews={false}
-                    inverted
-                    windowSize={2}
-                    data={list}
-                    keyExtractor={(item) => item.key}
-                    renderItem={renderItems}
-                />
-            </View>
-        </View>
+        <FlatList
+            maintainVisibleContentPosition={
+                autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
+            }
+            keyboardShouldPersistTaps="handled"
+            removeClippedSubviews={false}
+            inverted
+            windowSize={2}
+            data={list}
+            keyExtractor={(item) => item.key}
+            renderItem={renderItems}
+        />
     )
 }
 
 export default ChatWindow
-
-const styles = StyleSheet.create({
-    chatHistory: {
-        flex: 1,
-    },
-})

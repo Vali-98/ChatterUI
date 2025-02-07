@@ -50,7 +50,7 @@ const ChatInput = () => {
                     color: color.text._100,
                     backgroundColor: color.neutral._100,
                     flex: 1,
-                    borderWidth: 1,
+                    borderWidth: 2,
                     borderColor: color.primary._300,
                     borderRadius: borderRadius.l,
                     paddingHorizontal: spacing.xl,

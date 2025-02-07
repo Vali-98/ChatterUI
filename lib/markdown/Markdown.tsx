@@ -22,7 +22,11 @@ export namespace MarkdownStyle {
                 <Accordion
                     key={node.key}
                     label={node.sourceInfo ? 'Thought Process' : 'Thinking...'}
-                    style={{ flex: 1, marginBottom: 8 }}>
+                    style={{
+                        flex: 1,
+                        marginBottom: 8,
+                        elevation: 8,
+                    }}>
                     {children}
                 </Accordion>
             )
