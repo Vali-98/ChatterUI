@@ -98,18 +98,13 @@ const AppSettingsMenu = () => {
             <HeaderTitle title="Settings" />
 
             <SectionTitle>Style</SectionTitle>
-            {/*<ThemedButton
-                label="Customize Colors"
-                variant="secondary"
-                onPress={() => {
-                    router.push('/ColorSettings')
-                }}
-            />*/}
+
             <ThemedButton
-                label="Color Settings"
+                label="Change Theme"
                 variant="secondary"
                 onPress={() => router.push('/ColorSelector')}
             />
+
             <SectionTitle>Chat</SectionTitle>
 
             <ThemedSwitch

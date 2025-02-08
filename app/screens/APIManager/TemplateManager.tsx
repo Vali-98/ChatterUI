@@ -6,7 +6,7 @@ import { Logger } from '@lib/utils/Global'
 import { getDocumentAsync } from 'expo-document-picker'
 import { readAsStringAsync } from 'expo-file-system'
 import { Stack } from 'expo-router'
-import { FlatList, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Text, View } from 'react-native'
 
 import TemplateItem from './TemplateItem'
 

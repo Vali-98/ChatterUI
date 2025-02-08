@@ -1,4 +1,8 @@
 import { DownloadDirectoryPath, writeFile } from 'cui-fs'
+import { getDocumentAsync } from 'expo-document-picker'
+import { readAsStringAsync } from 'expo-file-system'
+
+import { Logger } from '../state/Logger'
 
 /**
  *
@@ -13,6 +17,44 @@ export const saveStringToDownload = async (
 ) => {
     if (encoding === 'utf8') data = btoa(data)
     await writeFile(`${DownloadDirectoryPath}/${filename}`, data, { encoding: encoding })
+}
+
+type PickerResult = { success: false } | { success: true; data: string }
+
+type JSONPickerResult = { success: false } | { success: true; data: any }
+
+export const pickJSONDocument = async (multiple: boolean = false): Promise<JSONPickerResult> => {
+    const result = await pickStringDocument({ type: 'application/json', multiple: multiple })
+    if (!result.success) return result
+    try {
+        const jsonData = JSON.parse(result.data)
+        return { success: true, data: jsonData }
+    } catch {
+        return { success: false }
+    }
+}
+
+export const pickStringDocument = async ({
+    multiple = false,
+    encoding = 'utf8',
+    type = '*/*',
+}: {
+    multiple?: boolean
+    encoding?: 'utf8' | 'base64'
+    type?: string
+} = {}): Promise<PickerResult> => {
+    const result = await getDocumentAsync({ type: type })
+    if (result.canceled) {
+        return { success: false }
+    }
+    const uri = result.assets[0].uri
+    const data = await readAsStringAsync(uri, { encoding: encoding }).catch((e) => {
+        Logger.log(`Failed to read file: ${e}`)
+    })
+    if (!data) {
+        return { success: false }
+    }
+    return { success: true, data: data }
 }
 
 const gb = 1000 ** 3

@@ -1,29 +1,37 @@
-export interface ColorGradient {
-    _100: string
-    _200: string
-    _300: string
-    _400: string
-    _500: string
-    _600: string
-    _700: string
-    _800: string
-    _900: string
-}
+import { z } from 'zod'
 
-export interface ColorScheme {
-    name: string
-    primary: ColorGradient
-    accent: ColorGradient
-    neutral: ColorGradient
-    warning: ColorGradient
-    error: ColorGradient
-    text: ColorGradient
-    quote: string
-    shadow: string
-}
+const hexColorSchema = z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/, {
+    message: 'Invalid color format. Use #RGB or #RRGGBB.',
+})
+
+const colorGradientSchema = z.object({
+    _100: hexColorSchema,
+    _200: hexColorSchema,
+    _300: hexColorSchema,
+    _400: hexColorSchema,
+    _500: hexColorSchema,
+    _600: hexColorSchema,
+    _700: hexColorSchema,
+    _800: hexColorSchema,
+    _900: hexColorSchema,
+})
+
+export const themeColorSchemaV1 = z.object({
+    version: z.number().int(),
+    name: z.string(),
+    quote: hexColorSchema,
+    shadow: hexColorSchema,
+    primary: colorGradientSchema,
+    neutral: colorGradientSchema,
+    error: colorGradientSchema,
+    text: colorGradientSchema,
+})
+
+export type ThemeColor = z.infer<typeof themeColorSchemaV1>
 
 export namespace DefaultColorSchemes {
-    export const lavenderDark: ColorScheme = {
+    export const lavenderDark: ThemeColor = {
+        version: 1,
         name: 'Lavender Dark',
         primary: {
             _100: '#2a254d',
@@ -36,17 +44,6 @@ export namespace DefaultColorSchemes {
             _800: '#b9a7db',
             _900: '#eeddff',
         },
-        accent: {
-            _100: '#1a1c33',
-            _200: '#292d52',
-            _300: '#383e71',
-            _400: '#474f90',
-            _500: '#5660af',
-            _600: '#6e78c6',
-            _700: '#8690dd',
-            _800: '#9ea8f4',
-            _900: '#b6c0ff',
-        },
         neutral: {
             _100: '#121018',
             _200: '#26222E',
@@ -57,17 +54,6 @@ export namespace DefaultColorSchemes {
             _700: '#908CAC',
             _800: '#AAA6CA',
             _900: '#C4C0E8',
-        },
-        warning: {
-            _100: '#ffe6cc',
-            _200: '#e6c099',
-            _300: '#cca866',
-            _400: '#b39033',
-            _500: '#997800',
-            _600: '#806000',
-            _700: '#664800',
-            _800: '#4d3600',
-            _900: '#332400',
         },
         error: {
             _100: '#ff8080',
@@ -95,7 +81,8 @@ export namespace DefaultColorSchemes {
         shadow: '#000000',
     }
 
-    export const lavenderLight: ColorScheme = {
+    export const lavenderLight: ThemeColor = {
+        version: 1,
         name: 'Lavender Light',
         primary: {
             _100: '#e8e6ff',
@@ -108,17 +95,6 @@ export namespace DefaultColorSchemes {
             _800: '#3e2fb3',
             _900: '#271a99',
         },
-        accent: {
-            _100: '#f2f4ff',
-            _200: '#d9dcff',
-            _300: '#c0c4ff',
-            _400: '#a7acff',
-            _500: '#8e94ff',
-            _600: '#767dde',
-            _700: '#5e66bd',
-            _800: '#464f9c',
-            _900: '#2e387b',
-        },
         neutral: {
             _100: '#F5F2FA',
             _200: '#EDEAF4',
@@ -129,31 +105,6 @@ export namespace DefaultColorSchemes {
             _700: '#7D759A',
             _800: '#5E5878',
             _900: '#3F3B55',
-        },
-        /**
-         * consider:
-        neutral: {
-            _100: '#EDEAF4',
-            _200: '#D8D4E6',
-            _300: '#C4BED8',
-            _400: '#B0A8CA',
-            _500: '#9C92BB',
-            _600: '#7D759A',
-            _700: '#5E5878',
-            _800: '#3F3B55',
-            _900: '#211F33',
-        },
-         */
-        warning: {
-            _100: '#fff5e6',
-            _200: '#ffe0b3',
-            _300: '#ffcc80',
-            _400: '#ffb84d',
-            _500: '#ffa31a',
-            _600: '#e68f00',
-            _700: '#cc7a00',
-            _800: '#b36600',
-            _900: '#995200',
         },
         error: {
             _100: '#f2d6d6',
@@ -181,7 +132,8 @@ export namespace DefaultColorSchemes {
         shadow: '#000000',
     }
 
-    export const amoled: ColorScheme = {
+    export const amoled: ThemeColor = {
+        version: 1,
         name: 'AMOLED Black & White',
         primary: {
             _100: '#333333',
@@ -194,17 +146,6 @@ export namespace DefaultColorSchemes {
             _800: '#e6e6e6',
             _900: '#ffffff',
         },
-        accent: {
-            _100: '#ffffff',
-            _200: '#e6e6e6',
-            _300: '#cccccc',
-            _400: '#b3b3b3',
-            _500: '#999999',
-            _600: '#808080',
-            _700: '#666666',
-            _800: '#4d4d4d',
-            _900: '#333333',
-        },
         neutral: {
             _100: '#000000',
             _200: '#0a0a0a',
@@ -215,17 +156,6 @@ export namespace DefaultColorSchemes {
             _700: '#3c3c3c',
             _800: '#464646',
             _900: '#505050',
-        },
-        warning: {
-            _100: '#ffffff',
-            _200: '#e6e6e6',
-            _300: '#cccccc',
-            _400: '#b3b3b3',
-            _500: '#999999',
-            _600: '#808080',
-            _700: '#666666',
-            _800: '#4d4d4d',
-            _900: '#333333',
         },
         error: {
             _100: '#ffffff',
@@ -253,7 +183,8 @@ export namespace DefaultColorSchemes {
         shadow: '#ffffff',
     }
 
-    export const navyDark: ColorScheme = {
+    export const navyDark: ThemeColor = {
+        version: 1,
         name: 'Navy Dark',
         primary: {
             _100: '#101a2d',
@@ -266,17 +197,6 @@ export namespace DefaultColorSchemes {
             _800: '#3974cc',
             _900: '#4188e3',
         },
-        accent: {
-            _100: '#1c2233',
-            _200: '#2d3552',
-            _300: '#3e4871',
-            _400: '#4f5b90',
-            _500: '#6070af',
-            _600: '#7888c6',
-            _700: '#909fdd',
-            _800: '#a8b6f4',
-            _900: '#c0ceff',
-        },
         neutral: {
             _100: '#0e1218',
             _200: '#1b1f2e',
@@ -287,17 +207,6 @@ export namespace DefaultColorSchemes {
             _700: '#8892b0',
             _800: '#a4aecf',
             _900: '#c0cbea',
-        },
-        warning: {
-            _100: '#ffe6cc',
-            _200: '#e6c099',
-            _300: '#cca866',
-            _400: '#b39033',
-            _500: '#997800',
-            _600: '#806000',
-            _700: '#664800',
-            _800: '#4d3600',
-            _900: '#332400',
         },
         error: {
             _100: '#ff8080',
@@ -324,8 +233,10 @@ export namespace DefaultColorSchemes {
         quote: '#e6a317',
         shadow: '#000000',
     }
-    export const hotPink: ColorScheme = {
-        name: 'Hot Pink',
+
+    export const hotPink: ThemeColor = {
+        version: 1,
+        name: 'Pink',
         primary: {
             _100: '#ffb3c9',
             _200: '#ff99b3',
@@ -337,17 +248,6 @@ export namespace DefaultColorSchemes {
             _800: '#804059',
             _900: '#66334b',
         },
-        accent: {
-            _100: '#ffe6f0',
-            _200: '#ffccd9',
-            _300: '#ffb3c2',
-            _400: '#ff99ab',
-            _500: '#ff8094',
-            _600: '#e67383',
-            _700: '#cc6672',
-            _800: '#b35961',
-            _900: '#994c50',
-        },
         neutral: {
             _100: '#ffe6eb',
             _200: '#ffccd6',
@@ -358,17 +258,6 @@ export namespace DefaultColorSchemes {
             _700: '#cc6673',
             _800: '#b35961',
             _900: '#994c4f',
-        },
-        warning: {
-            _100: '#ffe6cc',
-            _200: '#e6c099',
-            _300: '#cca866',
-            _400: '#b39033',
-            _500: '#997800',
-            _600: '#806000',
-            _700: '#664800',
-            _800: '#4d3600',
-            _900: '#332400',
         },
         error: {
             _100: '#ff8080',
@@ -396,7 +285,8 @@ export namespace DefaultColorSchemes {
         shadow: '#000000',
     }
 
-    export const retroGreen: ColorScheme = {
+    export const retroGreen: ThemeColor = {
+        version: 1,
         name: 'Retro Green',
         primary: {
             _100: '#38582a',
@@ -409,17 +299,6 @@ export namespace DefaultColorSchemes {
             _800: '#a8c893',
             _900: '#b8d8a2',
         },
-        accent: {
-            _100: '#c0ffa0',
-            _200: '#b0e690',
-            _300: '#a0cc80',
-            _400: '#90b370',
-            _500: '#809a60',
-            _600: '#708050',
-            _700: '#606640',
-            _800: '#505030',
-            _900: '#404020',
-        },
         neutral: {
             _100: '#101010',
             _200: '#181818',
@@ -430,17 +309,6 @@ export namespace DefaultColorSchemes {
             _700: '#404040',
             _800: '#484848',
             _900: '#505050',
-        },
-        warning: {
-            _100: '#ffe6cc',
-            _200: '#e6c099',
-            _300: '#cca866',
-            _400: '#b39033',
-            _500: '#997800',
-            _600: '#806000',
-            _700: '#664800',
-            _800: '#4d3600',
-            _900: '#332400',
         },
         error: {
             _100: '#ff8080',

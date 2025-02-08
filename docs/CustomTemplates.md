@@ -2,9 +2,9 @@
 
 This is a guide to adding custom API Configurations to ChatterUI.
 
-To add a custom API template, create a json file containing a configuration, such as [example.json](https://github.com/Vali-98/ChatterUI/blob/master/constants/API/example.json)
+To add a custom API template, create a json file containing a configuration, such as [exampleTemplate.json](https://github.com/Vali-98/ChatterUI/blob/master/docs/exampleTemplate.json)
 
-The Typescript definition can be found in [APIBuilder.types.ts](https://github.com/Vali-98/ChatterUI/blob/master/constants/API/APIBuilder.types.ts)
+The Typescript definition can be found in [APIBuilder.types.ts](https://github.com/Vali-98/ChatterUI/blob/master/lib/engine/API/APIBuilder.types.ts)
 
 To create your own API configuration, create a JSON that matches the Typescript spec above (or just use example.json as a template)
 
@@ -41,7 +41,7 @@ Below is an explanation of what each field does:
     -   `promptKey: string` - The key of the prompt value
         -   For example, if defined as "messages", the prompt will be added as `"messages" : <prompt>`
     -   `completionType` - currently supports ChatCompletions and TextCompletions
-        -   Refer to [ContextBuilder.ts](https://github.com/Vali-98/ChatterUI/blob/master/constants/API/ContextBuilder.ts) to see how the prompts are built.
+        -   Refer to [ContextBuilder.ts](https://github.com/Vali-98/ChatterUI/blob/master/lib/engine/API/ContextBuilder.ts) to see how the prompts are built.
         -   `type: chatCompletions` - Though the fields below can be customized, most APIs use the same values as OpenAI
             -   `userRole: string` - the name of the [USER] role
             -   `systemRole: string` the name of the [SYSTEM] role
@@ -52,7 +52,7 @@ Below is an explanation of what each field does:
     -   `authPrefix: 'Bearer ' | string` - A prefix before the API key value in the authorization header
     -   `removeLength: boolean` - when `max_length` is defined as a sampler, it can be used for controlling context size client-side, even if the API used doesn't support it. This allows you to remove the `max_length` field from the final request body in case the API used does not allow unsupported fields.
     -   `removeSeedifNegative?: boolean` - Some APIs only allow seed values of at least 0, and prefer an undefined seed for random seed values. This will remove the seed value if it is `-1` from the final request body.
--   `APIPayloadFormat` - Refer to [RequestBuilder.ts](https://github.com/Vali-98/ChatterUI/blob/master/constants/API/RequestBuilder.ts) for how the request body is constructed
+-   `APIPayloadFormat` - Refer to [RequestBuilder.ts](https://github.com/Vali-98/ChatterUI/blob/master/lib/engine/API/RequestBuilder.ts) for how the request body is constructed
     -   `type: 'openai' | 'ollama' | 'cohere' | 'horde'`
         -   openai - This is the general case request body type, that simply throws all the fields into the base object
         -   ollama - This wraps the samplers and stop sequence in an `options` object

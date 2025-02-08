@@ -159,7 +159,6 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
                     justifyContent: 'center',
                     alignItems: 'center',
                     opacity: animOpacity,
-                    transform: [{ scaleX: 0.99 }],
                 },
                 buttonStyle,
             ])}>

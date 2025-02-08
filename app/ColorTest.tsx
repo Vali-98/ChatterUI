@@ -1,4 +1,3 @@
-import { ColorScheme } from '@lib/theme/ThemeColor'
 import { Theme } from '@lib/theme/ThemeManager'
 import React from 'react'
 import { Text, View } from 'react-native'

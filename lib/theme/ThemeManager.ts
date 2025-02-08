@@ -1,13 +1,17 @@
+import { Logger } from '@lib/state/Logger'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import { setBackgroundColorAsync } from 'expo-system-ui'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-import { ColorScheme, DefaultColorSchemes } from './ThemeColor'
+import { ThemeColor, DefaultColorSchemes, themeColorSchemaV1 } from './ThemeColor'
 
 interface ColorStateProps {
-    color: ColorScheme
-    setColor: (colorScheme: ColorScheme) => void
+    customColors: ThemeColor[]
+    addCustomColor: (colorScheme: ThemeColor) => void
+    removeColorScheme: (index: number) => void
+    color: ThemeColor
+    setColor: (colorScheme: ThemeColor) => void
 }
 
 export const useGlobalStyles = () => {
@@ -24,12 +28,51 @@ export namespace Theme {
                     setBackgroundColorAsync(color.neutral._100)
                     set((state) => ({ ...state, color: color }))
                 },
+                customColors: [],
+                addCustomColor: (colorScheme: ThemeColor) => {
+                    const validation = themeColorSchemaV1.safeParse(colorScheme)
+
+                    if (!validation.success) {
+                        Logger.log(`Schema validation failed!`, true)
+                        Logger.log(
+                            'The format of the imported JSON does not match the required color scheme:\n' +
+                                validation.error.issues
+                                    .map((issue) => `${issue.path.join('.')} - ${issue.message}`)
+                                    .join('\n')
+                        )
+                        return
+                    }
+
+                    if (
+                        get().customColors.some((item) => item.name === colorScheme.name) ||
+                        DefaultColorSchemes.schemes.some((item) => item.name === colorScheme.name)
+                    ) {
+                        Logger.log('Color Name Already Used')
+                        return
+                    }
+                    set((state) => ({
+                        ...state,
+                        customColors: [...get().customColors, colorScheme],
+                    }))
+                    Logger.log(`Successfully imported ${colorScheme.name}`)
+                },
+                removeColorScheme: (index: number) => {
+                    if (index > get().customColors.length) {
+                        return
+                    }
+                    const colors = [...get().customColors]
+                    colors.splice(index, 1)
+                    set((state) => ({
+                        ...state,
+                        customColors: colors,
+                    }))
+                },
             }),
             {
                 name: 'colorscheme-storage',
                 storage: createJSONStorage(() => mmkvStorage),
                 version: 1,
-                partialize: (state) => ({ color: state.color }),
+                partialize: (state) => ({ color: state.color, customColors: state.customColors }),
             }
         )
     )
