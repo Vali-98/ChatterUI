@@ -226,6 +226,8 @@ export const useDropdownStyles = () => {
             borderRadius: borderRadius.m,
             padding: spacing.l,
             backgroundColor: color.neutral._200,
+            color: color.text._100,
+            textAlignVertical: 'center',
         },
 
         counterText: {
