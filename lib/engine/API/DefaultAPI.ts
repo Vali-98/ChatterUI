@@ -448,6 +448,7 @@ export const defaultTemplates: APIConfiguration[] = [
                 { externalName: 'max_context_length', samplerID: SamplerID.CONTEXT_LENGTH },
                 { externalName: 'max_tokens', samplerID: SamplerID.GENERATED_LENGTH },
                 { externalName: 'include_reasoning', samplerID: SamplerID.INCLUDE_REASONING },
+                { externalName: 'stream', samplerID: SamplerID.STREAMING },
                 { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
                 { externalName: 'presence_penalty', samplerID: SamplerID.PRESENCE_PENALTY },
                 { externalName: 'frequency_penalty', samplerID: SamplerID.FREQUENCY_PENALTY },
