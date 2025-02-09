@@ -146,6 +146,7 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
 
                     {template.features.useKey && (
                         <ThemedTextInput
+                            secureTextEntry
                             label="API Key"
                             value={values.key}
                             onChangeText={(value) => {

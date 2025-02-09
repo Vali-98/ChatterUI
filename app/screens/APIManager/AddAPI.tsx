@@ -128,6 +128,7 @@ const AddAPI = () => {
                 {template.features.useKey && (
                     <ThemedTextInput
                         label="API Key"
+                        secureTextEntry
                         value={values.key}
                         onChangeText={(value) => {
                             setValues({ ...values, key: value })
