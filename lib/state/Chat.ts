@@ -12,7 +12,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { Characters } from './Characters'
 import { Logger } from './Logger'
 import { AppMode, AppSettings, Global } from '../constants/GlobalValues'
-import { Llama } from '../engine/LlamaLocal'
+import { Llama } from '../engine/Local/LlamaLocal'
 import { mmkv } from '../storage/MMKV'
 
 export type ChatSwipe = {

@@ -1,7 +1,7 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import TextBoxModal from '@components/views/TextBoxModal'
+import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Characters } from '@lib/utils/Global'
 import { FlashList } from '@shopify/flash-list'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import React, { useState } from 'react'

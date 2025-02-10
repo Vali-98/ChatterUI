@@ -1,4 +1,4 @@
-import { Logger } from '@lib/utils/Global'
+import { Logger } from '@lib/state/Logger'
 import * as Notifications from 'expo-notifications'
 import { Platform } from 'react-native'
 

@@ -1,4 +1,5 @@
-import { AppSettings, Chats } from '@lib/utils/Global'
+import { AppSettings } from '@lib/constants/GlobalValues'
+import { Chats } from '@lib/state/Chat'
 import { FlatList } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 

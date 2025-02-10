@@ -1,8 +1,15 @@
 import { DownloadDirectoryPath, writeFile } from 'cui-fs'
 import { getDocumentAsync } from 'expo-document-picker'
-import { readAsStringAsync } from 'expo-file-system'
+import { documentDirectory, readAsStringAsync } from 'expo-file-system'
 
 import { Logger } from '../state/Logger'
+
+export const AppDirectory = {
+    ModelPath: `${documentDirectory}models/`,
+    SessionPath: `${documentDirectory}session/`,
+    CharacterPath: `${documentDirectory}characters/`,
+    Assets: `${documentDirectory}appAssets/`,
+}
 
 /**
  *

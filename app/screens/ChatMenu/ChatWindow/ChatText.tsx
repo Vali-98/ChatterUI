@@ -1,4 +1,5 @@
-import { Chats, MarkdownStyle } from '@lib/utils/Global'
+import { MarkdownStyle } from '@lib/markdown/Markdown'
+import { Chats } from '@lib/state/Chat'
 import React, { useEffect, useRef } from 'react'
 import { View, Animated, Easing, useAnimatedValue } from 'react-native'
 import Markdown from 'react-native-markdown-display'

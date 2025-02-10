@@ -1,4 +1,4 @@
-import { Logger } from '@lib/utils/Global'
+import { Logger } from '@lib/state/Logger'
 import { fetch } from 'expo/fetch'
 
 type SSEValues = {

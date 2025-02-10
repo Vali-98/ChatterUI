@@ -3,7 +3,7 @@ import { db } from '@db'
 import { AntDesign } from '@expo/vector-icons'
 import useLocalAuth from '@lib/hooks/LocalAuth'
 import { Theme } from '@lib/theme/ThemeManager'
-import { initializeApp, startupApp } from '@lib/utils/Global'
+import { startupApp } from '@lib/utils/Startup'
 import ChatMenu from '@screens/ChatMenu/ChatMenu'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { SplashScreen } from 'expo-router'
@@ -25,11 +25,9 @@ const Home = () => {
          * Startup Routine:
          * - wait for useMigration success
          * - startupApp() - creates defaults
-         * - initializeApp() - creates default dirs and files
          */
         if (success) {
             startupApp()
-            initializeApp()
             setFirstRender(false)
             SplashScreen.hideAsync()
         }

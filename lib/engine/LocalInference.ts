@@ -10,7 +10,7 @@ import { ModelDataType } from 'db/schema'
 
 import { APISampler } from './API/APIBuilder.types'
 import { buildTextCompletionContext } from './API/ContextBuilder'
-import { Llama, LlamaPreset } from './LlamaLocal'
+import { Llama, LlamaPreset } from './Local/LlamaLocal'
 
 export const localSamplerData: APISampler[] = [
     { externalName: 'n_predict', samplerID: SamplerID.GENERATED_LENGTH },

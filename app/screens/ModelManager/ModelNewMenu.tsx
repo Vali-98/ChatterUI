@@ -1,6 +1,6 @@
 import PopupMenu, { MenuRef } from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
-import { Llama } from '@lib/engine/LlamaLocal'
+import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { useState } from 'react'
 import { View } from 'react-native'
 

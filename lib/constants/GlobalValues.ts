@@ -120,7 +120,6 @@ export enum GenerationSettings {
 export enum AppSettings {
     DevMode = 'devmode',
     DarkMode = 'darkmode',
-    PrimaryHue = 'primaryhue',
     AnimateEditor = 'animateeditor',
     CreateFirstMes = 'createfirstmes',
     ChatOnStartup = 'chatonstartup',
@@ -149,7 +148,7 @@ export enum AppMode {
  * Default settings on first install
  * TODO: Remove primary hue to simply
  */
-export const AppSettingsDefault: Record<AppSettings, boolean | number> = {
+export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.AnimateEditor]: true,
     [AppSettings.AutoLoadLocal]: false,
     [AppSettings.AutoScroll]: true,
@@ -157,7 +156,6 @@ export const AppSettingsDefault: Record<AppSettings, boolean | number> = {
     [AppSettings.CreateFirstMes]: true,
     [AppSettings.DarkMode]: true,
     [AppSettings.DevMode]: false,
-    [AppSettings.PrimaryHue]: 240,
     [AppSettings.SendOnEnter]: false,
     [AppSettings.SaveLocalKV]: false,
     [AppSettings.PrintContext]: false,

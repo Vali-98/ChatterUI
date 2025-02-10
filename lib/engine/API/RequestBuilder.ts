@@ -1,6 +1,6 @@
 import { SamplerID, Samplers } from '@lib/constants/SamplerData'
+import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
-import { Instructs } from '@lib/utils/Global'
 
 import { APIConfiguration, APISampler, APIValues } from './APIBuilder.types'
 import { buildChatCompletionContext, buildTextCompletionContext } from './ContextBuilder'

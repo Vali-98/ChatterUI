@@ -1,5 +1,5 @@
+import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Chats } from '@lib/utils/Global'
 import React, { useState } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 

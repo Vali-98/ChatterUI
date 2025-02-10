@@ -1,7 +1,7 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import FadeBackrop from '@components/views/FadeBackdrop'
+import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Chats } from '@lib/utils/Global'
 import React, { useState } from 'react'
 import { GestureResponderEvent, Modal, StyleSheet, Text, TextInput, View } from 'react-native'
 import Animated, { SlideOutDown } from 'react-native-reanimated'

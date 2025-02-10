@@ -1,5 +1,5 @@
 import { db } from '@db'
-import { readableFileSize } from '@lib/utils/File'
+import { AppDirectory, readableFileSize } from '@lib/utils/File'
 import { CompletionParams, ContextParams, initLlama, LlamaContext } from 'cui-llama.rn'
 import { model_data, ModelDataType } from 'db/schema'
 import { eq } from 'drizzle-orm'
@@ -7,9 +7,10 @@ import { getDocumentAsync } from 'expo-document-picker'
 import * as FS from 'expo-file-system'
 import { create } from 'zustand'
 
-import { AppSettings, Global } from '../constants/GlobalValues'
-import { Logger } from '../state/Logger'
-import { mmkv } from '../storage/MMKV'
+import { checkGGMLDeprecated, GGMLNameMap } from './GGML'
+import { AppSettings, Global } from '../../constants/GlobalValues'
+import { Logger } from '../../state/Logger'
+import { mmkv } from '../../storage/MMKV'
 
 type CompletionTimings = {
     predicted_per_token_ms: number
@@ -53,8 +54,7 @@ export type LlamaPreset = {
     batch: number
 }
 
-const sessionFileDir = `${FS.documentDirectory}llama/`
-const sessionFile = `${sessionFileDir}llama-session.bin`
+const sessionFile = `${AppDirectory.SessionPath}llama-session.bin`
 
 const default_preset = {
     context_length: 4096,
@@ -64,8 +64,6 @@ const default_preset = {
 }
 
 export namespace Llama {
-    const model_dir = `${FS.documentDirectory}models/`
-
     export const useLlama = create<LlamaState>()((set, get) => ({
         context: undefined,
         modelName: undefined,
@@ -81,7 +79,7 @@ export namespace Llama {
                 return Logger.log('Model Already Loaded!', true)
             }
 
-            if (checkGGMLDeprecated(model)) {
+            if (checkGGMLDeprecated(parseInt(model.quantization))) {
                 return Logger.log('Quantization No Longer Supported!', true)
             }
 
@@ -179,9 +177,6 @@ export namespace Llama {
                 Logger.log('No Model Loaded', true)
                 return
             }
-            if (!(await FS.getInfoAsync(sessionFileDir)).exists) {
-                await FS.makeDirectoryAsync(sessionFileDir)
-            }
 
             if (!(await FS.getInfoAsync(sessionFile)).exists) {
                 await FS.writeAsStringAsync(sessionFile, '', { encoding: 'base64' })
@@ -265,7 +260,7 @@ export namespace Llama {
             Logger.log('Invalid URL', true)
             return
         }
-        const fileInfo = await FS.getInfoAsync(`${model_dir}${filename}`)
+        const fileInfo = await FS.getInfoAsync(`${AppDirectory.ModelPath}${filename}`)
         if (fileInfo.exists) {
             Logger.log('Model already exists!', true)
             // return
@@ -290,7 +285,7 @@ export namespace Llama {
                 }
                 await FS.moveAsync({
                     from: result.uri,
-                    to: `${model_dir}${filename}`,
+                    to: `${AppDirectory.ModelPath}${filename}`,
                 }).then(() => {
                     Logger.log(`${filename} downloaded sucessfully!`)
                 })
@@ -301,7 +296,7 @@ export namespace Llama {
     // Filesystem
 
     export const getModelList = async () => {
-        return await FS.readDirectoryAsync(model_dir)
+        return await FS.readDirectoryAsync(AppDirectory.ModelPath)
     }
 
     export const modelExists = async (modelName: string) => {
@@ -313,7 +308,8 @@ export namespace Llama {
         if (!modelInfo) return
         if (modelInfo.id === useLlama.getState()?.model?.id) await useLlama.getState().unload()
         // some models may be external
-        if (modelInfo.file_path.startsWith(model_dir)) await deleteModel(modelInfo.file)
+        if (modelInfo.file_path.startsWith(AppDirectory.ModelPath))
+            await deleteModel(modelInfo.file)
         await db.delete(model_data).where(eq(model_data.id, id))
     }
 
@@ -323,7 +319,7 @@ export namespace Llama {
     export const deleteModel = async (name: string) => {
         if (!(await modelExists(name))) return
         if (name === useLlama.getState()?.model?.name) await useLlama.getState().unload()
-        return await FS.deleteAsync(`${model_dir}${name}`)
+        return await FS.deleteAsync(`${AppDirectory.ModelPath}${name}`)
     }
 
     export const importModel = async () => {
@@ -333,9 +329,8 @@ export namespace Llama {
             if (result.canceled) return
             const file = result.assets[0]
             const name = file.name
-            const newdir = `${model_dir}${name}`
+            const newdir = `${AppDirectory.ModelPath}${name}`
             Logger.log('Importing file...', true)
-
             const success = await FS.copyAsync({
                 from: file.uri,
                 to: newdir,
@@ -385,7 +380,11 @@ export namespace Llama {
     })
 
     export const createModelData = async (filename: string, deleteOnFailure: boolean = false) => {
-        return setModelDataInternal(filename, `${model_dir}${filename}`, deleteOnFailure)
+        return setModelDataInternal(
+            filename,
+            `${AppDirectory.ModelPath}${filename}`,
+            deleteOnFailure
+        )
     }
 
     export const createModelDataExternal = async (
@@ -514,94 +513,4 @@ export namespace Llama {
         }
         return true
     }
-}
-
-enum GGMLType {
-    UNKNOWN = -1,
-    LLAMA_FTYPE_ALL_F32 = 0,
-    LLAMA_FTYPE_MOSTLY_F16 = 1,
-    LLAMA_FTYPE_MOSTLY_Q4_0 = 2,
-    LLAMA_FTYPE_MOSTLY_Q4_1 = 3,
-    // LLAMA_FTYPE_MOSTLY_Q4_1_SOME_F16 = 4,
-    // LLAMA_FTYPE_MOSTLY_Q4_2       = 5,
-    // LLAMA_FTYPE_MOSTLY_Q4_3       = 6,
-    LLAMA_FTYPE_MOSTLY_Q8_0 = 7,
-    LLAMA_FTYPE_MOSTLY_Q5_0 = 8,
-    LLAMA_FTYPE_MOSTLY_Q5_1 = 9,
-    LLAMA_FTYPE_MOSTLY_Q2_K = 10,
-    LLAMA_FTYPE_MOSTLY_Q3_K_S = 11,
-    LLAMA_FTYPE_MOSTLY_Q3_K_M = 12,
-    LLAMA_FTYPE_MOSTLY_Q3_K_L = 13,
-    LLAMA_FTYPE_MOSTLY_Q4_K_S = 14,
-    LLAMA_FTYPE_MOSTLY_Q4_K_M = 15,
-    LLAMA_FTYPE_MOSTLY_Q5_K_S = 16,
-    LLAMA_FTYPE_MOSTLY_Q5_K_M = 17,
-    LLAMA_FTYPE_MOSTLY_Q6_K = 18,
-    LLAMA_FTYPE_MOSTLY_IQ2_XXS = 19,
-    LLAMA_FTYPE_MOSTLY_IQ2_XS = 20,
-    LLAMA_FTYPE_MOSTLY_Q2_K_S = 21,
-    LLAMA_FTYPE_MOSTLY_IQ3_XS = 22,
-    LLAMA_FTYPE_MOSTLY_IQ3_XXS = 23,
-    LLAMA_FTYPE_MOSTLY_IQ1_S = 24,
-    LLAMA_FTYPE_MOSTLY_IQ4_NL = 25,
-    LLAMA_FTYPE_MOSTLY_IQ3_S = 26,
-    LLAMA_FTYPE_MOSTLY_IQ3_M = 27,
-    LLAMA_FTYPE_MOSTLY_IQ2_S = 28,
-    LLAMA_FTYPE_MOSTLY_IQ2_M = 29,
-    LLAMA_FTYPE_MOSTLY_IQ4_XS = 30,
-    LLAMA_FTYPE_MOSTLY_IQ1_M = 31,
-    LLAMA_FTYPE_MOSTLY_BF16 = 32,
-    LLAMA_FTYPE_MOSTLY_Q4_0_4_4 = 33,
-    LLAMA_FTYPE_MOSTLY_Q4_0_4_8 = 34,
-    LLAMA_FTYPE_MOSTLY_Q4_0_8_8 = 35,
-    LLAMA_FTYPE_MOSTLY_TQ1_0 = 36,
-    LLAMA_FTYPE_MOSTLY_TQ2_0 = 37,
-}
-
-export const GGMLNameMap = {
-    [GGMLType.UNKNOWN]: 'N/A',
-    [GGMLType.LLAMA_FTYPE_ALL_F32]: 'F32',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_F16]: 'F16',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q4_0]: 'Q4_0',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q4_1]: 'Q4_1',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q8_0]: 'Q8_0',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q5_0]: 'Q5_0',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q5_1]: 'Q5_1',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q2_K]: 'Q2_K',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q3_K_S]: 'Q3_K_S',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q3_K_M]: 'Q3_K_M',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q3_K_L]: 'Q3_K_L',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q4_K_S]: 'Q4_K_S',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q4_K_M]: 'Q4_K_M',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q5_K_S]: 'Q5_K_S',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q5_K_M]: 'Q5_K_M',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q6_K]: 'Q6_K',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_IQ2_XXS]: 'IQ2_XXS',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_IQ2_XS]: 'IQ2_XS',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q2_K_S]: 'Q2_K_S',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_IQ3_XS]: 'IQ3_XS',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_IQ3_XXS]: 'IQ3_XXS',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_IQ1_S]: 'IQ1_S',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_IQ4_NL]: 'IQ4_NL',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_IQ3_S]: 'IQ3_S',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_IQ3_M]: 'IQ3_M',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_IQ2_S]: 'IQ2_S',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_IQ2_M]: 'IQ2_M',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_IQ4_XS]: 'IQ4_XS',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_IQ1_M]: 'IQ1_M',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_BF16]: 'BF16',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q4_0_4_4]: 'Q4_0_4_4',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q4_0_4_8]: 'Q4_0_4_8',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_Q4_0_8_8]: 'Q4_0_8_8',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_TQ1_0]: 'TQ1_0',
-    [GGMLType.LLAMA_FTYPE_MOSTLY_TQ2_0]: 'TQ2_0',
-}
-
-const checkGGMLDeprecated = (model: ModelDataType) => {
-    const type = parseInt(model.quantization)
-    return (
-        type === GGMLType.LLAMA_FTYPE_MOSTLY_Q4_0_4_4 ||
-        type === GGMLType.LLAMA_FTYPE_MOSTLY_Q4_0_4_8 ||
-        type === GGMLType.LLAMA_FTYPE_MOSTLY_Q4_0_8_8
-    )
 }

@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons'
+import { Characters } from '@lib/state/Characters'
+import { Chats } from '@lib/state/Chat'
+import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Characters, Chats, Logger } from '@lib/utils/Global'
 import CharacterList from '@screens/CharacterMenu/CharacterList'
 import { Stack, useFocusEffect } from 'expo-router'
 import { useCallback, useRef, useState } from 'react'
@@ -11,11 +13,11 @@ import Animated, { runOnJS, ZoomIn } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import ChatInput from './ChatInput'
+import SettingsDrawer from '../SettingsDrawer/'
 import AvatarViewer from './ChatWindow/AvatarViewer'
 import ChatWindow from './ChatWindow/ChatWindow'
 import ChatsDrawer from './ChatsDrawer'
 import OptionsMenu from './OptionsMenu'
-import SettingsDrawer from '../SettingsDrawer/'
 
 const ChatMenu = () => {
     const { color, spacing } = Theme.useTheme()

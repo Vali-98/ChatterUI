@@ -7,7 +7,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { Logger } from './Logger'
 import { AppMode, Global } from '../constants/GlobalValues'
-import { Llama } from '../engine/LlamaLocal'
+import { Llama } from '../engine/Local/LlamaLocal'
 import { mmkv, mmkvStorage } from '../storage/MMKV'
 import { replaceMacros } from '../utils/Macros'
 

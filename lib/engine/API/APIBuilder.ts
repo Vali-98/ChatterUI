@@ -1,7 +1,8 @@
 import { SSEFetch } from '@lib/engine/SSEFetch'
-import { useInference } from '@lib/state/Chat'
+import { Characters } from '@lib/state/Characters'
+import { Chats, useInference } from '@lib/state/Chat'
 import { Instructs, InstructType } from '@lib/state/Instructs'
-import { Characters, Chats, Logger } from '@lib/utils/Global'
+import { Logger } from '@lib/state/Logger'
 import { nativeApplicationVersion } from 'expo-application'
 
 import { APIState } from './APIManagerState'

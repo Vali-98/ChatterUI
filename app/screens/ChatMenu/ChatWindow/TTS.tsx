@@ -2,7 +2,7 @@ import { FontAwesome } from '@expo/vector-icons'
 import { Chats } from '@lib/state/Chat'
 import { useTTS } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Logger } from '@lib/utils/Global'
+import { Logger } from '@lib/state/Logger'
 import { TouchableOpacity, View } from 'react-native'
 
 type TTSProps = {
