@@ -16,6 +16,7 @@ type AlertProps = {
     description: string
     buttons: AlertButtonProps[]
     alignButtons?: 'left' | 'right'
+    onDismiss?: () => void
 }
 
 type AlertState = {
@@ -77,6 +78,12 @@ const AlertButton: React.FC<AlertButtonProps> = ({ label, onPress, type = 'defau
 export const AlertBox = () => {
     const styles = useStyles()
     const { visible, props } = useAlert((state) => ({ visible: state.visible, props: state.props }))
+    const handleDismiss = () => {
+        const dismiss = props.onDismiss
+        if (dismiss) {
+            dismiss()
+        }
+    }
     const hide = useAlert((state) => state.hide)
     return (
         <Modal
@@ -85,8 +92,15 @@ export const AlertBox = () => {
             style={styles.modal}
             animationType="fade"
             statusBarTranslucent
-            onRequestClose={() => hide()}>
-            <FadeBackrop handleOverlayClick={() => hide()}>
+            onRequestClose={() => {
+                handleDismiss()
+                hide()
+            }}>
+            <FadeBackrop
+                handleOverlayClick={() => {
+                    handleDismiss()
+                    hide()
+                }}>
                 <Animated.View style={styles.textBoxContainer} entering={FadeInDown.duration(150)}>
                     <View style={styles.textBox}>
                         <Text style={styles.title}>{props.title}</Text>
