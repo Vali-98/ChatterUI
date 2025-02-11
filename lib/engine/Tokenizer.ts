@@ -42,7 +42,7 @@ export namespace Tokenizer {
     }))
 
     const importModelFromRes = async () => {
-        Logger.log('Importing Tokenizer')
+        Logger.info('Importing Tokenizer')
         await copyFileRes(
             'llama3tokenizer.gguf',
             documentDirectory + 'appAssets/llama3tokenizer.gguf'

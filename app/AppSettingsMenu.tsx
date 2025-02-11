@@ -26,9 +26,9 @@ const exportDB = async (notify: boolean = true) => {
         `${DownloadDirectoryPath}/${appVersion}-db-backup.db`
     )
         .then(() => {
-            if (notify) Logger.log('Download Successful!', true)
+            if (notify) Logger.infoToast('Download Successful!')
         })
-        .catch((e) => Logger.log('Failed to copy database: ' + e, true))
+        .catch((e) => Logger.errorToast('Failed to copy database: ' + e))
 }
 
 const importDB = async (uri: string, name: string) => {
@@ -42,11 +42,11 @@ const importDB = async (uri: string, name: string) => {
             to: `${documentDirectory}SQLite/db.db`,
         })
             .then(() => {
-                Logger.log('Copy Successful, Restarting now.')
+                Logger.info('Copy Successful, Restarting now.')
                 reloadAppAsync()
             })
             .catch((e) => {
-                Logger.log(`Failed to import database: ${e}`, true)
+                Logger.errorToast(`Failed to import database: ${e}`)
             })
     }
 

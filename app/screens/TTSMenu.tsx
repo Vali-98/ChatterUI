@@ -118,7 +118,7 @@ const TTSMenu = () => {
                     variant="secondary"
                     onPress={() => {
                         if (currentSpeaker === undefined) {
-                            Logger.log(`No Speaker Chosen`, true)
+                            Logger.warnToast(`No Speaker Chosen`)
                             return
                         }
                         Speech.speak(testAudioText, {

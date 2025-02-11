@@ -31,15 +31,15 @@ export const useTTSState = create<TTSState>()((set, get) => ({
 
         const currentSpeakerString = mmkv.getString(Global.TTSSpeaker)
         if (!currentSpeakerString) {
-            Logger.log('Invalid Speaker', true)
+            Logger.errorToast('Invalid Speaker')
             clearIndex()
             return
         }
         const currentSpeaker: Speech.Voice = JSON.parse(currentSpeakerString)
 
-        Logger.log('Starting TTS')
+        Logger.info('Starting TTS')
         if (currentSpeaker === undefined) {
-            Logger.log(`No Speaker Chosen`, true)
+            Logger.errorToast(`No Speaker Chosen`)
             clearIndex()
             return
         }
@@ -71,7 +71,7 @@ export const useTTSState = create<TTSState>()((set, get) => ({
         if (cleanedchunks.length === 0) clearIndex()
     },
     stopTTS: async () => {
-        Logger.log('TTS stopped')
+        Logger.info('TTS stopped')
         set((state) => ({ ...state, activeChatIndex: undefined }))
         await Speech.stop()
     },

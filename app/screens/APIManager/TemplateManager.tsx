@@ -1,8 +1,8 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { APIState } from '@lib/engine/API/APIManagerState'
-import { Theme } from '@lib/theme/ThemeManager'
 import { Logger } from '@lib/state/Logger'
+import { Theme } from '@lib/theme/ThemeManager'
 import { getDocumentAsync } from 'expo-document-picker'
 import { readAsStringAsync } from 'expo-file-system'
 import { Stack } from 'expo-router'
@@ -76,7 +76,7 @@ const TemplateManager = () => {
                         const jsonData = JSON.parse(data)
                         addTemplate(jsonData)
                     } catch (e) {
-                        Logger.log('Failed to Import', true)
+                        Logger.errorToast('Failed to Import')
                     }
                 }}
                 label="Add Template"

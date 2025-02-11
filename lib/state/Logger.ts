@@ -1,77 +1,77 @@
 import Toast from 'react-native-simple-toast'
+import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { AppSettings, Global } from '../constants/GlobalValues'
-import { mmkv } from '../storage/MMKV'
+import { mmkv, mmkvStorage } from '../storage/MMKV'
+
+const toastTime = 2000
+const maxloglength = 2000
+
+export enum LogLevel {
+    INFO,
+    WARN,
+    ERROR,
+    DEBUG,
+}
+
+type LogEntry = {
+    timestamp: string
+    message: string
+    level: LogLevel
+}
+
+type LogStateProps = {
+    logs: LogEntry[]
+    addLog: (entry: LogEntry) => void
+    flushLogs: () => void
+}
 
 export namespace Logger {
-    const toastTime = 2000
+    export const useLoggerState = create<LogStateProps>()(
+        persist(
+            (set, get) => ({
+                logs: [],
+                addLog: (entry) => {
+                    const newlogs = [...get().logs, entry]
+                    if (newlogs.length > maxloglength) newlogs.shift()
+                    set((state) => ({ ...state, logs: newlogs }))
+                },
+                flushLogs: () => {
+                    set((state) => ({ ...state, logs: [] }))
+                },
+            }),
+            {
+                name: 'logstate-storage',
+                storage: createJSONStorage(() => mmkvStorage),
+                version: 1,
+                partialize: (state) => ({
+                    logs: state.logs,
+                }),
+                migrate: async (persistedState: any, version) => {
+                    //no migrations yet
+                },
+            }
+        )
+    )
 
-    export enum LogLevel {
-        INFO,
-        WARN,
-        ERROR,
-        DEBUG,
-    }
-
-    const LevelName: Record<LogLevel, string> = {
+    export const LevelName: Record<LogLevel, string> = {
         [LogLevel.INFO]: '[INFO]',
         [LogLevel.WARN]: '[WARN]',
         [LogLevel.ERROR]: '[ERROR]',
         [LogLevel.DEBUG]: '[DEBUG]',
     }
 
-    type Log = {
-        timestamp: string
-        message: string
-        level: LogLevel
+    const insertLogs = (data: LogEntry) => {
+        useLoggerState.getState().addLog(data)
     }
 
-    const maxloglength = 300
-
-    const getLogs = () => {
-        return JSON.parse(mmkv.getString(Global.Logs) ?? '[]')
-    }
-
-    const insertToLogs = (data: string) => {
-        const logs = getLogs()
-        logs.push(data)
-        if (logs.length > maxloglength) logs.shift()
-        mmkv.set(Global.Logs, JSON.stringify(logs))
-    }
-
-    export const log = (data: string, toast: boolean = false, toastTime: number = 2000) => {
-        const timestamped = `[${new Date().toTimeString().substring(0, 8)}] : ${data}`
-        console.log(timestamped)
-        insertToLogs(timestamped)
-        if (toast) Toast.show(data, toastTime)
-    }
-
-    export const debug = (data: string) => {
-        if (__DEV__ || mmkv.getBoolean(AppSettings.DevMode)) {
-            insertToLogs(data)
-            console.log(`[Debug]: `, data)
-        }
-    }
-
-    export const flushLogs = () => {
-        mmkv.set(Global.Logs, '[]')
-    }
-
-    // new api
-
-    const insertLogs = (data: Log) => {
-        const logs = getLogs()
-        logs.push(data)
-        if (logs.length > maxloglength) logs.shift()
-        mmkv.set(Global.Logs, JSON.stringify(logs))
-    }
-
-    const createLog = (data: string, level: LogLevel): Log => {
+    const createLog = (data: string, level: LogLevel): LogEntry => {
         const timestamp = `[${new Date().toTimeString().substring(0, 8)}]`
         return { timestamp: timestamp, message: data, level: level }
     }
 
-    const printLog = (log: Log) => {
+    const printLog = (log: LogEntry) => {
         console.log(`${LevelName[log.level]}${log.timestamp}: ${log.message}`)
     }
 
@@ -108,7 +108,8 @@ export namespace Logger {
         Toast.show(data, toastTime)
     }
 
-    export const newDebug = (data: string) => {
+    export const debug = (data: string) => {
+        if (!__DEV__ && !mmkv.getBoolean(AppSettings.DevMode)) return
         const logItem = createLog(data, LogLevel.DEBUG)
         printLog(logItem)
         insertLogs(logItem)

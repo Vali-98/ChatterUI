@@ -34,7 +34,7 @@ const ChatInput = () => {
     const [newMessage, setNewMessage] = useState<string>('')
 
     const abortResponse = async () => {
-        Logger.log(`Aborting Generation`)
+        Logger.info(`Aborting Generation`)
         if (abortFunction) await abortFunction()
     }
 

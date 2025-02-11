@@ -37,7 +37,7 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
     useEffect(() => {
         const newTemplate = getTemplates().find((item) => item.name === values.configName)
         if (!newTemplate) {
-            Logger.log('Could not get valid template!', true)
+            Logger.errorToast('Could not get valid template!')
             close()
             return
         }
@@ -58,7 +58,7 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
         const result = await fetch(values.modelEndpoint, { headers: { ...auth } })
         const data = await result.json()
         if (result.status !== 200) {
-            Logger.log(`Could not retrieve models: ${data?.error?.message}`)
+            Logger.error(`Could not retrieve models: ${data?.error?.message}`)
             return
         }
         const models = getNestedValue(data, template.model.modelListParser)

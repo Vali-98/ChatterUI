@@ -56,7 +56,7 @@ export const pickStringDocument = async ({
     }
     const uri = result.assets[0].uri
     const data = await readAsStringAsync(uri, { encoding: encoding }).catch((e) => {
-        Logger.log(`Failed to read file: ${e}`)
+        Logger.info(`Failed to read file: ${e}`)
     })
     if (!data) {
         return { success: false }

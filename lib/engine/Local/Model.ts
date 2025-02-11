@@ -36,7 +36,7 @@ export namespace Model {
             const file = result.assets[0]
             const name = file.name
             const newdir = `${AppDirectory.ModelPath}${name}`
-            Logger.log('Importing file...', true)
+            Logger.infoToast('Importing file...')
             const success = await copyAsync({
                 from: file.uri,
                 to: newdir,
@@ -45,13 +45,13 @@ export namespace Model {
                     return true
                 })
                 .catch((error) => {
-                    Logger.log(`Import Failed: ${error.message}`, true)
+                    Logger.errorToast(`Import Failed: ${error.message}`)
                     return false
                 })
             if (!success) return
 
             // database routine here
-            if (await createModelData(name, true)) Logger.log(`Model Imported Sucessfully!`, true)
+            if (await createModelData(name, true)) Logger.infoToast(`Model Imported Sucessfully!`)
         })
     }
 
@@ -61,14 +61,14 @@ export namespace Model {
         }).then(async (result) => {
             if (result.canceled) return
             const file = result.assets[0]
-            Logger.log('Importing file...', true)
+            Logger.infoToast('Importing file...')
             if (!file) {
-                Logger.log('File Invalid')
+                Logger.errorToast('File Invalid')
                 return
             }
 
             if (await createModelDataExternal(file.uri, file.name, true))
-                Logger.log(`Model Imported Sucessfully!`, true)
+                Logger.infoToast(`Model Imported Sucessfully!`)
         })
     }
 
@@ -79,7 +79,7 @@ export namespace Model {
         // cull missing models
         modelList.forEach(async (item) => {
             if (item.name === '' || !(await getInfoAsync(item.file_path)).exists) {
-                Logger.log(`Model Missing, its entry will be deleted: ${item.name}`)
+                Logger.warnToast(`Model Missing, its entry will be deleted: ${item.name}`)
                 await db.delete(model_data).where(eq(model_data.id, item.id))
             }
         })
@@ -107,7 +107,7 @@ export namespace Model {
         deleteOnFailure: boolean = false
     ) => {
         if (!filename) {
-            Logger.log('Filename invalid, Import Failed', true)
+            Logger.errorToast('Filename invalid, Import Failed')
             return
         }
         return setModelDataInternal(filename, newdir, deleteOnFailure)
@@ -178,12 +178,12 @@ export namespace Model {
                 quantization: modelInfo.metadata?.['general.file_type'] ?? '-1',
                 architecture: modelType ?? 'N/A',
             }
-            Logger.log(`New Model Data:\n${modelDataText(modelDataEntry)}`)
+            Logger.info(`New Model Data:\n${modelDataText(modelDataEntry)}`)
             await modelContext.release()
             await db.update(model_data).set(modelDataEntry).where(eq(model_data.id, id))
             return true
         } catch (e) {
-            Logger.log(`Failed to create data: ${e}`, true)
+            Logger.errorToast(`Failed to create data: ${e}`)
             if (deleteOnFailure) deleteAsync(file_path, { idempotent: true })
             return false
         }
@@ -277,9 +277,9 @@ export namespace KV {
     export const kvInfo = async () => {
         const data = await getInfoAsync(sessionFile)
         if (!data.exists) {
-            Logger.log('No KV Cache found')
+            Logger.warn('No KV Cache found')
             return
         }
-        Logger.log(`Size of KV cache: ${Math.floor(data.size * 0.000001)} MB`)
+        Logger.info(`Size of KV cache: ${Math.floor(data.size * 0.000001)} MB`)
     }
 }

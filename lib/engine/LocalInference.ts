@@ -117,19 +117,19 @@ const verifyModelLoaded = async (): Promise<boolean> => {
         const autoLoad = mmkv.getBoolean(AppSettings.AutoLoadLocal)
         // If  autoload is disabled, just return
         if (!autoLoad) {
-            Logger.log('No Model Loaded', true)
+            Logger.warnToast('No Model Loaded')
             return false
         }
-        console.log(lastModel)
+
         // by default, autoload will attempt to load the last model used
         if (!lastModel) {
-            Logger.log('No Auto-Load Model Set', true)
+            Logger.warnToast('No Auto-Load Model Set')
             return false
         }
 
         // attempt to load model
         if (lastModel) {
-            Logger.log(`Auto-loading: ${lastModel.name}`, true)
+            Logger.infoToast(`Auto-loading: ${lastModel.name}`)
             await Llama.useLlama.getState().load(lastModel)
         }
     }
@@ -146,7 +146,7 @@ export const localInference = async () => {
     const context = Llama.useLlama.getState().context
 
     if (!context) {
-        Logger.log('No Model Loaded', true)
+        Logger.warnToast('No Model Loaded')
         stopGenerating()
         return
     }
@@ -155,9 +155,7 @@ export const localInference = async () => {
 
     if (mmkv.getBoolean(AppSettings.SaveLocalKV) && !KV.useKVState.getState().kvCacheLoaded) {
         const prompt = Llama.useLlama.getState().tokenize(payload.prompt)
-        console.log(prompt?.tokens.length)
         const result = KV.useKVState.getState().verifyKVCache(prompt?.tokens ?? [])
-        console.log(result)
         if (!result.match) {
             Alert.alert({
                 title: 'Cache Mismatch',
@@ -167,6 +165,7 @@ export const localInference = async () => {
                     {
                         label: 'Load Anyway',
                         onPress: async () => {
+                            Logger.warn('Overriding KV Cache despite mismatch')
                             const result = await Llama.useLlama.getState().loadKV()
                             if (result) {
                                 KV.useKVState.getState().setKvCacheLoaded(true)
@@ -209,7 +208,7 @@ const runLocalCompletion = async (payload: ReturnType<typeof buildLocalPayload>)
     const outputCompleted = (text: string) => {
         const regenCache = Chats.useChatState.getState().getRegenCache()
         Chats.useChatState.getState().setBuffer((regenCache + text).replaceAll(replace, ''))
-        if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.log(`Completion Output:\n${text}`)
+        if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(`Completion Output:\n${text}`)
         stopGenerating()
     }
 
@@ -217,7 +216,7 @@ const runLocalCompletion = async (payload: ReturnType<typeof buildLocalPayload>)
         .getState()
         .completion(payload, outputStream, outputCompleted)
         .catch((error) => {
-            Logger.log(`Failed to generate locally: ${error}`, true)
+            Logger.errorToast(`Failed to generate locally: ${error}`)
             stopGenerating()
         })
 }

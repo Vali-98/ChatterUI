@@ -51,13 +51,13 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                 chatId = await Chats.db.mutate.createChat(charId)
             }
             if (!chatId) {
-                Logger.log('Chat creation backup has failed! Please report.', true)
+                Logger.errorToast('Chat creation backup has failed! Please report.')
                 return
             }
             await loadChat(chatId)
             setNowLoading(false)
         } catch (error) {
-            Logger.log(`Couldn't load character: ${error}`, true)
+            Logger.errorToast(`Couldn't load character: ${error}`)
             setNowLoading(false)
         }
     }

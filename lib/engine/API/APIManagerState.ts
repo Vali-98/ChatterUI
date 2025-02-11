@@ -48,7 +48,7 @@ export namespace APIState {
                             template.name,
                             templates.map((item) => item.name)
                         )
-                        Logger.log(`Name exists, renaming to: ${newName}`)
+                        Logger.info(`Name exists, renaming to: ${newName}`)
                         template.name = newName
                     }
                     const output = verifyJSON(template, defaultTemplates[0])

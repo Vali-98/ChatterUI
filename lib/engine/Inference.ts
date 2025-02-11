@@ -13,7 +13,7 @@ export const regenerateResponse = async (swipeId: number, regenCache: boolean = 
     const messagesLength = Chats.useChatState.getState()?.data?.messages?.length ?? -1
     const message = Chats.useChatState.getState()?.data?.messages?.[messagesLength - 1]
 
-    Logger.log('Regenerate Response' + (regenCache ? '' : ' , Resetting Message'))
+    Logger.info('Regenerate Response' + (regenCache ? '' : ' , Resetting Message'))
 
     if (message?.is_user) {
         await Chats.useChatState.getState().addEntry(charName ?? '', true, '')
@@ -30,7 +30,7 @@ export const regenerateResponse = async (swipeId: number, regenCache: boolean = 
 }
 
 export const continueResponse = async (swipeId: number) => {
-    Logger.log(`Continuing Response`)
+    Logger.info(`Continuing Response`)
     Chats.useChatState.getState().setRegenCache()
     Chats.useChatState.getState().insertLastToBuffer()
     await generateResponse(swipeId)
@@ -55,11 +55,11 @@ const completionTaskOptions = {
 
 export const generateResponse = async (swipeId: number) => {
     if (useInference.getState().nowGenerating) {
-        Logger.log('Generation already in progress', true)
+        Logger.infoToast('Generation already in progress')
         return
     }
     Chats.useChatState.getState().startGenerating(swipeId)
-    Logger.log(`Obtaining response.`)
+    Logger.info(`Obtaining response.`)
     const data = performance.now()
     const appMode = getString(Global.AppMode)
 

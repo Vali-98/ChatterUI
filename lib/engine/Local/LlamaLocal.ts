@@ -105,15 +105,15 @@ export namespace Llama {
             const config = useEngineData.getState().config
 
             if (get()?.model?.id === model.id) {
-                return Logger.log('Model Already Loaded!', true)
+                return Logger.errorToast('Model Already Loaded!')
             }
 
             if (checkGGMLDeprecated(parseInt(model.quantization))) {
-                return Logger.log('Quantization No Longer Supported!', true)
+                return Logger.errorToast('Quantization No Longer Supported!')
             }
 
             if (!(await getInfoAsync(model.file_path)).exists) {
-                Logger.log('Model Does Not Exist!', true)
+                Logger.errorToast('Model Does Not Exist!')
                 return
             }
 
@@ -145,7 +145,7 @@ export namespace Llama {
             mmkv.set(Global.LocalSessionLoaded, setAutoLoad)
             */
 
-            Logger.log(
+            Logger.info(
                 `Starting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}`
             )
 
@@ -154,7 +154,7 @@ export namespace Llama {
             }
 
             const llamaContext = await initLlama(params, progressCallback).catch((error) => {
-                Logger.log(`Could Not Load Model: ${error} `, true)
+                Logger.errorToast(`Could Not Load Model: ${error} `)
             })
 
             if (!llamaContext) return
@@ -187,7 +187,7 @@ export namespace Llama {
         ) => {
             const llamaContext = get().context
             if (llamaContext === undefined) {
-                Logger.log('No Model Loaded', true)
+                Logger.errorToast('No Model Loaded')
                 return
             }
 
@@ -197,7 +197,7 @@ export namespace Llama {
                 })
                 .then(async ({ text, timings }: CompletionOutput) => {
                     completed(text)
-                    Logger.log(textTimings(timings))
+                    Logger.info(textTimings(timings))
                     if (mmkv.getBoolean(AppSettings.SaveLocalKV)) {
                         await get().saveKV(params.prompt)
                     }
@@ -209,7 +209,7 @@ export namespace Llama {
         saveKV: async (prompt: string | undefined) => {
             const llamaContext = get().context
             if (!llamaContext) {
-                Logger.log('No Model Loaded', true)
+                Logger.errorToast('No Model Loaded')
                 return
             }
 
@@ -224,33 +224,33 @@ export namespace Llama {
 
             const now = performance.now()
             const data = await llamaContext.saveSession(sessionFile.replace('file://', ''))
-            Logger.log(
+            Logger.info(
                 data === -1
                     ? 'Failed to save KV cache'
                     : `Saved KV in ${Math.floor(performance.now() - now)}ms with ${data} tokens`
             )
-            Logger.log(`Current KV Size is: ${readableFileSize(await KV.getKVSize())}`)
+            Logger.info(`Current KV Size is: ${readableFileSize(await KV.getKVSize())}`)
         },
         loadKV: async () => {
             let result = false
             const llamaContext = get().context
             if (!llamaContext) {
-                Logger.log('No Model Loaded', true)
+                Logger.errorToast('No Model Loaded')
                 return false
             }
             const data = await getInfoAsync(sessionFile)
             if (!data.exists) {
-                Logger.log('No Cache found')
+                Logger.warn('No Cache found')
                 return false
             }
             await llamaContext
                 .loadSession(sessionFile.replace('file://', ''))
                 .then(() => {
-                    Logger.log('Session loaded from KV cache')
+                    Logger.info('Session loaded from KV cache')
                     result = true
                 })
                 .catch(() => {
-                    Logger.log('Session loaded could not load from KV cache')
+                    Logger.error('Session loaded could not load from KV cache')
                 })
             return result
         },

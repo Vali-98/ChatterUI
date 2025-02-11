@@ -246,7 +246,7 @@ export namespace Instructs {
                 replacedMacros: () => {
                     const rawinstruct = get().data
                     if (!rawinstruct) {
-                        Logger.log('Something wrong happened with Instruct data', true)
+                        Logger.errorToast('Something wrong happened with Instruct data')
                         return Instructs.defaultInstruct
                     }
                     const instruct = { ...rawinstruct }
@@ -268,7 +268,7 @@ export namespace Instructs {
                         persistedState.data.timestamp = false
                         persistedState.data.examples = true
                         persistedState.data.format_type = 0
-                        Logger.log('[INSTRUCT] Migrated to v1')
+                        Logger.info('[INSTRUCT] Migrated to v1')
                     }
                     if (version === 1) {
                         persistedState.data.last_output_prefix = persistedState.data.output_prefix
@@ -285,7 +285,7 @@ export namespace Instructs {
                                 .where(eq(instructs.id, item.id))
                         })
 
-                        Logger.log('[INSTRUCT] Migrated to v2')
+                        Logger.info('[INSTRUCT] Migrated to v2')
                     }
                     if (version === 2) {
                         persistedState.data.scenario = true
@@ -355,7 +355,7 @@ export namespace Instructs {
                 if (data === -1) data = newid
             }
         })
-        Logger.log('Default Instructs Successfully Generated')
+        Logger.info('Default Instructs Successfully Generated')
         return data === -1 ? 1 : data
     }
 }

@@ -90,7 +90,7 @@ export namespace Characters {
                     const oldImageID = get().card?.image_id
                     const card = get().card
                     if (!id || !oldImageID || !card) {
-                        Logger.log('Could not get data, something very wrong has happned!', true)
+                        Logger.errorToast('Could not get data, something very wrong has happened!')
                         return
                     }
                     const imageID = new Date().getTime()
@@ -143,7 +143,7 @@ export namespace Characters {
                 migrate: async (persistedState: any, version) => {
                     if (version === 1) {
                         // migration from CharacterCardV2 to CharacterCardData
-                        Logger.log('Migrating User Store to v2')
+                        Logger.info('Migrating User Store to v2')
                         persistedState.id = undefined
                         persistedState.card = undefined
                     }
@@ -180,7 +180,7 @@ export namespace Characters {
             const oldImageID = get().card?.image_id
             const card = get().card
             if (!id || !oldImageID || !card) {
-                Logger.log('Could not get data, something very wrong has happned!', true)
+                Logger.errorToast('Could not get data, something very wrong has happned!')
                 return
             }
             const imageID = new Date().getTime()
@@ -509,7 +509,7 @@ export namespace Characters {
                         }
                         return image_id
                     } catch (error) {
-                        Logger.log(`Rolling back due to error: ` + error)
+                        Logger.errorToast(`Rolling back due to error: ` + error)
                         tx.rollback()
                         return undefined
                     }
@@ -521,7 +521,7 @@ export namespace Characters {
                 const card = await db.query.card(charId)
 
                 if (!card) {
-                    Logger.log('Failed to copy card: Card does not exit', true)
+                    Logger.errorToast('Failed to copy card: Card does not exit')
                     return
                 }
                 const imageInfo = await FS.getInfoAsync(getImageDir(card.image_id))
@@ -537,12 +537,12 @@ export namespace Characters {
                 card.image_id = now
                 const cv2 = cardDataToCV2(card)
                 if (!cv2) {
-                    Logger.log('Failed to copy card', true)
+                    Logger.errorToast('Failed to copy card')
                     return
                 }
                 await createCharacter(cv2, cacheLoc)
-                    .then(() => Logger.log(`Card cloned: ${card.name}`))
-                    .catch((e) => Logger.log(`Failed to clone card: ${e}`))
+                    .then(() => Logger.info(`Card cloned: ${card.name}`))
+                    .catch((e) => Logger.info(`Failed to clone card: ${e}`))
             }
         }
     }
@@ -578,7 +578,7 @@ export namespace Characters {
     export const createCharacterFromImage = async (uri: string) => {
         const file = await FS.readAsStringAsync(uri, { encoding: FS.EncodingType.Base64 })
         if (!file) {
-            Logger.log(`Failed to create card - Image could not be retrieved`, true)
+            Logger.errorToast(`Failed to create card - Image could not be retrieved`)
             return
         }
 
@@ -587,17 +587,17 @@ export namespace Characters {
         // WARNING: dangerous here, card is never verified to fulfill v2 card spec
 
         if (charactercard === undefined) {
-            Logger.log('No character was found.', true)
+            Logger.errorToast('No character was found.')
             return
         }
         if (charactercard?.spec_version !== '2.0') {
-            Logger.log('Character card must be in V 2.0 format.', true)
+            Logger.errorToast('Character card must be in V 2.0 format.')
             return
         }
 
         const newname = charactercard?.data?.name ?? charactercard.name
 
-        Logger.log(`Creating new character: ${newname}`)
+        Logger.info(`Creating new character: ${newname}`)
         return db.mutate.createCharacter(charactercard, uri)
     }
 
@@ -610,14 +610,14 @@ export namespace Characters {
             if (result.canceled) return
             result.assets.map(async (item) => {
                 await createCharacterFromImage(item.uri).catch((e) =>
-                    Logger.log(`Failed to create card from '${item.name}': ${e}`)
+                    Logger.error(`Failed to create card from '${item.name}': ${e}`)
                 )
             })
         })
     }
 
     export const importCharacterFromChub = async (character_id: string) => {
-        Logger.log(`Importing character from Chub: ${character_id}`, true)
+        Logger.infoToast(`Importing character from Chub: ${character_id}`)
         try {
             const res = await fetch('https://api.chub.ai/api/characters/download', {
                 method: 'POST',
@@ -637,12 +637,12 @@ export namespace Characters {
             await writeFile(cardCacheDir, btoa(binaryString), { encoding: 'base64' })
             return createCharacterFromImage(cardCacheDir)
         } catch (error) {
-            Logger.log(`Could not retreive card. ${error}`)
+            Logger.error(`Could not retreive card. ${error}`)
         }
     }
 
     export const importCharacterFromPyg = async (character_id: string) => {
-        Logger.log(`Loading from Pygmalion with id: ${character_id}`, true)
+        Logger.infoToast(`Loading from Pygmalion with id: ${character_id}`)
 
         const query = await fetch(
             `https://server.pygmalion.chat/api/export/character/${character_id}/v2`,
@@ -655,7 +655,7 @@ export namespace Characters {
             }
         )
         if (query.status !== 200) {
-            Logger.log(`Failed to retrieve card from Pygmalion: ${query.status}`, true)
+            Logger.errorToast(`Failed to retrieve card from Pygmalion: ${query.status}`)
             return
         }
 
@@ -674,7 +674,7 @@ export namespace Characters {
             encoding: 'base64',
         })
         await db.mutate.createCharacter(character, `${FS.cacheDirectory}${uuid}.png`)
-        Logger.log('Imported Character: ' + character.data.name)
+        Logger.info('Imported Character: ' + character.data.name)
     }
 
     export const importCharacterFromRemote = async (text: string) => {
@@ -696,7 +696,7 @@ export namespace Characters {
             if (character_id) return importCharacterFromPyg(character_id)
             else if (uuidRegex.test(path)) return importCharacterFromPyg(path)
             else {
-                Logger.log(`Failed to get id from Pygmalion URL`, true)
+                Logger.errorToast(`Failed to get id from Pygmalion URL`)
                 return
             }
         }
@@ -705,13 +705,13 @@ export namespace Characters {
             const path = url.pathname.replace('/characters/', '')
             if (/^[^/]+\/[^/]+$/.test(path)) return importCharacterFromChub(path)
             else {
-                Logger.log(`Failed to get id from Chub URL`, true)
+                Logger.errorToast(`Failed to get id from Chub URL`)
                 return
             }
         }
 
         // Regex checks for format of [name][/][character]
-        Logger.log(`URL not recognized`, true)
+        Logger.errorToast(`URL not recognized`)
     }
 
     export const getImageDir = (imageId: number) => {

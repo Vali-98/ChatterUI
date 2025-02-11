@@ -62,7 +62,7 @@ const migrateModelData_0_7_10_to_0_8_0 = () => {
         const model = mmkv.getString(oldDef)
         if (model) JSON.parse(model)
     } catch (e) {
-        Logger.log('Model could not be parsed, resetting')
+        Logger.warn('Model could not be parsed, resetting')
         mmkv.delete(oldDef)
     }
 }
@@ -85,7 +85,7 @@ export const generateDefaultDirectories = async () => {
     Object.values(AppDirectory).map(async (dir) => {
         await makeDirectoryAsync(`${dir}`, {})
             .then(() =>
-                Logger.log(
+                Logger.info(
                     `Successfully made directory: ${dir.replace(`${documentDirectory}`, '')}`
                 )
             )
@@ -106,7 +106,7 @@ const migratePresets_0_8_3_to_0_8_4 = async () => {
                 name: item.replace('.json', ''),
             })
         } catch (e) {
-            Logger.log(`Failed to migrate preset ${item}: ${e}`)
+            Logger.error(`Failed to migrate preset ${item}: ${e}`)
         }
     })
     await deleteAsync(presetDir)
@@ -120,11 +120,11 @@ const createDefaultUserData = async () => {
 const setDefaultCharacter = async () => {
     const userList = await Characters.db.query.cardList('user')
     if (!userList) {
-        Logger.log(
+        Logger.error(
             'User database is Invalid, this should not happen! Please report this occurence.'
         )
     } else if (userList?.length === 0) {
-        Logger.log('No Users exist, creating default Users')
+        Logger.warn('No Users exist, creating default Users')
         await createDefaultUserData()
     } else if (userList.length > 0 && !Characters.useUserCard.getState().card) {
         Characters.useUserCard.getState().setCard(userList[0].id)
@@ -134,9 +134,9 @@ const setDefaultCharacter = async () => {
 const setDefaultInstruct = () => {
     Instructs.db.query.instructList().then(async (list) => {
         if (!list) {
-            Logger.log('Instruct database Invalid, this should not happen! Please report this!')
+            Logger.error('Instruct database Invalid, this should not happen! Please report this!')
         } else if (list?.length === 0) {
-            Logger.log('No Instructs exist, creating default Instruct')
+            Logger.warn('No Instructs exist, creating default Instruct')
             const id = await Instructs.generateInitialDefaults()
             Instructs.useInstruct.getState().load(id)
         }
@@ -157,7 +157,7 @@ export const startupApp = () => {
 
     // Init Logs
     // TOOD: Move this to zustand
-    if (!mmkv.getString(Global.Logs)) mmkv.set(Global.Logs, JSON.stringify([]))
+    // if (!mmkv.getString(Global.Logs)) mmkv.set(Global.Logs, JSON.stringify([]))
 
     // Init step, appMode is never null
     if (!mmkv.getString(Global.AppMode)) mmkv.set(Global.AppMode, AppMode.LOCAL)
@@ -183,5 +183,5 @@ export const startupApp = () => {
 
     lockScreenOrientation()
     setBackgroundColorAsync(Theme.useColorState.getState().color.neutral._100)
-    Logger.log('Resetting state values for startup.')
+    Logger.info('Resetting state values for startup.')
 }

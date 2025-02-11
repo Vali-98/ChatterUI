@@ -50,7 +50,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, setNowLoading, nowL
                                 : await Chats.db.mutate.createChat(charId)
                             chatId && (await loadChat(chatId))
                         } else if (item.id === chatId) {
-                            Logger.log(`Something went wrong with creating a default chat`, true)
+                            Logger.errorToast(`Something went wrong with creating a default chat`)
                             unloadChat()
                         }
                         menuRef.current?.close()
@@ -82,7 +82,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, setNowLoading, nowL
         const name = `Chatlogs-${charName}-${item.id}.json`.replaceAll(' ', '_')
         await saveStringToDownload(JSON.stringify(await Chats.db.query.chat(item.id)), name, 'utf8')
         menuRef.current?.close()
-        Logger.log(`File: ${name} saved to downloads!`, true)
+        Logger.infoToast(`File: ${name} saved to downloads!`)
     }
 
     return (

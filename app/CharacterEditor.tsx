@@ -78,7 +78,7 @@ const ChracterEditor = () => {
             return Characters.db.mutate.updateCard(characterCard, charId).then(() => {
                 setCurrentCard(charId)
                 setEdited(() => false)
-                Logger.log('Card Saved!', true)
+                Logger.infoToast('Card Saved!')
             })
     }
 
@@ -155,7 +155,7 @@ const ChracterEditor = () => {
     const deleteAltMessageRoutine = async () => {
         const id = characterCard?.alternate_greetings[altSwipeIndex].id
         if (!id || !charId) {
-            Logger.log('Error deleting swipe', true)
+            Logger.errorToast('Error deleting swipe')
             return
         }
         await Characters.db.mutate.deleteAltGreeting(id)

@@ -1,8 +1,8 @@
 import { FontAwesome } from '@expo/vector-icons'
 import { Chats } from '@lib/state/Chat'
+import { Logger } from '@lib/state/Logger'
 import { useTTS } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Logger } from '@lib/state/Logger'
 import { TouchableOpacity, View } from 'react-native'
 
 type TTSProps = {
@@ -16,12 +16,12 @@ const TTS: React.FC<TTSProps> = ({ index }) => {
     const isSpeaking = index === activeChatIndex
 
     const handleSpeak = async () => {
-        Logger.log('Starting TTS')
+        Logger.info('Starting TTS')
         await startTTS(swipeText, index)
     }
 
     const handleStopSpeaking = async () => {
-        Logger.log('TTS stopped')
+        Logger.info('TTS stopped')
         await stopTTS()
     }
 

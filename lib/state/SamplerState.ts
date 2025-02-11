@@ -35,7 +35,7 @@ export namespace SamplersManager {
                 addSamplerConfig: (config) => {
                     const configs = get().configList
                     if (configs.some((item) => item.name === config.name)) {
-                        Logger.log(`Sampler Config "${config.name}" already exists!`, true)
+                        Logger.errorToast(`Sampler Config "${config.name}" already exists!`)
                         return
                     }
                     config.data = fixSamplerConfig(config.data)
@@ -143,7 +143,7 @@ export namespace SamplersManager {
                 (!result.assets[0].name.endsWith('json') &&
                     !result.assets[0].name.endsWith('settings'))
             ) {
-                Logger.log(`Invalid File Type!`, true)
+                Logger.errorToast(`Invalid File Type!`)
                 return
             }
             const name = result.assets[0].name
@@ -155,7 +155,7 @@ export namespace SamplersManager {
             })
             return { data: JSON.parse(data), name: name }
         } catch (e) {
-            Logger.log(`Failed to import: ${e}`, true)
+            Logger.errorToast(`Failed to import: ${e}`)
         }
     }
 }
@@ -173,6 +173,6 @@ export const fixSamplerConfig = (config: SamplerConfigData) => {
         samekeys = false
         Logger.debug(`Preset was missing field: ${key}`)
     })
-    if (!samekeys) Logger.log(`Preset had missing fields and was fixed!`)
+    if (!samekeys) Logger.warn(`Preset had missing fields and was fixed!`)
     return config
 }

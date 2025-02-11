@@ -38,7 +38,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
 
     const handleExport = () => {
         saveStringToDownload(JSON.stringify(item), `${item.name}.json`, 'utf8').then(() => {
-            Logger.log(`Saved ${item.name}.json To Downloads`, true)
+            Logger.infoToast(`Saved ${item.name}.json To Downloads`)
         })
     }
 

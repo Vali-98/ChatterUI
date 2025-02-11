@@ -163,10 +163,10 @@ export const buildTextCompletionContext = (max_length: number, printTimings = tr
 
     payload = replaceMacros(payload + message_acc)
     if (printTimings) {
-        Logger.log(`Approximate Context Size: ${message_acc_length + payload_length} tokens`)
-        Logger.log(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
+        Logger.info(`Approximate Context Size: ${message_acc_length + payload_length} tokens`)
+        Logger.info(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
     }
-    if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.log(payload)
+    if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(payload)
 
     return payload
 }
@@ -254,9 +254,9 @@ export const buildChatCompletionContext = (
     }
     const output = [...payload, ...messageBuffer.reverse()]
 
-    Logger.log(`Approximate Context Size: ${total_length} tokens`)
-    Logger.log(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
-    if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.log(JSON.stringify(output))
+    Logger.info(`Approximate Context Size: ${total_length} tokens`)
+    Logger.info(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
+    if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(JSON.stringify(output))
 
     return output
 }

@@ -35,7 +35,7 @@ export class SSEFetch {
             })
 
             if (res.status !== 200 || !res.body) {
-                Logger.log(await res.text())
+                Logger.error(await res.text())
                 return this.onError()
             }
             this.closeStream = res.body.cancel

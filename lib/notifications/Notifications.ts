@@ -19,7 +19,7 @@ export async function registerForPushNotificationsAsync() {
         finalStatus = status
     }
     if (finalStatus !== 'granted') {
-        Logger.log('You may need to enable notifications manually', true)
+        Logger.warnToast('You may need to enable notifications manually')
         return false
     }
 

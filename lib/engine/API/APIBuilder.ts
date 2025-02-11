@@ -14,7 +14,7 @@ export const buildAndSendRequest = async () => {
         .values.find((item, index) => index === APIState.useAPIState.getState().activeIndex)
 
     if (!requestValues) {
-        Logger.log(`No Active API`, true)
+        Logger.warnToast(`No Active API`)
         Chats.useChatState.getState().stopGenerating()
         return
     }
@@ -26,18 +26,18 @@ export const buildAndSendRequest = async () => {
 
     const config = configs[0]
     if (!config) {
-        Logger.log(`Configuration "${requestValues?.configName}" found`, true)
+        Logger.errorToast(`Configuration "${requestValues?.configName}" not found`)
         Chats.useChatState.getState().stopGenerating()
         return
     }
 
-    Logger.log(`Using Configuration: ${requestValues.configName}`)
+    Logger.info(`Using Configuration: ${requestValues.configName}`)
 
     let payload: any = undefined
     payload = buildRequest(config, requestValues)
 
     if (!payload) {
-        Logger.log('Something Went Wrong With Payload Construction', true)
+        Logger.errorToast('Something Went Wrong With Payload Construction')
         Chats.useChatState.getState().stopGenerating()
         return
     }
@@ -120,12 +120,12 @@ const readableStreamResponse = async (
     })
 
     sse.setOnError(() => {
-        Logger.log('Generation Failed', true)
+        Logger.errorToast('Generation Failed')
         closeStream()
     })
 
     sse.setOnClose(() => {
-        Logger.log('Stream Closed')
+        Logger.info('Stream Closed')
         closeStream()
     })
 
@@ -162,12 +162,12 @@ const hordeResponse = async (
                     'Content-Type': 'application/json',
                 },
             }).catch((error) => {
-                Logger.log(error)
+                Logger.error(error)
             })
         Chats.useChatState.getState().stopGenerating()
     })
 
-    Logger.log(`Using Horde`)
+    Logger.info(`Using Horde`)
 
     const request = await fetch(`${hordeURL}generate/text/async`, {
         method: 'POST',
@@ -181,16 +181,16 @@ const hordeResponse = async (
     })
 
     if (request.status === 401) {
-        Logger.log(`Invalid API Key`, true)
+        Logger.error(`Invalid API Key`)
         Chats.useChatState.getState().stopGenerating()
         return
     }
     if (request.status !== 202) {
-        Logger.log(`Request failed.`)
+        Logger.error(`Horde Request failed.`)
         Chats.useChatState.getState().stopGenerating()
         const body = await request.json()
-        Logger.log(JSON.stringify(body))
-        for (const e of body.errors) Logger.log(e)
+        Logger.error(JSON.stringify(body))
+        for (const e of body.errors) Logger.error(e)
         return
     }
 
@@ -202,7 +202,7 @@ const hordeResponse = async (
         await new Promise((resolve) => setTimeout(resolve, 5000))
         if (aborted) return
 
-        Logger.log(`Checking...`)
+        Logger.info(`Checking...`)
         const response = await fetch(`${hordeURL}generate/text/status/${generation_id}`, {
             method: 'GET',
             headers: {
@@ -213,9 +213,9 @@ const hordeResponse = async (
         })
 
         if (response.status === 400) {
-            Logger.log(`Response failed.`)
+            Logger.error(`Response failed.`)
             Chats.useChatState.getState().stopGenerating()
-            Logger.log((await response.json())?.message)
+            Logger.error((await response.json())?.message)
             return
         }
 

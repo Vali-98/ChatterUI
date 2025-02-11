@@ -61,18 +61,18 @@ const SamplerMenu = () => {
             `${currentConfig.name}.json`,
             'utf8'
         ).then(() => {
-            Logger.log('Downloaded Sampler Configuration!', true)
+            Logger.infoToast('Downloaded Sampler Configuration!')
         })
     }
 
     const handleImportSampler = () => {
         //TODO : Implement
-        Logger.log('Importing Not Implemented', true)
+        Logger.errorToast('Importing Not Implemented')
     }
 
     const handleDeleteSampler = () => {
         if (configList.length === 1) {
-            Logger.log(`Cannot Delete Last Configuration`, true)
+            Logger.errorToast(`Cannot Delete Last Configuration`)
             return false
         }
 
@@ -141,13 +141,13 @@ const SamplerMenu = () => {
                 booleans={[showNewSampler, setShowNewSampler]}
                 onConfirm={(text: string) => {
                     if (text === '') {
-                        Logger.log(`Sampler name cannot be empty`, true)
+                        Logger.errorToast(`Sampler name cannot be empty`)
                         return
                     }
 
                     for (const item of configList)
                         if (item.name === text) {
-                            Logger.log(`Sampler name already exists.`, true)
+                            Logger.errorToast(`Sampler name already exists.`)
                             return
                         }
                     addSamplerConfig({ name: text, data: currentConfig.data })

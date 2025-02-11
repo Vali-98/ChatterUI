@@ -18,7 +18,7 @@ const About = () => {
     const updateCounter = () => {
         if (devMode) return
         if (counter === 6) {
-            Logger.log(`You have enabled dev mode.`, true)
+            Logger.infoToast(`You have enabled dev mode.`)
             setDevMode(true)
         }
         setCounter(counter + 1)
@@ -46,7 +46,7 @@ const About = () => {
                     onPress={() => {
                         setCounter(0)
                         setDevMode(false)
-                        Logger.log('Dev mode disabled')
+                        Logger.info('Dev mode disabled')
                     }}
                 />
             )}

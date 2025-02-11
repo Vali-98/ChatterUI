@@ -69,12 +69,12 @@ const FormattingManager = () => {
         if (!instructID) return
         const name = (currentInstruct?.name ?? 'Default') + '.json'
         await saveStringToDownload(JSON.stringify(currentInstruct), name, 'utf8')
-        Logger.log(`Saved "${name}" to Downloads`, true)
+        Logger.infoToast(`Saved "${name}" to Downloads`)
     }
 
     const handleDeletePreset = () => {
         if (instructList.length === 1) {
-            Logger.log(`Cannot delete last Instruct preset.`, true)
+            Logger.warnToast(`Cannot delete last Instruct preset.`)
             return
         }
 
@@ -89,7 +89,7 @@ const FormattingManager = () => {
                         if (!instructID) return
                         const leftover = data.filter((item) => item.id !== instructID)
                         if (leftover.length === 0) {
-                            Logger.log('Cannot delete last instruct', true)
+                            Logger.warnToast('Cannot delete last instruct')
                             return
                         }
                         Instructs.db.mutate.deleteInstruct(instructID)
@@ -161,7 +161,7 @@ const FormattingManager = () => {
                         booleans={[showNewInstruct, setShowNewInstruct]}
                         onConfirm={(text) => {
                             if (instructList.some((item) => item.name === text)) {
-                                Logger.log(`Preset name already exists.`, true)
+                                Logger.warnToast(`Preset name already exists.`)
                                 return
                             }
                             if (!currentInstruct) return
@@ -169,7 +169,7 @@ const FormattingManager = () => {
                             Instructs.db.mutate
                                 .createInstruct({ ...currentInstruct, name: text })
                                 .then(async (newid) => {
-                                    Logger.log(`Preset created.`, true)
+                                    Logger.infoToast(`Preset created.`)
                                     await loadInstruct(newid)
                                 })
                         }}

@@ -33,8 +33,8 @@ export namespace Theme {
                     const validation = themeColorSchemaV1.safeParse(colorScheme)
 
                     if (!validation.success) {
-                        Logger.log(`Schema validation failed!`, true)
-                        Logger.log(
+                        Logger.errorToast(`Schema validation failed!`)
+                        Logger.error(
                             'The format of the imported JSON does not match the required color scheme:\n' +
                                 validation.error.issues
                                     .map((issue) => `${issue.path.join('.')} - ${issue.message}`)
@@ -47,14 +47,14 @@ export namespace Theme {
                         get().customColors.some((item) => item.name === colorScheme.name) ||
                         DefaultColorSchemes.schemes.some((item) => item.name === colorScheme.name)
                     ) {
-                        Logger.log('Color Name Already Used')
+                        Logger.errorToast('Color Name Already Used')
                         return
                     }
                     set((state) => ({
                         ...state,
                         customColors: [...get().customColors, colorScheme],
                     }))
-                    Logger.log(`Successfully imported ${colorScheme.name}`)
+                    Logger.info(`Successfully imported ${colorScheme.name}`)
                 },
                 removeColorScheme: (index: number) => {
                     if (index > get().customColors.length) {

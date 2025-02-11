@@ -146,7 +146,7 @@ export namespace Chats {
         // TODO : Replace this function
         stopGenerating: async () => {
             const cachedSwipeId = useInference.getState().currentSwipeId
-            Logger.log(`Saving Chat`)
+            Logger.info(`Saving Chat`)
             await get().updateFromBuffer(cachedSwipeId)
             useInference.getState().stopGenerating()
             get().setBuffer('')

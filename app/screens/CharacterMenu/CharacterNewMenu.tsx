@@ -45,7 +45,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
                 chatId = await Chats.db.mutate.createChat(charId)
             }
             if (!chatId) {
-                Logger.log('Chat creation backup has failed! Please report.', true)
+                Logger.errorToast('Chat creation backup has failed! Please report.')
                 return
             }
 
@@ -55,18 +55,18 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
             if (edit) router.push('/CharacterEditor')
             else router.back()
         } catch (error) {
-            Logger.log(`Couldn't load character: ${error}`, true)
+            Logger.errorToast(`Couldn't load character: ${error}`)
             setNowLoading(false)
         }
     }
 
     const handleCreateCharacter = async (text: string) => {
         if (!text) {
-            Logger.log('Name Cannot Be Empty!', true)
+            Logger.errorToast('Name Cannot Be Empty!')
             return
         }
         Characters.db.mutate.createCard(text).then(async (id) => {
-            await setCurrentCharacter(id, true)
+            await setCurrentCharacter(id)
         })
     }
 

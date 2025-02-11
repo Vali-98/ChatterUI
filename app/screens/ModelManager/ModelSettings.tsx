@@ -66,7 +66,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                     label: 'Delete KV Cache',
                     onPress: async () => {
                         await KV.deleteKV()
-                        Logger.log('KV Cache deleted!', true)
+                        Logger.info('KV Cache deleted!')
                         getKVSize()
                     },
                     type: 'warning',
