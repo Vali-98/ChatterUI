@@ -1,53 +1,75 @@
 import { Octicons } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useEffect } from 'react'
-import { View } from 'react-native'
-import Animated, {
-    SharedValue,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withTiming,
-} from 'react-native-reanimated'
+import { View, Animated, Easing, useAnimatedValue } from 'react-native'
 
 const translateMax = -10
 
 type DotProps = {
-    dx: SharedValue<number>
     offset: number
 }
 
-const Dot: React.FC<DotProps> = ({ dx, offset }) => {
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: Math.max(Math.sin(dx.value - offset), 0) * translateMax }],
-    }))
+const Dot: React.FC<DotProps> = ({ offset }) => {
+    const animatedValue = useAnimatedValue(0)
+
+    useEffect(() => {
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(animatedValue, {
+                    toValue: 0,
+                    duration: 400 + offset,
+                    easing: Easing.inOut(Easing.sin),
+                    useNativeDriver: true,
+                }),
+                Animated.timing(animatedValue, {
+                    toValue: 1,
+                    duration: 200,
+                    easing: Easing.inOut(Easing.sin),
+                    useNativeDriver: true,
+                }),
+                Animated.timing(animatedValue, {
+                    toValue: 0,
+                    duration: 200,
+                    easing: Easing.inOut(Easing.sin),
+                    useNativeDriver: true,
+                }),
+                Animated.timing(animatedValue, {
+                    toValue: 0,
+                    duration: 400 - offset,
+                    easing: Easing.inOut(Easing.sin),
+                    useNativeDriver: true,
+                }),
+            ])
+        ).start()
+    }, [])
+
+    const translateY = animatedValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, translateMax],
+    })
+
     const { color } = Theme.useTheme()
+
     return (
-        <Animated.View style={[animatedStyle]}>
-            <Octicons name="dot-fill" size={4} color={color.text._200} />
+        <Animated.View style={{ transform: [{ translateY }] }}>
+            <Octicons name="dot-fill" size={5} color={color.text._200} />
         </Animated.View>
     )
 }
 
 const AnimatedEllipsis = () => {
-    const dx = useSharedValue(Math.PI * 2)
-
-    useEffect(() => {
-        dx.value = withRepeat(withTiming(0, { duration: 1200 }), -1)
-    }, [])
-
     return (
         <View
             style={{
                 flexDirection: 'row',
-                paddingTop: 24,
-                paddingBottom: 2,
+                paddingTop: 12,
+                paddingBottom: 8,
                 paddingHorizontal: 4,
                 columnGap: 8,
             }}>
-            <Dot dx={dx} offset={1.2} />
-            <Dot dx={dx} offset={0.6} />
-            <Dot dx={dx} offset={0} />
+            <Dot offset={100} />
+            <Dot offset={200} />
+            <Dot offset={300} />
         </View>
     )
 }
