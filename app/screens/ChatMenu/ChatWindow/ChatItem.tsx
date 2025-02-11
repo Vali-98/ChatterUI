@@ -15,18 +15,16 @@ const ChatItem: React.FC<ChatItemProps> = ({ index, isLastMessage, isGreeting })
     const nowGenerating = useInference((state) => state.nowGenerating)
 
     return (
-        <FadeDownView>
-            <View style={styles.chatItem}>
-                <ChatFrame index={index} nowGenerating={nowGenerating} isLast={isLastMessage}>
-                    <ChatBody
-                        nowGenerating={nowGenerating}
-                        index={index}
-                        isLastMessage={isLastMessage}
-                        isGreeting={isGreeting}
-                    />
-                </ChatFrame>
-            </View>
-        </FadeDownView>
+        <View style={styles.chatItem}>
+            <ChatFrame index={index} nowGenerating={nowGenerating} isLast={isLastMessage}>
+                <ChatBody
+                    nowGenerating={nowGenerating}
+                    index={index}
+                    isLastMessage={isLastMessage}
+                    isGreeting={isGreeting}
+                />
+            </ChatFrame>
+        </View>
     )
 }
 

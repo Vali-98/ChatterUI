@@ -1,6 +1,6 @@
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { Chats } from '@lib/state/Chat'
-import { FlatList } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 import ChatItem from './ChatItem'
@@ -36,14 +36,14 @@ const ChatWindow = () => {
     }
 
     return (
-        <FlatList
+        <FlashList
             maintainVisibleContentPosition={
                 autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
             }
             keyboardShouldPersistTaps="handled"
             removeClippedSubviews={false}
             inverted
-            windowSize={2}
+            estimatedItemSize={60}
             data={list}
             keyExtractor={(item) => item.key}
             renderItem={renderItems}
