@@ -1,6 +1,6 @@
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { Chats } from '@lib/state/Chat'
-import { FlashList } from '@shopify/flash-list'
+import { FlatList } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 import ChatItem from './ChatItem'
@@ -14,7 +14,7 @@ type ListItem = {
 
 const ChatWindow = () => {
     const { chat } = Chats.useChat()
-    const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
+    const [autoScroll, _] = useMMKVBoolean(AppSettings.AutoScroll)
 
     const list: ListItem[] = (chat?.messages ?? [])
         .map((item, index) => ({
@@ -36,14 +36,14 @@ const ChatWindow = () => {
     }
 
     return (
-        <FlashList
+        <FlatList
             maintainVisibleContentPosition={
                 autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
             }
             keyboardShouldPersistTaps="handled"
             removeClippedSubviews={false}
             inverted
-            estimatedItemSize={60}
+            windowSize={2}
             data={list}
             keyExtractor={(item) => item.key}
             renderItem={renderItems}
