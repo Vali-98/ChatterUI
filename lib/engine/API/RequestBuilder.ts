@@ -32,11 +32,18 @@ const openAIRequest = (config: APIConfiguration, values: APIValues) => {
 
 const ollamaRequest = (config: APIConfiguration, values: APIValues) => {
     const { payloadFields, model, stop, prompt } = buildFields(config, values)
+    let keep_alive = 5
+    if (payloadFields.keep_alive) {
+        keep_alive = payloadFields.keep_alive as number
+        delete payloadFields.keep_alive
+    }
+
     return {
         options: {
             ...payloadFields,
             ...stop,
         },
+        keep_alive: keep_alive + 'm',
         ...model,
         ...prompt,
         raw: true,

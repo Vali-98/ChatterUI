@@ -55,6 +55,7 @@ export enum SamplerID {
 
     XTC_THRESHOLD = 'xtc_threshold',
     XTC_PROBABILITY = 'xtc_probability',
+    KEEP_ALIVE_DURATION = 'keep_alive_duration',
     //...
 }
 
@@ -553,6 +554,20 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             default: -1,
             min: -1,
             max: 100000,
+            step: 1,
+            precision: 0,
+        },
+    },
+    [SamplerID.KEEP_ALIVE_DURATION]: {
+        internalID: SamplerID.KEEP_ALIVE_DURATION,
+        friendlyName: 'Keep Alive Duration',
+        inputType: 'slider',
+        macro: '{{keep_alive_duration}}',
+        values: {
+            type: 'integer',
+            default: 5,
+            min: -1,
+            max: 14400,
             step: 1,
             precision: 0,
         },
