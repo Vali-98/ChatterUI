@@ -177,8 +177,6 @@ export const startupApp = () => {
 
     // migrations for old versions
     migrateModelData_0_7_10_to_0_8_0()
-
-    // TODO: Enable this
     migrateModelData_0_8_4_to_0_8_5()
 
     migratePresets_0_8_3_to_0_8_4()
