@@ -1,4 +1,5 @@
-import { AppSettings, Global } from '@lib/constants/GlobalValues'
+import Alert from '@components/views/Alert'
+import { AppSettings } from '@lib/constants/GlobalValues'
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { Characters } from '@lib/state/Characters'
 import { Chats, useInference } from '@lib/state/Chat'
@@ -6,11 +7,11 @@ import { Instructs, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { mmkv } from '@lib/storage/MMKV'
-import { ModelDataType } from 'db/schema'
 
 import { APISampler } from './API/APIBuilder.types'
 import { buildTextCompletionContext } from './API/ContextBuilder'
-import { Llama, LlamaPreset } from './Local/LlamaLocal'
+import { Llama, LlamaConfig } from './Local/LlamaLocal'
+import { KV } from './Local/Model'
 
 export const localSamplerData: APISampler[] = [
     { externalName: 'n_predict', samplerID: SamplerID.GENERATED_LENGTH },
@@ -36,18 +37,6 @@ export const localSamplerData: APISampler[] = [
     { externalName: 'dry_sequence_breakers', samplerID: SamplerID.DRY_SEQUENCE_BREAK },
 ]
 
-const getLocalPreset = (): LlamaPreset => {
-    const presetString = mmkv.getString(Global.LocalPreset)
-    return presetString
-        ? (JSON.parse(presetString) as LlamaPreset)
-        : {
-              context_length: 4096,
-              threads: 4,
-              gpu_layers: 0,
-              batch: 512,
-          }
-}
-
 const getSamplerFields = (max_length?: number) => {
     const preset: SamplerConfigData = SamplersManager.getCurrentSampler()
     return localSamplerData
@@ -72,8 +61,7 @@ const buildLocalPayload = () => {
     const rep_pen = payloadFields?.['penalty_repeat']
     const n_predict =
         (typeof payloadFields?.['n_predict'] === 'number' && payloadFields?.['n_predict']) || 0
-    const presetString = mmkv.getString(Global.LocalPreset)
-    const localPreset: LlamaPreset = getLocalPreset()
+    const localPreset: LlamaConfig = Llama.useEngineData.getState().config
     return {
         ...payloadFields,
         penalize_nl: typeof rep_pen === 'number' && rep_pen > 1,
@@ -82,6 +70,14 @@ const buildLocalPayload = () => {
         stop: constructStopSequence(),
         emit_partial_completion: true,
     }
+}
+
+const getPromptString = () => {
+    const payloadFields = getSamplerFields()
+    const localPreset: LlamaConfig = Llama.useEngineData.getState().config
+    const n_predict =
+        (typeof payloadFields?.['n_predict'] === 'number' && payloadFields?.['n_predict']) || 0
+    return buildTextCompletionContext(localPreset.context_length - n_predict)
 }
 
 const constructStopSequence = (): string[] => {
@@ -112,30 +108,42 @@ const constructReplaceStrings = (): string[] => {
     return [...stops, ...output]
 }
 
-export const localInference = async () => {
-    let context = Llama.useLlama.getState().context
+const verifyModelLoaded = async (): Promise<boolean> => {
+    const model = Llama.useLlama.getState().model
 
-    let model: undefined | ModelDataType = undefined
-
-    try {
-        const modelString = mmkv.getString(Global.LocalModel)
-        if (!modelString) {
+    // Model Loading Routine
+    if (!model) {
+        const lastModel = Llama.useEngineData.getState().lastModel
+        const autoLoad = mmkv.getBoolean(AppSettings.AutoLoadLocal)
+        // If  autoload is disabled, just return
+        if (!autoLoad) {
+            Logger.log('No Model Loaded', true)
+            return false
+        }
+        console.log(lastModel)
+        // by default, autoload will attempt to load the last model used
+        if (!lastModel) {
             Logger.log('No Auto-Load Model Set', true)
-            return
+            return false
         }
-        model = JSON.parse(modelString)
-    } catch (e) {
-        Logger.log('Failed to Auto-Load Model', true)
+
+        // attempt to load model
+        if (lastModel) {
+            Logger.log(`Auto-loading: ${lastModel.name}`, true)
+            await Llama.useLlama.getState().load(lastModel)
+        }
+    }
+    return true
+}
+
+export const localInference = async () => {
+    // Model Loading Routine
+    if (!(await verifyModelLoaded())) {
+        return stopGenerating()
     }
 
-    if (model && !context && mmkv.getBoolean(AppSettings.AutoLoadLocal)) {
-        const params = getLocalPreset()
-        if (params) {
-            Logger.log(`Auto-loading: ${model.name}`, true)
-            await Llama.useLlama.getState().load(model)
-            context = Llama.useLlama.getState().context
-        }
-    }
+    // verify that model has been loaded
+    const context = Llama.useLlama.getState().context
 
     if (!context) {
         Logger.log('No Model Loaded', true)
@@ -143,14 +151,45 @@ export const localInference = async () => {
         return
     }
 
-    const loadKV =
-        mmkv.getBoolean(AppSettings.SaveLocalKV) && !mmkv.getBoolean(Global.LocalSessionLoaded)
+    const payload = buildLocalPayload()
 
-    if (loadKV) {
-        await Llama.useLlama.getState().loadKV()
-        mmkv.set(Global.LocalSessionLoaded, true)
+    if (mmkv.getBoolean(AppSettings.SaveLocalKV) && !KV.useKVState.getState().kvCacheLoaded) {
+        const prompt = Llama.useLlama.getState().tokenize(payload.prompt)
+        console.log(prompt?.tokens.length)
+        const result = KV.useKVState.getState().verifyKVCache(prompt?.tokens ?? [])
+        console.log(result)
+        if (!result.match) {
+            Alert.alert({
+                title: 'Cache Mismatch',
+                description: `KV Cache does not match current prompt:\n\n${result.matchLength} of ${result.cachedLength} tokens are identical.\n\nPress 'Load Anyway' if you don't mind losing the cache.`,
+                buttons: [
+                    { label: 'Cancel', onPress: stopGenerating },
+                    {
+                        label: 'Load Anyway',
+                        onPress: async () => {
+                            const result = await Llama.useLlama.getState().loadKV()
+                            if (result) {
+                                KV.useKVState.getState().setKvCacheLoaded(true)
+                            }
+                            runLocalCompletion(payload)
+                        },
+                        type: 'warning',
+                    },
+                ],
+                onDismiss: stopGenerating,
+            })
+            return
+        }
+
+        const kvloadResult = await Llama.useLlama.getState().loadKV()
+        if (kvloadResult) {
+            KV.useKVState.getState().setKvCacheLoaded(true)
+        }
     }
+    await runLocalCompletion(payload)
+}
 
+const runLocalCompletion = async (payload: ReturnType<typeof buildLocalPayload>) => {
     const replace = RegExp(
         constructReplaceStrings()
             .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
@@ -161,8 +200,6 @@ export const localInference = async () => {
     useInference.getState().setAbort(async () => {
         await Llama.useLlama.getState().stopCompletion()
     })
-
-    const payload = buildLocalPayload()
 
     const outputStream = (text: string) => {
         const output = Chats.useChatState.getState().buffer + text

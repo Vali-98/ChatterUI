@@ -3,6 +3,7 @@ import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { AntDesign } from '@expo/vector-icons'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
+import { Model } from '@lib/engine/Local/Model'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
@@ -19,7 +20,7 @@ const ModelManager = () => {
     const styles = useStyles()
     const { color } = Theme.useTheme()
 
-    const { data, updatedAt } = useLiveQuery(Llama.getModelListQuery())
+    const { data, updatedAt } = useLiveQuery(Model.getModelListQuery())
 
     const [showSettings, setShowSettings] = useState(false)
 

@@ -1,15 +1,14 @@
 import Alert from '@components/views/Alert'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { AntDesign } from '@expo/vector-icons'
-import { Global } from '@lib/constants/GlobalValues'
 import { GGMLNameMap } from '@lib/engine/Local'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
+import { Model } from '@lib/engine/Local/Model'
 import { Theme } from '@lib/theme/ThemeManager'
 import { readableFileSize } from '@lib/utils/File'
 import { ModelDataType } from 'db/schema'
 import { useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { useMMKVObject } from 'react-native-mmkv'
 import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
 
 type ModelItemProps = {
@@ -37,11 +36,10 @@ const ModelItem: React.FC<ModelItemProps> = ({
     }))
 
     const [showEdit, setShowEdit] = useState(false)
-    const [autoLoad, setAutoLoad] = useMMKVObject<ModelDataType>(Global.LocalModel)
     //@ts-ignore
     const quant: string = item.quantization && GGMLNameMap[item.quantization]
     const disableDelete = modelId === item.id || modelLoading
-    const isInvalid = Llama.isInitialEntry(item)
+    const isInvalid = Model.isInitialEntry(item)
 
     const handleDeleteModel = () => {
         Alert.alert({
@@ -58,7 +56,10 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 {
                     label: 'Delete Model',
                     onPress: async () => {
-                        await Llama.deleteModelById(item.id)
+                        if (modelId === item.id) {
+                            await unloadModel()
+                        }
+                        await Model.deleteModelById(item.id)
                     },
                     type: 'warning',
                 },
@@ -76,7 +77,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
             <TextBoxModal
                 booleans={[showEdit, setShowEdit]}
                 onConfirm={async (name) => {
-                    await Llama.updateName(name, item.id)
+                    await Model.updateName(name, item.id)
                 }}
                 title="Rename Model"
                 defaultValue={item.name}
@@ -138,7 +139,6 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         onPress={async () => {
                             setModelLoading(true)
                             await loadModel(item)
-                            setAutoLoad(item)
                             setModelLoading(false)
                         }}>
                         <AntDesign

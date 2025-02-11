@@ -1,6 +1,5 @@
 import PopupMenu, { MenuRef } from '@components/views/PopupMenu'
-import TextBoxModal from '@components/views/TextBoxModal'
-import { Llama } from '@lib/engine/Local/LlamaLocal'
+import { Model } from '@lib/engine/Local/Model'
 import { useState } from 'react'
 import { View } from 'react-native'
 
@@ -12,13 +11,13 @@ type ModelNewMenuProps = {
 const ModelNewMenu: React.FC<ModelNewMenuProps> = ({ modelImporting, setModelImporting }) => {
     const [showDownload, setShowDownload] = useState(false)
 
-    const handleDownloadModel = (text: string) => {}
+    // const handleDownloadModel = (text: string) => {}
 
     const handleSetExternal = async (menuRef: MenuRef) => {
         menuRef.current?.close()
         if (modelImporting) return
         setModelImporting(true)
-        await Llama.linkModelExternal()
+        await Model.linkModelExternal()
         setModelImporting(false)
     }
 
@@ -26,18 +25,12 @@ const ModelNewMenu: React.FC<ModelNewMenuProps> = ({ modelImporting, setModelImp
         menuRef.current?.close()
         if (modelImporting) return
         setModelImporting(true)
-        await Llama.importModel()
+        await Model.importModel()
         setModelImporting(false)
     }
 
     return (
         <View>
-            <TextBoxModal
-                title="Enter Model Download Link"
-                booleans={[showDownload, setShowDownload]}
-                onConfirm={(text) => handleDownloadModel(text)}
-                showPaste
-            />
             <PopupMenu
                 placement="bottom"
                 icon="addfile"

@@ -86,22 +86,20 @@ export const enum Global {
     CohereKey = 'coherekey',
     CohereModel = 'coheremodel', */
 
+    // Local - deprecated with move to EngineData
+
+    // object containing model info object based on db schema, needed for auto-loading
+    // LocalModel = 'localmodel',
+    // preset values for model cpu specs
+    // LocalPreset = 'localpreset',
+    // whether or not a KV cache has been loaded
+    // LocalSessionLoaded = 'localsessionloaded',
+
     // Management
 
     CpuFeatures = 'cpufeatures',
-
     Logs = 'logs',
-
     AppMode = 'appmode',
-
-    // Local
-
-    // object containing model info object based on db schema, needed for auto-loading
-    LocalModel = 'localmodel',
-    // preset values for model cpu specs
-    LocalPreset = 'localpreset',
-    // whether or not a KV cache has been loaded
-    LocalSessionLoaded = 'localsessionloaded',
 
     // TODO move to zustaind state
     TTSSpeaker = 'ttsspeaker',

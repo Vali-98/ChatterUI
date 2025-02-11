@@ -1,16 +1,15 @@
-import { db } from '@db'
 import { AppDirectory, readableFileSize } from '@lib/utils/File'
 import { CompletionParams, ContextParams, initLlama, LlamaContext } from 'cui-llama.rn'
-import { model_data, ModelDataType } from 'db/schema'
-import { eq } from 'drizzle-orm'
-import { getDocumentAsync } from 'expo-document-picker'
-import * as FS from 'expo-file-system'
+import { ModelDataType } from 'db/schema'
+import { getInfoAsync, writeAsStringAsync } from 'expo-file-system'
 import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
-import { checkGGMLDeprecated, GGMLNameMap } from './GGML'
-import { AppSettings, Global } from '../../constants/GlobalValues'
+import { checkGGMLDeprecated } from './GGML'
+import { KV } from './Model'
+import { AppSettings } from '../../constants/GlobalValues'
 import { Logger } from '../../state/Logger'
-import { mmkv } from '../../storage/MMKV'
+import { mmkv, mmkvStorage } from '../../storage/MMKV'
 
 type CompletionTimings = {
     predicted_per_token_ms: number
@@ -33,11 +32,12 @@ type LlamaState = {
     context: LlamaContext | undefined
     model: undefined | ModelDataType
     loadProgress: number
+    promptCache?: string
     load: (model: ModelDataType) => Promise<void>
     setLoadProgress: (progress: number) => void
     unload: () => Promise<void>
-    saveKV: () => Promise<void>
-    loadKV: () => Promise<void>
+    saveKV: (prompt: string | undefined) => Promise<void>
+    loadKV: () => Promise<boolean>
     completion: (
         params: CompletionParams,
         callback: (text: string) => void,
@@ -45,18 +45,26 @@ type LlamaState = {
     ) => Promise<void>
     stopCompletion: () => Promise<void>
     tokenLength: (text: string) => number
+    tokenize: (text: string) => { tokens: number[] } | undefined
 }
 
-export type LlamaPreset = {
+export type LlamaConfig = {
     context_length: number
     threads: number
     gpu_layers: number
     batch: number
 }
 
+type EngineDataProps = {
+    config: LlamaConfig
+    lastModel?: ModelDataType
+    setConfiguration: (config: LlamaConfig) => void
+    setLastModelLoaded: (model: ModelDataType) => void
+}
+
 const sessionFile = `${AppDirectory.SessionPath}llama-session.bin`
 
-const default_preset = {
+const defaultConfig = {
     context_length: 4096,
     threads: 4,
     gpu_layers: 0,
@@ -64,16 +72,37 @@ const default_preset = {
 }
 
 export namespace Llama {
+    export const useEngineData = create<EngineDataProps>()(
+        persist(
+            (set) => ({
+                config: defaultConfig,
+                lastModel: undefined,
+                setConfiguration: (config: LlamaConfig) => {
+                    set((state) => ({ ...state, config: config }))
+                },
+                setLastModelLoaded: (model: ModelDataType) => {
+                    set((state) => ({ ...state, lastModel: model }))
+                },
+            }),
+            {
+                name: 'enginedata-storage',
+                partialize: (state) => ({
+                    config: state.config,
+                    lastModel: state.lastModel,
+                }),
+                storage: createJSONStorage(() => mmkvStorage),
+                version: 1,
+            }
+        )
+    )
+
     export const useLlama = create<LlamaState>()((set, get) => ({
         context: undefined,
-        modelName: undefined,
-        modelId: undefined,
         loadProgress: 0,
         model: undefined,
+        promptCache: undefined,
         load: async (model: ModelDataType) => {
-            const presetString = mmkv.getString(Global.LocalPreset)
-            if (!presetString) return
-            const preset: LlamaPreset = JSON.parse(presetString)
+            const config = useEngineData.getState().config
 
             if (get()?.model?.id === model.id) {
                 return Logger.log('Model Already Loaded!', true)
@@ -83,7 +112,7 @@ export namespace Llama {
                 return Logger.log('Quantization No Longer Supported!', true)
             }
 
-            if (!(await FS.getInfoAsync(model.file_path)).exists) {
+            if (!(await getInfoAsync(model.file_path)).exists) {
                 Logger.log('Model Does Not Exist!', true)
                 return
             }
@@ -94,11 +123,12 @@ export namespace Llama {
 
             const params: ContextParams = {
                 model: model.file_path,
-                n_ctx: preset.context_length,
-                n_threads: preset.threads,
-                n_batch: preset.batch,
+                n_ctx: config.context_length,
+                n_threads: config.threads,
+                n_batch: config.batch,
             }
 
+            /*
             let setAutoLoad = false
 
             try {
@@ -113,6 +143,7 @@ export namespace Llama {
             // This probably should be changed as the parameter name is somewhat confusing
             // TODO: Investigate why KV cache is loaded on chat instead of on model start
             mmkv.set(Global.LocalSessionLoaded, setAutoLoad)
+            */
 
             Logger.log(
                 `Starting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}`
@@ -133,6 +164,10 @@ export namespace Llama {
                 context: llamaContext,
                 model: model,
             }))
+
+            // updated EngineData
+            useEngineData.getState().setLastModelLoaded(model)
+            KV.useKVState.getState().setKvCacheLoaded(false)
         },
         setLoadProgress: (progress: number) => {
             set((state) => ({ ...state, loadProgress: progress }))
@@ -164,22 +199,27 @@ export namespace Llama {
                     completed(text)
                     Logger.log(textTimings(timings))
                     if (mmkv.getBoolean(AppSettings.SaveLocalKV)) {
-                        await get().saveKV()
+                        await get().saveKV(params.prompt)
                     }
                 })
         },
         stopCompletion: async () => {
             await get().context?.stopCompletion()
         },
-        saveKV: async () => {
+        saveKV: async (prompt: string | undefined) => {
             const llamaContext = get().context
             if (!llamaContext) {
                 Logger.log('No Model Loaded', true)
                 return
             }
 
-            if (!(await FS.getInfoAsync(sessionFile)).exists) {
-                await FS.writeAsStringAsync(sessionFile, '', { encoding: 'base64' })
+            if (prompt) {
+                const tokens = get().tokenize(prompt)?.tokens
+                KV.useKVState.getState().setKvCacheTokens(tokens ?? [])
+            }
+
+            if (!(await getInfoAsync(sessionFile)).exists) {
+                await writeAsStringAsync(sessionFile, '', { encoding: 'base64' })
             }
 
             const now = performance.now()
@@ -189,30 +229,36 @@ export namespace Llama {
                     ? 'Failed to save KV cache'
                     : `Saved KV in ${Math.floor(performance.now() - now)}ms with ${data} tokens`
             )
-            Logger.log(`Current KV Size is: ${readableFileSize(await getKVSize())}`)
+            Logger.log(`Current KV Size is: ${readableFileSize(await KV.getKVSize())}`)
         },
         loadKV: async () => {
+            let result = false
             const llamaContext = get().context
             if (!llamaContext) {
                 Logger.log('No Model Loaded', true)
-                return
+                return false
             }
-            const data = await FS.getInfoAsync(sessionFile)
+            const data = await getInfoAsync(sessionFile)
             if (!data.exists) {
-                Logger.log('No cache found')
-                return
+                Logger.log('No Cache found')
+                return false
             }
             await llamaContext
                 .loadSession(sessionFile.replace('file://', ''))
                 .then(() => {
                     Logger.log('Session loaded from KV cache')
+                    result = true
                 })
                 .catch(() => {
                     Logger.log('Session loaded could not load from KV cache')
                 })
+            return result
         },
         tokenLength: (text: string) => {
             return get().context?.tokenizeSync(text)?.tokens?.length ?? 0
+        },
+        tokenize: (text: string) => {
+            return get().context?.tokenizeSync(text)
         },
     }))
 
@@ -237,13 +283,8 @@ export namespace Llama {
 
     // Presets
 
-    export const setLlamaPreset = () => {
-        const presets = mmkv.getString(Global.LocalPreset)
-        if (presets === undefined) mmkv.set(Global.LocalPreset, JSON.stringify(default_preset))
-    }
-
-    // Downloaders
-
+    // Downloaders - Old Placeholder
+    /*
     export const downloadModel = async (
         url: string,
         callback?: () => void,
@@ -260,15 +301,15 @@ export namespace Llama {
             Logger.log('Invalid URL', true)
             return
         }
-        const fileInfo = await FS.getInfoAsync(`${AppDirectory.ModelPath}${filename}`)
+        const fileInfo = await getInfoAsync(`${AppDirectory.ModelPath}${filename}`)
         if (fileInfo.exists) {
             Logger.log('Model already exists!', true)
             // return
         }
         let current = 0
-        const downloadTask = FS.createDownloadResumable(
+        const downloadTask = createDownloadResumable(
             url,
-            `${FS.cacheDirectory}${filename}`,
+            `${cacheDirectory}${filename}`,
             {},
             (progress) => {
                 const percentage = progress.totalBytesWritten / progress.totalBytesExpectedToWrite
@@ -283,7 +324,7 @@ export namespace Llama {
                     Logger.log('Download failed')
                     return
                 }
-                await FS.moveAsync({
+                await moveAsync({
                     from: result.uri,
                     to: `${AppDirectory.ModelPath}${filename}`,
                 }).then(() => {
@@ -291,226 +332,5 @@ export namespace Llama {
                 })
             })
             .catch((err) => Logger.log(`Failed to download: ${err}`))
-    }
-
-    // Filesystem
-
-    export const getModelList = async () => {
-        return await FS.readDirectoryAsync(AppDirectory.ModelPath)
-    }
-
-    export const modelExists = async (modelName: string) => {
-        return (await getModelList()).includes(modelName)
-    }
-
-    export const deleteModelById = async (id: number) => {
-        const modelInfo = await db.query.model_data.findFirst({ where: eq(model_data.id, id) })
-        if (!modelInfo) return
-        if (modelInfo.id === useLlama.getState()?.model?.id) await useLlama.getState().unload()
-        // some models may be external
-        if (modelInfo.file_path.startsWith(AppDirectory.ModelPath))
-            await deleteModel(modelInfo.file)
-        await db.delete(model_data).where(eq(model_data.id, id))
-    }
-
-    /**
-     * @deprecated
-     */
-    export const deleteModel = async (name: string) => {
-        if (!(await modelExists(name))) return
-        if (name === useLlama.getState()?.model?.name) await useLlama.getState().unload()
-        return await FS.deleteAsync(`${AppDirectory.ModelPath}${name}`)
-    }
-
-    export const importModel = async () => {
-        return getDocumentAsync({
-            copyToCacheDirectory: false,
-        }).then(async (result) => {
-            if (result.canceled) return
-            const file = result.assets[0]
-            const name = file.name
-            const newdir = `${AppDirectory.ModelPath}${name}`
-            Logger.log('Importing file...', true)
-            const success = await FS.copyAsync({
-                from: file.uri,
-                to: newdir,
-            })
-                .then(() => {
-                    return true
-                })
-                .catch((error) => {
-                    Logger.log(`Import Failed: ${error.message}`, true)
-                    return false
-                })
-            if (!success) return
-
-            // database routine here
-            if (await createModelData(name, true)) Logger.log(`Model Imported Sucessfully!`, true)
-        })
-    }
-
-    export const linkModelExternal = async () => {
-        return getDocumentAsync({
-            copyToCacheDirectory: false,
-        }).then(async (result) => {
-            if (result.canceled) return
-            const file = result.assets[0]
-            Logger.log('Importing file...', true)
-            if (!file) {
-                Logger.log('File Invalid')
-                return
-            }
-            // database routine here
-            if (await createModelDataExternal(file.uri, file.name, true))
-                Logger.log(`Model Imported Sucessfully!`, true)
-        })
-    }
-
-    type ModelData = Omit<ModelDataType, 'id' | 'create_date' | 'last_modified'>
-
-    const initialModelEntry = (filename: string, file_path: string) => ({
-        context_length: 0,
-        file: filename,
-        file_path: file_path,
-        name: 'N/A',
-        file_size: 0,
-        params: 'N/A',
-        quantization: '-1',
-        architecture: 'N/A',
-    })
-
-    export const createModelData = async (filename: string, deleteOnFailure: boolean = false) => {
-        return setModelDataInternal(
-            filename,
-            `${AppDirectory.ModelPath}${filename}`,
-            deleteOnFailure
-        )
-    }
-
-    export const createModelDataExternal = async (
-        newdir: string,
-        filename: string,
-        deleteOnFailure: boolean = false
-    ) => {
-        if (!filename) {
-            Logger.log('Filename invalid, Import Failed', true)
-            return
-        }
-        return setModelDataInternal(filename, newdir, deleteOnFailure)
-    }
-
-    const setModelDataInternal = async (
-        filename: string,
-        file_path: string,
-        deleteOnFailure: boolean
-    ) => {
-        try {
-            const [{ id }, ...rest] = await db
-                .insert(model_data)
-                .values(initialModelEntry(filename, file_path))
-                .returning({ id: model_data.id })
-
-            const modelContext = await initLlama({ model: file_path, vocab_only: true })
-
-            const modelInfo: any = modelContext.model
-            const modelType = modelInfo.metadata?.['general.architecture']
-            const modelDataEntry = {
-                context_length: modelInfo.metadata?.[modelType + '.context_length'] ?? 0,
-                file: filename,
-                file_path: file_path,
-                name: modelInfo.metadata?.['general.name'] ?? 'N/A',
-                file_size: modelInfo.size ?? 0,
-                params: modelInfo.metadata?.['general.size_label'] ?? 'N/A',
-                quantization: modelInfo.metadata?.['general.file_type'] ?? '-1',
-                architecture: modelType ?? 'N/A',
-            }
-            Logger.log(`New Model Data:\n${modelDataText(modelDataEntry)}`)
-            await modelContext.release()
-            await db.update(model_data).set(modelDataEntry).where(eq(model_data.id, id))
-            return true
-        } catch (e) {
-            Logger.log(`Failed to create data: ${e}`, true)
-            if (deleteOnFailure) FS.deleteAsync(file_path, { idempotent: true })
-            return false
-        }
-    }
-
-    export const verifyModelList = async () => {
-        let modelList = await db.query.model_data.findMany()
-        const fileList = await getModelList()
-
-        // cull missing models
-        modelList.forEach(async (item) => {
-            if (item.name === '' || !(await FS.getInfoAsync(item.file_path)).exists) {
-                Logger.log(`Model Missing, its entry will be deleted: ${item.name}`)
-                await db.delete(model_data).where(eq(model_data.id, item.id))
-            }
-        })
-        // refresh as some may have been deleted
-        modelList = await db.query.model_data.findMany()
-
-        // create data as migration step
-        fileList.forEach(async (item) => {
-            if (modelList.some((model_data) => model_data.file === item)) return
-            await createModelData(`${item}`)
-        })
-    }
-
-    export const getKVSize = async () => {
-        const data = await FS.getInfoAsync(sessionFile)
-        return data.exists ? data.size : 0
-    }
-
-    export const deleteKV = async () => {
-        if ((await FS.getInfoAsync(sessionFile)).exists) {
-            await FS.deleteAsync(sessionFile)
-        }
-    }
-
-    export const kvInfo = async () => {
-        const data = await FS.getInfoAsync(sessionFile)
-        if (!data.exists) {
-            Logger.log('No KV Cache found')
-            return
-        }
-        Logger.log(`Size of KV cache: ${Math.floor(data.size * 0.000001)} MB`)
-    }
-
-    export const getModelListQuery = () => {
-        return db.query.model_data.findMany()
-    }
-
-    export const modelDataText = (data: ModelData) => {
-        const quantValue = data.quantization ?? ''
-
-        //@ts-ignore
-        const quantType = GGMLNameMap[quantValue]
-
-        return `Context length: ${data.context_length ?? 'N/A'}\nFile: ${data.file}\nName: ${data.name ?? 'N/A'}\nSize: ${(data.file_size && readableFileSize(data.file_size)) ?? 'N/A'}\nParams: ${data.params ?? 'N/A'}\nQuantization: ${quantType ?? 'N/A'}\nArchitecture: ${data.architecture ?? 'N/A'}`
-    }
-
-    export const updateName = async (name: string, id: number) => {
-        await db.update(model_data).set({ name: name }).where(eq(model_data.id, id))
-    }
-
-    export const isInitialEntry = (data: ModelData) => {
-        const initial: ModelData = {
-            file: '',
-            file_path: '',
-            context_length: 0,
-            name: 'N/A',
-            file_size: 0,
-            params: 'N/A',
-            quantization: '-1',
-            architecture: 'N/A',
-        }
-
-        for (const key in initial) {
-            if (key === 'file' || key === 'file_path') continue
-            const initialV = initial[key as keyof ModelData]
-            const dataV = data[key as keyof ModelData]
-            if (initialV !== dataV) return false
-        }
-        return true
-    }
+    }*/
 }

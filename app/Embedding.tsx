@@ -1,7 +1,5 @@
 import { rawdb } from '@db'
-import { Global } from '@lib/constants/GlobalValues'
-import { LlamaPreset } from '@lib/engine/Local/LlamaLocal'
-import { mmkv } from '@lib/storage/MMKV'
+import { LlamaConfig } from '@lib/engine/Local/LlamaLocal'
 import { Theme } from '@lib/theme/ThemeManager'
 import { initLlama, LlamaContext } from 'cui-llama.rn'
 import { NativeEmbeddingResult } from 'cui-llama.rn/lib/typescript/NativeRNLlama'
@@ -55,10 +53,7 @@ const EmbeddingScreen = () => {
             <Text>Embedding</Text>
             <TouchableOpacity
                 onPress={() => {
-                    const preset = mmkv.getString(Global.LocalPreset)
-                    if (!preset) return
-                    const presetJson = JSON.parse(preset) as LlamaPreset
-                    loadModel(presetJson)
+                    console.log('Reimplement if needed')
                 }}>
                 <Text style={{ color: color.text._100 }}>Load Model</Text>
             </TouchableOpacity>
@@ -188,14 +183,14 @@ const insertData = async () => {
 
 type EmbeddingStoreState = {
     model: undefined | LlamaContext
-    loadModel: (preset: LlamaPreset) => Promise<void>
+    loadModel: (preset: LlamaConfig) => Promise<void>
     getEmbedding: (text: string) => Promise<NativeEmbeddingResult | undefined>
 }
 
 export namespace EmbeddingState {
     export const useEmbedding = create<EmbeddingStoreState>()((set, get) => ({
         model: undefined,
-        loadModel: async (preset: LlamaPreset) => {
+        loadModel: async (preset: LlamaConfig) => {
             const model = await initLlama({
                 model: documentDirectory + 'models/allminifp16.gguf',
                 n_threads: preset.threads,

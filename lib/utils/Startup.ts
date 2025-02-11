@@ -1,3 +1,4 @@
+import { Model } from '@lib/engine/Local/Model'
 import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { getCpuFeatures } from 'cui-llama.rn'
@@ -56,13 +57,27 @@ const setCPUFeatures = async () => {
 const migrateModelData_0_7_10_to_0_8_0 = () => {
     // Fix for 0.7.10 -> 0.8.0 LocalModel data
     // Attempt to parse model, if this fails, delete the key
+    const oldDef = `localmodel`
     try {
-        const model = mmkv.getString(Global.LocalModel)
+        const model = mmkv.getString(oldDef)
         if (model) JSON.parse(model)
     } catch (e) {
         Logger.log('Model could not be parsed, resetting')
-        mmkv.delete(Global.LocalModel)
+        mmkv.delete(oldDef)
     }
+}
+
+const migrateModelData_0_8_4_to_0_8_5 = () => {
+    // `localmodel` is the definition of Global.LocalModel
+    const oldDef = `localmodel`
+    try {
+        const modelData = mmkv.getString(oldDef)
+        if (!modelData) return
+        const data = JSON.parse(modelData)
+        if (!data) return
+        mmkv.delete(oldDef)
+        Llama.useEngineData.getState().setLastModelLoaded(data)
+    } catch (e) {}
 }
 
 export const generateDefaultDirectories = async () => {
@@ -140,10 +155,6 @@ export const startupApp = () => {
     setDefaultCharacter()
     setDefaultInstruct()
 
-    // Ensure the llama.rn preset is generated
-    // TODO: Move this to zustand
-    Llama.setLlamaPreset()
-
     // Init Logs
     // TOOD: Move this to zustand
     if (!mmkv.getString(Global.Logs)) mmkv.set(Global.Logs, JSON.stringify([]))
@@ -162,10 +173,14 @@ export const startupApp = () => {
     setCPUFeatures()
 
     // Local Model Data in case external models are deleted
-    Llama.verifyModelList()
+    Model.verifyModelList()
 
     // migrations for old versions
     migrateModelData_0_7_10_to_0_8_0()
+
+    // TODO: Enable this
+    migrateModelData_0_8_4_to_0_8_5()
+
     migratePresets_0_8_3_to_0_8_4()
 
     lockScreenOrientation()

@@ -4,7 +4,8 @@ import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
 import { AppSettings, Global } from '@lib/constants/GlobalValues'
-import { Llama, LlamaPreset } from '@lib/engine/Local/LlamaLocal'
+import { Llama, LlamaConfig } from '@lib/engine/Local/LlamaLocal'
+import { KV } from '@lib/engine/Local/Model'
 import { Logger } from '@lib/state/Logger'
 import { readableFileSize } from '@lib/utils/File'
 import { useFocusEffect } from 'expo-router'
@@ -26,8 +27,10 @@ type CPUFeatures = {
 }
 
 const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoading, exit }) => {
-    const [preset, setPreset] = useMMKVObject<LlamaPreset>(Global.LocalPreset)
-    const [cpuFeatures, setCpuFeatures] = useMMKVObject<CPUFeatures>(Global.CpuFeatures)
+    const { config, setConfig } = Llama.useEngineData((state) => ({
+        config: state.config,
+        setConfig: state.setConfiguration,
+    }))
 
     const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
     const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)
@@ -35,7 +38,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
     const [kvSize, setKVSize] = useState(0)
 
     const getKVSize = async () => {
-        const size = await Llama.getKVSize()
+        const size = await KV.getKVSize()
         setKVSize(size)
     }
 
@@ -62,7 +65,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                 {
                     label: 'Delete KV Cache',
                     onPress: async () => {
-                        await Llama.deleteKV()
+                        await KV.deleteKV()
                         Logger.log('KV Cache deleted!', true)
                         getKVSize()
                     },
@@ -80,12 +83,12 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             exiting={SlideOutRight.easing(Easing.inOut(Easing.cubic))}>
             <SectionTitle>CPU Settings</SectionTitle>
             <View style={{ marginTop: 16 }} />
-            {preset && (
+            {config && (
                 <View>
                     <ThemedSlider
                         label="Max Context"
-                        value={preset.context_length}
-                        onValueChange={(value) => setPreset({ ...preset, context_length: value })}
+                        value={config.context_length}
+                        onValueChange={(value) => setConfig({ ...config, context_length: value })}
                         min={1024}
                         max={32768}
                         step={1024}
@@ -93,8 +96,8 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                     />
                     <ThemedSlider
                         label="Threads"
-                        value={preset.threads}
-                        onValueChange={(value) => setPreset({ ...preset, threads: value })}
+                        value={config.threads}
+                        onValueChange={(value) => setConfig({ ...config, threads: value })}
                         min={1}
                         max={8}
                         step={1}
@@ -103,8 +106,8 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
 
                     <ThemedSlider
                         label="Batch"
-                        value={preset.batch}
-                        onValueChange={(value) => setPreset({ ...preset, batch: value })}
+                        value={config.batch}
+                        onValueChange={(value) => setConfig({ ...config, batch: value })}
                         min={16}
                         max={512}
                         step={16}
@@ -114,8 +117,8 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                     {Platform.OS === 'ios' && (
                         <ThemedSlider
                             label="GPU Layers"
-                            value={preset.gpu_layers}
-                            onValueChange={(value) => setPreset({ ...preset, gpu_layers: value })}
+                            value={config.gpu_layers}
+                            onValueChange={(value) => setConfig({ ...config, gpu_layers: value })}
                             min={0}
                             max={100}
                             step={1}

@@ -10,7 +10,7 @@ import { replaceMacros } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 
-export const buildTextCompletionContext = (max_length: number) => {
+export const buildTextCompletionContext = (max_length: number, printTimings = true) => {
     const delta = performance.now()
     const bypassContextLength = mmkv.getBoolean(AppSettings.BypassContextLength)
     const tokenizer =
@@ -162,8 +162,10 @@ export const buildTextCompletionContext = (max_length: number) => {
     payload += currentInstruct.system_suffix
 
     payload = replaceMacros(payload + message_acc)
-    Logger.log(`Approximate Context Size: ${message_acc_length + payload_length} tokens`)
-    Logger.log(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
+    if (printTimings) {
+        Logger.log(`Approximate Context Size: ${message_acc_length + payload_length} tokens`)
+        Logger.log(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
+    }
     if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.log(payload)
 
     return payload
