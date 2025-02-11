@@ -95,10 +95,11 @@ export const enum Global {
     // whether or not a KV cache has been loaded
     // LocalSessionLoaded = 'localsessionloaded',
 
+    // Logs = 'logs', // moved to zustand state
+
     // Management
 
     CpuFeatures = 'cpufeatures',
-    Logs = 'logs',
     AppMode = 'appmode',
 
     // TODO move to zustaind state

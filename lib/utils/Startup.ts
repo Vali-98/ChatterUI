@@ -155,10 +155,6 @@ export const startupApp = () => {
     setDefaultCharacter()
     setDefaultInstruct()
 
-    // Init Logs
-    // TOOD: Move this to zustand
-    // if (!mmkv.getString(Global.Logs)) mmkv.set(Global.Logs, JSON.stringify([]))
-
     // Init step, appMode is never null
     if (!mmkv.getString(Global.AppMode)) mmkv.set(Global.AppMode, AppMode.LOCAL)
 
