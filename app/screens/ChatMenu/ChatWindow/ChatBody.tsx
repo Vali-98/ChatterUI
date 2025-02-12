@@ -1,11 +1,10 @@
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
-import React, { useState } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 
 import ChatText from './ChatText'
 import ChatTextLast from './ChatTextLast'
-import EditorModal from './EditorModal'
+import { useChatEditorState } from './EditorModal'
 import Swipes from './Swipes'
 
 type ChatTextProps = {
@@ -17,10 +16,10 @@ type ChatTextProps = {
 
 const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage, isGreeting }) => {
     const message = Chats.useEntryData(index)
-    const [editMode, setEditMode] = useState(false)
     const { color, spacing, borderRadius } = Theme.useTheme()
+    const showEditor = useChatEditorState((state) => state.show)
     const handleEnableEdit = () => {
-        setEditMode(!nowGenerating)
+        if (!nowGenerating) showEditor(index)
     }
 
     const hasSwipes = message?.swipes?.length > 1
@@ -28,15 +27,6 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
 
     return (
         <View>
-            {editMode && (
-                <EditorModal
-                    index={index}
-                    isLastMessage={isLastMessage}
-                    setEditMode={setEditMode}
-                    editMode={editMode}
-                />
-            )}
-
             <TouchableOpacity
                 style={{
                     backgroundColor: color.neutral._200,

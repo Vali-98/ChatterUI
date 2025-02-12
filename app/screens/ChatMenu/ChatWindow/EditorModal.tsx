@@ -2,38 +2,59 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import FadeBackrop from '@components/views/FadeBackdrop'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { GestureResponderEvent, Modal, StyleSheet, Text, TextInput, View } from 'react-native'
 import Animated, { SlideOutDown } from 'react-native-reanimated'
+import { create } from 'zustand'
 
-type EditorProps = {
+type ChatEditorStateProps = {
     index: number
-    isLastMessage: boolean
-    setEditMode: React.Dispatch<React.SetStateAction<boolean>>
     editMode: boolean
+    hide: () => void
+    show: (index: number) => void
 }
 
-const EditorModal: React.FC<EditorProps> = ({ index, isLastMessage, setEditMode, editMode }) => {
+//TODO: This is somewhat unsafe, as it always expects index to be valid at 0
+export const useChatEditorState = create<ChatEditorStateProps>()((set, get) => ({
+    index: 0,
+    editMode: false,
+    hide: () => {
+        set((state) => ({ ...state, editMode: false }))
+    },
+    show: (index) => {
+        set((state) => ({ ...state, editMode: true, index: index }))
+    },
+}))
+
+const EditorModal = () => {
+    const { index, editMode, hide } = useChatEditorState((state) => ({
+        index: state.index,
+        editMode: state.editMode,
+        hide: state.hide,
+    }))
     const styles = useStyles()
 
     const { updateEntry, deleteEntry } = Chats.useEntry()
     const { swipeText, swipe } = Chats.useSwipeData(index)
     const entry = Chats.useEntryData(index)
+    const [placeholderText, setPlaceholderText] = useState('')
 
-    const [placeholderText, setPlaceholderText] = useState(swipeText)
+    useEffect(() => {
+        setPlaceholderText(swipeText)
+    }, [swipeText])
 
     const handleEditMessage = () => {
         updateEntry(index, placeholderText, false)
-        setEditMode(false)
+        hide()
     }
 
     const handleDeleteMessage = () => {
         deleteEntry(index)
-        setEditMode(false)
+        hide()
     }
 
     const handleClose = () => {
-        setEditMode(false)
+        hide()
     }
 
     const handleOverlayClick = (e: GestureResponderEvent) => {

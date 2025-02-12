@@ -1,9 +1,10 @@
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { Chats } from '@lib/state/Chat'
-import { FlatList } from 'react-native'
+import { FlatList, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 import ChatItem from './ChatItem'
+import EditorModal from './EditorModal'
 
 type ListItem = {
     index: number
@@ -36,18 +37,23 @@ const ChatWindow = () => {
     }
 
     return (
-        <FlatList
-            maintainVisibleContentPosition={
-                autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
-            }
-            keyboardShouldPersistTaps="handled"
-            removeClippedSubviews={false}
-            inverted
-            windowSize={2}
-            data={list}
-            keyExtractor={(item) => item.key}
-            renderItem={renderItems}
-        />
+        <View style={{ flex: 1 }}>
+            {/**
+             * TODO: This is somewhat unsafe, as it expects length to always be at least 1
+             */}
+            {chat?.messages?.length !== 0 && <EditorModal />}
+            <FlatList
+                maintainVisibleContentPosition={
+                    autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
+                }
+                keyboardShouldPersistTaps="handled"
+                inverted
+                windowSize={2}
+                data={list}
+                keyExtractor={(item) => item.key}
+                renderItem={renderItems}
+            />
+        </View>
     )
 }
 
