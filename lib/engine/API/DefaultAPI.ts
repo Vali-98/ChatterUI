@@ -684,7 +684,7 @@ export const defaultTemplates: APIConfiguration[] = [
             responseParsePattern: 'choices.0.text',
             useStop: true,
             stopKey: 'stop',
-            promptKey: 'messages',
+            promptKey: 'prompt',
             removeLength: true,
         },
 
