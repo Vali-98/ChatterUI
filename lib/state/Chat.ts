@@ -649,9 +649,9 @@ export namespace Chats {
         const swipeIndex = message.swipe_id
         const swipesLength = message.swipes.length
         const { swipe, swipeText, swipeId } = useChatState((state) => ({
-            swipe: state?.data?.messages?.[index].swipes[swipeIndex],
-            swipeText: state?.data?.messages?.[index].swipes[swipeIndex].swipe ?? '',
-            swipeId: state?.data?.messages?.[index].swipes[swipeIndex].id,
+            swipe: state?.data?.messages?.[index]?.swipes[swipeIndex],
+            swipeText: state?.data?.messages?.[index]?.swipes[swipeIndex].swipe,
+            swipeId: state?.data?.messages?.[index]?.swipes[swipeIndex].id,
         }))
         return { swipeId, swipe, swipeText, swipeIndex, swipesLength }
     }

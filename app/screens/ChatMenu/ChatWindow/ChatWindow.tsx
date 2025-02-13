@@ -38,10 +38,7 @@ const ChatWindow = () => {
 
     return (
         <View style={{ flex: 1 }}>
-            {/**
-             * TODO: This is somewhat unsafe, as it expects length to always be at least 1
-             */}
-            {chat?.messages?.length !== 0 && <EditorModal />}
+            <EditorModal />
             <FlatList
                 maintainVisibleContentPosition={
                     autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
