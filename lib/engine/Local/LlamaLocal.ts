@@ -32,6 +32,7 @@ type LlamaState = {
     context: LlamaContext | undefined
     model: undefined | ModelDataType
     loadProgress: number
+    chatCount: number
     promptCache?: string
     load: (model: ModelDataType) => Promise<void>
     setLoadProgress: (progress: number) => void
@@ -99,6 +100,7 @@ export namespace Llama {
     export const useLlama = create<LlamaState>()((set, get) => ({
         context: undefined,
         loadProgress: 0,
+        chatCount: 0,
         model: undefined,
         promptCache: undefined,
         load: async (model: ModelDataType) => {
@@ -146,7 +148,7 @@ export namespace Llama {
             */
 
             Logger.info(
-                `Starting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}`
+                `\n------ MODEL LOAD -----\n Model Name: ${model.name}\nStarting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}`
             )
 
             const progressCallback = (progress: number) => {
@@ -163,6 +165,7 @@ export namespace Llama {
                 ...state,
                 context: llamaContext,
                 model: model,
+                chatCount: 1,
             }))
 
             // updated EngineData
@@ -197,7 +200,10 @@ export namespace Llama {
                 })
                 .then(async ({ text, timings }: CompletionOutput) => {
                     completed(text)
-                    Logger.info(textTimings(timings))
+                    Logger.info(
+                        `\n---- Start Chat ${get().chatCount} ----\n${textTimings(timings)}\n---- End Chat ${get().chatCount} ----\n`
+                    )
+                    set((state) => ({ ...state, chatCount: get().chatCount + 1 }))
                     if (mmkv.getBoolean(AppSettings.SaveLocalKV)) {
                         await get().saveKV(params.prompt)
                     }
