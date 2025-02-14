@@ -58,7 +58,7 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
                     markdownit={MarkdownStyle.Rules}
                     rules={MarkdownStyle.RenderRules}
                     style={markdownStyle}>
-                    {swipeText.trim()}
+                    {swipeText?.trim()}
                 </Markdown>
             </View>
         </Animated.View>

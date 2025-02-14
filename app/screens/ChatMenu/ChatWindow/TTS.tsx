@@ -17,7 +17,7 @@ const TTS: React.FC<TTSProps> = ({ index }) => {
 
     const handleSpeak = async () => {
         Logger.info('Starting TTS')
-        await startTTS(swipeText, index)
+        swipeText && (await startTTS(swipeText, index))
     }
 
     const handleStopSpeaking = async () => {

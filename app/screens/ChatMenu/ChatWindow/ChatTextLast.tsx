@@ -68,7 +68,9 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
                     markdownit={MarkdownStyle.Rules}
                     rules={MarkdownStyle.RenderRules}
                     style={markdownStyle}>
-                    {nowGenerating && swipeId === currentSwipeId ? buffer.trim() : swipeText.trim()}
+                    {nowGenerating && swipeId === currentSwipeId
+                        ? buffer.trim()
+                        : swipeText?.trim()}
                 </Markdown>
             </View>
         </Animated.View>
