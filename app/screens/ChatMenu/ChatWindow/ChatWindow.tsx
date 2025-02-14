@@ -1,9 +1,10 @@
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppMode, AppSettings, Global } from '@lib/constants/GlobalValues'
 import { Chats } from '@lib/state/Chat'
 import { FlatList, View } from 'react-native'
-import { useMMKVBoolean } from 'react-native-mmkv'
+import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 
 import ChatItem from './ChatItem'
+import ChatModelName from './ChatModelName'
 import EditorModal from './EditorModal'
 
 type ListItem = {
@@ -15,7 +16,9 @@ type ListItem = {
 
 const ChatWindow = () => {
     const { chat } = Chats.useChat()
-    const [autoScroll, _] = useMMKVBoolean(AppSettings.AutoScroll)
+    const [appMode, _] = useMMKVString(Global.AppMode)
+    const [showModelname, __] = useMMKVBoolean(AppSettings.ShowModelInChat)
+    const [autoScroll, ___] = useMMKVBoolean(AppSettings.AutoScroll)
 
     const list: ListItem[] = (chat?.messages ?? [])
         .map((item, index) => ({
@@ -39,6 +42,7 @@ const ChatWindow = () => {
     return (
         <View style={{ flex: 1 }}>
             <EditorModal />
+            {showModelname && appMode === AppMode.LOCAL && <ChatModelName />}
             <FlatList
                 maintainVisibleContentPosition={
                     autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }

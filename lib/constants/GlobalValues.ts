@@ -136,6 +136,7 @@ export enum AppSettings {
     LocallyAuthenticateUser = 'localauthuser',
     UnlockOrientation = 'unlockorientation',
     UseLegacyAPI = 'uselegacyapi',
+    ShowModelInChat = 'showmodelinchat',
 }
 
 export enum AppMode {
@@ -167,4 +168,5 @@ export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.ShowNotificationText]: false,
     [AppSettings.UnlockOrientation]: false,
     [AppSettings.UseLegacyAPI]: false,
+    [AppSettings.ShowModelInChat]: false,
 }

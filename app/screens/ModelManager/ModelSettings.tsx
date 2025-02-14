@@ -34,6 +34,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
 
     const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
     const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)
+    const [showModelInChat, setShowModelInChat] = useMMKVBoolean(AppSettings.ShowModelInChat)
 
     const [kvSize, setKVSize] = useState(0)
 
@@ -127,6 +128,11 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                 </View>
             )}
             <SectionTitle>Advanced Settings</SectionTitle>
+            <ThemedSwitch
+                label="Show Model Name In Chat"
+                value={showModelInChat}
+                onChangeValue={setShowModelInChat}
+            />
             <ThemedSwitch
                 label="Automatically Load Model on Chat"
                 value={autoloadLocal}

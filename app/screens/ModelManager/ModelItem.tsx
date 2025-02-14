@@ -9,7 +9,6 @@ import { readableFileSize } from '@lib/utils/File'
 import { ModelDataType } from 'db/schema'
 import { useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
 
 type ModelItemProps = {
     item: ModelDataType
@@ -71,9 +70,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const disableEdit = modelId === item.id || modelLoading || isInvalid
 
     return (
-        <Animated.View
-            style={styles.modelContainer}
-            entering={SlideInLeft.easing(Easing.inOut(Easing.cubic))}>
+        <View style={styles.modelContainer}>
             <TextBoxModal
                 booleans={[showEdit, setShowEdit]}
                 onConfirm={async (name) => {
@@ -164,7 +161,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                     </TouchableOpacity>
                 )}
             </View>
-        </Animated.View>
+        </View>
     )
 }
 
