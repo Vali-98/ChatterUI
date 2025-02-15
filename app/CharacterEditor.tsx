@@ -1,4 +1,5 @@
 import ThemedButton from '@components/buttons/ThemedButton'
+import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
@@ -416,6 +417,25 @@ const ChracterEditor = () => {
                         }}
                         value={characterCard?.mes_example}
                         numberOfLines={8}
+                    />
+
+                    <StringArrayEditor
+                        title="Tags"
+                        value={characterCard?.tags.map((item) => item.tag.tag) ?? []}
+                        setValue={(value) => {
+                            const newTags = value
+                                .filter((v) => !characterCard.tags.some((a) => a.tag.tag === v))
+                                .map((a) => ({ tag_id: -1, tag: { tag: a, id: -1 } }))
+                            setCharacterCardEdited({
+                                ...characterCard,
+                                tags: [
+                                    ...characterCard.tags.filter((v) =>
+                                        value.some((a) => a === v.tag.tag)
+                                    ),
+                                    ...newTags,
+                                ],
+                            })
+                        }}
                     />
                 </ScrollView>
             )}

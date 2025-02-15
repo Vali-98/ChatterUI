@@ -10,7 +10,7 @@ import {
     chats,
     tags,
 } from 'db/schema'
-import { desc, eq, inArray, notInArray } from 'drizzle-orm'
+import { and, desc, eq, inArray, notInArray } from 'drizzle-orm'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { randomUUID } from 'expo-crypto'
 import * as DocumentPicker from 'expo-document-picker'
@@ -20,7 +20,6 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { Logger } from './Logger'
-import { API } from '../constants/API'
 import { AppMode, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
 import { mmkv, mmkvStorage } from '../storage/MMKV'
@@ -384,25 +383,95 @@ export namespace Characters {
 
             export const updateCard = async (card: CharacterCardData, cardID: number) => {
                 if (!card) return
-                await database
-                    .update(characters)
-                    .set({
-                        description: card.description,
-                        first_mes: card.first_mes,
-                        name: card.name,
-                        personality: card.personality,
-                        scenario: card.scenario,
-                        mes_example: card.mes_example,
-                    })
-                    .where(eq(characters.id, cardID))
-                await Promise.all(
-                    card.alternate_greetings.map(async (item) => {
+
+                try {
+                    await database
+                        .update(characters)
+                        .set({
+                            description: card.description,
+                            first_mes: card.first_mes,
+                            name: card.name,
+                            personality: card.personality,
+                            scenario: card.scenario,
+                            mes_example: card.mes_example,
+                        })
+                        .where(eq(characters.id, cardID))
+                    await Promise.all(
+                        card.alternate_greetings.map(async (item) => {
+                            await database
+                                .update(characterGreetings)
+                                .set({ greeting: item.greeting })
+                                .where(eq(characterGreetings.id, item.id))
+                        })
+                    )
+                    if (card.tags) {
+                        // create { tag: string }[]
+                        const newTags = card.tags
+                            .filter((item) => item.tag_id === -1)
+                            .map((tag) => ({ tag: tag.tag.tag }))
+
+                        // New tags are marked with -1
+                        const currentTagIDs = card.tags
+                            .filter((item) => item.tag_id !== -1)
+                            .map((item) => ({
+                                character_id: card.id,
+                                tag_id: item.tag.id,
+                            }))
+                        const newTagIDs: (typeof characterTags.$inferSelect)[] = []
+
+                        // optimistically add missing tags
+                        if (newTags.length !== 0) {
+                            await database
+                                .insert(tags)
+                                .values(newTags)
+                                .onConflictDoNothing()
+                                .returning({
+                                    id: tags.id,
+                                })
+                                // concat new tags to tagids
+                                .then((result) => {
+                                    newTagIDs.push(
+                                        ...result.map((item) => ({
+                                            character_id: card.id,
+                                            tag_id: item.id,
+                                        }))
+                                    )
+                                })
+                        }
+
+                        if (newTagIDs.length !== 0)
+                            await database
+                                .insert(characterTags)
+                                .values(newTagIDs)
+                                .onConflictDoNothing()
+
+                        const ids = [...currentTagIDs, ...newTagIDs].map((item) => item.tag_id)
+                        // delete orphaned characterTags
+
                         await database
-                            .update(characterGreetings)
-                            .set({ greeting: item.greeting })
-                            .where(eq(characterGreetings.id, item.id))
-                    })
-                )
+                            .delete(characterTags)
+                            .where(
+                                and(
+                                    notInArray(characterTags.tag_id, ids),
+                                    eq(characterTags.character_id, card.id)
+                                )
+                            )
+
+                        // delete orphaned tags
+                        await database
+                            .delete(tags)
+                            .where(
+                                notInArray(
+                                    tags.id,
+                                    database
+                                        .select({ tag_id: characterTags.tag_id })
+                                        .from(characterTags)
+                                )
+                            )
+                    }
+                } catch (e) {
+                    console.log(e)
+                }
             }
 
             export const addAltGreeting = async (charId: number) => {
