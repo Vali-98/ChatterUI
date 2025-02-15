@@ -137,6 +137,7 @@ export enum AppSettings {
     UnlockOrientation = 'unlockorientation',
     UseLegacyAPI = 'uselegacyapi',
     ShowModelInChat = 'showmodelinchat',
+    ShowTags = 'showtags',
 }
 
 export enum AppMode {
@@ -169,4 +170,5 @@ export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.UnlockOrientation]: false,
     [AppSettings.UseLegacyAPI]: false,
     [AppSettings.ShowModelInChat]: false,
+    [AppSettings.ShowTags]: false,
 }
