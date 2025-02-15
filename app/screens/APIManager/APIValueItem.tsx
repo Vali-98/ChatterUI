@@ -49,7 +49,7 @@ const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
                     setShowEditor(false)
                 }}
             />
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                 <ThemedSwitch
                     value={item.active}
                     onChangeValue={(value) => {
@@ -57,7 +57,7 @@ const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
                     }}
                 />
 
-                <View style={{ marginLeft: spacing.xl }}>
+                <View style={{ marginLeft: spacing.xl, flexShrink: 1 }}>
                     <Text style={item.active ? styles.name : styles.nameInactive}>
                         {item.friendlyName}
                     </Text>
@@ -66,7 +66,7 @@ const APIValueItem: React.FC<APIValueItemProps> = ({ item, index }) => {
                     </Text>
                 </View>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0 }}>
                 <ThemedButton
                     onPress={handleDelete}
                     variant="critical"
