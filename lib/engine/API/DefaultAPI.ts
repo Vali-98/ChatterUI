@@ -649,7 +649,6 @@ export const defaultTemplates: APIConfiguration[] = [
                 { externalName: 'max_context_length', samplerID: SamplerID.CONTEXT_LENGTH },
                 { externalName: 'max_tokens', samplerID: SamplerID.GENERATED_LENGTH },
                 { externalName: 'stream', samplerID: SamplerID.STREAMING },
-                { externalName: 'rep_pen', samplerID: SamplerID.REPETITION_PENALTY },
                 { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
                 { externalName: 'min_p', samplerID: SamplerID.MIN_P },
                 { externalName: 'top_a', samplerID: SamplerID.TOP_A },
@@ -661,7 +660,10 @@ export const defaultTemplates: APIConfiguration[] = [
                 { externalName: 'seed', samplerID: SamplerID.SEED },
                 { externalName: 'typical', samplerID: SamplerID.TYPICAL },
                 { externalName: 'repetition_penalty', samplerID: SamplerID.REPETITION_PENALTY },
-                { externalName: 'rep_pen_range', samplerID: SamplerID.REPETITION_PENALTY_RANGE },
+                {
+                    externalName: 'repetition_penalty_range',
+                    samplerID: SamplerID.REPETITION_PENALTY_RANGE,
+                },
 
                 { externalName: 'sampler_seed', samplerID: SamplerID.SEED },
 
