@@ -22,7 +22,7 @@ const Logs = () => {
         const data = logs
             .map((item) => `${Logger.LevelName[item.level]} ${item.timestamp}: ${item.message}`)
             .join('\n')
-        saveStringToDownload(data, 'logs.txt', 'utf8')
+        saveStringToDownload(data, `logs-chatterui-${Date.now()}.txt`, 'utf8')
             .then(() => {
                 Logger.infoToast('Logs Downloaded!')
             })
