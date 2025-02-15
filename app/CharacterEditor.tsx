@@ -6,6 +6,7 @@ import Avatar from '@components/views/Avatar'
 import FadeDownView from '@components/views/FadeDownView'
 import HeaderTitle from '@components/views/HeaderTitle'
 import PopupMenu from '@components/views/PopupMenu'
+import { db } from '@db'
 import { AntDesign } from '@expo/vector-icons'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { useViewerState } from '@lib/state/AvatarViewer'
@@ -15,6 +16,7 @@ import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { usePreventRemove } from '@react-navigation/core'
 import AvatarViewer from '@screens/ChatMenu/ChatWindow/AvatarViewer'
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import * as DocumentPicker from 'expo-document-picker'
 import { useNavigation, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
@@ -26,6 +28,7 @@ const ChracterEditor = () => {
     const { color, spacing } = Theme.useTheme()
     const router = useRouter()
     const navigation = useNavigation()
+    const tags = useLiveQuery(db.query.tags.findMany())
     const { currentCard, setCurrentCard, charId, charName, unloadCharacter } =
         Characters.useCharacterCard(
             useShallow((state) => ({
@@ -192,7 +195,8 @@ const ChracterEditor = () => {
             {characterCard && (
                 <ScrollView
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ rowGap: 16 }}>
+                    keyboardShouldPersistTaps="always"
+                    contentContainerStyle={{ rowGap: 16, paddingBottom: 24 }}>
                     <View style={styles.characterHeader}>
                         <PopupMenu
                             placement="right"
@@ -421,6 +425,10 @@ const ChracterEditor = () => {
 
                     <StringArrayEditor
                         title="Tags"
+                        suggestions={tags.data
+                            .map((item) => item.tag)
+                            .filter((a) => !characterCard?.tags.some((item) => item.tag.tag === a))}
+                        showSuggestionsOnEmpty
                         value={characterCard?.tags.map((item) => item.tag.tag) ?? []}
                         setValue={(value) => {
                             const newTags = value

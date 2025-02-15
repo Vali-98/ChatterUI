@@ -1,8 +1,17 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import { AntDesign } from '@expo/vector-icons'
+import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import React, { useState } from 'react'
-import { Text, TextInput, TouchableOpacity, View, StyleSheet, ViewStyle } from 'react-native'
+import {
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+    StyleSheet,
+    ViewStyle,
+    ScrollView,
+} from 'react-native'
 
 type StringArrayEditorProps = {
     containerStyle?: ViewStyle
@@ -12,6 +21,8 @@ type StringArrayEditorProps = {
     allowDuplicates?: boolean
     replaceNewLine?: string
     allowBlank?: string
+    suggestions?: string[]
+    showSuggestionsOnEmpty?: boolean
 }
 
 const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
@@ -22,18 +33,28 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
     replaceNewLine = undefined,
     allowDuplicates = false,
     allowBlank = false,
+    suggestions = [],
+    showSuggestionsOnEmpty = false,
 }) => {
-    const { color } = Theme.useTheme()
+    const { color, borderRadius } = Theme.useTheme()
     const styles = useStyles()
     const [newData, setNewData] = useState('')
-
+    const filteredSuggestions = suggestions.filter((item) =>
+        item.toLowerCase().includes(newData.toLowerCase())
+    )
     const handleSplice = (index: number) => {
         setValue(value.filter((item, index2) => index2 !== index))
     }
 
     const addData = (newData: string) => {
-        if (newData === '') return
-        if (value.includes(newData)) return
+        if (newData === '') {
+            Logger.warnToast('Value cannot be empty')
+            return
+        }
+        if (value.includes(newData)) {
+            Logger.warnToast('Value already exists')
+            return
+        }
         setNewData('')
         setValue([...value, newData])
     }
@@ -41,6 +62,7 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
     return (
         <View style={[styles.mainContainer, containerStyle]}>
             <Text style={styles.title}>{title}</Text>
+
             <View style={styles.contentContainer}>
                 {value.length !== 0 && (
                     <View style={styles.tagContainer}>
@@ -57,6 +79,35 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
                         ))}
                     </View>
                 )}
+                {(newData || showSuggestionsOnEmpty) && filteredSuggestions.length > 0 && (
+                    <View style={{ marginBottom: 4 }}>
+                        <Text style={{ color: color.text._400, marginBottom: 4 }}>Suggestions</Text>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            nestedScrollEnabled
+                            style={{
+                                borderRadius: borderRadius.m,
+                            }}
+                            contentContainerStyle={{
+                                backgroundColor: color.neutral._100,
+                                borderColor: color.neutral._200,
+                                borderWidth: 1,
+                                flexDirection: 'row',
+                                columnGap: 8,
+                            }}>
+                            {filteredSuggestions.map((item, index) => (
+                                <ThemedButton
+                                    onPress={() => addData(item)}
+                                    variant="secondary"
+                                    label={item}
+                                    key={index}
+                                />
+                            ))}
+                        </ScrollView>
+                    </View>
+                )}
+
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
