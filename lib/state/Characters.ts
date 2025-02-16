@@ -438,14 +438,14 @@ export namespace Characters {
                                     )
                                 })
                         }
-
-                        if (newTagIDs.length !== 0)
+                        const mergedTags = [...currentTagIDs, ...newTagIDs]
+                        if (mergedTags.length !== 0)
                             await database
                                 .insert(characterTags)
-                                .values(newTagIDs)
+                                .values(mergedTags)
                                 .onConflictDoNothing()
 
-                        const ids = [...currentTagIDs, ...newTagIDs].map((item) => item.tag_id)
+                        const ids = mergedTags.map((item) => item.tag_id)
                         // delete orphaned characterTags
 
                         await database
