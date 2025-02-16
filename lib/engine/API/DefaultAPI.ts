@@ -664,9 +664,6 @@ export const defaultTemplates: APIConfiguration[] = [
                     externalName: 'repetition_penalty_range',
                     samplerID: SamplerID.REPETITION_PENALTY_RANGE,
                 },
-
-                { externalName: 'sampler_seed', samplerID: SamplerID.SEED },
-
                 { externalName: 'mirostat', samplerID: SamplerID.MIROSTAT_MODE },
                 { externalName: 'mirostat_tau', samplerID: SamplerID.MIROSTAT_TAU },
                 { externalName: 'mirostat_eta', samplerID: SamplerID.MIROSTAT_ETA },
