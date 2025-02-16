@@ -2,6 +2,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedCheckbox from '@components/input/ThemedCheckbox'
+import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
@@ -10,6 +11,7 @@ import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
+import { AppSettings } from '@lib/constants/GlobalValues'
 import useAutosave from '@lib/hooks/AutoSave'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { Instructs } from '@lib/state/Instructs'
@@ -20,6 +22,7 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
 import { SafeAreaView, ScrollView, Text, View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
+import { useMMKVBoolean } from 'react-native-mmkv'
 
 const autoformatterData = [
     { label: 'Disabled', example: '*<No Formatting>*' },
@@ -30,6 +33,7 @@ const autoformatterData = [
 
 const FormattingManager = () => {
     const markdownStyle = MarkdownStyle.useMarkdownStyle()
+    const [useTemplate, setUseTemplate] = useMMKVBoolean(AppSettings.UseModelTemplate)
     const { currentInstruct, loadInstruct, setCurrentInstruct } = Instructs.useInstruct(
         (state) => ({
             currentInstruct: state.data,
@@ -447,6 +451,15 @@ const FormattingManager = () => {
                                 ))}
                             </View>
                         </View>
+
+                        <SectionTitle>Local Template</SectionTitle>
+
+                        <ThemedSwitch
+                            label="Use Local Template"
+                            description="When in Local Mode, ChatterUI automatically uses the instruct template provided by the loaded model. Disable this if you want messages to be formatted using Instruct instead. System Prompt however is always used."
+                            value={useTemplate}
+                            onChangeValue={setUseTemplate}
+                        />
 
                         {/* @TODO: Macros are always replaced - people may want this to be changed
                             <CheckboxTitle

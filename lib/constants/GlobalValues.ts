@@ -138,6 +138,7 @@ export enum AppSettings {
     UseLegacyAPI = 'uselegacyapi',
     ShowModelInChat = 'showmodelinchat',
     ShowTags = 'showtags',
+    UseModelTemplate = 'useModelTemplate',
 }
 
 export enum AppMode {
@@ -171,4 +172,5 @@ export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.UseLegacyAPI]: false,
     [AppSettings.ShowModelInChat]: false,
     [AppSettings.ShowTags]: false,
+    [AppSettings.UseModelTemplate]: true,
 }

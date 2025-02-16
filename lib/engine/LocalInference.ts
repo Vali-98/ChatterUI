@@ -8,8 +8,8 @@ import { Logger } from '@lib/state/Logger'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { mmkv } from '@lib/storage/MMKV'
 
-import { APISampler } from './API/APIBuilder.types'
-import { buildTextCompletionContext } from './API/ContextBuilder'
+import { APIConfiguration, APISampler, APIValues } from './API/APIBuilder.types'
+import { buildTextCompletionContext, buildChatCompletionContext } from './API/ContextBuilder'
 import { Llama, LlamaConfig } from './Local/LlamaLocal'
 import { KV } from './Local/Model'
 
@@ -56,28 +56,39 @@ const getSamplerFields = (max_length?: number) => {
         .reduce((acc, obj) => Object.assign(acc, obj), {})
 }
 
-const buildLocalPayload = () => {
+const buildLocalPayload = async () => {
     const payloadFields = getSamplerFields()
     const rep_pen = payloadFields?.['penalty_repeat']
     const n_predict =
         (typeof payloadFields?.['n_predict'] === 'number' && payloadFields?.['n_predict']) || 0
     const localPreset: LlamaConfig = Llama.useEngineData.getState().config
+
+    let prompt: undefined | string = undefined
+
+    if (mmkv.getBoolean(AppSettings.UseModelTemplate)) {
+        const messages = buildChatCompletionContext(
+            localPreset.context_length - n_predict,
+            localAPIConfig,
+            localAPIValues
+        )
+        if (messages) prompt = await Llama.useLlama.getState().context?.getFormattedChat(messages)
+    }
+    if (!prompt) {
+        prompt = buildTextCompletionContext(localPreset.context_length - n_predict)
+    }
+
+    if (!prompt) {
+        Logger.errorToast('Failed to build prompt')
+    }
+
     return {
         ...payloadFields,
         penalize_nl: typeof rep_pen === 'number' && rep_pen > 1,
         n_threads: localPreset.threads,
-        prompt: buildTextCompletionContext(localPreset.context_length - n_predict),
+        prompt: prompt ?? '',
         stop: constructStopSequence(),
         emit_partial_completion: true,
     }
-}
-
-const getPromptString = () => {
-    const payloadFields = getSamplerFields()
-    const localPreset: LlamaConfig = Llama.useEngineData.getState().config
-    const n_predict =
-        (typeof payloadFields?.['n_predict'] === 'number' && payloadFields?.['n_predict']) || 0
-    return buildTextCompletionContext(localPreset.context_length - n_predict)
 }
 
 const constructStopSequence = (): string[] => {
@@ -151,7 +162,13 @@ export const localInference = async () => {
         return
     }
 
-    const payload = buildLocalPayload()
+    const payload = await buildLocalPayload()
+
+    if (!payload) {
+        Logger.warnToast('Failed to build payload')
+        stopGenerating()
+        return
+    }
 
     if (mmkv.getBoolean(AppSettings.SaveLocalKV) && !KV.useKVState.getState().kvCacheLoaded) {
         const prompt = Llama.useLlama.getState().tokenize(payload.prompt)
@@ -188,7 +205,7 @@ export const localInference = async () => {
     await runLocalCompletion(payload)
 }
 
-const runLocalCompletion = async (payload: ReturnType<typeof buildLocalPayload>) => {
+const runLocalCompletion = async (payload: Awaited<ReturnType<typeof buildLocalPayload>>) => {
     const replace = RegExp(
         constructReplaceStrings()
             .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
@@ -219,4 +236,73 @@ const runLocalCompletion = async (payload: ReturnType<typeof buildLocalPayload>)
             Logger.errorToast(`Failed to generate locally: ${error}`)
             stopGenerating()
         })
+}
+
+const localAPIValues: APIValues = {
+    endpoint: '',
+    modelEndpoint: '',
+    prefill: '',
+    firstMessage: '',
+    key: '',
+    model: undefined,
+    configName: 'Local',
+}
+
+// This is a dummy we use to hijack chat completions builder
+const localAPIConfig: APIConfiguration = {
+    version: 1,
+    name: 'Local',
+
+    defaultValues: {
+        endpoint: '',
+        modelEndpoint: '',
+        prefill: '',
+        firstMessage: '',
+        key: '',
+        model: undefined,
+    },
+
+    features: {
+        usePrefill: false,
+        useFirstMessage: false,
+        useKey: true,
+        useModel: true,
+        multipleModels: false,
+    },
+
+    request: {
+        requestType: 'stream',
+        samplerFields: [],
+        completionType: {
+            type: 'chatCompletions',
+            userRole: 'user',
+            systemRole: 'system',
+            assistantRole: 'assistant',
+            contentName: 'content',
+        },
+        authHeader: 'Authorization',
+        authPrefix: 'Bearer ',
+        responseParsePattern: 'choices.0.delta.content',
+        useStop: true,
+        stopKey: 'stop',
+        promptKey: 'messages',
+        removeLength: true,
+    },
+
+    payload: {
+        type: 'openai',
+    },
+
+    model: {
+        useModelContextLength: false,
+        nameParser: '',
+        contextSizeParser: '',
+        modelListParser: '',
+    },
+
+    ui: {
+        editableCompletionPath: false,
+        editableModelPath: false,
+        selectableModel: false,
+    },
 }
