@@ -7,12 +7,11 @@ import { useState } from 'react'
 import { SafeAreaView } from 'react-native'
 import Animated, { LinearTransition } from 'react-native-reanimated'
 
-import CharacterListHeader from './CharacterListHeader'
+import CharacterListHeader, { useCharacterListSorter } from './CharacterListHeader'
 import CharacterListing from './CharacterListing'
 import CharacterNewMenu from './CharacterNewMenu'
 import CharactersEmpty from './CharactersEmpty'
 import CharactersSearchEmpty from './CharactersSearchEmpty'
-import { sortList, SortType } from './SortButton'
 
 type CharacterListProps = {
     showHeader: boolean
@@ -21,14 +20,14 @@ type CharacterListProps = {
 const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
     const [nowLoading, setNowLoading] = useState(false)
     const [showMenu, setShowMenu] = useState(false)
-    const [textFilter, setTextFilter] = useState('')
 
-    const [sortType, setSortType] = useState<SortType>(SortType.RECENT_DESC)
+    const sortAndFilterCharInfo = useCharacterListSorter((state) => state.sortAndFilterCharInfo)
+
     const { data, updatedAt } = useLiveQuery(
         Characters.db.query.cardListQuery('character', 'modified')
     )
-    const characterList: CharInfo[] = data
-        .map((item) => ({
+    const characterList: CharInfo[] = sortAndFilterCharInfo(
+        data.map((item) => ({
             ...item,
             latestChat: item.chats[0]?.id,
             latestSwipe: item.chats[0]?.messages[0]?.swipes[0]?.swipe,
@@ -36,8 +35,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
             last_modified: item.last_modified ?? 0,
             tags: item.tags.map((item) => item.tag.tag),
         }))
-        .sort(sortList[sortType ?? SortType.RECENT_DESC])
-        .filter((item) => !textFilter || item.name.toLowerCase().includes(textFilter.toLowerCase()))
+    )
 
     return (
         <SafeAreaView style={{ paddingVertical: 16, paddingHorizontal: 8, flex: 1 }}>
@@ -59,13 +57,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
 
             {data.length !== 0 && (
                 <FadeDownView duration={100}>
-                    <CharacterListHeader
-                        sortType={sortType}
-                        setSortType={setSortType}
-                        textFilter={textFilter}
-                        setTextFilter={setTextFilter}
-                        resultLength={characterList.length}
-                    />
+                    <CharacterListHeader resultLength={characterList.length} />
                     <Animated.FlatList
                         itemLayoutAnimation={LinearTransition}
                         showsVerticalScrollIndicator={false}
