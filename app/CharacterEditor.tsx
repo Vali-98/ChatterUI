@@ -16,6 +16,8 @@ import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { usePreventRemove } from '@react-navigation/core'
 import AvatarViewer from '@screens/ChatMenu/ChatWindow/AvatarViewer'
+import { characterTags, tags } from 'db/schema'
+import { count, eq } from 'drizzle-orm'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import * as DocumentPicker from 'expo-document-picker'
 import { useNavigation, useRouter } from 'expo-router'
@@ -28,7 +30,17 @@ const ChracterEditor = () => {
     const { color, spacing } = Theme.useTheme()
     const router = useRouter()
     const navigation = useNavigation()
-    const tags = useLiveQuery(db.query.tags.findMany())
+    const data = useLiveQuery(
+        db
+            .select({
+                tag: tags.tag,
+                id: tags.id,
+                tagCount: count(characterTags.tag_id),
+            })
+            .from(tags)
+            .leftJoin(characterTags, eq(characterTags.tag_id, tags.id))
+            .groupBy(tags.id)
+    )
     const { currentCard, setCurrentCard, charId, charName, unloadCharacter } =
         Characters.useCharacterCard(
             useShallow((state) => ({
@@ -302,7 +314,7 @@ const ChracterEditor = () => {
                             justifyContent: 'space-between',
                         }}>
                         <Text style={{ color: color.text._100 }}>
-                            Alternate Greetings{' '}
+                            Alternate Greetings
                             {characterCard.alternate_greetings.length !== 0 && (
                                 <Text
                                     style={{
@@ -425,7 +437,7 @@ const ChracterEditor = () => {
 
                     <StringArrayEditor
                         title="Tags"
-                        suggestions={tags.data
+                        suggestions={data.data
                             .map((item) => item.tag)
                             .filter((a) => !characterCard?.tags.some((item) => item.tag.tag === a))}
                         showSuggestionsOnEmpty
@@ -433,7 +445,13 @@ const ChracterEditor = () => {
                         setValue={(value) => {
                             const newTags = value
                                 .filter((v) => !characterCard.tags.some((a) => a.tag.tag === v))
-                                .map((a) => ({ tag_id: -1, tag: { tag: a, id: -1 } }))
+                                .map((a) => {
+                                    const existing = data.data.filter((item) => item.tag === a)?.[0]
+                                    if (existing) {
+                                        return { tag_id: existing.id, tag: existing }
+                                    }
+                                    return { tag_id: -1, tag: { tag: a, id: -1 } }
+                                })
                             setCharacterCardEdited({
                                 ...characterCard,
                                 tags: [

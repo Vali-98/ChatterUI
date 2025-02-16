@@ -19,9 +19,11 @@ type StringArrayEditorProps = {
     value: string[]
     setValue: (newdata: string[]) => void
     allowDuplicates?: boolean
+    placeholder?: string
     replaceNewLine?: string
     allowBlank?: string
     suggestions?: string[]
+    filterOnly?: boolean
     showSuggestionsOnEmpty?: boolean
 }
 
@@ -32,15 +34,17 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
     setValue,
     replaceNewLine = undefined,
     allowDuplicates = false,
+    placeholder = 'Enter value...',
     allowBlank = false,
     suggestions = [],
+    filterOnly = false,
     showSuggestionsOnEmpty = false,
 }) => {
     const { color, borderRadius } = Theme.useTheme()
     const styles = useStyles()
     const [newData, setNewData] = useState('')
-    const filteredSuggestions = suggestions.filter((item) =>
-        item.toLowerCase().includes(newData.toLowerCase())
+    const filteredSuggestions = suggestions.filter(
+        (item) => item.toLowerCase().includes(newData.toLowerCase()) && !value.includes(item)
     )
     const handleSplice = (index: number) => {
         setValue(value.filter((item, index2) => index2 !== index))
@@ -80,8 +84,18 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
                     </View>
                 )}
                 {(newData || showSuggestionsOnEmpty) && filteredSuggestions.length > 0 && (
-                    <View style={{ marginBottom: 4 }}>
-                        <Text style={{ color: color.text._400, marginBottom: 4 }}>Suggestions</Text>
+                    <View
+                        style={{
+                            marginBottom: 4,
+                            flexDirection: 'row',
+                            columnGap: 4,
+                            alignItems: 'center',
+                        }}>
+                        {!filterOnly && (
+                            <Text style={{ color: color.text._400, marginBottom: 4 }}>
+                                Suggestions
+                            </Text>
+                        )}
                         <ScrollView
                             horizontal
                             showsHorizontalScrollIndicator={false}
@@ -98,6 +112,7 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
                             }}>
                             {filteredSuggestions.map((item, index) => (
                                 <ThemedButton
+                                    buttonStyle={{ paddingVertical: 4 }}
                                     onPress={() => addData(item)}
                                     variant="secondary"
                                     label={item}
@@ -115,11 +130,11 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
                         onChangeText={setNewData}
                         keyboardType="default"
                         multiline
-                        placeholder="Enter value..."
+                        placeholder={placeholder}
                         placeholderTextColor={color.text._700}
                     />
 
-                    <ThemedButton label="Add" onPress={() => addData(newData)} />
+                    {!filterOnly && <ThemedButton label="Add" onPress={() => addData(newData)} />}
                 </View>
             </View>
         </View>
@@ -164,7 +179,7 @@ const useStyles = () => {
         tag: {
             borderColor: color.primary._700,
             borderWidth: 1,
-            paddingVertical: 8,
+            paddingVertical: 4,
             paddingLeft: 12,
             paddingRight: 8,
             borderRadius: 8,

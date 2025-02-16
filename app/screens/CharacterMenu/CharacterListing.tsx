@@ -6,6 +6,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import CharacterEditPopup from './CharacterEditPopup'
+import { useCharacterListSorter } from './CharacterListHeader'
 
 type CharacterListingProps = {
     index: number
@@ -31,6 +32,11 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
     showTags,
     setNowLoading,
 }) => {
+    const { setShowSearch, setTagFilter, tagFilter } = useCharacterListSorter((state) => ({
+        setShowSearch: state.setShowSearch,
+        setTagFilter: state.setTagFilter,
+        tagFilter: state.tagFilter,
+    }))
     const { color } = Theme.useTheme()
     const styles = useStyles()
 
@@ -94,7 +100,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                     )}
                     <View
                         style={{
-                            paddingLeft: 16,
+                            marginTop: 4,
                             flex: 1,
                             flexDirection: 'row',
                             flexWrap: 'wrap',
@@ -103,9 +109,15 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                         }}>
                         {showTags &&
                             character.tags.map((item, index) => (
-                                <Text style={styles.tag} key={index}>
-                                    {item}
-                                </Text>
+                                <TouchableOpacity
+                                    key={index}
+                                    onPress={() => {
+                                        setShowSearch(true)
+                                        if (tagFilter.includes(item)) return
+                                        setTagFilter([...tagFilter, item])
+                                    }}>
+                                    <Text style={styles.tag}>{item}</Text>
+                                </TouchableOpacity>
                             ))}
                     </View>
                 </View>
@@ -178,13 +190,12 @@ const useStyles = () => {
 
         tag: {
             color: color.text._400,
-            fontSize: fontSize.s,
-            backgroundColor: color.primary._300,
-            paddingHorizontal: spacing.s,
-            paddingVertical: spacing.xs,
+            fontSize: fontSize.m,
+            borderWidth: 1,
+            borderColor: color.primary._200,
+            paddingHorizontal: spacing.l,
+            paddingVertical: spacing.s,
             borderRadius: borderRadius.s,
-            rowGap: 2,
-            columnGap: 4,
         },
     })
 }

@@ -1,8 +1,13 @@
 import ThemedButton from '@components/buttons/ThemedButton'
+import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedTextInput from '@components/input/ThemedTextInput'
+import { db } from '@db'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { CharInfo } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
+import { characterTags, tags } from 'db/schema'
+import { count, eq } from 'drizzle-orm'
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import React, { useEffect, useState } from 'react'
 import { BackHandler, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -12,6 +17,8 @@ import { create } from 'zustand'
 import SortButton, { sortList, SortType } from './SortButton'
 
 type CharacterListSorterProps = {
+    showSearch: boolean
+    setShowSearch: (b: boolean) => void
     sortType: SortType
     tagFilter: string[]
     textFilter: string
@@ -27,7 +34,7 @@ const getFilter = (textFilter: string, tagFilter: string[], sortType: SortType) 
             .filter(
                 (item) =>
                     item.name.toLowerCase().includes(textFilter.toLowerCase()) &&
-                    (tagFilter.length === 0 || item?.tags.some((tag) => tagFilter.includes(tag)))
+                    (tagFilter.length === 0 || tagFilter.every((tag) => item.tags.includes(tag)))
             )
             .sort(sortList[sortType])
     }
@@ -35,8 +42,20 @@ const getFilter = (textFilter: string, tagFilter: string[], sortType: SortType) 
 
 export const useCharacterListSorter = create<CharacterListSorterProps>()((set, get) => ({
     sortType: SortType.RECENT_DESC,
+    showSearch: false,
     textFilter: '',
     tagFilter: [],
+    setShowSearch: (b) => {
+        if (b) set((state) => ({ ...state, showSearch: b }))
+        else
+            set((state) => ({
+                ...state,
+                showSearch: b,
+                textFilter: '',
+                tagFilter: [],
+                sortAndFilterCharInfo: getFilter('', [], get().sortType),
+            }))
+    },
     setSortType: (sortType: SortType) => {
         set((stete) => ({
             ...stete,
@@ -66,18 +85,39 @@ type CharacterListHeaderProps = {
 }
 
 const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength }) => {
-    const { sortType, setSortType, textFilter, setTextFilter } = useCharacterListSorter(
-        (state) => ({
-            sortType: state.sortType,
-            setSortType: state.setSortType,
-            textFilter: state.textFilter,
-            setTextFilter: state.setTextFilter,
-        })
-    )
+    const {
+        showSearch,
+        setShowSearch,
+        sortType,
+        setSortType,
+        textFilter,
+        setTextFilter,
+        tagFilter,
+        setTagFilter,
+    } = useCharacterListSorter((state) => ({
+        showSearch: state.showSearch,
+        setShowSearch: state.setShowSearch,
+        sortType: state.sortType,
+        setSortType: state.setSortType,
+        textFilter: state.textFilter,
+        setTextFilter: state.setTextFilter,
+        tagFilter: state.tagFilter,
+        setTagFilter: state.setTagFilter,
+    }))
 
     const { color } = Theme.useTheme()
     const [showTags, setShowTags] = useMMKVBoolean(AppSettings.ShowTags)
-    const [showSearch, setShowSearch] = useState(false)
+
+    const { data } = useLiveQuery(
+        db
+            .select({
+                tag: tags.tag,
+                tagCount: count(characterTags.tag_id),
+            })
+            .from(tags)
+            .leftJoin(characterTags, eq(characterTags.tag_id, tags.id))
+            .groupBy(tags.id)
+    )
 
     useEffect(() => {
         if (!showSearch) return
@@ -148,7 +188,6 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                         variant="tertiary"
                         iconName={showSearch ? 'close' : 'search1'}
                         onPress={() => {
-                            if (showSearch) setTextFilter('')
                             setShowSearch(!showSearch)
                         }}
                         iconSize={24}
@@ -157,22 +196,49 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
             </View>
             {showSearch && (
                 <Animated.View
-                    style={{ paddingHorizontal: 12, paddingVertical: 8 }}
+                    style={{ paddingHorizontal: 12, paddingVertical: 8, rowGap: 8 }}
                     entering={FadeInUp.duration(150).withInitialValues({
                         transform: [{ translateY: -20 }],
                     })}
                     exiting={FadeOutUp.duration(100)}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <ThemedTextInput
-                            value={textFilter}
-                            onChangeText={setTextFilter}
-                            style={{
-                                color: resultLength === 0 ? color.text._700 : color.text._100,
-                            }}
-                            placeholder="Search Name..."
-                        />
-                    </View>
-                    {textFilter && (
+                    {showTags &&
+                        (data.length > 0 ? (
+                            <StringArrayEditor
+                                containerStyle={{ flex: 0 }}
+                                suggestions={data
+                                    .sort((a, b) => b.tagCount - a.tagCount)
+                                    .map((item) => item.tag)}
+                                title="Tags"
+                                value={tagFilter}
+                                setValue={setTagFilter}
+                                placeholder="Filter Tags..."
+                                filterOnly
+                                showSuggestionsOnEmpty
+                            />
+                        ) : (
+                            <Text
+                                style={{
+                                    color: color.text._500,
+                                    fontStyle: 'italic',
+                                    paddingVertical: 8,
+                                    paddingHorizontal: 16,
+                                    borderRadius: 8,
+                                    borderWidth: 1,
+                                    borderColor: color.neutral._400,
+                                }}>
+                                {'<No Tags Used>'}
+                            </Text>
+                        ))}
+                    <ThemedTextInput
+                        containerStyle={{ flex: 0 }}
+                        value={textFilter}
+                        onChangeText={setTextFilter}
+                        style={{
+                            color: resultLength === 0 ? color.text._700 : color.text._100,
+                        }}
+                        placeholder="Search Name..."
+                    />
+                    {(textFilter || tagFilter.length > 0) && (
                         <Text
                             style={{
                                 marginTop: 8,

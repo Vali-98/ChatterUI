@@ -1,10 +1,11 @@
 import { Theme } from '@lib/theme/ThemeManager'
-import { View, Text, StyleSheet, TextInput, TextInputProps } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TextInputProps, ViewStyle } from 'react-native'
 
 interface ThemedTextInputProps extends TextInputProps {
     label?: string
     description?: string
     value: string
+    containerStyle?: ViewStyle
 }
 // TODO: Delete this?
 const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
@@ -13,6 +14,7 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
     numberOfLines,
     multiline = false,
     style = undefined,
+    containerStyle = {},
     ...rest
 }) => {
     const { color } = Theme.useTheme()
@@ -20,6 +22,7 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
         <View
             style={{
                 flex: 1,
+                ...containerStyle,
             }}>
             {label && (
                 <Text

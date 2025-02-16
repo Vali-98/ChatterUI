@@ -1,10 +1,12 @@
 import FadeDownView from '@components/views/FadeDownView'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
+import { AppSettings } from '@lib/constants/GlobalValues'
 import { Characters, CharInfo } from '@lib/state/Characters'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
 import { SafeAreaView } from 'react-native'
+import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { LinearTransition } from 'react-native-reanimated'
 
 import CharacterListHeader, { useCharacterListSorter } from './CharacterListHeader'
@@ -20,6 +22,7 @@ type CharacterListProps = {
 const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
     const [nowLoading, setNowLoading] = useState(false)
     const [showMenu, setShowMenu] = useState(false)
+    const [showTags, _] = useMMKVBoolean(AppSettings.ShowTags)
 
     const sortAndFilterCharInfo = useCharacterListSorter((state) => state.sortAndFilterCharInfo)
 
@@ -69,7 +72,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                                 index={index}
                                 character={item}
                                 nowLoading={nowLoading}
-                                showTags={false}
+                                showTags={!!showTags}
                                 setNowLoading={setNowLoading}
                             />
                         )}
