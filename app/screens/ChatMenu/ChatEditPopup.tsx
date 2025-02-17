@@ -93,6 +93,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, setNowLoading, nowL
                     await Chats.db.mutate.renameChat(item.id, text)
                 }}
                 textCheck={(text) => text.length === 0}
+                defaultValue = {item.name}
             />
             <PopupMenu
                 icon="edit"
