@@ -2,6 +2,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import FadeBackrop from '@components/views/FadeBackdrop'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
+import * as ClipBoard from 'expo-clipboard'
 import React, { useEffect, useState } from 'react'
 import { GestureResponderEvent, Modal, StyleSheet, Text, TextInput, View } from 'react-native'
 import Animated, { SlideOutDown } from 'react-native-reanimated'
@@ -40,14 +41,14 @@ const EditorModal = () => {
     const [placeholderText, setPlaceholderText] = useState('')
 
     useEffect(() => {
-        swipeText && setPlaceholderText(swipeText)
-    }, [swipeText])
+        editMode && swipeText && setPlaceholderText(swipeText)
+    }, [swipeText, editMode])
 
     // TODO: This should safely return if invalid values were given
     if (swipeText === undefined) return
 
     const handleEditMessage = () => {
-        updateEntry(index, placeholderText, false)
+        updateEntry(index, placeholderText)
         hide()
     }
 
@@ -86,8 +87,35 @@ const EditorModal = () => {
                 <View style={{ flex: 1 }} />
                 <Animated.View exiting={SlideOutDown.duration(100)} style={styles.editorContainer}>
                     <View style={styles.topText}>
-                        <Text style={styles.nameText}>{entry?.name}</Text>
-                        <Text style={styles.timeText}>{swipe?.send_date.toLocaleTimeString()}</Text>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'flex-end',
+                            }}>
+                            <Text style={styles.nameText}>{entry?.name}</Text>
+                            <Text style={styles.timeText}>
+                                {swipe?.send_date.toLocaleTimeString()}
+                            </Text>
+                        </View>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'flex-end',
+                                columnGap: 16,
+                            }}>
+                            <ThemedButton
+                                iconName="reload1"
+                                variant="tertiary"
+                                label="Reset"
+                                onPress={() => swipeText && setPlaceholderText(swipeText)}
+                            />
+                            <ThemedButton
+                                iconName="copy1"
+                                variant="tertiary"
+                                label="Copy"
+                                onPress={() => swipeText && ClipBoard.setStringAsync(swipeText)}
+                            />
+                        </View>
                     </View>
 
                     <TextInput
@@ -140,6 +168,7 @@ const useStyles = () => {
         },
 
         topText: {
+            justifyContent: 'space-between',
             flexDirection: 'row',
             alignItems: 'flex-end',
             shadowColor: color.shadow,
