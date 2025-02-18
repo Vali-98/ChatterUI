@@ -59,9 +59,9 @@ export const defaultTemplates: APIConfiguration[] = [
 
         model: {
             useModelContextLength: false,
-            nameParser: '',
+            nameParser: 'id',
             contextSizeParser: '',
-            modelListParser: '',
+            modelListParser: 'data',
         },
 
         ui: {
