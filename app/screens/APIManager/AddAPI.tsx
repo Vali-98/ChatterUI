@@ -45,6 +45,17 @@ const AddAPI = () => {
             return
         }
         const models = getNestedValue(data, template.model.modelListParser)
+        const isArray = Array.isArray(models)
+        if (!models || !isArray) {
+            Logger.warn('Could not parse models!')
+            if (!models) {
+                Logger.error('Models resulted in an undefined value')
+            } else if (!isArray)
+                Logger.error(
+                    'Models resulted in an non-array value. `modelListParser` of template is likely incorrect'
+                )
+            return
+        }
         setModelList(models)
     }
 
