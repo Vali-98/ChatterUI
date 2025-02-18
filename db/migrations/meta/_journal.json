@@ -57,6 +57,13 @@
       "when": 1729170264378,
       "tag": "0007_loving_magik",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1739889489456,
+      "tag": "0008_fine_sleeper",
+      "breakpoints": true
     }
   ]
 }

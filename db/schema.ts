@@ -131,6 +131,7 @@ export const chatSwipes = sqliteTable('chat_swipes', {
     gen_finished: integer('gen_finished', { mode: 'timestamp' })
         .notNull()
         .$defaultFn(() => new Date()),
+    timings: text('timings', { mode: 'json' }).$type<CompletionTimings>(),
 })
 
 export const chatsRelations = relations(chats, ({ many, one }) => ({
@@ -290,3 +291,16 @@ export const model_data = sqliteTable('model_data', {
 // Types
 
 export type ModelDataType = typeof model_data.$inferSelect
+export type ChatSwipe = typeof chatSwipes.$inferSelect
+
+export type CompletionTimings = {
+    predicted_per_token_ms: number
+    predicted_per_second: number | null
+    predicted_ms: number
+    predicted_n: number
+
+    prompt_per_token_ms: number
+    prompt_per_second: number | null
+    prompt_ms: number
+    prompt_n: number
+}

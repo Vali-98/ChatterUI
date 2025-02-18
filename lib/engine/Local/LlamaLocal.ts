@@ -11,7 +11,7 @@ import { AppSettings } from '../../constants/GlobalValues'
 import { Logger } from '../../state/Logger'
 import { mmkv, mmkvStorage } from '../../storage/MMKV'
 
-type CompletionTimings = {
+export type CompletionTimings = {
     predicted_per_token_ms: number
     predicted_per_second: number | null
     predicted_ms: number
@@ -23,12 +23,12 @@ type CompletionTimings = {
     prompt_n: number
 }
 
-type CompletionOutput = {
+export type CompletionOutput = {
     text: string
     timings: CompletionTimings
 }
 
-type LlamaState = {
+export type LlamaState = {
     context: LlamaContext | undefined
     model: undefined | ModelDataType
     loadProgress: number
@@ -42,7 +42,7 @@ type LlamaState = {
     completion: (
         params: CompletionParams,
         callback: (text: string) => void,
-        completed: (text: string) => void
+        completed: (text: string, timngs: CompletionTimings) => void
     ) => Promise<void>
     stopCompletion: () => Promise<void>
     tokenLength: (text: string) => number
@@ -56,7 +56,7 @@ export type LlamaConfig = {
     batch: number
 }
 
-type EngineDataProps = {
+export type EngineDataProps = {
     config: LlamaConfig
     lastModel?: ModelDataType
     setConfiguration: (config: LlamaConfig) => void
@@ -199,7 +199,7 @@ export namespace Llama {
                     callback(data.token)
                 })
                 .then(async ({ text, timings }: CompletionOutput) => {
-                    completed(text)
+                    completed(text, timings)
                     Logger.info(
                         `\n---- Start Chat ${get().chatCount} ----\n${textTimings(timings)}\n---- End Chat ${get().chatCount} ----\n`
                     )

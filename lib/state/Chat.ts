@@ -3,7 +3,7 @@ import { Tokenizer } from '@lib/engine/Tokenizer'
 import { useTTSState } from '@lib/state/TTS'
 import { replaceMacros } from '@lib/utils/Macros'
 import { convertToFormatInstruct } from '@lib/utils/TextFormat'
-import { chatEntries, chatSwipes, chats } from 'db/schema'
+import { chatEntries, chatSwipes, chats, ChatSwipe, CompletionTimings } from 'db/schema'
 import { count, desc, eq, getTableColumns } from 'drizzle-orm'
 import * as Notifications from 'expo-notifications'
 import { create } from 'zustand'
@@ -15,13 +15,7 @@ import { AppMode, AppSettings, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
 import { mmkv } from '../storage/MMKV'
 
-export type ChatSwipe = {
-    id: number
-    entry_id: number
-    swipe: string
-    send_date: Date
-    gen_started: Date
-    gen_finished: Date
+export interface ChatSwipeState extends ChatSwipe {
     token_count?: number
     regen_cache?: string
 }
@@ -33,7 +27,7 @@ export type ChatEntry = {
     is_user: boolean
     order: number
     swipe_id: number
-    swipes: ChatSwipe[]
+    swipes: ChatSwipeState[]
 }
 
 export type ChatData = {
@@ -46,23 +40,27 @@ export type ChatData = {
 
 export interface ChatState {
     data: ChatData | undefined
-    buffer: string
+    buffer: OutputBuffer
     load: (chatId: number) => Promise<void>
     delete: (chatId: number) => Promise<void>
     addEntry: (name: string, is_user: boolean, message: string) => Promise<number | void>
     updateEntry: (
         index: number,
         message: string,
-        updateFinished?: boolean,
-        updateStarted?: boolean,
-        verifySwipeId?: number
+        options?: {
+            updateFinished?: boolean
+            updateStarted?: boolean
+            verifySwipeId?: number
+            timings?: CompletionTimings
+            resetTimings?: boolean
+        }
     ) => Promise<void>
     deleteEntry: (index: number) => Promise<void>
     reset: () => void
     swipe: (index: number, direction: number) => Promise<boolean>
     addSwipe: (index: number, message?: string) => Promise<number | void>
     getTokenCount: (index: number) => number
-    setBuffer: (data: string) => void
+    setBuffer: (data: OutputBuffer) => void
     insertBuffer: (data: string) => void
     updateFromBuffer: (cachedSwipeId?: number) => Promise<void>
     insertLastToBuffer: () => void
@@ -81,6 +79,14 @@ type InferenceStateType = {
     stopGenerating: () => void
     setAbort: (fn: () => void | Promise<void>) => void
 }
+
+type OutputBuffer = {
+    data: string
+    timings?: CompletionTimings
+    error?: string
+}
+
+type ChatSwipeUpdated = Pick<ChatSwipe, 'swipe' | 'id'> & Partial<Omit<ChatSwipe, 'swipe' | 'id'>>
 // TODO: Functionalize and move elsewhere
 export const sendGenerateCompleteNotification = async () => {
     const showMessage = mmkv.getBoolean(AppSettings.ShowNotificationText)
@@ -90,7 +96,7 @@ export const sendGenerateCompleteNotification = async () => {
         : 'Response Complete'
 
     const notificationText = showMessage
-        ? Chats.useChatState.getState().buffer.trim()
+        ? Chats.useChatState.getState().buffer?.data?.trim()
         : 'ChatterUI has finished a response.'
 
     Notifications.setNotificationHandler({
@@ -139,7 +145,7 @@ export const useInference = create<InferenceStateType>((set, get) => ({
 export namespace Chats {
     export const useChatState = create<ChatState>((set, get: () => ChatState) => ({
         data: undefined,
-        buffer: '',
+        buffer: { data: '' },
         startGenerating: (swipeId: number) => {
             useInference.getState().startGenerating(swipeId)
         },
@@ -149,7 +155,7 @@ export namespace Chats {
             Logger.info(`Saving Chat`)
             await get().updateFromBuffer(cachedSwipeId)
             useInference.getState().stopGenerating()
-            get().setBuffer('')
+            get().setBuffer({ data: '' })
 
             if (mmkv.getBoolean(Global.TTSEnable) && mmkv.getBoolean(Global.TTSAuto)) {
                 const length = get().data?.messages?.length
@@ -209,13 +215,8 @@ export namespace Chats {
             }))
         },
 
-        updateEntry: async (
-            index: number,
-            message: string,
-            updateFinished: boolean = true,
-            updateStarted: boolean = false,
-            verifySwipeId: number | undefined = undefined
-        ) => {
+        updateEntry: async (index: number, message: string, options = {}) => {
+            const { verifySwipeId, updateFinished, updateStarted, timings, resetTimings } = options
             const messages = get()?.data?.messages
             if (!messages) return
 
@@ -232,18 +233,28 @@ export namespace Chats {
 
             if (!chatSwipeId) return
 
-            const date = await db.mutate.updateChatSwipe(
-                chatSwipeId,
-                message,
-                updateStarted,
-                updateFinished
-            )
+            const date = new Date()
+
+            const updatedSwipe: ChatSwipeUpdated = {
+                id: chatSwipeId,
+                swipe: message,
+            }
+            if (updateFinished) updatedSwipe.gen_finished = date
+            if (updateStarted) updatedSwipe.gen_started = date
+            if (timings) updatedSwipe.timings = timings
+            if (resetTimings) updatedSwipe.timings = null
+
+            await db.mutate.updateChatSwipe(updatedSwipe)
+
             if (!updateState) return
+
             const entry = messages[index].swipes[messages[index].swipe_id]
             entry.swipe = message
             entry.token_count = undefined
             if (updateFinished) entry.gen_finished = date
             if (updateStarted) entry.gen_started = date
+            if (timings) entry.timings = timings
+            if (resetTimings) entry.timings = null
             messages[index].swipes[messages[index].swipe_id] = entry
 
             set((state) => ({
@@ -311,29 +322,41 @@ export namespace Chats {
             }))
             return token_count
         },
-        setBuffer: (newBuffer: string) =>
+        setBuffer: (newBuffer: OutputBuffer) =>
             set((state: ChatState) => ({ ...state, buffer: newBuffer })),
 
         insertBuffer: (data: string) =>
-            set((state: ChatState) => ({ ...state, buffer: state.buffer + data })),
+            set((state: ChatState) => ({
+                ...state,
+                buffer: { ...state.buffer, data: state.buffer.data + data },
+            })),
 
         updateFromBuffer: async (cachedSwipeId) => {
+            const NO_VALID_ENTRY = -1
             const index = get().data?.messages?.length
+            const buffer = get().buffer
+            const updatedSwipe: ChatSwipeUpdated = {
+                id: index ?? cachedSwipeId ?? NO_VALID_ENTRY,
+                swipe: buffer.data,
+            }
+            if (updatedSwipe.id === NO_VALID_ENTRY) return
+            if (buffer.timings) updatedSwipe.timings = buffer.timings
             if (!index) {
                 // this means there is no chat loaded, we need to update the db anyways
-                if (cachedSwipeId) {
-                    await db.mutate.updateChatSwipe(cachedSwipeId, get().buffer, false, true)
-                }
-                return
-            }
-            await get().updateEntry(index - 1, get().buffer, true, false, cachedSwipeId)
+                await db.mutate.updateChatSwipe(updatedSwipe)
+            } else
+                await get().updateEntry(index - 1, get().buffer.data, {
+                    updateFinished: true,
+                    verifySwipeId: cachedSwipeId,
+                    timings: buffer.timings,
+                })
         },
         insertLastToBuffer: () => {
             const message = get()?.data?.messages?.at(-1)
             if (!message) return
             const mes = message.swipes[message.swipe_id].swipe
 
-            set((state: ChatState) => ({ ...state, buffer: mes }))
+            set((state: ChatState) => ({ ...state, buffer: { ...state.buffer, data: mes } }))
         },
         setRegenCache: () => {
             const messages = get()?.data?.messages
@@ -542,28 +565,15 @@ export namespace Chats {
                     .where(eq(chatEntries.id, entryId))
             }
 
-            export const updateChatSwipe = async (
-                chatSwipeId: number,
-                message: string,
-                updateStarted: boolean,
-                updateFinished: boolean
-            ) => {
-                const date = new Date()
-                type UpdatedEntry = {
-                    swipe: string
-                    gen_started?: Date
-                    gen_finished?: Date
-                }
-
-                const data: UpdatedEntry = { swipe: message }
-                if (updateStarted) data.gen_started = date
-                if (updateFinished) data.gen_finished = date
-                await database.update(chatSwipes).set(data).where(eq(chatSwipes.id, chatSwipeId))
+            export const updateChatSwipe = async (chatSwipe: ChatSwipeUpdated) => {
+                await database
+                    .update(chatSwipes)
+                    .set(chatSwipe)
+                    .where(eq(chatSwipes.id, chatSwipe.id))
                 const swipe = await database.query.chatSwipes.findFirst({
-                    where: eq(chatSwipes.id, chatSwipeId),
+                    where: eq(chatSwipes.id, chatSwipe.id),
                 })
                 if (swipe?.entry_id) updateEntryModified(swipe.entry_id)
-                return date
             }
 
             export const deleteChat = async (chatId: number) => {
@@ -704,6 +714,7 @@ export namespace Chats {
                 send_date: new Date(),
                 gen_started: new Date(),
                 gen_finished: new Date(),
+                timings: null,
             },
         ],
     }

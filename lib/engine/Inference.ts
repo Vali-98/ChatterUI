@@ -23,8 +23,12 @@ export const regenerateResponse = async (swipeId: number, regenCache: boolean = 
         if (regenCache) replacement = message?.swipes[message.swipe_id].regen_cache ?? ''
         else Chats.useChatState.getState().resetRegenCache()
 
-        if (replacement) Chats.useChatState.getState().setBuffer(replacement)
-        await Chats.useChatState.getState().updateEntry(messagesLength - 1, replacement, true, true)
+        if (replacement) Chats.useChatState.getState().setBuffer({ data: replacement })
+        await Chats.useChatState.getState().updateEntry(messagesLength - 1, replacement, {
+            updateFinished: true,
+            updateStarted: true,
+            resetTimings: true,
+        })
     }
     await generateResponse(swipeId)
 }

@@ -115,8 +115,7 @@ const readableStreamResponse = async (
 
     sse.setOnEvent((data) => {
         const text = jsonreader(data) ?? ''
-        const output = Chats.useChatState.getState().buffer + text
-        Chats.useChatState.getState().setBuffer(output.replaceAll(replace, ''))
+        Chats.useChatState.getState().insertBuffer(text.replaceAll(replace, ''))
     })
 
     sse.setOnError(() => {

@@ -470,7 +470,7 @@ export namespace Characters {
                             )
                     }
                 } catch (e) {
-                    console.log(e)
+                    Logger.warn(`${e}`)
                 }
             }
 

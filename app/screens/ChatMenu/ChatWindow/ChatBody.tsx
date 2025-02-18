@@ -1,6 +1,8 @@
+import { AppMode, AppSettings, Global } from '@lib/constants/GlobalValues'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
-import { TouchableOpacity, View } from 'react-native'
+import { TouchableOpacity, View, Text } from 'react-native'
+import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 
 import ChatText from './ChatText'
 import ChatTextLast from './ChatTextLast'
@@ -16,7 +18,9 @@ type ChatTextProps = {
 
 const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage, isGreeting }) => {
     const message = Chats.useEntryData(index)
-    const { color, spacing, borderRadius } = Theme.useTheme()
+    const [appMode, _] = useMMKVString(Global.AppMode)
+    const [showTPS, __] = useMMKVBoolean(AppSettings.ShowTokenPerSecond)
+    const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
     const showEditor = useChatEditorState((state) => state.show)
     const handleEnableEdit = () => {
         if (!nowGenerating) showEditor(index)
@@ -24,7 +28,7 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
 
     const hasSwipes = message?.swipes?.length > 1
     const showSwipe = !message.is_user && isLastMessage && (hasSwipes || !isGreeting)
-
+    const timings = message.swipes[message.swipe_id].timings
     return (
         <View>
             <TouchableOpacity
@@ -46,13 +50,29 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
                 ) : (
                     <ChatText nowGenerating={nowGenerating} index={index} />
                 )}
+                {showTPS && appMode === AppMode.LOCAL && timings && (
+                    <Text
+                        style={{
+                            color: color.text._500,
+                            fontWeight: '300',
+                            textAlign: 'right',
+                            fontSize: fontSize.s,
+                        }}>
+                        {`Prompt: ${getFiniteValue(timings.prompt_per_second)} t/s`}
+                        {`   Text Gen: ${getFiniteValue(timings.predicted_per_second)} t/s`}
+                    </Text>
+                )}
             </TouchableOpacity>
-
             {showSwipe && (
                 <Swipes index={index} nowGenerating={nowGenerating} isGreeting={isGreeting} />
             )}
         </View>
     )
+}
+
+const getFiniteValue = (value: number | null) => {
+    if (!value || !isFinite(value)) return (0).toFixed(2)
+    return value.toFixed(2)
 }
 
 export default ChatBody

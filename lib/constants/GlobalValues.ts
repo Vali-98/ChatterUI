@@ -139,6 +139,7 @@ export enum AppSettings {
     ShowModelInChat = 'showmodelinchat',
     ShowTags = 'showtags',
     UseModelTemplate = 'useModelTemplate',
+    ShowTokenPerSecond = 'showtokenpersecond',
 }
 
 export enum AppMode {
@@ -173,4 +174,5 @@ export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.ShowModelInChat]: false,
     [AppSettings.ShowTags]: false,
     [AppSettings.UseModelTemplate]: true,
+    [AppSettings.ShowTokenPerSecond]: true,
 }

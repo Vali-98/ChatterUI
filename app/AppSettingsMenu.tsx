@@ -89,6 +89,10 @@ const AppSettingsMenu = () => {
     const [authLocal, setAuthLocal] = useMMKVBoolean(AppSettings.LocallyAuthenticateUser)
     const [unlockOrientation, setUnlockOrientation] = useMMKVBoolean(AppSettings.UnlockOrientation)
 
+    const [showTokensPerSecond, setShowTokensPerSecond] = useMMKVBoolean(
+        AppSettings.ShowTokenPerSecond
+    )
+
     return (
         <ScrollView
             style={{
@@ -135,6 +139,13 @@ const AppSettingsMenu = () => {
                 value={sendOnEnter}
                 onChangeValue={setSendOnEnter}
                 description="Submits messages when Enter is pressed"
+            />
+
+            <ThemedSwitch
+                label="Show Tokens Per Second"
+                value={showTokensPerSecond}
+                onChangeValue={setShowTokensPerSecond}
+                description="Show tokens per second when using local models"
             />
 
             <SectionTitle>Generation</SectionTitle>

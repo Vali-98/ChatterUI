@@ -36,7 +36,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
     const updateHeight = () => {
         if (firstRender.current) return
         const oveflowPadding = 12
-        const showPadding = nowGenerating && buffer !== ''
+        const showPadding = nowGenerating && buffer.data !== ''
 
         if (viewRef.current) {
             viewRef.current.measure((x, y, width, measuredHeight) => {
@@ -60,7 +60,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
             <View style={{ minHeight: 10 }} ref={viewRef} onLayout={() => updateHeight()}>
-                {swipeId === currentSwipeId && nowGenerating && buffer === '' && (
+                {swipeId === currentSwipeId && nowGenerating && buffer.data === '' && (
                     <AnimatedEllipsis />
                 )}
                 <Markdown
@@ -69,7 +69,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
                     rules={MarkdownStyle.RenderRules}
                     style={markdownStyle}>
                     {nowGenerating && swipeId === currentSwipeId
-                        ? buffer.trim()
+                        ? buffer.data.trim()
                         : swipeText?.trim()}
                 </Markdown>
             </View>

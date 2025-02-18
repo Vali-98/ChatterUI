@@ -7,9 +7,10 @@ import { Instructs, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { mmkv } from '@lib/storage/MMKV'
+import { CompletionTimings } from 'db/schema'
 
 import { APIConfiguration, APISampler, APIValues } from './API/APIBuilder.types'
-import { buildTextCompletionContext, buildChatCompletionContext } from './API/ContextBuilder'
+import { buildChatCompletionContext, buildTextCompletionContext } from './API/ContextBuilder'
 import { Llama, LlamaConfig } from './Local/LlamaLocal'
 import { KV } from './Local/Model'
 
@@ -218,13 +219,14 @@ const runLocalCompletion = async (payload: Awaited<ReturnType<typeof buildLocalP
     })
 
     const outputStream = (text: string) => {
-        const output = Chats.useChatState.getState().buffer + text
-        Chats.useChatState.getState().setBuffer(output.replaceAll(replace, ''))
+        Chats.useChatState.getState().insertBuffer(text)
     }
 
-    const outputCompleted = (text: string) => {
+    const outputCompleted = (text: string, timings: CompletionTimings) => {
         const regenCache = Chats.useChatState.getState().getRegenCache()
-        Chats.useChatState.getState().setBuffer((regenCache + text).replaceAll(replace, ''))
+        Chats.useChatState
+            .getState()
+            .setBuffer({ data: (regenCache + text).replaceAll(replace, ''), timings: timings })
         if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(`Completion Output:\n${text}`)
         stopGenerating()
     }
