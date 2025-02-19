@@ -1,8 +1,8 @@
 diff --git a/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt b/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt
-index 12cd12b..f2fefbc 100644
+index 4691b00..f017adf 100644
 --- a/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt
 +++ b/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt
-@@ -237,6 +237,7 @@ class SQLiteModule : Module() {
+@@ -254,6 +254,7 @@ class SQLiteModule : Module() {
      if (database.openOptions.enableChangeListener) {
        addUpdateHook(database)
      }
@@ -10,7 +10,7 @@ index 12cd12b..f2fefbc 100644
    }
  
    @Throws(AccessClosedResourceException::class, SQLiteErrorException::class)
-@@ -369,6 +370,18 @@ class SQLiteModule : Module() {
+@@ -386,6 +387,18 @@ class SQLiteModule : Module() {
      }
    }
  

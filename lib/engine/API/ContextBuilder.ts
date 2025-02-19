@@ -245,9 +245,13 @@ export const buildChatCompletionContext = (
 
         const prefill = index === messages.length - 1 ? values.prefill : ''
 
+        if (!swipe_data.swipe && !prefill && index === messages.length - 1) {
+            continue
+        }
+
         messageBuffer.push({
             role: message.is_user ? completionFeats.userRole : completionFeats.assistantRole,
-            content: replaceMacros(prefill + message.swipes[message.swipe_id].swipe),
+            content: replaceMacros(prefill + swipe_data.swipe),
         })
         total_length += len
         index--
