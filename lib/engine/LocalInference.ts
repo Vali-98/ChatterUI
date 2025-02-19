@@ -77,7 +77,6 @@ const buildLocalPayload = async () => {
                 const result = await Llama.useLlama
                     .getState()
                     .context?.getFormattedChat(messages, null)
-                console.log(typeof result)
                 if (typeof result === 'string') prompt = result
                 // Currently not used since we dont pass in { jinja: true }
                 else if (typeof result === 'object') prompt = result.prompt
@@ -86,7 +85,6 @@ const buildLocalPayload = async () => {
             Logger.error(`Failed to use template: ${e}`)
         }
     }
-    console.log(prompt)
     if (!prompt) {
         prompt = buildTextCompletionContext(localPreset.context_length - n_predict)
     }
