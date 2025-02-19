@@ -7,8 +7,8 @@ type HeaderButtonProps = {
     headerLeft?: () => ReactNode
 }
 
-const HeaderButton: React.FC<HeaderButtonProps> = ({ headerRight, headerLeft }) => {
-    return <Stack.Screen options={{ headerRight: headerRight, headerLeft: headerLeft }} />
+const HeaderButton: React.FC<HeaderButtonProps> = ({ ...rest }) => {
+    return <Stack.Screen options={rest} />
 }
 
 export default HeaderButton
