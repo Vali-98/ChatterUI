@@ -35,6 +35,10 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
     const [modelList, setModelList] = useState<any[]>([])
 
     useEffect(() => {
+        setValues(originalValues)
+    }, [originalValues])
+
+    useEffect(() => {
         const newTemplate = getTemplates().find((item) => item.name === values.configName)
         if (!newTemplate) {
             Logger.errorToast('Could not get valid template!')
