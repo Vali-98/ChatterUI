@@ -1,6 +1,7 @@
 import { Model } from '@lib/engine/Local/Model'
 import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
+import { useTTSState } from '@lib/state/TTS'
 import { getCpuFeatures } from 'cui-llama.rn'
 import { DeviceType, getDeviceTypeAsync } from 'expo-device'
 import {
@@ -11,6 +12,7 @@ import {
     readDirectoryAsync,
 } from 'expo-file-system'
 import { setBackgroundColorAsync } from 'expo-system-ui'
+import { z } from 'zod'
 
 import { AppDirectory } from './File'
 import { lockScreenOrientation } from './Screen'
@@ -78,6 +80,41 @@ const migrateModelData_0_8_4_to_0_8_5 = () => {
         mmkv.delete(oldDef)
         Llama.useEngineData.getState().setLastModelLoaded(data)
     } catch (e) {}
+}
+
+const migrateTTSData_0_8_5_to_0_8_6 = () => {
+    /** previous Global enum data:
+        TTSSpeaker = 'ttsspeaker',
+        TTSEnable = 'ttsenable',
+        TTSAuto = `ttsauto`, 
+    */
+    if (mmkv.getBoolean('ttsauto')) {
+        mmkv.delete('ttsauto')
+        useTTSState.getState().setAuto(true)
+    }
+    if (mmkv.getBoolean('ttsenable')) {
+        mmkv.delete('ttsenable')
+        useTTSState.getState().setEnabled(true)
+    }
+    const speakerData = mmkv.getString('ttsspeaker')
+    if (speakerData) {
+        mmkv.delete('ttsspeaker')
+        try {
+            const voiceData = JSON.parse(speakerData)
+            const voiceSchema = z.object({
+                identifier: z.string(),
+                name: z.string(),
+                quality: z.enum(['Default', 'Enhanced']),
+                language: z.string(),
+            })
+            const result = voiceSchema.safeParse(voiceData)
+            if (result.success) {
+                useTTSState.getState().setVoice(voiceData)
+            } else throw new Error('Schema validation failed')
+        } catch (e) {
+            Logger.error('Failed to migrate voice from 0.8.5 to 0.8.6')
+        }
+    }
 }
 
 export const generateDefaultDirectories = async () => {
@@ -174,8 +211,8 @@ export const startupApp = () => {
     // migrations for old versions
     migrateModelData_0_7_10_to_0_8_0()
     migrateModelData_0_8_4_to_0_8_5()
-
     migratePresets_0_8_3_to_0_8_4()
+    migrateTTSData_0_8_5_to_0_8_6()
 
     lockScreenOrientation()
     setBackgroundColorAsync(Theme.useColorState.getState().color.neutral._100)

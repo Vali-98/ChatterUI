@@ -97,16 +97,16 @@ export const enum Global {
 
     // Logs = 'logs', // moved to zustand state
 
+    // Moved to Zustand state
+    // TTSSpeaker = 'ttsspeaker',
+    // TTSEnable = 'ttsenable',
+    // TTSAuto = `ttsauto`,
+    // TTSAutoStart = 'ttsautostart', // moved autoTTS to zustand state
+
     // Management
 
     CpuFeatures = 'cpufeatures',
     AppMode = 'appmode',
-
-    // TODO move to zustaind state
-    TTSSpeaker = 'ttsspeaker',
-    TTSEnable = 'ttsenable',
-    TTSAuto = `ttsauto`,
-    // TTSAutoStart = 'ttsautostart', // moved autoTTS to zustand state
 }
 
 export enum GenerationSettings {

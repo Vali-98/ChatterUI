@@ -157,13 +157,15 @@ export namespace Chats {
             useInference.getState().stopGenerating()
             get().setBuffer({ data: '' })
 
-            if (mmkv.getBoolean(Global.TTSEnable) && mmkv.getBoolean(Global.TTSAuto)) {
+            const ttsState = useTTSState.getState()
+
+            if (ttsState.enabled && ttsState.auto) {
                 const length = get().data?.messages?.length
                 if (!length) return
                 const message = get().data?.messages?.[length - 1]
                 if (!message) return
-                await useTTSState.getState().stopTTS()
-                useTTSState.getState().startTTS(message.swipes[message.swipe_id].swipe, length - 1)
+                await ttsState.stopTTS()
+                ttsState.startTTS(message.swipes[message.swipe_id].swipe, length - 1)
             }
         },
         load: async (chatId: number) => {

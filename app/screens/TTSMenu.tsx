@@ -1,17 +1,17 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
+import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import SectionTitle from '@components/text/SectionTitle'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { Global } from '@lib/constants/GlobalValues'
 import { Logger } from '@lib/state/Logger'
+import { useTTS } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
 import { groupBy } from '@lib/utils/Array'
 import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'
 import { View } from 'react-native'
-import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
 
 type LanguageListItem = {
     [key: string]: Speech.Voice[]
@@ -19,10 +19,8 @@ type LanguageListItem = {
 
 const TTSMenu = () => {
     const { color } = Theme.useTheme()
-    const [currentSpeaker, setCurrentSpeaker] = useMMKVObject<Speech.Voice>(Global.TTSSpeaker)
-    const [enableTTS, setEnableTTS] = useMMKVBoolean(Global.TTSEnable)
-    const [autoTTS, setAutoTTS] = useMMKVBoolean(Global.TTSAuto)
-    const [lang, setLang] = useState(currentSpeaker?.language ?? 'en-US')
+    const { voice, setVoice, enabled, setEnabled, auto, setAuto, rate, setRate } = useTTS()
+    const [lang, setLang] = useState(voice?.language ?? 'en-US')
     const [modelList, setModelList] = useState<Speech.Voice[]>([])
     const languageList: LanguageListItem = groupBy(modelList, 'language')
     const [testAudioText, setTestAudioText] = useState('This is a test audio')
@@ -56,19 +54,29 @@ const TTSMenu = () => {
 
             <ThemedSwitch
                 label="Enable"
-                value={enableTTS}
+                value={enabled}
                 onChangeValue={(value) => {
                     if (value) {
                         getVoices(true)
                     } else Speech.stop()
-                    setEnableTTS(value)
+                    setEnabled(value)
                 }}
             />
 
             <ThemedSwitch
-                value={autoTTS}
-                onChangeValue={setAutoTTS}
+                value={auto}
+                onChangeValue={setAuto}
                 label="Automatically TTS On Inference"
+            />
+
+            <ThemedSlider
+                label="Speed"
+                min={0.1}
+                max={2.5}
+                step={0.1}
+                precision={1}
+                value={rate}
+                onValueChange={setRate}
             />
 
             <SectionTitle style={{ marginTop: 8 }}>
@@ -101,11 +109,11 @@ const TTSMenu = () => {
                 style={{ marginBottom: 8 }}
                 search
                 modalTitle="Select Speaker"
-                selected={currentSpeaker}
+                selected={voice}
                 data={languageList?.[lang] ?? []}
                 labelExtractor={(item) => item.identifier}
                 placeholder="Select Speaker"
-                onChangeValue={(item) => setCurrentSpeaker(item)}
+                onChangeValue={(item) => setVoice(item)}
             />
             <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}>
                 <ThemedTextInput
@@ -117,13 +125,14 @@ const TTSMenu = () => {
                     label="Test"
                     variant="secondary"
                     onPress={() => {
-                        if (currentSpeaker === undefined) {
+                        if (voice === undefined) {
                             Logger.warnToast(`No Speaker Chosen`)
                             return
                         }
                         Speech.speak(testAudioText, {
-                            language: currentSpeaker.language,
-                            voice: currentSpeaker.identifier,
+                            language: voice.language,
+                            voice: voice.identifier,
+                            rate: rate,
                         })
                     }}
                 />

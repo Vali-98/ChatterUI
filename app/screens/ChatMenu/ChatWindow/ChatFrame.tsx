@@ -1,12 +1,11 @@
 import Avatar from '@components/views/Avatar'
-import { Global } from '@lib/constants/GlobalValues'
 import { useViewerState } from '@lib/state/AvatarViewer'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
+import { useTTSState } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
 import { ReactNode } from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
-import { useMMKVBoolean } from 'react-native-mmkv'
 
 import TTSMenu from './TTS'
 
@@ -22,7 +21,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
 
     const message = Chats.useEntryData(index)
     const setShowViewer = useViewerState((state) => state.setShow)
-    const [TTSenabled, setTTSenabled] = useMMKVBoolean(Global.TTSEnable)
+    const enabled = useTTSState((state) => state.enabled)
     const charImageId = Characters.useCharacterCard((state) => state.card?.image_id) ?? 0
     const userImageId = Characters.useUserCard((state) => state.card?.image_id) ?? 0
 
@@ -74,7 +73,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                         {deltaTime}s
                     </Text>
                 )}
-                {TTSenabled && <TTSMenu index={index} />}
+                {enabled && <TTSMenu index={index} />}
             </View>
             <View style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
