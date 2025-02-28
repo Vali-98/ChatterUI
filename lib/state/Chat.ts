@@ -209,12 +209,16 @@ export namespace Chats {
 
             await db.mutate.deleteChatEntry(entryId)
 
-            set((state) => ({
-                ...state,
-                data: state?.data
-                    ? { ...state.data, messages: messages.filter((item, ind) => ind !== index) }
-                    : state.data,
-            }))
+            set((state) => {
+                if (!state.data) return state
+                return {
+                    ...state,
+                    data: {
+                        ...state.data,
+                        messages: messages.filter((item, ind) => ind !== index),
+                    },
+                }
+            })
         },
 
         updateEntry: async (index: number, message: string, options = {}) => {
