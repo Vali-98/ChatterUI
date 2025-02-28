@@ -48,6 +48,7 @@ export class SSEFetch {
             if (this.abortController.signal.aborted) {
                 Logger.debug('Abort caught')
             }
+            Logger.error('Request Failed: ' + e)
         } finally {
             this.onClose()
         }
