@@ -41,7 +41,7 @@ const EditorModal = () => {
     const [placeholderText, setPlaceholderText] = useState('')
 
     useEffect(() => {
-        editMode && swipeText && setPlaceholderText(swipeText)
+        editMode && swipeText !== undefined && setPlaceholderText(swipeText)
     }, [swipeText, editMode])
 
     // TODO: This should safely return if invalid values were given
