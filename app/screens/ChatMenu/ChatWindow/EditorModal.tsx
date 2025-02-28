@@ -48,13 +48,13 @@ const EditorModal = () => {
     if (swipeText === undefined) return
 
     const handleEditMessage = () => {
-        updateEntry(index, placeholderText)
         hide()
+        updateEntry(index, placeholderText)
     }
 
     const handleDeleteMessage = () => {
-        deleteEntry(index)
         hide()
+        deleteEntry(index)
     }
 
     const handleClose = () => {
