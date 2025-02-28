@@ -49,7 +49,6 @@ const ChatWindow = () => {
                 }
                 keyboardShouldPersistTaps="handled"
                 inverted
-                windowSize={2}
                 data={list}
                 keyExtractor={(item) => item.key}
                 renderItem={renderItems}
