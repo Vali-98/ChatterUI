@@ -324,17 +324,17 @@ export const defaultTemplates: APIConfiguration[] = [
                 assistantRole: 'assistant',
                 contentName: 'content',
             },
-            authHeader: '',
+            authHeader: 'x-api-key',
             authPrefix: '',
-            responseParsePattern: 'choices.0.text',
+            responseParsePattern: 'delta.text',
             useStop: true,
             stopKey: 'stop_sequences',
-            promptKey: 'prompt',
+            promptKey: 'messages',
             removeLength: true,
         },
 
         payload: {
-            type: 'openai',
+            type: 'claude',
         },
 
         model: {

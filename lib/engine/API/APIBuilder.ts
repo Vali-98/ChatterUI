@@ -48,7 +48,11 @@ export const buildAndSendRequest = async () => {
 
     let header: any = {}
     if (config.features.useKey) {
+        const anthropicVersion =
+            config.name === 'Claude' ? { 'anthropic-version': '2023-06-01' } : {}
+
         header = {
+            ...anthropicVersion,
             [config.request.authHeader]: config.request.authPrefix + requestValues.key,
         }
     }

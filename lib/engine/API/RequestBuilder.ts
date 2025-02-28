@@ -15,6 +15,8 @@ export const buildRequest = (config: APIConfiguration, values: APIValues) => {
             return cohereRequest(config, values)
         case 'horde':
             return hordeRequest(config, values)
+        case 'claude':
+            return claudeRequest(config, values)
         case 'custom':
             return customRequest(config, values)
     }
@@ -76,6 +78,29 @@ const cohereRequest = (config: APIConfiguration, values: APIValues) => {
         preamble: preamble.message,
         chat_history: history,
         [config.request.promptKey]: last?.message ?? '',
+    }
+}
+
+const claudeRequest = (config: APIConfiguration, values: APIValues) => {
+    const { payloadFields, model, stop, prompt } = buildFields(config, values)
+
+    const systemPrompt = Instructs.useInstruct.getState().data?.system_prompt
+    const systemRole =
+        config.request.completionType.type === 'chatCompletions'
+            ? config.request.completionType.systemRole
+            : 'system'
+    const promptObject = prompt?.[config.request.promptKey]
+    const finalPrompt = Array.isArray(promptObject)
+        ? {
+              [config.request.promptKey]: promptObject.filter((item) => item.role !== systemRole),
+          }
+        : prompt
+    return {
+        system: systemPrompt,
+        ...payloadFields,
+        ...model,
+        ...stop,
+        ...finalPrompt,
     }
 }
 

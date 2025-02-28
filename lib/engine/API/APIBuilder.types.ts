@@ -70,7 +70,7 @@ export interface APIRequestFormat {
 // cohere is defined, however its format now supports openai
 // custom formats allows you to define a string with macros instead
 export type APIPayloadFormat =
-    | { type: 'openai' | 'ollama' | 'cohere' | 'horde' }
+    | { type: 'openai' | 'ollama' | 'cohere' | 'horde' | 'claude' }
     | { type: 'custom'; customPayload: string }
 
 export interface APIModelFormat {

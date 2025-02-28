@@ -226,9 +226,7 @@ export const buildChatCompletionContext = (
         { role: completionFeats.systemRole, [completionFeats.contentName]: replaceMacros(initial) },
     ]
 
-    const messageBuffer: Message[] = config.features.useFirstMessage
-        ? [{ role: completionFeats.userRole, [completionFeats.contentName]: values.firstMessage }]
-        : []
+    const messageBuffer: Message[] = []
 
     let index = messages.length - 1
     for (const message of messages.reverse()) {
@@ -241,7 +239,7 @@ export const buildChatCompletionContext = (
         const name_length = currentInstruct.names ? tokenizer(name_string) : 0
         const len =
             Chats.useChatState.getState().getTokenCount(index) + name_length + timestamp_length
-        if (len > max_length && !bypassContextLength) break
+        if (total_length + len > max_length && !bypassContextLength) break
 
         const prefill = index === messages.length - 1 ? values.prefill : ''
 
@@ -256,8 +254,15 @@ export const buildChatCompletionContext = (
         total_length += len
         index--
     }
-    const output = [...payload, ...messageBuffer.reverse()]
 
+    if (config.features.useFirstMessage)
+        messageBuffer.push({
+            role: completionFeats.userRole,
+            [completionFeats.contentName]: values.firstMessage,
+        })
+
+    const output = [...payload, ...messageBuffer.reverse()]
+    console.log(output)
     Logger.info(`Approximate Context Size: ${total_length} tokens`)
     Logger.info(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
     if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(JSON.stringify(output))
