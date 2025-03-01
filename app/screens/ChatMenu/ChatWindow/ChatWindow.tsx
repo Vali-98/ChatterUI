@@ -1,5 +1,7 @@
 import { AppMode, AppSettings, Global } from '@lib/constants/GlobalValues'
+import { useBackgroundImage } from '@lib/state/BackgroundImage'
 import { Chats } from '@lib/state/Chat'
+import { AppDirectory } from '@lib/utils/File'
 import { ImageBackground } from 'expo-image'
 import { FlatList } from 'react-native'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
@@ -21,6 +23,8 @@ const ChatWindow = () => {
     const [showModelname, __] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [autoScroll, ___] = useMMKVBoolean(AppSettings.AutoScroll)
 
+    const image = useBackgroundImage((state) => state.image)
+
     const list: ListItem[] = (chat?.messages ?? [])
         .map((item, index) => ({
             index: index,
@@ -41,7 +45,10 @@ const ChatWindow = () => {
     }
 
     return (
-        <ImageBackground style={{ flex: 1 }}>
+        <ImageBackground
+            cachePolicy="none"
+            style={{ flex: 1 }}
+            source={{ uri: image ? AppDirectory.Assets + image : '' }}>
             <EditorModal />
             {showModelname && appMode === AppMode.LOCAL && <ChatModelName />}
             <FlatList
