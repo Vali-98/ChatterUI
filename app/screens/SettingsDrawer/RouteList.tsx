@@ -112,7 +112,7 @@ const getPaths = (remote: boolean): ButtonData[] => [
     },
     {
         name: 'Settings',
-        path: '/AppSettingsMenu',
+        path: '/screens/AppSettingsMenu',
         icon: 'setting',
     },
 ]

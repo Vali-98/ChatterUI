@@ -1,6 +1,7 @@
 import { AppMode, AppSettings, Global } from '@lib/constants/GlobalValues'
 import { Chats } from '@lib/state/Chat'
-import { FlatList, View } from 'react-native'
+import { ImageBackground } from 'expo-image'
+import { FlatList } from 'react-native'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 
 import ChatItem from './ChatItem'
@@ -40,7 +41,7 @@ const ChatWindow = () => {
     }
 
     return (
-        <View style={{ flex: 1 }}>
+        <ImageBackground style={{ flex: 1 }}>
             <EditorModal />
             {showModelname && appMode === AppMode.LOCAL && <ChatModelName />}
             <FlatList
@@ -53,7 +54,7 @@ const ChatWindow = () => {
                 keyExtractor={(item) => item.key}
                 renderItem={renderItems}
             />
-        </View>
+        </ImageBackground>
     )
 }
 
