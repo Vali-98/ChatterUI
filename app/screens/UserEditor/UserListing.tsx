@@ -1,5 +1,6 @@
 import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
+import Drawer from '@components/views/Drawer'
 import PopupMenu from '@components/views/PopupMenu'
 import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -10,9 +11,6 @@ type CharacterData = Awaited<ReturnType<typeof Characters.db.query.cardListQuery
 
 type CharacterListingProps = {
     user: CharacterData
-    nowLoading: boolean
-    setNowLoading: (b: boolean) => void
-    setShowModal: (b: boolean) => void
 }
 
 const day_ms = 86400000
@@ -24,14 +22,12 @@ const getTimeStamp = (oldtime: number) => {
     return new Date(oldtime).toLocaleDateString()
 }
 
-const UserListing: React.FC<CharacterListingProps> = ({
-    user,
-    nowLoading,
-    setNowLoading,
-    setShowModal,
-}) => {
+const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
     const styles = useStyles()
     const { spacing } = Theme.useTheme()
+    const { setShowDrawer } = Drawer.useDrawerState((state) => ({
+        setShowDrawer: (b: boolean) => state.setShow(Drawer.ID.USERLIST, b),
+    }))
 
     const { userId, setCard } = Characters.useUserCard((state) => ({
         userId: state.id,
@@ -79,9 +75,7 @@ const UserListing: React.FC<CharacterListingProps> = ({
                     label: 'Clone User',
                     onPress: async () => {
                         menuRef.current?.close()
-                        setNowLoading(true)
                         await Characters.db.mutate.duplicateCard(user.id)
-                        setNowLoading(false)
                     },
                 },
             ],
@@ -95,12 +89,9 @@ const UserListing: React.FC<CharacterListingProps> = ({
             }>
             <TouchableOpacity
                 style={styles.longButton}
-                disabled={nowLoading}
                 onPress={async () => {
-                    setNowLoading(true)
                     await setCard(user.id)
-                    setShowModal(false)
-                    setNowLoading(false)
+                    setShowDrawer(false)
                 }}>
                 <View
                     style={{

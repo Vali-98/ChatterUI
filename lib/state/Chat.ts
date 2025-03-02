@@ -4,7 +4,7 @@ import { useTTSState } from '@lib/state/TTS'
 import { replaceMacros } from '@lib/utils/Macros'
 import { convertToFormatInstruct } from '@lib/utils/TextFormat'
 import { chatEntries, chatSwipes, chats, ChatSwipe, CompletionTimings } from 'db/schema'
-import { count, desc, eq, getTableColumns } from 'drizzle-orm'
+import { count, desc, eq, getTableColumns, like } from 'drizzle-orm'
 import * as Notifications from 'expo-notifications'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
@@ -455,6 +455,21 @@ export namespace Chats {
             export const chatExists = async (chatId: number) => {
                 return await database.query.chats.findFirst({ where: eq(chats.id, chatId) })
             }
+
+            export const searchChat = async (query: string) => {
+                return await database
+                    .select({
+                        swipeId: chatSwipes.id,
+                        chatId: chatEntries.chat_id,
+                        chatName: chats.name,
+                        swipe: chatSwipes.swipe,
+                        sendDate: chatSwipes.send_date,
+                    })
+                    .from(chatSwipes)
+                    .innerJoin(chatEntries, eq(chatSwipes.entry_id, chatEntries.id))
+                    .innerJoin(chats, eq(chatEntries.chat_id, chats.id))
+                    .where(like(chatSwipes.swipe, `%${query}%`))
+            }
         }
         export namespace mutate {
             export const createChat = async (charId: number) => {
@@ -509,7 +524,7 @@ export namespace Chats {
                 }
                 await database
                     .update(chats)
-                    .set({ last_modified: new Date().getTime() })
+                    .set({ last_modified: Date.now() })
                     .where(eq(chats.id, chatID))
             }
 
@@ -611,7 +626,7 @@ export namespace Chats {
                 })
                 if (!result) return
 
-                result.last_modified = new Date().getTime()
+                result.last_modified = Date.now()
 
                 const [{ newChatId }, ..._] = await database
                     .insert(chats)

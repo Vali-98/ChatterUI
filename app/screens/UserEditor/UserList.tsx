@@ -9,17 +9,12 @@ import { Text, View } from 'react-native'
 
 import UserListing from './UserListing'
 
-type UserListProps = {
-    setShowModal: (b: boolean) => void
-}
-
-const UserList: React.FC<UserListProps> = ({ setShowModal }) => {
-    const { color, spacing, borderWidth, borderRadius, fontSize } = Theme.useTheme()
+const UserList = () => {
+    const { color, spacing, fontSize } = Theme.useTheme()
 
     const { data } = useLiveQuery(Characters.db.query.cardListQuery('user'))
 
     const [showNewUser, setShowNewUser] = useState(false)
-    const [nowLoading, setNowLoading] = useState(false)
     const { setCard, id } = Characters.useUserCard((state) => ({
         setCard: state.setCard,
         id: state.id,
@@ -57,14 +52,7 @@ const UserList: React.FC<UserListProps> = ({ setShowModal }) => {
                     data={data}
                     showsVerticalScrollIndicator={false}
                     keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item, index }) => (
-                        <UserListing
-                            user={item}
-                            nowLoading={nowLoading}
-                            setNowLoading={setNowLoading}
-                            setShowModal={setShowModal}
-                        />
-                    )}
+                    renderItem={({ item, index }) => <UserListing user={item} />}
                     estimatedItemSize={100}
                     initialScrollIndex={Math.max(currentIndex, 0)}
                 />

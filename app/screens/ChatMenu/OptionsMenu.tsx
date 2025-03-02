@@ -1,9 +1,11 @@
+import Drawer from '@components/views/Drawer'
 import { AntDesign, Ionicons } from '@expo/vector-icons'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useRouter } from 'expo-router'
-import { View, Text, StyleSheet } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
+import { View, Text, StyleSheet, BackHandler } from 'react-native'
 import {
     Menu,
     MenuOption,
@@ -21,28 +23,35 @@ type MenuData = {
     button: 'back' | 'edit' | 'paperclip'
 }
 
-type OptionsMenuProps = {
-    menuRef: React.MutableRefObject<Menu | null>
-    showChats: (b: boolean) => void
-}
-
-const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef, showChats }) => {
+const OptionsMenu = () => {
+    const router = useRouter()
     const styles = useStyles()
     const menuStyle = useMenuStyle()
     const { color, spacing } = Theme.useTheme()
+    const [showMenu, setShowMenu] = useState(false)
+    const menuRef: React.MutableRefObject<Menu | null> = useRef(null)
 
-    const router = useRouter()
-    const { unloadCharacter } = Characters.useCharacterCard((state) => ({
-        unloadCharacter: state.unloadCard,
-    }))
+    const setShowChat = Drawer.useDrawerState(
+        (state) => (b: boolean) => state.setShow(Drawer.ID.CHATLIST, b)
+    )
 
-    const { unloadChat } = Chats.useChat()
+    useEffect(() => {
+        const backAction = () => {
+            if (showMenu) {
+                setShowMenu(false)
+                menuRef.current?.close()
+                return true
+            }
+            return false
+        }
+        const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
+        return () => handler.remove()
+    }, [showMenu])
 
     const menuoptions: MenuData[] = [
         {
             callback: () => {
-                unloadCharacter()
-                unloadChat()
+                router.back()
             },
             text: 'Main Menu',
             button: 'back',
@@ -56,7 +65,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef, showChats }) => {
         },
         {
             callback: () => {
-                showChats(true)
+                setShowChat(true)
             },
             text: 'Chat History',
             button: 'paperclip',
@@ -64,7 +73,11 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({ menuRef, showChats }) => {
     ]
 
     return (
-        <Menu renderer={SlideInMenu} ref={menuRef}>
+        <Menu
+            onClose={() => setShowMenu(false)}
+            onOpen={() => setShowMenu(true)}
+            renderer={SlideInMenu}
+            ref={menuRef}>
             <MenuTrigger>
                 <Ionicons
                     name="caret-up-circle"

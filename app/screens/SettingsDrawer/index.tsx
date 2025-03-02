@@ -11,42 +11,36 @@ import AppModeToggle from './AppModeToggle'
 import RouteList from './RouteList'
 import UserInfo from './UserInfo'
 
-type SettingsDrawerProps = {
-    booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
-}
-
-const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ booleans: [showModal, setShowModal] }) => {
+const SettingsDrawer = () => {
     const { color, spacing } = Theme.useTheme()
 
     const [devMode, _] = useMMKVBoolean(AppSettings.DevMode)
-
-    if (showModal)
-        return (
-            <Drawer
-                setShowDrawer={setShowModal}
-                drawerStyle={{
-                    width: '60%',
-                    paddingBottom: spacing.xl2,
+    return (
+        <Drawer.Body
+            drawerId={Drawer.ID.SETTINGS}
+            drawerStyle={{
+                width: '60%',
+                paddingBottom: spacing.xl2,
+            }}>
+            <UserInfo />
+            <AppModeToggle />
+            <RouteList />
+            <Text
+                style={{
+                    alignSelf: 'center',
+                    color: color.text._300,
+                    marginTop: spacing.l,
+                    marginBottom: spacing.xl2,
                 }}>
-                <UserInfo />
-                <AppModeToggle />
-                <RouteList />
-                <Text
-                    style={{
-                        alignSelf: 'center',
-                        color: color.text._300,
-                        marginTop: spacing.l,
-                        marginBottom: spacing.xl2,
-                    }}>
-                    {__DEV__ && 'DEV BUILD\t'}
-                    {devMode && 'DEV MODE\t'}
-                    {'v' + appConfig.expo.version}
-                </Text>
-                <View style={{ marginHorizontal: spacing.xl2 }}>
-                    <SupportButton />
-                </View>
-            </Drawer>
-        )
+                {__DEV__ && 'DEV BUILD\t'}
+                {devMode && 'DEV MODE\t'}
+                {'v' + appConfig.expo.version}
+            </Text>
+            <View style={{ marginHorizontal: spacing.xl2 }}>
+                <SupportButton />
+            </View>
+        </Drawer.Body>
+    )
 }
 
 export default SettingsDrawer

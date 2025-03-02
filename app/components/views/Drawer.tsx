@@ -1,6 +1,8 @@
+import ThemedButton from '@components/buttons/ThemedButton'
+import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useFocusEffect } from 'expo-router'
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useCallback, useEffect } from 'react'
 import { BackHandler, StyleSheet, View, ViewStyle } from 'react-native'
 import Animated, {
     ComplexAnimationBuilder,
@@ -14,6 +16,7 @@ import Animated, {
     SlideOutRight,
     SlideOutUp,
 } from 'react-native-reanimated'
+import { create } from 'zustand'
 
 import FadeBackrop from './FadeBackdrop'
 
@@ -33,44 +36,102 @@ const animationOut: Record<Direction, ComplexAnimationBuilder> = {
     down: SlideOutDown.duration(300).easing(Easing.out(Easing.quad)),
 }
 
-type DrawerProps = {
+type DrawerBodyProps = {
+    drawerId: Drawer.ID
     direction?: Direction
     drawerStyle?: ViewStyle
-    setShowDrawer: (b: boolean) => void
     children?: ReactNode
 }
 
-const Drawer: React.FC<DrawerProps> = ({
-    setShowDrawer,
-    direction = 'left',
-    drawerStyle = {},
-    children = undefined,
-}) => {
-    const handleOverlayClick = () => setShowDrawer(false)
-    const styles = useStyles()
-    const backAction = () => {
-        setShowDrawer(false)
-        return true
+type DrawerButtonProps = {
+    drawerId: string
+    openIcon?: keyof typeof AntDesign.glyphMap
+    closeIcon?: keyof typeof AntDesign.glyphMap
+}
+
+type DrawerStateProps = {
+    values: Record<string, boolean>
+    setShow: (key: string, value: boolean) => void
+}
+
+namespace Drawer {
+    export enum ID {
+        SETTINGS = 'settings',
+        CHATLIST = 'chats',
+        USERLIST = 'userlist',
     }
 
-    useFocusEffect(() => {
-        BackHandler.removeEventListener('hardwareBackPress', backAction)
-        const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
-        return () => handler.remove()
-    })
+    export const Body: React.FC<DrawerBodyProps> = ({
+        drawerId,
+        direction = 'left',
+        drawerStyle = {},
+        children = undefined,
+    }) => {
+        const styles = useStyles()
+        const { setShow, show } = useDrawerState((state) => ({
+            setShow: state.setShow,
+            show: state.values?.[drawerId],
+        }))
+        const handleOverlayClick = () => setShow(drawerId, false)
 
-    return (
-        <View style={styles.absolute}>
-            <FadeBackrop handleOverlayClick={handleOverlayClick}>
-                <Animated.View
-                    style={{ ...styles.drawer, ...drawerStyle }}
-                    entering={animationIn[direction]}
-                    exiting={animationOut[direction]}>
-                    {children}
-                </Animated.View>
-            </FadeBackrop>
-        </View>
-    )
+        useFocusEffect(
+            useCallback(() => {
+                const backAction = () => {
+                    if (show) {
+                        setShow(drawerId, false)
+                        return true
+                    }
+                    return false
+                }
+                const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
+                return () => handler.remove()
+            }, [show])
+        )
+
+        if (show)
+            return (
+                <View style={styles.absolute}>
+                    <FadeBackrop handleOverlayClick={handleOverlayClick}>
+                        <Animated.View
+                            style={{ ...styles.drawer, ...drawerStyle }}
+                            entering={animationIn[direction]}
+                            exiting={animationOut[direction]}>
+                            {children}
+                        </Animated.View>
+                    </FadeBackrop>
+                </View>
+            )
+    }
+
+    export const Button: React.FC<DrawerButtonProps> = ({
+        drawerId,
+        openIcon = 'menu-fold',
+        closeIcon = 'close',
+    }) => {
+        const { setShow, show } = useDrawerState((state) => ({
+            setShow: state.setShow,
+            show: state.values?.[drawerId],
+        }))
+        return (
+            <ThemedButton
+                iconSize={24}
+                onPress={() => {
+                    setShow(drawerId, !show)
+                }}
+                variant="tertiary"
+                iconName={show ? closeIcon : openIcon}
+            />
+        )
+    }
+
+    export const useDrawerState = create<DrawerStateProps>((set) => ({
+        values: {},
+        setShow: (key, value) =>
+            set((state) => ({
+                ...state,
+                values: { ...state.values, [key]: value },
+            })),
+    }))
 }
 
 export default Drawer

@@ -3,6 +3,7 @@ import { Characters, CharInfo } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
+import { useRouter } from 'expo-router'
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import CharacterEditPopup from './CharacterEditPopup'
@@ -32,6 +33,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
     showTags,
     setNowLoading,
 }) => {
+    const router = useRouter()
     const { setShowSearch, setTagFilter, tagFilter } = useCharacterListSorter((state) => ({
         setShowSearch: state.setShowSearch,
         setTagFilter: state.setTagFilter,
@@ -62,6 +64,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
             }
             await loadChat(chatId)
             setNowLoading(false)
+            router.push('/screens/ChatMenu')
         } catch (error) {
             Logger.errorToast(`Couldn't load character: ${error}`)
             setNowLoading(false)

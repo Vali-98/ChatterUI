@@ -183,8 +183,8 @@ const setDefaultInstruct = () => {
 export const startupApp = () => {
     console.log('[APP STARTED]: T1APT')
     // DEV: Needed for Reset
-    Chats.useChatState.getState().reset()
-    Characters.useCharacterCard.getState().unloadCard()
+    //Chats.useChatState.getState().reset()
+    //Characters.useCharacterCard.getState().unloadCard()
 
     // Sets default preferences
     setAppDefaultSettings()

@@ -1,18 +1,13 @@
 import Drawer from '@components/views/Drawer'
-import { SetStateAction } from 'react'
 import { StyleSheet } from 'react-native'
 
 import UserList from './UserList'
 
-type UserDrawerProps = {
-    booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
-}
-
-const UserDrawer: React.FC<UserDrawerProps> = ({ booleans: [showModal, setShowModal] }) => {
+const UserDrawer = () => {
     return (
-        <Drawer drawerStyle={styles.drawer} setShowDrawer={setShowModal} direction="right">
-            <UserList setShowModal={setShowModal} />
-        </Drawer>
+        <Drawer.Body drawerId={Drawer.ID.USERLIST} drawerStyle={styles.drawer} direction="right">
+            <UserList />
+        </Drawer.Body>
     )
 }
 

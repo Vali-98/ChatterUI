@@ -44,16 +44,14 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
         <SafeAreaView style={{ paddingVertical: 16, paddingHorizontal: 8, flex: 1 }}>
             <HeaderTitle />
             <HeaderButton
-                headerRight={() =>
-                    showHeader && (
-                        <CharacterNewMenu
-                            nowLoading={nowLoading}
-                            setNowLoading={setNowLoading}
-                            setShowMenu={setShowMenu}
-                            showMenu={showMenu}
-                        />
-                    )
-                }
+                headerRight={() => (
+                    <CharacterNewMenu
+                        nowLoading={nowLoading}
+                        setNowLoading={setNowLoading}
+                        setShowMenu={setShowMenu}
+                        showMenu={showMenu}
+                    />
+                )}
             />
 
             {data.length === 0 && updatedAt && <CharactersEmpty />}

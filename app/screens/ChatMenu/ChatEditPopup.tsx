@@ -19,11 +19,9 @@ type ListItem = {
 
 type ChatEditPopupProps = {
     item: ListItem
-    nowLoading: boolean
-    setNowLoading: (b: boolean) => void
 }
 
-const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, setNowLoading, nowLoading }) => {
+const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
     const [showRename, setShowRename] = useState<boolean>(false)
 
     const { charName, charId } = Characters.useCharacterCard((state) => ({
@@ -93,11 +91,10 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, setNowLoading, nowL
                     await Chats.db.mutate.renameChat(item.id, text)
                 }}
                 textCheck={(text) => text.length === 0}
-                defaultValue = {item.name}
+                defaultValue={item.name}
             />
             <PopupMenu
                 icon="edit"
-                disabled={nowLoading}
                 options={[
                     {
                         label: 'Rename',

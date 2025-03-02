@@ -4,7 +4,7 @@ import { AntDesign } from '@expo/vector-icons'
 import useLocalAuth from '@lib/hooks/LocalAuth'
 import { Theme } from '@lib/theme/ThemeManager'
 import { startupApp } from '@lib/utils/Startup'
-import ChatMenu from '@screens/ChatMenu/ChatMenu'
+import CharacterMenu from '@screens/CharacterMenu'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { SplashScreen } from 'expo-router'
 import { useEffect, useState } from 'react'
@@ -57,7 +57,7 @@ const Home = () => {
                 </TouchableOpacity>
             </View>
         )
-    if (!firstRender && success) return <ChatMenu />
+    if (!firstRender && success) return <CharacterMenu />
     return <HeaderTitle />
 }
 

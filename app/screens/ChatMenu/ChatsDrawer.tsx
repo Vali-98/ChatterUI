@@ -1,41 +1,39 @@
 import ThemedButton from '@components/buttons/ThemedButton'
+import ThemedTextInput from '@components/input/ThemedTextInput'
 import Drawer from '@components/views/Drawer'
-import { Ionicons } from '@expo/vector-icons'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
+import { FlashList } from '@shopify/flash-list'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
-import { SetStateAction, useState } from 'react'
-import { Text, TouchableOpacity, StyleSheet, View, FlatList } from 'react-native'
+import { useState } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 
-import ChatEditPopup from './ChatEditPopup'
+import ChatDrawerItem from './ChatDrawerItem'
+import ChatDrawerSearchItem from './ChatDrawerSearchItem'
 
-type ChatsDrawerProps = {
-    booleans: [boolean, (b: boolean | SetStateAction<boolean>) => void]
-}
-
-type ListItem = {
-    id: number
-    character_id: number
-    create_date: Date
-    name: string
-    last_modified: null | number
-    entryCount: number
-}
-
-const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShowModal] }) => {
+const ChatsDrawer = () => {
     const styles = useStyles()
-    const { color, spacing } = Theme.useTheme()
 
     const { charId } = Characters.useCharacterCard((state) => ({ charId: state.id }))
-    const [nowLoading, setNowLoading] = useState<boolean>(false)
     const { data } = useLiveQuery(Chats.db.query.chatListQuery(charId ?? 0))
+    const { setShowDrawer } = Drawer.useDrawerState((state) => ({
+        setShowDrawer: (b: boolean) => state.setShow(Drawer.ID.CHATLIST, b),
+    }))
 
-    const { loadChat, chatId } = Chats.useChat()
+    const { loadChat } = Chats.useChat()
+
+    const [searchResults, setSearchResults] = useState<
+        Awaited<ReturnType<typeof Chats.db.query.searchChat>>
+    >([])
+
+    const [showSearchBar, setShowSearchBar] = useState(false)
+    const [showSearchResults, setShowSearchResults] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
 
     const handleLoadChat = async (chatId: number) => {
         await loadChat(chatId)
-        setShowModal(false)
+        setShowDrawer(false)
     }
 
     const handleCreateChat = async () => {
@@ -45,51 +43,77 @@ const ChatsDrawer: React.FC<ChatsDrawerProps> = ({ booleans: [showModal, setShow
             })
     }
 
-    const renderChat = (item: ListItem, index: number) => {
-        const date = new Date(item.last_modified ?? 0)
-        return (
-            <View style={item.id === chatId ? styles.chatItemActive : styles.chatItem}>
-                <TouchableOpacity
-                    style={{ flex: 1, paddingHorizontal: spacing.xs, paddingVertical: spacing.m }}
-                    onPress={() => handleLoadChat(item.id)}>
-                    <Text style={styles.title}>{item.name}</Text>
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            marginTop: spacing.xl,
-                        }}>
-                        <Ionicons name="chatbox" size={20} color={color.text._400} />
-                        <Text style={styles.smallTextChat}>{item.entryCount}</Text>
-                        <Text style={styles.smallText}>{date.toLocaleDateString()}</Text>
-                        <Text style={styles.smallText}>{date.toLocaleTimeString()}</Text>
-                    </View>
-                </TouchableOpacity>
-                <ChatEditPopup item={item} nowLoading={nowLoading} setNowLoading={setNowLoading} />
-            </View>
-        )
-    }
-
     return (
-        <Drawer setShowDrawer={setShowModal} drawerStyle={styles.drawer} direction="right">
-            <Text style={styles.drawerTitle}>Chats</Text>
-            <FlatList
-                style={styles.listContainer}
-                data={data}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item, index }) => renderChat(item, index)}
-                showsVerticalScrollIndicator={false}
-                removeClippedSubviews={false}
-            />
-            <ThemedButton label="New Chat" onPress={handleCreateChat} />
-        </Drawer>
+        <Drawer.Body drawerId={Drawer.ID.CHATLIST} drawerStyle={styles.drawer} direction="right">
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text style={styles.drawerTitle}>Chats</Text>
+                <ThemedButton
+                    variant="tertiary"
+                    iconName={showSearchBar ? 'close' : 'search1'}
+                    onPress={() => {
+                        setShowSearchBar(!showSearchBar)
+                        setShowSearchResults(searchQuery.length > 0 && !showSearchBar)
+                    }}
+                />
+            </View>
+            {showSearchBar && (
+                <ThemedTextInput
+                    placeholder="Search for message..."
+                    containerStyle={{ flex: 0, marginTop: 12 }}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    onSubmitEditing={async () => {
+                        if (!searchQuery) return
+                        const results = await Chats.db.query.searchChat(searchQuery)
+                        setSearchResults(
+                            results.sort((a, b) => b.sendDate.getTime() - a.sendDate.getTime())
+                        )
+                        setShowSearchResults(true)
+                    }}
+                    submitBehavior="submit"
+                />
+            )}
+            {!showSearchResults && (
+                <View style={styles.listContainer}>
+                    <FlashList
+                        estimatedItemSize={82}
+                        data={data}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item, index }) => (
+                            <ChatDrawerItem item={item} onLoad={handleLoadChat} />
+                        )}
+                        showsVerticalScrollIndicator={false}
+                        removeClippedSubviews={false}
+                    />
+                    <ThemedButton label="New Chat" onPress={handleCreateChat} />
+                </View>
+            )}
+            {showSearchResults && (
+                <View style={styles.listContainer}>
+                    <FlashList
+                        estimatedItemSize={92}
+                        data={searchResults}
+                        keyExtractor={(item) => item.swipeId.toString()}
+                        renderItem={({ item }) => (
+                            <ChatDrawerSearchItem
+                                item={item}
+                                onLoad={handleLoadChat}
+                                query={searchQuery}
+                            />
+                        )}
+                        showsVerticalScrollIndicator={false}
+                        removeClippedSubviews={false}
+                    />
+                </View>
+            )}
+        </Drawer.Body>
     )
 }
 
 export default ChatsDrawer
 
 const useStyles = () => {
-    const { color, spacing, borderWidth, borderRadius, fontSize } = Theme.useTheme()
+    const { color, spacing, fontSize } = Theme.useTheme()
 
     return StyleSheet.create({
         drawer: {
@@ -121,35 +145,6 @@ const useStyles = () => {
             flex: 1,
             marginTop: spacing.xl,
             marginBottom: spacing.l,
-        },
-
-        chatItem: {
-            alignItems: 'center',
-            flexDirection: 'row',
-            paddingHorizontal: spacing.m,
-            flex: 1,
-            marginBottom: spacing.m,
-            borderRadius: borderRadius.m,
-            borderWidth: borderWidth.m,
-            borderColor: color.neutral._100,
-        },
-
-        chatItemActive: {
-            alignItems: 'center',
-            flexDirection: 'row',
-            paddingHorizontal: spacing.m,
-            flex: 1,
-            marginBottom: spacing.m,
-            borderRadius: spacing.m,
-            borderWidth: borderWidth.m,
-            borderColor: color.primary._500,
-        },
-        smallText: { color: color.text._400, marginLeft: spacing.l },
-        smallTextChat: { color: color.text._400, marginLeft: spacing.sm },
-
-        editButton: {
-            paddingHorizontal: spacing.m,
-            justifyContent: 'center',
         },
     })
 }
