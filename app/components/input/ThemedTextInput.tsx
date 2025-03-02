@@ -7,7 +7,7 @@ interface ThemedTextInputProps extends TextInputProps {
     value: string
     containerStyle?: ViewStyle
 }
-// TODO: Delete this?
+
 const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
     label,
     description,
