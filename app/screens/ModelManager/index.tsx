@@ -162,7 +162,6 @@ const ModelManager = () => {
 export default ModelManager
 
 export const useStyles = () => {
-    // todo: find common items to add here
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
 
     return StyleSheet.create({

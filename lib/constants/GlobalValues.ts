@@ -149,7 +149,6 @@ export enum AppMode {
 
 /**
  * Default settings on first install
- * TODO: Remove primary hue to simply
  */
 export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.AnimateEditor]: true,

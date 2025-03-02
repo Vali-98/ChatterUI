@@ -257,10 +257,6 @@ export const characterLorebooksRelations = relations(characterLorebooks, ({ one 
 
 // TODO:
 
-////// presets - 1 table
-
-// export const presets = sqliteTable('presets', {})
-
 ////// group chats - 2 tables
 
 // export const groupChats = sqliteTable('group_chats', {})

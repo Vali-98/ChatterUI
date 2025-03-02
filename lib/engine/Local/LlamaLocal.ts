@@ -130,23 +130,6 @@ export namespace Llama {
                 n_batch: config.batch,
             }
 
-            /*
-            let setAutoLoad = false
-
-            try {
-                const modelString = mmkv.getString(Global.LocalModel)
-                if (modelString) {
-                    const oldmodel: ModelDataType | undefined = JSON.parse(modelString)
-                    setAutoLoad = oldmodel?.id !== model.id
-                }
-            } catch (e) {}
-            // When LocalSessionLoaded is set to false, it will load KV cache.
-            // We check if the model id is the same as above, if not, set to true to skip kv-cache load
-            // This probably should be changed as the parameter name is somewhat confusing
-            // TODO: Investigate why KV cache is loaded on chat instead of on model start
-            mmkv.set(Global.LocalSessionLoaded, setAutoLoad)
-            */
-
             Logger.info(
                 `\n------ MODEL LOAD -----\n Model Name: ${model.name}\nStarting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}`
             )
