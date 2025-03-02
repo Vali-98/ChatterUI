@@ -471,6 +471,7 @@ export namespace Chats {
                     .where(
                         and(like(chatSwipes.swipe, `%${query}%`), eq(chats.character_id, charId))
                     )
+                    .limit(999)
             }
         }
         export namespace mutate {
