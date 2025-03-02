@@ -8,7 +8,8 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { characterTags, tags } from 'db/schema'
 import { count, eq } from 'drizzle-orm'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
-import React, { useEffect, useState } from 'react'
+import { useFocusEffect } from 'expo-router'
+import { useCallback } from 'react'
 import { BackHandler, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
@@ -119,15 +120,17 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
             .groupBy(tags.id)
     )
 
-    useEffect(() => {
-        if (!showSearch) return
-        const handler = BackHandler.addEventListener('hardwareBackPress', () => {
-            setTextFilter('')
-            setShowSearch(false)
-            return true
-        })
-        return () => handler.remove()
-    }, [showSearch])
+    useFocusEffect(
+        useCallback(() => {
+            if (!showSearch) return
+            const handler = BackHandler.addEventListener('hardwareBackPress', () => {
+                setTextFilter('')
+                setShowSearch(false)
+                return true
+            })
+            return () => handler.remove()
+        }, [showSearch])
+    )
 
     return (
         <View>
