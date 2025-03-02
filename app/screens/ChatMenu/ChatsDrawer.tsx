@@ -63,8 +63,8 @@ const ChatsDrawer = () => {
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                     onSubmitEditing={async () => {
-                        if (!searchQuery) return
-                        const results = await Chats.db.query.searchChat(searchQuery)
+                        if (!searchQuery || !charId) return
+                        const results = await Chats.db.query.searchChat(searchQuery, charId)
                         setSearchResults(
                             results.sort((a, b) => b.sendDate.getTime() - a.sendDate.getTime())
                         )
@@ -88,24 +88,30 @@ const ChatsDrawer = () => {
                     <ThemedButton label="New Chat" onPress={handleCreateChat} />
                 </View>
             )}
-            {showSearchResults && (
-                <View style={styles.listContainer}>
-                    <FlashList
-                        estimatedItemSize={92}
-                        data={searchResults}
-                        keyExtractor={(item) => item.swipeId.toString()}
-                        renderItem={({ item }) => (
-                            <ChatDrawerSearchItem
-                                item={item}
-                                onLoad={handleLoadChat}
-                                query={searchQuery}
-                            />
-                        )}
-                        showsVerticalScrollIndicator={false}
-                        removeClippedSubviews={false}
-                    />
-                </View>
-            )}
+            {showSearchResults &&
+                (searchResults.length > 0 ? (
+                    <View style={styles.listContainer}>
+                        <Text style={styles.resultCount}>Results: {searchResults.length}</Text>
+                        <FlashList
+                            estimatedItemSize={92}
+                            data={searchResults}
+                            keyExtractor={(item) => item.swipeId.toString()}
+                            renderItem={({ item }) => (
+                                <ChatDrawerSearchItem
+                                    item={item}
+                                    onLoad={handleLoadChat}
+                                    query={searchQuery}
+                                />
+                            )}
+                            showsVerticalScrollIndicator={false}
+                            removeClippedSubviews={false}
+                        />
+                    </View>
+                ) : (
+                    <View style={styles.emptyContainer}>
+                        <Text style={styles.emptyText}>No Results</Text>
+                    </View>
+                ))}
         </Drawer.Body>
     )
 }
@@ -139,6 +145,23 @@ const useStyles = () => {
         title: {
             color: color.text._100,
             fontSize: fontSize.l,
+        },
+
+        emptyText: {
+            color: color.text._400,
+            fontSize: fontSize.m,
+            fontStyle: 'italic',
+        },
+
+        emptyContainer: {
+            flex: 1,
+            alignItems: 'center',
+            padding: spacing.xl3,
+        },
+
+        resultCount: {
+            color: color.text._600,
+            fontSize: fontSize.s,
         },
 
         listContainer: {

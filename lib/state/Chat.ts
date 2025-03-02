@@ -4,7 +4,7 @@ import { useTTSState } from '@lib/state/TTS'
 import { replaceMacros } from '@lib/utils/Macros'
 import { convertToFormatInstruct } from '@lib/utils/TextFormat'
 import { chatEntries, chatSwipes, chats, ChatSwipe, CompletionTimings } from 'db/schema'
-import { count, desc, eq, getTableColumns, like } from 'drizzle-orm'
+import { and, count, desc, eq, getTableColumns, like } from 'drizzle-orm'
 import * as Notifications from 'expo-notifications'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
@@ -456,7 +456,7 @@ export namespace Chats {
                 return await database.query.chats.findFirst({ where: eq(chats.id, chatId) })
             }
 
-            export const searchChat = async (query: string) => {
+            export const searchChat = async (query: string, charId: number) => {
                 return await database
                     .select({
                         swipeId: chatSwipes.id,
@@ -468,7 +468,9 @@ export namespace Chats {
                     .from(chatSwipes)
                     .innerJoin(chatEntries, eq(chatSwipes.entry_id, chatEntries.id))
                     .innerJoin(chats, eq(chatEntries.chat_id, chats.id))
-                    .where(like(chatSwipes.swipe, `%${query}%`))
+                    .where(
+                        and(like(chatSwipes.swipe, `%${query}%`), eq(chats.character_id, charId))
+                    )
             }
         }
         export namespace mutate {
