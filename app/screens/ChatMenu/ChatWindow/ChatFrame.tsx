@@ -31,7 +31,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
         Math.round(
             Math.max(
                 0,
-                ((nowGenerating && isLast ? new Date().getTime() : swipe.gen_finished.getTime()) -
+                ((nowGenerating && isLast ? Date.now() : swipe.gen_finished.getTime()) -
                     swipe.gen_started.getTime()) /
                     1000
             )

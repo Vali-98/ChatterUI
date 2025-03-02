@@ -92,7 +92,7 @@ export namespace Characters {
                         Logger.errorToast('Could not get data, something very wrong has happened!')
                         return
                     }
-                    const imageID = new Date().getTime()
+                    const imageID = Date.now()
                     await db.mutate.updateCardField('image_id', imageID, id)
                     await deleteImage(oldImageID)
                     await copyImage(sourceURI, imageID)
@@ -182,7 +182,7 @@ export namespace Characters {
                 Logger.errorToast('Could not get data, something very wrong has happned!')
                 return
             }
-            const imageID = new Date().getTime()
+            const imageID = Date.now()
             await db.mutate.updateCardField('image_id', imageID, id)
             await deleteImage(oldImageID)
             await copyImage(sourceURI, imageID)
@@ -531,7 +531,7 @@ export namespace Characters {
             export const updateModified = async (charID: number) => {
                 await database
                     .update(characters)
-                    .set({ last_modified: new Date().getTime() })
+                    .set({ last_modified: Date.now() })
                     .where(eq(characters.id, charID))
             }
 
@@ -601,7 +601,7 @@ export namespace Characters {
                         from: getImageDir(card.image_id),
                         to: cacheLoc,
                     })
-                const now = new Date().getTime()
+                const now = Date.now()
                 card.last_modified = now
                 card.image_id = now
                 const cv2 = cardDataToCV2(card)
