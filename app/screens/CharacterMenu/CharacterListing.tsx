@@ -4,6 +4,7 @@ import { Characters, CharInfo } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
+import { getFriendlyTimeStamp } from '@lib/utils/Time'
 import { useRouter } from 'expo-router'
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -16,15 +17,6 @@ type CharacterListingProps = {
     character: CharInfo
     nowLoading: boolean
     setNowLoading: (b: boolean) => void
-}
-
-const day_ms = 86400000
-const getTimeStamp = (oldtime: number) => {
-    const now = Date.now()
-    const delta = now - oldtime
-    if (delta < now % day_ms) return new Date(oldtime).toLocaleTimeString()
-    if (delta < (now % day_ms) + day_ms) return 'Yesterday'
-    return new Date(oldtime).toLocaleDateString()
 }
 
 const CharacterListing: React.FC<CharacterListingProps> = ({
@@ -94,7 +86,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                             {character.name}
                         </Text>
                         <Text style={styles.timestamp}>
-                            {getTimeStamp(character.last_modified)}
+                            {getFriendlyTimeStamp(character.last_modified)}
                         </Text>
                     </View>
                     {character.latestSwipe && (
