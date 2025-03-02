@@ -45,7 +45,8 @@ const ChatsDrawer = () => {
 
     return (
         <Drawer.Body drawerId={Drawer.ID.CHATLIST} drawerStyle={styles.drawer} direction="right">
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View
+                style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
                 <Text style={styles.drawerTitle}>Chats</Text>
                 <ThemedButton
                     variant="tertiary"
@@ -162,11 +163,12 @@ const useStyles = () => {
         resultCount: {
             color: color.text._600,
             fontSize: fontSize.s,
+            marginBottom: spacing.m,
         },
 
         listContainer: {
             flex: 1,
-            marginTop: spacing.xl,
+            marginTop: spacing.m,
             marginBottom: spacing.l,
         },
     })

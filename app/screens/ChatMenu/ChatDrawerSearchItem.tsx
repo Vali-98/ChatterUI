@@ -21,7 +21,7 @@ const ChatDrawerSearchItem: React.FC<ChatDrawerSearchItemProps> = ({ item, onLoa
             style={{
                 paddingHorizontal: spacing.m,
                 paddingVertical: spacing.m,
-                rowGap: 4,
+                rowGap: 2,
             }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Text style={{ color: color.text._300, fontSize: fontSize.m, fontWeight: '500' }}>
@@ -33,9 +33,9 @@ const ChatDrawerSearchItem: React.FC<ChatDrawerSearchItemProps> = ({ item, onLoa
             </View>
             <Text>
                 {segmented.showHeadEllipsis && <Text style={{ color: color.text._500 }}>...</Text>}
-                <Text style={{ color: color.text._500 }}>{segmented.head}</Text>
+                <Text style={{ color: color.text._500 }}>{segmented.head.trimStart()}</Text>
                 <Text style={{ color: color.text._300, fontWeight: '700' }}>{segmented.query}</Text>
-                <Text style={{ color: color.text._500 }}>{segmented.tail}</Text>
+                <Text style={{ color: color.text._500 }}>{segmented.tail.trimEnd()}</Text>
                 {segmented.showTailEllipsis && <Text style={{ color: color.text._500 }}>...</Text>}
             </Text>
         </TouchableOpacity>

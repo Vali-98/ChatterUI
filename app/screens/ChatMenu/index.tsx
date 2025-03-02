@@ -16,7 +16,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
-const CharacterMenu = () => {
+const ChatMenu = () => {
     const { spacing } = Theme.useTheme()
     const { unloadCharacter } = Characters.useCharacterCard(
         useShallow((state) => ({
@@ -78,9 +78,11 @@ const CharacterMenu = () => {
                 <HeaderTitle />
                 <HeaderButton
                     headerLeft={() => !showChats && <Drawer.Button drawerId={Drawer.ID.SETTINGS} />}
-                    headerRight={() => (
-                        <Drawer.Button drawerId={Drawer.ID.CHATLIST} openIcon="message1" />
-                    )}
+                    headerRight={() =>
+                        !showSettings && (
+                            <Drawer.Button drawerId={Drawer.ID.CHATLIST} openIcon="message1" />
+                        )
+                    }
                 />
 
                 <View
@@ -109,4 +111,4 @@ const CharacterMenu = () => {
     )
 }
 
-export default CharacterMenu
+export default ChatMenu
