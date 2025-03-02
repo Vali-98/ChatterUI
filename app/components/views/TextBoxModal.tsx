@@ -98,8 +98,8 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                         <View style={styles.buttonContainer}>
                             <ThemedButton
                                 label="Cancel"
+                                variant="tertiary"
                                 onPress={() => handleClose()}
-                                variant="secondary"
                                 buttonStyle={{
                                     paddingVertical: spacing.l,
                                     paddingHorizontal: spacing.xl,
@@ -107,6 +107,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                             />
                             <ThemedButton
                                 label="Confirm"
+                                variant="secondary"
                                 onPress={() => {
                                     if (textCheck(text)) {
                                         setShowError(true)
@@ -139,12 +140,12 @@ const useStyles = () => {
         },
 
         modalview: {
-            margin: spacing.xl2,
+            margin: spacing.xl,
             backgroundColor: color.neutral._200,
-            borderRadius: borderRadius.xl2,
-            paddingHorizontal: spacing.xl3,
-            paddingTop: spacing.xl3,
-            paddingBottom: spacing.xl2,
+            borderRadius: borderRadius.xl,
+            paddingHorizontal: spacing.xl2,
+            paddingTop: spacing.xl2,
+            paddingBottom: spacing.xl,
             alignItems: 'center',
             shadowColor: '#000',
             shadowOffset: {
@@ -159,8 +160,7 @@ const useStyles = () => {
         buttonContainer: {
             flex: 1,
             columnGap: spacing.xl,
-            paddingRight: spacing.m,
-            paddingTop: spacing.m,
+            marginTop: spacing.s,
             flexDirection: 'row',
             justifyContent: 'flex-end',
         },
