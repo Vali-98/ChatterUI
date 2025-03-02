@@ -11,54 +11,19 @@ import { useShallow } from 'zustand/react/shallow'
 type CharacterNewMenuProps = {
     nowLoading: boolean
     setNowLoading: (b: boolean) => void
-    showMenu: boolean
-    setShowMenu: (b: boolean) => void
 }
 
-const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
-    nowLoading,
-    setNowLoading,
-    showMenu,
-    setShowMenu,
-}) => {
+const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowLoading }) => {
     const { setCurrentCard } = Characters.useCharacterCard(
         useShallow((state) => ({
             setCurrentCard: state.setCard,
             id: state.id,
         }))
     )
-    const { loadChat } = Chats.useChat()
 
     const router = useRouter()
     const [showNewChar, setShowNewChar] = useState<boolean>(false)
     const [showDownload, setShowDownload] = useState(false)
-
-    const setCurrentCharacter = async (charId: number, edit: boolean = false) => {
-        if (nowLoading) return
-
-        try {
-            await setCurrentCard(charId)
-            setNowLoading(true)
-            const returnedChatId = await Chats.db.query.chatNewestId(charId)
-            let chatId = returnedChatId
-            if (!chatId) {
-                chatId = await Chats.db.mutate.createChat(charId)
-            }
-            if (!chatId) {
-                Logger.errorToast('Chat creation backup has failed! Please report.')
-                return
-            }
-
-            await loadChat(chatId)
-
-            setNowLoading(false)
-            if (edit) router.push('/CharacterEditor')
-            else router.back()
-        } catch (error) {
-            Logger.errorToast(`Couldn't load character: ${error}`)
-            setNowLoading(false)
-        }
-    }
 
     const handleCreateCharacter = async (text: string) => {
         if (!text) {
@@ -66,7 +31,11 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({
             return
         }
         Characters.db.mutate.createCard(text).then(async (id) => {
-            await setCurrentCharacter(id)
+            if (nowLoading) return
+            setNowLoading(true)
+            await setCurrentCard(id)
+            setNowLoading(false)
+            router.push('/CharacterEditor')
         })
     }
 

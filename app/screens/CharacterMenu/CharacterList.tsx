@@ -21,8 +21,6 @@ type CharacterListProps = {
 
 const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
     const [nowLoading, setNowLoading] = useState(false)
-    const [showMenu, setShowMenu] = useState(false)
-    const [showTags, _] = useMMKVBoolean(AppSettings.ShowTags)
 
     const sortAndFilterCharInfo = useCharacterListSorter((state) => state.sortAndFilterCharInfo)
 
@@ -45,12 +43,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
             <HeaderTitle />
             <HeaderButton
                 headerRight={() => (
-                    <CharacterNewMenu
-                        nowLoading={nowLoading}
-                        setNowLoading={setNowLoading}
-                        setShowMenu={setShowMenu}
-                        showMenu={showMenu}
-                    />
+                    <CharacterNewMenu nowLoading={nowLoading} setNowLoading={setNowLoading} />
                 )}
             />
 
@@ -70,7 +63,6 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                                 index={index}
                                 character={item}
                                 nowLoading={nowLoading}
-                                showTags={!!showTags}
                                 setNowLoading={setNowLoading}
                             />
                         )}

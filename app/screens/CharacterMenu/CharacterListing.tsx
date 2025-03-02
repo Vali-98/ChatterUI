@@ -1,10 +1,12 @@
 import Avatar from '@components/views/Avatar'
+import { AppSettings } from '@lib/constants/GlobalValues'
 import { Characters, CharInfo } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useRouter } from 'expo-router'
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useMMKVBoolean } from 'react-native-mmkv'
 
 import CharacterEditPopup from './CharacterEditPopup'
 import { useCharacterListSorter } from './CharacterListHeader'
@@ -13,7 +15,6 @@ type CharacterListingProps = {
     index: number
     character: CharInfo
     nowLoading: boolean
-    showTags: boolean
     setNowLoading: (b: boolean) => void
 }
 
@@ -30,10 +31,10 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
     index,
     character,
     nowLoading,
-    showTags,
     setNowLoading,
 }) => {
     const router = useRouter()
+    const [showTags, _] = useMMKVBoolean(AppSettings.ShowTags)
     const { setShowSearch, setTagFilter, tagFilter } = useCharacterListSorter((state) => ({
         setShowSearch: state.setShowSearch,
         setTagFilter: state.setTagFilter,

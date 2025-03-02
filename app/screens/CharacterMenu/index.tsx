@@ -1,7 +1,6 @@
 import Drawer from '@components/views/Drawer'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { Chats } from '@lib/state/Chat'
 import CharacterList from '@screens/CharacterMenu/CharacterList'
 import { SafeAreaView } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
