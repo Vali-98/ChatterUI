@@ -110,7 +110,8 @@ const ChracterEditor = () => {
                         Characters.db.mutate.deleteCard(charId ?? -1)
                         unloadCharacter()
                         unloadChat()
-                        router.back()
+                        Logger.info(`Deleted character: ${charName}`)
+                        router.dismissAll()
                     },
                     type: 'warning',
                 },
