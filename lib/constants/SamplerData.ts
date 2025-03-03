@@ -108,8 +108,8 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
         values: {
             type: 'integer',
             min: 1024,
-            max: 32769,
-            default: 4098,
+            max: 128000,
+            default: 8192,
             step: 16,
             precision: 0,
         },
