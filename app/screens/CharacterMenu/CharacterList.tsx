@@ -50,7 +50,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
             {data.length === 0 && updatedAt && <CharactersEmpty />}
 
             {data.length !== 0 && (
-                <FadeDownView duration={100}>
+                <FadeDownView duration={100} style={{ flex: 1 }}>
                     <CharacterListHeader resultLength={characterList.length} />
                     <Animated.FlatList
                         itemLayoutAnimation={LinearTransition}
