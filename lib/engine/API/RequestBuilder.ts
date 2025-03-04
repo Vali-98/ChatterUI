@@ -92,12 +92,21 @@ const claudeRequest = (config: APIConfiguration, values: APIValues) => {
     const promptObject = prompt?.[config.request.promptKey]
     const finalPrompt = Array.isArray(promptObject)
         ? {
-              [config.request.promptKey]: promptObject.filter((item) => item.role !== systemRole),
+              // Items with blank content typically only happen if the generation has failed
+              // However, if they stay in the array, Anthropic will reject all subsequent calls.
+              // An alternative would be to remove the blank message from the context during onError
+              // processing, but that code is shared, so for a Claude-only fix, this does the job
+              [config.request.promptKey]: promptObject.filter(
+                  (item) => item.role !== systemRole && !!item['content']
+              ),
           }
         : prompt
     return {
         system: systemPrompt,
         ...payloadFields,
+        // If `stream` is false, Claude does not use SSEs. Same format, just as
+        // a HTTP Response Body, not an Event, and there is no handler for that
+        stream: true,
         ...model,
         ...stop,
         ...finalPrompt,

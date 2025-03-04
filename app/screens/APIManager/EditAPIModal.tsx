@@ -6,7 +6,6 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import FadeBackrop from '@components/views/FadeBackdrop'
 import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
-import claudeModels from '@lib/engine/API/ClaudeModels.json'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useEffect, useState } from 'react'
@@ -51,13 +50,14 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
 
     const handleGetModelList = async () => {
         if (!template.features.useModel || !show) return
-        if (template.defaultValues.modelEndpoint === '{{CLAUDE}}') {
-            setModelList(claudeModels.models)
-            return
-        }
-        let auth: any = {}
+        const auth: any = {}
         if (template.features.useKey) {
-            auth = { [template.request.authHeader]: template.request.authPrefix + values.key }
+            auth[template.request.authHeader] = template.request.authPrefix + values.key
+
+            // All authenticated Anthropic API calls require an `anthropic-version` header
+            if (template.name === 'Claude') {
+                auth['anthropic-version'] = '2023-06-01'
+            }
         }
         const result = await fetch(values.modelEndpoint, { headers: { ...auth } })
         const data = await result.json()

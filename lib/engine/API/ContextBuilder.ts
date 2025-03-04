@@ -255,7 +255,13 @@ export const buildChatCompletionContext = (
         index--
     }
 
-    if (config.features.useFirstMessage)
+    if (
+        config.features.useFirstMessage &&
+        // It might make sense to either make a firstMessage mandatory if useFirstMessage is enabled
+        // or else remove blank firstMessages for all payload types, but I don't know how other
+        // models expect this to behave, so this only affects Claude
+        (config.payload.type !== 'claude' || !!values.firstMessage)
+    )
         messageBuffer.push({
             role: completionFeats.userRole,
             [completionFeats.contentName]: values.firstMessage,
