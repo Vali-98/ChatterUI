@@ -5,7 +5,7 @@ import UserList from './UserList'
 
 const UserDrawer = () => {
     return (
-        <Drawer.Body drawerId={Drawer.ID.USERLIST} drawerStyle={styles.drawer} direction="right">
+        <Drawer.Body drawerID={Drawer.ID.USERLIST} drawerStyle={styles.drawer} direction="right">
             <UserList />
         </Drawer.Body>
     )

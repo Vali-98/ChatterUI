@@ -44,7 +44,7 @@ const ChatsDrawer = () => {
     }
 
     return (
-        <Drawer.Body drawerId={Drawer.ID.CHATLIST} drawerStyle={styles.drawer} direction="right">
+        <Drawer.Body drawerID={Drawer.ID.CHATLIST} drawerStyle={styles.drawer} direction="right">
             <View
                 style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
                 <Text style={styles.drawerTitle}>Chats</Text>

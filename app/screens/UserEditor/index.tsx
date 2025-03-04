@@ -1,42 +1,16 @@
-import { AntDesign } from '@expo/vector-icons'
-import { Theme } from '@lib/theme/ThemeManager'
+import Drawer from '@components/views/Drawer'
 import { Stack } from 'expo-router'
-import { useState } from 'react'
-import { Pressable, View } from 'react-native'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { runOnJS } from 'react-native-reanimated'
+import { View } from 'react-native'
 
 import UserCardEditor from './UserCardEditor'
 import UserDrawer from './UserDrawer'
 
 const UserEditor = () => {
-    const { color } = Theme.useTheme()
-    const [showDrawer, setShowDrawer] = useState(false)
-
-    const handleLeftFling = () => {
-        setShowDrawer(false)
-    }
-
-    const handleRightFlight = () => {
-        setShowDrawer(true)
-    }
-
-    const swipeShowDrawer = Gesture.Fling()
-        .direction(3)
-        .onEnd(() => {
-            runOnJS(handleRightFlight)()
-        })
-
-    const swipeHideDrawer = Gesture.Fling()
-        .direction(1)
-        .onEnd(() => {
-            runOnJS(handleLeftFling)()
-        })
-
-    const gesture = Gesture.Exclusive(swipeHideDrawer, swipeShowDrawer)
-
     return (
-        <GestureDetector gesture={gesture}>
+        <Drawer.Gesture
+            config={[
+                { drawerID: Drawer.ID.USERLIST, openDirection: 'left', closeDirection: 'right' },
+            ]}>
             <View
                 style={{
                     flex: 1,
@@ -45,21 +19,13 @@ const UserEditor = () => {
                     options={{
                         title: 'Edit User',
                         animation: 'simple_push',
-                        headerRight: () => (
-                            <Pressable onPressIn={() => setShowDrawer(!showDrawer)}>
-                                <AntDesign
-                                    name={showDrawer ? 'menu-fold' : 'menu-unfold'}
-                                    color={color.text._300}
-                                    size={24}
-                                />
-                            </Pressable>
-                        ),
+                        headerRight: () => <Drawer.Button drawerID={Drawer.ID.USERLIST} />,
                     }}
                 />
                 <UserCardEditor />
-                {showDrawer && <UserDrawer booleans={[showDrawer, setShowDrawer]} />}
+                <UserDrawer />
             </View>
-        </GestureDetector>
+        </Drawer.Gesture>
     )
 }
 

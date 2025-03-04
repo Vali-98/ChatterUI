@@ -3,7 +3,6 @@ import Drawer from '@components/views/Drawer'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { Theme } from '@lib/theme/ThemeManager'
 import appConfig from 'app.config'
-import { SetStateAction } from 'react'
 import { Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
@@ -17,7 +16,7 @@ const SettingsDrawer = () => {
     const [devMode, _] = useMMKVBoolean(AppSettings.DevMode)
     return (
         <Drawer.Body
-            drawerId={Drawer.ID.SETTINGS}
+            drawerID={Drawer.ID.SETTINGS}
             drawerStyle={{
                 width: '60%',
                 paddingBottom: spacing.xl2,

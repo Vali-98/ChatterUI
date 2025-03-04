@@ -2,11 +2,13 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useFocusEffect } from 'expo-router'
-import React, { ReactNode, useCallback, useEffect } from 'react'
+import React, { ComponentProps, ReactNode, useCallback } from 'react'
 import { BackHandler, StyleSheet, View, ViewStyle } from 'react-native'
+import { FlingGesture, GestureDetector, Gesture as GS } from 'react-native-gesture-handler'
 import Animated, {
     ComplexAnimationBuilder,
     Easing,
+    runOnJS,
     SlideInDown,
     SlideInLeft,
     SlideInRight,
@@ -37,16 +39,33 @@ const animationOut: Record<Direction, ComplexAnimationBuilder> = {
 }
 
 type DrawerBodyProps = {
-    drawerId: Drawer.ID
+    drawerID: Drawer.ID
     direction?: Direction
     drawerStyle?: ViewStyle
     children?: ReactNode
 }
 
 type DrawerButtonProps = {
-    drawerId: string
+    drawerID: Drawer.ID
     openIcon?: keyof typeof AntDesign.glyphMap
     closeIcon?: keyof typeof AntDesign.glyphMap
+}
+
+type DrawerGestureConfig = {
+    drawerID: Drawer.ID
+    closeDirection: Direction
+    openDirection: Direction
+}
+
+const DirectionToGestureMap: Record<Direction, number> = {
+    left: 2,
+    right: 1,
+    up: 4,
+    down: 8,
+}
+
+interface DrawerGestureProps extends Omit<ComponentProps<typeof GestureDetector>, 'gesture'> {
+    config: DrawerGestureConfig[]
 }
 
 type DrawerStateProps = {
@@ -62,7 +81,7 @@ namespace Drawer {
     }
 
     export const Body: React.FC<DrawerBodyProps> = ({
-        drawerId,
+        drawerID: drawerId,
         direction = 'left',
         drawerStyle = {},
         children = undefined,
@@ -104,7 +123,7 @@ namespace Drawer {
     }
 
     export const Button: React.FC<DrawerButtonProps> = ({
-        drawerId,
+        drawerID: drawerId,
         openIcon = 'menu-fold',
         closeIcon = 'close',
     }) => {
@@ -122,6 +141,41 @@ namespace Drawer {
                 iconName={show ? closeIcon : openIcon}
             />
         )
+    }
+
+    export const Gesture: React.FC<DrawerGestureProps> = ({ config, ...rest }) => {
+        const { setShowDrawer, values } = Drawer.useDrawerState((state) => ({
+            setShowDrawer: state.setShow,
+            values: state.values,
+        }))
+
+        const drawerShown = config.map((item) => values?.[item.drawerID]).some((item) => item)
+
+        const gestures: FlingGesture[] = []
+        config.forEach((item) => {
+            gestures.push(
+                GS.Fling()
+                    .direction(DirectionToGestureMap[item.closeDirection])
+                    .onEnd(() => {
+                        setShowDrawer(item.drawerID, false)
+                    })
+                    .runOnJS(true)
+                    .enabled(values?.[item.drawerID])
+            )
+
+            gestures.push(
+                GS.Fling()
+                    .direction(DirectionToGestureMap[item.openDirection])
+                    .onEnd(() => {
+                        setShowDrawer(item.drawerID, true)
+                    })
+                    .runOnJS(true)
+                    .enabled(!drawerShown)
+            )
+        })
+        const gesture = GS.Simultaneous(...gestures)
+
+        return <GestureDetector {...rest} gesture={gesture} />
     }
 
     export const useDrawerState = create<DrawerStateProps>((set) => ({
