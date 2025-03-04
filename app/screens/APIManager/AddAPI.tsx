@@ -3,6 +3,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import ThemedTextInput from '@components/input/ThemedTextInput'
+import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -33,10 +34,8 @@ const AddAPI = () => {
         const auth: any = {}
         if (template.features.useKey) {
             auth[template.request.authHeader] = template.request.authPrefix + values.key
-
-            // All authenticated Anthropic API calls require an `anthropic-version` header
             if (template.name === 'Claude') {
-                auth['anthropic-version'] = '2023-06-01'
+                auth['anthropic-version'] = CLAUDE_VERSION
             }
         }
         const result = await fetch(values.modelEndpoint, { headers: { ...auth } })

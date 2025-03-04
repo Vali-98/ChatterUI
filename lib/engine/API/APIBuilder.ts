@@ -1,3 +1,4 @@
+import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { SSEFetch } from '@lib/engine/SSEFetch'
 import { Characters } from '@lib/state/Characters'
 import { Chats, useInference } from '@lib/state/Chat'
@@ -49,7 +50,7 @@ export const buildAndSendRequest = async () => {
     let header: any = {}
     if (config.features.useKey) {
         const anthropicVersion =
-            config.name === 'Claude' ? { 'anthropic-version': '2023-06-01' } : {}
+            config.name === 'Claude' ? { 'anthropic-version': CLAUDE_VERSION } : {}
 
         header = {
             ...anthropicVersion,

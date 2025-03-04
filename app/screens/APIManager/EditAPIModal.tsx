@@ -4,6 +4,7 @@ import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import FadeBackrop from '@components/views/FadeBackdrop'
+import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
 import { Logger } from '@lib/state/Logger'
@@ -53,10 +54,8 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
         const auth: any = {}
         if (template.features.useKey) {
             auth[template.request.authHeader] = template.request.authPrefix + values.key
-
-            // All authenticated Anthropic API calls require an `anthropic-version` header
             if (template.name === 'Claude') {
-                auth['anthropic-version'] = '2023-06-01'
+                auth['anthropic-version'] = CLAUDE_VERSION
             }
         }
         const result = await fetch(values.modelEndpoint, { headers: { ...auth } })
