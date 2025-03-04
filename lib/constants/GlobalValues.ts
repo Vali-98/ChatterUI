@@ -109,13 +109,6 @@ export const enum Global {
     AppMode = 'appmode',
 }
 
-export enum GenerationSettings {
-    DisableFirst = 'disablefirst',
-    UseFormatter = 'useformatter',
-    FormatterTarget = 'formattertarget',
-    FormatterSource = 'formattersource',
-}
-
 export enum AppSettings {
     DevMode = 'devmode',
     DarkMode = 'darkmode',

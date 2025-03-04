@@ -437,7 +437,7 @@ const ChracterEditor = () => {
                     />
 
                     <StringArrayEditor
-                        title="Tags"
+                        label="Tags"
                         suggestions={data.data
                             .map((item) => item.tag)
                             .filter((a) => !characterCard?.tags.some((item) => item.tag.tag === a))}

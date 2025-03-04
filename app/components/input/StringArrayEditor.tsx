@@ -15,7 +15,7 @@ import {
 
 type StringArrayEditorProps = {
     containerStyle?: ViewStyle
-    title: string
+    label?: string
     value: string[]
     setValue: (newdata: string[]) => void
     allowDuplicates?: boolean
@@ -29,7 +29,7 @@ type StringArrayEditorProps = {
 
 const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
     containerStyle = undefined,
-    title,
+    label = undefined,
     value,
     setValue,
     replaceNewLine = undefined,
@@ -65,7 +65,7 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
 
     return (
         <View style={[styles.mainContainer, containerStyle]}>
-            <Text style={styles.title}>{title}</Text>
+            {label && <Text style={styles.title}>{label}</Text>}
 
             <View style={styles.contentContainer}>
                 {value.length !== 0 && (
@@ -202,7 +202,6 @@ const useStyles = () => {
         input: {
             flex: 1,
             color: color.text._100,
-            paddingVertical: 4,
             paddingHorizontal: 8,
             borderRadius: 8,
         },

@@ -47,7 +47,7 @@ const ComponentTest = () => {
             <Accordion label="Test Accordion">
                 <Text style={{ color: 'yellow' }}>TEST TEXT</Text>
             </Accordion>
-            <StringArrayEditor title="Test Input Label" value={data} setValue={setData} />
+            <StringArrayEditor label="Test Input Label" value={data} setValue={setData} />
             <ThemedCheckbox label="Test Checkbox" value={checkbox} onChangeValue={setCheckbox} />
             <ThemedSwitch label="Test Switch" value={sw} onChangeValue={setSw} />
             <ThemedSlider

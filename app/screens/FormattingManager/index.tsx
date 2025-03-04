@@ -13,6 +13,7 @@ import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import useAutosave from '@lib/hooks/AutoSave'
+import { useTextFilterState } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { Instructs } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
@@ -47,6 +48,10 @@ const FormattingManager = () => {
     const instructList = data
     const selectedItem = data.filter((item) => item.id === instructID)?.[0]
     const [showNewInstruct, setShowNewInstruct] = useState<boolean>(false)
+    const { textFilter, setTextFilter } = useTextFilterState((state) => ({
+        textFilter: state.filter,
+        setTextFilter: state.setFilter,
+    }))
 
     const handleSaveInstruct = (log: boolean) => {
         if (currentInstruct && instructID)
@@ -321,7 +326,7 @@ const FormattingManager = () => {
 
                         <StringArrayEditor
                             containerStyle={{ marginBottom: spacing.l }}
-                            title="Stop Sequence"
+                            label="Stop Sequence"
                             value={
                                 currentInstruct.stop_sequence
                                     ? currentInstruct.stop_sequence.split(',')
@@ -451,6 +456,16 @@ const FormattingManager = () => {
                                 ))}
                             </View>
                         </View>
+
+                        <SectionTitle>Hidden Text</SectionTitle>
+                        <Text
+                            style={{
+                                color: color.text._400,
+                            }}>
+                            Hides text that matches regex patterns defined below. (case insensitive)
+                        </Text>
+
+                        <StringArrayEditor value={textFilter} setValue={setTextFilter} />
 
                         <SectionTitle>Local Template</SectionTitle>
 

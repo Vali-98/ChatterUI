@@ -1,6 +1,8 @@
+import ThemedButton from '@components/buttons/ThemedButton'
+import { useTextFilter } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { Chats } from '@lib/state/Chat'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { View, Animated, Easing, useAnimatedValue } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 
@@ -11,10 +13,9 @@ type ChatTextProps = {
 
 const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
     const markdownStyle = MarkdownStyle.useMarkdownStyle()
-
+    const [showHidden, setShowHidden] = useState(false)
     const { swipeText } = Chats.useSwipeData(index)
     const viewRef = useRef<View>(null)
-
     const animHeight = useAnimatedValue(-1)
     const targetHeight = useRef(-1)
     const firstRender = useRef(true)
@@ -50,6 +51,8 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
         // requestAnimationFrame(() => updateHeight())
     }, [swipeText])
 
+    const filteredText = useTextFilter(swipeText?.trim() ?? '')
+    const renderedText = showHidden ? swipeText?.trim() : filteredText.result
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
             <View style={{ minHeight: 10 }} ref={viewRef} onLayout={() => updateHeight()}>
@@ -58,8 +61,23 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
                     markdownit={MarkdownStyle.Rules}
                     rules={MarkdownStyle.RenderRules}
                     style={markdownStyle}>
-                    {swipeText?.trim()}
+                    {renderedText}
                 </Markdown>
+                {filteredText.found && (
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                        <ThemedButton
+                            onPress={() => setShowHidden(!showHidden)}
+                            variant="secondary"
+                            label={showHidden ? 'Hide Filtered' : 'Show Filtered'}
+                            labelStyle={{ flex: 0, fontSize: 12 }}
+                            buttonStyle={{
+                                paddingVertical: 0,
+                                paddingHorizontal: 4,
+                                borderWidth: 0,
+                            }}
+                        />
+                    </View>
+                )}
             </View>
         </Animated.View>
     )

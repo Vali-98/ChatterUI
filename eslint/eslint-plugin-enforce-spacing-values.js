@@ -1,10 +1,10 @@
-const allowedValues = [2, 4, 8, 12, 16, 24]
+const allowedValues = [0, 2, 4, 8, 12, 16, 24]
 
 module.exports = {
     meta: {
         type: 'suggestion',
         docs: {
-            description: 'Enforce border, padding, and margin values to be 2, 4, 8, 12, or 16',
+            description: 'Enforce border, padding, and margin values to be 0, 2, 4, 8, 12, or 16',
             category: 'Stylistic Issues',
             recommended: false,
         },

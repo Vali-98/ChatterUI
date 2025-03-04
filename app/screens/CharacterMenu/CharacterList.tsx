@@ -1,12 +1,10 @@
 import FadeDownView from '@components/views/FadeDownView'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { AppSettings } from '@lib/constants/GlobalValues'
 import { Characters, CharInfo } from '@lib/state/Characters'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
 import { SafeAreaView } from 'react-native'
-import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { LinearTransition } from 'react-native-reanimated'
 
 import CharacterListHeader, { useCharacterListSorter } from './CharacterListHeader'

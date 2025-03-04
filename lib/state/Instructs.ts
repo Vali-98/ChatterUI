@@ -360,31 +360,4 @@ export namespace Instructs {
     }
 }
 
-export type InstructType = {
-    id?: number
-    name: string
-    system_prompt: string
-    system_prefix: string
-    system_suffix: string
-    input_prefix: string
-    input_suffix: string
-    output_prefix: string
-    output_suffix: string
-    stop_sequence: string
-    activation_regex: string
-
-    user_alignment_message: string
-    wrap: boolean
-    macro: boolean
-    names: boolean
-    names_force_groups: boolean
-
-    timestamp: boolean
-    examples: boolean
-    format_type: number
-
-    last_output_prefix: string
-
-    scenario: boolean
-    personality: boolean
-}
+export type InstructType = Omit<typeof instructs.$inferSelect, 'id'> & { id?: number }

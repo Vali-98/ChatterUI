@@ -262,7 +262,6 @@ export const buildChatCompletionContext = (
         })
 
     const output = [...payload, ...messageBuffer.reverse()]
-    console.log(output)
     Logger.info(`Approximate Context Size: ${total_length} tokens`)
     Logger.info(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
     if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(JSON.stringify(output))
