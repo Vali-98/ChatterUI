@@ -47,9 +47,16 @@ module.exports = function thinkPlugin(md) {
         if (openTagStart !== -1 && openTagEnd !== -1) {
             let inlineContent = line.slice(openTagEnd + 1)
             if (inlineContent.trim().length) {
-                if (inlineContent.includes('</think>')) {
-                    inlineContent = inlineContent.replace('</think>', '')
+                const endThinkIndex = line.indexOf('</think>')
+                if (endThinkIndex > 0) {
+                    // if there is a trailing string, set to be rendered later
+                    if (endThinkIndex + 8 < line.length) {
+                        trailing = line.slice(endThinkIndex + 8)
+                    }
+                    inlineContent = inlineContent.slice(0, endThinkIndex - 7)
                     hasCloseTag = true
+                    //we never push past the first line, so back to here
+                    nextLine--
                 }
                 contentLines.push(inlineContent)
             }
