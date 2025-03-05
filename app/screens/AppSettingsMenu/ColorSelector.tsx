@@ -7,8 +7,7 @@ import { DefaultColorSchemes, ThemeColor } from '@lib/theme/ThemeColor'
 import { Theme } from '@lib/theme/ThemeManager'
 import { pickJSONDocument } from '@lib/utils/File'
 import React from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
-import { FlatList } from 'react-native-gesture-handler'
+import { Text, TouchableOpacity, View, FlatList } from 'react-native'
 
 type ColorThemeItemProps = {
     item: ThemeColor
