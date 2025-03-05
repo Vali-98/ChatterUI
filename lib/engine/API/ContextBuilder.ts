@@ -244,6 +244,7 @@ export const buildChatCompletionContext = (
         const prefill = index === messages.length - 1 ? values.prefill : ''
 
         if (!swipe_data.swipe && !prefill && index === messages.length - 1) {
+            index--
             continue
         }
 
@@ -254,8 +255,7 @@ export const buildChatCompletionContext = (
         total_length += len
         index--
     }
-
-    if (config.features.useFirstMessage)
+    if (config.features.useFirstMessage && values.firstMessage)
         messageBuffer.push({
             role: completionFeats.userRole,
             [completionFeats.contentName]: values.firstMessage,

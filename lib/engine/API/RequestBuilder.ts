@@ -92,12 +92,15 @@ const claudeRequest = (config: APIConfiguration, values: APIValues) => {
     const promptObject = prompt?.[config.request.promptKey]
     const finalPrompt = Array.isArray(promptObject)
         ? {
-              [config.request.promptKey]: promptObject.filter((item) => item.role !== systemRole),
+              [config.request.promptKey]: promptObject.filter(
+                  (item) => item.role !== systemRole && item['content']
+              ),
           }
         : prompt
     return {
         system: systemPrompt,
         ...payloadFields,
+        stream: true,
         ...model,
         ...stop,
         ...finalPrompt,

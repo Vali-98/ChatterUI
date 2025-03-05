@@ -292,7 +292,7 @@ export const defaultTemplates: APIConfiguration[] = [
 
         defaultValues: {
             endpoint: 'https://api.anthropic.com/v1/messages',
-            modelEndpoint: '{{CLAUDE}}',
+            modelEndpoint: 'https://api.anthropic.com/v1/models',
             prefill: '',
             firstMessage: '',
             key: '',
@@ -303,7 +303,7 @@ export const defaultTemplates: APIConfiguration[] = [
             useKey: true,
             useModel: true,
             usePrefill: true,
-            useFirstMessage: true,
+            useFirstMessage: false,
             multipleModels: false,
         },
 
@@ -339,9 +339,9 @@ export const defaultTemplates: APIConfiguration[] = [
 
         model: {
             useModelContextLength: false,
-            nameParser: 'name',
+            nameParser: 'id',
             contextSizeParser: '',
-            modelListParser: 'models',
+            modelListParser: 'data',
         },
 
         ui: {

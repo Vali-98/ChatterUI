@@ -3,8 +3,8 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import ThemedTextInput from '@components/input/ThemedTextInput'
+import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
-import claudeModels from '@lib/engine/API/ClaudeModels.json'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { Stack, useRouter } from 'expo-router'
@@ -30,13 +30,13 @@ const AddAPI = () => {
 
     const handleGetModelList = async () => {
         if (!template.features.useModel) return
-        if (template.defaultValues.modelEndpoint === '{{CLAUDE}}') {
-            setModelList(claudeModels.models)
-            return
-        }
-        let auth: any = {}
+
+        const auth: any = {}
         if (template.features.useKey) {
-            auth = { [template.request.authHeader]: template.request.authPrefix + values.key }
+            auth[template.request.authHeader] = template.request.authPrefix + values.key
+            if (template.name === 'Claude') {
+                auth['anthropic-version'] = CLAUDE_VERSION
+            }
         }
         const result = await fetch(values.modelEndpoint, { headers: { ...auth } })
         const data = await result.json()

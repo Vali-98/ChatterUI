@@ -168,3 +168,5 @@ export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.UseModelTemplate]: true,
     [AppSettings.ShowTokenPerSecond]: true,
 }
+
+export const CLAUDE_VERSION = '2023-06-01'
