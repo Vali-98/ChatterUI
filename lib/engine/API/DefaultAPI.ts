@@ -303,7 +303,7 @@ export const defaultTemplates: APIConfiguration[] = [
             useKey: true,
             useModel: true,
             usePrefill: true,
-            useFirstMessage: true,
+            useFirstMessage: false,
             multipleModels: false,
         },
 
