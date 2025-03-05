@@ -8,7 +8,6 @@ import { FlingGesture, GestureDetector, Gesture as GS } from 'react-native-gestu
 import Animated, {
     ComplexAnimationBuilder,
     Easing,
-    runOnJS,
     SlideInDown,
     SlideInLeft,
     SlideInRight,
@@ -134,7 +133,7 @@ namespace Drawer {
         return (
             <ThemedButton
                 iconSize={24}
-                onPress={() => {
+                onPressIn={() => {
                     setShow(drawerId, !show)
                 }}
                 variant="tertiary"
