@@ -91,8 +91,11 @@ const EditorModal = () => {
                             style={{
                                 flexDirection: 'row',
                                 alignItems: 'flex-end',
+                                flex: 1,
                             }}>
-                            <Text style={styles.nameText}>{entry?.name}</Text>
+                            <Text numberOfLines={1} style={styles.nameText}>
+                                {entry?.name}
+                            </Text>
                             <Text style={styles.timeText}>
                                 {swipe?.send_date.toLocaleTimeString()}
                             </Text>
@@ -180,12 +183,13 @@ const useStyles = () => {
             color: color.text._100,
             fontSize: fontSize.l,
             marginLeft: spacing.l,
+            flex: 1,
         },
 
         timeText: {
             color: color.text._400,
             fontSize: fontSize.s,
-            marginLeft: spacing.m,
+            marginHorizontal: spacing.s,
         },
 
         messageInput: {
