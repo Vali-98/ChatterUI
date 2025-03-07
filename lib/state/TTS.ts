@@ -139,6 +139,7 @@ export const useTTSState = create<TTSState>()(
                 enabled: state.enabled,
                 auto: state.auto,
                 voice: state.voice,
+                rate: state.rate,
             }),
         }
     )
