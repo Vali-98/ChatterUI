@@ -3,7 +3,7 @@ import { Tokenizer } from '@lib/engine/Tokenizer'
 import { useTTSState } from '@lib/state/TTS'
 import { replaceMacros } from '@lib/utils/Macros'
 import { convertToFormatInstruct } from '@lib/utils/TextFormat'
-import { chatEntries, chatSwipes, chats, ChatSwipe, CompletionTimings } from 'db/schema'
+import { chatEntries, chats, ChatSwipe, chatSwipes, CompletionTimings } from 'db/schema'
 import { and, count, desc, eq, getTableColumns, like } from 'drizzle-orm'
 import * as Notifications from 'expo-notifications'
 import { create } from 'zustand'
@@ -11,8 +11,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { Characters } from './Characters'
 import { Logger } from './Logger'
-import { AppMode, AppSettings, Global } from '../constants/GlobalValues'
-import { Llama } from '../engine/Local/LlamaLocal'
+import { AppSettings } from '../constants/GlobalValues'
 import { mmkv } from '../storage/MMKV'
 
 export interface ChatSwipeState extends ChatSwipe {
@@ -315,10 +314,7 @@ export namespace Chats {
             const swipe_id = messages[index].swipe_id
             const cached_token_count = messages[index].swipes[swipe_id].token_count
             if (cached_token_count) return cached_token_count
-            const getTokenCount =
-                mmkv.getString(Global.AppMode) === AppMode.LOCAL
-                    ? Llama.useLlama.getState().tokenLength
-                    : Tokenizer.useTokenizer.getState().getTokenCount
+            const getTokenCount = Tokenizer.getTokenizer()
 
             const token_count = getTokenCount(messages[index].swipes[swipe_id].swipe)
             messages[index].swipes[swipe_id].token_count = token_count

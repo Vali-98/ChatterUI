@@ -1,9 +1,10 @@
 import { AntDesign } from '@expo/vector-icons'
-import { AppMode, AppSettings, Global } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/GlobalValues'
+import { useAppMode } from '@lib/state/AppMode'
 import { Theme } from '@lib/theme/ThemeManager'
 import { Href, useRouter } from 'expo-router'
-import { FlatList, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
+import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
 
 type ButtonData = {
@@ -41,8 +42,8 @@ const DrawerButton = ({ item, index }: DrawerButtonProps) => {
 
 const RouteList = () => {
     const [devMode, _] = useMMKVBoolean(AppSettings.DevMode)
-    const [appMode, __] = useMMKVString(Global.AppMode)
-    const paths = getPaths(appMode === AppMode.REMOTE)
+    const { appMode } = useAppMode()
+    const paths = getPaths(appMode === 'remote')
     return (
         <FlatList
             showsVerticalScrollIndicator={false}

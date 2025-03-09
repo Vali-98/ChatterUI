@@ -52,7 +52,7 @@ const ChracterEditor = () => {
             }))
         )
 
-    const getTokenCount = Tokenizer.useTokenizer((state) => state.getTokenCount)
+    const getTokenCount = Tokenizer.useDefaultTokenizer((state) => state.getTokenCount)
     const [characterCard, setCharacterCard] = useState<CharacterCardData | undefined>(currentCard)
     const { chat, unloadChat } = Chats.useChat()
 

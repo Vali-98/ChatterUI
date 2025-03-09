@@ -8,23 +8,22 @@ import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
-import { AppMode, Global } from '@lib/constants/GlobalValues'
 import { Samplers } from '@lib/constants/SamplerData'
 import { APISampler } from '@lib/engine/API/APIBuilder.types'
 import { APIState as APIStateNew } from '@lib/engine/API/APIManagerState'
 import { localSamplerData } from '@lib/engine/LocalInference'
+import { useAppMode } from '@lib/state/AppMode'
 import { Logger } from '@lib/state/Logger'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 import { useState } from 'react'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import { useMMKVString } from 'react-native-mmkv'
+import { ScrollView, StyleSheet, Text } from 'react-native'
 
 const SamplerMenu = () => {
     const styles = useStyles()
     const { spacing } = Theme.useTheme()
-    const [appMode, setAppMode] = useMMKVString(Global.AppMode)
+    const { appMode } = useAppMode()
     const [showNewSampler, setShowNewSampler] = useState<boolean>(false)
 
     const {
@@ -44,7 +43,7 @@ const SamplerMenu = () => {
     }))
 
     const getSamplerList = (): APISampler[] => {
-        if (appMode === AppMode.LOCAL) return localSamplerData
+        if (appMode === 'local') return localSamplerData
         if (activeIndex !== -1) {
             const template = getTemplates().find(
                 (item) => item.name === apiValues[activeIndex].configName

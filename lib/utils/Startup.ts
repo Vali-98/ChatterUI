@@ -11,12 +11,13 @@ import {
     readAsStringAsync,
     readDirectoryAsync,
 } from 'expo-file-system'
+import { router } from 'expo-router'
 import { setBackgroundColorAsync } from 'expo-system-ui'
 import { z } from 'zod'
 
 import { AppDirectory } from './File'
 import { lockScreenOrientation } from './Screen'
-import { AppMode, AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
+import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
 import { Characters } from '../state/Characters'
 import { Chats } from '../state/Chat'
@@ -25,10 +26,12 @@ import { mmkv } from '../storage/MMKV'
 import { Theme } from '../theme/ThemeManager'
 
 const loadChatOnInit = async () => {
+    if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return
     const newestChat = await Chats.db.query.chatNewest()
     if (!newestChat) return
     await Characters.useCharacterCard.getState().setCard(newestChat.character_id)
     await Chats.useChatState.getState().load(newestChat.id)
+    router.push('/screens/ChatMenu')
 }
 
 const setAppDefaultSettings = () => {
@@ -192,12 +195,7 @@ export const startupApp = () => {
     setDefaultCharacter()
     setDefaultInstruct()
 
-    // Init step, appMode is never null
-    if (!mmkv.getString(Global.AppMode)) mmkv.set(Global.AppMode, AppMode.LOCAL)
-
-    if (mmkv.getBoolean(AppSettings.ChatOnStartup)) {
-        loadChatOnInit()
-    }
+    loadChatOnInit()
 
     // Initialize the default card
     createDefaultCard()

@@ -1,10 +1,11 @@
-import { AppMode, AppSettings, Global } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/GlobalValues'
+import { useAppMode } from '@lib/state/AppMode'
 import { useBackgroundImage } from '@lib/state/BackgroundImage'
 import { Chats } from '@lib/state/Chat'
 import { AppDirectory } from '@lib/utils/File'
 import { ImageBackground } from 'expo-image'
 import { FlatList } from 'react-native'
-import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
+import { useMMKVBoolean } from 'react-native-mmkv'
 
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
@@ -19,7 +20,7 @@ type ListItem = {
 
 const ChatWindow = () => {
     const { chat } = Chats.useChat()
-    const [appMode, _] = useMMKVString(Global.AppMode)
+    const { appMode } = useAppMode()
     const [showModelname, __] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [autoScroll, ___] = useMMKVBoolean(AppSettings.AutoScroll)
 
@@ -50,7 +51,7 @@ const ChatWindow = () => {
             style={{ flex: 1 }}
             source={{ uri: image ? AppDirectory.Assets + image : '' }}>
             <EditorModal />
-            {showModelname && appMode === AppMode.LOCAL && <ChatModelName />}
+            {showModelname && appMode === 'local' && <ChatModelName />}
             <FlatList
                 maintainVisibleContentPosition={
                     autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }

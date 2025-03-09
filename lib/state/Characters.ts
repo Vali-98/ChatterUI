@@ -20,9 +20,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { Logger } from './Logger'
-import { AppMode, Global } from '../constants/GlobalValues'
-import { Llama } from '../engine/Local/LlamaLocal'
-import { mmkv, mmkvStorage } from '../storage/MMKV'
+import { mmkvStorage } from '../storage/MMKV'
 import { getPngChunkText } from '../utils/PNG'
 
 export type CharInfo = {
@@ -117,10 +115,7 @@ export namespace Characters {
                     const personality = replaceMacros(card.personality)
                     const scenario = replaceMacros(card.scenario)
 
-                    const getTokenCount =
-                        mmkv.getString(Global.AppMode) === AppMode.LOCAL
-                            ? Llama.useLlama.getState().tokenLength
-                            : Tokenizer.useTokenizer.getState().getTokenCount
+                    const getTokenCount = Tokenizer.getTokenizer()
 
                     const newCache: CharacterTokenCache = {
                         otherName: userName,
@@ -208,10 +203,7 @@ export namespace Characters {
             const personality = replaceMacros(card.personality)
             const scenario = replaceMacros(card.scenario)
 
-            const getTokenCount =
-                mmkv.getString(Global.AppMode) === AppMode.LOCAL
-                    ? Llama.useLlama.getState().tokenLength
-                    : Tokenizer.useTokenizer.getState().getTokenCount
+            const getTokenCount = Tokenizer.getTokenizer()
 
             const newCache = {
                 otherName: charName,

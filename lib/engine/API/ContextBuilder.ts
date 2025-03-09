@@ -1,5 +1,4 @@
-import { AppMode, AppSettings, Global } from '@lib/constants/GlobalValues'
-import { Llama } from '@lib/engine/Local/LlamaLocal'
+import { AppSettings } from '@lib/constants/GlobalValues'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
@@ -10,29 +9,35 @@ import { replaceMacros } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 
+const getCardData = () => {
+    const userCard = { ...Characters.useUserCard.getState().card }
+    const currentCard = { ...Characters.useCharacterCard.getState().card }
+    return { userCard, currentCard }
+}
+
+const getCaches = (charName: string, userName: string) => {
+    const characterCache = Characters.useCharacterCard.getState().getCache(userName)
+    const userCache = Characters.useUserCard.getState().getCache(charName)
+    const instructCache = Instructs.useInstruct.getState().getCache(charName, userName)
+    return { characterCache, userCache, instructCache }
+}
+
 export const buildTextCompletionContext = (max_length: number, printTimings = true) => {
     const delta = performance.now()
     const bypassContextLength = mmkv.getBoolean(AppSettings.BypassContextLength)
-    const tokenizer =
-        mmkv.getString(Global.AppMode) === AppMode.LOCAL
-            ? Llama.useLlama.getState().tokenLength
-            : Tokenizer.useTokenizer.getState().getTokenCount
-
+    const tokenizer = Tokenizer.getTokenizer()
     const messages = [...(Chats.useChatState.getState().data?.messages ?? [])]
 
     const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
 
-    const userCard = { ...Characters.useUserCard.getState().card }
-    const currentCard = { ...Characters.useCharacterCard.getState().card }
+    const { userCard, currentCard } = getCardData()
     const userName = userCard?.name ?? ''
     const charName = currentCard?.name ?? ''
+    const userCardData = (userCard?.description ?? '').trim()
+    const charCardData = (currentCard?.description ?? '').trim()
 
-    const characterCache = Characters.useCharacterCard.getState().getCache(userName)
-    const userCache = Characters.useUserCard.getState().getCache(charName)
-    const instructCache = Instructs.useInstruct.getState().getCache(charName, userName)
+    const { characterCache, userCache, instructCache } = getCaches(charName, userName)
 
-    const user_card_data = (userCard?.description ?? '').trim()
-    const char_card_data = (currentCard?.description ?? '').trim()
     let payload = ``
 
     // set suffix length as its always added
@@ -46,8 +51,8 @@ export const buildTextCompletionContext = (max_length: number, printTimings = tr
         payload += `${currentInstruct.system_prompt}`
         payload_length += instructCache.system_prompt_length
     }
-    if (char_card_data) {
-        payload += char_card_data
+    if (charCardData) {
+        payload += charCardData
         payload_length += characterCache.description_length
     }
 
@@ -61,8 +66,8 @@ export const buildTextCompletionContext = (max_length: number, printTimings = tr
         payload_length += characterCache.personality_length
     }
 
-    if (user_card_data) {
-        payload += user_card_data
+    if (userCardData) {
+        payload += userCardData
         payload_length += userCache.description_length
     }
     // suffix must be delayed for example messages
@@ -182,22 +187,16 @@ export const buildChatCompletionContext = (
     const bypassContextLength = mmkv.getBoolean(AppSettings.BypassContextLength)
     if (config.request.completionType.type !== 'chatCompletions') return
     const completionFeats = config.request.completionType
-    const tokenizer =
-        mmkv.getString(Global.AppMode) === AppMode.LOCAL
-            ? Llama.useLlama.getState().tokenLength
-            : Tokenizer.useTokenizer.getState().getTokenCount
+    const tokenizer = Tokenizer.getTokenizer()
 
     const messages = [...(Chats.useChatState.getState().data?.messages ?? [])]
-    const userCard = { ...Characters.useUserCard.getState().card }
-    const currentCard = { ...Characters.useCharacterCard.getState().card }
     const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
 
+    const { userCard, currentCard } = getCardData()
     const userName = userCard?.name ?? ''
     const charName = currentCard?.name ?? ''
 
-    const characterCache = Characters.useCharacterCard.getState().getCache(userName)
-    const userCache = Characters.useUserCard.getState().getCache(charName)
-    const instructCache = Instructs.useInstruct.getState().getCache(charName, userName)
+    const { characterCache, userCache, instructCache } = getCaches(charName, userName)
 
     const buffer = Chats.useChatState.getState().buffer
 

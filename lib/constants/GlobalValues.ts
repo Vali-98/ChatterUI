@@ -104,9 +104,9 @@ export const enum Global {
     // TTSAutoStart = 'ttsautostart', // moved autoTTS to zustand state
 
     // Management
+    // AppMode = 'appmode', // moved to zustand state
 
     CpuFeatures = 'cpufeatures',
-    AppMode = 'appmode',
 }
 
 export enum AppSettings {
@@ -133,11 +133,6 @@ export enum AppSettings {
     ShowTags = 'showtags',
     UseModelTemplate = 'useModelTemplate',
     ShowTokenPerSecond = 'showtokenpersecond',
-}
-
-export enum AppMode {
-    LOCAL = 'local',
-    REMOTE = 'remote',
 }
 
 /**

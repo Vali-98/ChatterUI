@@ -1,22 +1,21 @@
 import { AntDesign } from '@expo/vector-icons'
-import { AppMode, Global } from '@lib/constants/GlobalValues'
+import { useAppMode } from '@lib/state/AppMode'
 import { Theme } from '@lib/theme/ThemeManager'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { useMMKVString } from 'react-native-mmkv'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 const AppModeToggle = () => {
     const styles = useStyles()
     const { color } = Theme.useTheme()
-    const [appMode, setAppMode] = useMMKVString(Global.AppMode)
-    const localMode = appMode === AppMode.LOCAL
-    const remoteMode = appMode === AppMode.REMOTE
+    const { appMode, setAppMode } = useAppMode()
+    const localMode = appMode === 'local'
+    const remoteMode = appMode === 'remote'
 
     return (
         <View style={styles.modeContainer}>
             <Text style={styles.appModeText}>App Mode</Text>
             <View style={styles.modeButtonContainer}>
                 <TouchableOpacity
-                    onPress={() => setAppMode(AppMode.LOCAL)}
+                    onPress={() => setAppMode('local')}
                     style={localMode ? styles.modeButton : styles.modeButtonInactive}>
                     <AntDesign
                         name="mobile1"
@@ -26,7 +25,7 @@ const AppModeToggle = () => {
                     <Text style={localMode ? styles.modeText : styles.modeTextInactive}>Local</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={() => setAppMode(AppMode.REMOTE)}
+                    onPress={() => setAppMode('remote')}
                     style={remoteMode ? styles.modeButton : styles.modeButtonInactive}>
                     <AntDesign
                         name="cloudo"

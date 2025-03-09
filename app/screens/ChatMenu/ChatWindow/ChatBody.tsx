@@ -1,8 +1,9 @@
-import { AppMode, AppSettings, Global } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/GlobalValues'
+import { useAppMode } from '@lib/state/AppMode'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
-import { TouchableOpacity, View, Text } from 'react-native'
-import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
+import { Text, TouchableOpacity, View } from 'react-native'
+import { useMMKVBoolean } from 'react-native-mmkv'
 
 import ChatText from './ChatText'
 import ChatTextLast from './ChatTextLast'
@@ -18,7 +19,7 @@ type ChatTextProps = {
 
 const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage, isGreeting }) => {
     const message = Chats.useEntryData(index)
-    const [appMode, _] = useMMKVString(Global.AppMode)
+    const { appMode } = useAppMode()
     const [showTPS, __] = useMMKVBoolean(AppSettings.ShowTokenPerSecond)
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
     const showEditor = useChatEditorState((state) => state.show)
@@ -50,7 +51,7 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
                 ) : (
                     <ChatText nowGenerating={nowGenerating} index={index} />
                 )}
-                {showTPS && appMode === AppMode.LOCAL && timings && (
+                {showTPS && appMode === 'local' && timings && (
                     <Text
                         style={{
                             color: color.text._500,

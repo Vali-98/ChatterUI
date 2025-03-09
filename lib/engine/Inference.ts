@@ -1,7 +1,7 @@
+import { useAppModeState } from '@lib/state/AppMode'
 import { Chats, useInference } from '@lib/state/Chat'
 import BackgroundService from 'react-native-background-actions'
 
-import { AppMode, Global } from '../constants/GlobalValues'
 import { Characters } from '../state/Characters'
 import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
@@ -65,17 +65,13 @@ export const generateResponse = async (swipeId: number) => {
     Chats.useChatState.getState().startGenerating(swipeId)
     Logger.info(`Obtaining response.`)
     const data = performance.now()
-    const appMode = getString(Global.AppMode)
+    const appMode = useAppModeState.getState().appMode
 
-    if (appMode === AppMode.LOCAL) {
+    if (appMode === 'local') {
         await BackgroundService.start(localInference, completionTaskOptions)
     } else {
         await BackgroundService.start(buildAndSendRequest, completionTaskOptions)
     }
 
     Logger.debug(`Time taken for generateResponse(): ${(performance.now() - data).toFixed(2)}ms`)
-}
-
-const getString = (key: string) => {
-    return mmkv.getString(key) ?? ''
 }
