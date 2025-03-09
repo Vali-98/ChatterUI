@@ -4,11 +4,8 @@ export enum SamplerID {
     TOP_K = 'top_k',
     TOP_A = 'top_a',
     TOP_P = 'top_p',
-
     SINGLE_LINE = 'single_line',
-    //SAMPLER_ORDER = 'sampler_order',
     SEED = 'seed',
-
     TAIL_FREE_SAMPLING = 'tfs',
     EPSILON_CUTOFF = 'epsilon_cutoff',
     ETA_CUTOFF = 'eta_cutoff',
@@ -29,7 +26,6 @@ export enum SamplerID {
     INCLUDE_REASONING = 'include_reasoning',
     ADD_BOS_TOKEN = 'add_bos_token',
     BAN_EOS_TOKEN = 'ban_eos_token',
-    //TRUNCATION_LENGTH = 'truncation_length',
     SKIP_SPECIAL_TOKENS = 'skip_special_tokens',
     STREAMING = 'streaming',
     MIROSTAT_MODE = 'mirostat_mode',
@@ -39,24 +35,18 @@ export enum SamplerID {
     NEGATIVE_PROMPT = 'negative_prompt',
     GRAMMAR_STRING = 'grammar_string',
     BANNED_TOKENS = 'banned_tokens',
-    //REPETITION_PENALTY_SIZE = 'rep_pen_size',
-
     CONTEXT_LENGTH = 'max_length',
     GENERATED_LENGTH = 'genamt',
-
     DYNATEMP_RANGE = 'dynatemp_range',
     SMOOTHING_FACTOR = 'smoothing_factor',
-
     DRY_MULTIPLIER = 'dry_multiplier',
     DRY_BASE = 'dry_base',
     DRY_ALLOWED_LENGTH = 'dry_allowed_length',
     DRY_SEQUENCE_BREAK = 'dry_sequence_break',
     DRY_PENALTY_LAST_N = 'dry_penalty_last_n',
-
     XTC_THRESHOLD = 'xtc_threshold',
     XTC_PROBABILITY = 'xtc_probability',
     KEEP_ALIVE_DURATION = 'keep_alive_duration',
-    //...
 }
 
 type InputType = 'slider' | 'textinput' | 'checkbox' | 'custom' | 'split'

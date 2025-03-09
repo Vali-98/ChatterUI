@@ -4,7 +4,6 @@ import BackgroundService from 'react-native-background-actions'
 
 import { Characters } from '../state/Characters'
 import { Logger } from '../state/Logger'
-import { mmkv } from '../storage/MMKV'
 import { buildAndSendRequest } from './API/APIBuilder'
 import { localInference } from './LocalInference'
 
