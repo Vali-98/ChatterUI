@@ -25,7 +25,7 @@ import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
 import { Theme } from '../theme/ThemeManager'
 
-const loadChatOnInit = async () => {
+export const loadChatOnInit = async () => {
     if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return
     const newestChat = await Chats.db.query.chatNewest()
     if (!newestChat) return
@@ -194,8 +194,6 @@ export const startupApp = () => {
     generateDefaultDirectories()
     setDefaultCharacter()
     setDefaultInstruct()
-
-    loadChatOnInit()
 
     // Initialize the default card
     createDefaultCard()

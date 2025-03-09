@@ -3,7 +3,7 @@ import { db } from '@db'
 import { AntDesign } from '@expo/vector-icons'
 import useLocalAuth from '@lib/hooks/LocalAuth'
 import { Theme } from '@lib/theme/ThemeManager'
-import { startupApp } from '@lib/utils/Startup'
+import { loadChatOnInit, startupApp } from '@lib/utils/Startup'
 import CharacterMenu from '@screens/CharacterMenu'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { SplashScreen } from 'expo-router'
@@ -19,6 +19,12 @@ const Home = () => {
     const { authorized, retry } = useLocalAuth()
 
     const [firstRender, setFirstRender] = useState<boolean>(true)
+
+    useEffect(() => {
+        if (authorized && success) {
+            loadChatOnInit()
+        }
+    }, [authorized])
 
     useEffect(() => {
         /**
