@@ -41,7 +41,7 @@ const APIManager = () => {
                     style={{
                         paddingHorizontal: spacing.xl,
                     }}
-                    contentContainerStyle={{ rowGap: 4 }}
+                    contentContainerStyle={{ rowGap: 4, paddingBottom: 24 }}
                     data={apiValues}
                     keyExtractor={(item, index) => item.configName + index}
                     renderItem={({ item, index }) => <APIValueItem item={item} index={index} />}
