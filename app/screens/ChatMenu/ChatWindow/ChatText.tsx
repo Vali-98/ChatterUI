@@ -36,6 +36,7 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
         if (viewRef.current) {
             viewRef.current.measure((x, y, width, measuredHeight) => {
                 if (targetHeight.current === measuredHeight) return
+                if (targetHeight.current > -1) animHeight.setValue(targetHeight.current)
                 handleAnimateHeight(measuredHeight)
                 targetHeight.current = measuredHeight
             })

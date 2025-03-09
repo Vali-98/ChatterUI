@@ -45,6 +45,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
             viewRef.current.measure((x, y, width, measuredHeight) => {
                 const newHeight = measuredHeight + (showPadding ? oveflowPadding : 0)
                 if (targetHeight.current === newHeight) return
+                if (targetHeight.current > -1) animHeight.setValue(targetHeight.current)
                 handleAnimateHeight(newHeight)
                 targetHeight.current = newHeight
             })
