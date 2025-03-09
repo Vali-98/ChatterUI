@@ -1,4 +1,5 @@
 import { Model } from '@lib/engine/Local/Model'
+import { useAppModeState } from '@lib/state/AppMode'
 import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSState } from '@lib/state/TTS'
@@ -152,6 +153,19 @@ const migratePresets_0_8_3_to_0_8_4 = async () => {
     await deleteAsync(presetDir)
 }
 
+const migrateAppMode_0_8_5_to_0_8_6 = () => {
+    // Old Global Value AppMode = 'appmode',
+    const oldKey = 'appmode'
+    const oldAppMode = mmkv.getString(oldKey)
+    if (!oldAppMode) return
+
+    if (oldAppMode === 'local' || oldAppMode === 'remote') {
+        useAppModeState.getState().setAppMode(oldAppMode)
+    }
+    mmkv.delete(oldKey)
+    Logger.warn('Migrated appmode from 0.8.5 to 0.8.6')
+}
+
 const createDefaultUserData = async () => {
     const id = await Characters.db.mutate.createCard('User', 'user')
     Characters.useUserCard.getState().setCard(id)
@@ -209,6 +223,7 @@ export const startupApp = () => {
     migrateModelData_0_8_4_to_0_8_5()
     migratePresets_0_8_3_to_0_8_4()
     migrateTTSData_0_8_5_to_0_8_6()
+    migrateAppMode_0_8_5_to_0_8_6()
 
     lockScreenOrientation()
     setBackgroundColorAsync(Theme.useColorState.getState().color.neutral._100)
