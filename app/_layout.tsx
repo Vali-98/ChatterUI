@@ -18,7 +18,7 @@ setOptions({
 const Layout = () => {
     useDrizzleStudio(rawdb)
 
-    const theme = Theme.useTheme()
+    const { color } = Theme.useTheme()
 
     useEffect(() => {
         const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
@@ -35,14 +35,14 @@ const Layout = () => {
             <MenuProvider>
                 <Stack
                     screenOptions={{
-                        headerStyle: { backgroundColor: theme.color.neutral._100 },
-                        headerTitleStyle: { color: theme.color.text._100 },
-                        headerTintColor: theme.color.text._100,
-                        contentStyle: { backgroundColor: theme.color.neutral._100 },
+                        headerStyle: { backgroundColor: color.neutral._100 },
+                        headerTitleStyle: { color: color.text._100 },
+                        headerTintColor: color.text._100,
+                        contentStyle: { backgroundColor: color.neutral._100 },
                         headerShadowVisible: false,
                         headerTitleAlign: 'center',
                         presentation: 'transparentModal',
-                        statusBarBackgroundColor: theme.color.neutral._100,
+                        statusBarBackgroundColor: color.neutral._100,
                     }}>
                     <Stack.Screen name="index" options={{ animation: 'fade' }} />
                 </Stack>
