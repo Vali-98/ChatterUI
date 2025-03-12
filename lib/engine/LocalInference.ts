@@ -76,7 +76,7 @@ const buildLocalPayload = async () => {
             if (messages) {
                 const result = await Llama.useLlama
                     .getState()
-                    .context?.getFormattedChat(messages, null)
+                    .context?.getFormattedChat(messages, null, { jinja: true })
                 if (typeof result === 'string') prompt = result
                 // Currently not used since we dont pass in { jinja: true }
                 else if (typeof result === 'object') prompt = result.prompt
