@@ -8,7 +8,7 @@ interface TTextProps extends TextProps {
     color?: FontColor
 }
 
-const TText: React.FC<TTextProps> = ({ color = '500', children, style, ...props }) => {
+const TText: React.FC<TTextProps> = ({ color = '100', children, style, ...props }) => {
     const fontWeightOverride = useMemo(
         () => ({ fontWeight: (style as TextStyle)?.fontWeight ?? '500' }),
         [style]
