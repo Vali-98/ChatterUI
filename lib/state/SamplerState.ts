@@ -171,8 +171,8 @@ export const fixSamplerConfig = (config: SamplerConfigData) => {
         const data = Samplers[key].values.default
         config[key] = data
         samekeys = false
-        Logger.debug(`Preset was missing field: ${key}`)
+        Logger.debug(`Sampler Config was missing field: ${key}`)
     })
-    if (!samekeys) Logger.warn(`Preset had missing fields and was fixed!`)
+    if (!samekeys) Logger.warn(`Sampler Config had missing fields and was fixed!`)
     return config
 }

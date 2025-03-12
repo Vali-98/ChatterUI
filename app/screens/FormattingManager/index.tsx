@@ -88,7 +88,7 @@ const FormattingManager = () => {
         }
 
         Alert.alert({
-            title: `Delete Preset`,
+            title: `Delete Config`,
             description: `Are you sure you want to delete '${currentInstruct?.name}'?`,
             buttons: [
                 { label: 'Cancel' },
@@ -117,7 +117,7 @@ const FormattingManager = () => {
             placement="bottom"
             options={[
                 {
-                    label: 'Create Preset',
+                    label: 'Create Config',
                     icon: 'addfile',
                     onPress: (menu) => {
                         setShowNewInstruct(true)
@@ -126,7 +126,7 @@ const FormattingManager = () => {
                     },
                 },
                 {
-                    label: 'Export Preset',
+                    label: 'Export Config',
                     icon: 'download',
                     onPress: (menu) => {
                         handleExportPreset()
@@ -134,7 +134,7 @@ const FormattingManager = () => {
                     },
                 },
                 {
-                    label: 'Delete Preset',
+                    label: 'Delete Config',
                     icon: 'delete',
                     onPress: (menu) => {
                         handleDeletePreset()
@@ -170,7 +170,7 @@ const FormattingManager = () => {
                         booleans={[showNewInstruct, setShowNewInstruct]}
                         onConfirm={(text) => {
                             if (instructList.some((item) => item.name === text)) {
-                                Logger.warnToast(`Preset name already exists.`)
+                                Logger.warnToast(`Config name already exists.`)
                                 return
                             }
                             if (!currentInstruct) return
@@ -178,7 +178,7 @@ const FormattingManager = () => {
                             Instructs.db.mutate
                                 .createInstruct({ ...currentInstruct, name: text })
                                 .then(async (newid) => {
-                                    Logger.infoToast(`Preset created.`)
+                                    Logger.infoToast(`Config created.`)
                                     await loadInstruct(newid)
                                 })
                         }}
@@ -201,7 +201,7 @@ const FormattingManager = () => {
                                 if (item.id === instructID) return
                                 loadInstruct(item.id)
                             }}
-                            modalTitle="Select Preset"
+                            modalTitle="Select Config"
                             search
                         />
                         <ThemedButton iconName="save" iconSize={28} variant="tertiary" />
