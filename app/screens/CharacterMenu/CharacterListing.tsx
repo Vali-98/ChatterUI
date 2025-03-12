@@ -96,12 +96,12 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                     )}
                     <View
                         style={{
-                            marginTop: 4,
+                            marginTop: 8,
                             flex: 1,
                             flexDirection: 'row',
                             flexWrap: 'wrap',
-                            columnGap: 2,
-                            rowGap: 2,
+                            columnGap: 4,
+                            rowGap: 4,
                         }}>
                         {showTags &&
                             character.tags.map((item, index) => (
@@ -185,13 +185,14 @@ const useStyles = () => {
         },
 
         tag: {
-            color: color.text._400,
+            color: color.text._200,
             fontSize: fontSize.m,
             borderWidth: 1,
             borderColor: color.primary._200,
+            backgroundColor: color.primary._100,
             paddingHorizontal: spacing.l,
             paddingVertical: spacing.s,
-            borderRadius: borderRadius.s,
+            borderRadius: borderRadius.xl,
         },
     })
 }
