@@ -16,6 +16,7 @@ import { randomUUID } from 'expo-crypto'
 import * as DocumentPicker from 'expo-document-picker'
 import * as FS from 'expo-file-system'
 import { useEffect } from 'react'
+import { z } from 'zod'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
@@ -368,7 +369,7 @@ export namespace Characters {
             ) => {
                 const [{ id }, ..._] = await database
                     .insert(characters)
-                    .values({ ...TavernCardV2(name), type: type })
+                    .values({ ...createBlankV2Card(name), type: type })
                     .returning({ id: characters.id })
                 return id
             }
@@ -485,16 +486,13 @@ export namespace Characters {
 
             // TODO: Proper per field updates, though not that expensive
             export const updateCardField = async (
-                field: keyof CharacterCardV2Data,
+                field: keyof NonNullable<CharacterCardData>,
                 data: any,
                 charId: number
             ) => {
-                if (field === 'tags') {
-                    // find tags and update
-                    return
-                }
                 if (field === 'alternate_greetings') {
                     // find greetings and update
+                    Logger.warn('ALT GREETINGS MODIFICATION NOT IMPLEMENTED')
                     return
                 }
                 await database
@@ -553,7 +551,7 @@ export namespace Characters {
                             for (const greeting of greetingdata)
                                 await tx.insert(characterGreetings).values(greeting)
 
-                        if (data.tags.length !== 0) {
+                        if (data.tags && data?.tags?.length !== 0) {
                             const tagsdata = data.tags.map((tag) => ({ tag: tag }))
                             for (const tag of tagsdata)
                                 await tx.insert(tags).values(tag).onConflictDoNothing()
@@ -596,7 +594,7 @@ export namespace Characters {
                 const now = Date.now()
                 card.last_modified = now
                 card.image_id = now
-                const cv2 = cardDataToCV2(card)
+                const cv2 = convertDBDataToCV2(card)
                 if (!cv2) {
                     Logger.errorToast('Failed to copy card')
                     return
@@ -619,17 +617,13 @@ export namespace Characters {
         })
     }
 
-    export const cardDataToCV2 = (data: CharacterCardData): CharacterCardV2 | undefined => {
-        if (!data) return
-
+    export const convertDBDataToCV2 = (data: NonNullable<CharacterCardData>): CharacterCardV2 => {
         const { id, ...rest } = data
-
         return {
             spec: 'chara_card_v2',
             spec_version: '2.0',
             data: {
                 ...rest,
-                last_modified: rest?.last_modified ?? 0, // assume this never actually fails
                 tags: rest.tags.map((item) => item.tag.tag),
                 alternate_greetings: rest.alternate_greetings.map((item) => item.greeting),
             },
@@ -643,37 +637,60 @@ export namespace Characters {
             return
         }
 
-        const charactercard = getPngChunkText(file)
+        const card = getPngChunkText(file)
 
-        // WARNING: dangerous here, card is never verified to fulfill v2 card spec
-
-        if (charactercard === undefined) {
+        if (card === undefined) {
             Logger.errorToast('No character was found.')
             return
         }
-        if (charactercard?.spec_version !== '2.0') {
-            Logger.errorToast('Character card must be in V 2.0 format.')
-            return
-        }
 
-        const newname = charactercard?.data?.name ?? charactercard.name
-
-        Logger.info(`Creating new character: ${newname}`)
-        return db.mutate.createCharacter(charactercard, uri)
+        await createCharacterFromV2JSON(card, uri)
     }
 
-    export const importCharacterFromImage = async () => {
-        return DocumentPicker.getDocumentAsync({
+    const createCharacterFromV1JSON = async (data: any, uri: string | undefined = undefined) => {
+        const result = characterCardV1Schema.safeParse(data)
+        if (result.error) {
+            Logger.errorToast('Invalid Character Card')
+            return
+        }
+        const converted = createBlankV2Card(result.data.name, result.data)
+
+        Logger.info(`Creating new character: ${result.data.name}`)
+        return db.mutate.createCharacter(converted, uri)
+    }
+
+    const createCharacterFromV2JSON = async (data: any, uri: string | undefined = undefined) => {
+        // check JSON def
+        const result = characterCardV2Schema.safeParse(data)
+        if (result.error) {
+            Logger.warnToast('V2 Parsing failed, falling back to V1')
+            return await createCharacterFromV1JSON(data, uri)
+        }
+
+        Logger.info(`Creating new character: ${result.data.data.name}`)
+        return await db.mutate.createCharacter(result.data, uri)
+    }
+
+    export const importCharacter = async () => {
+        const result = await DocumentPicker.getDocumentAsync({
             copyToCacheDirectory: true,
-            type: 'image/*',
+            type: ['image/*', 'application/json'],
             multiple: true,
-        }).then((result) => {
-            if (result.canceled) return
-            result.assets.map(async (item) => {
-                await createCharacterFromImage(item.uri).catch((e) =>
-                    Logger.error(`Failed to create card from '${item.name}': ${e}`)
-                )
-            })
+        })
+        if (result.canceled) return
+        result.assets.map(async (item) => {
+            const isPNG = item.mimeType?.includes('image/')
+            const isJSON = item.mimeType?.includes('application/json')
+            try {
+                if (isJSON) {
+                    const data = await FS.readAsStringAsync(item.uri)
+                    await createCharacterFromV2JSON(JSON.parse(data))
+                }
+
+                if (isPNG) await createCharacterFromImage(item.uri)
+            } catch (e) {
+                Logger.error(`Failed to create card from '${item.name}': ${e}`)
+            }
         })
     }
 
@@ -806,10 +823,45 @@ export namespace Characters {
     }
 }
 
-export type CharacterCardV2Data = {
-    // field for chatterUI
-    image_id: number
+const characterCardV1Schema = z.object({
+    name: z.string(),
+    description: z.string(),
+    personality: z.string().catch(''),
+    scenario: z.string().catch(''),
+    first_mes: z.string().catch(''),
+    mes_example: z.string().catch(''),
+})
 
+const characterCardV2DataSchema = z.object({
+    name: z.string(),
+    description: z.string().catch(''),
+    personality: z.string().catch(''),
+    scenario: z.string().catch(''),
+    first_mes: z.string().catch(''),
+    mes_example: z.string().catch(''),
+
+    creator_notes: z.string().catch(''),
+    system_prompt: z.string().catch(''),
+    post_history_instructions: z.string().catch(''),
+    creator: z.string().catch(''),
+    character_version: z.string().catch(''),
+    alternate_greetings: z.string().array().catch([]),
+    tags: z.string().array().catch([]),
+})
+
+const characterCardV2Schema = z.object({
+    spec: z.literal('chara_card_v2'),
+    spec_version: z.literal('2.0'),
+    data: characterCardV2DataSchema,
+})
+
+type CharaterCardV1 = z.infer<typeof characterCardV1Schema>
+
+type CharacterCardV2Data = z.infer<typeof characterCardV2DataSchema>
+
+type CharacterCardV2 = z.infer<typeof characterCardV2Schema>
+
+export type CharacterCardV2DataOld = {
     name: string
     description: string
     personality: string
@@ -830,46 +882,45 @@ export type CharacterCardV2Data = {
     creator: string
     character_version: string
     //extensions: {},
-    last_modified: number | null
 }
 
-export type CharacterCardV2 = {
-    spec: string
-    spec_version: string
+export type CharacterCardV2Old = {
+    spec: 'chara_card_v2'
+    spec_version: '2.0'
     data: CharacterCardV2Data
 }
 
-const TavernCardV2 = (name: string) => {
+const createBlankV2Card = (
+    name: string,
+    options: {
+        description: string
+        personality: string
+        scenario: string
+        first_mes: string
+        mes_example: string
+    } = { description: '', personality: '', scenario: '', first_mes: '', mes_example: '' }
+): CharacterCardV2 => {
     return {
-        name: name,
-        description: '',
-        personality: '',
-        scenario: '',
-        first_mes: '',
-        mes_example: '',
-
         spec: 'chara_card_v2',
         spec_version: '2.0',
         data: {
             name: name,
-            description: '',
-            personality: '',
-            scenario: '',
-            first_mes: '',
-            mes_example: '',
+            description: options.description,
+            personality: options.personality,
+            scenario: options.scenario,
+            first_mes: options.first_mes,
+            mes_example: options.mes_example,
 
             // New fields start here
             creator_notes: '',
             system_prompt: '',
             post_history_instructions: '',
             alternate_greetings: [],
-            character_book: '',
 
             // May 8th additions
             tags: [],
             creator: '',
             character_version: '',
-            extensions: {},
         },
     }
 }

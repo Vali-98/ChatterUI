@@ -70,7 +70,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                     {
                         label: 'Import From File',
                         onPress: (menu) => {
-                            Characters.importCharacterFromImage()
+                            Characters.importCharacter()
                             menu.current?.close()
                         },
                         icon: 'upload',
