@@ -341,7 +341,10 @@ export namespace Chats {
                 id: index ?? cachedSwipeId ?? NO_VALID_ENTRY,
                 swipe: buffer.data,
             }
-            if (updatedSwipe.id === NO_VALID_ENTRY) return
+            if (updatedSwipe.id === NO_VALID_ENTRY) {
+                Logger.error('Attempted to insert to buffer, but no valid entry was found!')
+                return
+            }
             if (buffer.timings) updatedSwipe.timings = buffer.timings
             if (!index) {
                 // this means there is no chat loaded, we need to update the db anyways
