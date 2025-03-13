@@ -166,42 +166,49 @@ const customRequest = (config: APIConfiguration, values: APIValues) => {
 const buildFields = (config: APIConfiguration, values: APIValues) => {
     const payloadFields = getSamplerFields(config, values)
 
-    const contextLengthObject = config.request.samplerFields.filter(
-        (item) => item.samplerID === SamplerID.CONTEXT_LENGTH
-    )
-
-    const seedObject = config.request.samplerFields.filter(
-        (item) => item.samplerID === SamplerID.SEED
-    )
-
-    const lengthField = payloadFields?.[contextLengthObject?.[0]?.externalName]
-    const length = typeof lengthField === 'number' ? lengthField : 0
-
+    // Model Data
     const model = config.features.useModel
         ? {
               model: getModelName(config, values),
           }
         : {}
-
-    const modelLength = getModelContextLength(config, values)
-
+    // Stop Sequence
     const stop = config.request.useStop ? { [config.request.stopKey]: constructStopSequence() } : {}
 
-    if (contextLengthObject[0] && config.request.removeLength) {
-        delete payloadFields?.[contextLengthObject?.[0].externalName]
-    }
+    // Seed Data
+    const seedObject = config.request.samplerFields.filter(
+        (item) => item.samplerID === SamplerID.SEED
+    )
 
     if (seedObject[0] && config.request.removeSeedifNegative) {
         delete payloadFields?.[seedObject?.[0].externalName]
     }
 
-    const usedLength = config.model.useModelContextLength ? (modelLength ?? length) : length
+    // Context Length
+    const contextLengthObject = config.request.samplerFields.filter(
+        (item) => item.samplerID === SamplerID.CONTEXT_LENGTH
+    )
 
+    const instructLengthField = payloadFields?.[contextLengthObject?.[0]?.externalName]
+    if (instructLengthField) {
+        delete payloadFields?.[contextLengthObject?.[0].externalName]
+    }
+
+    const modelLengthField = getModelContextLength(config, values)
+    const instructLength =
+        typeof instructLengthField === 'number' ? instructLengthField : (modelLengthField ?? 0)
+    const modelLength = modelLengthField ?? instructLength
+    console.log(modelLength, instructLengthField)
+    const length = config.model.useModelContextLength
+        ? Math.min(modelLength, instructLength)
+        : instructLength
+
+    // Prompt
     const prompt = {
         [config.request.promptKey]:
             config.request.completionType.type === 'chatCompletions'
-                ? buildChatCompletionContext(usedLength, config, values)
-                : buildTextCompletionContext(usedLength),
+                ? buildChatCompletionContext(length, config, values)
+                : buildTextCompletionContext(length),
     }
     return { payloadFields, model, stop, prompt, length }
 }
