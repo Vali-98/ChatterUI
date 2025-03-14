@@ -70,6 +70,12 @@ module.exports = {
                     icon: './assets/images/notification.png',
                 },
             ],
+            [
+                './expo-build-plugins/androidattributes.plugin.js',
+                {
+                    'android:largeHeap': true,
+                },
+            ],
             'expo-localization',
             'expo-router',
             'expo-sqlite',
