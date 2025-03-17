@@ -4,6 +4,7 @@ on:
     push:
         branches:
             - master
+            - dev
 
 jobs:
     trigger-build:
@@ -17,4 +18,9 @@ jobs:
                   tags: tag:chatterui-cd
 
             - name: Trigger Build
-              run: curl -X GET ${{secrets.TS_BUILD_API}}
+              run: |
+                  if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+                    curl -X GET ${{ secrets.TS_BUILD_API }}
+                  elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+                    curl -X GET ${{ secrets.TS_BUILD_DEV_API }}
+                  fi
