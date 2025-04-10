@@ -1,3 +1,4 @@
+import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import * as Speech from 'expo-speech'
@@ -132,7 +133,7 @@ export const useTTSState = create<TTSState>()(
             },
         }),
         {
-            name: 'tts-data-storage',
+            name: Storage.TTS,
             storage: createJSONStorage(() => mmkvStorage),
             version: 1,
             partialize: (state) => ({

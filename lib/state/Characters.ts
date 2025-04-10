@@ -1,5 +1,6 @@
 import { db as database } from '@db'
 import { Tokenizer } from '@lib/engine/Tokenizer'
+import { Storage } from '@lib/enums/Storage'
 import { copyFileRes, writeFile } from 'cui-fs'
 import {
     characterGreetings,
@@ -131,7 +132,7 @@ export namespace Characters {
                 },
             }),
             {
-                name: 'usercard-storage',
+                name: Storage.UserCard,
                 storage: createJSONStorage(() => mmkvStorage),
                 version: 2,
                 partialize: (state) => ({ id: state.id, card: state.card }),

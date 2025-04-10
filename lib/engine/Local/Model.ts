@@ -1,4 +1,5 @@
 import { db } from '@db'
+import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import { AppDirectory, readableFileSize } from '@lib/utils/File'
@@ -251,7 +252,7 @@ export namespace KV {
                 },
             }),
             {
-                name: 'kvdata-storage',
+                name: Storage.KV,
                 partialize: (state) => ({
                     kvCacheTokens: state.kvCacheTokens,
                 }),

@@ -1,3 +1,4 @@
+import { Storage } from '@lib/enums/Storage'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import { AppDirectory } from '@lib/utils/File'
 import { getDocumentAsync } from 'expo-document-picker'
@@ -43,7 +44,7 @@ export const useBackgroundImage = create<BackgroundImageStateProps>()(
             },
         }),
         {
-            name: 'background-image-storage',
+            name: Storage.BackgroundImage,
             partialize: (state) => ({ image: state.image }),
             storage: createJSONStorage(() => mmkvStorage),
             version: 1,

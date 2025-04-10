@@ -1,3 +1,4 @@
+import { Storage } from '@lib/enums/Storage'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
@@ -18,7 +19,7 @@ export const useAppModeState = create<AppModeStateProps>()(
             },
         }),
         {
-            name: 'appmode-storage',
+            name: Storage.AppMode,
             storage: createJSONStorage(() => mmkvStorage),
             partialize: (state) => ({ appMode: state.appMode }),
             version: 1,

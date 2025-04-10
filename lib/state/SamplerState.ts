@@ -4,6 +4,7 @@ import {
     SamplerID,
     Samplers,
 } from '@lib/constants/SamplerData'
+import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import { getDocumentAsync } from 'expo-document-picker'
@@ -84,7 +85,7 @@ export namespace SamplersManager {
                 },
             }),
             {
-                name: 'samplerstate-storage',
+                name: Storage.Samplers,
                 storage: createJSONStorage(() => mmkvStorage),
                 version: 1,
                 partialize: (state) => ({

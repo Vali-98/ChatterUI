@@ -1,3 +1,4 @@
+import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import { create } from 'zustand'
@@ -15,7 +16,7 @@ export const useTextFilterState = create<TextFilterStateProps>()(
             setFilter: (arr) => set((state) => ({ ...state, filter: arr })),
         }),
         {
-            name: 'textfilter-storage',
+            name: Storage.TextFilter,
             version: 1,
             storage: createJSONStorage(() => mmkvStorage),
         }

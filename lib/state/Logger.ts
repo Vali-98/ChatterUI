@@ -1,3 +1,4 @@
+import { Storage } from '@lib/enums/Storage'
 import Toast from 'react-native-simple-toast'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
@@ -42,7 +43,7 @@ export namespace Logger {
                 },
             }),
             {
-                name: 'logstate-storage',
+                name: Storage.Logs,
                 storage: createJSONStorage(() => mmkvStorage),
                 version: 1,
                 partialize: (state) => ({

@@ -1,3 +1,4 @@
+import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import { setBackgroundColorAsync } from 'expo-system-ui'
@@ -70,7 +71,7 @@ export namespace Theme {
                 },
             }),
             {
-                name: 'colorscheme-storage',
+                name: Storage.ColorState,
                 storage: createJSONStorage(() => mmkvStorage),
                 version: 1,
                 partialize: (state) => ({ color: state.color, customColors: state.customColors }),

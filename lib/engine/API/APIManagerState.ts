@@ -1,3 +1,4 @@
+import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import { create } from 'zustand'
@@ -92,7 +93,7 @@ export namespace APIState {
                 },
             }),
             {
-                name: 'api-storage',
+                name: Storage.API,
                 storage: createJSONStorage(() => mmkvStorage),
                 version: 1,
             }

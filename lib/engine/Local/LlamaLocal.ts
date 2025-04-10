@@ -1,3 +1,4 @@
+import { Storage } from '@lib/enums/Storage'
 import { AppDirectory, readableFileSize } from '@lib/utils/File'
 import { CompletionParams, ContextParams, initLlama, LlamaContext } from 'cui-llama.rn'
 import { ModelDataType } from 'db/schema'
@@ -86,7 +87,7 @@ export namespace Llama {
                 },
             }),
             {
-                name: 'enginedata-storage',
+                name: Storage.EngineData,
                 partialize: (state) => ({
                     config: state.config,
                     lastModel: state.lastModel,

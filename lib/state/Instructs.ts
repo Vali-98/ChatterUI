@@ -1,5 +1,6 @@
 import { db as database } from '@db'
 import { Tokenizer } from '@lib/engine/Tokenizer'
+import { Storage } from '@lib/enums/Storage'
 import { instructs } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import { create } from 'zustand'
@@ -254,7 +255,7 @@ export namespace Instructs {
                 },
             }),
             {
-                name: 'instruct-storage',
+                name: Storage.Instruct,
                 storage: createJSONStorage(() => mmkvStorage),
                 partialize: (state) => ({ data: state.data }),
                 version: 3,
