@@ -133,6 +133,7 @@ export enum AppSettings {
     ShowTags = 'showtags',
     UseModelTemplate = 'useModelTemplate',
     ShowTokenPerSecond = 'showtokenpersecond',
+    AutoLoadUser = 'autoloaduser',
 }
 
 /**
@@ -162,6 +163,7 @@ export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.ShowTags]: false,
     [AppSettings.UseModelTemplate]: true,
     [AppSettings.ShowTokenPerSecond]: true,
+    [AppSettings.AutoLoadUser]: true,
 }
 
 export const CLAUDE_VERSION = '2023-06-01'

@@ -33,6 +33,7 @@ export type ChatData = {
     id: number
     create_date: Date
     character_id: number
+    user_id: number | null
     name: string
     messages: ChatEntry[] | undefined
 }
@@ -169,7 +170,20 @@ export namespace Chats {
         },
         load: async (chatId: number) => {
             const data = await db.query.chat(chatId)
-            set((state: ChatState) => ({
+
+            if (data?.user_id && mmkv.getBoolean(AppSettings.AutoLoadUser)) {
+                const userID = Characters.useUserCard.getState().id
+                if (userID !== data.user_id) {
+                    Logger.info('Autoloading User with ID: ' + data.user_id)
+                    await Characters.useUserCard.getState().setCard(data.user_id)
+                    const name = Characters.useUserCard.getState().card?.name
+                    if (name) {
+                        Logger.infoToast('Loading User : ' + name)
+                    }
+                }
+            }
+
+            set((state) => ({
                 ...state,
                 data: data,
             }))
@@ -395,7 +409,7 @@ export namespace Chats {
 
     export namespace db {
         export namespace query {
-            export const chat = async (chatId: number): Promise<ChatData | undefined> => {
+            export const chat = async (chatId: number) => {
                 const chat = await database.query.chats.findFirst({
                     where: eq(chats.id, chatId),
                     with: {
@@ -480,6 +494,7 @@ export namespace Chats {
                     Logger.error('Character does not exist!')
                     return
                 }
+                const userId = Characters.useUserCard.getState().id
                 const charName = card.name
                 return await database.transaction(async (tx) => {
                     if (!card || !charName) return
@@ -487,6 +502,7 @@ export namespace Chats {
                         .insert(chats)
                         .values({
                             character_id: charId,
+                            user_id: userId ?? null,
                         })
                         .returning({ chatId: chats.id })
 

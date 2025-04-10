@@ -96,6 +96,7 @@ export const chats = sqliteTable('chats', {
     character_id: integer('character_id', { mode: 'number' })
         .notNull()
         .references(() => characters.id, { onDelete: 'cascade' }),
+    user_id: integer('user_id', { mode: 'number' }),
     last_modified: integer('last_modified', { mode: 'number' })
         .$defaultFn(() => Date.now())
         .$onUpdateFn(() => Date.now()),

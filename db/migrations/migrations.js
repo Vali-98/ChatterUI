@@ -10,6 +10,7 @@ import m0005 from './0005_warm_microbe.sql';
 import m0006 from './0006_bored_carnage.sql';
 import m0007 from './0007_loving_magik.sql';
 import m0008 from './0008_fine_sleeper.sql';
+import m0009 from './0009_huge_young_avengers.sql';
 
   export default {
     journal,
@@ -22,7 +23,8 @@ m0004,
 m0005,
 m0006,
 m0007,
-m0008
+m0008,
+m0009
     }
   }
   

@@ -10,6 +10,7 @@ const ChatSettings = () => {
     const [chatOnStartup, setChatOnStartup] = useMMKVBoolean(AppSettings.ChatOnStartup)
     const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
     const [sendOnEnter, setSendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
+    const [autoLoadUser, setAutoLoadUser] = useMMKVBoolean(AppSettings.AutoLoadUser)
 
     const [showTokensPerSecond, setShowTokensPerSecond] = useMMKVBoolean(
         AppSettings.ShowTokenPerSecond
@@ -38,6 +39,13 @@ const ChatSettings = () => {
                 value={chatOnStartup}
                 onChangeValue={setChatOnStartup}
                 description="Loads the most recent chat on startup"
+            />
+
+            <ThemedSwitch
+                label="Auto Load User"
+                value={autoLoadUser}
+                onChangeValue={setAutoLoadUser}
+                description="When opening a chat, automatically loads the User the chat was created with"
             />
 
             <ThemedSwitch

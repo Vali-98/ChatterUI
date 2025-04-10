@@ -1,0 +1,1 @@
+ALTER TABLE `chats` ADD `user_id` integer;

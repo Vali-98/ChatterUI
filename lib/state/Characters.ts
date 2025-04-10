@@ -67,7 +67,8 @@ export namespace Characters {
                 tokenCache: undefined,
                 setCard: async (id: number) => {
                     const card = await db.query.card(id)
-                    set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
+                    if (card)
+                        set((state) => ({ ...state, card: card, id: id, tokenCache: undefined }))
                     return card?.name
                 },
                 unloadCard: () => {
