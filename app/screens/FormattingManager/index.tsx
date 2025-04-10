@@ -166,23 +166,25 @@ const FormattingManager = () => {
                     }}>
                     <HeaderTitle title="Formatting" />
                     <HeaderButton headerRight={headerRight} />
-                    <TextBoxModal
-                        booleans={[showNewInstruct, setShowNewInstruct]}
-                        onConfirm={(text) => {
-                            if (instructList.some((item) => item.name === text)) {
-                                Logger.warnToast(`Config name already exists.`)
-                                return
-                            }
-                            if (!currentInstruct) return
+                    <View>
+                        <TextBoxModal
+                            booleans={[showNewInstruct, setShowNewInstruct]}
+                            onConfirm={(text) => {
+                                if (instructList.some((item) => item.name === text)) {
+                                    Logger.warnToast(`Config name already exists.`)
+                                    return
+                                }
+                                if (!currentInstruct) return
 
-                            Instructs.db.mutate
-                                .createInstruct({ ...currentInstruct, name: text })
-                                .then(async (newid) => {
-                                    Logger.infoToast(`Config created.`)
-                                    await loadInstruct(newid)
-                                })
-                        }}
-                    />
+                                Instructs.db.mutate
+                                    .createInstruct({ ...currentInstruct, name: text })
+                                    .then(async (newid) => {
+                                        Logger.infoToast(`Config created.`)
+                                        await loadInstruct(newid)
+                                    })
+                            }}
+                        />
+                    </View>
 
                     <View
                         style={{
