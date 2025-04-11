@@ -58,7 +58,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
             }
         }
         requestAnimationFrame(() => updateHeight())
-    }, [nowGenerating, buffer])
+    }, [nowGenerating, buffer, swipeText])
 
     const filteredText = useTextFilter(swipeText?.trim() ?? '')
     const renderedText = showHidden ? swipeText?.trim() : filteredText.result
