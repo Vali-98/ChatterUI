@@ -5,14 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import ChatEditPopup from './ChatEditPopup'
 
-type ListItem = {
-    id: number
-    character_id: number
-    create_date: Date
-    name: string
-    last_modified: null | number
-    entryCount: number
-}
+type ListItem = Awaited<ReturnType<typeof Chats.db.query.chatListQuery>>[0]
 
 type ChatDrawerItemProps = {
     item: ListItem
