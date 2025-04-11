@@ -674,6 +674,10 @@ export namespace Chats {
             export const renameChat = async (chatId: number, name: string) => {
                 await database.update(chats).set({ name: name }).where(eq(chats.id, chatId))
             }
+
+            export const updateUser = async (chatId: number, userId: number) => {
+                await database.update(chats).set({ user_id: userId }).where(eq(chats.id, chatId))
+            }
         }
     }
 

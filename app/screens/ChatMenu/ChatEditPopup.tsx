@@ -2,23 +2,14 @@ import Alert from '@components/views/Alert'
 import PopupMenu, { MenuRef } from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { Characters } from '@lib/state/Characters'
-import { Chats } from '@lib/state/Chat'
+import { ChatData, Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
 import { saveStringToDownload } from '@lib/utils/File'
 import React, { useState } from 'react'
 import { View } from 'react-native'
 
-type ListItem = {
-    id: number
-    character_id: number
-    create_date: Date
-    name: string
-    last_modified: null | number
-    entryCount: number
-}
-
 type ChatEditPopupProps = {
-    item: ListItem
+    item: ChatData
 }
 
 const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
@@ -27,6 +18,11 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
     const { charName, charId } = Characters.useCharacterCard((state) => ({
         charId: state.id,
         charName: state.card?.name ?? 'Unknown',
+    }))
+
+    const { userId, userName } = Characters.useUserCard((state) => ({
+        userId: state.id,
+        userName: state.card?.name,
     }))
 
     const { deleteChat, loadChat, chatId, unloadChat } = Chats.useChat()
@@ -83,6 +79,16 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
         Logger.infoToast(`File: ${name} saved to downloads!`)
     }
 
+    const handleLinkUser = async () => {
+        if (userId === item.user_id) return
+        if (!userId) {
+            Logger.errorToast('No current User')
+            return
+        }
+        await Chats.db.mutate.updateUser(item.id, userId)
+        Logger.errorToast(`Linked to User: ${userName}`)
+    }
+
     return (
         <View>
             <TextBoxModal
@@ -113,6 +119,11 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
                         label: 'Clone',
                         icon: 'copy1',
                         onPress: handleCloneChat,
+                    },
+                    {
+                        label: 'Link User',
+                        icon: 'user',
+                        onPress: handleLinkUser,
                     },
                     {
                         label: 'Delete',
