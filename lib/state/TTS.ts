@@ -6,7 +6,6 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 type TTSState = {
-    active: boolean
     activeChatIndex?: number
     voice?: Speech.Voice
     enabled: boolean
@@ -18,7 +17,24 @@ type TTSState = {
     setAuto: (b: boolean) => void
     setVoice: (v: Speech.Voice) => void
     setRate: (r: number) => void
+    setLiveTTS: (b: boolean) => void
+
+    speak: (text: string, onDone?: () => void, onStop?: () => void) => void
+    handleEndGeneration: (lastIndex: number, text: string) => Promise<void>
+    // stream TTS
+    liveTTS: boolean
+    buffer: string
+    clearAndRunBuffer: (lastIndex: number) => void
+    clearBuffer: () => void
+    /**
+     * Inserts text into the buffer, attempts TTS if valid sentence and adds remainder to buffer
+     * @param text text for TTS
+     * @returns
+     */
+    insertBuffer: (text: string) => void
 }
+
+const sentenceEndRegex = /(?<=[^\d])([.?!])(?:["'`*_)]*)\s+(?=[A-Z0-9])|([.?!])(?:["'`*_)]*)$/gm
 
 export const useTTS = () => {
     const {
@@ -33,6 +49,8 @@ export const useTTS = () => {
         enabled,
         voice,
         rate,
+        live,
+        setLive,
     } = useTTSState((state) => ({
         startTTS: state.startTTS,
         stopTTS: state.stopTTS,
@@ -45,6 +63,8 @@ export const useTTS = () => {
         enabled: state.enabled,
         voice: state.voice,
         rate: state.rate,
+        live: state.liveTTS,
+        setLive: state.setLiveTTS,
     }))
     return {
         startTTS,
@@ -58,6 +78,8 @@ export const useTTS = () => {
         enabled,
         voice,
         rate,
+        live,
+        setLive,
     }
 }
 
@@ -67,13 +89,13 @@ export const useTTSState = create<TTSState>()(
             voice: undefined,
             enabled: false,
             auto: false,
-            active: false,
+            liveTTS: false,
             rate: 1,
             activeChatIndex: undefined,
             startTTS: async (text: string, index: number, exitCallback = () => {}) => {
                 const clearIndex = () => {
                     if (get().activeChatIndex === index)
-                        set((state) => ({ ...state, activeChatIndex: undefined }))
+                        set((state) => ({ activeChatIndex: undefined }))
                 }
 
                 const currentSpeaker = get().voice
@@ -116,20 +138,86 @@ export const useTTSState = create<TTSState>()(
             },
             stopTTS: async () => {
                 Logger.info('TTS stopped')
-                set((state) => ({ ...state, activeChatIndex: undefined }))
+                set((state) => ({ activeChatIndex: undefined }))
                 await Speech.stop()
             },
             setEnabled: (b: boolean) => {
-                set((state) => ({ ...state, enabled: b }))
+                set((state) => ({ enabled: b }))
             },
             setAuto: (b: boolean) => {
-                set((state) => ({ ...state, auto: b }))
+                set((state) => ({ auto: b }))
             },
             setVoice: (v: Speech.Voice) => {
-                set((state) => ({ ...state, voice: v }))
+                set((state) => ({ voice: v }))
             },
             setRate: (r: number) => {
-                set((state) => ({ ...state, rate: r }))
+                set((state) => ({ rate: r }))
+            },
+            setLiveTTS: (b: boolean) => {
+                set((state) => ({ liveTTS: b }))
+            },
+            speak: (text, onDone = () => {}, onStop = () => {}) => {
+                const currentSpeaker = get().voice
+                Speech.speak(text, {
+                    language: currentSpeaker?.language,
+                    voice: currentSpeaker?.identifier,
+                    onDone: onDone,
+                    onStopped: onStop,
+                    rate: get().rate,
+                })
+            },
+
+            handleEndGeneration: async (lastIndex, text) => {
+                if (get().activeChatIndex !== undefined) return
+                if (get().liveTTS) {
+                    get().clearAndRunBuffer(lastIndex)
+                } else if (get().enabled && get().auto) {
+                    await get().stopTTS()
+                    get().startTTS(text, lastIndex)
+                }
+            },
+
+            // Stream Data
+
+            buffer: '',
+            clearAndRunBuffer: (lastIndex) => {
+                const buffer = get().buffer
+
+                if (buffer.trim()) {
+                    const clean = cleanMarkdown(buffer)
+                    if (clean) {
+                        set({ activeChatIndex: lastIndex })
+                        get().speak(clean, () => set({ activeChatIndex: undefined }))
+                    }
+                }
+                set({ buffer: '' })
+            },
+            clearBuffer: () => {
+                set({ buffer: '' })
+            },
+            insertBuffer: (text: string) => {
+                const live = get().liveTTS
+                if (!live) return
+                const newBuffer = get().buffer + text
+
+                let lastMatchIndex = -1
+                let match
+
+                while ((match = sentenceEndRegex.exec(newBuffer)) !== null) {
+                    lastMatchIndex = sentenceEndRegex.lastIndex
+                }
+
+                if (lastMatchIndex !== -1) {
+                    const fullSentence = newBuffer.slice(0, lastMatchIndex).trim()
+                    const remainder = newBuffer.slice(lastMatchIndex)
+                    const clean = cleanMarkdown(fullSentence)
+                    if (clean) {
+                        get().speak(clean)
+                    }
+                    set({ buffer: remainder })
+                } else {
+                    set({ buffer: newBuffer })
+                }
             },
         }),
         {
@@ -141,7 +229,13 @@ export const useTTSState = create<TTSState>()(
                 auto: state.auto,
                 voice: state.voice,
                 rate: state.rate,
+                liveTTS: state.liveTTS,
             }),
         }
     )
 )
+
+const cleanMarkdown = (text: string): string => {
+    const result = text.replace(/([*_]{1,2}|`|\[\^.*?\]\(.*?\)|<\/?[^>]+>)/g, '')
+    return result
+}

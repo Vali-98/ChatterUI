@@ -19,7 +19,8 @@ type LanguageListItem = {
 
 const TTSMenu = () => {
     const { color } = Theme.useTheme()
-    const { voice, setVoice, enabled, setEnabled, auto, setAuto, rate, setRate } = useTTS()
+    const { voice, setVoice, enabled, setEnabled, auto, setAuto, rate, setRate, live, setLive } =
+        useTTS()
     const [lang, setLang] = useState(voice?.language ?? 'en-US')
     const [modelList, setModelList] = useState<Speech.Voice[]>([])
     const languageList: LanguageListItem = groupBy(modelList, 'language')
@@ -65,8 +66,24 @@ const TTSMenu = () => {
 
             <ThemedSwitch
                 value={auto}
-                onChangeValue={setAuto}
-                label="Automatically TTS On Inference"
+                onChangeValue={(value) => {
+                    if (value) {
+                        setLive(false)
+                    }
+                    setAuto(value)
+                }}
+                label="Automatically TTS After Inference"
+            />
+
+            <ThemedSwitch
+                value={live}
+                onChangeValue={(value) => {
+                    if (value) {
+                        setAuto(false)
+                    }
+                    setLive(value)
+                }}
+                label="Automatically TTS During Inference"
             />
 
             <ThemedSlider

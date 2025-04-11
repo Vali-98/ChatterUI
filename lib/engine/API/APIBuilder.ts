@@ -4,6 +4,7 @@ import { Characters } from '@lib/state/Characters'
 import { Chats, useInference } from '@lib/state/Chat'
 import { Instructs, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
+import { useTTSState } from '@lib/state/TTS'
 import { nativeApplicationVersion } from 'expo-application'
 
 import { APIState } from './APIManagerState'
@@ -119,8 +120,9 @@ const readableStreamResponse = async (
     })
 
     sse.setOnEvent((data) => {
-        const text = jsonreader(data) ?? ''
-        Chats.useChatState.getState().insertBuffer(text.replaceAll(replace, ''))
+        const text = (jsonreader(data) ?? '').replaceAll(replace, '')
+        Chats.useChatState.getState().insertBuffer(text)
+        useTTSState.getState().insertBuffer(text)
     })
 
     sse.setOnError(() => {
@@ -234,8 +236,9 @@ const hordeResponse = async (
             .join(`|`),
         'g'
     )
-
-    Chats.useChatState.getState().setBuffer(result.generations[0].text.replaceAll(replace, ''))
+    const text = result.generations[0].text.replaceAll(replace, '')
+    Chats.useChatState.getState().setBuffer(text)
+    useTTSState.getState().insertBuffer(text)
     Chats.useChatState.getState().stopGenerating()
 }
 

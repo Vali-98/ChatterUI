@@ -6,6 +6,7 @@ import { Chats, useInference } from '@lib/state/Chat'
 import { Instructs, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { SamplersManager } from '@lib/state/SamplerState'
+import { useTTSState } from '@lib/state/TTS'
 import { mmkv } from '@lib/storage/MMKV'
 import { CompletionTimings } from 'db/schema'
 
@@ -231,6 +232,7 @@ const runLocalCompletion = async (payload: Awaited<ReturnType<typeof buildLocalP
 
     const outputStream = (text: string) => {
         Chats.useChatState.getState().insertBuffer(text)
+        useTTSState.getState().insertBuffer(text)
     }
 
     const outputCompleted = (text: string, timings: CompletionTimings) => {
