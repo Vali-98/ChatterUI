@@ -5,6 +5,8 @@ import * as Speech from 'expo-speech'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
+import { Chats, useInference } from './Chat'
+
 type TTSState = {
     activeChatIndex?: number
     voice?: Speech.Voice
@@ -21,8 +23,11 @@ type TTSState = {
 
     speak: (text: string, onDone?: () => void, onStop?: () => void) => void
     handleEndGeneration: (lastIndex: number, text: string) => Promise<void>
+    handleStartGeneration: (lastIndex: number) => void
     // stream TTS
     liveTTS: boolean
+    pauseLive?: boolean
+    setPauseLive: (b: boolean) => void
     buffer: string
     clearAndRunBuffer: (lastIndex: number) => void
     clearBuffer: () => void
@@ -82,6 +87,21 @@ export const useTTS = () => {
         setLive,
     }
 }
+
+useInference.subscribe(({ nowGenerating }) => {
+    const data = Chats.useChatState.getState().data
+    const length = data?.messages?.length
+    if (!length) return
+    if (!nowGenerating) {
+        const message = data?.messages?.[length - 1]
+        if (!message) return
+        useTTSState
+            .getState()
+            .handleEndGeneration(length - 1, message.swipes[message.swipe_id].swipe)
+    } else {
+        useTTSState.getState().handleStartGeneration(length - 1)
+    }
+})
 
 export const useTTSState = create<TTSState>()(
     persist(
@@ -156,6 +176,9 @@ export const useTTSState = create<TTSState>()(
             setLiveTTS: (b: boolean) => {
                 set((state) => ({ liveTTS: b }))
             },
+            setPauseLive: (b: boolean) => {
+                set((state) => ({ pauseLive: b }))
+            },
             speak: (text, onDone = () => {}, onStop = () => {}) => {
                 const currentSpeaker = get().voice
                 Speech.speak(text, {
@@ -177,18 +200,25 @@ export const useTTSState = create<TTSState>()(
                 }
             },
 
+            handleStartGeneration: (lastIndex) => {
+                if (get().liveTTS) set({ activeChatIndex: lastIndex })
+                set({ pauseLive: false })
+            },
+
             // Stream Data
 
             buffer: '',
             clearAndRunBuffer: (lastIndex) => {
                 const buffer = get().buffer
 
-                if (buffer.trim()) {
+                if (!get().pauseLive && buffer.trim()) {
                     const clean = cleanMarkdown(buffer)
                     if (clean) {
                         set({ activeChatIndex: lastIndex })
                         get().speak(clean, () => set({ activeChatIndex: undefined }))
                     }
+                } else {
+                    set({ activeChatIndex: undefined })
                 }
                 set({ buffer: '' })
             },
@@ -196,8 +226,7 @@ export const useTTSState = create<TTSState>()(
                 set({ buffer: '' })
             },
             insertBuffer: (text: string) => {
-                const live = get().liveTTS
-                if (!live) return
+                if (!get().liveTTS || get().pauseLive) return
                 const newBuffer = get().buffer + text
 
                 let lastMatchIndex = -1
@@ -212,7 +241,16 @@ export const useTTSState = create<TTSState>()(
                     const remainder = newBuffer.slice(lastMatchIndex)
                     const clean = cleanMarkdown(fullSentence)
                     if (clean) {
-                        get().speak(clean)
+                        get().speak(
+                            clean,
+                            () => {},
+                            () =>
+                                set({
+                                    pauseLive: true,
+                                    activeChatIndex: undefined,
+                                    buffer: '',
+                                })
+                        )
                     }
                     set({ buffer: remainder })
                 } else {

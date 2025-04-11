@@ -1,6 +1,5 @@
 import { db as database } from '@db'
 import { Tokenizer } from '@lib/engine/Tokenizer'
-import { useTTSState } from '@lib/state/TTS'
 import { replaceMacros } from '@lib/utils/Macros'
 import { convertToFormatInstruct } from '@lib/utils/TextFormat'
 import { chatEntries, chats, ChatSwipe, chatSwipes, CompletionTimings } from 'db/schema'
@@ -156,14 +155,6 @@ export namespace Chats {
             await get().updateFromBuffer(cachedSwipeId)
             useInference.getState().stopGenerating()
             get().setBuffer({ data: '' })
-
-            const length = get().data?.messages?.length
-            if (!length) return
-            const message = get().data?.messages?.[length - 1]
-            if (!message) return
-            useTTSState
-                .getState()
-                .handleEndGeneration(length - 1, message.swipes[message.swipe_id].swipe)
         },
         load: async (chatId: number) => {
             const data = await db.query.chat(chatId)
