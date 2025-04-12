@@ -200,8 +200,11 @@ export const useTTSState = create<TTSState>()(
                 }
             },
 
-            handleStartGeneration: (lastIndex) => {
-                if (get().liveTTS) set({ activeChatIndex: lastIndex })
+            handleStartGeneration: async (lastIndex) => {
+                if (get().liveTTS) {
+                    await Speech.stop()
+                    set({ activeChatIndex: lastIndex })
+                }
                 set({ pauseLive: false })
             },
 
