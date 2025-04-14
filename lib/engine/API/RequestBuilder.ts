@@ -198,7 +198,6 @@ const buildFields = (config: APIConfiguration, values: APIValues) => {
     const instructLength =
         typeof instructLengthField === 'number' ? instructLengthField : (modelLengthField ?? 0)
     const modelLength = modelLengthField ?? instructLength
-    console.log(modelLength, instructLengthField)
     const length = config.model.useModelContextLength
         ? Math.min(modelLength, instructLength)
         : instructLength
