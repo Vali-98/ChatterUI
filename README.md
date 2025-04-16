@@ -6,7 +6,7 @@ Run LLMs on device or connect to various commercial or open source APIs. Chatter
 
 If you like the app, feel free support me here:
 
-<a href='https://ko-fi.com/W7W7X8T7W' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+<a href='https://ko-fi.com/W7W7X8T7W' target='_blank'><img height='42' style='border:0px;height:42px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 <div>
 Chat With Characters or Assistants
@@ -129,13 +129,7 @@ eas build --platform android --local
 
 ### IOS
 
-Currently untested as I do not own hardware for iOS development. Assistance here would be greatly appreciated!
-
-Possible issues:
-
--   cui-fs having no Swift integration
--   Platform specific shadows
--   Exporting files not using shareAsync
+Currently in development
 
 ## Acknowledgement
 
