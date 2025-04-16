@@ -1,6 +1,5 @@
 import { Stack } from 'expo-router'
 import { ReactNode } from 'react'
-import { NativeStackScreenProps } from 'react-native-screens/lib/typescript/native-stack/types'
 
 type HeaderButtonProps = {
     headerRight?: () => ReactNode
@@ -12,3 +11,4 @@ const HeaderButton: React.FC<HeaderButtonProps> = ({ ...rest }) => {
 }
 
 export default HeaderButton
+

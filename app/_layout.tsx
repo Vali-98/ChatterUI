@@ -35,13 +35,13 @@ const Layout = () => {
             <MenuProvider>
                 <Stack
                     screenOptions={{
+                        headerBackButtonDisplayMode: 'minimal',
                         headerStyle: { backgroundColor: color.neutral._100 },
                         headerTitleStyle: { color: color.text._100 },
                         headerTintColor: color.text._100,
                         contentStyle: { backgroundColor: color.neutral._100 },
                         headerShadowVisible: false,
                         headerTitleAlign: 'center',
-                        presentation: 'transparentModal',
                         statusBarBackgroundColor: color.neutral._100,
                     }}>
                     <Stack.Screen name="index" options={{ animation: 'fade' }} />
@@ -52,3 +52,4 @@ const Layout = () => {
 }
 
 export default Layout
+
