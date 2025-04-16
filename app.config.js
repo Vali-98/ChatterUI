@@ -44,13 +44,6 @@ module.exports = {
                 },
             ],
             [
-                'expo-custom-assets',
-                {
-                    assetsPaths: ['./assets/models'],
-                    assetsDirName: 'appAssets',
-                },
-            ],
-            [
                 'expo-build-properties',
                 {
                     android: {
