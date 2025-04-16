@@ -1,11 +1,17 @@
 import { useAppModeState } from '@lib/state/AppMode'
 import { Logger } from '@lib/state/Logger'
-import { copyFileRes } from 'cui-fs'
 import { initLlama, LlamaContext } from 'cui-llama.rn'
-import { deleteAsync, documentDirectory, getInfoAsync, makeDirectoryAsync } from 'expo-file-system'
+import {
+    copyAsync,
+    deleteAsync,
+    documentDirectory,
+    getInfoAsync,
+    makeDirectoryAsync,
+} from 'expo-file-system'
 import { create } from 'zustand'
 
 import { Llama } from './Local/LlamaLocal'
+import { Asset } from 'expo-asset'
 
 type TokenizerState = {
     model?: LlamaContext
@@ -27,13 +33,7 @@ export namespace Tokenizer {
         loadModel: async () => {
             if (get().model) return
 
-            const folderDir = `${documentDirectory}appAssets/`
-            const folderExists = (await getInfoAsync(folderDir)).exists
-            if (!folderExists) await makeDirectoryAsync(`${documentDirectory}appAssets`)
-
-            const modelDir = `${folderDir}llama3tokenizer.gguf`
-            const modelExists = (await getInfoAsync(modelDir)).exists
-            if (!modelExists) await importModelFromRes()
+            await importModelFromRes()
 
             const context = await initLlama({
                 model: documentDirectory + 'appAssets/llama3tokenizer.gguf',
@@ -45,11 +45,16 @@ export namespace Tokenizer {
     }))
 
     const importModelFromRes = async () => {
+        const folderDir = `${documentDirectory}appAssets/`
+        const folderExists = (await getInfoAsync(folderDir)).exists
+        if (!folderExists) await makeDirectoryAsync(`${documentDirectory}appAssets`)
+        const modelDir = `${folderDir}llama3tokenizer.gguf`
+        const modelExists = (await getInfoAsync(modelDir)).exists
+        if (modelExists) return
         Logger.info('Importing Tokenizer')
-        await copyFileRes(
-            'llama3tokenizer.gguf',
-            documentDirectory + 'appAssets/llama3tokenizer.gguf'
-        )
+        const [asset] = await Asset.loadAsync(require('./../../assets/models/llama3tokenizer.gguf'))
+        await asset.downloadAsync()
+        if (asset.localUri) await copyAsync({ from: asset.localUri, to: modelDir })
     }
 
     export const debugDeleteModel = async () => {
@@ -71,3 +76,4 @@ export namespace Tokenizer {
 }
 
 Tokenizer.useDefaultTokenizer.getState().loadModel()
+

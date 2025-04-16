@@ -1,7 +1,7 @@
 import { db as database } from '@db'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Storage } from '@lib/enums/Storage'
-import { copyFileRes, writeFile } from 'cui-fs'
+import { writeFile } from 'cui-fs'
 import {
     characterGreetings,
     characterTags,
@@ -24,6 +24,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { Logger } from './Logger'
 import { mmkvStorage } from '../storage/MMKV'
 import { getPngChunkText } from '../utils/PNG'
+import { Asset } from 'expo-asset'
 
 export type CharInfo = {
     name: string
@@ -805,7 +806,11 @@ export namespace Characters {
         const cardDefaultDir = `${FS.documentDirectory}appAssets/${pngName}`
 
         const fileinfo = await FS.getInfoAsync(cardDefaultDir)
-        if (!fileinfo.exists) await copyFileRes(resName, cardDefaultDir)
+        if (!fileinfo.exists) {
+            const [asset] = await Asset.loadAsync(require('./../../assets/models/aibot.png'))
+            await asset.downloadAsync()
+            if (asset.localUri) await FS.copyAsync({ from: asset.localUri, to: cardDefaultDir })
+        }
         await createCharacterFromImage(cardDefaultDir)
     }
 
@@ -950,3 +955,4 @@ export const replaceMacros = (text: string) => {
     for (const rule of rules) newtext = newtext.replaceAll(rule.macro, rule.value)
     return newtext
 }
+

@@ -14,6 +14,7 @@ module.exports = {
         ios: {
             supportsTablet: true,
             package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
+            bundleIdentifier: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
         },
         android: {
             adaptiveIcon: {
@@ -36,6 +37,12 @@ module.exports = {
             favicon: './assets/images/adaptive-icon.png',
         },
         plugins: [
+            [
+                'expo-asset',
+                {
+                    assets: ['./assets/models/aibot.png', './assets/models/llama3tokenizer.gguf'],
+                },
+            ],
             [
                 'expo-custom-assets',
                 {
@@ -96,3 +103,4 @@ module.exports = {
         },
     },
 }
+

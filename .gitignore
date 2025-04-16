@@ -6,17 +6,12 @@ node_modules*
 # dev items
 public/
 
-# Android Build
+# builds
 android
 eas.json
 *.apk
 .gradle
-
-# IoS Build
-./ios
-
-# builds
-builds/
+ios
 
 # Expo
 .expo/
