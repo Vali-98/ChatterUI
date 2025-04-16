@@ -3,8 +3,8 @@ import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
+import { localDownload } from '@vali98/react-native-fs'
 import appConfig from 'app.config'
-import { copyFile, DocumentDirectoryPath, DownloadDirectoryPath } from 'cui-fs'
 import { reloadAppAsync } from 'expo'
 import { getDocumentAsync } from 'expo-document-picker'
 import { copyAsync, deleteAsync, documentDirectory } from 'expo-file-system'
@@ -14,14 +14,11 @@ import { Text, View } from 'react-native'
 const appVersion = appConfig.expo.version
 
 const exportDB = async (notify: boolean = true) => {
-    await copyFile(
-        `${DocumentDirectoryPath}/SQLite/db.db`,
-        `${DownloadDirectoryPath}/${appVersion}-db-backup.db`
-    )
+    await localDownload(`${documentDirectory}/SQLite/db.db`.replace('file://', ''))
         .then(() => {
             if (notify) Logger.infoToast('Download Successful!')
         })
-        .catch((e) => Logger.errorToast('Failed to copy database: ' + e))
+        .catch((e: string) => Logger.errorToast('Failed to copy database: ' + e))
 }
 
 const importDB = async (uri: string, name: string) => {
@@ -112,3 +109,4 @@ const DatabaseSettings = () => {
 }
 
 export default DatabaseSettings
+

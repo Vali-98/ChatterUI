@@ -1,8 +1,13 @@
-import { DownloadDirectoryPath, writeFile } from 'cui-fs'
 import { getDocumentAsync } from 'expo-document-picker'
-import { documentDirectory, readAsStringAsync } from 'expo-file-system'
+import {
+    cacheDirectory,
+    documentDirectory,
+    readAsStringAsync,
+    writeAsStringAsync,
+} from 'expo-file-system'
 
 import { Logger } from '../state/Logger'
+import { localDownload } from '@vali98/react-native-fs'
 
 export const AppDirectory = {
     ModelPath: `${documentDirectory}models/`,
@@ -20,10 +25,12 @@ export const AppDirectory = {
 export const saveStringToDownload = async (
     data: string,
     filename: string,
-    encoding: 'ascii' | 'base64' | `utf8`
+    encoding: 'base64' | `utf8`
 ) => {
-    if (encoding === 'utf8') data = btoa(data)
-    await writeFile(`${DownloadDirectoryPath}/${filename}`, data, { encoding: encoding })
+    await writeAsStringAsync(cacheDirectory + filename, data, { encoding })
+    await localDownload(cacheDirectory?.replace('file://', '') + filename).catch((e) =>
+        Logger.error('Failed to download: ' + e)
+    )
 }
 
 type PickerResult = { success: false } | { success: true; data: string }
@@ -81,3 +88,4 @@ export const readableFileSize = (size: number) => {
         return `${sizeInGB.toFixed(2)} GB`
     }
 }
+

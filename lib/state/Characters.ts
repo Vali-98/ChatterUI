@@ -1,7 +1,6 @@
 import { db as database } from '@db'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Storage } from '@lib/enums/Storage'
-import { writeFile } from 'cui-fs'
 import {
     characterGreetings,
     characterTags,
@@ -715,7 +714,7 @@ export namespace Characters {
             let binaryString = ''
             dataArray.forEach((byte) => (binaryString += String.fromCharCode(byte)))
             const cardCacheDir = `${FS.cacheDirectory}${randomUUID()}.png`
-            await writeFile(cardCacheDir, btoa(binaryString), { encoding: 'base64' })
+            await FS.writeAsStringAsync(cardCacheDir, btoa(binaryString), { encoding: 'base64' })
             return createCharacterFromImage(cardCacheDir)
         } catch (error) {
             Logger.error(`Could not retreive card. ${error}`)
@@ -751,9 +750,8 @@ export namespace Characters {
         dataArray.forEach((byte) => (binaryString += String.fromCharCode(byte)))
         const uuid = randomUUID()
 
-        await writeFile(`${FS.cacheDirectory}${uuid}.png`, btoa(binaryString), {
-            encoding: 'base64',
-        })
+        const cardCacheDir = `${FS.cacheDirectory}${randomUUID()}.png`
+        await FS.writeAsStringAsync(cardCacheDir, btoa(binaryString), { encoding: 'base64' })
         await db.mutate.createCharacter(character, `${FS.cacheDirectory}${uuid}.png`)
         Logger.info('Imported Character: ' + character.data.name)
     }
