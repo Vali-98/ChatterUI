@@ -5,6 +5,8 @@ on:
         branches:
             - master
             - dev
+        paths-ignore:
+            - 'README.md'
 
 jobs:
     trigger-build:
@@ -24,3 +26,4 @@ jobs:
                   elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
                     curl -X GET ${{ secrets.TS_BUILD_DEV_API }}
                   fi
+

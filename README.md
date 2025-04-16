@@ -6,7 +6,7 @@ Run LLMs on device or connect to various commercial or open source APIs. Chatter
 
 If you like the app, feel free support me here:
 
-<a href="https://ko-fi.com/vali98" target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Support me on ko-fi.com' /></a>
+<a href='https://ko-fi.com/W7W7X8T7W' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 <div>
 Chat With Characters or Assistants
@@ -133,7 +133,6 @@ Currently untested as I do not own hardware for iOS development. Assistance here
 
 Possible issues:
 
--   cui-llama.rn lacking Swift implementation for cui-specific functions
 -   cui-fs having no Swift integration
 -   Platform specific shadows
 -   Exporting files not using shareAsync
@@ -142,3 +141,4 @@ Possible issues:
 
 -   [llama.cpp](https://github.com/ggerganov/llama.cpp) - the underlying engine to run LLMs
 -   [llama.rn](https://github.com/mybigday/llama.rn) - the original react-native llama.cpp adapter
+
