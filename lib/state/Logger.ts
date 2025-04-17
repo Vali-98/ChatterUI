@@ -3,10 +3,11 @@ import Toast from 'react-native-simple-toast'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-import { AppSettings, Global } from '../constants/GlobalValues'
+import { AppSettings } from '../constants/GlobalValues'
 import { mmkv, mmkvStorage } from '../storage/MMKV'
+import { Theme } from '@lib/theme/ThemeManager'
 
-const toastTime = 2000
+const toastTime = Toast.SHORT
 const maxloglength = 2000
 
 export enum LogLevel {
@@ -95,7 +96,7 @@ export namespace Logger {
 
     export const warnToast = (data: string) => {
         warn(data)
-        Toast.show(data, toastTime)
+        Toast.show(data, toastTime, { textColor: 'yellow' })
     }
 
     export const error = (data: string) => {
@@ -106,7 +107,7 @@ export namespace Logger {
 
     export const errorToast = (data: string) => {
         error(data)
-        Toast.show(data, toastTime)
+        Toast.show(data, toastTime, { textColor: 'red' })
     }
 
     export const debug = (data: string) => {
@@ -118,6 +119,9 @@ export namespace Logger {
 
     export const debugToast = (data: string) => {
         error(data)
-        Toast.show(data, toastTime)
+        Toast.show(data, toastTime, {
+            textColor: 'blue',
+        })
     }
 }
+
