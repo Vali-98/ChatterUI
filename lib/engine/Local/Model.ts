@@ -12,6 +12,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { GGMLNameMap, GGMLType } from './GGML'
+import { Platform } from 'react-native'
 
 export type ModelData = Omit<ModelDataType, 'id' | 'create_date' | 'last_modified'>
 
@@ -78,12 +79,15 @@ export namespace Model {
         const fileList = await getModelList()
 
         // cull missing models
-        modelList.forEach(async (item) => {
-            if (item.name === '' || !(await getInfoAsync(item.file_path)).exists) {
-                Logger.warnToast(`Model Missing, its entry will be deleted: ${item.name}`)
-                await db.delete(model_data).where(eq(model_data.id, item.id))
-            }
-        })
+        if (Platform.OS === 'android')
+            // cull not required on iOS
+            modelList.forEach(async (item) => {
+                if (item.name === '' || !(await getInfoAsync(item.file_path)).exists) {
+                    Logger.warnToast(`Model Missing, its entry will be deleted: ${item.name}`)
+                    await db.delete(model_data).where(eq(model_data.id, item.id))
+                }
+            })
+
         // refresh as some may have been deleted
         modelList = await db.query.model_data.findMany()
 
@@ -284,3 +288,4 @@ export namespace KV {
         Logger.info(`Size of KV cache: ${Math.floor(data.size * 0.000001)} MB`)
     }
 }
+
