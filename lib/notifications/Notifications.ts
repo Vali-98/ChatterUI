@@ -1,6 +1,7 @@
+import Alert from '@components/views/Alert'
 import { Logger } from '@lib/state/Logger'
 import * as Notifications from 'expo-notifications'
-import { Platform } from 'react-native'
+import { Linking, Platform } from 'react-native'
 
 export async function registerForPushNotificationsAsync() {
     if (Platform.OS === 'android') {
@@ -19,9 +20,24 @@ export async function registerForPushNotificationsAsync() {
         finalStatus = status
     }
     if (finalStatus !== 'granted') {
-        Logger.warnToast('You may need to enable notifications manually')
+        Alert.alert({
+            title: 'Permission Required',
+            description: 'ChatterUI requires permissions to send you notifications.',
+            buttons: [
+                {
+                    label: 'Cancel',
+                },
+                {
+                    label: 'Open Permissions',
+                    onPress: () => {
+                        Linking.openSettings()
+                    },
+                },
+            ],
+        })
         return false
     }
 
     return true
 }
+
