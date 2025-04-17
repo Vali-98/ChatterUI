@@ -12,6 +12,11 @@ module.exports = {
         userInterfaceStyle: 'automatic',
         assetBundlePatterns: ['**/*'],
         ios: {
+            icon: {
+                dark: './assets/images/ios-dark.png',
+                light: './assets/images/ios-light.png',
+                tinted: './assets/images/icon.png',
+            },
             supportsTablet: true,
             package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
             bundleIdentifier: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
