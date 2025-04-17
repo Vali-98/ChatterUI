@@ -10,6 +10,7 @@ import GeneratingSettings from './GeneratingSettings'
 import ScreenSettings from './ScreenSettings'
 import SecuritySettings from './SecuritySettings'
 import StyleSettings from './StyleSettings'
+import NotificationSettings from './NotificationSettings'
 
 const AppSettingsMenu = () => {
     const { spacing } = Theme.useTheme()
@@ -26,11 +27,12 @@ const AppSettingsMenu = () => {
 
             <StyleSettings />
             <ChatSettings />
-            <GeneratingSettings />
             <CharacterSettings />
+            <GeneratingSettings />
+            <NotificationSettings />
+            <ScreenSettings />
             <DatabaseSettings />
             <SecuritySettings />
-            <ScreenSettings />
 
             <View style={{ paddingVertical: spacing.xl3 }} />
         </ScrollView>
@@ -38,3 +40,4 @@ const AppSettingsMenu = () => {
 }
 
 export default AppSettingsMenu
+
