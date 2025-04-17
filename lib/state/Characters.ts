@@ -369,9 +369,11 @@ export namespace Characters {
                 name: string,
                 type: 'user' | 'character' = 'character'
             ) => {
+                const { data } = createBlankV2Card(name)
+
                 const [{ id }, ..._] = await database
                     .insert(characters)
-                    .values({ ...createBlankV2Card(name), type: type })
+                    .values({ ...data, type: type })
                     .returning({ id: characters.id })
                 return id
             }
@@ -865,35 +867,6 @@ type CharaterCardV1 = z.infer<typeof characterCardV1Schema>
 type CharacterCardV2Data = z.infer<typeof characterCardV2DataSchema>
 
 type CharacterCardV2 = z.infer<typeof characterCardV2Schema>
-
-export type CharacterCardV2DataOld = {
-    name: string
-    description: string
-    personality: string
-    scenario: string
-    first_mes: string
-    mes_example: string
-
-    // New fields start here
-    creator_notes: string
-    system_prompt: string
-    post_history_instructions: string
-    alternate_greetings: string[]
-    //for ChatterUI this will be removed into its own table
-    //character_book: string
-
-    // May 8th additions
-    tags: string[]
-    creator: string
-    character_version: string
-    //extensions: {},
-}
-
-export type CharacterCardV2Old = {
-    spec: 'chara_card_v2'
-    spec_version: '2.0'
-    data: CharacterCardV2Data
-}
 
 const createBlankV2Card = (
     name: string,

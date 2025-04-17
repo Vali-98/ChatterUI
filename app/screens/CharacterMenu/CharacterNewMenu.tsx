@@ -1,7 +1,6 @@
 import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { Characters } from '@lib/state/Characters'
-import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
@@ -91,3 +90,4 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
 }
 
 export default CharacterNewMenu
+
