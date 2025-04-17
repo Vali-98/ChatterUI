@@ -5,16 +5,16 @@ interface FallbackImageProps extends Omit<ImageProps, 'source' | 'onError'> {
 }
 
 const Avatar: React.FC<FallbackImageProps> = ({ targetImage, ...rest }) => {
-    const fallbackImage = require('@assets/user.png')
-
     return (
         <Image
             {...rest}
             source={{ uri: targetImage }}
-            placeholder={fallbackImage}
+            placeholder={require('@assets/user.png')}
             cachePolicy="none"
+            placeholderContentFit="contain"
         />
     )
 }
 
 export default Avatar
+
