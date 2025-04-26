@@ -469,6 +469,7 @@ export const defaultTemplates: APIConfiguration[] = [
             stopKey: 'stop',
             promptKey: 'messages',
             removeLength: true,
+            removeSeedifNegative: true,
         },
 
         payload: {
@@ -771,3 +772,4 @@ export const defaultTemplates: APIConfiguration[] = [
         },
     },
 ]
+
