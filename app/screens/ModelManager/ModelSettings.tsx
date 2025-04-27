@@ -3,27 +3,21 @@ import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
-import { AppSettings, Global } from '@lib/constants/GlobalValues'
-import { Llama, LlamaConfig } from '@lib/engine/Local/LlamaLocal'
+import { AppSettings } from '@lib/constants/GlobalValues'
+import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { KV } from '@lib/engine/Local/Model'
 import { Logger } from '@lib/state/Logger'
 import { readableFileSize } from '@lib/utils/File'
 import { useFocusEffect } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { BackHandler, Platform, View } from 'react-native'
-import { useMMKVBoolean, useMMKVObject } from 'react-native-mmkv'
+import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated'
 
 type ModelSettingsProp = {
     modelImporting: boolean
     modelLoading: boolean
     exit: () => void
-}
-
-type CPUFeatures = {
-    armv8: boolean
-    dotprod: boolean
-    i8mm: boolean
 }
 
 const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoading, exit }) => {
@@ -161,3 +155,4 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
 }
 
 export default ModelSettings
+
