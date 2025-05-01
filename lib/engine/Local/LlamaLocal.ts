@@ -129,6 +129,7 @@ export namespace Llama {
                 n_ctx: config.context_length,
                 n_threads: config.threads,
                 n_batch: config.batch,
+                use_mlock: true,
             }
 
             Logger.info(
@@ -324,3 +325,4 @@ export namespace Llama {
             .catch((err) => Logger.log(`Failed to download: ${err}`))
     }*/
 }
+
