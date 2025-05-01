@@ -14,7 +14,7 @@
     "dev:android": "cross-env APP_VARIANT=development expo run:android",
     "dev:ios": "cross-env APP_VARIANT=development expo run:ios",
     "migrate": "npx drizzle-kit generate",
-    "patchsql": "npx patch-package expo-sqlite --exclude \"\\.project|\\.cxx|build|bin\" --case-sensitive-path-filtering",
+    "patchsql": "npx patch-package expo-sqlite --exclude \"\\.project|\\.cxx|\\.c|\\.h|build|bin\" --case-sensitive-path-filtering",
     "patchfetch": "npx patch-package expo --include '\".*fetch\\.ts$|.*NativeResponse\\.kt$\"'"
   },
   "jest": {
@@ -31,6 +31,7 @@
     "babel-plugin-inline-import": "^3.0.0",
     "babel-plugin-react-compiler": "^19.0.0-beta-a7bf2bd-20241110",
     "cui-llama.rn": "^1.6.0",
+    "drizzle-kit": "^0.31.0",
     "drizzle-orm": "^0.36.2",
     "eas-cli": "^14.5.0",
     "eslint-plugin-react-compiler": "^0.0.0-experimental-7c1344f-20241009",
@@ -65,7 +66,7 @@
     "react-native-gesture-handler": "~2.20.2",
     "react-native-markdown-display": "^7.0.2",
     "react-native-mmkv": "^3.1.0",
-    "react-native-popup-menu": "^0.16.1",
+    "react-native-popup-menu": "^0.17.0",
     "react-native-progress": "^5.0.1",
     "react-native-quick-base64": "^2.1.2",
     "react-native-reanimated": "~3.16.1",
@@ -82,7 +83,6 @@
     "@types/react": "~18.3.12",
     "babel-preset-expo": "^12.0.1",
     "cross-env": "^7.0.3",
-    "drizzle-kit": "^0.30.4",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-universe": "^12.0.0",

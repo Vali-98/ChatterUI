@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-popup-menu/build/rnpm.js b/node_modules/react-native-popup-menu/build/rnpm.js
-index 1111c2d..c8e21c4 100644
+index 47bc91a..198081e 100644
 --- a/node_modules/react-native-popup-menu/build/rnpm.js
 +++ b/node_modules/react-native-popup-menu/build/rnpm.js
 @@ -1,3 +1,5 @@
@@ -8,39 +8,24 @@ index 1111c2d..c8e21c4 100644
  (function (global, factory) {
    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('react-native'), require('react')) :
    typeof define === 'function' && define.amd ? define(['exports', 'react-native', 'react'], factory) :
-@@ -2324,9 +2326,9 @@
+@@ -2017,9 +2019,9 @@
            ref: onRef,
            collapsable: false,
            style: customStyles.triggerOuterWrapper
--        }, /*#__PURE__*/React__default.createElement(Touchable, _extends({
-+        }, /*#__PURE__*/React__default.createElement(Pressable, _extends({
+-        }, React__default.createElement(Touchable, _extends({
++        }, React__default.createElement(Pressable, _extends({
            testID: testID,
 -          onPress: triggerOnLongPress ? onAlternativeAction : onPress,
 +          onPressIn: triggerOnLongPress ? onAlternativeAction : onPress,
            onLongPress: triggerOnLongPress ? onPress : onAlternativeAction
-         }, defaultTouchableProps, customStyles.triggerTouchable), /*#__PURE__*/React__default.createElement(reactNative.View, _extends({}, other, {
+         }, defaultTouchableProps, customStyles.triggerTouchable), React__default.createElement(reactNative.View, _extends({}, other, {
            style: [customStyles.triggerWrapper, style]
-@@ -3211,8 +3213,8 @@
-         wY = windowLayout.y,
+@@ -2900,7 +2902,7 @@
          wWidth = windowLayout.width,
          wHeight = windowLayout.height;
--    var tX = triggerLayout.x,
+     var tX = triggerLayout.x,
 -        tY = triggerLayout.y,
-+    var tX =  triggerLayout.x, 
 +        tY = triggerLayout.y < 0 ? optionsLayout.y : triggerLayout.y,
          tHeight = triggerLayout.height,
          tWidth = triggerLayout.width;
      var oHeight = optionsLayout.height,
-@@ -3311,12 +3313,10 @@
-           }],
-           opacity: this.state.scaleAnim
-         };
--
-         var _computeProperties = computeProperties(layouts, userPlacement, preferredPlacement, isRTL),
-             position = _computeProperties.position,
-             placement = _computeProperties.placement,
-             offset = _computeProperties.offset;
--
-         return /*#__PURE__*/React__default.createElement(reactNative.Animated.View, {
-           style: [styles$6.animated, animation, position, getContainerStyle({
-             placement: placement,
