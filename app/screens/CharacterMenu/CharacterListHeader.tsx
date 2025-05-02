@@ -16,6 +16,7 @@ import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import { create } from 'zustand'
 
 import SortButton, { sortList, SortType } from './SortButton'
+import { useShallow } from 'zustand/react/shallow'
 
 type CharacterListSorterProps = {
     showSearch: boolean
@@ -95,16 +96,18 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
         setTextFilter,
         tagFilter,
         setTagFilter,
-    } = useCharacterListSorter((state) => ({
-        showSearch: state.showSearch,
-        setShowSearch: state.setShowSearch,
-        sortType: state.sortType,
-        setSortType: state.setSortType,
-        textFilter: state.textFilter,
-        setTextFilter: state.setTextFilter,
-        tagFilter: state.tagFilter,
-        setTagFilter: state.setTagFilter,
-    }))
+    } = useCharacterListSorter(
+        useShallow((state) => ({
+            showSearch: state.showSearch,
+            setShowSearch: state.setShowSearch,
+            sortType: state.sortType,
+            setSortType: state.setSortType,
+            textFilter: state.textFilter,
+            setTextFilter: state.setTextFilter,
+            tagFilter: state.tagFilter,
+            setTagFilter: state.setTagFilter,
+        }))
+    )
 
     const { color } = Theme.useTheme()
     const [showTags, setShowTags] = useMMKVBoolean(AppSettings.ShowTags)
@@ -257,3 +260,4 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
 }
 
 export default CharacterListHeader
+

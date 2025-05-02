@@ -11,15 +11,17 @@ import { StyleSheet, Text, View } from 'react-native'
 
 import ChatDrawerItem from './ChatDrawerItem'
 import ChatDrawerSearchItem from './ChatDrawerSearchItem'
+import { useShallow } from 'zustand/react/shallow'
 
 const ChatsDrawer = () => {
     const styles = useStyles()
 
-    const { charId } = Characters.useCharacterCard((state) => ({ charId: state.id }))
+    const { charId } = Characters.useCharacterCard(useShallow((state) => ({ charId: state.id })))
     const { data } = useLiveQuery(Chats.db.query.chatListQuery(charId ?? 0))
-    const { setShowDrawer } = Drawer.useDrawerState((state) => ({
-        setShowDrawer: (b: boolean) => state.setShow(Drawer.ID.CHATLIST, b),
-    }))
+    const setShow = Drawer.useDrawerState((state) => state.setShow)
+    const setShowDrawer = (b: boolean) => {
+        setShow(Drawer.ID.CHATLIST, b)
+    }
 
     const { loadChat } = Chats.useChat()
 
@@ -173,3 +175,4 @@ const useStyles = () => {
         },
     })
 }
+

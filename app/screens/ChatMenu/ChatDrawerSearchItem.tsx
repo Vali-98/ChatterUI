@@ -1,4 +1,3 @@
-import Drawer from '@components/views/Drawer'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getFriendlyTimeStamp } from '@lib/utils/Time'
@@ -84,3 +83,4 @@ const segmentText = (text: string, query: string): SnippetResult => {
         showTailEllipsis: showTailEllipsis,
     }
 }
+

@@ -12,14 +12,16 @@ import { useShallow } from 'zustand/react/shallow'
 
 const ChatInput = () => {
     const { color, borderRadius, spacing } = Theme.useTheme()
-    const [sendOnEnter, setSendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
+    const [sendOnEnter, _] = useMMKVBoolean(AppSettings.SendOnEnter)
 
     const { addEntry } = Chats.useEntry()
 
-    const { nowGenerating, abortFunction } = useInference((state) => ({
-        nowGenerating: state.nowGenerating,
-        abortFunction: state.abortFunction,
-    }))
+    const { nowGenerating, abortFunction } = useInference(
+        useShallow((state) => ({
+            nowGenerating: state.nowGenerating,
+            abortFunction: state.abortFunction,
+        }))
+    )
 
     const { charName } = Characters.useCharacterCard(
         useShallow((state) => ({
@@ -94,3 +96,4 @@ const ChatInput = () => {
 }
 
 export default ChatInput
+

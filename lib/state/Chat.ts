@@ -103,6 +103,8 @@ export const sendGenerateCompleteNotification = async () => {
             shouldShowAlert: false,
             shouldPlaySound: false,
             shouldSetBadge: false,
+            shouldShowBanner: true,
+            shouldShowList: false,
         }),
     })
 
@@ -671,7 +673,9 @@ export namespace Chats {
 
     export const useEntryData = (index: number) => {
         // TODO: Investigate if dummyEntry is dangerous
-        const entry = useChatState((state) => state?.data?.messages?.[index] ?? dummyEntry)
+        const entry = useChatState(
+            useShallow((state) => state?.data?.messages?.[index] ?? dummyEntry)
+        )
         return entry
     }
 
@@ -689,11 +693,13 @@ export namespace Chats {
         const message = useEntryData(index)
         const swipeIndex = message.swipe_id
         const swipesLength = message.swipes.length
-        const { swipe, swipeText, swipeId } = useChatState((state) => ({
-            swipe: state?.data?.messages?.[index]?.swipes[swipeIndex],
-            swipeText: state?.data?.messages?.[index]?.swipes[swipeIndex].swipe,
-            swipeId: state?.data?.messages?.[index]?.swipes[swipeIndex].id,
-        }))
+        const { swipe, swipeText, swipeId } = useChatState(
+            useShallow((state) => ({
+                swipe: state?.data?.messages?.[index]?.swipes[swipeIndex],
+                swipeText: state?.data?.messages?.[index]?.swipes[swipeIndex].swipe,
+                swipeId: state?.data?.messages?.[index]?.swipes[swipeIndex].id,
+            }))
+        )
         return { swipeId, swipe, swipeText, swipeIndex, swipesLength }
     }
 
@@ -750,3 +756,4 @@ export namespace Chats {
         ],
     }
 }
+

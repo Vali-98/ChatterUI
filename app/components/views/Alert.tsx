@@ -4,6 +4,7 @@ import React, { ReactNode } from 'react'
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 
 type AlertButtonProps = {
     label: string
@@ -77,7 +78,9 @@ const AlertButton: React.FC<AlertButtonProps> = ({ label, onPress, type = 'defau
 
 export const AlertBox = () => {
     const styles = useStyles()
-    const { visible, props } = useAlert((state) => ({ visible: state.visible, props: state.props }))
+    const { visible, props } = useAlert(
+        useShallow((state) => ({ visible: state.visible, props: state.props }))
+    )
     const handleDismiss = () => {
         const dismiss = props.onDismiss
         if (dismiss) {
@@ -181,3 +184,4 @@ const useStyles = () => {
         },
     })
 }
+

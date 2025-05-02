@@ -20,6 +20,7 @@ import Animated, {
 import { create } from 'zustand'
 
 import FadeBackrop from './FadeBackdrop'
+import { useShallow } from 'zustand/react/shallow'
 
 type Direction = 'left' | 'right' | 'up' | 'down'
 
@@ -86,10 +87,12 @@ namespace Drawer {
         children = undefined,
     }) => {
         const styles = useStyles()
-        const { setShow, show } = useDrawerState((state) => ({
-            setShow: state.setShow,
-            show: state.values?.[drawerId],
-        }))
+        const { setShow, show } = useDrawerState(
+            useShallow((state) => ({
+                setShow: state.setShow,
+                show: state.values?.[drawerId],
+            }))
+        )
         const handleOverlayClick = () => setShow(drawerId, false)
 
         useFocusEffect(
@@ -126,10 +129,12 @@ namespace Drawer {
         openIcon = 'menu-fold',
         closeIcon = 'close',
     }) => {
-        const { setShow, show } = useDrawerState((state) => ({
-            setShow: state.setShow,
-            show: state.values?.[drawerId],
-        }))
+        const { setShow, show } = useDrawerState(
+            useShallow((state) => ({
+                setShow: state.setShow,
+                show: state.values?.[drawerId],
+            }))
+        )
         return (
             <ThemedButton
                 iconSize={24}
@@ -143,10 +148,12 @@ namespace Drawer {
     }
 
     export const Gesture: React.FC<DrawerGestureProps> = ({ config, ...rest }) => {
-        const { setShowDrawer, values } = Drawer.useDrawerState((state) => ({
-            setShowDrawer: state.setShow,
-            values: state.values,
-        }))
+        const { setShowDrawer, values } = Drawer.useDrawerState(
+            useShallow((state) => ({
+                setShowDrawer: state.setShow,
+                values: state.values,
+            }))
+        )
 
         const drawerShown = config.map((item) => values?.[item.drawerID]).some((item) => item)
 
@@ -216,3 +223,4 @@ const useStyles = () => {
         },
     })
 }
+

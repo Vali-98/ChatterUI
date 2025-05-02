@@ -24,10 +24,12 @@ const ChatMenu = () => {
 
     const { chat, unloadChat } = Chats.useChat()
 
-    const { showSettings, showChats } = Drawer.useDrawerState((state) => ({
-        showSettings: state.values?.[Drawer.ID.SETTINGS],
-        showChats: state.values?.[Drawer.ID.CHATLIST],
-    }))
+    const { showSettings, showChats } = Drawer.useDrawerState(
+        useShallow((state) => ({
+            showSettings: state.values?.[Drawer.ID.SETTINGS],
+            showChats: state.values?.[Drawer.ID.CHATLIST],
+        }))
+    )
 
     useEffect(() => {
         return () => {
@@ -84,3 +86,4 @@ const ChatMenu = () => {
 }
 
 export default ChatMenu
+

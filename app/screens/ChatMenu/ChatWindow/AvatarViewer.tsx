@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Image, Modal, StyleSheet, Text, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
+import { useShallow } from 'zustand/react/shallow'
 
 type AvatarViewerProps = {
     editorButton?: boolean
@@ -17,21 +18,27 @@ const AvatarViewer: React.FC<AvatarViewerProps> = ({ editorButton = true }) => {
     const router = useRouter()
     const styles = useStyles()
 
-    const { show, setShow, isUser } = useViewerState((state) => ({
-        show: state.showViewer,
-        setShow: state.setShow,
-        isUser: state.isUser,
-    }))
+    const { show, setShow, isUser } = useViewerState(
+        useShallow((state) => ({
+            show: state.showViewer,
+            setShow: state.setShow,
+            isUser: state.isUser,
+        }))
+    )
 
-    const { charName, charImageId } = Characters.useCharacterCard((state) => ({
-        charName: state.card?.name,
-        charImageId: state.card?.image_id,
-    }))
+    const { charName, charImageId } = Characters.useCharacterCard(
+        useShallow((state) => ({
+            charName: state.card?.name,
+            charImageId: state.card?.image_id,
+        }))
+    )
 
-    const { userName, userImageId } = Characters.useUserCard((state) => ({
-        userName: state.card?.name,
-        userImageId: state.card?.image_id,
-    }))
+    const { userName, userImageId } = Characters.useUserCard(
+        useShallow((state) => ({
+            userName: state.card?.name,
+            userImageId: state.card?.image_id,
+        }))
+    )
 
     const [aspectRatio, setAspectRatio] = useState(1)
 
@@ -147,3 +154,4 @@ const useStyles = () => {
         },
     })
 }
+

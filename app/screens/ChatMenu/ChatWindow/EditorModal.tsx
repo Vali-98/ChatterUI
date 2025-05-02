@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react'
 import { GestureResponderEvent, Modal, StyleSheet, Text, TextInput, View } from 'react-native'
 import Animated, { SlideOutDown } from 'react-native-reanimated'
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 
 type ChatEditorStateProps = {
     index: number
@@ -28,11 +29,13 @@ export const useChatEditorState = create<ChatEditorStateProps>()((set, get) => (
 }))
 
 const EditorModal = () => {
-    const { index, editMode, hide } = useChatEditorState((state) => ({
-        index: state.index,
-        editMode: state.editMode,
-        hide: state.hide,
-    }))
+    const { index, editMode, hide } = useChatEditorState(
+        useShallow((state) => ({
+            index: state.index,
+            editMode: state.editMode,
+            hide: state.hide,
+        }))
+    )
     const styles = useStyles()
 
     const { updateEntry, deleteEntry } = Chats.useEntry()
@@ -202,3 +205,4 @@ const useStyles = () => {
         },
     })
 }
+

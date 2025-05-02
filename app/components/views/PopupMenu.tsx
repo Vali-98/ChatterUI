@@ -88,7 +88,6 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
     }
 
     useFocusEffect(() => {
-        BackHandler.removeEventListener('hardwareBackPress', backAction)
         const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
         return () => handler.remove()
     })
@@ -174,3 +173,4 @@ const useStyles = () => {
         },
     })
 }
+

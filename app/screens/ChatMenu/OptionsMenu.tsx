@@ -1,11 +1,9 @@
 import Drawer from '@components/views/Drawer'
 import { AntDesign, Ionicons } from '@expo/vector-icons'
-import { Characters } from '@lib/state/Characters'
-import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useRouter } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
-import { View, Text, StyleSheet, BackHandler } from 'react-native'
+import { BackHandler, StyleSheet, Text, View } from 'react-native'
 import {
     Menu,
     MenuOption,
@@ -31,9 +29,11 @@ const OptionsMenu = () => {
     const [showMenu, setShowMenu] = useState(false)
     const menuRef: React.MutableRefObject<Menu | null> = useRef(null)
 
-    const setShowChat = Drawer.useDrawerState(
-        (state) => (b: boolean) => state.setShow(Drawer.ID.CHATLIST, b)
-    )
+    const setShow = Drawer.useDrawerState((state) => state.setShow)
+
+    const setShowChat = (b: boolean) => {
+        setShow(Drawer.ID.CHATLIST, b)
+    }
 
     useEffect(() => {
         const backAction = () => {
@@ -155,3 +155,4 @@ const useStyles = () => {
         },
     })
 }
+
