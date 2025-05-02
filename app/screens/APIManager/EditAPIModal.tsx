@@ -12,6 +12,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { useEffect, useState } from 'react'
 import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native'
 import Animated, { SlideOutDown } from 'react-native-reanimated'
+import { useShallow } from 'zustand/react/shallow'
 
 type EditAPIModalProps = {
     index: number
@@ -24,10 +25,12 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
     const { color, spacing, fontSize } = Theme.useTheme()
     const styles = useStyles()
 
-    const { editValue, getTemplates } = APIState.useAPIState((state) => ({
-        getTemplates: state.getTemplates,
-        editValue: state.editValue,
-    }))
+    const { editValue, getTemplates } = APIState.useAPIState(
+        useShallow((state) => ({
+            getTemplates: state.getTemplates,
+            editValue: state.editValue,
+        }))
+    )
 
     const [template, setTemplate] = useState<APIConfiguration>(getTemplates()[0])
 
@@ -281,3 +284,4 @@ const getNestedValue = (obj: any, path: string) => {
     const value = keys.reduce((acc, key) => acc?.[key], obj)
     return value ?? null
 }
+

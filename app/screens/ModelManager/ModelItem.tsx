@@ -9,6 +9,7 @@ import { readableFileSize } from '@lib/utils/File'
 import { ModelDataType } from 'db/schema'
 import { useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 type ModelItemProps = {
     item: ModelDataType
@@ -28,11 +29,13 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const styles = useStyles()
     const { color } = Theme.useTheme()
 
-    const { loadModel, unloadModel, modelId } = Llama.useLlama((state) => ({
-        loadModel: state.load,
-        unloadModel: state.unload,
-        modelId: state.model?.id,
-    }))
+    const { loadModel, unloadModel, modelId } = Llama.useLlama(
+        useShallow((state) => ({
+            loadModel: state.load,
+            unloadModel: state.unload,
+            modelId: state.model?.id,
+        }))
+    )
 
     const [showEdit, setShowEdit] = useState(false)
     //@ts-ignore
@@ -221,3 +224,4 @@ const useStyles = () => {
         },
     })
 }
+

@@ -3,7 +3,6 @@ import ThemedCheckbox from '@components/input/ThemedCheckbox'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
-import FadeDownView from '@components/views/FadeDownView'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import PopupMenu from '@components/views/PopupMenu'
@@ -18,7 +17,8 @@ import { SamplersManager } from '@lib/state/SamplerState'
 import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 import { useState } from 'react'
-import { ScrollView, StyleSheet, Text } from 'react-native'
+import { ScrollView, StyleSheet, Text, SafeAreaView } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 const SamplerMenu = () => {
     const styles = useStyles()
@@ -36,11 +36,13 @@ const SamplerMenu = () => {
         configList,
     } = SamplersManager.useSamplers()
 
-    const { apiValues, activeIndex, getTemplates } = APIStateNew.useAPIState((state) => ({
-        apiValues: state.values,
-        activeIndex: state.activeIndex,
-        getTemplates: state.getTemplates,
-    }))
+    const { apiValues, activeIndex, getTemplates } = APIStateNew.useAPIState(
+        useShallow((state) => ({
+            apiValues: state.values,
+            activeIndex: state.activeIndex,
+            getTemplates: state.getTemplates,
+        }))
+    )
 
     const getSamplerList = (): APISampler[] => {
         if (appMode === 'local') return localSamplerData
@@ -135,7 +137,7 @@ const SamplerMenu = () => {
     )
 
     return (
-        <FadeDownView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
             <TextBoxModal
                 booleans={[showNewSampler, setShowNewSampler]}
                 onConfirm={(text: string) => {
@@ -246,7 +248,7 @@ const SamplerMenu = () => {
                         }
                     })}
             </ScrollView>
-        </FadeDownView>
+        </SafeAreaView>
     )
 }
 

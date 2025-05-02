@@ -8,11 +8,11 @@ import { model_data, ModelDataType } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import { getDocumentAsync } from 'expo-document-picker'
 import { copyAsync, deleteAsync, getInfoAsync, readDirectoryAsync } from 'expo-file-system'
+import { Platform } from 'react-native'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { GGMLNameMap, GGMLType } from './GGML'
-import { Platform } from 'react-native'
 
 export type ModelData = Omit<ModelDataType, 'id' | 'create_date' | 'last_modified'>
 
@@ -288,4 +288,3 @@ export namespace KV {
         Logger.info(`Size of KV cache: ${Math.floor(data.size * 0.000001)} MB`)
     }
 }
-

@@ -3,5 +3,7 @@
     "java.compile.nullAnalysis.mode": "disabled",
     "workbench.tree.indent": 24,
     "breadcrumbs.symbolSortOrder": "position",
-    "explorer.sortOrder": "filesFirst"
+    "explorer.sortOrder": "filesFirst",
+    "files.insertFinalNewline": false
 }
+

@@ -5,11 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "node",
+            "type": "radon-ide",
             "request": "launch",
-            "name": "Launch Program",
-            "skipFiles": ["<node_internals>/**"],
-            "program": "${workspaceFolder}\\app\\index.js"
+            "name": "Radon IDE panel",
+            "ios": {
+                "configuration": "Debug"
+            },
+            "android": {
+                "buildType": "debug"
+            },
+            "env": {
+                "APP_VARIANT": "development"
+            }
         }
     ]
 }
+

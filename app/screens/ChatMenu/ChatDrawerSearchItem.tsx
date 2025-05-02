@@ -83,4 +83,3 @@ const segmentText = (text: string, query: string): SnippetResult => {
         showTailEllipsis: showTailEllipsis,
     }
 }
-

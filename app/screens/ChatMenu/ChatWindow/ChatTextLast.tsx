@@ -38,7 +38,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
 
     const updateHeight = () => {
         if (firstRender.current) return
-        const showPadding = nowGenerating && buffer.data !== ''
+        const showPadding = nowGenerating && buffer.data
         const overflowPadding = showPadding ? 12 : 0
         if (viewRef.current) {
             viewRef.current.measure((x, y, width, measuredHeight) => {

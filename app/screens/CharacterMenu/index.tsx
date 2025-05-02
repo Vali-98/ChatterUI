@@ -1,11 +1,9 @@
 import Drawer from '@components/views/Drawer'
-import HeaderButton from '@components/views/HeaderButton'
-import HeaderTitle from '@components/views/HeaderTitle'
 import CharacterList from '@screens/CharacterMenu/CharacterList'
-import { SafeAreaView } from 'react-native'
+import { View } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 import SettingsDrawer from '../SettingsDrawer'
-import { useShallow } from 'zustand/react/shallow'
 
 const CharacterMenu = () => {
     const { showDrawer } = Drawer.useDrawerState(
@@ -19,21 +17,16 @@ const CharacterMenu = () => {
             config={[
                 { drawerID: Drawer.ID.SETTINGS, openDirection: 'right', closeDirection: 'left' },
             ]}>
-            <SafeAreaView
+            <View
                 style={{
                     flex: 1,
                     flexDirection: 'row',
                 }}>
-                <HeaderTitle />
-                <HeaderButton headerLeft={() => <Drawer.Button drawerID={Drawer.ID.SETTINGS} />} />
-
                 <CharacterList showHeader={!showDrawer} />
-
                 <SettingsDrawer />
-            </SafeAreaView>
+            </View>
         </Drawer.Gesture>
     )
 }
 
 export default CharacterMenu
-

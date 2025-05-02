@@ -6,6 +6,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { Chats, useInference } from './Chat'
+import { useShallow } from 'zustand/react/shallow'
 
 type TTSState = {
     activeChatIndex?: number
@@ -56,21 +57,23 @@ export const useTTS = () => {
         rate,
         live,
         setLive,
-    } = useTTSState((state) => ({
-        startTTS: state.startTTS,
-        stopTTS: state.stopTTS,
-        activeChatIndex: state.activeChatIndex,
-        setVoice: state.setVoice,
-        setEnabled: state.setEnabled,
-        setAuto: state.setAuto,
-        setRate: state.setRate,
-        auto: state.auto,
-        enabled: state.enabled,
-        voice: state.voice,
-        rate: state.rate,
-        live: state.liveTTS,
-        setLive: state.setLiveTTS,
-    }))
+    } = useTTSState(
+        useShallow((state) => ({
+            startTTS: state.startTTS,
+            stopTTS: state.stopTTS,
+            activeChatIndex: state.activeChatIndex,
+            setVoice: state.setVoice,
+            setEnabled: state.setEnabled,
+            setAuto: state.setAuto,
+            setRate: state.setRate,
+            auto: state.auto,
+            enabled: state.enabled,
+            voice: state.voice,
+            rate: state.rate,
+            live: state.liveTTS,
+            setLive: state.setLiveTTS,
+        }))
+    )
     return {
         startTTS,
         activeChatIndex,
@@ -280,3 +283,4 @@ const cleanMarkdown = (text: string): string => {
     const result = text.replace(/([*_]{1,2}|`|\[\^.*?\]\(.*?\)|<\/?[^>]+>)/g, '')
     return result
 }
+

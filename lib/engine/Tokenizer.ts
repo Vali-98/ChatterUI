@@ -1,6 +1,7 @@
 import { useAppModeState } from '@lib/state/AppMode'
 import { Logger } from '@lib/state/Logger'
 import { initLlama, LlamaContext } from 'cui-llama.rn'
+import { Asset } from 'expo-asset'
 import {
     copyAsync,
     deleteAsync,
@@ -11,7 +12,6 @@ import {
 import { create } from 'zustand'
 
 import { Llama } from './Local/LlamaLocal'
-import { Asset } from 'expo-asset'
 
 type TokenizerState = {
     model?: LlamaContext
@@ -76,4 +76,3 @@ export namespace Tokenizer {
 }
 
 Tokenizer.useDefaultTokenizer.getState().loadModel()
-

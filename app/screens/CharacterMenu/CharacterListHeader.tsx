@@ -14,9 +14,9 @@ import { BackHandler, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 
 import SortButton, { sortList, SortType } from './SortButton'
-import { useShallow } from 'zustand/react/shallow'
 
 type CharacterListSorterProps = {
     showSearch: boolean
@@ -260,4 +260,3 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
 }
 
 export default CharacterListHeader
-

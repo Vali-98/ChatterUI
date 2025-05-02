@@ -1,6 +1,5 @@
-import FadeDownView from '@components/views/FadeDownView'
 import { useInference } from '@lib/state/Chat'
-import { View, StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 
 import ChatBody from './ChatBody'
 import ChatFrame from './ChatFrame'

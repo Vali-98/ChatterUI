@@ -8,4 +8,3 @@ config.resolver.sourceExts.push('sql')
 config.resolver.assetExts.push('gguf')
 
 module.exports = config
-

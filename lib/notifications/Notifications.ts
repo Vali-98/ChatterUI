@@ -40,4 +40,3 @@ export async function registerForPushNotificationsAsync() {
 
     return true
 }
-

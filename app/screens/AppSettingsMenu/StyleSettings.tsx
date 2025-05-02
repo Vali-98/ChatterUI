@@ -5,15 +5,18 @@ import { useBackgroundImage } from '@lib/state/BackgroundImage'
 import { useRouter } from 'expo-router'
 import React from 'react'
 import { View } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 const StyleSettings = () => {
     const router = useRouter()
 
-    const { chatBackground, importBackground, deleteBackground } = useBackgroundImage((state) => ({
-        chatBackground: state.image,
-        importBackground: state.importImage,
-        deleteBackground: state.removeImage,
-    }))
+    const { chatBackground, importBackground, deleteBackground } = useBackgroundImage(
+        useShallow((state) => ({
+            chatBackground: state.image,
+            importBackground: state.importImage,
+            deleteBackground: state.removeImage,
+        }))
+    )
 
     return (
         <View style={{ rowGap: 8 }}>
@@ -55,3 +58,4 @@ const StyleSettings = () => {
 }
 
 export default StyleSettings
+

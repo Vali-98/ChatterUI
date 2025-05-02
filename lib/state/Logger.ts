@@ -1,11 +1,11 @@
 import { Storage } from '@lib/enums/Storage'
+import { Theme } from '@lib/theme/ThemeManager'
 import Toast from 'react-native-simple-toast'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { AppSettings } from '../constants/GlobalValues'
 import { mmkv, mmkvStorage } from '../storage/MMKV'
-import { Theme } from '@lib/theme/ThemeManager'
 
 const toastTime = Toast.SHORT
 const maxloglength = 2000
@@ -124,4 +124,3 @@ export namespace Logger {
         })
     }
 }
-

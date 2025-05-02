@@ -17,4 +17,3 @@ const Avatar: React.FC<FallbackImageProps> = ({ targetImage, ...rest }) => {
 }
 
 export default Avatar
-

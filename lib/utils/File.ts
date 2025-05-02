@@ -1,3 +1,4 @@
+import { localDownload } from '@vali98/react-native-fs'
 import { getDocumentAsync } from 'expo-document-picker'
 import {
     cacheDirectory,
@@ -7,7 +8,6 @@ import {
 } from 'expo-file-system'
 
 import { Logger } from '../state/Logger'
-import { localDownload } from '@vali98/react-native-fs'
 
 export const AppDirectory = {
     ModelPath: `${documentDirectory}models/`,
@@ -88,4 +88,3 @@ export const readableFileSize = (size: number) => {
         return `${sizeInGB.toFixed(2)} GB`
     }
 }
-

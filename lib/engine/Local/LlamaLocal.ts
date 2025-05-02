@@ -325,4 +325,3 @@ export namespace Llama {
             .catch((err) => Logger.log(`Failed to download: ${err}`))
     }*/
 }
-

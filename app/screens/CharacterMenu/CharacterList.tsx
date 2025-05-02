@@ -1,12 +1,12 @@
-import FadeDownView from '@components/views/FadeDownView'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { Characters, CharInfo } from '@lib/state/Characters'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
-import { SafeAreaView } from 'react-native'
+import { SafeAreaView, View } from 'react-native'
 import Animated, { LinearTransition } from 'react-native-reanimated'
 
+import Drawer from '@components/views/Drawer'
 import CharacterListHeader, { useCharacterListSorter } from './CharacterListHeader'
 import CharacterListing from './CharacterListing'
 import CharacterNewMenu from './CharacterNewMenu'
@@ -40,6 +40,9 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
         <SafeAreaView style={{ paddingVertical: 16, paddingHorizontal: 8, flex: 1 }}>
             <HeaderTitle />
             <HeaderButton
+                headerLeft={() => (
+                    <Drawer.Button drawerID={Drawer.ID.SETTINGS} buttonStyle={{ width: 30 }} />
+                )}
                 headerRight={() => (
                     <CharacterNewMenu nowLoading={nowLoading} setNowLoading={setNowLoading} />
                 )}
@@ -48,7 +51,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
             {data.length === 0 && updatedAt && <CharactersEmpty />}
 
             {data.length !== 0 && (
-                <FadeDownView duration={100} style={{ flex: 1 }}>
+                <View style={{ flex: 1 }}>
                     <CharacterListHeader resultLength={characterList.length} />
                     <Animated.FlatList
                         itemLayoutAnimation={LinearTransition}
@@ -65,7 +68,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                             />
                         )}
                     />
-                </FadeDownView>
+                </View>
             )}
 
             {characterList.length === 0 && data.length !== 0 && updatedAt && (

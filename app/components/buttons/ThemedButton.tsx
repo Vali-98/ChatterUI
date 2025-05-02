@@ -14,7 +14,7 @@ import {
 
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'critical' | 'disabled'
 
-interface ThemedButtonProps extends Omit<PressableProps, 'style'> {
+export interface ThemedButtonProps extends Omit<PressableProps, 'style'> {
     labelStyle?: TextStyle
     label?: string
     buttonStyle?: ViewStyle

@@ -38,4 +38,3 @@ export const useAppMode = () => {
 
     return { appMode, setAppMode }
 }
-

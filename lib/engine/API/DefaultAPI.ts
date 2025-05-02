@@ -772,4 +772,3 @@ export const defaultTemplates: APIConfiguration[] = [
         },
     },
 ]
-

@@ -8,10 +8,10 @@ import { FlashList } from '@shopify/flash-list'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 import ChatDrawerItem from './ChatDrawerItem'
 import ChatDrawerSearchItem from './ChatDrawerSearchItem'
-import { useShallow } from 'zustand/react/shallow'
 
 const ChatsDrawer = () => {
     const styles = useStyles()
@@ -175,4 +175,3 @@ const useStyles = () => {
         },
     })
 }
-

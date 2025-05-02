@@ -1,5 +1,4 @@
 import Alert from '@components/views/Alert'
-import FadeDownView from '@components/views/FadeDownView'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import PopupMenu from '@components/views/PopupMenu'
@@ -8,13 +7,16 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 import { FlashList } from '@shopify/flash-list'
 import { Text, View } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 const Logs = () => {
     const { color } = Theme.useTheme()
-    const { logs, flushLogs } = Logger.useLoggerState((state) => ({
-        logs: state.logs,
-        flushLogs: state.flushLogs,
-    }))
+    const { logs, flushLogs } = Logger.useLoggerState(
+        useShallow((state) => ({
+            logs: state.logs,
+            flushLogs: state.flushLogs,
+        }))
+    )
 
     const logitems = logs.toReversed()
     const handleExportLogs = () => {
@@ -82,7 +84,7 @@ const Logs = () => {
     )
 
     return (
-        <FadeDownView style={{ flex: 1 }}>
+        <>
             <HeaderTitle title="Logs" />
             <HeaderButton headerRight={headerRight} />
 
@@ -112,7 +114,7 @@ const Logs = () => {
                     )}
                 />
             </View>
-        </FadeDownView>
+        </>
     )
 }
 

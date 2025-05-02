@@ -10,14 +10,17 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { Stack, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 const AddAPI = () => {
     const styles = useStyles()
     const router = useRouter()
-    const { addValue, getTemplates } = APIState.useAPIState((state) => ({
-        getTemplates: state.getTemplates,
-        addValue: state.addValue,
-    }))
+    const { addValue, getTemplates } = APIState.useAPIState(
+        useShallow((state) => ({
+            getTemplates: state.getTemplates,
+            addValue: state.addValue,
+        }))
+    )
 
     const [template, setTemplate] = useState(getTemplates()[0])
     const [values, setValues] = useState<APIManagerValue>({
@@ -275,3 +278,4 @@ const getNestedValue = (obj: any, path: string) => {
     const value = keys.reduce((acc, key) => acc?.[key], obj)
     return value ?? null
 }
+

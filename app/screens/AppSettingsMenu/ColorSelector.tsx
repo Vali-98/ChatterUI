@@ -8,6 +8,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { pickJSONDocument } from '@lib/utils/File'
 import React from 'react'
 import { Text, TouchableOpacity, View, FlatList } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 type ColorThemeItemProps = {
     item: ThemeColor
@@ -17,14 +18,16 @@ type ColorThemeItemProps = {
 
 const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete = false }) => {
     const { color, setColor, customColors, addCustomColor, removeColorScheme, length } =
-        Theme.useColorState((state) => ({
-            color: state.color,
-            setColor: state.setColor,
-            customColors: state.customColors,
-            addCustomColor: state.addCustomColor,
-            removeColorScheme: state.removeColorScheme,
-            length: state.customColors.length,
-        }))
+        Theme.useColorState(
+            useShallow((state) => ({
+                color: state.color,
+                setColor: state.setColor,
+                customColors: state.customColors,
+                addCustomColor: state.addCustomColor,
+                removeColorScheme: state.removeColorScheme,
+                length: state.customColors.length,
+            }))
+        )
 
     const handleRemoveColorScheme = (index: number) => {
         Alert.alert({
@@ -169,3 +172,4 @@ const ColorSelector = () => {
 }
 
 export default ColorSelector
+

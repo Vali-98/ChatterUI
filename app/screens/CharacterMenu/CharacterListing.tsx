@@ -8,10 +8,10 @@ import { getFriendlyTimeStamp } from '@lib/utils/Time'
 import { useRouter } from 'expo-router'
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
+import { useShallow } from 'zustand/react/shallow'
 
 import CharacterEditPopup from './CharacterEditPopup'
 import { useCharacterListSorter } from './CharacterListHeader'
-import { useShallow } from 'zustand/react/shallow'
 
 type CharacterListingProps = {
     index: number
@@ -71,7 +71,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
 
     const getPreviewText = () => {
         if (!character.latestSwipe || !character.latestName) return '(No Chat Data)'
-        return character.latestName + ':  ' + character.latestSwipe
+        return character.latestName + ':  ' + character.latestSwipe.trim()
     }
 
     return (
@@ -201,4 +201,3 @@ const useStyles = () => {
         },
     })
 }
-

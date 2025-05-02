@@ -200,7 +200,7 @@ export namespace Chats {
             if (entry) messages.push(entry)
             set((state) => ({
                 ...state,
-                data: state?.data ? { ...state.data, messages: messages } : state.data,
+                data: state?.data ? { ...state.data, messages: [...messages] } : state.data,
             }))
             return entry?.swipes[0].id
         },
@@ -274,9 +274,9 @@ export namespace Chats {
 
         // returns true if overflowing right swipe, used to trigger generate
         swipe: async (index: number, direction: number) => {
-            const messages = get()?.data?.messages
+            let messages = get()?.data?.messages
             if (!messages) return false
-
+            messages = [...messages]
             const swipe_id = messages[index].swipe_id
             const target = swipe_id + direction
             const limit = messages[index].swipes.length - 1
@@ -284,10 +284,15 @@ export namespace Chats {
             if (target < 0) return false
             if (target > limit) return true
             messages[index].swipe_id = target
-            set((state) => ({
-                ...state,
-                data: state?.data ? { ...state.data, messages: messages } : state.data,
-            }))
+            messages[index] = { ...messages[index] }
+            set((state) => {
+                if (state.data) {
+                    return {
+                        ...state,
+                        data: { ...state.data, messages: messages },
+                    }
+                } else return state
+            })
 
             const entryId = messages[index].id
             await db.mutate.updateEntrySwipeId(entryId, target)
@@ -673,10 +678,8 @@ export namespace Chats {
 
     export const useEntryData = (index: number) => {
         // TODO: Investigate if dummyEntry is dangerous
-        const entry = useChatState(
-            useShallow((state) => state?.data?.messages?.[index] ?? dummyEntry)
-        )
-        return entry
+        const entry = useChatState((state) => state?.data?.messages?.[index])
+        return entry ?? dummyEntry
     }
 
     export const useSwipes = () => {
@@ -756,4 +759,3 @@ export namespace Chats {
         ],
     }
 }
-

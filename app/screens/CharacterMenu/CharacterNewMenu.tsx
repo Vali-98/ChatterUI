@@ -39,7 +39,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
     }
 
     return (
-        <View>
+        <>
             <TextBoxModal
                 booleans={[showNewChar, setShowNewChar]}
                 title="Create New Character"
@@ -55,6 +55,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
             />
 
             <PopupMenu
+                style={{ width: 30, marginRight: 8 }}
                 icon="adduser"
                 options={[
                     {
@@ -85,9 +86,8 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                 ]}
                 placement="bottom"
             />
-        </View>
+        </>
     )
 }
 
 export default CharacterNewMenu
-

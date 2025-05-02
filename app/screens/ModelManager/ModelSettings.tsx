@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react'
 import { BackHandler, Platform, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated'
+import { useShallow } from 'zustand/react/shallow'
 
 type ModelSettingsProp = {
     modelImporting: boolean
@@ -21,10 +22,12 @@ type ModelSettingsProp = {
 }
 
 const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoading, exit }) => {
-    const { config, setConfig } = Llama.useEngineData((state) => ({
-        config: state.config,
-        setConfig: state.setConfiguration,
-    }))
+    const { config, setConfig } = Llama.useEngineData(
+        useShallow((state) => ({
+            config: state.config,
+            setConfig: state.setConfiguration,
+        }))
+    )
 
     const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
     const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)

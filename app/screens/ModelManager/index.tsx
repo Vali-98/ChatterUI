@@ -15,6 +15,7 @@ import ModelEmpty from './ModelEmpty'
 import ModelItem from './ModelItem'
 import ModelNewMenu from './ModelNewMenu'
 import ModelSettings from './ModelSettings'
+import { useShallow } from 'zustand/react/shallow'
 
 const ModelManager = () => {
     const styles = useStyles()
@@ -27,11 +28,13 @@ const ModelManager = () => {
     const [modelLoading, setModelLoading] = useState(false)
     const [modelImporting, setModelImporting] = useState(false)
 
-    const { modelName, loadProgress, setloadProgress } = Llama.useLlama((state) => ({
-        modelName: state.model?.name,
-        loadProgress: state.loadProgress,
-        setloadProgress: state.setLoadProgress,
-    }))
+    const { modelName, loadProgress, setloadProgress } = Llama.useLlama(
+        useShallow((state) => ({
+            modelName: state.model?.name,
+            loadProgress: state.loadProgress,
+            setloadProgress: state.setLoadProgress,
+        }))
+    )
 
     return (
         <View style={styles.mainContainer}>
@@ -202,3 +205,4 @@ export const useStyles = () => {
         },
     })
 }
+

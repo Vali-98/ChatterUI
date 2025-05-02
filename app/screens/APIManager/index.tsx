@@ -6,13 +6,16 @@ import { Stack, useRouter } from 'expo-router'
 import { FlatList, Pressable, Text, View } from 'react-native'
 
 import APIValueItem from './APIValueItem'
+import { useShallow } from 'zustand/react/shallow'
 
 const APIManager = () => {
     // eslint-disable-next-line react-compiler/react-compiler
     'use no memo'
-    const { apiValues } = APIState.useAPIState((state) => ({
-        apiValues: state.values,
-    }))
+    const { apiValues } = APIState.useAPIState(
+        useShallow((state) => ({
+            apiValues: state.values,
+        }))
+    )
     const { color, spacing } = Theme.useTheme()
 
     const router = useRouter()
@@ -76,3 +79,4 @@ const APIManager = () => {
 }
 
 export default APIManager
+

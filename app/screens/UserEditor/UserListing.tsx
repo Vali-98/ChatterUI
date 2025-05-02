@@ -6,6 +6,7 @@ import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Menu } from 'react-native-popup-menu'
+import { useShallow } from 'zustand/react/shallow'
 
 type CharacterData = Awaited<ReturnType<typeof Characters.db.query.cardListQuery>>[0]
 
@@ -25,14 +26,18 @@ const getTimeStamp = (oldtime: number) => {
 const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
     const styles = useStyles()
     const { spacing } = Theme.useTheme()
-    const { setShowDrawer } = Drawer.useDrawerState((state) => ({
-        setShowDrawer: (b: boolean) => state.setShow(Drawer.ID.USERLIST, b),
-    }))
+    const setShow = Drawer.useDrawerState((state) => state.setShow)
 
-    const { userId, setCard } = Characters.useUserCard((state) => ({
-        userId: state.id,
-        setCard: state.setCard,
-    }))
+    const setShowDrawer = (b: boolean) => {
+        setShow(Drawer.ID.USERLIST, b)
+    }
+
+    const { userId, setCard } = Characters.useUserCard(
+        useShallow((state) => ({
+            userId: state.id,
+            setCard: state.setCard,
+        }))
+    )
 
     const handleDeleteCard = async (menuRef: React.MutableRefObject<Menu | null>) => {
         Alert.alert({
@@ -192,3 +197,4 @@ const useStyles = () => {
         },
     })
 }
+

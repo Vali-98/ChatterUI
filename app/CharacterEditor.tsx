@@ -3,7 +3,6 @@ import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
-import FadeDownView from '@components/views/FadeDownView'
 import HeaderTitle from '@components/views/HeaderTitle'
 import PopupMenu from '@components/views/PopupMenu'
 import { db } from '@db'
@@ -23,6 +22,7 @@ import * as DocumentPicker from 'expo-document-picker'
 import { useNavigation, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
 const ChracterEditor = () => {
@@ -202,7 +202,7 @@ const ChracterEditor = () => {
     }
 
     return (
-        <FadeDownView style={styles.mainContainer}>
+        <SafeAreaView style={styles.mainContainer}>
             <HeaderTitle title="Edit Character" />
             <AvatarViewer editorButton={false} />
             {characterCard && (
@@ -466,7 +466,7 @@ const ChracterEditor = () => {
                     />
                 </ScrollView>
             )}
-        </FadeDownView>
+        </SafeAreaView>
     )
 }
 

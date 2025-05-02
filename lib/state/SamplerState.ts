@@ -11,6 +11,7 @@ import { getDocumentAsync } from 'expo-document-picker'
 import { EncodingType, readAsStringAsync } from 'expo-file-system'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { useShallow } from 'zustand/react/shallow'
 
 export type SamplerConfig = {
     name: string
@@ -108,15 +109,17 @@ export namespace SamplersManager {
             changeConfig,
             updateCurrentConfig,
             configList,
-        } = useSamplerState((state) => ({
-            currentPresetIndex: state.currentConfigIndex,
-            samplerConfigs: state.configList,
-            addSamplerConfig: state.addSamplerConfig,
-            deleteSamplerConfig: state.deleteSamplerConfig,
-            changeConfig: state.setConfig,
-            updateCurrentConfig: state.updateCurrentConfig,
-            configList: state.configList,
-        }))
+        } = useSamplerState(
+            useShallow((state) => ({
+                currentPresetIndex: state.currentConfigIndex,
+                samplerConfigs: state.configList,
+                addSamplerConfig: state.addSamplerConfig,
+                deleteSamplerConfig: state.deleteSamplerConfig,
+                changeConfig: state.setConfig,
+                updateCurrentConfig: state.updateCurrentConfig,
+                configList: state.configList,
+            }))
+        )
 
         const currentConfig = samplerConfigs[currentConfigIndex]
 
@@ -177,3 +180,4 @@ export const fixSamplerConfig = (config: SamplerConfigData) => {
     if (!samekeys) Logger.warn(`Sampler Config had missing fields and was fixed!`)
     return config
 }
+

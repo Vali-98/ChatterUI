@@ -1,4 +1,4 @@
-import ThemedButton from '@components/buttons/ThemedButton'
+import ThemedButton, { ThemedButtonProps } from '@components/buttons/ThemedButton'
 import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useFocusEffect } from 'expo-router'
@@ -18,9 +18,9 @@ import Animated, {
     SlideOutUp,
 } from 'react-native-reanimated'
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 
 import FadeBackrop from './FadeBackdrop'
-import { useShallow } from 'zustand/react/shallow'
 
 type Direction = 'left' | 'right' | 'up' | 'down'
 
@@ -45,7 +45,7 @@ type DrawerBodyProps = {
     children?: ReactNode
 }
 
-type DrawerButtonProps = {
+interface DrawerButtonProps extends ThemedButtonProps {
     drawerID: Drawer.ID
     openIcon?: keyof typeof AntDesign.glyphMap
     closeIcon?: keyof typeof AntDesign.glyphMap
@@ -108,26 +108,27 @@ namespace Drawer {
                 return () => handler.remove()
             }, [show])
         )
+        if (!show) return
 
-        if (show)
-            return (
-                <View style={styles.absolute}>
-                    <FadeBackrop handleOverlayClick={handleOverlayClick}>
-                        <Animated.View
-                            style={{ ...styles.drawer, ...drawerStyle }}
-                            entering={animationIn[direction]}
-                            exiting={animationOut[direction]}>
-                            {children}
-                        </Animated.View>
-                    </FadeBackrop>
-                </View>
-            )
+        return (
+            <View style={styles.absolute}>
+                <FadeBackrop handleOverlayClick={handleOverlayClick}>
+                    <Animated.View
+                        style={{ ...styles.drawer, ...drawerStyle }}
+                        entering={animationIn[direction]}
+                        exiting={animationOut[direction]}>
+                        {children}
+                    </Animated.View>
+                </FadeBackrop>
+            </View>
+        )
     }
 
     export const Button: React.FC<DrawerButtonProps> = ({
         drawerID: drawerId,
         openIcon = 'menu-fold',
         closeIcon = 'close',
+        ...rest
     }) => {
         const { setShow, show } = useDrawerState(
             useShallow((state) => ({
@@ -143,6 +144,7 @@ namespace Drawer {
                 }}
                 variant="tertiary"
                 iconName={show ? closeIcon : openIcon}
+                {...rest}
             />
         )
     }
@@ -223,4 +225,3 @@ const useStyles = () => {
         },
     })
 }
-

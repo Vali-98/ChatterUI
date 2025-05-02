@@ -82,4 +82,3 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
 }
 
 export default CharacterEditPopup
-

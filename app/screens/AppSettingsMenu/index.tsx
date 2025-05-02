@@ -7,10 +7,10 @@ import CharacterSettings from './CharacterSettings'
 import ChatSettings from './ChatSettings'
 import DatabaseSettings from './DatabaseSettings'
 import GeneratingSettings from './GeneratingSettings'
+import NotificationSettings from './NotificationSettings'
 import ScreenSettings from './ScreenSettings'
 import SecuritySettings from './SecuritySettings'
 import StyleSettings from './StyleSettings'
-import NotificationSettings from './NotificationSettings'
 
 const AppSettingsMenu = () => {
     const { spacing } = Theme.useTheme()
@@ -40,4 +40,3 @@ const AppSettingsMenu = () => {
 }
 
 export default AppSettingsMenu
-

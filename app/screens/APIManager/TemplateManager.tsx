@@ -9,14 +9,17 @@ import { Stack } from 'expo-router'
 import { FlatList, Text, View } from 'react-native'
 
 import TemplateItem from './TemplateItem'
+import { useShallow } from 'zustand/react/shallow'
 
 const TemplateManager = () => {
     // eslint-disable-next-line react-compiler/react-compiler
     'use no memo'
-    const { templates, addTemplate } = APIState.useAPIState((state) => ({
-        templates: state.customTemplates,
-        addTemplate: state.addTemplate,
-    }))
+    const { templates, addTemplate } = APIState.useAPIState(
+        useShallow((state) => ({
+            templates: state.customTemplates,
+            addTemplate: state.addTemplate,
+        }))
+    )
 
     const { color, spacing } = Theme.useTheme()
 
@@ -86,3 +89,4 @@ const TemplateManager = () => {
 }
 
 export default TemplateManager
+

@@ -15,9 +15,7 @@ type TemplateItemProps = {
 const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
     const { color, spacing, borderWidth, fontSize, borderRadius } = Theme.useTheme()
 
-    const { removeTemplate } = APIState.useAPIState((state) => ({
-        removeTemplate: state.removeTemplate,
-    }))
+    const removeTemplate = APIState.useAPIState((state) => state.removeTemplate)
 
     const handleDelete = () => {
         Alert.alert({
@@ -83,3 +81,4 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
 }
 
 export default TemplateItem
+

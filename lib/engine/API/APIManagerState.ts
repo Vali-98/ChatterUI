@@ -32,7 +32,7 @@ export namespace APIState {
                 values: [],
                 customTemplates: [],
                 addValue: (value) => {
-                    const values = get().values
+                    const values = [...get().values]
                     values.forEach((item) => (item.active = false))
                     values.push(value)
                     set((state) => ({
@@ -59,7 +59,7 @@ export namespace APIState {
                     }))
                 },
                 removeValue: (index) => {
-                    const values = get().values
+                    const values = [...get().values]
                     let activeIndex = get().activeIndex
                     if (index === activeIndex) {
                         activeIndex = -1
@@ -73,7 +73,7 @@ export namespace APIState {
                     set((state) => ({ ...state, customTemplates: templates }))
                 },
                 editValue: (newValue, index) => {
-                    const values = get().values
+                    const values = [...get().values]
                     const oldValue = values[index]
                     values[index] = newValue
                     let active = {}
@@ -131,3 +131,4 @@ function generateUniqueName(baseName: string, names: string[]) {
     const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1
     return `${baseName} (${nextNumber})`
 }
+
