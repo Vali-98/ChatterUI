@@ -35,7 +35,6 @@ module.exports = {
                 'android.permission.WAKE_LOCK',
                 'android.permission.FOREGROUND_SERVICE_DATA_SYNC',
             ],
-            edgeToEdgeEnabled: true,
         },
         web: {
             bundler: 'metro',

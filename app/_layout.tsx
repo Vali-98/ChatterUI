@@ -32,6 +32,7 @@ const Layout = () => {
                         headerShadowVisible: false,
                         headerTitleAlign: 'center',
                         statusBarBackgroundColor: color.neutral._100,
+                        navigationBarColor: color.neutral._100,
                     }}>
                     <Stack.Screen name="index" options={{ animation: 'fade' }} />
                 </Stack>
