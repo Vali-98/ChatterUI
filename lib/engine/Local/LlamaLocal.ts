@@ -80,10 +80,10 @@ export namespace Llama {
                 config: defaultConfig,
                 lastModel: undefined,
                 setConfiguration: (config: LlamaConfig) => {
-                    set((state) => ({ ...state, config: config }))
+                    set({ config: config })
                 },
                 setLastModelLoaded: (model: ModelDataType) => {
-                    set((state) => ({ ...state, lastModel: model }))
+                    set({ lastModel: model })
                 },
             }),
             {
@@ -130,6 +130,7 @@ export namespace Llama {
                 n_threads: config.threads,
                 n_batch: config.batch,
                 use_mlock: true,
+                use_mmap: true,
             }
 
             Logger.info(
@@ -146,27 +147,25 @@ export namespace Llama {
 
             if (!llamaContext) return
 
-            set((state) => ({
-                ...state,
+            set({
                 context: llamaContext,
                 model: model,
                 chatCount: 1,
-            }))
+            })
 
             // updated EngineData
             useEngineData.getState().setLastModelLoaded(model)
             KV.useKVState.getState().setKvCacheLoaded(false)
         },
         setLoadProgress: (progress: number) => {
-            set((state) => ({ ...state, loadProgress: progress }))
+            set({ loadProgress: progress })
         },
         unload: async () => {
             await get().context?.release()
-            set((state) => ({
-                ...state,
+            set({
                 context: undefined,
                 model: undefined,
-            }))
+            })
         },
         completion: async (
             params: CompletionParams,
@@ -188,7 +187,7 @@ export namespace Llama {
                     Logger.info(
                         `\n---- Start Chat ${get().chatCount} ----\n${textTimings(timings)}\n---- End Chat ${get().chatCount} ----\n`
                     )
-                    set((state) => ({ ...state, chatCount: get().chatCount + 1 }))
+                    set({ chatCount: get().chatCount + 1 })
                     if (mmkv.getBoolean(AppSettings.SaveLocalKV)) {
                         await get().saveKV(params.prompt)
                     }
