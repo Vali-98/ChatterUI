@@ -194,17 +194,17 @@ export const useTTSState = create<TTSState>()(
             },
 
             handleEndGeneration: async (lastIndex, text) => {
-                if (get().activeChatIndex !== undefined) return
+                if (!get().enabled) return
                 if (get().liveTTS) {
                     get().clearAndRunBuffer(lastIndex)
-                } else if (get().enabled && get().auto) {
+                } else if (get().auto && get().activeChatIndex === undefined) {
                     await get().stopTTS()
                     get().startTTS(text, lastIndex)
                 }
             },
 
             handleStartGeneration: async (lastIndex) => {
-                if (get().liveTTS) {
+                if (get().enabled && get().liveTTS) {
                     await Speech.stop()
                     set({ activeChatIndex: lastIndex })
                 }
@@ -232,7 +232,7 @@ export const useTTSState = create<TTSState>()(
                 set({ buffer: '' })
             },
             insertBuffer: (text: string) => {
-                if (!get().liveTTS || get().pauseLive) return
+                if (!get().enabled || !get().liveTTS || get().pauseLive) return
                 const newBuffer = get().buffer + text
 
                 let lastMatchIndex = -1
@@ -283,4 +283,3 @@ const cleanMarkdown = (text: string): string => {
     const result = text.replace(/([*_]{1,2}|`|\[\^.*?\]\(.*?\)|<\/?[^>]+>)/g, '')
     return result
 }
-
