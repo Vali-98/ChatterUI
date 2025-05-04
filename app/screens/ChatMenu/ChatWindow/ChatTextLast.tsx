@@ -37,7 +37,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
     }
 
     const updateHeight = () => {
-        if (firstRender.current) return
+        if (firstRender.current) return (firstRender.current = false)
         const showPadding = nowGenerating && buffer.data
         const overflowPadding = showPadding ? 12 : 0
         if (viewRef.current) {
@@ -51,20 +51,11 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
         }
     }
 
-    useEffect(() => {
-        if (firstRender.current) {
-            return () => {
-                firstRender.current = false
-            }
-        }
-        requestAnimationFrame(() => updateHeight())
-    }, [nowGenerating, buffer, swipeText])
-
     const filteredText = useTextFilter(swipeText?.trim() ?? '')
     const renderedText = showHidden ? swipeText?.trim() : filteredText.result
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
-            <View style={{ minHeight: 10 }} ref={viewRef}>
+            <View style={{ minHeight: 10 }} ref={viewRef} onLayout={updateHeight}>
                 {swipeId === currentSwipeId && nowGenerating && buffer.data === '' && (
                     <AnimatedEllipsis />
                 )}

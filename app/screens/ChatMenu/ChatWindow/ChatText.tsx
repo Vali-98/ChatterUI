@@ -32,7 +32,7 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
     }
 
     const updateHeight = () => {
-        if (firstRender.current) return
+        if (firstRender.current) return (firstRender.current = false)
         if (viewRef.current) {
             viewRef.current.measure((x, y, width, measuredHeight) => {
                 if (targetHeight.current === measuredHeight) return
@@ -42,15 +42,6 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
             })
         }
     }
-
-    useEffect(() => {
-        if (firstRender.current) {
-            return () => {
-                firstRender.current = false
-            }
-        }
-        // requestAnimationFrame(() => updateHeight())
-    }, [swipeText])
 
     const filteredText = useTextFilter(swipeText?.trim() ?? '')
     const renderedText = showHidden ? swipeText?.trim() : filteredText.result
