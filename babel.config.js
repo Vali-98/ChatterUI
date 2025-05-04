@@ -3,13 +3,7 @@ module.exports = function (api) {
     return {
         presets: ['babel-preset-expo'],
         plugins: [
-            [
-                'babel-plugin-react-compiler',
-                {
-                    // runtimeModule: 'react-compiler-runtime',
-                    target: '18',
-                },
-            ], // must run first!
+            ['babel-plugin-react-compiler'], // must run first!
             ['inline-import', { extensions: ['.sql'] }],
             // Required for expo-routerouter/
             'react-native-reanimated/plugin',

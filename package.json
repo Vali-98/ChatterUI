@@ -29,7 +29,7 @@
     "@shopify/flash-list": "1.7.6",
     "@vali98/react-native-fs": "^0.1.0",
     "babel-plugin-inline-import": "^3.0.0",
-    "babel-plugin-react-compiler": "^19.0.0-beta-a7bf2bd-20241110",
+    "babel-plugin-react-compiler": "^19.0.0-beta-af1b7da-20250417",
     "cui-llama.rn": "^1.6.0",
     "drizzle-kit": "^0.31.0",
     "drizzle-orm": "^0.36.2",
