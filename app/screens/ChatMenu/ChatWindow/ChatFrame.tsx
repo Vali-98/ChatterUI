@@ -21,7 +21,6 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
 
     const message = Chats.useEntryData(index)
     const setShowViewer = useViewerState((state) => state.setShow)
-    const enabled = useTTSState((state) => state.enabled)
     const charImageId = Characters.useCharacterCard((state) => state.card?.image_id) ?? 0
     const userImageId = Characters.useUserCard((state) => state.card?.image_id) ?? 0
 
@@ -40,40 +39,31 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
 
     return (
         <View style={{ flexDirection: 'row' }}>
-            <View style={{ alignItems: 'center' }}>
-                <TouchableOpacity onPress={() => setShowViewer(true, message.is_user)}>
-                    <Avatar
-                        style={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: borderRadius.xl,
-                            marginBottom: spacing.sm,
-                            marginLeft: spacing.sm,
-                            marginRight: spacing.m,
-                        }}
-                        targetImage={Characters.getImageDir(
-                            message.is_user ? userImageId : charImageId
-                        )}
-                    />
-                </TouchableOpacity>
+            <View
+                style={{
+                    alignItems: 'center',
+                }}>
+                <View style={{ rowGap: spacing.m, alignItems: 'center' }}>
+                    <TouchableOpacity onPress={() => setShowViewer(true, message.is_user)}>
+                        <Avatar
+                            style={{
+                                width: 48,
+                                height: 48,
+                                borderRadius: borderRadius.xl,
+                                marginLeft: spacing.sm,
+                                marginRight: spacing.m,
+                            }}
+                            targetImage={Characters.getImageDir(
+                                message.is_user ? userImageId : charImageId
+                            )}
+                        />
+                    </TouchableOpacity>
 
-                <Text
-                    style={{
-                        color: color.text._400,
-                        paddingTop: spacing.sm,
-                    }}>
-                    #{index}
-                </Text>
-                {deltaTime !== undefined && !message.is_user && index !== 0 && (
-                    <Text
-                        style={{
-                            color: color.text._400,
-                            paddingTop: spacing.sm,
-                        }}>
-                        {deltaTime}s
-                    </Text>
-                )}
-                {enabled && <TTSMenu index={index} />}
+                    <Text style={{ color: color.text._400 }}>#{index}</Text>
+                    {deltaTime !== undefined && !message.is_user && index !== 0 && (
+                        <Text style={{ color: color.text._400 }}>{deltaTime}s</Text>
+                    )}
+                </View>
             </View>
             <View style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>

@@ -56,7 +56,7 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
                     {renderedText}
                 </Markdown>
                 {filteredText.found && (
-                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                    <View style={{ flexDirection: 'row' }}>
                         <ThemedButton
                             onPress={() => setShowHidden(!showHidden)}
                             variant="secondary"
@@ -64,7 +64,8 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
                             labelStyle={{ flex: 0, fontSize: 12 }}
                             buttonStyle={{
                                 paddingVertical: 0,
-                                paddingHorizontal: 4,
+                                paddingBottom: 0,
+                                paddingHorizontal: 0,
                                 borderWidth: 0,
                             }}
                         />
