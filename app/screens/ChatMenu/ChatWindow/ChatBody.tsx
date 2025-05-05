@@ -75,7 +75,7 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
         <View>
             <Pressable
                 onPress={() => {
-                    setShowOptions(showOptions ? undefined : index)
+                    setShowOptions(showOptions || nowGenerating ? undefined : index)
                 }}
                 style={{
                     backgroundColor: color.neutral._200,
@@ -108,7 +108,7 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
                         justifyContent: 'space-between',
                     }}>
                     <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                        {(showOptions || isSpeaking) && (
+                        {((showOptions && !nowGenerating) || isSpeaking) && (
                             <Animated.View
                                 entering={StretchInY.duration(100)}
                                 exiting={StretchOutY.duration(100)}
@@ -119,11 +119,11 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
                                     position: 'absolute',
                                     paddingVertical: 4,
                                     paddingHorizontal: 16,
-                                    borderRadius: 16,
+                                    borderRadius: 8,
                                     borderWidth: 1,
                                     borderColor: color.primary._500,
                                     backgroundColor: color.neutral._300,
-                                    bottom: 0,
+                                    bottom: -4,
                                     zIndex: 21,
                                     boxShadow: [
                                         {
