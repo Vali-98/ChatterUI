@@ -14,7 +14,7 @@ type TTSState = {
     enabled: boolean
     auto: boolean
     rate: number
-    startTTS: (text: string, index: number, callback?: () => void) => Promise<void>
+    startTTS: (text: string, index: number) => Promise<void>
     stopTTS: () => Promise<void>
     setEnabled: (b: boolean) => void
     setAuto: (b: boolean) => void
@@ -115,10 +115,9 @@ export const useTTSState = create<TTSState>()(
             liveTTS: false,
             rate: 1,
             activeChatIndex: undefined,
-            startTTS: async (text: string, index: number, exitCallback = () => {}) => {
+            startTTS: async (text: string, index: number) => {
                 const clearIndex = () => {
-                    if (get().activeChatIndex === index)
-                        set((state) => ({ activeChatIndex: undefined }))
+                    if (get().activeChatIndex === index) set({ activeChatIndex: undefined })
                 }
 
                 const currentSpeaker = get().voice
@@ -145,7 +144,7 @@ export const useTTSState = create<TTSState>()(
                     item.replaceAll(/[*"]/g, '').trim()
                 )
                 Logger.debug('TTS started with ' + cleanedchunks.length + ' chunks')
-                set((state) => ({ ...state, activeChatIndex: index }))
+                set({ activeChatIndex: index })
                 cleanedchunks.forEach((chunk, index) =>
                     Speech.speak(chunk, {
                         language: currentSpeaker?.language,
@@ -161,26 +160,26 @@ export const useTTSState = create<TTSState>()(
             },
             stopTTS: async () => {
                 Logger.info('TTS stopped')
-                set((state) => ({ activeChatIndex: undefined }))
+                set({ buffer: '', activeChatIndex: undefined, pauseLive: get().liveTTS })
                 await Speech.stop()
             },
             setEnabled: (b: boolean) => {
-                set((state) => ({ enabled: b }))
+                set({ enabled: b })
             },
             setAuto: (b: boolean) => {
-                set((state) => ({ auto: b }))
+                set({ auto: b })
             },
             setVoice: (v: Speech.Voice) => {
-                set((state) => ({ voice: v }))
+                set({ voice: v })
             },
             setRate: (r: number) => {
-                set((state) => ({ rate: r }))
+                set({ rate: r })
             },
             setLiveTTS: (b: boolean) => {
-                set((state) => ({ liveTTS: b }))
+                set({ liveTTS: b })
             },
             setPauseLive: (b: boolean) => {
-                set((state) => ({ pauseLive: b }))
+                set({ pauseLive: b })
             },
             speak: (text, onDone = () => {}, onStop = () => {}) => {
                 const currentSpeaker = get().voice
@@ -197,7 +196,7 @@ export const useTTSState = create<TTSState>()(
                 if (!get().enabled) return
                 if (get().liveTTS) {
                     get().clearAndRunBuffer(lastIndex)
-                } else if (get().auto && get().activeChatIndex === undefined) {
+                } else if (get().auto) {
                     await get().stopTTS()
                     get().startTTS(text, lastIndex)
                 }
@@ -247,16 +246,7 @@ export const useTTSState = create<TTSState>()(
                     const remainder = newBuffer.slice(lastMatchIndex)
                     const clean = cleanMarkdown(fullSentence)
                     if (clean) {
-                        get().speak(
-                            clean,
-                            () => {},
-                            () =>
-                                set({
-                                    pauseLive: true,
-                                    activeChatIndex: undefined,
-                                    buffer: '',
-                                })
-                        )
+                        get().speak(clean)
                     }
                     set({ buffer: remainder })
                 } else {
