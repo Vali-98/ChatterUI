@@ -7,11 +7,6 @@ body:
     - type: markdown
       attributes:
           value: |
-              Thanks for taking the time to suggest a feature! Please complete the following fields.
-
-    - type: markdown
-      attributes:
-          value: |
               **Before submitting a feature request:**
 
               1. Check [existing issues](https://github.com/Vali-98/ChatterUI/issues) to see if your idea is already covered.
