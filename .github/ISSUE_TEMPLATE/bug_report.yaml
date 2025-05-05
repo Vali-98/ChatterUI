@@ -1,0 +1,62 @@
+name: Bug Report
+description: Report a bug to help us improve ChatterUI
+title: '[Bug]: '
+labels: [bug]
+
+body:
+    - type: markdown
+      attributes:
+          value: |
+              **Before submitting a bug report**, Check [existing issues](https://github.com/Vali-98/ChatterUI/issues to see if your issue is already covered.
+              ---
+
+              *Lets keep the issues page clean and organized.*
+
+    - type: markdown
+      attributes:
+          value: |
+              Please fill out the following to help us reproduce and fix the issue.
+
+    - type: input
+      id: version
+      validations:
+          required: true
+      attributes:
+          label: App Version
+          description: What version are you running?
+          placeholder: e.g., 0.8.6, 0.8.3-beta1...
+
+    - type: textarea
+      id: expected
+      validations:
+          required: true
+      attributes:
+          label: Expected Behavior
+          description: What did you expect to happen?
+
+    - type: textarea
+      id: actual
+      validations:
+          required: true
+      attributes:
+          label: Actual Behavior
+          description: What actually happened?
+
+    - type: textarea
+      id: steps
+      validations:
+          required: true
+      attributes:
+          label: Steps to Reproduce
+          description: Describe how to reproduce the issue.
+          placeholder: |
+              1. Go to '...'
+              2. Click on '...'
+              3. Scroll down to '...'
+              4. See error
+
+    - type: textarea
+      id: attachments
+      attributes:
+          label: Upload Logs or Screenshots
+          description: Attach logs or screenshots if needed
