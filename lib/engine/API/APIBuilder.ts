@@ -120,6 +120,13 @@ const readableStreamResponse = async (
     })
 
     sse.setOnEvent((data) => {
+        try {
+            const a = JSON.parse(data)
+            if (a?.error) {
+                Logger.errorToast('Error Logged')
+                Logger.error(data)
+            }
+        } catch (e) {}
         const text = (jsonreader(data) ?? '').replaceAll(replace, '')
         Chats.useChatState.getState().insertBuffer(text)
         useTTSState.getState().insertBuffer(text)
