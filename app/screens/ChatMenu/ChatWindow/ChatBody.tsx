@@ -83,7 +83,15 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
                     minHeight: 40,
                     borderRadius: borderRadius.m,
                     shadowColor: color.shadow,
-                    elevation: 2,
+                    boxShadow: [
+                        {
+                            offsetX: 1,
+                            offsetY: 1,
+                            spreadDistance: 2,
+                            color: color.shadow,
+                            blurRadius: 4,
+                        },
+                    ],
                 }}
                 onLongPress={handleEnableEdit}>
                 {isLastMessage ? (
@@ -114,6 +122,15 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
                                     backgroundColor: color.neutral._300,
                                     bottom: 0,
                                     zIndex: 21,
+                                    boxShadow: [
+                                        {
+                                            offsetX: 1,
+                                            offsetY: 1,
+                                            color: color.shadow,
+                                            spreadDistance: 1,
+                                            blurRadius: 4,
+                                        },
+                                    ],
                                 }}>
                                 {!(isLastMessage && nowGenerating) && (
                                     <>
