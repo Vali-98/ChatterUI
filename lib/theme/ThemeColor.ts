@@ -78,7 +78,7 @@ export namespace DefaultColorSchemes {
             _900: '#000000',
         },
         quote: '#e69d17',
-        shadow: '#000000',
+        shadow: '#111111',
     }
 
     export const lavenderLight: ThemeColor = {
@@ -129,7 +129,7 @@ export namespace DefaultColorSchemes {
             _900: '#faf7ff',
         },
         quote: '#e69d17',
-        shadow: '#000000',
+        shadow: '#aaa',
     }
 
     export const amoled: ThemeColor = {
