@@ -1,23 +1,22 @@
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useAppMode } from '@lib/state/AppMode'
-import { Chats } from '@lib/state/Chat'
+import { Chats, useInference } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Pressable, Text, TouchableOpacity, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import { Logger } from '@lib/state/Logger'
 import { useTTS } from '@lib/state/TTS'
 import { setStringAsync } from 'expo-clipboard'
-import { useState } from 'react'
 import Animated, { StretchInY, StretchOutY } from 'react-native-reanimated'
+import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 import ChatText from './ChatText'
 import ChatTextLast from './ChatTextLast'
 import { useChatEditorState } from './EditorModal'
 import Swipes from './Swipes'
 import TTS from './TTS'
-import { create } from 'zustand'
-import { useShallow } from 'zustand/react/shallow'
 
 type ChatTextProps = {
     index: number
@@ -32,6 +31,11 @@ interface OptionsStateProps {
     setActiveIndex: (n: number | undefined) => void
 }
 
+useInference.subscribe(({ nowGenerating }) => {
+    if (nowGenerating) {
+        optionState.getState().setActiveIndex(undefined)
+    }
+})
 const optionState = create<OptionsStateProps>()((set) => ({
     setActiveIndex: (n) => set({ activeIndex: n }),
 }))
