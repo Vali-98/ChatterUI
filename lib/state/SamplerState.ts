@@ -70,14 +70,10 @@ export namespace SamplersManager {
                     const configs = get().configList
                     const index = get().currentConfigIndex
                     configs[index] = config
-                    set((state) => ({
-                        ...state,
-                        configList: configs,
-                    }))
+                    set({ configList: [...configs] })
                 },
                 fixConfigs: () => {
                     set((state) => ({
-                        ...state,
                         configList: state.configList.map((item) => ({
                             name: item.name,
                             data: fixSamplerConfig(item.data),
@@ -180,4 +176,3 @@ export const fixSamplerConfig = (config: SamplerConfigData) => {
     if (!samekeys) Logger.warn(`Sampler Config had missing fields and was fixed!`)
     return config
 }
-

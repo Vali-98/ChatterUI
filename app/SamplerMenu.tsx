@@ -8,7 +8,7 @@ import HeaderTitle from '@components/views/HeaderTitle'
 import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { Samplers } from '@lib/constants/SamplerData'
-import { APISampler } from '@lib/engine/API/APIBuilder.types'
+import { APIConfiguration, APISampler } from '@lib/engine/API/APIBuilder.types'
 import { APIState as APIStateNew } from '@lib/engine/API/APIManagerState'
 import { localSamplerData } from '@lib/engine/LocalInference'
 import { useAppMode } from '@lib/state/AppMode'
@@ -48,7 +48,7 @@ const SamplerMenu = () => {
         if (appMode === 'local') return localSamplerData
         if (activeIndex !== -1) {
             const template = getTemplates().find(
-                (item) => item.name === apiValues[activeIndex].configName
+                (item: APIConfiguration) => item.name === apiValues[activeIndex].configName
             )
             if (!template) return []
             return template.request.samplerFields
