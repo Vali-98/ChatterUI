@@ -23,40 +23,33 @@ body:
           required: true
       attributes:
           label: App Version
-          description: What version are you running?
-          placeholder: e.g., 0.8.6, 0.8.3-beta1...
+          description: What ChatterUI version are you running?
+          placeholder: e.g., 0.8.7, 0.8.7-beta1...
 
-    - type: textarea
-      id: expected
+    - type: input
+      id: device
       validations:
           required: true
       attributes:
-          label: Expected Behavior
-          description: What did you expect to happen?
+          label: Device Information
+          description: What is your device and Android version?
+          placeholder: e.g., Samsung S22, Android 12
+
+    - type: input
+      id: api
+      attributes:
+          label: (Optional) API / Local and Model Info
+          description: If this issue is model / API related, provide the relevant information
+          placeholder: e.g., OpenRouter - Qwen 3 14B, Local - Gemma 3 1B
 
     - type: textarea
-      id: actual
+      id: description
       validations:
           required: true
       attributes:
-          label: Actual Behavior
-          description: What actually happened?
-
-    - type: textarea
-      id: steps
-      validations:
-          required: true
-      attributes:
-          label: Steps to Reproduce
-          description: Describe how to reproduce the issue.
-          placeholder: |
-              1. Go to '...'
-              2. Click on '...'
-              3. Scroll down to '...'
-              4. See error
-
-    - type: textarea
-      id: attachments
-      attributes:
-          label: Upload Logs or Screenshots
-          description: Attach logs or screenshots if needed
+          label: Description
+          description: |
+              Explain the bug in detail. Preferably, add reproduction steps such as:
+                 1. Go to Home
+                 2. Press Open Button
+                 3. ...
