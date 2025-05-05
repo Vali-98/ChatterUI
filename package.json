@@ -31,7 +31,7 @@
     "babel-plugin-inline-import": "^3.0.0",
     "babel-plugin-react-compiler": "^19.0.0-beta-af1b7da-20250417",
     "cui-llama.rn": "^1.6.0",
-    "drizzle-kit": "^0.31.0",
+    "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.36.2",
     "eslint-plugin-react-compiler": "^0.0.0-experimental-7c1344f-20241009",
     "expo": "^53.0.0",

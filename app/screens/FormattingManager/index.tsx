@@ -383,6 +383,16 @@ const FormattingManager = () => {
                                     })
                                 }}
                             />
+                            <ThemedCheckbox
+                                label="Remove Think Tags"
+                                value={currentInstruct.hide_think_tags}
+                                onChangeValue={(b) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        hide_think_tags: b,
+                                    })
+                                }}
+                            />
                         </View>
                         <View>
                             <ThemedCheckbox

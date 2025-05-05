@@ -2,12 +2,28 @@ import { AppSettings } from '@lib/constants/GlobalValues'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
-import { Instructs } from '@lib/state/Instructs'
+import { Instructs, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'
-import { replaceMacros } from '@lib/utils/Macros'
+import { getDefaultMacroRules, Macro } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
+
+const getMacrosRules = (instruct: InstructType) => {
+    const rules = getDefaultMacroRules()
+    if (instruct.hide_think_tags) {
+        rules.push({
+            macro: /<think>[\s\S]*?<\/think>/g,
+            value: '',
+        })
+    }
+    return rules
+}
+
+const replaceMacros = (data: string, rules: Macro[]) => {
+    for (const rule of rules) data = data.replaceAll(rule.macro, rule.value)
+    return data
+}
 
 const getCardData = () => {
     const userCard = { ...Characters.useUserCard.getState().card }
@@ -37,7 +53,7 @@ export const buildTextCompletionContext = (max_length: number, printTimings = tr
     const charCardData = (currentCard?.description ?? '').trim()
 
     const { characterCache, userCache, instructCache } = getCaches(charName, userName)
-
+    const rules = getMacrosRules(currentInstruct)
     let payload = ``
 
     // set suffix length as its always added
@@ -166,7 +182,7 @@ export const buildTextCompletionContext = (max_length: number, printTimings = tr
 
     payload += currentInstruct.system_suffix
 
-    payload = replaceMacros(payload + message_acc)
+    payload = replaceMacros(payload + message_acc, rules)
     if (printTimings) {
         Logger.info(`Approximate Context Size: ${message_acc_length + payload_length} tokens`)
         Logger.info(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
@@ -191,7 +207,7 @@ export const buildChatCompletionContext = (
 
     const messages = [...(Chats.useChatState.getState().data?.messages ?? [])]
     const currentInstruct = Instructs.useInstruct.getState().replacedMacros()
-
+    const rules = getMacrosRules(currentInstruct)
     const { userCard, currentCard } = getCardData()
     const userName = userCard?.name ?? ''
     const charName = currentCard?.name ?? ''
@@ -222,7 +238,10 @@ export const buildChatCompletionContext = (
     }
 
     const payload: Message[] = [
-        { role: completionFeats.systemRole, [completionFeats.contentName]: replaceMacros(initial) },
+        {
+            role: completionFeats.systemRole,
+            [completionFeats.contentName]: replaceMacros(initial, rules),
+        },
     ]
 
     const messageBuffer: Message[] = []
@@ -249,7 +268,7 @@ export const buildChatCompletionContext = (
 
         messageBuffer.push({
             role: message.is_user ? completionFeats.userRole : completionFeats.assistantRole,
-            content: replaceMacros(prefill + swipe_data.swipe),
+            content: replaceMacros(prefill + swipe_data.swipe, rules),
         })
         total_length += len
         index--

@@ -190,6 +190,9 @@ export const instructs = sqliteTable('instructs', {
     // additions 17/10/2024 v5
     scenario: integer('scenario', { mode: 'boolean' }).notNull().default(true),
     personality: integer('personality', { mode: 'boolean' }).notNull().default(true),
+
+    // additions 5/5/2025 v6
+    hide_think_tags: integer('hide_think_tags', { mode: 'boolean' }).notNull().default(true),
 })
 
 // LOREBOOKS

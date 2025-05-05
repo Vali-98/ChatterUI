@@ -20,6 +20,7 @@ const defaultBooleans = {
     format_type: 0,
     scenario: true,
     personality: true,
+    hide_think_tags: true,
 }
 
 const defaultInstructs: InstructType[] = [
@@ -258,7 +259,7 @@ export namespace Instructs {
                 name: Storage.Instruct,
                 storage: createJSONStorage(() => mmkvStorage),
                 partialize: (state) => ({ data: state.data }),
-                version: 3,
+                version: 4,
                 migrate: async (persistedState: any, version) => {
                     if (!version) {
                         persistedState.data.timestamp = false
@@ -286,6 +287,10 @@ export namespace Instructs {
                     if (version === 2) {
                         persistedState.data.scenario = true
                         persistedState.data.personality = true
+                    }
+
+                    if (version === 3) {
+                        persistedState.data.hide_think_tags = true
                     }
 
                     return persistedState

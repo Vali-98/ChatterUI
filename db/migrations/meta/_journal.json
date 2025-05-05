@@ -71,6 +71,13 @@
       "when": 1744296576041,
       "tag": "0009_huge_young_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1746450681184,
+      "tag": "0010_empty_pandemic",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE `instructs` ADD `hide_think_tags` integer DEFAULT true NOT NULL;
