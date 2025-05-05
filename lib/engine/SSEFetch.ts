@@ -33,12 +33,12 @@ export class SSEFetch {
                 headers: values.headers,
                 ...body,
             })
-
             if (res.status !== 200 || !res.body) {
                 Logger.error(await res.text())
                 return this.onError()
             }
             this.closeStream = res.body.cancel
+            //@ts-expect-error incorrect typing by expo/fetch
             for await (const chunk of res.body) {
                 const data = this.decoder.decode(chunk)
                 const output = parseSSE(data)
