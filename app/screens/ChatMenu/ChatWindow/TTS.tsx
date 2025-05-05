@@ -1,9 +1,10 @@
-import { FontAwesome, Octicons } from '@expo/vector-icons'
+import { Octicons } from '@expo/vector-icons'
 import { Chats, useInference } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
-import { useTTS, useTTSState } from '@lib/state/TTS'
+import { useTTS } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
 import { TouchableOpacity, View } from 'react-native'
+import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated'
 
 type TTSProps = {
     index: number
@@ -28,18 +29,23 @@ const TTS: React.FC<TTSProps> = ({ index }) => {
     if (enabled)
         return (
             <View>
-                {isSpeaking ? (
-                    <TouchableOpacity onPress={handleStopSpeaking}>
-                        <Octicons name="mute" size={20} color={color.error._500} />
-                    </TouchableOpacity>
-                ) : (
-                    <TouchableOpacity onPress={handleSpeak} disabled={nowGenerating}>
-                        <Octicons
-                            name="unmute"
-                            size={20}
-                            color={nowGenerating ? color.text._600 : color.primary._400}
-                        />
-                    </TouchableOpacity>
+                {isSpeaking && (
+                    <Animated.View entering={ZoomIn.duration(200)} exiting={ZoomOut.duration(200)}>
+                        <TouchableOpacity onPress={handleStopSpeaking}>
+                            <Octicons name="mute" size={20} color={color.error._500} />
+                        </TouchableOpacity>
+                    </Animated.View>
+                )}
+                {!isSpeaking && (
+                    <Animated.View entering={ZoomIn.duration(200)} exiting={ZoomOut.duration(200)}>
+                        <TouchableOpacity onPress={handleSpeak} disabled={nowGenerating}>
+                            <Octicons
+                                name="unmute"
+                                size={20}
+                                color={nowGenerating ? color.text._600 : color.primary._400}
+                            />
+                        </TouchableOpacity>
+                    </Animated.View>
                 )}
             </View>
         )

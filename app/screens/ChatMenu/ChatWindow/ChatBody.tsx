@@ -9,7 +9,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import { Logger } from '@lib/state/Logger'
 import { useTTS } from '@lib/state/TTS'
 import { setStringAsync } from 'expo-clipboard'
-import Animated, { StretchInY, StretchOutY } from 'react-native-reanimated'
+import Animated, { StretchInY, StretchOutY, ZoomIn, ZoomOut } from 'react-native-reanimated'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 import ChatText from './ChatText'
@@ -134,55 +134,68 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
                                 }}>
                                 {!(isLastMessage && nowGenerating) && (
                                     <>
-                                        <ThemedButton
-                                            variant="tertiary"
-                                            iconName="copy1"
-                                            iconSize={16}
-                                            iconStyle={{
-                                                color: color.text._500,
-                                            }}
-                                            onPress={() => {
-                                                setStringAsync(swipe)
-                                                    .then(() => {
-                                                        Logger.infoToast('Copied')
-                                                    })
-                                                    .catch(() => {
-                                                        Logger.errorToast(
-                                                            'Failed to copy to clipboard'
-                                                        )
-                                                    })
-                                            }}
-                                        />
-                                        <ThemedButton
-                                            variant="tertiary"
-                                            iconName="edit"
-                                            iconSize={16}
-                                            iconStyle={{
-                                                color: color.text._500,
-                                            }}
-                                            onPress={handleEnableEdit}
-                                        />
-                                        {code && (
+                                        <Animated.View
+                                            entering={ZoomIn.duration(200)}
+                                            exiting={ZoomOut.duration(200)}>
                                             <ThemedButton
                                                 variant="tertiary"
-                                                iconName="codesquareo"
+                                                iconName="copy1"
                                                 iconSize={16}
                                                 iconStyle={{
                                                     color: color.text._500,
                                                 }}
                                                 onPress={() => {
-                                                    if (code[1])
-                                                        setStringAsync(code[1])
-                                                            .then(() => {
-                                                                Logger.infoToast('Copied Code')
-                                                            })
-                                                            .catch(() => {
-                                                                Logger.errorToast(
-                                                                    'Failed to copy to clipboard'
-                                                                )
-                                                            })
+                                                    setStringAsync(swipe)
+                                                        .then(() => {
+                                                            Logger.infoToast('Copied')
+                                                        })
+                                                        .catch(() => {
+                                                            Logger.errorToast(
+                                                                'Failed to copy to clipboard'
+                                                            )
+                                                        })
                                                 }}
                                             />
+                                        </Animated.View>
+
+                                        <Animated.View
+                                            entering={ZoomIn.duration(200)}
+                                            exiting={ZoomOut.duration(200)}>
+                                            <ThemedButton
+                                                variant="tertiary"
+                                                iconName="edit"
+                                                iconSize={16}
+                                                iconStyle={{
+                                                    color: color.text._500,
+                                                }}
+                                                onPress={handleEnableEdit}
+                                            />
+                                        </Animated.View>
+                                        {code && (
+                                            <Animated.View
+                                                entering={ZoomIn.duration(200)}
+                                                exiting={ZoomOut.duration(200)}>
+                                                <ThemedButton
+                                                    variant="tertiary"
+                                                    iconName="codesquareo"
+                                                    iconSize={16}
+                                                    iconStyle={{
+                                                        color: color.text._500,
+                                                    }}
+                                                    onPress={() => {
+                                                        if (code[1])
+                                                            setStringAsync(code[1])
+                                                                .then(() => {
+                                                                    Logger.infoToast('Copied Code')
+                                                                })
+                                                                .catch(() => {
+                                                                    Logger.errorToast(
+                                                                        'Failed to copy to clipboard'
+                                                                    )
+                                                                })
+                                                    }}
+                                                />
+                                            </Animated.View>
                                         )}
                                     </>
                                 )}
