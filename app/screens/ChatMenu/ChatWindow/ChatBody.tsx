@@ -40,10 +40,12 @@ const optionState = create<OptionsStateProps>()((set) => ({
     setActiveIndex: (n) => set({ activeIndex: n }),
 }))
 
+/*TODO: Move Chat Option Bar to own component */
 const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage, isGreeting }) => {
     const message = Chats.useEntryData(index)
     const { appMode } = useAppMode()
-    const [showTPS, __] = useMMKVBoolean(AppSettings.ShowTokenPerSecond)
+    const [showTPS, _] = useMMKVBoolean(AppSettings.ShowTokenPerSecond)
+    const [quickDelete, __] = useMMKVBoolean(AppSettings.QuickDelete)
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
 
     const { activeChatIndex } = useTTS()
@@ -53,6 +55,7 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
             activeIndex: state.activeIndex,
         }))
     )
+    const { deleteEntry } = Chats.useEntry()
 
     const showOptions = activeIndex === index
 
@@ -134,6 +137,22 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
                                 }}>
                                 {!(isLastMessage && nowGenerating) && (
                                     <>
+                                        <Animated.View
+                                            entering={ZoomIn.duration(200)}
+                                            exiting={ZoomOut.duration(200)}>
+                                            <ThemedButton
+                                                variant="tertiary"
+                                                iconName="delete"
+                                                iconSize={16}
+                                                iconStyle={{
+                                                    color: color.error._400,
+                                                }}
+                                                onPress={() => {
+                                                    if (showOptions) setShowOptions(undefined)
+                                                    deleteEntry(index)
+                                                }}
+                                            />
+                                        </Animated.View>
                                         <Animated.View
                                             entering={ZoomIn.duration(200)}
                                             exiting={ZoomOut.duration(200)}>

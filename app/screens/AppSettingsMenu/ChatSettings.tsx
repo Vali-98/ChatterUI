@@ -11,6 +11,7 @@ const ChatSettings = () => {
     const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
     const [sendOnEnter, setSendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
     const [autoLoadUser, setAutoLoadUser] = useMMKVBoolean(AppSettings.AutoLoadUser)
+    const [quickDelete, setQuickDelete] = useMMKVBoolean(AppSettings.QuickDelete)
 
     const [showTokensPerSecond, setShowTokensPerSecond] = useMMKVBoolean(
         AppSettings.ShowTokenPerSecond
@@ -60,6 +61,13 @@ const ChatSettings = () => {
                 value={showTokensPerSecond}
                 onChangeValue={setShowTokensPerSecond}
                 description="Show tokens per second when using local models"
+            />
+
+            <ThemedSwitch
+                label="Quick Delete"
+                value={quickDelete}
+                onChangeValue={setQuickDelete}
+                description="Toggle delete button in chat options bar"
             />
         </View>
     )

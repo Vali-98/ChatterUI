@@ -134,6 +134,7 @@ export enum AppSettings {
     UseModelTemplate = 'useModelTemplate',
     ShowTokenPerSecond = 'showtokenpersecond',
     AutoLoadUser = 'autoloaduser',
+    QuickDelete = 'settings-quickdelete',
 }
 
 /**
@@ -164,6 +165,7 @@ export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.UseModelTemplate]: true,
     [AppSettings.ShowTokenPerSecond]: true,
     [AppSettings.AutoLoadUser]: true,
+    [AppSettings.QuickDelete]: false,
 }
 
 export const CLAUDE_VERSION = '2023-06-01'
