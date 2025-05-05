@@ -7,9 +7,9 @@ body:
     - type: markdown
       attributes:
           value: |
-              **Before submitting a bug report**, Check [existing issues](https://github.com/Vali-98/ChatterUI/issues to see if your issue is already covered.
+              **Before submitting a bug report:** 
+              Check [existing issues](https://github.com/Vali-98/ChatterUI/issues) to see if your issue is already covered.
               ---
-
               *Lets keep the issues page clean and organized.*
 
     - type: markdown
