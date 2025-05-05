@@ -17,22 +17,19 @@ type ColorThemeItemProps = {
 }
 
 const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete = false }) => {
-    const { color, setColor, customColors, addCustomColor, removeColorScheme, length } =
-        Theme.useColorState(
-            useShallow((state) => ({
-                color: state.color,
-                setColor: state.setColor,
-                customColors: state.customColors,
-                addCustomColor: state.addCustomColor,
-                removeColorScheme: state.removeColorScheme,
-                length: state.customColors.length,
-            }))
-        )
+    const { color, setColor, customColors, removeColorScheme } = Theme.useColorState(
+        useShallow((state) => ({
+            color: state.color,
+            setColor: state.setColor,
+            customColors: state.customColors,
+            removeColorScheme: state.removeColorScheme,
+        }))
+    )
 
     const handleRemoveColorScheme = (index: number) => {
         Alert.alert({
             title: 'Delete Theme',
-            description: `Are you sure you want to delete ${customColors[0].name}? This cannot be undone!`,
+            description: `Are you sure you want to delete ${customColors[0]?.name}? This cannot be undone!`,
             buttons: [
                 { label: 'Cancel' },
                 {
@@ -125,11 +122,13 @@ const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete
 }
 
 const ColorSelector = () => {
-    const { color, customColors, addCustomColor } = Theme.useColorState((state) => ({
-        color: state.color,
-        customColors: state.customColors,
-        addCustomColor: state.addCustomColor,
-    }))
+    const { color, customColors, addCustomColor } = Theme.useColorState(
+        useShallow((state) => ({
+            color: state.color,
+            customColors: state.customColors,
+            addCustomColor: state.addCustomColor,
+        }))
+    )
 
     return (
         <View style={{ padding: 16, rowGap: 16 }}>
@@ -172,4 +171,3 @@ const ColorSelector = () => {
 }
 
 export default ColorSelector
-
