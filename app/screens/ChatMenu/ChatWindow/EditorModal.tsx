@@ -90,38 +90,10 @@ const EditorModal = () => {
                 <View style={{ flex: 1 }} />
                 <Animated.View exiting={SlideOutDown.duration(100)} style={styles.editorContainer}>
                     <View style={styles.topText}>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'flex-end',
-                                flex: 1,
-                            }}>
-                            <Text numberOfLines={1} style={styles.nameText}>
-                                {entry?.name}
-                            </Text>
-                            <Text style={styles.timeText}>
-                                {swipe?.send_date.toLocaleTimeString()}
-                            </Text>
-                        </View>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'flex-end',
-                                columnGap: 16,
-                            }}>
-                            <ThemedButton
-                                iconName="reload1"
-                                variant="tertiary"
-                                label="Reset"
-                                onPress={() => swipeText && setPlaceholderText(swipeText)}
-                            />
-                            <ThemedButton
-                                iconName="copy1"
-                                variant="tertiary"
-                                label="Copy"
-                                onPress={() => swipeText && ClipBoard.setStringAsync(swipeText)}
-                            />
-                        </View>
+                        <Text numberOfLines={1} style={styles.nameText} ellipsizeMode="tail">
+                            {entry?.name}
+                        </Text>
+                        <Text style={styles.timeText}>{swipe?.send_date.toLocaleTimeString()}</Text>
                     </View>
 
                     <TextInput
@@ -143,6 +115,12 @@ const EditorModal = () => {
                             iconName="delete"
                             onPress={handleDeleteMessage}
                             variant="critical"
+                        />
+                        <ThemedButton
+                            iconName="reload1"
+                            variant="tertiary"
+                            label="Reset"
+                            onPress={() => swipeText && setPlaceholderText(swipeText)}
                         />
                         <ThemedButton
                             label="Confirm"
@@ -174,9 +152,9 @@ const useStyles = () => {
         },
 
         topText: {
-            justifyContent: 'space-between',
             flexDirection: 'row',
             alignItems: 'flex-end',
+            columnGap: 12,
             shadowColor: color.shadow,
             borderTopRightRadius: spacing.m,
             borderTopLeftRadius: spacing.m,
@@ -185,14 +163,11 @@ const useStyles = () => {
         nameText: {
             color: color.text._100,
             fontSize: fontSize.l,
-            marginLeft: spacing.l,
-            flex: 1,
         },
 
         timeText: {
             color: color.text._400,
             fontSize: fontSize.s,
-            marginHorizontal: spacing.s,
         },
 
         messageInput: {
