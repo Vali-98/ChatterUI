@@ -7,7 +7,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { checkGGMLDeprecated } from './GGML'
-import { KV } from './Model'
+import { KV, Model } from './Model'
 import { AppSettings } from '../../constants/GlobalValues'
 import { Logger } from '../../state/Logger'
 import { mmkv, mmkvStorage } from '../../storage/MMKV'
@@ -115,8 +115,9 @@ export namespace Llama {
                 return Logger.errorToast('Quantization No Longer Supported!')
             }
 
-            if (!(await getInfoAsync(model.file_path)).exists) {
+            if (!(await Model.getModelExists(model.file_path))) {
                 Logger.errorToast('Model Does Not Exist!')
+                Model.verifyModelList()
                 return
             }
 
@@ -209,6 +210,7 @@ export namespace Llama {
             }
 
             if (!(await getInfoAsync(sessionFile)).exists) {
+                Logger.warn('Session file does not exist, creating...')
                 await writeAsStringAsync(sessionFile, '', { encoding: 'base64' })
             }
 

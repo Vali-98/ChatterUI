@@ -74,6 +74,15 @@ export namespace Model {
         })
     }
 
+    export const getModelExists = async (path: string) => {
+        return await getInfoAsync(path)
+            .then((result) => result.exists)
+            .catch((e) => {
+                Logger.error(`${e}`)
+                return false
+            })
+    }
+
     export const verifyModelList = async () => {
         let modelList = await db.query.model_data.findMany()
         const fileList = await getModelList()
@@ -82,7 +91,7 @@ export namespace Model {
         if (Platform.OS === 'android')
             // cull not required on iOS
             modelList.forEach(async (item) => {
-                if (item.name === '' || !(await getInfoAsync(item.file_path)).exists) {
+                if (item.name === '' || !(await getModelExists(item.file_path))) {
                     Logger.warnToast(`Model Missing, its entry will be deleted: ${item.name}`)
                     await db.delete(model_data).where(eq(model_data.id, item.id))
                 }
