@@ -25,6 +25,7 @@ import { Chats } from '../state/Chat'
 import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
 import { Theme } from '../theme/ThemeManager'
+import { Tokenizer } from '@lib/engine/Tokenizer'
 
 export const loadChatOnInit = async () => {
     if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return
@@ -217,7 +218,7 @@ export const startupApp = () => {
 
     // Local Model Data in case external models are deleted
     Model.verifyModelList()
-
+    Tokenizer.useDefaultTokenizer.getState().loadModel()
     // migrations for old versions
     migrateModelData_0_7_10_to_0_8_0()
     migrateModelData_0_8_4_to_0_8_5()

@@ -27,13 +27,19 @@ export namespace Tokenizer {
             return get()?.model?.tokenizeSync(text)?.tokens ?? []
         },
         getTokenCount: (text: string) => {
-            const tokens = get()?.model?.tokenizeSync(text)?.tokens?.length ?? 0
-            return tokens
+            const model = get().model
+            if (!model) {
+                Logger.warn('Tokenizer not loaded')
+                return 0
+            }
+            return model.tokenizeSync(text).tokens.length
         },
         loadModel: async () => {
             if (get().model) return
 
-            await importModelFromRes()
+            await importModelFromRes().catch((e) => {
+                Logger.error('Could not import Tokenizer: ' + e)
+            })
 
             const context = await initLlama({
                 model: documentDirectory + 'appAssets/llama3tokenizer.gguf',
@@ -74,5 +80,3 @@ export namespace Tokenizer {
         return appMode === 'local' ? llamaTokenizer : defaultTokenizer
     }
 }
-
-Tokenizer.useDefaultTokenizer.getState().loadModel()
