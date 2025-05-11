@@ -21,9 +21,10 @@ import { z } from 'zod'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-import { Logger } from './Logger'
+import { saveStringToDownload } from '@lib/utils/File'
 import { mmkvStorage } from '../storage/MMKV'
-import { getPngChunkText } from '../utils/PNG'
+import { createPNGWithText, getPngChunkText } from '../utils/PNG'
+import { Logger } from './Logger'
 
 export type CharInfo = {
     name: string
@@ -756,6 +757,26 @@ export namespace Characters {
         await FS.writeAsStringAsync(cardCacheDir, btoa(binaryString), { encoding: 'base64' })
         await db.mutate.createCharacter(character, `${FS.cacheDirectory}${uuid}.png`)
         Logger.info('Imported Character: ' + character.data.name)
+    }
+
+    export const exportCharacter = async (id: number) => {
+        const dbcard = await db.query.card(id)
+        if (!dbcard) {
+            Logger.error('Exported card does not exist!')
+            return
+        }
+        const imagePath = getImageDir(dbcard.image_id)
+        // name can be empty string, should at least have something
+        const exportedFileName = (dbcard.name ?? 'Character') + '.png'
+        const cardString = JSON.stringify(convertDBDataToCV2(dbcard))
+        const fileData = await FS.readAsStringAsync(imagePath, {
+            encoding: FS.EncodingType.Base64,
+        }).catch((e) => {
+            Logger.error('Could not get file data for export: ' + JSON.stringify(e))
+        })
+        if (!fileData) return
+        const exportData = createPNGWithText(cardString, fileData)
+        await saveStringToDownload(exportData, exportedFileName, 'base64')
     }
 
     export const importCharacterFromRemote = async (text: string) => {

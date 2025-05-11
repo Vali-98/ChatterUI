@@ -99,6 +99,86 @@ function decodePNG(data: Uint8Array) {
     }
 }
 
+export function createPNGWithText(data: string, filedata: string): string {
+    const binaryString = atob(filedata)
+    const bytes = Uint8Array.from(binaryString, (c) => c.charCodeAt(0))
+
+    // PNG signature check
+    if (
+        bytes[0] !== 0x89 ||
+        bytes[1] !== 0x50 ||
+        bytes[2] !== 0x4e ||
+        bytes[3] !== 0x47 ||
+        bytes[4] !== 0x0d ||
+        bytes[5] !== 0x0a ||
+        bytes[6] !== 0x1a ||
+        bytes[7] !== 0x0a
+    ) {
+        throw new Error('Invalid PNG header')
+    }
+
+    const newChunks: Uint8Array[] = []
+    let offset = 8
+    newChunks.push(bytes.slice(0, 8)) // push PNG header
+
+    let inserted = false
+    while (offset < bytes.length) {
+        const length =
+            (bytes[offset] << 24) |
+            (bytes[offset + 1] << 16) |
+            (bytes[offset + 2] << 8) |
+            bytes[offset + 3]
+        const type = String.fromCharCode(...bytes.slice(offset + 4, offset + 8))
+        const chunkEnd = offset + 12 + length
+        const chunk = bytes.slice(offset, chunkEnd)
+
+        if (type === 'tEXt') {
+            // Skip existing tEXt chunk
+            offset = chunkEnd
+            continue
+        }
+
+        newChunks.push(chunk)
+        offset = chunkEnd
+
+        if (type === 'IHDR' && !inserted) {
+            newChunks.push(createTextChunk(data))
+            inserted = true
+        }
+    }
+
+    const output = new Uint8Array(newChunks.reduce((acc, chunk) => acc + chunk.length, 0))
+    let outOffset = 0
+    for (const chunk of newChunks) {
+        output.set(chunk, outOffset)
+        outOffset += chunk.length
+    }
+
+    return btoa(String.fromCharCode(...output))
+}
+
+function createTextChunk(text: string): Uint8Array {
+    const keyword = 'Description' // required PNG text chunk keyword
+    const textBytes = new TextEncoder().encode(keyword + '\0' + btoa(text))
+    const typeBytes = new TextEncoder().encode('tEXt')
+
+    const length = textBytes.length
+    const lengthBytes = new Uint8Array(4)
+    new DataView(lengthBytes.buffer).setUint32(0, length)
+
+    const chunk = new Uint8Array(4 + 4 + length + 4)
+    chunk.set(lengthBytes, 0)
+    chunk.set(typeBytes, 4)
+    chunk.set(textBytes, 8)
+
+    const crc = crc32_buf(chunk.slice(4, 8 + length))
+    const crcBytes = new Uint8Array(4)
+    new DataView(crcBytes.buffer).setUint32(0, crc)
+    chunk.set(crcBytes, 8 + length)
+
+    return chunk
+}
+
 function signed_crc_table() {
     let c = 0
     const table = new Array(256)

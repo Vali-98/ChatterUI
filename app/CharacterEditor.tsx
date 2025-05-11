@@ -89,6 +89,17 @@ const ChracterEditor = () => {
         })
     })
 
+    const handleExportCard = async () => {
+        try {
+            if (!charId) return
+
+            await Characters.exportCharacter(charId)
+            Logger.infoToast('Card Exported!')
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     const handleSaveCard = async () => {
         if (characterCard && charId)
             return Characters.db.mutate.updateCard(characterCard, charId).then(() => {
@@ -260,13 +271,22 @@ const ChracterEditor = () => {
                                     label="Delete"
                                     onPress={handleDeleteCard}
                                 />
-
+                                {!edited && (
+                                    <ThemedButton
+                                        iconName="upload"
+                                        iconSize={20}
+                                        label="Export"
+                                        onPress={handleExportCard}
+                                        variant="secondary"
+                                    />
+                                )}
                                 {edited && (
                                     <ThemedButton
                                         iconName="save"
                                         iconSize={20}
                                         label="Save"
                                         onPress={handleSaveCard}
+                                        variant="secondary"
                                     />
                                 )}
                             </View>
