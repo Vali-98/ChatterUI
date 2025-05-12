@@ -259,9 +259,6 @@ const getSamplerFields = (config: APIConfiguration, values: APIValues) => {
 }
 
 const constructStopSequence = (): string[] => {
-    const instruct = Instructs.useInstruct.getState().replacedMacros()
-    const sequence: string[] = []
-    if (instruct.stop_sequence !== '')
-        instruct.stop_sequence.split(',').forEach((item) => item !== '' && sequence.push(item))
-    return sequence
+    // kept this helper for extendability
+    return Instructs.useInstruct.getState().getStopSequence()
 }

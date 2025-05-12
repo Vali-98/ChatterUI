@@ -105,31 +105,22 @@ const buildLocalPayload = async () => {
 }
 
 const constructStopSequence = (): string[] => {
-    const instruct = Instructs.useInstruct.getState().replacedMacros()
-    const sequence: string[] = []
-    if (instruct.stop_sequence !== '')
-        instruct.stop_sequence.split(',').forEach((item) => item !== '' && sequence.push(item))
-    return sequence
+    // kept this helper for extendability
+    return Instructs.useInstruct.getState().getStopSequence()
 }
 
 const stopGenerating = () => {
+    // kept this helper for extendability
     Chats.useChatState.getState().stopGenerating()
 }
 
 const constructReplaceStrings = (): string[] => {
-    const currentInstruct: InstructType = Instructs.useInstruct.getState().replacedMacros()
     // default stop strings defined instructs
     const stops: string[] = constructStopSequence()
     // additional stop strings based on context configuration
-    const output: string[] = []
-
-    if (currentInstruct.names) {
-        const userName = Characters.useCharacterCard.getState().card?.name ?? ''
-        const charName: string = Characters.useCharacterCard.getState()?.card?.name ?? ''
-        output.push(`${userName} :`)
-        output.push(`${charName} :`)
-    }
-    return [...stops, ...output]
+    //    const output: string[] = []
+    //  return [...stops, ...output]
+    return stops
 }
 
 const verifyModelLoaded = async (): Promise<boolean> => {

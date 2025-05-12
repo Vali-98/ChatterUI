@@ -349,8 +349,7 @@ const FormattingManager = () => {
                     <View
                         style={{
                             flexDirection: 'row',
-                            columnGap: spacing.xl,
-                            justifyContent: 'space-around',
+                            columnGap: spacing.xl2,
                         }}>
                         <View>
                             <ThemedCheckbox
@@ -423,6 +422,16 @@ const FormattingManager = () => {
                                     setCurrentInstruct({
                                         ...currentInstruct,
                                         personality: b,
+                                    })
+                                }}
+                            />
+                            <ThemedCheckbox
+                                label="Use Common Stop"
+                                value={currentInstruct.use_common_stop}
+                                onChangeValue={(b) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        use_common_stop: b,
                                     })
                                 }}
                             />

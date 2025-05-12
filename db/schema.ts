@@ -193,6 +193,7 @@ export const instructs = sqliteTable('instructs', {
 
     // additions 5/5/2025 v6
     hide_think_tags: integer('hide_think_tags', { mode: 'boolean' }).notNull().default(true),
+    use_common_stop: integer('use_common_stop', { mode: 'boolean' }).notNull().default(true),
 })
 
 // LOREBOOKS
