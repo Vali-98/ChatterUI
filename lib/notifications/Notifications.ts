@@ -67,7 +67,6 @@ export function useNotificationObserver() {
             const useAuth = mmkv.getBoolean(AppSettings.LocallyAuthenticateUser)
             if (autoLoad || useAuth) return
             const chatLoaded = Chats.useChatState.getState().data
-            console.log(!!chatLoaded)
             if (chatLoaded) return
             Logger.info('Loading chat from notification')
             const data = notification.request.content.data
