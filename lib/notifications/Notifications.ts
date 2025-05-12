@@ -64,7 +64,8 @@ export function useNotificationObserver() {
 
         async function redirect(notification: Notifications.Notification) {
             const autoLoad = mmkv.getBoolean(AppSettings.ChatOnStartup)
-            if (autoLoad) return
+            const useAuth = mmkv.getBoolean(AppSettings.LocallyAuthenticateUser)
+            if (autoLoad || useAuth) return
             const chatLoaded = Chats.useChatState.getState().data
             console.log(!!chatLoaded)
             if (chatLoaded) return

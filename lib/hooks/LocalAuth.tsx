@@ -7,7 +7,7 @@ const useLocalAuth = () => {
     const [success, setSuccess] = useState(false)
     const [retryCount, setRetryCount] = useState(0)
     const [hasAuth, sethasAuth] = useState(true)
-    const [enabled, setEnabled] = useMMKVBoolean(AppSettings.LocallyAuthenticateUser)
+    const [enabled, _] = useMMKVBoolean(AppSettings.LocallyAuthenticateUser)
     const authorized = !enabled || !hasAuth || success
 
     const retry = useCallback(() => {
