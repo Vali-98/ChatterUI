@@ -16,8 +16,8 @@ import { router } from 'expo-router'
 import { setBackgroundColorAsync } from 'expo-system-ui'
 import { z } from 'zod'
 
-import { AppDirectory } from './File'
-import { lockScreenOrientation } from './Screen'
+import { Tokenizer } from '@lib/engine/Tokenizer'
+import { setupNotifications } from '@lib/notifications/Notifications'
 import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
 import { Characters } from '../state/Characters'
@@ -25,7 +25,8 @@ import { Chats } from '../state/Chat'
 import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
 import { Theme } from '../theme/ThemeManager'
-import { Tokenizer } from '@lib/engine/Tokenizer'
+import { AppDirectory } from './File'
+import { lockScreenOrientation } from './Screen'
 
 export const loadChatOnInit = async () => {
     if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return
@@ -209,6 +210,9 @@ export const startupApp = () => {
     generateDefaultDirectories()
     setDefaultCharacter()
     setDefaultInstruct()
+
+    // setup notifications
+    setupNotifications()
 
     // Initialize the default card
     createDefaultCard()

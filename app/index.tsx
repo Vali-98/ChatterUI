@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import migrations from '../db/migrations/migrations'
+import { useNotificationObserver } from '@lib/notifications/Notifications'
 
 const Home = () => {
     const { color } = Theme.useTheme()
@@ -19,6 +20,8 @@ const Home = () => {
     const { authorized, retry } = useLocalAuth()
 
     const [firstRender, setFirstRender] = useState<boolean>(true)
+
+    useNotificationObserver()
 
     useEffect(() => {
         if (authorized && success) {
