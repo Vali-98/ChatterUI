@@ -19,7 +19,7 @@ import { characterTags, tags } from 'db/schema'
 import { count, eq } from 'drizzle-orm'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import * as DocumentPicker from 'expo-document-picker'
-import { useNavigation, useRouter } from 'expo-router'
+import { Redirect, useNavigation, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -66,6 +66,7 @@ const ChracterEditor = () => {
     }
 
     usePreventRemove(edited, ({ data }) => {
+        if (!charId) return
         Alert.alert({
             title: `Unsaved Changes`,
             description: `You have unsaved changes, leaving now will discard your progress.`,
@@ -126,8 +127,8 @@ const ChracterEditor = () => {
                         Characters.db.mutate.deleteCard(charId ?? -1)
                         unloadCharacter()
                         unloadChat()
+                        setEdited(false)
                         Logger.info(`Deleted character: ${charName}`)
-                        router.dismissAll()
                     },
                     type: 'warning',
                 },
@@ -216,6 +217,8 @@ const ChracterEditor = () => {
             ],
         })
     }
+
+    if (!charId) return <Redirect href=".." />
 
     return (
         <SafeAreaView style={styles.mainContainer}>
