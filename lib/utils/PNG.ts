@@ -146,15 +146,22 @@ export function createPNGWithText(data: string, filedata: string): string {
             inserted = true
         }
     }
-
     const output = new Uint8Array(newChunks.reduce((acc, chunk) => acc + chunk.length, 0))
     let outOffset = 0
     for (const chunk of newChunks) {
         output.set(chunk, outOffset)
         outOffset += chunk.length
     }
+    return uint8ToBase64(output)
+}
 
-    return btoa(String.fromCharCode(...output))
+function uint8ToBase64(bytes: Uint8Array): string {
+    let binary = ''
+    const chunkSize = 0x4000 // 16KB chunks
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize))
+    }
+    return btoa(binary)
 }
 
 function createTextChunk(text: string): Uint8Array {

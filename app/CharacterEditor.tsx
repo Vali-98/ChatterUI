@@ -89,12 +89,17 @@ const ChracterEditor = () => {
         })
     })
 
-    const handleExportCard = async () => {
+    const handleExportCard = () => {
         try {
             if (!charId) return
-
-            await Characters.exportCharacter(charId)
-            Logger.infoToast('Card Exported!')
+            Characters.exportCharacter(charId)
+                .catch((e) => {
+                    Logger.errorToast('Failed to export')
+                    Logger.error(JSON.stringify(e))
+                })
+                .then(() => {
+                    Logger.infoToast('Card Exported!')
+                })
         } catch (e) {
             console.log(e)
         }
