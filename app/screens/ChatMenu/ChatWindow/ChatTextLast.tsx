@@ -29,7 +29,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
         animHeight.stopAnimation(() =>
             Animated.timing(animHeight, {
                 toValue: newheight,
-                duration: 150,
+                duration: 300,
                 useNativeDriver: false,
                 easing: Easing.inOut((x) => x * x),
             }).start()
@@ -50,6 +50,10 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
             })
         }
     }
+
+    useEffect(() => {
+        if (!nowGenerating && !firstRender.current) setTimeout(() => updateHeight(), 400)
+    }, [nowGenerating])
 
     const filteredText = useTextFilter(swipeText?.trim() ?? '')
     const renderedText = showHidden ? swipeText?.trim() : filteredText.result
