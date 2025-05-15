@@ -1,4 +1,4 @@
-import { relations, sql } from 'drizzle-orm'
+import { relations } from 'drizzle-orm'
 import { integer, sqliteTable, text, primaryKey } from 'drizzle-orm/sqlite-core'
 
 // TAVERN V2 SPEC
@@ -149,11 +149,31 @@ export const chatEntriesRelations = relations(chatEntries, ({ one, many }) => ({
         references: [chats.id],
     }),
     swipes: many(chatSwipes),
+    attachments: many(chatAttachments),
 }))
 
 export const swipesRelations = relations(chatSwipes, ({ one }) => ({
     entry: one(chatEntries, {
         fields: [chatSwipes.entry_id],
+        references: [chatEntries.id],
+    }),
+}))
+
+export const chatAttachments = sqliteTable('chat_attachment', {
+    id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+    chat_entry_id: integer('chat_entry_id', { mode: 'number' })
+        .notNull()
+        .references(() => chatEntries.id, { onDelete: 'cascade' }),
+    uri: text('uri').notNull(),
+    type: text('type', { enum: ['audio', 'image', 'document'] }).notNull(),
+    mime_type: text('mime_type').notNull(),
+    name: text('name').notNull(),
+    size: integer('size').notNull().default(0),
+})
+
+export const mediaAttachmentsRelations = relations(chatAttachments, ({ one }) => ({
+    entry: one(chatEntries, {
+        fields: [chatAttachments.chat_entry_id],
         references: [chatEntries.id],
     }),
 }))
@@ -293,6 +313,9 @@ export const model_data = sqliteTable('model_data', {
 
 export type ModelDataType = typeof model_data.$inferSelect
 export type ChatSwipe = typeof chatSwipes.$inferSelect
+export type ChatEntryType = typeof chatEntries.$inferSelect
+export type ChatType = typeof chats.$inferSelect
+export type ChatAttachmentType = typeof chatAttachments.$inferSelect
 
 export type CompletionTimings = {
     predicted_per_token_ms: number

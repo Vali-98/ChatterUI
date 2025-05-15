@@ -2,7 +2,17 @@ import { db as database } from '@db'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { replaceMacros } from '@lib/utils/Macros'
 import { convertToFormatInstruct } from '@lib/utils/TextFormat'
-import { chatEntries, chats, ChatSwipe, chatSwipes, CompletionTimings } from 'db/schema'
+import {
+    chatAttachments,
+    ChatAttachmentType,
+    chatEntries,
+    ChatEntryType,
+    chats,
+    ChatSwipe,
+    chatSwipes,
+    ChatType,
+    CompletionTimings,
+} from 'db/schema'
 import { and, count, desc, eq, getTableColumns, like } from 'drizzle-orm'
 import * as Notifications from 'expo-notifications'
 import { create } from 'zustand'
@@ -12,37 +22,38 @@ import { Characters } from './Characters'
 import { Logger } from './Logger'
 import { AppSettings } from '../constants/GlobalValues'
 import { mmkv } from '../storage/MMKV'
+import { getInfoAsync } from 'expo-file-system'
+import mime from 'mime/lite'
 
 export interface ChatSwipeState extends ChatSwipe {
     token_count?: number
     regen_cache?: string
 }
 
-export type ChatEntry = {
-    id: number
-    chat_id: number
-    name: string
-    is_user: boolean
-    order: number
-    swipe_id: number
+export interface ChatEntry extends ChatEntryType {
     swipes: ChatSwipeState[]
+    attachments: ChatAttachmentType[]
 }
 
-export type ChatData = {
-    id: number
-    create_date: Date
-    character_id: number
-    user_id: number | null
-    name: string
-    messages: ChatEntry[] | undefined
+export interface ChatData extends ChatType {
+    messages: ChatEntry[]
 }
 
 export interface ChatState {
     data: ChatData | undefined
     buffer: OutputBuffer
+    // chat data
     load: (chatId: number) => Promise<void>
     delete: (chatId: number) => Promise<void>
-    addEntry: (name: string, is_user: boolean, message: string) => Promise<number | void>
+    reset: () => void
+
+    // chat entry data
+    addEntry: (
+        name: string,
+        is_user: boolean,
+        message: string,
+        attachments?: string[]
+    ) => Promise<number | void>
     updateEntry: (
         index: number,
         message: string,
@@ -55,17 +66,28 @@ export interface ChatState {
         }
     ) => Promise<void>
     deleteEntry: (index: number) => Promise<void>
-    reset: () => void
+
+    // swipe data
     swipe: (index: number, direction: number) => Promise<boolean>
     addSwipe: (index: number, message?: string) => Promise<number | void>
-    getTokenCount: (index: number) => number
+
+    // buffer data
     setBuffer: (data: OutputBuffer) => void
     insertBuffer: (data: string) => void
     updateFromBuffer: (cachedSwipeId?: number) => Promise<void>
     insertLastToBuffer: () => void
+
+    // regen data
     setRegenCache: () => void
     getRegenCache: () => string
     resetRegenCache: () => void
+
+    // attachments
+    // add attachment
+    removeAttachment: (entryId: number, attachmentId: number) => Promise<void>
+
+    // generation system
+    getTokenCount: (index: number) => number
     stopGenerating: () => void
     startGenerating: (swipeId: number) => void
 }
@@ -184,13 +206,27 @@ export namespace Chats {
                 data: undefined,
             })),
 
-        addEntry: async (name: string, is_user: boolean, message: string) => {
+        addEntry: async (
+            name: string,
+            is_user: boolean,
+            message: string,
+            attachments: string[] = []
+        ) => {
             const messages = get().data?.messages
             const chatId = get().data?.id
             if (!messages || !chatId) return
             const order = messages.length > 0 ? messages[messages.length - 1].order + 1 : 0
-
-            const entry = await db.mutate.createEntry(chatId, name, is_user, order, message)
+            const entry = await db.mutate.createEntry(
+                chatId,
+                name,
+                is_user,
+                order,
+                message,
+                attachments
+            )
+            if (attachments.length > 0 && entry) {
+                const entryId = entry.id
+            }
             if (entry) messages.push(entry)
             set((state) => ({
                 ...state,
@@ -394,6 +430,18 @@ export namespace Chats {
                 data: state?.data ? { ...state.data, messages: messages } : state.data,
             }))
         },
+        removeAttachment: async (index: number, attachmentId: number) => {
+            const messages = get()?.data?.messages
+            const message = messages?.[index]
+            if (!messages || !message) return
+            await db.mutate.deleteAttachment(attachmentId)
+            message.attachments = message.attachments.filter((item) => item.id !== attachmentId)
+            messages[index] = message
+            set((state) => ({
+                ...state,
+                data: state?.data ? { ...state.data, messages: [...messages] } : state.data,
+            }))
+        },
     }))
 
     export namespace db {
@@ -406,6 +454,7 @@ export namespace Chats {
                             orderBy: chatEntries.order,
                             with: {
                                 swipes: true,
+                                attachments: true,
                             },
                         },
                     },
@@ -497,28 +546,43 @@ export namespace Chats {
 
                     // custom setting to not generate first mes
                     if (!mmkv.getBoolean(AppSettings.CreateFirstMes)) return chatId
+                    const greetings = [
+                        card.first_mes ?? '',
+                        ...card.alternate_greetings.map((item) => item.greeting),
+                    ].filter((item) => item)
 
-                    const [{ entryId }, ...__] = await tx
-                        .insert(chatEntries)
-                        .values({
-                            chat_id: chatId,
-                            is_user: false,
-                            name: card.name ?? '',
-                            order: 0,
-                        })
-                        .returning({ entryId: chatEntries.id })
+                    if (greetings.length > 0) {
+                        const [{ entryId }, ...__] = await tx
+                            .insert(chatEntries)
+                            .values({
+                                chat_id: chatId,
+                                is_user: false,
+                                name: card.name ?? '',
+                                order: 0,
+                            })
+                            .returning({ entryId: chatEntries.id })
 
-                    await tx.insert(chatSwipes).values({
-                        entry_id: entryId,
-                        swipe: convertToFormatInstruct(replaceMacros(card.first_mes ?? '')),
-                    })
+                        await tx.insert(chatSwipes).values(
+                            greetings.map((item) => ({
+                                entry_id: entryId,
+                                swipe: convertToFormatInstruct(item),
+                            }))
+                        )
 
-                    card?.alternate_greetings?.forEach(async (data) => {
+                        /*
                         await tx.insert(chatSwipes).values({
                             entry_id: entryId,
-                            swipe: convertToFormatInstruct(replaceMacros(data.greeting)),
+                            swipe: convertToFormatInstruct(replaceMacros(card.first_mes ?? '')),
                         })
-                    })
+
+                        card?.alternate_greetings?.forEach(async (data) => {
+                            await tx.insert(chatSwipes).values({
+                                entry_id: entryId,
+                                swipe: convertToFormatInstruct(replaceMacros(data.greeting)),
+                            })
+                        })*/
+                    }
+
                     await Characters.db.mutate.updateModified(charId)
                     return chatId
                 })
@@ -540,7 +604,8 @@ export namespace Chats {
                 name: string,
                 isUser: boolean,
                 order: number,
-                message: string
+                message: string,
+                attachments: string[] = []
             ) => {
                 const [{ entryId }, ...__] = await database
                     .insert(chatEntries)
@@ -554,9 +619,13 @@ export namespace Chats {
                 await database
                     .insert(chatSwipes)
                     .values({ swipe: replaceMacros(message), entry_id: entryId })
+
+                attachments.forEach(async (uri) => {
+                    await createAttachment(entryId, uri)
+                })
                 const entry = await database.query.chatEntries.findFirst({
                     where: eq(chatEntries.id, entryId),
-                    with: { swipes: true },
+                    with: { swipes: true, attachments: true },
                 })
                 await updateChatModified(chatId)
                 return entry
@@ -572,17 +641,15 @@ export namespace Chats {
             }
 
             export const createSwipe = async (entryId: number, message: string) => {
-                const [{ swipeId }, ...__] = await database
+                const [swipe] = await database
                     .insert(chatSwipes)
                     .values({
                         entry_id: entryId,
                         swipe: replaceMacros(message),
                     })
-                    .returning({ swipeId: chatSwipes.id })
+                    .returning()
                 await updateEntryModified(entryId)
-                return await database.query.chatSwipes.findFirst({
-                    where: eq(chatSwipes.id, swipeId),
-                })
+                return swipe
             }
 
             export const updateEntrySwipeId = async (entryId: number, swipeId: number) => {
@@ -666,6 +733,32 @@ export namespace Chats {
 
             export const updateUser = async (chatId: number, userId: number) => {
                 await database.update(chats).set({ user_id: userId }).where(eq(chats.id, chatId))
+            }
+
+            export const createAttachment = async (entryId: number, uri: string) => {
+                const attachmentId = Date.now()
+                const fileInfo = await getInfoAsync(uri, {})
+                if (!fileInfo.exists || fileInfo.isDirectory) return
+                const name = uri.split('/').pop() || 'unknown'
+                const extension = name.split('.').pop()?.toLowerCase()
+                const mimeType = mime.getType(uri)
+                const type = mimeType?.split('/')?.[0]
+                if (!name || !extension || !mimeType || !type || !validExtensionTypes(type)) return
+                const [attachment] = await database
+                    .insert(chatAttachments)
+                    .values({
+                        type: type,
+                        name: attachmentId + '.' + extension,
+                        chat_entry_id: entryId,
+                        uri: uri,
+                        mime_type: mimeType,
+                    })
+                    .returning()
+                return attachment
+            }
+
+            export const deleteAttachment = async (attachmentId: number) => {
+                await database.delete(chatAttachments).where(eq(chatAttachments.id, attachmentId))
             }
         }
     }
@@ -751,5 +844,11 @@ export namespace Chats {
                 timings: null,
             },
         ],
+        attachments: [],
+    }
+
+    const validExtensionTypes = (type: string) => {
+        //TODO: Add document, eg application/pdf or text/plain
+        return type === 'audio' || type === 'image'
     }
 }

@@ -57,6 +57,7 @@
     "expo-sqlite": "~15.2.9",
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.7",
+    "mime": "^4.0.7",
     "react": "19.0.0",
     "react-compiler-runtime": "^19.0.0-beta-a7bf2bd-20241110",
     "react-native": "0.79.2",

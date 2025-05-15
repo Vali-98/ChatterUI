@@ -10,10 +10,15 @@ import { TextInput, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
+type Attachment = {
+    uri: string
+    type: 'image'
+}
+
 const ChatInput = () => {
     const { color, borderRadius, spacing } = Theme.useTheme()
     const [sendOnEnter, _] = useMMKVBoolean(AppSettings.SendOnEnter)
-
+    const [attachments, setAttachments] = useState<Attachment[]>([])
     const { addEntry } = Chats.useEntry()
 
     const { nowGenerating, abortFunction } = useInference(
@@ -41,9 +46,16 @@ const ChatInput = () => {
     }
 
     const handleSend = async () => {
-        if (newMessage.trim() !== '') await addEntry(userName ?? '', true, newMessage)
+        if (newMessage.trim() !== '')
+            await addEntry(
+                userName ?? '',
+                true,
+                newMessage,
+                attachments.map((item) => item.uri)
+            )
         const swipeId = await addEntry(charName ?? '', false, '')
-        setNewMessage((message) => '')
+        setNewMessage('')
+        setAttachments([])
         if (swipeId) generateResponse(swipeId)
     }
 
