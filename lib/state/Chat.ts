@@ -22,8 +22,9 @@ import { Characters } from './Characters'
 import { Logger } from './Logger'
 import { AppSettings } from '../constants/GlobalValues'
 import { mmkv } from '../storage/MMKV'
-import { getInfoAsync } from 'expo-file-system'
+import { copyAsync, deleteAsync, getInfoAsync } from 'expo-file-system'
 import mime from 'mime/lite'
+import { AppDirectory } from '@lib/utils/File'
 
 export interface ChatSwipeState extends ChatSwipe {
     token_count?: number
@@ -678,6 +679,13 @@ export namespace Chats {
 
             export const deleteChatEntry = async (entryId: number) => {
                 await updateEntryModified(entryId)
+                const attachments = await database.query.chatAttachments.findMany({
+                    where: eq(chatAttachments.chat_entry_id, entryId),
+                })
+                attachments.forEach(
+                    async (item) => await deleteAsync(item.uri, { idempotent: true })
+                )
+
                 await database.delete(chatEntries).where(eq(chatEntries.id, entryId))
             }
 
@@ -739,18 +747,24 @@ export namespace Chats {
                 const attachmentId = Date.now()
                 const fileInfo = await getInfoAsync(uri, {})
                 if (!fileInfo.exists || fileInfo.isDirectory) return
+
                 const name = uri.split('/').pop() || 'unknown'
                 const extension = name.split('.').pop()?.toLowerCase()
                 const mimeType = mime.getType(uri)
                 const type = mimeType?.split('/')?.[0]
                 if (!name || !extension || !mimeType || !type || !validExtensionTypes(type)) return
+                const newURI = AppDirectory.Attachments + attachmentId + extension
+                await copyAsync({
+                    from: uri,
+                    to: newURI,
+                })
                 const [attachment] = await database
                     .insert(chatAttachments)
                     .values({
                         type: type,
-                        name: attachmentId + '.' + extension,
+                        name: name,
                         chat_entry_id: entryId,
-                        uri: uri,
+                        uri: newURI,
                         mime_type: mimeType,
                     })
                     .returning()

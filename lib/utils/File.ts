@@ -14,6 +14,7 @@ export const AppDirectory = {
     SessionPath: `${documentDirectory}session/`,
     CharacterPath: `${documentDirectory}characters/`,
     Assets: `${documentDirectory}appAssets/`,
+    Attachments: `${documentDirectory}attachments/`,
 }
 
 /**

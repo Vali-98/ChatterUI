@@ -64,20 +64,9 @@ const ChatMenu = () => {
                         flex: 1,
                     }}>
                     {chat && <ChatWindow />}
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            marginVertical: spacing.m,
-                            paddingHorizontal: spacing.l,
-                        }}>
-                        <AvatarViewer />
-                        <OptionsMenu />
-                        <ChatInput />
-                    </View>
+                    <ChatInput />
                 </View>
-
+                <AvatarViewer />
                 <ChatsDrawer />
                 <SettingsDrawer />
             </SafeAreaView>

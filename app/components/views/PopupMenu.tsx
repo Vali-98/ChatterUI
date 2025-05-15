@@ -2,7 +2,7 @@ import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useFocusEffect } from 'expo-router'
 import React, { ReactNode, useRef, useState } from 'react'
-import { StyleSheet, TouchableOpacity, Text, BackHandler, TextStyle } from 'react-native'
+import { StyleSheet, TouchableOpacity, Text, BackHandler, TextStyle, ViewStyle } from 'react-native'
 import {
     Menu,
     MenuOption,
@@ -34,6 +34,7 @@ type PopupMenuProps = {
     options: MenuOptionProp[]
     placement?: 'top' | 'right' | 'bottom' | 'left' | 'auto'
     children?: ReactNode
+    menuCustomStyle?: ViewStyle
 }
 
 const PopupOption: React.FC<PopupOptionProps> = ({
@@ -71,6 +72,7 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
     icon,
     iconSize = 26,
     style = {},
+    menuCustomStyle = {},
     options,
     children,
     placement = 'left',
@@ -97,6 +99,7 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
             ref={menuRef}
             onOpen={() => setShowMenu(true)}
             onClose={() => setShowMenu(false)}
+            style={menuCustomStyle}
             renderer={Popover}
             rendererProps={{
                 placement: placement,
@@ -133,6 +136,8 @@ const useMenuStyle = (): MenuOptionsCustomStyle => {
             backgroundColor: color.neutral._200,
             padding: spacing.sm,
             borderRadius: borderRadius.l,
+            borderWidth: 1,
+            borderColor: color.primary._200,
         },
         optionsWrapper: {
             backgroundColor: color.neutral._200,
