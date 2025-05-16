@@ -22,8 +22,8 @@ export const buildRequest = (config: APIConfiguration, values: APIValues) => {
     }
 }
 
-const openAIRequest = (config: APIConfiguration, values: APIValues) => {
-    const { payloadFields, model, stop, prompt } = buildFields(config, values)
+const openAIRequest = async (config: APIConfiguration, values: APIValues) => {
+    const { payloadFields, model, stop, prompt } = await buildFields(config, values)
     return {
         ...payloadFields,
         ...model,
@@ -32,8 +32,8 @@ const openAIRequest = (config: APIConfiguration, values: APIValues) => {
     }
 }
 
-const ollamaRequest = (config: APIConfiguration, values: APIValues) => {
-    const { payloadFields, model, stop, prompt } = buildFields(config, values)
+const ollamaRequest = async (config: APIConfiguration, values: APIValues) => {
+    const { payloadFields, model, stop, prompt } = await buildFields(config, values)
     let keep_alive = 5
     if (payloadFields.keep_alive) {
         keep_alive = payloadFields.keep_alive as number
@@ -53,11 +53,11 @@ const ollamaRequest = (config: APIConfiguration, values: APIValues) => {
     }
 }
 
-const cohereRequest = (config: APIConfiguration, values: APIValues) => {
+const cohereRequest = async (config: APIConfiguration, values: APIValues) => {
     if (config.request.completionType.type === 'textCompletions') {
         return
     }
-    const { payloadFields, model, stop, prompt } = buildFields(config, values)
+    const { payloadFields, model, stop, prompt } = await buildFields(config, values)
 
     const seedObject = config.request.samplerFields.filter(
         (item) => item.samplerID === SamplerID.SEED
@@ -81,8 +81,8 @@ const cohereRequest = (config: APIConfiguration, values: APIValues) => {
     }
 }
 
-const claudeRequest = (config: APIConfiguration, values: APIValues) => {
-    const { payloadFields, model, stop, prompt } = buildFields(config, values)
+const claudeRequest = async (config: APIConfiguration, values: APIValues) => {
+    const { payloadFields, model, stop, prompt } = await buildFields(config, values)
 
     const systemPrompt = Instructs.useInstruct.getState().data?.system_prompt
     const systemRole =
@@ -107,8 +107,8 @@ const claudeRequest = (config: APIConfiguration, values: APIValues) => {
     }
 }
 
-const hordeRequest = (config: APIConfiguration, values: APIValues) => {
-    const { payloadFields, model, stop, prompt } = buildFields(config, values)
+const hordeRequest = async (config: APIConfiguration, values: APIValues) => {
+    const { payloadFields, model, stop, prompt } = await buildFields(config, values)
     return {
         params: {
             ...payloadFields,
@@ -129,7 +129,7 @@ const hordeRequest = (config: APIConfiguration, values: APIValues) => {
     }
 }
 
-const customRequest = (config: APIConfiguration, values: APIValues) => {
+const customRequest = async (config: APIConfiguration, values: APIValues) => {
     if (config.payload.type !== 'custom') return {}
     const modelName = getModelName(config, values)
 
@@ -144,9 +144,9 @@ const customRequest = (config: APIConfiguration, values: APIValues) => {
 
     let prompt: any = undefined
     if (config.request.completionType.type === 'chatCompletions') {
-        prompt = buildChatCompletionContext(length, config, values)
+        prompt = await buildChatCompletionContext(length, config, values)
     } else {
-        prompt = buildTextCompletionContext(length)
+        prompt = await buildTextCompletionContext(length)
     }
 
     const responseBody = config.payload.customPayload
@@ -163,7 +163,7 @@ const customRequest = (config: APIConfiguration, values: APIValues) => {
     return responseBody
 }
 
-const buildFields = (config: APIConfiguration, values: APIValues) => {
+const buildFields = async (config: APIConfiguration, values: APIValues) => {
     const payloadFields = getSamplerFields(config, values)
 
     // Model Data
@@ -206,8 +206,8 @@ const buildFields = (config: APIConfiguration, values: APIValues) => {
     const prompt = {
         [config.request.promptKey]:
             config.request.completionType.type === 'chatCompletions'
-                ? buildChatCompletionContext(length, config, values)
-                : buildTextCompletionContext(length),
+                ? await buildChatCompletionContext(length, config, values)
+                : await buildTextCompletionContext(length),
     }
     return { payloadFields, model, stop, prompt, length }
 }

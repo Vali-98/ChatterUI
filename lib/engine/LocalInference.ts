@@ -1,9 +1,8 @@
 import Alert from '@components/views/Alert'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
-import { Characters } from '@lib/state/Characters'
 import { Chats, useInference } from '@lib/state/Chat'
-import { Instructs, InstructType } from '@lib/state/Instructs'
+import { Instructs } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSState } from '@lib/state/TTS'
@@ -68,7 +67,7 @@ const buildLocalPayload = async () => {
     let prompt: undefined | string = undefined
 
     if (mmkv.getBoolean(AppSettings.UseModelTemplate)) {
-        const messages = buildChatCompletionContext(
+        const messages = await buildChatCompletionContext(
             localPreset.context_length - n_predict,
             localAPIConfig,
             localAPIValues
@@ -87,7 +86,7 @@ const buildLocalPayload = async () => {
         }
     }
     if (!prompt) {
-        prompt = buildTextCompletionContext(localPreset.context_length - n_predict)
+        prompt = await buildTextCompletionContext(localPreset.context_length - n_predict)
     }
 
     if (!prompt) {

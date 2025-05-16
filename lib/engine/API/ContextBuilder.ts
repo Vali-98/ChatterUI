@@ -8,6 +8,7 @@ import { mmkv } from '@lib/storage/MMKV'
 import { getDefaultMacroRules, Macro } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
+import { readAsStringAsync } from 'expo-file-system'
 
 const getMacrosRules = (instruct: InstructType) => {
     const rules = getDefaultMacroRules()
@@ -38,7 +39,7 @@ const getCaches = (charName: string, userName: string) => {
     return { characterCache, userCache, instructCache }
 }
 
-export const buildTextCompletionContext = (max_length: number, printTimings = true) => {
+export const buildTextCompletionContext = async (max_length: number, printTimings = true) => {
     const delta = performance.now()
     const bypassContextLength = mmkv.getBoolean(AppSettings.BypassContextLength)
     const tokenizer = Tokenizer.getTokenizer()
@@ -192,13 +193,18 @@ export const buildTextCompletionContext = (max_length: number, printTimings = tr
     return payload
 }
 
-type Message = { role: string; [x: string]: string }
+type ContentTypes =
+    | { type: 'input_text' | 'text'; text: string }
+    | { type: 'image_url'; image_url: { url: string } }
+    | { type: 'input_audio'; input_audio: { data: string; format: string } }
 
-export const buildChatCompletionContext = (
+type Message = { role: string; [x: string]: ContentTypes[] | string }
+
+export const buildChatCompletionContext = async (
     max_length: number,
     config: APIConfiguration,
     values: APIValues
-): Message[] | undefined => {
+): Promise<Message[] | void> => {
     const delta = performance.now()
     const bypassContextLength = mmkv.getBoolean(AppSettings.BypassContextLength)
     if (config.request.completionType.type !== 'chatCompletions') return
@@ -243,7 +249,7 @@ export const buildChatCompletionContext = (
             [completionFeats.contentName]: replaceMacros(initial, rules),
         },
     ]
-
+    let lastImage = false
     const messageBuffer: Message[] = []
 
     let index = messages.length - 1
@@ -265,11 +271,52 @@ export const buildChatCompletionContext = (
             index--
             continue
         }
+        const role = message.is_user ? completionFeats.userRole : completionFeats.assistantRole
 
-        messageBuffer.push({
-            role: message.is_user ? completionFeats.userRole : completionFeats.assistantRole,
-            content: replaceMacros(prefill + swipe_data.swipe, rules),
-        })
+        if (message.attachments.length > 0) {
+            //TODO: Make this toggleable
+            //TODO: image len
+            //TODO: last image only
+            //TODO: config check
+            Logger.warn('Image output is incomplete')
+
+            const images: ContentTypes[] = await Promise.all(
+                message.attachments
+                    .filter((item) => item.type === 'image' || item.type === 'audio')
+                    .map(async (item) => {
+                        const base64data = await readAsStringAsync(item.uri, { encoding: 'base64' })
+
+                        if (item.type === 'image')
+                            return {
+                                type: 'image_url',
+                                image_url: {
+                                    url: 'data:' + item.mime_type + ';base64,' + base64data,
+                                },
+                            }
+                        return {
+                            type: 'input_audio',
+                            input_audio: { data: base64data, format: item.mime_type.split('/')[1] },
+                        }
+                    })
+            )
+
+            messageBuffer.push({
+                role: role,
+                [completionFeats.contentName]: [
+                    {
+                        type: 'text',
+                        text: replaceMacros(prefill + swipe_data.swipe, rules),
+                    },
+                    ...images,
+                ],
+            })
+        } else {
+            messageBuffer.push({
+                role: role,
+                [completionFeats.contentName]: replaceMacros(prefill + swipe_data.swipe, rules),
+            })
+        }
+
         total_length += len
         index--
     }

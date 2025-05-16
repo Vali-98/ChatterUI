@@ -36,7 +36,7 @@ export const buildAndSendRequest = async () => {
     Logger.info(`Using Configuration: ${requestValues.configName}`)
 
     let payload: any = undefined
-    payload = buildRequest(config, requestValues)
+    payload = await buildRequest(config, requestValues)
 
     if (!payload) {
         Logger.errorToast('Something Went Wrong With Payload Construction')

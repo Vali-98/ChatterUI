@@ -52,6 +52,8 @@ export interface APIRequestFormat {
               systemRole: string
               assistantRole: string
               contentName: string
+              supportsAudio?: boolean
+              supportsImages?: boolean
           }
         | { type: 'textCompletions' }
     // key for the authorization header
