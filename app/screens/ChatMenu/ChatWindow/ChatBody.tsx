@@ -11,6 +11,7 @@ import ChatText from './ChatText'
 import ChatTextLast from './ChatTextLast'
 import { useChatEditorState } from './EditorModal'
 import Swipes from './Swipes'
+import ChatAttachments from './ChatAttachments'
 
 type ChatTextProps = {
     index: number
@@ -73,6 +74,7 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
                 ) : (
                     <ChatText nowGenerating={nowGenerating} index={index} />
                 )}
+                <ChatAttachments index={index} />
                 <View
                     style={{
                         flexDirection: 'row-reverse',

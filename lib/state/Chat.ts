@@ -25,6 +25,7 @@ import { mmkv } from '../storage/MMKV'
 import { copyAsync, deleteAsync, getInfoAsync } from 'expo-file-system'
 import mime from 'mime/lite'
 import { AppDirectory } from '@lib/utils/File'
+import { randomUUID } from 'expo-crypto'
 
 export interface ChatSwipeState extends ChatSwipe {
     token_count?: number
@@ -621,13 +622,17 @@ export namespace Chats {
                     .insert(chatSwipes)
                     .values({ swipe: replaceMacros(message), entry_id: entryId })
 
-                attachments.forEach(async (uri) => {
-                    await createAttachment(entryId, uri)
-                })
+                await Promise.all(
+                    attachments.map(async (uri) => {
+                        await createAttachment(entryId, uri)
+                    })
+                )
+
                 const entry = await database.query.chatEntries.findFirst({
                     where: eq(chatEntries.id, entryId),
                     with: { swipes: true, attachments: true },
                 })
+
                 await updateChatModified(chatId)
                 return entry
             }
@@ -682,8 +687,10 @@ export namespace Chats {
                 const attachments = await database.query.chatAttachments.findMany({
                     where: eq(chatAttachments.chat_entry_id, entryId),
                 })
-                attachments.forEach(
-                    async (item) => await deleteAsync(item.uri, { idempotent: true })
+                await Promise.all(
+                    attachments.map(
+                        async (item) => await deleteAsync(item.uri, { idempotent: true })
+                    )
                 )
 
                 await database.delete(chatEntries).where(eq(chatEntries.id, entryId))
@@ -744,7 +751,7 @@ export namespace Chats {
             }
 
             export const createAttachment = async (entryId: number, uri: string) => {
-                const attachmentId = Date.now()
+                const attachmentId = randomUUID()
                 const fileInfo = await getInfoAsync(uri, {})
                 if (!fileInfo.exists || fileInfo.isDirectory) return
 
