@@ -5,9 +5,9 @@ import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 import EditAPIModal from './EditAPIModal'
-import { useShallow } from 'zustand/react/shallow'
 
 type APIValueItemProps = {
     item: APIManagerValue
@@ -139,4 +139,3 @@ const useStyles = () => {
         },
     })
 }
-

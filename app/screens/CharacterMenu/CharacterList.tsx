@@ -1,3 +1,4 @@
+import Drawer from '@components/views/Drawer'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { Characters, CharInfo } from '@lib/state/Characters'
@@ -6,7 +7,6 @@ import { useState } from 'react'
 import { SafeAreaView, View } from 'react-native'
 import Animated, { LinearTransition } from 'react-native-reanimated'
 
-import Drawer from '@components/views/Drawer'
 import CharacterListHeader, { useCharacterListSorter } from './CharacterListHeader'
 import CharacterListing from './CharacterListing'
 import CharacterNewMenu from './CharacterNewMenu'

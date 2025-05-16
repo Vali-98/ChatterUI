@@ -10,12 +10,12 @@ import { useState } from 'react'
 import { StyleSheet, Text, View, FlatList } from 'react-native'
 import * as Progress from 'react-native-progress'
 import Animated, { Easing, SlideInLeft, SlideOutLeft } from 'react-native-reanimated'
+import { useShallow } from 'zustand/react/shallow'
 
 import ModelEmpty from './ModelEmpty'
 import ModelItem from './ModelItem'
 import ModelNewMenu from './ModelNewMenu'
 import ModelSettings from './ModelSettings'
-import { useShallow } from 'zustand/react/shallow'
 
 const ModelManager = () => {
     const styles = useStyles()
@@ -205,4 +205,3 @@ export const useStyles = () => {
         },
     })
 }
-

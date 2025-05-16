@@ -284,4 +284,3 @@ const getNestedValue = (obj: any, path: string) => {
     const value = keys.reduce((acc, key) => acc?.[key], obj)
     return value ?? null
 }
-

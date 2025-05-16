@@ -1,4 +1,3 @@
-import { Instructs } from '@lib/state/Instructs'
 import { Characters } from '../state/Characters'
 
 export type Macro = {

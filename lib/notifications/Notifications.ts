@@ -14,6 +14,7 @@ export const setupNotifications = () => {
         handleNotification: async () => ({
             shouldPlaySound: false,
             shouldSetBadge: false,
+            shouldShowAlert: false,
             shouldShowBanner: false,
             shouldShowList: false,
         }),
@@ -65,7 +66,7 @@ export function useNotificationObserver() {
         async function redirect(notification: Notifications.Notification) {
             const autoLoad = mmkv.getBoolean(AppSettings.ChatOnStartup)
             const useAuth = mmkv.getBoolean(AppSettings.LocallyAuthenticateUser)
-            if (autoLoad || useAuth) return
+            if (autoLoad ?? useAuth) return
             const chatLoaded = Chats.useChatState.getState().data
             if (chatLoaded) return
             Logger.info('Loading chat from notification')

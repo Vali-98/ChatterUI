@@ -9,7 +9,8 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "postinstall": "patch-package",
-    "lint": "eslint .",
+    "lint": "eslint app db lib --ignore-pattern db/migrations",
+    "lint:fix": "eslint app db lib --ignore-pattern db/migrations --fix",
     "prebuild": "cross-env APP_VARIANT=development expo prebuild --clean",
     "dev:android": "cross-env APP_VARIANT=development expo run:android",
     "dev:ios": "cross-env APP_VARIANT=development expo run:ios",
@@ -80,6 +81,7 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@types/base-64": "^1.0.2",
+    "@types/mime": "^3.0.4",
     "@types/react": "~19.0.10",
     "babel-preset-expo": "~13.0.0",
     "cross-env": "^7.0.3",

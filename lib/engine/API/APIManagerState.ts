@@ -131,4 +131,3 @@ function generateUniqueName(baseName: string, names: string[]) {
     const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1
     return `${baseName} (${nextNumber})`
 }
-

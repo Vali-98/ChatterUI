@@ -7,9 +7,9 @@ import { getDocumentAsync } from 'expo-document-picker'
 import { readAsStringAsync } from 'expo-file-system'
 import { Stack } from 'expo-router'
 import { FlatList, Text, View } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 import TemplateItem from './TemplateItem'
-import { useShallow } from 'zustand/react/shallow'
 
 const TemplateManager = () => {
     // eslint-disable-next-line react-compiler/react-compiler
@@ -89,4 +89,3 @@ const TemplateManager = () => {
 }
 
 export default TemplateManager
-

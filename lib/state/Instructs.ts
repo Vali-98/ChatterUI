@@ -6,10 +6,10 @@ import { eq } from 'drizzle-orm'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
+import { Characters } from './Characters'
 import { Logger } from './Logger'
 import { mmkvStorage } from '../storage/MMKV'
 import { replaceMacros } from '../utils/Macros'
-import { Characters } from './Characters'
 
 const defaultBooleans = {
     wrap: false,

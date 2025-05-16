@@ -1,6 +1,7 @@
 import { db as database } from '@db'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Storage } from '@lib/enums/Storage'
+import { saveStringToDownload } from '@lib/utils/File'
 import {
     characterGreetings,
     characterTags,
@@ -21,10 +22,9 @@ import { z } from 'zod'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-import { saveStringToDownload } from '@lib/utils/File'
+import { Logger } from './Logger'
 import { mmkvStorage } from '../storage/MMKV'
 import { createPNGWithText, getPngChunkText } from '../utils/PNG'
-import { Logger } from './Logger'
 
 export type CharInfo = {
     name: string

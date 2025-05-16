@@ -4,9 +4,9 @@ import { mmkvStorage } from '@lib/storage/MMKV'
 import * as Speech from 'expo-speech'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { useShallow } from 'zustand/react/shallow'
 
 import { Chats, useInference } from './Chat'
-import { useShallow } from 'zustand/react/shallow'
 
 type TTSState = {
     activeChatIndex?: number

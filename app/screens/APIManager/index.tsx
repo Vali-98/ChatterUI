@@ -4,9 +4,9 @@ import { APIState } from '@lib/engine/API/APIManagerState'
 import { Theme } from '@lib/theme/ThemeManager'
 import { Stack, useRouter } from 'expo-router'
 import { FlatList, Pressable, Text, View } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 import APIValueItem from './APIValueItem'
-import { useShallow } from 'zustand/react/shallow'
 
 const APIManager = () => {
     // eslint-disable-next-line react-compiler/react-compiler
@@ -79,4 +79,3 @@ const APIManager = () => {
 }
 
 export default APIManager
-

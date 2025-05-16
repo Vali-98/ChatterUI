@@ -1,5 +1,6 @@
 import { db as database } from '@db'
 import { Tokenizer } from '@lib/engine/Tokenizer'
+import { AppDirectory } from '@lib/utils/File'
 import { replaceMacros } from '@lib/utils/Macros'
 import { convertToFormatInstruct } from '@lib/utils/TextFormat'
 import {
@@ -14,7 +15,10 @@ import {
     CompletionTimings,
 } from 'db/schema'
 import { and, count, desc, eq, getTableColumns, like } from 'drizzle-orm'
+import { randomUUID } from 'expo-crypto'
+import { copyAsync, deleteAsync, getInfoAsync } from 'expo-file-system'
 import * as Notifications from 'expo-notifications'
+import mime from 'mime/lite'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -22,10 +26,6 @@ import { Characters } from './Characters'
 import { Logger } from './Logger'
 import { AppSettings } from '../constants/GlobalValues'
 import { mmkv } from '../storage/MMKV'
-import { copyAsync, deleteAsync, getInfoAsync } from 'expo-file-system'
-import mime from 'mime/lite'
-import { AppDirectory } from '@lib/utils/File'
-import { randomUUID } from 'expo-crypto'
 
 export interface ChatSwipeState extends ChatSwipe {
     token_count?: number
@@ -755,7 +755,7 @@ export namespace Chats {
                 const fileInfo = await getInfoAsync(uri, {})
                 if (!fileInfo.exists || fileInfo.isDirectory) return
 
-                const name = uri.split('/').pop() || 'unknown'
+                const name = uri.split('/').pop() ?? 'unknown'
                 const extension = name.split('.').pop()?.toLowerCase()
                 const mimeType = mime.getType(uri)
                 const type = mimeType?.split('/')?.[0]

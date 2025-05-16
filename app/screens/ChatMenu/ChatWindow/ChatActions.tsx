@@ -5,15 +5,16 @@ import { Logger } from '@lib/state/Logger'
 import { useTTS } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
 import { setStringAsync } from 'expo-clipboard'
+import { useFocusEffect } from 'expo-router'
 import React, { useCallback } from 'react'
 import { BackHandler, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { StretchInY, StretchOutY, ZoomIn, ZoomOut } from 'react-native-reanimated'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
+
 import { useChatEditorState } from './EditorModal'
 import TTS from './TTS'
-import { useFocusEffect } from 'expo-router'
 
 interface OptionsStateProps {
     activeIndex?: number

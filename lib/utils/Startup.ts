@@ -1,4 +1,6 @@
 import { Model } from '@lib/engine/Local/Model'
+import { Tokenizer } from '@lib/engine/Tokenizer'
+import { setupNotifications } from '@lib/notifications/Notifications'
 import { useAppModeState } from '@lib/state/AppMode'
 import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
@@ -16,8 +18,8 @@ import { router } from 'expo-router'
 import { setBackgroundColorAsync } from 'expo-system-ui'
 import { z } from 'zod'
 
-import { Tokenizer } from '@lib/engine/Tokenizer'
-import { setupNotifications } from '@lib/notifications/Notifications'
+import { AppDirectory } from './File'
+import { lockScreenOrientation } from './Screen'
 import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
 import { Characters } from '../state/Characters'
@@ -25,8 +27,6 @@ import { Chats } from '../state/Chat'
 import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
 import { Theme } from '../theme/ThemeManager'
-import { AppDirectory } from './File'
-import { lockScreenOrientation } from './Screen'
 
 export const loadChatOnInit = async () => {
     if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return

@@ -81,4 +81,3 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
 }
 
 export default TemplateItem
-

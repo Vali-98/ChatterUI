@@ -43,4 +43,3 @@ const SettingsDrawer = () => {
 }
 
 export default SettingsDrawer
-

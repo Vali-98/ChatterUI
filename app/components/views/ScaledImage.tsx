@@ -1,6 +1,6 @@
-import { Image as RNImage } from 'react-native'
-import React, { useEffect, useState } from 'react'
 import { Image, ImageProps } from 'expo-image'
+import { useEffect, useState } from 'react'
+import { Image as RNImage } from 'react-native'
 
 interface ScaledImageProps extends ImageProps {
     uri: string

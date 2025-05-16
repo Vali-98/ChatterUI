@@ -6,9 +6,9 @@ import { FlashList } from '@shopify/flash-list'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import React, { useState } from 'react'
 import { Text, View } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 import UserListing from './UserListing'
-import { useShallow } from 'zustand/react/shallow'
 
 const UserList = () => {
     const { color, spacing, fontSize } = Theme.useTheme()
@@ -66,4 +66,3 @@ const UserList = () => {
 }
 
 export default UserList
-

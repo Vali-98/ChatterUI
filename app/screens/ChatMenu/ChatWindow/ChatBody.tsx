@@ -4,14 +4,14 @@ import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 import { Pressable, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
-
 import { useShallow } from 'zustand/react/shallow'
+
 import ChatActions, { optionState } from './ChatActions'
+import ChatAttachments from './ChatAttachments'
 import ChatText from './ChatText'
 import ChatTextLast from './ChatTextLast'
 import { useChatEditorState } from './EditorModal'
 import Swipes from './Swipes'
-import ChatAttachments from './ChatAttachments'
 
 type ChatTextProps = {
     index: number

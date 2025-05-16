@@ -2,6 +2,7 @@ import HeaderTitle from '@components/views/HeaderTitle'
 import { db } from '@db'
 import { AntDesign } from '@expo/vector-icons'
 import useLocalAuth from '@lib/hooks/LocalAuth'
+import { useNotificationObserver } from '@lib/notifications/Notifications'
 import { Theme } from '@lib/theme/ThemeManager'
 import { loadChatOnInit, startupApp } from '@lib/utils/Startup'
 import CharacterMenu from '@screens/CharacterMenu'
@@ -11,7 +12,6 @@ import { useEffect, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import migrations from '../db/migrations/migrations'
-import { useNotificationObserver } from '@lib/notifications/Notifications'
 
 const Home = () => {
     const { color } = Theme.useTheme()

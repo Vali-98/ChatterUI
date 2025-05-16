@@ -58,4 +58,3 @@ const StyleSettings = () => {
 }
 
 export default StyleSettings
-
