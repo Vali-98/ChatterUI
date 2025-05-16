@@ -570,19 +570,6 @@ export namespace Chats {
                                 swipe: convertToFormatInstruct(replaceMacros(item)),
                             }))
                         )
-
-                        /*
-                        await tx.insert(chatSwipes).values({
-                            entry_id: entryId,
-                            swipe: convertToFormatInstruct(replaceMacros(card.first_mes ?? '')),
-                        })
-
-                        card?.alternate_greetings?.forEach(async (data) => {
-                            await tx.insert(chatSwipes).values({
-                                entry_id: entryId,
-                                swipe: convertToFormatInstruct(replaceMacros(data.greeting)),
-                            })
-                        })*/
                     }
 
                     await Characters.db.mutate.updateModified(charId)
