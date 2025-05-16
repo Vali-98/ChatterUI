@@ -119,10 +119,10 @@ const getPaths = (remote: boolean): ButtonData[] => [
 ]
 
 const paths_dev: ButtonData[] = [
-    {
+    /*{
         name: '[DEV] HF',
         path: '/HFTest',
-    },
+    },*/
     {
         name: '[DEV] Components',
         path: '/ComponentTest',
