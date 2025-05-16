@@ -1,0 +1,34 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+title: '[Feature Request]: '
+labels: [enhancement]
+
+body:
+    - type: markdown
+      attributes:
+          value: |
+              **Before submitting a feature request:**
+
+              1. Check [existing issues](https://github.com/Vali-98/ChatterUI/issues) to see if your idea is already covered.
+              2. If you need a new API provider added, check out the [Custom Templates](https://github.com/Vali-98/ChatterUI/discussions/126) to add support yourself!
+              3. If you need a new color scheme, check out [Custom Themes](https://github.com/Vali-98/ChatterUI/discussions/218)
+
+              ---
+
+              *Lets keep the issues page clean and organized.*
+
+    - type: textarea
+      id: description
+      validations:
+          required: true
+      attributes:
+          label: Description
+          description: A concise description of the feature
+          placeholder: e.g., Support for <Platform> is needed because...
+
+    - type: textarea
+      id: solution
+      attributes:
+          label: Proposed Solution
+          description: If you have an idea for how to implement it, describe it here.
+          placeholder: e.g., We can add support by...

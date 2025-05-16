@@ -40,7 +40,8 @@ type TTSState = {
     insertBuffer: (text: string) => void
 }
 
-const sentenceEndRegex = /(?<=[^\d])([.?!])(?:["'`*_)]*)\s+(?=[A-Z0-9])|([.?!])(?:["'`*_)]*)$/gm
+const sentenceEndRegex =
+    /(?<=[^\d])([。…？！.?!])(?:["'`*_)]*)\s+(?=[A-Z0-9])|([。…？！.?!])(?:["'`*_)]*)$/gm
 
 export const useTTS = () => {
     const {
@@ -129,7 +130,7 @@ export const useTTSState = create<TTSState>()(
                     return
                 }
                 if (await Speech.isSpeakingAsync()) await Speech.stop()
-                const filter = /([!?.,*"])/
+                const filter = /([。…！？、!?.,*"])/
                 const filteredchunks: string[] = []
                 const chunks = text.split(filter)
                 chunks.forEach((item, index) => {

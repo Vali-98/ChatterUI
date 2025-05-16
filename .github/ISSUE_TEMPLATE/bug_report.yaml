@@ -1,0 +1,53 @@
+name: Bug Report
+description: Report a bug to help us improve ChatterUI
+title: '[Bug]: '
+labels: [bug]
+
+body:
+    - type: markdown
+      attributes:
+          value: |
+              **Before submitting a bug report:**, Check [existing issues](https://github.com/Vali-98/ChatterUI/issues) to see if your issue is already covered.
+
+              ---
+
+              *Lets keep the issues page clean and organized.*
+
+    - type: input
+      id: version
+      validations:
+          required: true
+      attributes:
+          label: App Version
+          description: What ChatterUI version are you running?
+          placeholder: e.g., 0.8.7, 0.8.7-beta1...
+
+    - type: input
+      id: device
+      validations:
+          required: true
+      attributes:
+          label: Device Information
+          description: What is your device and Android version?
+          placeholder: e.g., Samsung S22, Android 12
+
+    - type: input
+      id: api
+      attributes:
+          label: (Optional) API / Local and Model Info
+          description: If this issue is model / API related, provide the relevant information
+          placeholder: e.g., OpenRouter - Qwen 3 14B, Local - Gemma 3 1B
+
+    - type: textarea
+      id: description
+      validations:
+          required: true
+      attributes:
+          label: Description
+          description: |
+              Explain the bug in detail. Preferably, add reproduction steps such as:
+                 1. Go to Home
+                 2. Press Open Button
+                 3. ...
+                
+              Feel free to attack logs or screenshots as needed. You can export logs at Sidebar > Logs > Export
