@@ -186,7 +186,7 @@ const ChatInput = () => {
                             ]}
                             style={{ color: color.text._400 }}
                             placement="top"
-                            menuCustomStyle={{ position: 'absolute', marginRight: 16 }}
+                            menuCustomStyle={{ position: 'absolute', marginRight: 12 }}
                         />
                     )}
                 </View>
