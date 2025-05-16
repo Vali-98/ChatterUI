@@ -567,7 +567,7 @@ export namespace Chats {
                         await tx.insert(chatSwipes).values(
                             greetings.map((item) => ({
                                 entry_id: entryId,
-                                swipe: convertToFormatInstruct(item),
+                                swipe: convertToFormatInstruct(replaceMacros(item)),
                             }))
                         )
 
