@@ -100,6 +100,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
                 booleans={[showRename, setShowRename]}
                 onConfirm={async (text) => {
                     await Chats.db.mutate.renameChat(item.id, text)
+                    await loadChat(item.id)
                 }}
                 textCheck={(text) => text.length === 0}
                 defaultValue={item.name}
