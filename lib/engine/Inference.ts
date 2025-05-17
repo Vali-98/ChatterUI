@@ -73,4 +73,21 @@ export const generateResponse = async (swipeId: number) => {
     }
 
     Logger.debug(`Time taken for generateResponse(): ${(performance.now() - data).toFixed(2)}ms`)
+
+    await generateChatName()
+}
+
+const generateChatName = async () => {
+    let data = Chats.useChatState.getState()?.data
+    const chatId = data?.id
+    const chatName = data?.name
+
+    if (chatName === 'New Chat') {
+        const message = data?.messages?.find(m => m.is_user)?.swipes[0]?.swipe.trim()
+        if (!message) return
+        const newName = message.slice(0, 30)
+        await Chats.db.mutate.renameChat(chatId, newName)
+
+        data.name = newName
+    }
 }
