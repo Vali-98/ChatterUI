@@ -78,7 +78,7 @@ export const generateResponse = async (swipeId: number) => {
 }
 
 const generateChatName = async () => {
-    let data = Chats.useChatState.getState()?.data
+    const data = Chats.useChatState.getState()?.data
     const chatId = data?.id
     const chatName = data?.name
 
@@ -87,7 +87,6 @@ const generateChatName = async () => {
         if (!message) return
         const newName = message.slice(0, 30)
         await Chats.db.mutate.renameChat(chatId, newName)
-
-        data.name = newName
+        await Chats.useChatState.getState().load(chatId)
     }
 }
