@@ -1,7 +1,7 @@
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Characters } from '@lib/state/Characters'
-import { Chats } from '@lib/state/Chat'
+import { ChatEntry, Chats } from '@lib/state/Chat'
 import { Instructs, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'
@@ -249,9 +249,8 @@ export const buildChatCompletionContext = async (
             [completionFeats.contentName]: replaceMacros(initial, rules),
         },
     ]
-    let lastImage = false
+    let hasImage = false
     const messageBuffer: Message[] = []
-
     let index = messages.length - 1
     for (const message of messages.reverse()) {
         const swipe_data = message.swipes[message.swipe_id]
@@ -261,9 +260,23 @@ export const buildChatCompletionContext = async (
 
         const name_string = `${message.name} :`
         const name_length = currentInstruct.names ? tokenizer(name_string) : 0
+        const { attachments, hasImageNew } = getValidAttachments(
+            message,
+            completionFeats,
+            currentInstruct,
+            hasImage
+        )
+
         const len =
-            Chats.useChatState.getState().getTokenCount(index) + name_length + timestamp_length
+            Chats.useChatState.getState().getTokenCount(index, {
+                addAttachments: attachments.length > 0,
+                lastImageOnly: currentInstruct.last_image_only,
+            }) +
+            name_length +
+            timestamp_length
+
         if (total_length + len > max_length && !bypassContextLength) break
+        hasImage = hasImageNew
 
         const prefill = index === messages.length - 1 ? values.prefill : ''
 
@@ -274,30 +287,27 @@ export const buildChatCompletionContext = async (
         const role = message.is_user ? completionFeats.userRole : completionFeats.assistantRole
 
         if (message.attachments.length > 0) {
-            //TODO: Make this toggleable
             //TODO: image len
-            //TODO: last image only
-            //TODO: config check
             Logger.warn('Image output is incomplete')
 
             const images: ContentTypes[] = await Promise.all(
-                message.attachments
-                    .filter((item) => item.type === 'image' || item.type === 'audio')
-                    .map(async (item) => {
-                        const base64data = await readAsStringAsync(item.uri, { encoding: 'base64' })
-
-                        if (item.type === 'image')
-                            return {
-                                type: 'image_url',
-                                image_url: {
-                                    url: 'data:' + item.mime_type + ';base64,' + base64data,
-                                },
-                            }
+                attachments.map(async (item) => {
+                    const base64data = await readAsStringAsync(item.uri, { encoding: 'base64' })
+                    if (item.type === 'image')
                         return {
-                            type: 'input_audio',
-                            input_audio: { data: base64data, format: item.mime_type.split('/')[1] },
+                            type: 'image_url',
+                            image_url: {
+                                url: 'data:' + item.mime_type + ';base64,' + base64data,
+                            },
                         }
-                    })
+                    return {
+                        type: 'input_audio',
+                        input_audio: {
+                            data: base64data,
+                            format: item.mime_type.split('/')[1],
+                        },
+                    }
+                })
             )
 
             messageBuffer.push({
@@ -332,4 +342,36 @@ export const buildChatCompletionContext = async (
     if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(JSON.stringify(output))
 
     return output
+}
+
+const getValidAttachments = (
+    entry: ChatEntry,
+    config: {
+        type: 'chatCompletions'
+        userRole: string
+        systemRole: string
+        assistantRole: string
+        contentName: string
+        supportsAudio?: boolean
+        supportsImages?: boolean
+    },
+    instruct: InstructType,
+    hasImage: boolean
+) => {
+    let hasImageNew = hasImage
+    const audioAttachments = entry.attachments.filter(
+        (item) => item.type === 'audio' && instruct.send_audio && config.supportsAudio
+    )
+
+    let imageAttachments: typeof entry.attachments = []
+    if (instruct.send_images && config.supportsImages) {
+        const images = entry.attachments.filter((item) => item.type === 'image')
+        if (instruct.last_image_only && images.length > 0) {
+            imageAttachments = [images[0]]
+        } else {
+            imageAttachments = images
+        }
+    }
+    const attachments = [...audioAttachments, ...imageAttachments]
+    return { hasImageNew, attachments }
 }

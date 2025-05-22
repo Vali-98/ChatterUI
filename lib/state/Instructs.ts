@@ -23,6 +23,10 @@ const defaultBooleans = {
     personality: true,
     hide_think_tags: true,
     use_common_stop: true,
+    send_images: true,
+    send_audio: true,
+    send_documents: true,
+    last_image_only: true,
 }
 
 const defaultInstructs: InstructType[] = [
@@ -299,7 +303,7 @@ export namespace Instructs {
                 name: Storage.Instruct,
                 storage: createJSONStorage(() => mmkvStorage),
                 partialize: (state) => ({ data: state.data }),
-                version: 5,
+                version: 6,
                 migrate: async (persistedState: any, version) => {
                     if (!version) {
                         persistedState.data.timestamp = false
@@ -335,6 +339,13 @@ export namespace Instructs {
 
                     if (version === 4) {
                         persistedState.data.use_common_stop = true
+                    }
+
+                    if (version === 5) {
+                        persistedState.data.send_images = true
+                        persistedState.data.send_audio = true
+                        persistedState.data.send_documents = true
+                        persistedState.data.last_image_only = true
                     }
 
                     return persistedState

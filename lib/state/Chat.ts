@@ -29,6 +29,7 @@ import { mmkv } from '../storage/MMKV'
 
 export interface ChatSwipeState extends ChatSwipe {
     token_count?: number
+    attachment_count?: number
     regen_cache?: string
 }
 
@@ -89,7 +90,10 @@ export interface ChatState {
     removeAttachment: (entryId: number, attachmentId: number) => Promise<void>
 
     // generation system
-    getTokenCount: (index: number) => number
+    getTokenCount: (
+        index: number,
+        options?: { addAttachments: boolean; lastImageOnly: boolean }
+    ) => number
     stopGenerating: () => void
     startGenerating: (swipeId: number) => void
 }
@@ -348,22 +352,39 @@ export namespace Chats {
             return swipe?.id
         },
 
-        getTokenCount: (index: number) => {
+        getTokenCount: (
+            index: number,
+            options = {
+                lastImageOnly: false,
+                addAttachments: false,
+            }
+        ) => {
             const messages = get()?.data?.messages
             if (!messages) return 0
 
             const swipe_id = messages[index].swipe_id
-            const cached_token_count = messages[index].swipes[swipe_id].token_count
-            if (cached_token_count) return cached_token_count
+
+            const attachmentLength = messages[index].attachments.length
+            const attachmentCount = options.addAttachments
+                ? options.lastImageOnly
+                    ? 1
+                    : attachmentLength
+                : 0
+
+            const { token_count, attachment_count } = messages[index].swipes[swipe_id]
+            if (token_count && attachmentCount === attachment_count) return token_count
             const getTokenCount = Tokenizer.getTokenizer()
 
-            const token_count = getTokenCount(messages[index].swipes[swipe_id].swipe)
-            messages[index].swipes[swipe_id].token_count = token_count
+            const new_token_count = getTokenCount(
+                messages[index].swipes[swipe_id].swipe,
+                Array(attachmentCount).fill('')
+            )
+            messages[index].swipes[swipe_id].token_count = new_token_count
             set((state: ChatState) => ({
                 ...state,
                 data: state?.data ? { ...state.data, messages: messages } : state.data,
             }))
-            return token_count
+            return new_token_count
         },
         setBuffer: (newBuffer: OutputBuffer) =>
             set((state: ChatState) => ({ ...state, buffer: newBuffer })),

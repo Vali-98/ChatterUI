@@ -328,7 +328,7 @@ const FormattingManager = () => {
                     </View>
 
                     <StringArrayEditor
-                        containerStyle={{ marginBottom: spacing.l }}
+                        containerStyle={{}}
                         label="Stop Sequence"
                         value={
                             currentInstruct.stop_sequence
@@ -344,6 +344,17 @@ const FormattingManager = () => {
                         replaceNewLine="\n"
                     />
 
+                    <ThemedCheckbox
+                        label="Use Common Stop Sequences"
+                        value={currentInstruct.use_common_stop}
+                        onChangeValue={(b) => {
+                            setCurrentInstruct({
+                                ...currentInstruct,
+                                use_common_stop: b,
+                            })
+                        }}
+                    />
+
                     <SectionTitle>Macros & Character Card</SectionTitle>
 
                     <View
@@ -351,7 +362,7 @@ const FormattingManager = () => {
                             flexDirection: 'row',
                             columnGap: spacing.xl2,
                         }}>
-                        <View>
+                        <View style={{ flex: 1 }}>
                             <ThemedCheckbox
                                 label="Wrap In Newline"
                                 value={currentInstruct.wrap}
@@ -393,7 +404,7 @@ const FormattingManager = () => {
                                 }}
                             />
                         </View>
-                        <View>
+                        <View style={{ flex: 1 }}>
                             <ThemedCheckbox
                                 label="Use Examples"
                                 value={currentInstruct.examples}
@@ -425,13 +436,57 @@ const FormattingManager = () => {
                                     })
                                 }}
                             />
+                        </View>
+                    </View>
+
+                    <SectionTitle>Attachments</SectionTitle>
+
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            columnGap: spacing.xl2,
+                            justifyContent: 'space-between',
+                        }}>
+                        <View style={{ flex: 1 }}>
                             <ThemedCheckbox
-                                label="Use Common Stop"
-                                value={currentInstruct.use_common_stop}
+                                label="Send Images"
+                                value={currentInstruct.send_images}
                                 onChangeValue={(b) => {
                                     setCurrentInstruct({
                                         ...currentInstruct,
-                                        use_common_stop: b,
+                                        send_images: b,
+                                    })
+                                }}
+                            />
+                            <ThemedCheckbox
+                                label="Send Documents"
+                                value={currentInstruct.send_documents}
+                                onChangeValue={(b) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        send_documents: b,
+                                    })
+                                }}
+                            />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                            <ThemedCheckbox
+                                label="Send Audio"
+                                value={currentInstruct.send_audio}
+                                onChangeValue={(b) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        send_audio: b,
+                                    })
+                                }}
+                            />
+                            <ThemedCheckbox
+                                label="Use Last Image Only"
+                                value={currentInstruct.last_image_only}
+                                onChangeValue={(b) => {
+                                    setCurrentInstruct({
+                                        ...currentInstruct,
+                                        last_image_only: b,
                                     })
                                 }}
                             />

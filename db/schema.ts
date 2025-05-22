@@ -214,6 +214,12 @@ export const instructs = sqliteTable('instructs', {
     // additions 5/5/2025 v6
     hide_think_tags: integer('hide_think_tags', { mode: 'boolean' }).notNull().default(true),
     use_common_stop: integer('use_common_stop', { mode: 'boolean' }).notNull().default(true),
+
+    // additions 22/5/2025 v7
+    send_images: integer('send_images', { mode: 'boolean' }).notNull().default(true),
+    send_audio: integer('send_audio', { mode: 'boolean' }).notNull().default(true),
+    send_documents: integer('send_documents', { mode: 'boolean' }).notNull().default(true),
+    last_image_only: integer('last_image_only', { mode: 'boolean' }).notNull().default(true),
 })
 
 // LOREBOOKS

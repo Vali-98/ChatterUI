@@ -47,6 +47,8 @@ Below is an explanation of what each field does:
             -   `systemRole: string` the name of the [SYSTEM] role
             -   `assistantRole: string` - the name of the [ASSISTANT] role
             -   `contentName: string` - the key of the [CONTENT] field
+            -   `supportsImages: boolean` - whether or not this API has image input
+            -   `supportsAudio: boolean` whether or not this API has audio input
         -   `type: textCompletions` - Use this if the API uses text completions
     -   `authHeader: 'Authorization' | 'X-API-KEY' | string` - The header key for authorization
     -   `authPrefix: 'Bearer ' | string` - A prefix before the API key value in the authorization header

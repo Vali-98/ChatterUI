@@ -16,7 +16,7 @@ import { Llama } from './Local/LlamaLocal'
 type TokenizerState = {
     model?: LlamaContext
     tokenize: (text: string) => number[]
-    getTokenCount: (text: string) => number
+    getTokenCount: (text: string, image_urls?: string[]) => number
     loadModel: () => Promise<void>
 }
 
@@ -26,13 +26,14 @@ export namespace Tokenizer {
         tokenize: (text: string) => {
             return get()?.model?.tokenizeSync(text)?.tokens ?? []
         },
-        getTokenCount: (text: string) => {
+        getTokenCount: (text: string, image_urls: string[] = []) => {
             const model = get().model
             if (!model) {
                 Logger.warn('Tokenizer not loaded')
                 return 0
             }
-            return model.tokenizeSync(text).tokens.length
+            console.log(image_urls.length)
+            return model.tokenizeSync(text).tokens.length + image_urls.length * 512
         },
         loadModel: async () => {
             if (get().model) return
