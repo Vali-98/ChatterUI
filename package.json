@@ -26,6 +26,7 @@
     "@expo/config-plugins": "^10.0.2",
     "@expo/prebuild-config": "~9.0.0",
     "@expo/vector-icons": "^14.1.0",
+    "@legendapp/list": "^1.0.14",
     "@react-native-community/slider": "4.5.6",
     "@shopify/flash-list": "1.7.6",
     "@vali98/react-native-fs": "^0.1.0",
