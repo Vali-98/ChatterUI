@@ -367,7 +367,10 @@ const getValidAttachments = (
     if (instruct.send_images && config.supportsImages) {
         const images = entry.attachments.filter((item) => item.type === 'image')
         if (instruct.last_image_only && images.length > 0) {
-            imageAttachments = [images[0]]
+            if (!hasImageNew) {
+                hasImageNew = true
+                imageAttachments = [images[0]]
+            }
         } else {
             imageAttachments = images
         }
