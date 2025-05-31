@@ -13,7 +13,7 @@ export namespace MarkdownStyle {
         double_quote: (node: any, children: any, parent: any, styles: any) => {
             return (
                 <Text key={node.key} style={styles.double_quote}>
-                    "{children}"
+                    {children}
                 </Text>
             )
         },

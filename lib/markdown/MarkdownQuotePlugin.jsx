@@ -1,59 +1,61 @@
 module.exports = function doubleQuotePlugin(md) {
-    // Define a new rule to inline various double-quote types
-    md.core.ruler.push('double_quote', function (state) {
-        if (state.env.inDoubleQuote) return
-        // Define a regex to match double quotes, including curly ones
-        const doubleQuoteRegex = /([“”"])(.*?)([“”"])/g
+    md.core.ruler.after('inline', 'double_quote', function (state) {
+        for (const blockToken of state.tokens) {
+            if (blockToken.type !== 'inline' || !blockToken.children) continue
 
-        // Loop through all tokens
-        for (let i = 0; i < state.tokens.length; i++) {
-            const token = state.tokens[i]
+            const children = blockToken.children
+            const newChildren = []
 
-            if (token.type === 'inline' && doubleQuoteRegex.test(token.content)) {
-                const parts = []
-                let lastIndex = 0
-                // Use the regex to find double-quoted segments
-                token.content.replace(
-                    doubleQuoteRegex,
-                    (match, openQuote, text, closeQuote, offset) => {
-                        // Push the text before the match as a plain text token
-                        if (offset > lastIndex) {
-                            parts.push(
-                                ...md.parseInline(token.content.slice(lastIndex, offset), state.env)
-                            )
+            for (let i = 0; i < children.length; i++) {
+                const token = children[i]
+
+                if (token.type === 'text') {
+                    const regex = /([“”"])([^“”"]+?)\1/g
+                    let remaining = token.content
+                    let lastIndex = 0
+                    let match
+
+                    while ((match = regex.exec(token.content))) {
+                        const [fullMatch, quoteChar, innerText] = match
+                        const matchStart = match.index
+
+                        // Add text before the quote
+                        if (matchStart > lastIndex) {
+                            const before = new state.Token('text', '', 0)
+                            before.content = token.content.slice(lastIndex, matchStart)
+                            newChildren.push(before)
                         }
 
-                        // Push a double-quote token for the matched quote and its content
+                        // Tokenize the inside of the quote
+                        const innerState = new md.inline.State(innerText, md, state.env, [])
+                        md.inline.tokenize(innerState)
 
-                        parts.push({
-                            type: 'double_quote',
-                            children: [
-                                { type: 'text', content: `${openQuote}` },
-                                ...md.parseInline(text, state.env),
-                                { type: 'text', content: `${closeQuote}` },
-                            ],
-                        })
+                        // Wrap in a double_quote token
+                        const dqToken = new state.Token('double_quote', '', 0)
+                        dqToken.children = [
+                            Object.assign(new state.Token('text', '', 0), { content: quoteChar }),
+                            ...innerState.tokens,
+                            Object.assign(new state.Token('text', '', 0), { content: quoteChar }),
+                        ]
+                        newChildren.push(dqToken)
 
-                        lastIndex = offset + match.length
+                        lastIndex = match.index + fullMatch.length
                     }
-                )
 
-                // Add any remaining text after the last match
-                if (lastIndex < token.content.length) {
-                    parts.push(...md.parseInline(token.content.slice(lastIndex), state.env))
+                    // Remaining text
+                    if (lastIndex < token.content.length) {
+                        const tail = new state.Token('text', '', 0)
+                        tail.content = token.content.slice(lastIndex)
+                        newChildren.push(tail)
+                    }
+                } else {
+                    newChildren.push(token)
                 }
-                // Convert parts into tokens and replace the child tokens
-                state.tokens.splice(
-                    i,
-                    1,
-                    ...parts.map((part) => {
-                        const newToken = new state.Token(part.type, '', 0)
-                        newToken.content = part.content
-                        newToken.children = part.children
-                        return newToken
-                    })
-                )
             }
+
+            blockToken.children = newChildren
         }
+
+        return true
     })
 }
