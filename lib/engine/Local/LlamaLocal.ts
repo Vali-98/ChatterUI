@@ -132,6 +132,7 @@ export namespace Llama {
                 n_batch: config.batch,
                 use_mlock: true,
                 use_mmap: true,
+                ctx_shift: true, // TODO: Disable this for MTMD
             }
 
             Logger.info(
