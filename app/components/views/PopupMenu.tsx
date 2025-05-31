@@ -2,7 +2,15 @@ import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useFocusEffect } from 'expo-router'
 import React, { ReactNode, useRef, useState } from 'react'
-import { StyleSheet, TouchableOpacity, Text, BackHandler, TextStyle, ViewStyle } from 'react-native'
+import {
+    StyleSheet,
+    TouchableOpacity,
+    Text,
+    BackHandler,
+    TextStyle,
+    ViewStyle,
+    I18nManager,
+} from 'react-native'
 import {
     Menu,
     MenuOption,
@@ -94,6 +102,13 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
         return () => handler.remove()
     })
 
+    const switchRTL = () => {
+        if (!I18nManager.isRTL) return placement
+        if (placement === 'left') return 'right'
+        if (placement === 'right') return 'left'
+        return placement
+    }
+
     return (
         <Menu
             ref={menuRef}
@@ -102,7 +117,7 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
             style={menuCustomStyle}
             renderer={Popover}
             rendererProps={{
-                placement: placement,
+                placement: switchRTL(),
                 anchorStyle: styles.anchor,
                 openAnimationDuration: 150,
                 closeAnimationDuration: 0,
