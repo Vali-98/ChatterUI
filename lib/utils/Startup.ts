@@ -27,6 +27,7 @@ import { Chats } from '../state/Chat'
 import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
 import { Theme } from '../theme/ThemeManager'
+import { patchAndroidText } from './PatchText'
 
 export const loadChatOnInit = async () => {
     if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return
@@ -219,6 +220,10 @@ export const startupApp = () => {
 
     // get fp16, i8mm and dotprod data
     setCPUFeatures()
+
+    // patch for Bold Text bug
+    // refer to https://github.com/Vali-98/ChatterUI/issues/161
+    patchAndroidText()
 
     // Local Model Data in case external models are deleted
     Model.verifyModelList()
