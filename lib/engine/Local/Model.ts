@@ -3,7 +3,7 @@ import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import { AppDirectory, readableFileSize } from '@lib/utils/File'
-import { initLlama } from 'cui-llama.rn'
+import { initLlama, loadLlamaModelInfo } from 'cui-llama.rn'
 import { model_data, ModelDataType } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import { getDocumentAsync } from 'expo-document-picker'
@@ -178,22 +178,27 @@ export namespace Model {
                 .values(initialModelEntry(filename, file_path))
                 .returning({ id: model_data.id })
 
-            const modelContext = await initLlama({ model: file_path, vocab_only: true })
+            // This will load GGUF KV-pairs
+            // refer to https://github.com/ggml-org/ggml/blob/master/docs/gguf.md#standardized-key-value-pairs
 
-            const modelInfo: any = modelContext.model
-            const modelType = modelInfo.metadata?.['general.architecture']
+            const modelInfo: any = await loadLlamaModelInfo(file_path)
+            let fileSize = 0
+            const fileResult = await getInfoAsync(file_path)
+            if (fileResult.exists) {
+                fileSize = fileResult.size
+            }
+            const modelType = modelInfo?.['general.architecture']
             const modelDataEntry = {
-                context_length: modelInfo.metadata?.[modelType + '.context_length'] ?? 0,
+                context_length: modelInfo?.[modelType + '.context_length'] ?? 0,
                 file: filename,
                 file_path: file_path,
-                name: modelInfo.metadata?.['general.name'] ?? 'N/A',
-                file_size: modelInfo.size ?? 0,
-                params: modelInfo.metadata?.['general.size_label'] ?? 'N/A',
-                quantization: modelInfo.metadata?.['general.file_type'] ?? '-1',
+                name: modelInfo?.['general.name'] ?? 'N/A',
+                file_size: fileSize,
+                params: modelInfo?.['general.size_label'] ?? 'N/A',
+                quantization: modelInfo?.['general.file_type'] ?? '-1',
                 architecture: modelType ?? 'N/A',
             }
             Logger.info(`New Model Data:\n${modelDataText(modelDataEntry)}`)
-            await modelContext.release()
             await db.update(model_data).set(modelDataEntry).where(eq(model_data.id, id))
             return true
         } catch (e) {

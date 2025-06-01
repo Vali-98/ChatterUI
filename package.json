@@ -16,7 +16,8 @@
     "dev:ios": "cross-env APP_VARIANT=development expo run:ios",
     "migrate": "npx drizzle-kit generate",
     "patchsql": "npx patch-package expo-sqlite --exclude \"\\.project|\\.cxx|\\.c|\\.h|build|bin\" --case-sensitive-path-filtering",
-    "patchfetch": "npx patch-package expo --include '\".*fetch\\.ts$|.*NativeResponse\\.kt$\"'"
+    "patchfetch": "npx patch-package expo --include '\".*fetch\\.ts$|.*NativeResponse\\.kt$\"'",
+    "patchfs": "npx patch-package expo-file-system --include \"\\.kt$\""
   },
   "jest": {
     "preset": "jest-expo"
@@ -31,7 +32,7 @@
     "@vali98/react-native-fs": "^0.1.0",
     "babel-plugin-inline-import": "^3.0.0",
     "babel-plugin-react-compiler": "^19.0.0-beta-af1b7da-20250417",
-    "cui-llama.rn": "^1.7.0",
+    "cui-llama.rn": "^1.7.1",
     "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.36.2",
     "eslint-plugin-react-compiler": "^0.0.0-experimental-7c1344f-20241009",
