@@ -32,7 +32,6 @@ export namespace Tokenizer {
                 Logger.warn('Tokenizer not loaded')
                 return 0
             }
-            console.log(image_urls.length)
             return model.tokenizeSync(text).tokens.length + image_urls.length * 512
         },
         loadModel: async () => {

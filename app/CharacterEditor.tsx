@@ -102,7 +102,7 @@ const ChracterEditor = () => {
                     Logger.infoToast('Card Exported!')
                 })
         } catch (e) {
-            console.log(e)
+            Logger.errorToast('Could not export: ' + JSON.stringify(e))
         }
     }
 
