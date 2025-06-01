@@ -823,16 +823,17 @@ export namespace Chats {
     }
 
     export const useChat = () => {
-        const { loadChat, unloadChat, chat, chatId, deleteChat } = Chats.useChatState(
+        const { loadChat, unloadChat, chat, chatId, deleteChat, chatLength } = Chats.useChatState(
             useShallow((state) => ({
                 loadChat: state.load,
                 unloadChat: state.reset,
                 chat: state.data,
                 chatId: state.data?.id,
                 deleteChat: state.delete,
+                chatLength: state.data?.messages.length,
             }))
         )
-        return { chat, loadChat, unloadChat, deleteChat, chatId }
+        return { chat, loadChat, unloadChat, deleteChat, chatId, chatLength }
     }
 
     export const useEntry = () => {
