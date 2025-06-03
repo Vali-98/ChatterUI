@@ -1,7 +1,5 @@
 import ScaledImage from '@components/views/ScaledImage'
 import { Chats } from '@lib/state/Chat'
-import { ChatAttachmentType } from 'db/schema'
-import { Image } from 'expo-image'
 import { Dimensions, View } from 'react-native'
 
 type ChatAttachmentsProps = {
