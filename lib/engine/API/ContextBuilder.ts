@@ -287,7 +287,6 @@ export const buildChatCompletionContext = async (
         const role = message.is_user ? completionFeats.userRole : completionFeats.assistantRole
 
         if (message.attachments.length > 0) {
-            //TODO: image len
             Logger.warn('Image output is incomplete')
 
             const images: ContentTypes[] = await Promise.all(

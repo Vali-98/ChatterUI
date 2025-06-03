@@ -31,13 +31,16 @@ export type CompletionOutput = {
 
 export type LlamaState = {
     context: LlamaContext | undefined
-    model: undefined | ModelDataType
+    model?: ModelDataType
+    mmproj?: ModelDataType
     loadProgress: number
     chatCount: number
     promptCache?: string
     load: (model: ModelDataType) => Promise<void>
+    loadMmproj: (model: ModelDataType) => Promise<void>
     setLoadProgress: (progress: number) => void
     unload: () => Promise<void>
+    unloadMmproj: () => Promise<void>
     saveKV: (prompt: string | undefined) => Promise<void>
     loadKV: () => Promise<boolean>
     completion: (
@@ -46,7 +49,7 @@ export type LlamaState = {
         completed: (text: string, timngs: CompletionTimings) => void
     ) => Promise<void>
     stopCompletion: () => Promise<void>
-    tokenLength: (text: string) => number
+    tokenLength: (text: string, mediaPaths?: string[]) => number
     tokenize: (text: string) => { tokens: number[] } | undefined
 }
 
@@ -102,7 +105,6 @@ export namespace Llama {
         context: undefined,
         loadProgress: 0,
         chatCount: 0,
-        model: undefined,
         promptCache: undefined,
         load: async (model: ModelDataType) => {
             const config = useEngineData.getState().config
@@ -132,7 +134,6 @@ export namespace Llama {
                 n_batch: config.batch,
                 use_mlock: true,
                 use_mmap: true,
-                ctx_shift: true, // TODO: Disable this for MTMD
             }
 
             Logger.info(
@@ -159,14 +160,45 @@ export namespace Llama {
             useEngineData.getState().setLastModelLoaded(model)
             KV.useKVState.getState().setKvCacheLoaded(false)
         },
+        loadMmproj: async (model: ModelDataType) => {
+            const context = get().context
+            if (!context) return
+            set({
+                mmproj: model,
+            })
+            Logger.info('Loading MMPROJ')
+            await context
+                .initMultimodal({ path: model.file_path })
+                .catch((e) => Logger.errorToast('Failed to load MMPROJ: ' + e))
+            const capabilities = await context.getMultimodalSupport()
+            Logger.info(
+                `Multimodal Capabilities:\nVision: ${capabilities.vision}\nAudio: ${capabilities.audio}`
+            )
+        },
         setLoadProgress: (progress: number) => {
             set({ loadProgress: progress })
         },
         unload: async () => {
+            if (get().mmproj) {
+                await get().context?.releaseMultimodal()
+            }
+
             await get().context?.release()
             set({
                 context: undefined,
                 model: undefined,
+                mmproj: undefined,
+            })
+        },
+        unloadMmproj: async () => {
+            if (!get().mmproj) return
+            await get()
+                .context?.releaseMultimodal()
+                .catch((e) => {
+                    Logger.errorToast('Failed to unload MMPROJ: ' + e)
+                })
+            set({
+                mmproj: undefined,
             })
         },
         completion: async (
@@ -247,8 +279,10 @@ export namespace Llama {
                 })
             return result
         },
-        tokenLength: (text: string) => {
-            return get().context?.tokenizeSync(text)?.tokens?.length ?? 0
+        tokenLength: (text: string, mediaPaths: string[] = []) => {
+            return (
+                (get().context?.tokenizeSync(text)?.tokens?.length ?? 0) + mediaPaths.length * 512
+            )
         },
         tokenize: (text: string) => {
             return get().context?.tokenizeSync(text)
@@ -273,57 +307,4 @@ export namespace Llama {
                 : '\nNo Tokens Generated')
         )
     }
-
-    // Presets
-
-    // Downloaders - Old Placeholder
-    /*
-    export const downloadModel = async (
-        url: string,
-        callback?: () => void,
-        cancel?: (cancel: () => void) => void
-    ) => {
-        // check if this model already exists
-        const result = await fetch(url, { method: 'HEAD' })
-        const contentDisposition = result.headers.get('Content-Disposition')
-        let filename = undefined
-        if (contentDisposition && contentDisposition.includes('filename=')) {
-            filename = contentDisposition.split('filename=')[1].split(';')[0].replace(/['"]/g, '')
-        }
-        if (!filename) {
-            Logger.log('Invalid URL', true)
-            return
-        }
-        const fileInfo = await getInfoAsync(`${AppDirectory.ModelPath}${filename}`)
-        if (fileInfo.exists) {
-            Logger.log('Model already exists!', true)
-            // return
-        }
-        let current = 0
-        const downloadTask = createDownloadResumable(
-            url,
-            `${cacheDirectory}${filename}`,
-            {},
-            (progress) => {
-                const percentage = progress.totalBytesWritten / progress.totalBytesExpectedToWrite
-                if (percentage <= current) return
-                current = percentage
-            }
-        )
-        await downloadTask
-            .downloadAsync()
-            .then(async (result) => {
-                if (!result?.uri) {
-                    Logger.log('Download failed')
-                    return
-                }
-                await moveAsync({
-                    from: result.uri,
-                    to: `${AppDirectory.ModelPath}${filename}`,
-                }).then(() => {
-                    Logger.log(`${filename} downloaded sucessfully!`)
-                })
-            })
-            .catch((err) => Logger.log(`Failed to download: ${err}`))
-    }*/
 }

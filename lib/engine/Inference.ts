@@ -71,6 +71,4 @@ export const generateResponse = async (swipeId: number) => {
     } else {
         await BackgroundService.start(buildAndSendRequest, completionTaskOptions)
     }
-
-    Logger.debug(`Time taken for generateResponse(): ${(performance.now() - data).toFixed(2)}ms`)
 }

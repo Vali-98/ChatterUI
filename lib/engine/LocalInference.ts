@@ -63,8 +63,21 @@ const buildLocalPayload = async () => {
     const n_predict =
         (typeof payloadFields?.['n_predict'] === 'number' && payloadFields?.['n_predict']) || 0
     const localPreset: LlamaConfig = Llama.useEngineData.getState().config
-
     let prompt: undefined | string = undefined
+    let mediaPaths: string[] = []
+    const inferConfig = { ...localAPIConfig }
+    const context = Llama.useLlama.getState().context
+    const completionType = inferConfig.request.completionType
+    if (context && (await context.isMultimodalEnabled())) {
+        const mtmdSupport = await context.getMultimodalSupport()
+        if (completionType.type === 'chatCompletions') {
+            completionType.supportsAudio = mtmdSupport?.audio
+            completionType.supportsImages = mtmdSupport?.vision
+            inferConfig.request.completionType = completionType
+        }
+    }
+    const hasAudio = completionType.type === 'chatCompletions' && completionType.supportsAudio
+    const hasImage = completionType.type === 'chatCompletions' && completionType.supportsImages
 
     if (mmkv.getBoolean(AppSettings.UseModelTemplate)) {
         const messages = await buildChatCompletionContext(
@@ -79,7 +92,13 @@ const buildLocalPayload = async () => {
                     .context?.getFormattedChat(messages, null, { jinja: true })
                 if (typeof result === 'string') prompt = result
                 // Currently not used since we dont pass in { jinja: true }
-                else if (typeof result === 'object') prompt = result.prompt
+                else if (typeof result === 'object') {
+                    prompt = result.prompt
+                    mediaPaths = result.media_paths ?? []
+                    if (mediaPaths.length > 0 && !hasImage && !hasAudio) {
+                        Logger.warnToast('Media was added without multimodal support.')
+                    }
+                }
             }
         } catch (e) {
             Logger.error(`Failed to use template: ${e}`)
@@ -100,6 +119,7 @@ const buildLocalPayload = async () => {
         prompt: prompt ?? '',
         stop: constructStopSequence(),
         emit_partial_completion: true,
+        media_paths: mediaPaths,
     }
 }
 
@@ -151,61 +171,66 @@ const verifyModelLoaded = async (): Promise<boolean> => {
 }
 
 export const localInference = async () => {
-    // Model Loading Routine
-    if (!(await verifyModelLoaded())) {
-        return stopGenerating()
-    }
+    try {
+        // Model Loading Routine
+        if (!(await verifyModelLoaded())) {
+            return stopGenerating()
+        }
 
-    // verify that model has been loaded
-    const context = Llama.useLlama.getState().context
+        // verify that model has been loaded
+        const context = Llama.useLlama.getState().context
 
-    if (!context) {
-        Logger.warnToast('No Model Loaded')
-        stopGenerating()
-        return
-    }
-
-    const payload = await buildLocalPayload()
-
-    if (!payload) {
-        Logger.warnToast('Failed to build payload')
-        stopGenerating()
-        return
-    }
-
-    if (mmkv.getBoolean(AppSettings.SaveLocalKV) && !KV.useKVState.getState().kvCacheLoaded) {
-        const prompt = Llama.useLlama.getState().tokenize(payload.prompt)
-        const result = KV.useKVState.getState().verifyKVCache(prompt?.tokens ?? [])
-        if (!result.match) {
-            Alert.alert({
-                title: 'Cache Mismatch',
-                description: `KV Cache does not match current prompt:\n\n${result.matchLength} of ${result.cachedLength} tokens are identical.\n\nPress 'Load Anyway' if you don't mind losing the cache.`,
-                buttons: [
-                    { label: 'Cancel', onPress: stopGenerating },
-                    {
-                        label: 'Load Anyway',
-                        onPress: async () => {
-                            Logger.warn('Overriding KV Cache despite mismatch')
-                            const result = await Llama.useLlama.getState().loadKV()
-                            if (result) {
-                                KV.useKVState.getState().setKvCacheLoaded(true)
-                            }
-                            runLocalCompletion(payload)
-                        },
-                        type: 'warning',
-                    },
-                ],
-                onDismiss: stopGenerating,
-            })
+        if (!context) {
+            Logger.warnToast('No Model Loaded')
+            stopGenerating()
             return
         }
 
-        const kvloadResult = await Llama.useLlama.getState().loadKV()
-        if (kvloadResult) {
-            KV.useKVState.getState().setKvCacheLoaded(true)
+        const payload = await buildLocalPayload()
+
+        if (!payload) {
+            Logger.warnToast('Failed to build payload')
+            stopGenerating()
+            return
         }
+
+        if (mmkv.getBoolean(AppSettings.SaveLocalKV) && !KV.useKVState.getState().kvCacheLoaded) {
+            const prompt = Llama.useLlama.getState().tokenize(payload.prompt)
+            const result = KV.useKVState.getState().verifyKVCache(prompt?.tokens ?? [])
+            if (!result.match) {
+                Alert.alert({
+                    title: 'Cache Mismatch',
+                    description: `KV Cache does not match current prompt:\n\n${result.matchLength} of ${result.cachedLength} tokens are identical.\n\nPress 'Load Anyway' if you don't mind losing the cache.`,
+                    buttons: [
+                        { label: 'Cancel', onPress: stopGenerating },
+                        {
+                            label: 'Load Anyway',
+                            onPress: async () => {
+                                Logger.warn('Overriding KV Cache despite mismatch')
+                                const result = await Llama.useLlama.getState().loadKV()
+                                if (result) {
+                                    KV.useKVState.getState().setKvCacheLoaded(true)
+                                }
+                                runLocalCompletion(payload)
+                            },
+                            type: 'warning',
+                        },
+                    ],
+                    onDismiss: stopGenerating,
+                })
+                return
+            }
+
+            const kvloadResult = await Llama.useLlama.getState().loadKV()
+            if (kvloadResult) {
+                KV.useKVState.getState().setKvCacheLoaded(true)
+            }
+        }
+        await runLocalCompletion(payload)
+    } catch (e) {
+        Logger.errorToast('Failed to run local inference: ' + e)
+        stopGenerating()
     }
-    await runLocalCompletion(payload)
 }
 
 const runLocalCompletion = async (payload: Awaited<ReturnType<typeof buildLocalPayload>>) => {

@@ -30,20 +30,21 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const styles = useStyles()
     const { color } = Theme.useTheme()
 
-    const { loadModel, unloadModel, modelId } = Llama.useLlama(
+    const { loadModel, unloadModel, modelId, loadMmproj, unloadMmproj, mmprojId } = Llama.useLlama(
         useShallow((state) => ({
             loadModel: state.load,
             unloadModel: state.unload,
             modelId: state.model?.id,
+            loadMmproj: state.loadMmproj,
+            unloadMmproj: state.unloadMmproj,
+            mmprojId: state.mmproj?.id,
         }))
     )
 
     const [showEdit, setShowEdit] = useState(false)
     //@ts-ignore
     const quant: string = item.quantization && GGMLNameMap[item.quantization]
-    const disableDelete = modelId === item.id || modelLoading
     const isInvalid = Model.isInitialEntry(item)
-
     const handleDeleteModel = () => {
         Alert.alert({
             title: 'Delete Model',
@@ -69,9 +70,15 @@ const ModelItem: React.FC<ModelItemProps> = ({
             ],
         })
     }
+    const isMMPROJ = item.architecture === 'clip' || item.architecture === 'llava'
+    const isLoaded = isMMPROJ ? mmprojId === item.id : modelId === item.id
 
-    const disable = modelLoading || modelImporting || modelId !== undefined || isInvalid
-    const disableEdit = modelId === item.id || modelLoading || isInvalid
+    const disable =
+        modelLoading || isInvalid || modelImporting || isMMPROJ
+            ? !modelId || isLoaded
+            : modelId !== undefined
+    const disableEdit = isLoaded || modelLoading || isInvalid
+    const disableDelete = isLoaded || modelLoading
 
     return (
         <View style={styles.modelContainer}>
@@ -134,12 +141,13 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         color={disableDelete ? color.text._600 : color.error._500}
                     />
                 </TouchableOpacity>
-                {modelId !== item.id && (
+                {!isLoaded && (
                     <TouchableOpacity
                         disabled={disable}
                         onPress={async () => {
+                            const modelLoader = isMMPROJ ? loadMmproj : loadModel
                             setModelLoading(true)
-                            await loadModel(item).catch((e) => {
+                            await modelLoader(item).catch((e) => {
                                 Logger.error(`Failed to load model: ${e}`)
                             })
                             setModelLoading(false)
@@ -152,11 +160,11 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         />
                     </TouchableOpacity>
                 )}
-                {modelId === item.id && (
+                {isLoaded && (
                     <TouchableOpacity
                         disabled={modelLoading || modelImporting}
                         onPress={async () => {
-                            await unloadModel()
+                            isMMPROJ ? await unloadMmproj() : await unloadModel()
                         }}>
                         <AntDesign
                             name="closecircleo"
