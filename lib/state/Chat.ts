@@ -768,7 +768,7 @@ export namespace Chats {
                 const mimeType = mime.getType(uri)
                 const type = mimeType?.split('/')?.[0]
                 if (!name || !extension || !mimeType || !type || !validExtensionTypes(type)) return
-                const newURI = AppDirectory.Attachments + attachmentId + extension
+                const newURI = AppDirectory.Attachments + attachmentId + '.' + extension
                 await copyAsync({
                     from: uri,
                     to: newURI,
