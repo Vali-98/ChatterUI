@@ -156,7 +156,7 @@ const useStyles = () => {
             color: color.text._100,
             borderColor: color.neutral._300,
             paddingHorizontal: spacing.s,
-            paddingVertical: spacing.m,
+            paddingVertical: spacing.s,
             borderRadius: borderRadius.m,
         },
 
