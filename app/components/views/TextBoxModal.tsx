@@ -62,6 +62,8 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
             visible={showModal}
             style={{ flex: 1 }}
             transparent
+            statusBarTranslucent
+            navigationBarTranslucent
             onRequestClose={handleClose}
             animationType="fade">
             <TouchableOpacity

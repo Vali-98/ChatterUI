@@ -73,8 +73,9 @@ const MultiDropdownSheet = <T,>({
         <View style={containerStyle}>
             <Modal
                 transparent
-                onRequestClose={() => setShowList(false)}
                 statusBarTranslucent
+                navigationBarTranslucent
+                onRequestClose={() => setShowList(false)}
                 visible={showList}
                 animationType="fade">
                 <FadeBackrop

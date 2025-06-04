@@ -78,8 +78,9 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
     return (
         <Modal
             transparent
-            onRequestClose={close}
             statusBarTranslucent
+            navigationBarTranslucent
+            onRequestClose={close}
             visible={show}
             animationType="fade">
             <FadeBackrop

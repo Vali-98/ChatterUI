@@ -95,6 +95,7 @@ export const AlertBox = () => {
             style={styles.modal}
             animationType="fade"
             statusBarTranslucent
+            navigationBarTranslucent
             onRequestClose={() => {
                 handleDismiss()
                 hide()
