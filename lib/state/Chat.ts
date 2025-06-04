@@ -46,7 +46,7 @@ export interface ChatState {
     data: ChatData | undefined
     buffer: OutputBuffer
     // chat data
-    load: (chatId: number) => Promise<void>
+    load: (chatId: number, overrideScrollOffset?: number) => Promise<void>
     delete: (chatId: number) => Promise<void>
     reset: () => void
 
@@ -180,7 +180,7 @@ export namespace Chats {
             useInference.getState().stopGenerating()
             get().setBuffer({ data: '' })
         },
-        load: async (chatId: number) => {
+        load: async (chatId, overrideScrollOffset) => {
             const data = await db.query.chat(chatId)
 
             if (data?.user_id && mmkv.getBoolean(AppSettings.AutoLoadUser)) {
@@ -193,6 +193,10 @@ export namespace Chats {
                         Logger.infoToast('Loading User : ' + name)
                     }
                 }
+            }
+
+            if (data && overrideScrollOffset !== undefined) {
+                data.scroll_offset = Math.max(0, data.messages.length - overrideScrollOffset)
             }
 
             set((state) => ({
@@ -788,6 +792,13 @@ export namespace Chats {
 
             export const deleteAttachment = async (attachmentId: number) => {
                 await database.delete(chatAttachments).where(eq(chatAttachments.id, attachmentId))
+            }
+
+            export const updateScrollOffset = async (chatId: number, scrollOffset: number) => {
+                await database
+                    .update(chats)
+                    .set({ scroll_offset: scrollOffset })
+                    .where(eq(chats.id, chatId))
             }
         }
     }

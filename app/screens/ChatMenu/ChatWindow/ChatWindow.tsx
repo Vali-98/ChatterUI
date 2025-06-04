@@ -10,6 +10,8 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
 import EditorModal from './EditorModal'
+import { useDebounce } from '@lib/hooks/Debounce'
+import { useEffect, useRef, useState } from 'react'
 
 type ListItem = {
     index: number
@@ -21,8 +23,24 @@ type ListItem = {
 const ChatWindow = () => {
     const { chat } = Chats.useChat()
     const { appMode } = useAppMode()
+    const [saveScroll, _] = useMMKVBoolean(AppSettings.SaveScrollPosition)
     const [showModelname, __] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [autoScroll, ___] = useMMKVBoolean(AppSettings.AutoScroll)
+
+    const flatlistRef = useRef<FlatList | null>(null)
+
+    const updateScrollPosition = useDebounce((position: number) => {
+        if (chat?.id) {
+            Chats.db.mutate.updateScrollOffset(chat.id, position)
+        }
+    }, 200)
+
+    useEffect(() => {
+        if (saveScroll && chat?.scroll_offset) {
+            const offset = Math.max(0, chat.scroll_offset)
+            if (offset > 2) flatlistRef.current?.scrollToIndex({ index: offset, animated: false })
+        }
+    }, [chat?.id])
 
     const image = useBackgroundImage((state) => state.image)
 
@@ -53,6 +71,7 @@ const ChatWindow = () => {
             <EditorModal />
             {showModelname && appMode === 'local' && <ChatModelName />}
             <FlatList
+                ref={flatlistRef}
                 maintainVisibleContentPosition={
                     autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
                 }
@@ -61,6 +80,25 @@ const ChatWindow = () => {
                 data={list}
                 keyExtractor={(item) => item.key}
                 renderItem={renderItems}
+                scrollEventThrottle={16}
+                onViewableItemsChanged={(item) => {
+                    const index = item.viewableItems?.at(0)?.index
+                    if (index) updateScrollPosition(index)
+                }}
+                onScrollToIndexFailed={(error) => {
+                    flatlistRef.current?.scrollToOffset({
+                        offset: error.averageItemLength * error.index,
+                        animated: true,
+                    })
+                    setTimeout(() => {
+                        if (list.length !== 0 && flatlistRef.current !== null) {
+                            flatlistRef.current?.scrollToIndex({
+                                index: error.index,
+                                animated: true,
+                            })
+                        }
+                    }, 100)
+                }}
             />
         </ImageBackground>
     )

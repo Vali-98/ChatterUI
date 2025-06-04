@@ -137,6 +137,7 @@ export enum AppSettings {
     AutoLoadUser = 'autoloaduser',
     QuickDelete = 'settings-quickdelete',
     UseTagHider = 'settings-usetaghider',
+    SaveScrollPosition = 'settings-savescrollposition',
 }
 
 /**
@@ -169,6 +170,7 @@ export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.AutoLoadUser]: true,
     [AppSettings.QuickDelete]: false,
     [AppSettings.UseTagHider]: true,
+    [AppSettings.SaveScrollPosition]: false,
 }
 
 export const CLAUDE_VERSION = '2023-06-01'

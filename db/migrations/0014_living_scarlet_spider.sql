@@ -1,0 +1,1 @@
+ALTER TABLE `chats` ADD `scroll_offset` integer DEFAULT 0 NOT NULL;

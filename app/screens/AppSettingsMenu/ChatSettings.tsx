@@ -12,6 +12,7 @@ const ChatSettings = () => {
     const [sendOnEnter, setSendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
     const [autoLoadUser, setAutoLoadUser] = useMMKVBoolean(AppSettings.AutoLoadUser)
     const [quickDelete, setQuickDelete] = useMMKVBoolean(AppSettings.QuickDelete)
+    const [saveScroll, setSaveScroll] = useMMKVBoolean(AppSettings.SaveScrollPosition)
 
     const [showTokensPerSecond, setShowTokensPerSecond] = useMMKVBoolean(
         AppSettings.ShowTokenPerSecond
@@ -68,6 +69,13 @@ const ChatSettings = () => {
                 value={quickDelete}
                 onChangeValue={setQuickDelete}
                 description="Toggle delete button in chat options bar"
+            />
+
+            <ThemedSwitch
+                label="Save Scroll Position"
+                value={saveScroll}
+                onChangeValue={setSaveScroll}
+                description="Automatically move to last scrolled position in chat"
             />
         </View>
     )

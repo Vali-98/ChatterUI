@@ -99,6 +99,13 @@
       "when": 1747888349967,
       "tag": "0013_unique_namorita",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1749047909392,
+      "tag": "0014_living_scarlet_spider",
+      "breakpoints": true
     }
   ]
 }
