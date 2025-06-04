@@ -16,6 +16,7 @@ import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
+import { TagHider } from '@lib/state/TagHider'
 import SortButton, { sortList, SortType } from './SortButton'
 
 type CharacterListSorterProps = {
@@ -111,6 +112,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
 
     const { color } = Theme.useTheme()
     const [showTags, setShowTags] = useMMKVBoolean(AppSettings.ShowTags)
+    const hiddenTags = TagHider.useHiddenTags()
 
     const { data } = useLiveQuery(
         db
@@ -122,6 +124,8 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
             .leftJoin(characterTags, eq(characterTags.tag_id, tags.id))
             .groupBy(tags.id)
     )
+
+    const filteredData = data.filter((item) => !hiddenTags.includes(item.tag))
 
     useFocusEffect(
         useCallback(() => {
@@ -207,34 +211,20 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                         transform: [{ translateY: -20 }],
                     })}
                     exiting={FadeOutUp.duration(100)}>
-                    {showTags &&
-                        (data.length > 0 ? (
-                            <StringArrayEditor
-                                containerStyle={{ flex: 0 }}
-                                suggestions={data
-                                    .sort((a, b) => b.tagCount - a.tagCount)
-                                    .map((item) => item.tag)}
-                                label="Tags"
-                                value={tagFilter}
-                                setValue={setTagFilter}
-                                placeholder="Filter Tags..."
-                                filterOnly
-                                showSuggestionsOnEmpty
-                            />
-                        ) : (
-                            <Text
-                                style={{
-                                    color: color.text._500,
-                                    fontStyle: 'italic',
-                                    paddingVertical: 8,
-                                    paddingHorizontal: 16,
-                                    borderRadius: 8,
-                                    borderWidth: 1,
-                                    borderColor: color.neutral._400,
-                                }}>
-                                {'<No Tags Used>'}
-                            </Text>
-                        ))}
+                    {showTags && filteredData.length > 0 && (
+                        <StringArrayEditor
+                            containerStyle={{ flex: 0 }}
+                            suggestions={filteredData
+                                .sort((a, b) => b.tagCount - a.tagCount)
+                                .map((item) => item.tag)}
+                            label="Tags"
+                            value={tagFilter}
+                            setValue={setTagFilter}
+                            placeholder="Filter Tags..."
+                            filterOnly
+                            showSuggestionsOnEmpty
+                        />
+                    )}
                     <ThemedTextInput
                         containerStyle={{ flex: 0 }}
                         value={textFilter}

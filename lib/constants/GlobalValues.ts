@@ -135,6 +135,7 @@ export enum AppSettings {
     ShowTokenPerSecond = 'showtokenpersecond',
     AutoLoadUser = 'autoloaduser',
     QuickDelete = 'settings-quickdelete',
+    UseTagHider = 'settings-usetaghider',
 }
 
 /**
@@ -166,6 +167,7 @@ export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.ShowTokenPerSecond]: true,
     [AppSettings.AutoLoadUser]: true,
     [AppSettings.QuickDelete]: false,
+    [AppSettings.UseTagHider]: true,
 }
 
 export const CLAUDE_VERSION = '2023-06-01'

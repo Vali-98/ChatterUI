@@ -11,6 +11,7 @@ import NotificationSettings from './NotificationSettings'
 import ScreenSettings from './ScreenSettings'
 import SecuritySettings from './SecuritySettings'
 import StyleSettings from './StyleSettings'
+import TagHiderSettings from './TagHiderSettings'
 
 const AppSettingsMenu = () => {
     const { spacing } = Theme.useTheme()
@@ -29,6 +30,7 @@ const AppSettingsMenu = () => {
             <ChatSettings />
             <CharacterSettings />
             <GeneratingSettings />
+            <TagHiderSettings />
             <NotificationSettings />
             <ScreenSettings />
             <DatabaseSettings />

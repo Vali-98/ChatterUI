@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { SafeAreaView, View } from 'react-native'
 import Animated, { LinearTransition } from 'react-native-reanimated'
 
+import { TagHider } from '@lib/state/TagHider'
 import CharacterListHeader, { useCharacterListSorter } from './CharacterListHeader'
 import CharacterListing from './CharacterListing'
 import CharacterNewMenu from './CharacterNewMenu'
@@ -19,13 +20,14 @@ type CharacterListProps = {
 
 const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
     const [nowLoading, setNowLoading] = useState(false)
-
+    const hiddenTags = TagHider.useHiddenTags()
     const sortAndFilterCharInfo = useCharacterListSorter((state) => state.sortAndFilterCharInfo)
 
     const { data, updatedAt } = useLiveQuery(
         Characters.db.query.cardListQuery('character', 'modified')
     )
-    const characterList: CharInfo[] = sortAndFilterCharInfo(
+
+    let characterList: CharInfo[] = sortAndFilterCharInfo(
         data.map((item) => ({
             ...item,
             latestChat: item.chats[0]?.id,
@@ -35,6 +37,10 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
             tags: item.tags.map((item) => item.tag.tag),
         }))
     )
+    if (hiddenTags.length > 0)
+        characterList = characterList.filter(
+            (info) => !info.tags.some((item) => hiddenTags.includes(item))
+        )
 
     return (
         <SafeAreaView style={{ paddingVertical: 16, paddingHorizontal: 8, flex: 1 }}>
