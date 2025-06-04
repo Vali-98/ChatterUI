@@ -163,17 +163,18 @@ export namespace Llama {
         loadMmproj: async (model: ModelDataType) => {
             const context = get().context
             if (!context) return
-            set({
-                mmproj: model,
-            })
+
             Logger.info('Loading MMPROJ')
             await context
-                .initMultimodal({ path: model.file_path })
+                .initMultimodal({ path: model.file_path, use_gpu: true })
                 .catch((e) => Logger.errorToast('Failed to load MMPROJ: ' + e))
             const capabilities = await context.getMultimodalSupport()
             Logger.info(
                 `Multimodal Capabilities:\nVision: ${capabilities.vision}\nAudio: ${capabilities.audio}`
             )
+            set({
+                mmproj: model,
+            })
         },
         setLoadProgress: (progress: number) => {
             set({ loadProgress: progress })
