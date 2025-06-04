@@ -69,11 +69,11 @@ export function useNotificationObserver() {
             if (autoLoad ?? useAuth) return
             const chatLoaded = Chats.useChatState.getState().data
             if (chatLoaded) return
-            Logger.info('Loading chat from notification')
             const data = notification.request.content.data
             const chatId = data?.chatId as number | undefined
             const characterId = data?.characterId as number | undefined
             if (chatId && characterId) {
+                Logger.info('Loading chat from notification')
                 try {
                     await Chats.useChatState.getState().load(chatId)
                     await Characters.useCharacterCard.getState().setCard(characterId)
