@@ -1,5 +1,5 @@
 import { MMKV } from 'react-native-mmkv'
-import { StateStorage } from 'zustand/middleware'
+import { createJSONStorage, StateStorage } from 'zustand/middleware'
 
 export const mmkv = new MMKV()
 
@@ -14,4 +14,30 @@ export const mmkvStorage: StateStorage = {
     removeItem: (name) => {
         return mmkv.delete(name)
     },
+}
+
+export enum PersistStore {
+    TagHider = 'tag-hider-storage',
+}
+
+export namespace PersistStore {
+    /**
+     * Create a persist config object for zustand-persist
+     * @param name key from PersistStore enum
+     * @param options extra options to merge, e.g. partialize, version overrides
+     */
+    export function create<T>(
+        name: PersistStore,
+        options: Partial<{
+            partialize: (state: T) => Partial<T>
+            version: number
+        }> = {}
+    ) {
+        return {
+            name,
+            storage: createJSONStorage(() => mmkvStorage),
+            partialize: options?.partialize ?? ((state: T) => state),
+            ...options,
+        }
+    }
 }
