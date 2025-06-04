@@ -194,7 +194,7 @@ export namespace Model {
                 file_path: file_path,
                 name: modelInfo?.['general.name'] ?? 'N/A',
                 file_size: fileSize,
-                params: modelInfo?.['general.size_label'] ?? 'N/A',
+                params: modelInfo?.['general.size_label'] ?? filename ?? 'N/A',
                 quantization: modelInfo?.['general.file_type'] ?? '-1',
                 architecture: modelType ?? 'N/A',
             }
