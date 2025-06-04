@@ -202,7 +202,7 @@ const setDefaultInstruct = () => {
 }
 
 const setCPUThreads = () => {
-    const threads = mmkv.getString(Global.CPUThreads)
+    const threads = mmkv.getNumber(Global.CPUThreads)
     if (threads) return
     let newThreads = 8
     try {
