@@ -17,6 +17,7 @@ import {
 import { router } from 'expo-router'
 import { setBackgroundColorAsync } from 'expo-system-ui'
 import { z } from 'zod'
+import { getThreads } from '@vali98/react-native-cpu-info'
 
 import { AppDirectory } from './File'
 import { lockScreenOrientation } from './Screen'
@@ -200,6 +201,19 @@ const setDefaultInstruct = () => {
     })
 }
 
+const setCPUThreads = () => {
+    const threads = mmkv.getString(Global.CPUThreads)
+    if (threads) return
+    let newThreads = 8
+    try {
+        newThreads = getThreads()
+    } catch (e) {
+        Logger.error('Failed to set CPU Threads: ' + e)
+    }
+    Logger.info('Setting CPU Threads to ' + newThreads)
+    mmkv.set(Global.CPUThreads, newThreads)
+}
+
 export const startupApp = () => {
     console.log('[APP STARTED]: T1APT')
     // DEV: Needed for Reset
@@ -220,6 +234,9 @@ export const startupApp = () => {
 
     // get fp16, i8mm and dotprod data
     setCPUFeatures()
+
+    // set cpu thread count
+    setCPUThreads()
 
     // patch for Bold Text bug
     // refer to https://github.com/Vali-98/ChatterUI/issues/161

@@ -107,6 +107,7 @@ export const enum Global {
     // AppMode = 'appmode', // moved to zustand state
 
     CpuFeatures = 'cpufeatures',
+    CPUThreads = 'constants-cpu-threads',
 }
 
 export enum AppSettings {
