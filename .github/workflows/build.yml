@@ -19,11 +19,13 @@ jobs:
                   oauth-client-id: ${{secrets.TS_OAUTH_CLIENT_ID}}
                   oauth-secret: ${{secrets.TS_OAUTH_SECRET}}
                   tags: tag:chatterui-cd
+                  version: latest
+                  use-cache: 'true'
 
             - name: Trigger Build
               run: |
                   if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-                    curl -X GET ${{ secrets.TS_BUILD_API }}
+                    curl -sS -X GET ${{ secrets.TS_BUILD_API }}
                   elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
-                    curl -X GET ${{ secrets.TS_BUILD_DEV_API }}
+                    curl -sS -X GET ${{ secrets.TS_BUILD_DEV_API }}
                   fi
