@@ -25,7 +25,7 @@ jobs:
             - name: Trigger Build
               run: |
                   if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-                    curl -N -X GET ${{ secrets.TS_BUILD_API }}
+                    curl -sS -X GET ${{ secrets.TS_BUILD_API }}
                   elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
-                    curl -N -X GET ${{ secrets.TS_BUILD_DEV_API }}
+                    curl -sS -X GET ${{ secrets.TS_BUILD_DEV_API }}
                   fi
