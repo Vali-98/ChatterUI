@@ -40,6 +40,7 @@ export interface ChatEntry extends ChatEntryType {
 
 export interface ChatData extends ChatType {
     messages: ChatEntry[]
+    autoScroll?: { cause: 'search' | 'saveScroll'; index: number }
 }
 
 interface ChatSearchQueryResult {
@@ -197,7 +198,7 @@ export namespace Chats {
             get().setBuffer({ data: '' })
         },
         load: async (chatId, overrideScrollOffset) => {
-            const data = await db.query.chat(chatId)
+            const data = (await db.query.chat(chatId)) as ChatData | undefined
 
             if (data?.user_id && mmkv.getBoolean(AppSettings.AutoLoadUser)) {
                 const userID = Characters.useUserCard.getState().id
@@ -211,24 +212,34 @@ export namespace Chats {
                 }
             }
 
-            if (data && overrideScrollOffset !== undefined) {
-                if (overrideScrollOffset.type === 'index')
-                    data.scroll_offset = Math.max(
-                        0,
-                        data.messages.length - overrideScrollOffset.value
-                    )
-                if (overrideScrollOffset.type === 'entryId') {
-                    const index = data.messages.findIndex(
-                        (item) => item.id === overrideScrollOffset.value
-                    )
-                    if (index !== -1) {
-                        data.scroll_offset = Math.max(0, data.messages.length - index - 1)
+            if (data) {
+                if (overrideScrollOffset !== undefined) {
+                    if (overrideScrollOffset.type === 'index') {
+                        const entryIndex = Math.max(
+                            0,
+                            data.messages.length - overrideScrollOffset.value
+                        )
+                        data.autoScroll = { cause: 'search', index: entryIndex }
                     }
+                    if (overrideScrollOffset.type === 'entryId') {
+                        const entryIndex = data.messages.findIndex(
+                            (item) => item.id === overrideScrollOffset.value
+                        )
+                        if (entryIndex !== -1) {
+                            data.autoScroll = {
+                                cause: 'search',
+                                index: data.messages.length - entryIndex - 1,
+                            }
+                        }
+                    }
+                } else {
+                    // we assume this is taken from ChatWindow
+                    data.autoScroll = { cause: 'saveScroll', index: data.scroll_offset }
                 }
-            }
 
-            if (data && data.scroll_offset >= data.messages.length) {
-                data.scroll_offset = data.messages.length
+                if (data.autoScroll?.index && data.autoScroll.index > data.messages.length) {
+                    data.autoScroll.index = data.messages.length - 1
+                }
             }
 
             set({

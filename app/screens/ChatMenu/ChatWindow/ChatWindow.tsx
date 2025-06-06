@@ -36,16 +36,17 @@ const ChatWindow = () => {
     }, 200)
 
     useEffect(() => {
-        if (saveScroll && chat?.scroll_offset) {
-            const offset = Math.max(0, chat.scroll_offset)
-            if (offset > 2)
-                flatlistRef.current?.scrollToIndex({
-                    index: offset,
-                    animated: false,
-                    viewOffset: 100,
-                })
-        }
-    }, [chat?.id, chat?.scroll_offset])
+        if (!chat?.autoScroll) return
+
+        if (!saveScroll && chat.autoScroll.cause === 'saveScroll') return
+        const offset = Math.min(Math.max(0, chat.autoScroll.index), chat.messages.length - 1)
+        if (offset > 2)
+            flatlistRef.current?.scrollToIndex({
+                index: offset,
+                animated: chat.autoScroll.cause === 'search',
+                viewOffset: 32,
+            })
+    }, [chat?.id, chat?.autoScroll])
 
     const image = useBackgroundImage((state) => state.image)
 
