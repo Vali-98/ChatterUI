@@ -132,6 +132,7 @@ export namespace Llama {
                 n_ctx: config.context_length,
                 n_threads: config.threads,
                 n_batch: config.batch,
+                ctx_shift: true,
                 use_mlock: true,
                 use_mmap: true,
             }
