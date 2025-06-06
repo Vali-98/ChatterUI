@@ -1,17 +1,17 @@
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { useDebounce } from '@lib/hooks/Debounce'
 import { useAppMode } from '@lib/state/AppMode'
 import { useBackgroundImage } from '@lib/state/BackgroundImage'
 import { Chats } from '@lib/state/Chat'
 import { AppDirectory } from '@lib/utils/File'
 import { ImageBackground } from 'expo-image'
+import { useEffect, useRef, useState } from 'react'
 import { FlatList } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
 import EditorModal from './EditorModal'
-import { useDebounce } from '@lib/hooks/Debounce'
-import { useEffect, useRef, useState } from 'react'
 
 type ListItem = {
     index: number

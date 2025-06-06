@@ -6,9 +6,9 @@ import { Instructs, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'
 import { getDefaultMacroRules, Macro } from '@lib/utils/Macros'
+import { readAsStringAsync } from 'expo-file-system'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
-import { readAsStringAsync } from 'expo-file-system'
 
 const getMacrosRules = (instruct: InstructType) => {
     const rules = getDefaultMacroRules()

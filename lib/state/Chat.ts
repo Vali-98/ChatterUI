@@ -425,7 +425,6 @@ export namespace Chats {
                 messages[index].swipes[swipe_id].swipe,
                 messages[index].attachments.map((item) => item.uri)
             )
-            console.log(index, new_token_count)
 
             messages[index].swipes[swipe_id].token_count = new_token_count
             set((state: ChatState) => ({

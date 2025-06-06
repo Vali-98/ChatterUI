@@ -34,7 +34,7 @@ export namespace PersistStore {
         }> = {}
     ) {
         return {
-            name,
+            name: name,
             storage: createJSONStorage(() => mmkvStorage),
             partialize: options?.partialize ?? ((state: T) => state),
             ...options,

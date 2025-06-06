@@ -4,6 +4,7 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import { db } from '@db'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { CharInfo } from '@lib/state/Characters'
+import { TagHider } from '@lib/state/TagHider'
 import { Theme } from '@lib/theme/ThemeManager'
 import { characterTags, tags } from 'db/schema'
 import { count, eq } from 'drizzle-orm'
@@ -16,7 +17,6 @@ import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
-import { TagHider } from '@lib/state/TagHider'
 import SortButton, { sortList, SortType } from './SortButton'
 
 type CharacterListSorterProps = {

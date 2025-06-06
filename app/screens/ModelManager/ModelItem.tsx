@@ -164,7 +164,8 @@ const ModelItem: React.FC<ModelItemProps> = ({
                     <TouchableOpacity
                         disabled={modelLoading || modelImporting}
                         onPress={async () => {
-                            isMMPROJ ? await unloadMmproj() : await unloadModel()
+                            if (isMMPROJ) await unloadMmproj()
+                            else await unloadModel()
                         }}>
                         <AntDesign
                             name="closecircleo"

@@ -294,8 +294,6 @@ export namespace Llama {
             })
 
             if (!result) return 0
-            console.log(result)
-
             return result.tokens.length
         },
         tokenize: (text: string, media_paths: string[] = []) => {

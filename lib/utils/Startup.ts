@@ -5,6 +5,7 @@ import { useAppModeState } from '@lib/state/AppMode'
 import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSState } from '@lib/state/TTS'
+import { getThreads } from '@vali98/react-native-cpu-info'
 import { getCpuFeatures } from 'cui-llama.rn'
 import { DeviceType, getDeviceTypeAsync } from 'expo-device'
 import {
@@ -17,9 +18,9 @@ import {
 import { router } from 'expo-router'
 import { setBackgroundColorAsync } from 'expo-system-ui'
 import { z } from 'zod'
-import { getThreads } from '@vali98/react-native-cpu-info'
 
 import { AppDirectory } from './File'
+import { patchAndroidText } from './PatchText'
 import { lockScreenOrientation } from './Screen'
 import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
@@ -28,7 +29,6 @@ import { Chats } from '../state/Chat'
 import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
 import { Theme } from '../theme/ThemeManager'
-import { patchAndroidText } from './PatchText'
 
 export const loadChatOnInit = async () => {
     if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return

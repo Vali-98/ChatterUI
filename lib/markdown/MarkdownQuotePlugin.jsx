@@ -9,7 +9,7 @@ module.exports = function doubleQuotePlugin(md) {
             for (let i = 0; i < children.length; i++) {
                 const token = children[i]
                 if (token.type === 'text') {
-                    let content = token.content
+                    const content = token.content
                     let start = 0
                     for (let j = 0; j < content.length; j++) {
                         if (content[j] === '"') {
