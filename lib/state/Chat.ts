@@ -14,7 +14,7 @@ import {
     ChatType,
     CompletionTimings,
 } from 'db/schema'
-import { and, count, desc, eq, getTableColumns, like } from 'drizzle-orm'
+import { and, count, desc, eq, getTableColumns, like, sql } from 'drizzle-orm'
 import { randomUUID } from 'expo-crypto'
 import { copyAsync, deleteAsync, getInfoAsync } from 'expo-file-system'
 import * as Notifications from 'expo-notifications'
@@ -42,11 +42,27 @@ export interface ChatData extends ChatType {
     messages: ChatEntry[]
 }
 
+interface ChatSearchQueryResult {
+    swipeId: number
+    chatId: number
+    chatEntryId: number
+    chatName: string
+    swipe: string
+    sendDate: number
+}
+
+interface ChatSearchResult extends Omit<ChatSearchQueryResult, 'sendDate'> {
+    sendDate: Date
+}
+
 export interface ChatState {
     data: ChatData | undefined
     buffer: OutputBuffer
     // chat data
-    load: (chatId: number, overrideScrollOffset?: number) => Promise<void>
+    load: (
+        chatId: number,
+        overrideScrollOffset?: { value: number; type: 'entryId' | 'index' }
+    ) => Promise<void>
     delete: (chatId: number) => Promise<void>
     reset: () => void
 
@@ -196,13 +212,28 @@ export namespace Chats {
             }
 
             if (data && overrideScrollOffset !== undefined) {
-                data.scroll_offset = Math.max(0, data.messages.length - overrideScrollOffset)
+                if (overrideScrollOffset.type === 'index')
+                    data.scroll_offset = Math.max(
+                        0,
+                        data.messages.length - overrideScrollOffset.value
+                    )
+                if (overrideScrollOffset.type === 'entryId') {
+                    const index = data.messages.findIndex(
+                        (item) => item.id === overrideScrollOffset.value
+                    )
+                    if (index !== -1) {
+                        data.scroll_offset = Math.max(0, data.messages.length - index - 1)
+                    }
+                }
             }
 
-            set((state) => ({
-                ...state,
+            if (data && data.scroll_offset >= data.messages.length) {
+                data.scroll_offset = data.messages.length
+            }
+
+            set({
                 data: data,
-            }))
+            })
         },
 
         delete: async (chatId: number) => {
@@ -534,22 +565,42 @@ export namespace Chats {
                 return await database.query.chats.findFirst({ where: eq(chats.id, chatId) })
             }
 
-            export const searchChat = async (query: string, charId: number) => {
-                return await database
+            export const searchChat = async (
+                query: string,
+                charId: number
+            ): Promise<ChatSearchResult[]> => {
+                const swipesWithIndex = sql`
+                    SELECT
+                        ${chatSwipes.id} AS swipeId,
+                        ${chatSwipes.entry_id} AS entryId,
+                        ${chatSwipes.swipe},
+                        ${chatSwipes.send_date} AS sendDate,
+                        ROW_NUMBER() OVER (PARTITION BY ${chatSwipes.entry_id} ORDER BY ${chatSwipes.id}) AS swipeIndex
+                    FROM ${chatSwipes}
+                    `
+
+                const result = (await database
                     .select({
-                        swipeId: chatSwipes.id,
+                        swipeId: sql`swipeId`,
                         chatId: chatEntries.chat_id,
+                        chatEntryId: chatEntries.id,
                         chatName: chats.name,
-                        swipe: chatSwipes.swipe,
-                        sendDate: chatSwipes.send_date,
+                        swipe: sql`swipe`,
+                        sendDate: sql`sendDate`,
                     })
-                    .from(chatSwipes)
-                    .innerJoin(chatEntries, eq(chatSwipes.entry_id, chatEntries.id))
-                    .innerJoin(chats, eq(chatEntries.chat_id, chats.id))
-                    .where(
-                        and(like(chatSwipes.swipe, `%${query}%`), eq(chats.character_id, charId))
+                    .from(chatEntries)
+                    .innerJoin(
+                        sql`(${swipesWithIndex}) AS swi`,
+                        sql`swi.entryId = ${chatEntries.id} AND swi.swipeIndex = ${chatEntries.swipe_id} + 1`
                     )
-                    .limit(999)
+                    .innerJoin(chats, eq(chatEntries.chat_id, chats.id))
+                    .where(and(like(sql`swipe`, `%${query}%`), eq(chats.character_id, charId)))
+                    .orderBy(sql`sendDate`)
+                    .limit(100)) as ChatSearchQueryResult[]
+
+                return result.map((item) => {
+                    return { ...item, sendDate: new Date(item.sendDate * 1000) }
+                })
             }
         }
         export namespace mutate {

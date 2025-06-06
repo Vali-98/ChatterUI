@@ -10,6 +10,9 @@ import { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
+import { useDebounce } from '@lib/hooks/Debounce'
+import { Logger } from '@lib/state/Logger'
+import Animated, { FadeIn } from 'react-native-reanimated'
 import ChatDrawerItem from './ChatDrawerItem'
 import ChatDrawerSearchItem from './ChatDrawerSearchItem'
 
@@ -33,9 +36,27 @@ const ChatsDrawer = () => {
     const [showSearchResults, setShowSearchResults] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
 
-    const handleLoadChat = async (chatId: number) => {
-        await loadChat(chatId)
+    const handleLoadChat = async (
+        chatId: number,
+        setOffset?: { type: 'index' | 'entryId'; value: number }
+    ) => {
+        await loadChat(chatId, setOffset)
         setShowDrawer(false)
+    }
+
+    const search = useDebounce(async (query: string, charId?: number) => {
+        if (!charId || !query) return
+        const results = await Chats.db.query.searchChat(query, charId).catch((e) => {
+            Logger.error('Failed to run query: ' + e)
+            return []
+        })
+        setSearchResults(results.sort((a, b) => b.sendDate.getTime() - a.sendDate.getTime()))
+        setShowSearchResults(true)
+    }, 500)
+
+    const setSearch = (query: string) => {
+        setSearchQuery(query)
+        search(query, charId)
     }
 
     const handleCreateChat = async () => {
@@ -64,20 +85,13 @@ const ChatsDrawer = () => {
                     placeholder="Search for message..."
                     containerStyle={{ flex: 0, marginTop: 12 }}
                     value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    onSubmitEditing={async () => {
-                        if (!searchQuery || !charId) return
-                        const results = await Chats.db.query.searchChat(searchQuery, charId)
-                        setSearchResults(
-                            results.sort((a, b) => b.sendDate.getTime() - a.sendDate.getTime())
-                        )
-                        setShowSearchResults(true)
-                    }}
+                    autoCorrect={false}
+                    onChangeText={setSearch}
                     submitBehavior="submit"
                 />
             )}
             {!showSearchResults && (
-                <View style={styles.listContainer}>
+                <Animated.View entering={FadeIn.duration(200)} style={styles.listContainer}>
                     <FlashList
                         estimatedItemSize={82}
                         data={data}
@@ -89,32 +103,34 @@ const ChatsDrawer = () => {
                         removeClippedSubviews={false}
                     />
                     <ThemedButton label="New Chat" onPress={handleCreateChat} />
-                </View>
+                </Animated.View>
             )}
-            {showSearchResults &&
-                (searchResults.length > 0 ? (
-                    <View style={styles.listContainer}>
+            {showSearchResults && (
+                <Animated.View entering={FadeIn.duration(200)} style={styles.listContainer}>
+                    {searchResults.length > 0 && (
                         <Text style={styles.resultCount}>Results: {searchResults.length}</Text>
-                        <FlashList
-                            estimatedItemSize={92}
-                            data={searchResults}
-                            keyExtractor={(item) => item.swipeId.toString()}
-                            renderItem={({ item }) => (
-                                <ChatDrawerSearchItem
-                                    item={item}
-                                    onLoad={handleLoadChat}
-                                    query={searchQuery}
-                                />
-                            )}
-                            showsVerticalScrollIndicator={false}
-                            removeClippedSubviews={false}
-                        />
-                    </View>
-                ) : (
-                    <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>No Results</Text>
-                    </View>
-                ))}
+                    )}
+                    <FlashList
+                        estimatedItemSize={92}
+                        data={searchResults}
+                        keyExtractor={(item) => item.swipeId.toString()}
+                        renderItem={({ item }) => (
+                            <ChatDrawerSearchItem
+                                item={item}
+                                onLoad={handleLoadChat}
+                                query={searchQuery}
+                            />
+                        )}
+                        showsVerticalScrollIndicator={false}
+                        removeClippedSubviews={false}
+                        ListEmptyComponent={() => (
+                            <View style={styles.emptyContainer}>
+                                <Text style={styles.emptyText}>No Results</Text>
+                            </View>
+                        )}
+                    />
+                </Animated.View>
+            )}
         </Drawer.Body>
     )
 }

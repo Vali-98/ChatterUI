@@ -29,18 +29,23 @@ const ChatWindow = () => {
 
     const flatlistRef = useRef<FlatList | null>(null)
 
-    const updateScrollPosition = useDebounce((position: number) => {
-        if (chat?.id) {
-            Chats.db.mutate.updateScrollOffset(chat.id, position)
+    const updateScrollPosition = useDebounce((position: number, chatId: number) => {
+        if (chatId) {
+            Chats.db.mutate.updateScrollOffset(chatId, position)
         }
     }, 200)
 
     useEffect(() => {
         if (saveScroll && chat?.scroll_offset) {
             const offset = Math.max(0, chat.scroll_offset)
-            if (offset > 2) flatlistRef.current?.scrollToIndex({ index: offset, animated: false })
+            if (offset > 2)
+                flatlistRef.current?.scrollToIndex({
+                    index: offset,
+                    animated: false,
+                    viewOffset: 100,
+                })
         }
-    }, [chat?.id])
+    }, [chat?.id, chat?.scroll_offset])
 
     const image = useBackgroundImage((state) => state.image)
 
@@ -83,7 +88,7 @@ const ChatWindow = () => {
                 scrollEventThrottle={16}
                 onViewableItemsChanged={(item) => {
                     const index = item.viewableItems?.at(0)?.index
-                    if (index) updateScrollPosition(index)
+                    if (index && chat?.id) updateScrollPosition(index, chat.id)
                 }}
                 onScrollToIndexFailed={(error) => {
                     flatlistRef.current?.scrollToOffset({

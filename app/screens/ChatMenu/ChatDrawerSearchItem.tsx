@@ -6,7 +6,7 @@ import { Text, TouchableOpacity, View } from 'react-native'
 type ChatDrawerSearchItemProps = {
     query: string
     item: Awaited<ReturnType<typeof Chats.db.query.searchChat>>[0]
-    onLoad: (id: number) => void
+    onLoad: (id: number, setOffset?: { type: 'index' | 'entryId'; value: number }) => void
 }
 
 const ChatDrawerSearchItem: React.FC<ChatDrawerSearchItemProps> = ({ item, onLoad, query }) => {
@@ -16,7 +16,7 @@ const ChatDrawerSearchItem: React.FC<ChatDrawerSearchItemProps> = ({ item, onLoa
 
     return (
         <TouchableOpacity
-            onPress={() => onLoad(item.chatId)}
+            onPress={() => onLoad(item.chatId, { type: 'entryId', value: item.chatEntryId })}
             style={{
                 paddingHorizontal: spacing.m,
                 paddingVertical: spacing.m,
