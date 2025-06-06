@@ -37,9 +37,13 @@ const ChatWindow = () => {
 
     useEffect(() => {
         if (!chat?.autoScroll) return
+        const isSave = chat.autoScroll.cause === 'saveScroll'
+        if (!saveScroll && isSave) return
+        const offset = Math.min(
+            Math.max(0, chat.autoScroll.index + (isSave ? 1 : 0)),
+            chat.messages.length - 1
+        )
 
-        if (!saveScroll && chat.autoScroll.cause === 'saveScroll') return
-        const offset = Math.min(Math.max(0, chat.autoScroll.index), chat.messages.length - 1)
         if (offset > 2)
             flatlistRef.current?.scrollToIndex({
                 index: offset,
@@ -89,7 +93,12 @@ const ChatWindow = () => {
                 scrollEventThrottle={16}
                 onViewableItemsChanged={(item) => {
                     const index = item.viewableItems?.at(0)?.index
-                    if (index && chat?.id) updateScrollPosition(index, chat.id)
+
+                    if (index && chat?.id)
+                        updateScrollPosition(
+                            index - (item.viewableItems.length === 1 ? 1 : 0),
+                            chat.id
+                        )
                 }}
                 onScrollToIndexFailed={(error) => {
                     flatlistRef.current?.scrollToOffset({
@@ -101,6 +110,7 @@ const ChatWindow = () => {
                             flatlistRef.current?.scrollToIndex({
                                 index: error.index,
                                 animated: true,
+                                viewOffset: 32,
                             })
                         }
                     }, 100)
