@@ -168,10 +168,7 @@ export namespace Llama {
             await context
                 .initMultimodal({ path: model.file_path, use_gpu: true })
                 .catch((e) => Logger.errorToast('Failed to load MMPROJ: ' + e))
-            const capabilities = await context.getMultimodalSupport()
-            Logger.info(
-                `Multimodal Capabilities:\nVision: ${capabilities.vision}\nAudio: ${capabilities.audio}`
-            )
+
             set({
                 mmproj: model,
             })
