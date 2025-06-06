@@ -110,7 +110,7 @@ export interface ChatState {
     getTokenCount: (
         index: number,
         options?: { addAttachments: boolean; lastImageOnly: boolean }
-    ) => number
+    ) => Promise<number>
     stopGenerating: () => void
     startGenerating: (swipeId: number) => void
 }
@@ -398,7 +398,7 @@ export namespace Chats {
             return swipe?.id
         },
 
-        getTokenCount: (
+        getTokenCount: async (
             index: number,
             options = {
                 lastImageOnly: false,
@@ -421,10 +421,12 @@ export namespace Chats {
             if (token_count && attachmentCount === attachment_count) return token_count
             const getTokenCount = Tokenizer.getTokenizer()
 
-            const new_token_count = getTokenCount(
+            const new_token_count = await getTokenCount(
                 messages[index].swipes[swipe_id].swipe,
-                Array(attachmentCount).fill('')
+                messages[index].attachments.map((item) => item.uri)
             )
+            console.log(index, new_token_count)
+
             messages[index].swipes[swipe_id].token_count = new_token_count
             set((state: ChatState) => ({
                 ...state,

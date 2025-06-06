@@ -163,8 +163,14 @@ const verifyModelLoaded = async (): Promise<boolean> => {
 
         // attempt to load model
         if (lastModel) {
-            Logger.infoToast(`Auto-loading: ${lastModel.name}`)
+            Logger.infoToast(`Auto-loading Model: ${lastModel.name}`)
             await Llama.useLlama.getState().load(lastModel)
+        }
+
+        const lastMmproj = Llama.useEngineData.getState().lastMmproj
+        if (lastMmproj) {
+            Logger.infoToast(`Auto-loading MMPROJ: ${lastMmproj.name}`)
+            await Llama.useLlama.getState().loadMmproj(lastMmproj)
         }
     }
     return true
@@ -195,7 +201,7 @@ export const localInference = async () => {
         }
 
         if (mmkv.getBoolean(AppSettings.SaveLocalKV) && !KV.useKVState.getState().kvCacheLoaded) {
-            const prompt = Llama.useLlama.getState().tokenize(payload.prompt)
+            const prompt = Llama.useLlama.getState().tokenize(payload.prompt, payload.media_paths)
             const result = KV.useKVState.getState().verifyKVCache(prompt?.tokens ?? [])
             if (!result.match) {
                 Alert.alert({

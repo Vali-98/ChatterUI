@@ -1,17 +1,29 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useCallback } from 'react'
 
-export function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: number): T {
+export function useDebounce<T extends (...args: any[]) => void>(
+    callback: T,
+    delay: number
+): (...args: Parameters<T>) => void {
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const callbackRef = useRef(callback)
 
-    const debouncedFn = useRef((...args: any[]) => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current)
-        }
+    // Keep callback ref up-to-date
+    useEffect(() => {
+        callbackRef.current = callback
+    }, [callback])
 
-        timeoutRef.current = setTimeout(() => {
-            callback(...args)
-        }, delay)
-    })
+    const debouncedFn = useCallback(
+        (...args: Parameters<T>) => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current)
+            }
+
+            timeoutRef.current = setTimeout(() => {
+                callbackRef.current(...args)
+            }, delay)
+        },
+        [delay]
+    )
 
     useEffect(() => {
         return () => {
@@ -21,5 +33,5 @@ export function useDebounce<T extends (...args: any[]) => void>(callback: T, del
         }
     }, [])
 
-    return debouncedFn.current as T
+    return debouncedFn
 }

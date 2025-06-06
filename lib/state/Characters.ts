@@ -54,7 +54,7 @@ type CharacterCardState = {
     unloadCard: () => void
     getImage: () => string
     updateImage: (sourceURI: string) => void
-    getCache: (otherName: string) => CharacterTokenCache
+    getCache: (otherName: string) => Promise<CharacterTokenCache>
 }
 
 export type CharacterCardData = Awaited<ReturnType<typeof Characters.db.query.cardQuery>>
@@ -101,7 +101,7 @@ export namespace Characters {
                     card.image_id = imageID
                     set((state) => ({ ...state, card: card }))
                 },
-                getCache: (userName: string) => {
+                getCache: async (userName: string) => {
                     const cache = get().tokenCache
                     if (cache && cache?.otherName === userName) return cache
 
@@ -123,10 +123,10 @@ export namespace Characters {
 
                     const newCache: CharacterTokenCache = {
                         otherName: userName,
-                        description_length: getTokenCount(description),
-                        examples_length: getTokenCount(examples),
-                        personality_length: getTokenCount(personality),
-                        scenario_length: getTokenCount(scenario),
+                        description_length: await getTokenCount(description),
+                        examples_length: await getTokenCount(examples),
+                        personality_length: await getTokenCount(personality),
+                        scenario_length: await getTokenCount(scenario),
                     }
 
                     set((state) => ({ ...state, tokenCache: newCache }))
@@ -188,7 +188,7 @@ export namespace Characters {
             card.image_id = imageID
             set((state) => ({ ...state, card: card }))
         },
-        getCache: (charName: string) => {
+        getCache: async (charName: string) => {
             const cache = get().tokenCache
             const card = get().card
             if (cache?.otherName && cache.otherName === useUserCard.getState().card?.name)
@@ -211,10 +211,10 @@ export namespace Characters {
 
             const newCache = {
                 otherName: charName,
-                description_length: getTokenCount(description),
-                examples_length: getTokenCount(examples),
-                personality_length: getTokenCount(personality),
-                scenario_length: getTokenCount(scenario),
+                description_length: await getTokenCount(description),
+                examples_length: await getTokenCount(examples),
+                personality_length: await getTokenCount(personality),
+                scenario_length: await getTokenCount(scenario),
             }
             set((state) => ({ ...state, tokenCache: newCache }))
             return newCache

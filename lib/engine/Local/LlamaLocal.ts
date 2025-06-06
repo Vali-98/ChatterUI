@@ -41,7 +41,7 @@ export type LlamaState = {
     setLoadProgress: (progress: number) => void
     unload: () => Promise<void>
     unloadMmproj: () => Promise<void>
-    saveKV: (prompt: string | undefined) => Promise<void>
+    saveKV: (prompt: string | undefined, media_paths?: string[]) => Promise<void>
     loadKV: () => Promise<boolean>
     completion: (
         params: CompletionParams,
@@ -49,8 +49,8 @@ export type LlamaState = {
         completed: (text: string, timngs: CompletionTimings) => void
     ) => Promise<void>
     stopCompletion: () => Promise<void>
-    tokenLength: (text: string, mediaPaths?: string[]) => number
-    tokenize: (text: string) => { tokens: number[] } | undefined
+    tokenLength: (text: string, mediaPaths?: string[]) => Promise<number>
+    tokenize: (text: string, media_paths?: string[]) => { tokens: number[] } | undefined
 }
 
 export type LlamaConfig = {
@@ -63,8 +63,10 @@ export type LlamaConfig = {
 export type EngineDataProps = {
     config: LlamaConfig
     lastModel?: ModelDataType
+    lastMmproj?: ModelDataType
     setConfiguration: (config: LlamaConfig) => void
     setLastModelLoaded: (model: ModelDataType) => void
+    setLastMmprojLoaded: (model: ModelDataType) => void
 }
 
 const sessionFile = `${AppDirectory.SessionPath}llama-session.bin`
@@ -81,12 +83,14 @@ export namespace Llama {
         persist(
             (set) => ({
                 config: defaultConfig,
-                lastModel: undefined,
                 setConfiguration: (config: LlamaConfig) => {
                     set({ config: config })
                 },
                 setLastModelLoaded: (model: ModelDataType) => {
                     set({ lastModel: model })
+                },
+                setLastMmprojLoaded: (mmproj: ModelDataType) => {
+                    set({ lastMmproj: mmproj })
                 },
             }),
             {
@@ -94,6 +98,7 @@ export namespace Llama {
                 partialize: (state) => ({
                     config: state.config,
                     lastModel: state.lastModel,
+                    lastMmproj: state.lastMmproj,
                 }),
                 storage: createJSONStorage(() => mmkvStorage),
                 version: 1,
@@ -170,9 +175,14 @@ export namespace Llama {
                 .initMultimodal({ path: model.file_path, use_gpu: true })
                 .catch((e) => Logger.errorToast('Failed to load MMPROJ: ' + e))
 
+            // TODO: Fix previewing model capabilities
+            // refer to https://github.com/mybigday/llama.rn/issues/151
+
             set({
                 mmproj: model,
             })
+
+            useEngineData.getState().setLastMmprojLoaded(model)
         },
         setLoadProgress: (progress: number) => {
             set({ loadProgress: progress })
@@ -222,14 +232,14 @@ export namespace Llama {
                     )
                     set({ chatCount: get().chatCount + 1 })
                     if (mmkv.getBoolean(AppSettings.SaveLocalKV)) {
-                        await get().saveKV(params.prompt)
+                        await get().saveKV(params.prompt, params.media_paths ?? [])
                     }
                 })
         },
         stopCompletion: async () => {
             await get().context?.stopCompletion()
         },
-        saveKV: async (prompt: string | undefined) => {
+        saveKV: async (prompt, media_paths) => {
             const llamaContext = get().context
             if (!llamaContext) {
                 Logger.errorToast('No Model Loaded')
@@ -237,7 +247,7 @@ export namespace Llama {
             }
 
             if (prompt) {
-                const tokens = get().tokenize(prompt)?.tokens
+                const tokens = get().tokenize(prompt, media_paths ?? [])?.tokens
                 KV.useKVState.getState().setKvCacheTokens(tokens ?? [])
             }
 
@@ -278,13 +288,18 @@ export namespace Llama {
                 })
             return result
         },
-        tokenLength: (text: string, mediaPaths: string[] = []) => {
-            return (
-                (get().context?.tokenizeSync(text)?.tokens?.length ?? 0) + mediaPaths.length * 512
-            )
+        tokenLength: async (text: string, mediaPaths: string[] = []) => {
+            const result = await get().context?.tokenizeAsync(text, {
+                media_paths: mediaPaths.map((item) => item.replace('file://', '')),
+            })
+
+            if (!result) return 0
+            console.log(result)
+
+            return result.tokens.length
         },
-        tokenize: (text: string) => {
-            return get().context?.tokenizeSync(text)
+        tokenize: (text: string, media_paths: string[] = []) => {
+            return get().context?.tokenizeSync(text, { media_paths: media_paths })
         },
     }))
 

@@ -172,7 +172,7 @@ type InstructState = {
     load: (id: number) => Promise<void>
     setData: (instruct: InstructType) => void
     tokenCache: InstructTokenCache | undefined
-    getCache: (charName: string, userName: string) => InstructTokenCache
+    getCache: (charName: string, userName: string) => Promise<InstructTokenCache>
     replacedMacros: () => InstructType
     getStopSequence: () => string[]
 }
@@ -225,7 +225,7 @@ export namespace Instructs {
                 setData: (instruct: InstructType) => {
                     set((state) => ({ ...state, data: instruct, tokenCache: undefined }))
                 },
-                getCache: (charName: string, userName: string) => {
+                getCache: async (charName: string, userName: string) => {
                     const cache = get().tokenCache
                     if (cache && cache.charName === charName && cache.userName === userName)
                         return cache
@@ -249,15 +249,15 @@ export namespace Instructs {
                     const newCache: InstructTokenCache = {
                         charName: charName,
                         userName: userName,
-                        system_prompt_length: getTokenCount(instruct.system_prompt),
-                        system_prefix_length: getTokenCount(instruct.system_prefix),
-                        system_suffix_length: getTokenCount(instruct.system_suffix),
-                        input_prefix_length: getTokenCount(instruct.input_prefix),
-                        input_suffix_length: getTokenCount(instruct.input_suffix),
-                        output_prefix_length: getTokenCount(instruct.output_prefix),
-                        last_output_prefix_length: getTokenCount(instruct.last_output_prefix),
-                        output_suffix_length: getTokenCount(instruct.output_suffix),
-                        user_alignment_message_length: getTokenCount(instruct.system_prompt),
+                        system_prompt_length: await getTokenCount(instruct.system_prompt),
+                        system_prefix_length: await getTokenCount(instruct.system_prefix),
+                        system_suffix_length: await getTokenCount(instruct.system_suffix),
+                        input_prefix_length: await getTokenCount(instruct.input_prefix),
+                        input_suffix_length: await getTokenCount(instruct.input_suffix),
+                        output_prefix_length: await getTokenCount(instruct.output_prefix),
+                        last_output_prefix_length: await getTokenCount(instruct.last_output_prefix),
+                        output_suffix_length: await getTokenCount(instruct.output_suffix),
+                        user_alignment_message_length: await getTokenCount(instruct.system_prompt),
                     }
                     set((state) => ({ ...state, tokenCache: newCache }))
                     return newCache
