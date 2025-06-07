@@ -112,6 +112,8 @@ const buildLocalPayload = async () => {
         Logger.errorToast('Failed to build prompt')
     }
 
+    const finalMediaPaths = hasAudio || hasImage ? { media_paths: mediaPaths } : {}
+
     return {
         ...payloadFields,
         penalize_nl: typeof rep_pen === 'number' && rep_pen > 1,
@@ -119,7 +121,7 @@ const buildLocalPayload = async () => {
         prompt: prompt ?? '',
         stop: constructStopSequence(),
         emit_partial_completion: true,
-        media_paths: mediaPaths,
+        ...finalMediaPaths,
     }
 }
 
