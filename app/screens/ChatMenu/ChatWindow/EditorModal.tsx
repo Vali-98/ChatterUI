@@ -82,6 +82,8 @@ const EditorModal = () => {
                 visible={editMode}
                 animationType="fade"
                 transparent
+                statusBarTranslucent
+                navigationBarTranslucent
                 onShow={handleAutoFocus}
                 onRequestClose={handleClose}
                 style={{ flex: 1 }}>
