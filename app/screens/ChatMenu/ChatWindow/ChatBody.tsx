@@ -20,7 +20,6 @@ type ChatTextProps = {
     isGreeting: boolean
 }
 
-/*TODO: Move Chat Option Bar to own component */
 const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage, isGreeting }) => {
     const message = Chats.useEntryData(index)
     const { appMode } = useAppMode()
