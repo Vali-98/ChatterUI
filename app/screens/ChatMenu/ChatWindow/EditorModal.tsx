@@ -140,12 +140,13 @@ export default EditorModal
 
 const useStyles = () => {
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
+
     return StyleSheet.create({
         editorContainer: {
             backgroundColor: color.neutral._100,
             flexShrink: 1,
             paddingTop: spacing.xl,
-            paddingBottom: spacing.l,
+            paddingBottom: 48,
             paddingHorizontal: spacing.xl,
             borderTopRightRadius: borderRadius.l,
             borderTopLeftRadius: borderRadius.l,
