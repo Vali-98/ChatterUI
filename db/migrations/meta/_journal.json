@@ -1,118 +1,111 @@
 {
-  "version": "5",
-  "dialect": "sqlite",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "5",
-      "when": 1713404342936,
-      "tag": "0000_sudden_blockbuster",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1719971104700,
-      "tag": "0001_yellow_squirrel_girl",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1726593007556,
-      "tag": "0002_majestic_brother_voodoo",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1726978324478,
-      "tag": "0003_violet_firelord",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1727016764430,
-      "tag": "0004_small_deadpool",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1727844763371,
-      "tag": "0005_warm_microbe",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1728559551008,
-      "tag": "0006_bored_carnage",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "6",
-      "when": 1729170264378,
-      "tag": "0007_loving_magik",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "6",
-      "when": 1739889489456,
-      "tag": "0008_fine_sleeper",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "6",
-      "when": 1744296576041,
-      "tag": "0009_huge_young_avengers",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "6",
-      "when": 1746450681184,
-      "tag": "0010_empty_pandemic",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "6",
-      "when": 1747052799473,
-      "tag": "0011_icy_obadiah_stane",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "6",
-      "when": 1747231254920,
-      "tag": "0012_tidy_shen",
-      "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "6",
-      "when": 1747888349967,
-      "tag": "0013_unique_namorita",
-      "breakpoints": true
-    },
-    {
-      "idx": 14,
-      "version": "6",
-      "when": 1749047909392,
-      "tag": "0014_living_scarlet_spider",
-      "breakpoints": true
-    },
-    {
-      "idx": 15,
-      "version": "6",
-      "when": 1749460261823,
-      "tag": "0015_slimy_retro_girl",
-      "breakpoints": true
-    }
-  ]
+    "version": "5",
+    "dialect": "sqlite",
+    "entries": [
+        {
+            "idx": 0,
+            "version": "5",
+            "when": 1713404342936,
+            "tag": "0000_sudden_blockbuster",
+            "breakpoints": true
+        },
+        {
+            "idx": 1,
+            "version": "5",
+            "when": 1719971104700,
+            "tag": "0001_yellow_squirrel_girl",
+            "breakpoints": true
+        },
+        {
+            "idx": 2,
+            "version": "6",
+            "when": 1726593007556,
+            "tag": "0002_majestic_brother_voodoo",
+            "breakpoints": true
+        },
+        {
+            "idx": 3,
+            "version": "6",
+            "when": 1726978324478,
+            "tag": "0003_violet_firelord",
+            "breakpoints": true
+        },
+        {
+            "idx": 4,
+            "version": "6",
+            "when": 1727016764430,
+            "tag": "0004_small_deadpool",
+            "breakpoints": true
+        },
+        {
+            "idx": 5,
+            "version": "6",
+            "when": 1727844763371,
+            "tag": "0005_warm_microbe",
+            "breakpoints": true
+        },
+        {
+            "idx": 6,
+            "version": "6",
+            "when": 1728559551008,
+            "tag": "0006_bored_carnage",
+            "breakpoints": true
+        },
+        {
+            "idx": 7,
+            "version": "6",
+            "when": 1729170264378,
+            "tag": "0007_loving_magik",
+            "breakpoints": true
+        },
+        {
+            "idx": 8,
+            "version": "6",
+            "when": 1739889489456,
+            "tag": "0008_fine_sleeper",
+            "breakpoints": true
+        },
+        {
+            "idx": 9,
+            "version": "6",
+            "when": 1744296576041,
+            "tag": "0009_huge_young_avengers",
+            "breakpoints": true
+        },
+        {
+            "idx": 10,
+            "version": "6",
+            "when": 1746450681184,
+            "tag": "0010_empty_pandemic",
+            "breakpoints": true
+        },
+        {
+            "idx": 11,
+            "version": "6",
+            "when": 1747052799473,
+            "tag": "0011_icy_obadiah_stane",
+            "breakpoints": true
+        },
+        {
+            "idx": 12,
+            "version": "6",
+            "when": 1747231254920,
+            "tag": "0012_tidy_shen",
+            "breakpoints": true
+        },
+        {
+            "idx": 13,
+            "version": "6",
+            "when": 1747888349967,
+            "tag": "0013_unique_namorita",
+            "breakpoints": true
+        },
+        {
+            "idx": 14,
+            "version": "6",
+            "when": 1749047909392,
+            "tag": "0014_living_scarlet_spider",
+            "breakpoints": true
+        }
+    ]
 }
