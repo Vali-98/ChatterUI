@@ -24,8 +24,7 @@ export const characters = sqliteTable('characters', {
     character_version: text('character_version').notNull().default(''),
     last_modified: integer('last_modified', { mode: 'number' })
         .$defaultFn(() => Date.now())
-        .$onUpdateFn(() => Date.now())
-        .notNull(),
+        .$onUpdateFn(() => Date.now()),
 })
 
 export const characterGreetings = sqliteTable('character_greetings', {
