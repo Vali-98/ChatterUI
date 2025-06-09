@@ -1,5 +1,5 @@
 diff --git a/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt b/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt
-index 208a2f8..17b59ef 100644
+index ff4d53f..4ece231 100644
 --- a/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt
 +++ b/node_modules/expo-sqlite/android/src/main/java/expo/modules/sqlite/SQLiteModule.kt
 @@ -340,6 +340,15 @@ class SQLiteModule : Module() {
