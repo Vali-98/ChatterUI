@@ -4,7 +4,6 @@ import { Characters } from '@lib/state/Characters'
 import { Logger } from '@lib/state/Logger'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 type CharacterNewMenuProps = {

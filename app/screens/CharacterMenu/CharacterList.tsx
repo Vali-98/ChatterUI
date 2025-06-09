@@ -64,6 +64,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{ rowGap: 8 }}
                         data={characterList}
+                        windowSize={3}
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item, index }) => (
                             <CharacterListing
