@@ -463,8 +463,8 @@ export namespace Characters {
                     },
                     orderBy:
                         orderBy === 'name' ? dir(characters.name) : dir(characters.last_modified),
-                    limit,
-                    offset,
+                    limit: limit,
+                    offset: offset,
                 })
             }
 

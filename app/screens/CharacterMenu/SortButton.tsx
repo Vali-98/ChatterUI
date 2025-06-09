@@ -1,6 +1,6 @@
 import { AntDesign } from '@expo/vector-icons'
-import { CharInfo } from '@lib/state/Characters'
 import { CharacterSorter, SearchType } from '@lib/state/CharacterSorter'
+import { CharInfo } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
 import React from 'react'
 import { Text, StyleSheet, TouchableOpacity } from 'react-native'

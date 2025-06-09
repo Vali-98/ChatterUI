@@ -16,7 +16,7 @@ type ChatEditorStateProps = {
 }
 
 //TODO: This is somewhat unsafe, as it always expects index to be valid at 0
-export const useChatEditorState = create<ChatEditorStateProps>()((set, get) => ({
+export const useChatEditorState = create<ChatEditorStateProps>()((set) => ({
     index: 0,
     editMode: false,
     hide: () => {
@@ -146,7 +146,7 @@ const useStyles = () => {
             backgroundColor: color.neutral._100,
             flexShrink: 1,
             paddingTop: spacing.xl,
-            paddingBottom: 48,
+            paddingBottom: 12 * 4,
             paddingHorizontal: spacing.xl,
             borderTopRightRadius: borderRadius.l,
             borderTopLeftRadius: borderRadius.l,

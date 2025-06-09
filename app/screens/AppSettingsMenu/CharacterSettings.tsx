@@ -4,6 +4,7 @@ import Alert from '@components/views/Alert'
 import { Characters } from '@lib/state/Characters'
 import React from 'react'
 import { View } from 'react-native'
+
 import TagHiderSettings from './TagHiderSettings'
 
 const CharacterSettings = () => {

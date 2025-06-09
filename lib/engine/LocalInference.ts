@@ -112,7 +112,7 @@ const buildLocalPayload = async () => {
         Logger.errorToast('Failed to build prompt')
     }
 
-    const finalMediaPaths = hasAudio || hasImage ? { media_paths: mediaPaths } : {}
+    const finalMediaPaths = (hasAudio ?? hasImage) ? { media_paths: mediaPaths } : {}
 
     return {
         ...payloadFields,

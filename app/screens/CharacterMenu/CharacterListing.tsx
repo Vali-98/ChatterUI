@@ -1,5 +1,6 @@
 import Avatar from '@components/views/Avatar'
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { CharacterSorter } from '@lib/state/CharacterSorter'
 import { Characters, CharInfo } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
@@ -11,7 +12,6 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
 import CharacterEditPopup from './CharacterEditPopup'
-import { CharacterSorter } from '@lib/state/CharacterSorter'
 
 type CharacterListingProps = {
     character: CharInfo

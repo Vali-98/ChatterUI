@@ -3,6 +3,7 @@ import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import { db } from '@db'
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { CharacterSorter } from '@lib/state/CharacterSorter'
 import { TagHider } from '@lib/state/TagHider'
 import { Theme } from '@lib/theme/ThemeManager'
 import { characterTags, tags } from 'db/schema'
@@ -15,7 +16,6 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 
 import SortButton from './SortButton'
-import { CharacterSorter } from '@lib/state/CharacterSorter'
 
 type CharacterListHeaderProps = {
     resultLength: number

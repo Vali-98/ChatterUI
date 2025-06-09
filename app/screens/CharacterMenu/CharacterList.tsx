@@ -1,13 +1,14 @@
 import Drawer from '@components/views/Drawer'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { Characters, CharInfo } from '@lib/state/Characters'
 import { CharacterSorter } from '@lib/state/CharacterSorter'
+import { Characters, CharInfo } from '@lib/state/Characters'
 import { TagHider } from '@lib/state/TagHider'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
 import { SafeAreaView, View } from 'react-native'
 import Animated from 'react-native-reanimated'
+
 import CharacterListHeader from './CharacterListHeader'
 import CharacterListing from './CharacterListing'
 import CharacterNewMenu from './CharacterNewMenu'
@@ -41,7 +42,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
         [searchType, searchOrder, textFilter, tagFilter, hiddenTags, pages]
     )
 
-    let characterList: CharInfo[] = data.map((item) => ({
+    const characterList: CharInfo[] = data.map((item) => ({
         ...item,
         latestChat: item.chats[0]?.id,
         latestSwipe: item.chats[0]?.messages[0]?.swipes[0]?.swipe,

@@ -127,10 +127,10 @@ const ChatActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMe
                                 />
                                 <View
                                     style={{
-                                        borderColor: color.text._700,
-                                        borderLeftWidth: 2,
-                                        marginLeft: 14,
-                                        marginRight: 6,
+                                        borderColor: color.primary._500,
+                                        borderLeftWidth: 1,
+                                        marginLeft: 12,
+                                        marginRight: 4,
                                     }}
                                 />
                             </Animated.View>
