@@ -47,7 +47,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
         latestChat: item.chats[0]?.id,
         latestSwipe: item.chats[0]?.messages[0]?.swipes[0]?.swipe,
         latestName: item.chats[0]?.messages[0]?.name,
-        last_modified: item.last_modified,
+        last_modified: item.last_modified ?? 0,
         tags: item.tags.map((item) => item.tag.tag),
     }))
 
