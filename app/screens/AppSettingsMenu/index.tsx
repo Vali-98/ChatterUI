@@ -30,7 +30,6 @@ const AppSettingsMenu = () => {
             <ChatSettings />
             <CharacterSettings />
             <GeneratingSettings />
-            <TagHiderSettings />
             <NotificationSettings />
             <ScreenSettings />
             <DatabaseSettings />

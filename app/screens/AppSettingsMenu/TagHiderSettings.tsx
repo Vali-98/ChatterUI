@@ -17,10 +17,9 @@ const TagHiderSettings = () => {
     )
 
     return (
-        <View style={{ marginBottom: 4 }}>
-            <SectionTitle>Hide Tags</SectionTitle>
+        <View>
             <ThemedSwitch
-                label="Enable"
+                label="Hidden Tags"
                 description="Hide characters with the following tags from the character list."
                 value={tagHider}
                 onChangeValue={(b) => setUseTagHider(b)}
