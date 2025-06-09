@@ -110,6 +110,7 @@ const ChatActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMe
                     <>
                         {quickDelete && (
                             <Animated.View
+                                style={{ flexDirection: 'row' }}
                                 entering={ZoomIn.duration(200)}
                                 exiting={ZoomOut.duration(200)}>
                                 <ThemedButton
@@ -122,6 +123,14 @@ const ChatActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMe
                                     onPress={() => {
                                         if (showOptions) setShowOptions(undefined)
                                         deleteEntry(index)
+                                    }}
+                                />
+                                <View
+                                    style={{
+                                        borderColor: color.text._700,
+                                        borderLeftWidth: 2,
+                                        marginLeft: 14,
+                                        marginRight: 6,
                                     }}
                                 />
                             </Animated.View>

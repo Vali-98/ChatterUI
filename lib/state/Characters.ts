@@ -11,7 +11,19 @@ import {
     chats,
     tags,
 } from 'db/schema'
-import { and, desc, eq, inArray, notInArray } from 'drizzle-orm'
+import {
+    and,
+    asc,
+    desc,
+    eq,
+    exists,
+    gte,
+    inArray,
+    like,
+    notExists,
+    notInArray,
+    sql,
+} from 'drizzle-orm'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Asset } from 'expo-asset'
 import { randomUUID } from 'expo-crypto'
@@ -358,6 +370,104 @@ export namespace Characters {
                 })
             }
 
+            export const cardListQueryWindow = (
+                type: 'character' | 'user',
+                orderBy: 'name' | 'modified' = 'modified',
+                direction: 'desc' | 'asc' = 'desc',
+                limit = 20,
+                offset = 0,
+                searchFilter: string = '',
+                searchTags: string[] = [],
+                hiddenTags: string[] = []
+            ) => {
+                const dir = direction === 'asc' ? asc : desc
+                return database.query.characters.findMany({
+                    columns: {
+                        id: true,
+                        name: true,
+                        image_id: true,
+                        last_modified: true,
+                    },
+                    where: (characters) => {
+                        const base = eq(characters.type, type)
+                        const search = searchFilter
+                            ? like(characters.name, `${searchFilter.trim().toLocaleLowerCase()}`)
+                            : undefined
+                        const hidden =
+                            hiddenTags.length > 0
+                                ? notExists(
+                                      database
+                                          .select()
+                                          .from(characterTags)
+                                          .innerJoin(tags, eq(characterTags.tag_id, tags.id))
+                                          .where(
+                                              and(
+                                                  eq(characterTags.character_id, characters.id),
+                                                  inArray(tags.tag, hiddenTags)
+                                              )
+                                          )
+                                  )
+                                : undefined
+                        const filteredTags =
+                            searchTags.length > 0
+                                ? gte(
+                                      database
+                                          .select({ count: sql<number>`count(*)` })
+                                          .from(characterTags)
+                                          .innerJoin(tags, eq(characterTags.tag_id, tags.id))
+                                          .where(
+                                              and(
+                                                  eq(characterTags.character_id, characters.id),
+                                                  inArray(tags.tag, searchTags)
+                                              )
+                                          ),
+                                      searchTags.length
+                                  )
+                                : undefined
+
+                        return and(base, search, hidden, filteredTags)
+                    },
+                    with: {
+                        tags: {
+                            columns: {},
+                            with: {
+                                tag: true,
+                            },
+                        },
+                        chats: {
+                            columns: {
+                                id: true,
+                            },
+                            limit: 1,
+                            orderBy: desc(chats.last_modified),
+                            with: {
+                                messages: {
+                                    columns: {
+                                        id: true,
+                                        name: true,
+                                    },
+                                    limit: 1,
+                                    orderBy: desc(chatEntries.id),
+                                    with: {
+                                        swipes: {
+                                            columns: {
+                                                swipe: true,
+                                            },
+                                            orderBy: desc(chatSwipes.id),
+                                            limit: 1,
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    orderBy:
+                        orderBy === 'name' ? dir(characters.name) : dir(characters.last_modified),
+                    limit,
+                    offset,
+                })
+            }
+
             export const cardExists = async (charId: number) => {
                 return await database.query.characters.findFirst({
                     where: eq(characters.id, charId),
@@ -531,10 +641,7 @@ export namespace Characters {
             }
 
             export const createCharacter = async (card: CharacterCardV2, imageuri: string = '') => {
-                // TODO : Extract CharacterBook value to Lorebooks, CharacterLorebooks
                 const { data } = card
-                // provide warning ?
-                // if (data.character_book) { console.log(warn) }
                 const image_id = await database.transaction(async (tx) => {
                     try {
                         const [{ id, image_id }, ..._] = await tx

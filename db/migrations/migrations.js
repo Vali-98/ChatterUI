@@ -16,6 +16,7 @@ import m0011 from './0011_icy_obadiah_stane.sql';
 import m0012 from './0012_tidy_shen.sql';
 import m0013 from './0013_unique_namorita.sql';
 import m0014 from './0014_living_scarlet_spider.sql';
+import m0015 from './0015_slimy_retro_girl.sql';
 
   export default {
     journal,
@@ -34,7 +35,8 @@ m0010,
 m0011,
 m0012,
 m0013,
-m0014
+m0014,
+m0015
     }
   }
   

@@ -18,6 +18,7 @@ export const mmkvStorage: StateStorage = {
 
 export enum PersistStore {
     TagHider = 'tag-hider-storage',
+    CharacterSearch = 'storage-character-search',
 }
 
 export namespace PersistStore {

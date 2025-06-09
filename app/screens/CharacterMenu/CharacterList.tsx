@@ -2,13 +2,13 @@ import Drawer from '@components/views/Drawer'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { Characters, CharInfo } from '@lib/state/Characters'
+import { CharacterSorter } from '@lib/state/CharacterSorter'
 import { TagHider } from '@lib/state/TagHider'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
 import { SafeAreaView, View } from 'react-native'
-import Animated, { LinearTransition } from 'react-native-reanimated'
-
-import CharacterListHeader, { useCharacterListSorter } from './CharacterListHeader'
+import Animated from 'react-native-reanimated'
+import CharacterListHeader from './CharacterListHeader'
 import CharacterListing from './CharacterListing'
 import CharacterNewMenu from './CharacterNewMenu'
 import CharactersEmpty from './CharactersEmpty'
@@ -18,29 +18,37 @@ type CharacterListProps = {
     showHeader: boolean
 }
 
+const PAGE_SIZE = 30
+
 const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
     const [nowLoading, setNowLoading] = useState(false)
+    const { showSearch, searchType, searchOrder, tagFilter, textFilter } =
+        CharacterSorter.useSorter()
     const hiddenTags = TagHider.useHiddenTags()
-    const sortAndFilterCharInfo = useCharacterListSorter((state) => state.sortAndFilterCharInfo)
-
+    const [pages, setPages] = useState(3)
+    const [previousLength, setPreviousLength] = useState(0)
     const { data, updatedAt } = useLiveQuery(
-        Characters.db.query.cardListQuery('character', 'modified')
+        Characters.db.query.cardListQueryWindow(
+            'character',
+            searchType,
+            searchOrder,
+            PAGE_SIZE * pages,
+            0,
+            textFilter,
+            tagFilter,
+            hiddenTags
+        ),
+        [searchType, searchOrder, textFilter, tagFilter, hiddenTags, pages]
     )
 
-    let characterList: CharInfo[] = sortAndFilterCharInfo(
-        data.map((item) => ({
-            ...item,
-            latestChat: item.chats[0]?.id,
-            latestSwipe: item.chats[0]?.messages[0]?.swipes[0]?.swipe,
-            latestName: item.chats[0]?.messages[0]?.name,
-            last_modified: item.last_modified ?? 0,
-            tags: item.tags.map((item) => item.tag.tag),
-        }))
-    )
-    if (hiddenTags.length > 0)
-        characterList = characterList.filter(
-            (info) => !info.tags.some((item) => hiddenTags.includes(item))
-        )
+    let characterList: CharInfo[] = data.map((item) => ({
+        ...item,
+        latestChat: item.chats[0]?.id,
+        latestSwipe: item.chats[0]?.messages[0]?.swipes[0]?.swipe,
+        latestName: item.chats[0]?.messages[0]?.name,
+        last_modified: item.last_modified,
+        tags: item.tags.map((item) => item.tag.tag),
+    }))
 
     return (
         <SafeAreaView style={{ paddingVertical: 16, paddingHorizontal: 8, flex: 1 }}>
@@ -54,29 +62,37 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
                 )}
             />
 
-            {data.length === 0 && updatedAt && <CharactersEmpty />}
+            {data.length === 0 && !showSearch && updatedAt && <CharactersEmpty />}
 
-            {data.length !== 0 && (
-                <View style={{ flex: 1 }}>
-                    <CharacterListHeader resultLength={characterList.length} />
-                    <Animated.FlatList
-                        itemLayoutAnimation={LinearTransition}
-                        showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ rowGap: 8 }}
-                        data={characterList}
-                        windowSize={3}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={({ item, index }) => (
-                            <CharacterListing
-                                index={index}
-                                character={item}
-                                nowLoading={nowLoading}
-                                setNowLoading={setNowLoading}
-                            />
-                        )}
-                    />
-                </View>
-            )}
+            <View style={{ flex: 1 }}>
+                <CharacterListHeader resultLength={characterList.length} />
+                <Animated.FlatList
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ rowGap: 8 }}
+                    data={characterList}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <CharacterListing
+                            character={item}
+                            nowLoading={nowLoading}
+                            setNowLoading={setNowLoading}
+                        />
+                    )}
+                    onEndReachedThreshold={1}
+                    onEndReached={() => {
+                        if (previousLength === data.length) {
+                            return
+                        }
+                        setPreviousLength(data.length)
+                        setPages(pages + 1)
+                    }}
+                    windowSize={3}
+                    onStartReachedThreshold={0.1}
+                    onStartReached={() => {
+                        setPages(3)
+                    }}
+                />
+            </View>
 
             {characterList.length === 0 && data.length !== 0 && updatedAt && (
                 <CharactersSearchEmpty />

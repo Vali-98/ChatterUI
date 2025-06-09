@@ -24,9 +24,8 @@ export const characters = sqliteTable('characters', {
     character_version: text('character_version').notNull().default(''),
     last_modified: integer('last_modified', { mode: 'number' })
         .$defaultFn(() => Date.now())
-        .$onUpdateFn(() => Date.now()),
-    //.default(sql`(unixepoch('subsec')*1000)`)
-    //.$onUpdate(() => sql`(unixepoch('subsec')*1000)`),
+        .$onUpdateFn(() => Date.now())
+        .notNull(),
 })
 
 export const characterGreetings = sqliteTable('character_greetings', {

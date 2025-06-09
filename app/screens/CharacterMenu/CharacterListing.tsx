@@ -11,30 +11,22 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
 import CharacterEditPopup from './CharacterEditPopup'
-import { useCharacterListSorter } from './CharacterListHeader'
+import { CharacterSorter } from '@lib/state/CharacterSorter'
 
 type CharacterListingProps = {
-    index: number
     character: CharInfo
     nowLoading: boolean
     setNowLoading: (b: boolean) => void
 }
 
 const CharacterListing: React.FC<CharacterListingProps> = ({
-    index,
     character,
     nowLoading,
     setNowLoading,
 }) => {
     const router = useRouter()
     const [showTags, _] = useMMKVBoolean(AppSettings.ShowTags)
-    const { setShowSearch, setTagFilter, tagFilter } = useCharacterListSorter(
-        useShallow((state) => ({
-            setShowSearch: state.setShowSearch,
-            setTagFilter: state.setTagFilter,
-            tagFilter: state.tagFilter,
-        }))
-    )
+    const { setShowSearch, setTagFilter, tagFilter } = CharacterSorter.useSorter()
     const { color } = Theme.useTheme()
     const styles = useStyles()
 
