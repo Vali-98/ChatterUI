@@ -74,7 +74,6 @@ const MultiDropdownSheet = <T,>({
             <Modal
                 transparent
                 statusBarTranslucent
-                navigationBarTranslucent
                 onRequestClose={() => setShowList(false)}
                 visible={showList}
                 animationType="fade">

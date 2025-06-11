@@ -83,7 +83,6 @@ const EditorModal = () => {
                 animationType="fade"
                 transparent
                 statusBarTranslucent
-                navigationBarTranslucent
                 onShow={handleAutoFocus}
                 onRequestClose={handleClose}
                 style={{ flex: 1 }}>
@@ -146,7 +145,7 @@ const useStyles = () => {
             backgroundColor: color.neutral._100,
             flexShrink: 1,
             paddingTop: spacing.xl,
-            paddingBottom: 12 * 4,
+            paddingBottom: spacing.l,
             paddingHorizontal: spacing.xl,
             borderTopRightRadius: borderRadius.l,
             borderTopLeftRadius: borderRadius.l,

@@ -79,7 +79,6 @@ const EditAPIModal: React.FC<EditAPIModalProps> = ({ index, show, close, origina
         <Modal
             transparent
             statusBarTranslucent
-            navigationBarTranslucent
             onRequestClose={close}
             visible={show}
             animationType="fade">
