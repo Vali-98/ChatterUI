@@ -1,92 +1,119 @@
-import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
+import { AppSettings, CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { SSEFetch } from '@lib/engine/SSEFetch'
-import { Characters } from '@lib/state/Characters'
-import { Chats, useInference } from '@lib/state/Chat'
-import { Instructs, InstructType } from '@lib/state/Instructs'
+import { useInference } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
-import { useTTSState } from '@lib/state/TTS'
 import { nativeApplicationVersion } from 'expo-application'
 
-import { APIState } from './APIManagerState'
-import { buildRequest } from './RequestBuilder'
+import { mmkv } from '@lib/storage/MMKV'
+import { buildContext, ContextBuilderParams } from './ContextBuilder2'
+import { buildRequest, RequestBuilderParams } from './RequestBuilder'
 
-export const buildAndSendRequest = async () => {
-    const requestValues = APIState.useAPIState
-        .getState()
-        .values.find((item, index) => index === APIState.useAPIState.getState().activeIndex)
+export interface APIBuilderParams
+    extends ContextBuilderParams,
+        Omit<RequestBuilderParams, 'prompt'> {
+    onData: (data: string) => void
+    onEnd: (data: string) => void
+    stopSequence: string[]
+    stopGenerating: () => void
+}
 
-    if (!requestValues) {
-        Logger.warnToast(`No Active API`)
-        Chats.useChatState.getState().stopGenerating()
-        return
-    }
-
-    const configs = APIState.useAPIState
-        .getState()
-        .getTemplates()
-        .filter((item) => item.name === requestValues.configName)
-
-    const config = configs[0]
-    if (!config) {
-        Logger.errorToast(`Configuration "${requestValues?.configName}" not found`)
-        Chats.useChatState.getState().stopGenerating()
-        return
-    }
-
-    Logger.info(`Using Configuration: ${requestValues.configName}`)
-
-    let payload: any = undefined
-    payload = await buildRequest(config, requestValues)
-
-    if (!payload) {
-        Logger.errorToast('Something Went Wrong With Payload Construction')
-        Chats.useChatState.getState().stopGenerating()
-        return
-    }
-
-    if (typeof payload !== 'string') {
-        payload = JSON.stringify(payload)
-    }
-
-    let header: any = {}
-    if (config.features.useKey) {
-        const anthropicVersion =
-            config.name === 'Claude' ? { 'anthropic-version': CLAUDE_VERSION } : {}
-
-        header = {
-            ...anthropicVersion,
-            [config.request.authHeader]: config.request.authPrefix + requestValues.key,
+export const buildAndSendRequest = async ({
+    apiConfig,
+    apiValues,
+    onData,
+    onEnd,
+    instruct,
+    samplers,
+    character,
+    user,
+    messages,
+    stopSequence,
+    stopGenerating,
+    chatTokenizer,
+    tokenizer,
+    messageLoader,
+    maxLength,
+    cache,
+}: APIBuilderParams) => {
+    try {
+        let payload: any = undefined
+        const bypassContextLength = mmkv.getBoolean(AppSettings.BypassContextLength)
+        const prompt = await buildContext({
+            apiConfig,
+            apiValues,
+            instruct,
+            character,
+            user,
+            messages,
+            chatTokenizer,
+            tokenizer,
+            messageLoader,
+            maxLength,
+            cache,
+            bypassContextLength,
+        })
+        if (prompt === undefined) {
+            Logger.errorToast(`Prompt construction failed`)
+            stopGenerating()
+            return
         }
-    }
 
-    if (config.request.requestType === 'stream')
-        readableStreamResponse(
-            requestValues.endpoint,
-            payload,
-            (responseString) => {
+        payload = await buildRequest({
+            apiConfig,
+            apiValues,
+            samplers,
+            instruct,
+            prompt,
+            stopSequence,
+        })
+
+        if (!payload) {
+            Logger.errorToast(`Payload construction failed`)
+            stopGenerating()
+            return
+        }
+
+        if (typeof payload !== 'string') {
+            payload = JSON.stringify(payload)
+        }
+
+        let header: any = {}
+        if (apiConfig.features.useKey) {
+            const anthropicVersion =
+                apiConfig.name === 'Claude' ? { 'anthropic-version': CLAUDE_VERSION } : {}
+
+            header = {
+                ...anthropicVersion,
+                [apiConfig.request.authHeader]: apiConfig.request.authPrefix + apiValues.key,
+            }
+        }
+
+        const sendFunc =
+            apiConfig.request.requestType === 'stream' ? readableStreamResponse : hordeResponse
+
+        const replaceStrings = constructReplaceStrings(stopSequence)
+
+        return sendFunc({
+            endpoint: apiValues.endpoint,
+            payload: payload,
+            onEvent: (event) => {
                 try {
-                    return getNestedValue(
-                        JSON.parse(responseString),
-                        config.request.responseParsePattern
+                    const data = getNestedValue(
+                        typeof event === 'string' ? JSON.parse(event) : event,
+                        apiConfig.request.responseParsePattern
                     )
+                    const text = data.replaceAll(replaceStrings, '')
+
+                    onData(text)
                 } catch (e) {}
             },
-            header
-        )
-    else {
-        hordeResponse(
-            requestValues.endpoint,
-            payload,
-            (responseString) => {
-                try {
-                    return getNestedValue(
-                        JSON.parse(responseString),
-                        config.request.responseParsePattern
-                    )
-                } catch (e) {}
-            },
-            header
-        )
+            onEnd: onEnd,
+            header: header,
+            stopGenerating: stopGenerating,
+        })
+    } catch (e) {
+        Logger.errorToast('Completion failed: ' + e)
+        stopGenerating()
     }
 }
 
@@ -94,24 +121,108 @@ type KeyHeader = {
     [key: string]: string
 }
 
-const readableStreamResponse = async (
-    endpoint: string,
-    payload: string,
-    jsonreader: (event: any) => string,
-    header: KeyHeader = {}
-) => {
-    const replace = RegExp(
-        constructReplaceStrings()
-            .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-            .join(`|`),
-        'g'
-    )
+type SenderParams = {
+    endpoint: string
+    payload: string
+    header: KeyHeader
+    onEnd: (data: string) => void
+    onEvent: (event: any) => void
+    stopGenerating: () => void
+}
 
+const hordeResponse = (senderParams: SenderParams) => {
+    const hordeURL = `https://aihorde.net/api/v2/`
+    let generation_id = ''
+    let aborted = false
+
+    const abortFn = () => {
+        aborted = true
+        if (generation_id) {
+            fetch(`${hordeURL}generate/text/status/${generation_id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Client-Agent': `ChatterUI:${nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
+                    accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).catch(Logger.error)
+        }
+        senderParams.stopGenerating()
+    }
+
+    const sendRequest = async () => {
+        Logger.info(`Using Horde`)
+
+        const request = await fetch(`${hordeURL}generate/text/async`, {
+            method: 'POST',
+            body: senderParams.payload,
+            headers: {
+                ...senderParams.header,
+                'Client-Agent': `ChatterUI:${nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
+                accept: 'application/json',
+                'content-type': 'application/json',
+            },
+        })
+
+        if (request.status === 401) {
+            Logger.error(`Invalid API Key`)
+            senderParams.stopGenerating()
+            return
+        }
+
+        if (request.status !== 202) {
+            Logger.error(`Horde Request failed.`)
+            senderParams.stopGenerating()
+            const body = await request.json()
+            Logger.error(JSON.stringify(body))
+            for (const e of body.errors) Logger.error(e)
+            return
+        }
+
+        const body = await request.json()
+        generation_id = body.id
+        let result
+
+        do {
+            await new Promise((resolve) => setTimeout(resolve, 5000))
+            if (aborted) return
+
+            Logger.info(`Checking...`)
+            const response = await fetch(`${hordeURL}generate/text/status/${generation_id}`, {
+                method: 'GET',
+                headers: {
+                    'Client-Agent': `ChatterUI:${nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
+                    accept: 'application/json',
+                    'content-type': 'application/json',
+                },
+            })
+
+            if (response.status === 400) {
+                Logger.error(`Response failed.`)
+                senderParams.stopGenerating()
+                Logger.error((await response.json())?.message)
+                return
+            }
+
+            result = await response.json()
+        } while (!result.done)
+
+        if (aborted) return
+        if (result) senderParams.onEvent(result)
+        senderParams.stopGenerating()
+    }
+    sendRequest()
+
+    return abortFn
+}
+
+const readableStreamResponse = async (senderParams: SenderParams) => {
     const sse = new SSEFetch()
 
     const closeStream = () => {
         Logger.debug('Running Close Stream')
-        Chats.useChatState.getState().stopGenerating()
+        senderParams.onEnd('')
+        senderParams.stopGenerating()
     }
 
     useInference.getState().setAbort(async () => {
@@ -127,9 +238,7 @@ const readableStreamResponse = async (
                 Logger.error(data)
             }
         } catch (e) {}
-        const text = (jsonreader(data) ?? '').replaceAll(replace, '')
-        Chats.useChatState.getState().insertBuffer(text)
-        useTTSState.getState().insertBuffer(text)
+        senderParams.onEvent(data)
     })
 
     sse.setOnError(() => {
@@ -143,121 +252,24 @@ const readableStreamResponse = async (
     })
 
     sse.start({
-        endpoint: endpoint,
-        body: payload,
+        endpoint: senderParams.endpoint,
+        body: senderParams.payload,
         method: 'POST',
         headers: {
             accept: 'application/json',
             'Content-Type': 'application/json',
-            ...header,
+            ...senderParams.header,
         },
     })
+
+    return sse.abort
 }
 
-const hordeResponse = async (
-    endpoint: string,
-    payload: string,
-    jsonreader: (event: any) => string,
-    header: KeyHeader = {}
-) => {
-    const hordeURL = `https://aihorde.net/api/v2/`
-    let generation_id = ''
-    let aborted = false
-
-    useInference.getState().setAbort(() => {
-        aborted = true
-        if (generation_id !== null)
-            fetch(`${hordeURL}generate/text/status/${generation_id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Client-Agent': `ChatterUI:${nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
-                    accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-            }).catch((error) => {
-                Logger.error(error)
-            })
-        Chats.useChatState.getState().stopGenerating()
-    })
-
-    Logger.info(`Using Horde`)
-
-    const request = await fetch(`${hordeURL}generate/text/async`, {
-        method: 'POST',
-        body: payload,
-        headers: {
-            ...header,
-            'Client-Agent': `ChatterUI:${nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
-            accept: 'application/json',
-            'content-type': 'application/json',
-        },
-    })
-
-    if (request.status === 401) {
-        Logger.error(`Invalid API Key`)
-        Chats.useChatState.getState().stopGenerating()
-        return
-    }
-    if (request.status !== 202) {
-        Logger.error(`Horde Request failed.`)
-        Chats.useChatState.getState().stopGenerating()
-        const body = await request.json()
-        Logger.error(JSON.stringify(body))
-        for (const e of body.errors) Logger.error(e)
-        return
-    }
-
-    const body = await request.json()
-    generation_id = body.id
-    let result = undefined
-
-    do {
-        await new Promise((resolve) => setTimeout(resolve, 5000))
-        if (aborted) return
-
-        Logger.info(`Checking...`)
-        const response = await fetch(`${hordeURL}generate/text/status/${generation_id}`, {
-            method: 'GET',
-            headers: {
-                'Client-Agent': `ChatterUI:${nativeApplicationVersion}:https://github.com/Vali-98/ChatterUI`,
-                accept: 'application/json',
-                'content-type': 'application/json',
-            },
-        })
-
-        if (response.status === 400) {
-            Logger.error(`Response failed.`)
-            Chats.useChatState.getState().stopGenerating()
-            Logger.error((await response.json())?.message)
-            return
-        }
-
-        result = await response.json()
-    } while (!result.done)
-
-    if (aborted) return
-
+const constructReplaceStrings = (stopSequence: string[]) => {
     const replace = RegExp(
-        constructReplaceStrings()
-            .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-            .join(`|`),
+        stopSequence.map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join(`|`),
         'g'
     )
-    const text = result.generations[0].text.replaceAll(replace, '')
-    Chats.useChatState.getState().setBuffer(text)
-    useTTSState.getState().insertBuffer(text)
-    Chats.useChatState.getState().stopGenerating()
-}
-
-const constructReplaceStrings = (): string[] => {
-    // kept this helper for extendability
-    const stops: string[] = constructStopSequence()
-    return stops
-}
-
-const constructStopSequence = (): string[] => {
-    // kept this helper for extendability
-    return Instructs.useInstruct.getState().getStopSequence()
 }
 
 const getNestedValue = (obj: any, path: string) => {

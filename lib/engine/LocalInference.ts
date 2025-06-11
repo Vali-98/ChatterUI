@@ -56,7 +56,7 @@ const getSamplerFields = (max_length?: number) => {
         })
         .reduce((acc, obj) => Object.assign(acc, obj), {})
 }
-
+// TODO: Use new builders
 const buildLocalPayload = async () => {
     const payloadFields = getSamplerFields()
     const rep_pen = payloadFields?.['penalty_repeat']

@@ -5,13 +5,14 @@ import { ChatEntry, Chats } from '@lib/state/Chat'
 import { Instructs, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'
-import { getDefaultMacroRules, Macro } from '@lib/utils/Macros'
+import { Macro } from '@lib/utils/Macros'
 import { readAsStringAsync } from 'expo-file-system'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
+import { replaceMacros } from '@lib/state/Macros'
 
 const getMacrosRules = (instruct: InstructType) => {
-    const rules = getDefaultMacroRules()
+    const rules = []
     if (instruct.hide_think_tags) {
         rules.push({
             macro: /<think>[\s\S]*?<\/think>/g,
@@ -21,8 +22,8 @@ const getMacrosRules = (instruct: InstructType) => {
     return rules
 }
 
-const replaceMacros = (data: string, rules: Macro[]) => {
-    for (const rule of rules) data = data.replaceAll(rule.macro, rule.value)
+const replaceMacrosInternal = (data: string, rules: Macro[]) => {
+    for (const rule of rules) data = replaceMacros(data, { extraMacros: rules })
     return data
 }
 
@@ -183,7 +184,7 @@ export const buildTextCompletionContext = async (max_length: number, printTiming
 
     payload += currentInstruct.system_suffix
 
-    payload = replaceMacros(payload + message_acc, rules)
+    payload = replaceMacrosInternal(payload + message_acc, rules)
     if (printTimings) {
         Logger.info(`Approximate Context Size: ${message_acc_length + payload_length} tokens`)
         Logger.info(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
@@ -246,7 +247,7 @@ export const buildChatCompletionContext = async (
     const payload: Message[] = [
         {
             role: completionFeats.systemRole,
-            [completionFeats.contentName]: replaceMacros(initial, rules),
+            [completionFeats.contentName]: replaceMacrosInternal(initial, rules),
         },
     ]
     let hasImage = false
@@ -314,7 +315,7 @@ export const buildChatCompletionContext = async (
                 [completionFeats.contentName]: [
                     {
                         type: 'text',
-                        text: replaceMacros(prefill + swipe_data.swipe, rules),
+                        text: replaceMacrosInternal(prefill + swipe_data.swipe, rules),
                     },
                     ...images,
                 ],
@@ -322,7 +323,10 @@ export const buildChatCompletionContext = async (
         } else {
             messageBuffer.push({
                 role: role,
-                [completionFeats.contentName]: replaceMacros(prefill + swipe_data.swipe, rules),
+                [completionFeats.contentName]: replaceMacrosInternal(
+                    prefill + swipe_data.swipe,
+                    rules
+                ),
             })
         }
 

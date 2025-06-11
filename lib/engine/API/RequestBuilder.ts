@@ -1,29 +1,51 @@
-import { SamplerID, Samplers } from '@lib/constants/SamplerData'
-import { Instructs } from '@lib/state/Instructs'
+import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
+import { InstructType } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
 
 import { APIConfiguration, APISampler, APIValues } from './APIBuilder.types'
-import { buildChatCompletionContext, buildTextCompletionContext } from './ContextBuilder'
+import { Message } from './ContextBuilder2'
 
-export const buildRequest = (config: APIConfiguration, values: APIValues) => {
-    switch (config.payload.type) {
+export interface RequestBuilderParams {
+    apiConfig: APIConfiguration
+    apiValues: APIValues
+    samplers: SamplerConfigData
+    instruct: InstructType
+    stopSequence: string[]
+    prompt: string | Message[]
+}
+
+type SamplerField = {
+    [x: string]: string | number | boolean | object
+}
+
+export const buildRequest = async ({
+    apiConfig,
+    apiValues,
+    samplers,
+    instruct,
+    prompt,
+    stopSequence,
+}: RequestBuilderParams) => {
+    const samplerFields = getSamplerFields(apiConfig, apiValues, samplers)
+    const fields = await buildFields(apiConfig, apiValues, samplerFields, stopSequence, prompt)
+
+    switch (apiConfig.payload.type) {
         case 'openai':
-            return openAIRequest(config, values)
+            return openAIRequest(fields)
         case 'ollama':
-            return ollamaRequest(config, values)
+            return ollamaRequest(fields)
         case 'cohere':
-            return cohereRequest(config, values)
+            return cohereRequest(apiConfig, fields)
         case 'horde':
-            return hordeRequest(config, values)
+            return hordeRequest(fields)
         case 'claude':
-            return claudeRequest(config, values)
+            return claudeRequest(apiConfig, instruct, fields)
         case 'custom':
-            return customRequest(config, values)
+            return customRequest(apiConfig, apiValues, fields)
     }
 }
 
-const openAIRequest = async (config: APIConfiguration, values: APIValues) => {
-    const { payloadFields, model, stop, prompt } = await buildFields(config, values)
+const openAIRequest = async ({ payloadFields, model, stop, prompt }: Field) => {
     return {
         ...payloadFields,
         ...model,
@@ -32,8 +54,7 @@ const openAIRequest = async (config: APIConfiguration, values: APIValues) => {
     }
 }
 
-const ollamaRequest = async (config: APIConfiguration, values: APIValues) => {
-    const { payloadFields, model, stop, prompt } = await buildFields(config, values)
+const ollamaRequest = async ({ payloadFields, model, stop, prompt }: Field) => {
     let keep_alive = 5
     if (payloadFields.keep_alive) {
         keep_alive = payloadFields.keep_alive as number
@@ -53,11 +74,13 @@ const ollamaRequest = async (config: APIConfiguration, values: APIValues) => {
     }
 }
 
-const cohereRequest = async (config: APIConfiguration, values: APIValues) => {
+const cohereRequest = async (
+    config: APIConfiguration,
+    { payloadFields, model, stop, prompt }: Field
+) => {
     if (config.request.completionType.type === 'textCompletions') {
         return
     }
-    const { payloadFields, model, stop, prompt } = await buildFields(config, values)
 
     const seedObject = config.request.samplerFields.filter(
         (item) => item.samplerID === SamplerID.SEED
@@ -81,10 +104,12 @@ const cohereRequest = async (config: APIConfiguration, values: APIValues) => {
     }
 }
 
-const claudeRequest = async (config: APIConfiguration, values: APIValues) => {
-    const { payloadFields, model, stop, prompt } = await buildFields(config, values)
-
-    const systemPrompt = Instructs.useInstruct.getState().data?.system_prompt
+const claudeRequest = async (
+    config: APIConfiguration,
+    instruct: InstructType,
+    { payloadFields, model, stop, prompt }: Field
+) => {
+    const systemPrompt = instruct.system_prompt
     const systemRole =
         config.request.completionType.type === 'chatCompletions'
             ? config.request.completionType.systemRole
@@ -107,8 +132,7 @@ const claudeRequest = async (config: APIConfiguration, values: APIValues) => {
     }
 }
 
-const hordeRequest = async (config: APIConfiguration, values: APIValues) => {
-    const { payloadFields, model, stop, prompt } = await buildFields(config, values)
+const hordeRequest = async ({ payloadFields, model, stop, prompt }: Field) => {
     return {
         params: {
             ...payloadFields,
@@ -129,7 +153,11 @@ const hordeRequest = async (config: APIConfiguration, values: APIValues) => {
     }
 }
 
-const customRequest = async (config: APIConfiguration, values: APIValues) => {
+const customRequest = async (
+    config: APIConfiguration,
+    values: APIValues,
+    { stop, prompt }: Field
+) => {
     if (config.payload.type !== 'custom') return {}
     const modelName = getModelName(config, values)
 
@@ -142,13 +170,6 @@ const customRequest = async (config: APIConfiguration, values: APIValues) => {
     } else {
     }
 
-    let prompt: any = undefined
-    if (config.request.completionType.type === 'chatCompletions') {
-        prompt = await buildChatCompletionContext(length, config, values)
-    } else {
-        prompt = await buildTextCompletionContext(length)
-    }
-
     const responseBody = config.payload.customPayload
 
     config.request.samplerFields.map((item) => {
@@ -157,15 +178,24 @@ const customRequest = async (config: APIConfiguration, values: APIValues) => {
             sampler?.[item.samplerID]?.toString() ?? ''
         )
     })
-    responseBody.replaceAll('{{stop}}', constructStopSequence().toString())
-    responseBody.replaceAll('{{prompt}}', prompt)
+    responseBody.replaceAll('{{stop}}', stop.toString())
+    responseBody.replaceAll(
+        '{{prompt}}',
+        typeof prompt === 'object' ? JSON.stringify(prompt) : prompt
+    )
     responseBody.replaceAll('{{model}}', modelName.toString())
     return responseBody
 }
 
-const buildFields = async (config: APIConfiguration, values: APIValues) => {
-    const payloadFields = getSamplerFields(config, values)
+type Field = Awaited<ReturnType<typeof buildFields>>
 
+const buildFields = async (
+    config: APIConfiguration,
+    values: APIValues,
+    payloadFields: SamplerField,
+    stopSeq: string[],
+    promptData: string | Message[]
+) => {
     // Model Data
     const model = config.features.useModel
         ? {
@@ -173,7 +203,7 @@ const buildFields = async (config: APIConfiguration, values: APIValues) => {
           }
         : {}
     // Stop Sequence
-    const stop = config.request.useStop ? { [config.request.stopKey]: constructStopSequence() } : {}
+    const stop = config.request.useStop ? { [config.request.stopKey]: stopSeq } : {}
 
     // Seed Data
     const seedObject = config.request.samplerFields.filter(
@@ -202,13 +232,8 @@ const buildFields = async (config: APIConfiguration, values: APIValues) => {
         ? Math.min(modelLength, instructLength)
         : instructLength
 
-    // Prompt
-    const prompt = {
-        [config.request.promptKey]:
-            config.request.completionType.type === 'chatCompletions'
-                ? await buildChatCompletionContext(length, config, values)
-                : await buildTextCompletionContext(length),
-    }
+    const prompt = { [config.request.promptKey]: promptData }
+
     return { payloadFields, model, stop, prompt, length }
 }
 
@@ -235,15 +260,19 @@ const getModelContextLength = (config: APIConfiguration, values: APIValues): num
     return Number.isInteger(result) ? result : undefined
 }
 
-const getSamplerFields = (config: APIConfiguration, values: APIValues) => {
+const getSamplerFields = (
+    config: APIConfiguration,
+    values: APIValues,
+    samplers: SamplerConfigData
+) => {
     let max_length = undefined
     if (config.model.useModelContextLength) {
         max_length = getModelContextLength(config, values)
     }
-    const preset = SamplersManager.getCurrentSampler()
+
     return [...config.request.samplerFields]
         .map((item: APISampler) => {
-            const value = preset[item.samplerID]
+            const value = samplers[item.samplerID]
             const samplerItem = Samplers[item.samplerID]
             let cleanvalue = value
             if (typeof value === 'number')
@@ -256,9 +285,4 @@ const getSamplerFields = (config: APIConfiguration, values: APIValues) => {
             return { [item.externalName as SamplerID]: cleanvalue }
         })
         .reduce((acc, obj) => Object.assign(acc, obj), {})
-}
-
-const constructStopSequence = (): string[] => {
-    // kept this helper for extendability
-    return Instructs.useInstruct.getState().getStopSequence()
 }

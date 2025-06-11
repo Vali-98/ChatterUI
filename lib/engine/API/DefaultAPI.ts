@@ -537,7 +537,7 @@ export const defaultTemplates: APIConfiguration[] = [
             completionType: { type: 'textCompletions' },
             authHeader: 'apikey',
             authPrefix: '',
-            responseParsePattern: '',
+            responseParsePattern: 'generations.0.text',
             useStop: true,
             stopKey: 'stop_sequence',
             promptKey: 'prompt',
