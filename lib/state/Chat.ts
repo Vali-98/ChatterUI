@@ -1,7 +1,7 @@
 import { db as database } from '@db'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { AppDirectory } from '@lib/utils/File'
-import { replaceMacros } from '@lib/utils/Macros'
+import { replaceMacros } from '@lib/state/Macros'
 import { convertToFormatInstruct } from '@lib/utils/TextFormat'
 import {
     chatAttachments,

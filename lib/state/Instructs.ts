@@ -9,7 +9,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { Characters } from './Characters'
 import { Logger } from './Logger'
 import { mmkvStorage } from '../storage/MMKV'
-import { replaceMacros } from '../utils/Macros'
+import { replaceMacros } from '../state/Macros'
 
 const defaultBooleans = {
     wrap: false,
@@ -182,7 +182,7 @@ export type InstructListItem = {
     name: string
 }
 
-type InstructTokenCache = {
+export type InstructTokenCache = {
     charName: string
     userName: string
     system_prompt_length: number

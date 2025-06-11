@@ -37,6 +37,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { Logger } from './Logger'
 import { mmkvStorage } from '../storage/MMKV'
 import { createPNGWithText, getPngChunkText } from '../utils/PNG'
+import { replaceMacroBase } from '@lib/utils/Macros'
 
 export type CharInfo = {
     name: string
@@ -49,7 +50,7 @@ export type CharInfo = {
     latestChat?: number
 }
 
-type CharacterTokenCache = {
+export type CharacterTokenCache = {
     otherName: string
     description_length: number
     examples_length: number
@@ -1036,21 +1037,15 @@ type Macro = {
     value: string
 }
 
-const weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-
 export const replaceMacros = (text: string) => {
     if (text === undefined) return ''
-    let newtext: string = text
+    let newText: string = text
     const charName = Characters.useCharacterCard.getState().card?.name ?? ''
     const userName = Characters.useUserCard.getState().card?.name ?? ''
-    const time = new Date()
     const rules: Macro[] = [
         { macro: '{{user}}', value: userName },
         { macro: '{{char}}', value: charName },
-        { macro: '{{time}}', value: time.toLocaleTimeString() },
-        { macro: '{{date}}', value: time.toLocaleDateString() },
-        { macro: '{{day}}', value: weekday[time.getDay()] },
     ]
-    for (const rule of rules) newtext = newtext.replaceAll(rule.macro, rule.value)
-    return newtext
+    for (const rule of rules) newText = replaceMacroBase(newText, { extraMacros: rules })
+    return newText
 }
