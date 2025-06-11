@@ -2,9 +2,11 @@ import { useAppModeState } from '@lib/state/AppMode'
 import { Chats, useInference } from '@lib/state/Chat'
 import BackgroundService from 'react-native-background-actions'
 
+import { AppSettings } from '@lib/constants/GlobalValues'
 import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSState } from '@lib/state/TTS'
+import { mmkv } from '@lib/storage/MMKV'
 import { useCallback } from 'react'
 import { Characters } from '../state/Characters'
 import { Logger } from '../state/Logger'
@@ -114,8 +116,12 @@ const chatInferenceStream = async () => {
         Chats.useChatState.getState().insertBuffer(text)
         useTTSState.getState().insertBuffer(text)
     }
-    fields.onEnd = () => {
-        // TODO: Generate title if valid
+    fields.onEnd = async () => {
+        const chat = Chats.useChatState.getState().data
+        if (!mmkv.getBoolean(AppSettings.AutoGenerateTitle) || !chat || chat?.name !== 'New Chat')
+            return
+        Logger.info('Generating Title')
+        titleGeneratorStream(chat.id)
     }
     const abort = await buildAndSendRequest(fields)
     useInference.getState().setAbort(() => {
@@ -124,18 +130,19 @@ const chatInferenceStream = async () => {
     })
 }
 
-const titleGeneratorStream = async () => {
+const titleGeneratorStream = async (chatId: number) => {
     const fields = await obtainFields()
     if (!fields) {
         Logger.error('Title Generation Failed')
         return
     }
+    fields.samplers.genamt = 50
     let output = ''
     fields.onData = (text) => {
         output += text
     }
     fields.onEnd = () => {
-        console.log(output)
+        Chats.db.mutate.renameChat(chatId, output.substring(0, 50).trim())
     }
     const entry = {
         id: -1,
@@ -158,7 +165,6 @@ const titleGeneratorStream = async () => {
         attachments: [],
     }
     fields.messages.push(entry)
-    fields.stopGenerating = () => Chats.useChatState.getState().stopGenerating()
 
     await buildAndSendRequest(fields)
 }

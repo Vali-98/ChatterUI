@@ -13,6 +13,7 @@ const ChatSettings = () => {
     const [autoLoadUser, setAutoLoadUser] = useMMKVBoolean(AppSettings.AutoLoadUser)
     const [quickDelete, setQuickDelete] = useMMKVBoolean(AppSettings.QuickDelete)
     const [saveScroll, setSaveScroll] = useMMKVBoolean(AppSettings.SaveScrollPosition)
+    const [autoTitle, setAutoTitle] = useMMKVBoolean(AppSettings.AutoGenerateTitle)
 
     const [showTokensPerSecond, setShowTokensPerSecond] = useMMKVBoolean(
         AppSettings.ShowTokenPerSecond
@@ -76,6 +77,13 @@ const ChatSettings = () => {
                 value={saveScroll}
                 onChangeValue={setSaveScroll}
                 description="Automatically move to last scrolled position in chat"
+            />
+
+            <ThemedSwitch
+                label="Automatically Generate Titles"
+                value={autoTitle}
+                onChangeValue={setAutoTitle}
+                description="Automatically generates titles for chats"
             />
         </View>
     )

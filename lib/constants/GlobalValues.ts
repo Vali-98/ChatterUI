@@ -138,6 +138,7 @@ export enum AppSettings {
     QuickDelete = 'settings-quickdelete',
     UseTagHider = 'settings-usetaghider',
     SaveScrollPosition = 'settings-savescrollposition',
+    AutoGenerateTitle = 'settings-auto-generate-title',
 }
 
 /**
@@ -171,6 +172,7 @@ export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.QuickDelete]: false,
     [AppSettings.UseTagHider]: true,
     [AppSettings.SaveScrollPosition]: false,
+    [AppSettings.AutoGenerateTitle]: true,
 }
 
 export const CLAUDE_VERSION = '2023-06-01'
