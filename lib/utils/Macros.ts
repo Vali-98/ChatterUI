@@ -24,7 +24,7 @@ export const replaceMacroBase = (
     options: ReplaceMacroOptions = { extraMacros: [] }
 ) => {
     let newtext: string = text
-    const rules = getDefaultMacros()
+    const rules = [...getDefaultMacros(), ...(options?.extraMacros ?? [])]
     for (const rule of rules) newtext = newtext.replaceAll(rule.macro, rule.value)
     return newtext
 }
