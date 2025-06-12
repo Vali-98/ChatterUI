@@ -931,7 +931,6 @@ export namespace Characters {
     export const createDefaultCard = async () => {
         const filename = 'aibot'
         const pngName = filename + '.png'
-        const resName = filename + '.raw'
         const cardDefaultDir = `${FS.documentDirectory}appAssets/${pngName}`
 
         const fileinfo = await FS.getInfoAsync(cardDefaultDir)
