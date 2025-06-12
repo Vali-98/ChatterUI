@@ -43,7 +43,7 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
             return {
                 buttonStyle: {
                     backgroundColor: theme.color.primary._500,
-                    borderColor: theme.color.primary._100,
+                    borderColor: theme.color.primary._200,
                     borderWidth: theme.borderWidth.m,
                     paddingVertical: theme.spacing.m,
                     paddingHorizontal: theme.spacing.xl,
