@@ -80,7 +80,8 @@
     "react-native-simple-toast": "^3.2.0",
     "upgrade": "^1.1.0",
     "zod": "^3.24.1",
-    "zustand": "^5.0.4"
+    "zustand": "^5.0.4",
+    "expo-navigation-bar": "~4.2.5"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

@@ -6,6 +6,8 @@ import PopupMenu from '@components/views/PopupMenu'
 import { DefaultColorSchemes, ThemeColor } from '@lib/theme/ThemeColor'
 import { Theme } from '@lib/theme/ThemeManager'
 import { pickJSONDocument } from '@lib/utils/File'
+import { setBackgroundColorAsync as setUIBackgroundColor } from 'expo-system-ui'
+import { setBackgroundColorAsync as setNavBackgroundColor } from 'expo-navigation-bar'
 import React from 'react'
 import { Text, TouchableOpacity, View, FlatList } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
@@ -51,7 +53,11 @@ const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete
                 alignItems: 'center',
             }}>
             <TouchableOpacity
-                onPress={() => setColor(item)}
+                onPress={() => {
+                    setColor(item)
+                    setUIBackgroundColor(item.neutral._100)
+                    setNavBackgroundColor(item.neutral._100)
+                }}
                 style={{
                     borderColor: item.text._100,
                     borderWidth: 1,

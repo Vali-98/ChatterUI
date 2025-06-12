@@ -16,7 +16,8 @@ import {
     readDirectoryAsync,
 } from 'expo-file-system'
 import { router } from 'expo-router'
-import { setBackgroundColorAsync } from 'expo-system-ui'
+import { setBackgroundColorAsync as setUIBackgroundColor } from 'expo-system-ui'
+import { setBackgroundColorAsync as setNavBackgroundColor } from 'expo-navigation-bar'
 import { z } from 'zod'
 
 import { AppDirectory } from './File'
@@ -253,6 +254,10 @@ export const startupApp = () => {
     migrateAppMode_0_8_5_to_0_8_6()
 
     lockScreenOrientation()
-    setBackgroundColorAsync(Theme.useColorState.getState().color.neutral._100)
+
+    const backgroundColor = Theme.useColorState.getState().color.neutral._100
+    setUIBackgroundColor(backgroundColor)
+    setNavBackgroundColor(backgroundColor)
+
     Logger.info('Resetting state values for startup.')
 }
