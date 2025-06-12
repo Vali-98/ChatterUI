@@ -225,11 +225,6 @@ const readableStreamResponse = async (senderParams: SenderParams) => {
         senderParams.stopGenerating()
     }
 
-    useInference.getState().setAbort(async () => {
-        Logger.debug('Running Abort')
-        sse.abort()
-    })
-
     sse.setOnEvent((data) => {
         try {
             const a = JSON.parse(data)
@@ -262,7 +257,7 @@ const readableStreamResponse = async (senderParams: SenderParams) => {
         },
     })
 
-    return sse.abort
+    return () => sse.abort()
 }
 
 const constructReplaceStrings = (stopSequence: string[]) => {
