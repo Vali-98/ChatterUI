@@ -55,9 +55,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
         <SafeAreaView style={{ paddingVertical: 16, paddingHorizontal: 8, flex: 1 }}>
             <HeaderTitle />
             <HeaderButton
-                headerLeft={() => (
-                    <Drawer.Button drawerID={Drawer.ID.SETTINGS} buttonStyle={{ width: 30 }} />
-                )}
+                headerLeft={() => <Drawer.Button drawerID={Drawer.ID.SETTINGS} />}
                 headerRight={() => (
                     <CharacterNewMenu nowLoading={nowLoading} setNowLoading={setNowLoading} />
                 )}

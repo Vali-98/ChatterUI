@@ -54,7 +54,6 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
             />
 
             <PopupMenu
-                style={{ width: 30, marginRight: 8 }}
                 icon="adduser"
                 options={[
                     {
