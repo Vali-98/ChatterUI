@@ -12,8 +12,20 @@ import { Image } from 'expo-image'
 import React, { useState } from 'react'
 import { TextInput, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
-import Animated, { BounceIn, LinearTransition, ZoomOut } from 'react-native-reanimated'
+import Animated, {
+    BounceIn,
+    FadeIn,
+    FadeOut,
+    LayoutAnimationsValues,
+    LinearTransition,
+    SlideInLeft,
+    withDelay,
+    withSpring,
+    withTiming,
+    ZoomOut,
+} from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
+import OptionsMenu from './OptionsMenu'
 
 export type Attachment = {
     uri: string
@@ -21,12 +33,14 @@ export type Attachment = {
     name: string
 }
 
+const AnimatedTextInput = Animated.createAnimatedComponent(TextInput)
+
 const ChatInput = () => {
     const { color, borderRadius, spacing } = Theme.useTheme()
     const [sendOnEnter, _] = useMMKVBoolean(AppSettings.SendOnEnter)
     const [attachments, setAttachments] = useState<Attachment[]>([])
+    const [hideOptions, setHideOptions] = useState(false)
     const { addEntry } = Chats.useEntry()
-
     const { nowGenerating, abortFunction } = useInference(
         useShallow((state) => ({
             nowGenerating: state.nowGenerating,
@@ -68,7 +82,8 @@ const ChatInput = () => {
     return (
         <View
             style={{
-                paddingHorizontal: spacing.xl,
+                paddingHorizontal: spacing.l,
+                paddingVertical: spacing.l,
                 rowGap: spacing.m,
             }}>
             <Animated.FlatList
@@ -120,77 +135,107 @@ const ChatInput = () => {
                     )
                 }}
             />
-
             <View
                 style={{
                     flexDirection: 'row',
                     alignItems: 'center',
                     columnGap: spacing.m,
                 }}>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        flex: 1,
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                    }}>
-                    <TextInput
-                        style={{
-                            color: color.text._100,
-                            backgroundColor: color.neutral._100,
-                            flex: 1,
-                            borderWidth: 2,
-                            borderColor: color.primary._300,
-                            borderRadius: borderRadius.l,
-                            paddingHorizontal: spacing.xl,
-                            paddingVertical: spacing.m,
-                        }}
-                        placeholder="Message..."
-                        placeholderTextColor={color.text._700}
-                        value={newMessage}
-                        onChangeText={(text) => setNewMessage(text)}
-                        multiline
-                        submitBehavior={sendOnEnter ? 'blurAndSubmit' : 'newline'}
-                        onSubmitEditing={sendOnEnter ? handleSend : undefined}
-                    />
-                    {!newMessage && (
-                        <PopupMenu
-                            icon="paperclip"
-                            iconSize={20}
-                            options={[
-                                {
-                                    label: 'Add Image',
-                                    icon: 'picture',
-                                    onPress: async (menuRef) => {
-                                        menuRef.current?.close()
-                                        const result = await getDocumentAsync({
-                                            type: 'image/*',
-                                            multiple: true,
-                                            copyToCacheDirectory: true,
-                                        })
-                                        if (result.canceled || result.assets.length < 1) return
+                <Animated.View layout={XAxisOnlyTransition}>
+                    {!hideOptions && (
+                        <Animated.View
+                            entering={FadeIn}
+                            exiting={FadeOut}
+                            style={{ flexDirection: 'row', columnGap: 8, alignItems: 'center' }}>
+                            <OptionsMenu />
+                            <PopupMenu
+                                icon="paperclip"
+                                iconSize={20}
+                                options={[
+                                    {
+                                        label: 'Add Image',
+                                        icon: 'picture',
+                                        onPress: async (menuRef) => {
+                                            menuRef.current?.close()
+                                            const result = await getDocumentAsync({
+                                                type: 'image/*',
+                                                multiple: true,
+                                                copyToCacheDirectory: true,
+                                            })
+                                            if (result.canceled || result.assets.length < 1) return
 
-                                        const newAttachments = result.assets
-                                            .map((item) => ({
-                                                uri: item.uri,
-                                                type: 'image',
-                                                name: item.name,
-                                            }))
-                                            .filter(
-                                                (item) =>
-                                                    !attachments.some((a) => a.name === item.name)
-                                            ) as Attachment[]
-                                        setAttachments([...attachments, ...newAttachments])
+                                            const newAttachments = result.assets
+                                                .map((item) => ({
+                                                    uri: item.uri,
+                                                    type: 'image',
+                                                    name: item.name,
+                                                }))
+                                                .filter(
+                                                    (item) =>
+                                                        !attachments.some(
+                                                            (a) => a.name === item.name
+                                                        )
+                                                ) as Attachment[]
+                                            setAttachments([...attachments, ...newAttachments])
+                                        },
                                     },
-                                },
-                            ]}
-                            style={{ color: color.text._400 }}
-                            placement="top"
-                            menuCustomStyle={{ position: 'absolute', marginRight: 12 }}
-                        />
+                                ]}
+                                style={{
+                                    color: color.text._400,
+                                    padding: 6,
+                                    backgroundColor: color.neutral._200,
+                                    borderRadius: 16,
+                                }}
+                                placement="top"
+                            />
+                        </Animated.View>
                     )}
-                </View>
-
+                    {hideOptions && (
+                        <Animated.View entering={FadeIn} exiting={FadeOut}>
+                            <ThemedButton
+                                iconSize={20}
+                                iconStyle={{
+                                    color: color.text._400,
+                                }}
+                                buttonStyle={{
+                                    padding: 2,
+                                    backgroundColor: color.neutral._200,
+                                    borderRadius: 16,
+                                }}
+                                variant="tertiary"
+                                iconName="right"
+                                onPress={() => setHideOptions(false)}
+                            />
+                        </Animated.View>
+                    )}
+                </Animated.View>
+                <AnimatedTextInput
+                    layout={XAxisOnlyTransition}
+                    style={{
+                        color: color.text._100,
+                        backgroundColor: color.neutral._100,
+                        flex: 1,
+                        borderWidth: 2,
+                        borderColor: color.primary._300,
+                        borderRadius: borderRadius.l,
+                        paddingHorizontal: spacing.m,
+                        paddingVertical: spacing.m,
+                    }}
+                    onPress={() => {
+                        setHideOptions(!!newMessage)
+                    }}
+                    numberOfLines={6}
+                    placeholder="Message..."
+                    placeholderTextColor={color.text._700}
+                    value={newMessage}
+                    onChangeText={(text) => {
+                        setHideOptions(!!text)
+                        setNewMessage(text)
+                    }}
+                    multiline
+                    submitBehavior={sendOnEnter ? 'blurAndSubmit' : 'newline'}
+                    onSubmitEditing={sendOnEnter ? handleSend : undefined}
+                />
                 <TouchableOpacity
                     style={{
                         borderRadius: borderRadius.m,
@@ -210,3 +255,18 @@ const ChatInput = () => {
 }
 
 export default ChatInput
+
+const XAxisOnlyTransition = (values: LayoutAnimationsValues) => {
+    'worklet'
+    return {
+        animations: {
+            originX: withTiming(values.targetOriginX),
+            width: withTiming(values.targetWidth),
+        },
+
+        initialValues: {
+            originX: values.currentOriginX,
+            width: values.currentWidth,
+        },
+    }
+}

@@ -79,12 +79,7 @@ const OptionsMenu = () => {
             renderer={SlideInMenu}
             ref={menuRef}>
             <MenuTrigger>
-                <Ionicons
-                    name="caret-up-circle"
-                    style={styles.optionsButton}
-                    size={32}
-                    color={color.text._400}
-                />
+                <Ionicons name="caret-up" style={styles.optionsButton} size={24} />
             </MenuTrigger>
             <MenuOptions customStyles={menuStyle}>
                 {menuoptions.map((item, index) => (
@@ -133,7 +128,10 @@ const useStyles = () => {
 
     return StyleSheet.create({
         optionsButton: {
-            color: color.primary._500,
+            color: color.text._500,
+            padding: 4,
+            backgroundColor: color.neutral._200,
+            borderRadius: 16,
         },
 
         optionItem: {
