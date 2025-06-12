@@ -142,7 +142,7 @@ const titleGeneratorStream = async (chatId: number) => {
         output += text
     }
     fields.onEnd = () => {
-        Chats.db.mutate.renameChat(chatId, output.substring(0, 50).trim())
+        Chats.db.mutate.renameChat(chatId, output.substring(0, 50).trim().replaceAll(`"`, ''))
     }
     const entry = {
         id: -1,
