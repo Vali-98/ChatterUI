@@ -73,7 +73,7 @@ const ChatsDrawer = () => {
                 <Text style={styles.drawerTitle}>{showSearchBar ? 'Search' : 'Chats'}</Text>
                 <ThemedButton
                     variant="tertiary"
-                    iconName={showSearchBar ? 'close' : 'search1'}
+                    iconName={showSearchBar ? 'menufold' : 'search1'}
                     onPress={() => {
                         setShowSearchBar(!showSearchBar)
                         setShowSearchResults(searchQuery.length > 0 && !showSearchBar)
@@ -83,7 +83,7 @@ const ChatsDrawer = () => {
             {showSearchBar && (
                 <ThemedTextInput
                     placeholder="Search for message..."
-                    containerStyle={{ flex: 0, marginTop: 12 }}
+                    containerStyle={{ flex: 0, marginTop: 12, marginBottom: 12 }}
                     value={searchQuery}
                     autoCorrect={false}
                     onChangeText={setSearch}
