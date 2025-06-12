@@ -176,7 +176,7 @@ const createDefaultUserData = async () => {
     Characters.useUserCard.getState().setCard(id)
 }
 
-const setDefaultCharacter = async () => {
+const setDefaultUser = async () => {
     const userList = await Characters.db.query.cardList('user')
     if (!userList) {
         Logger.error(
@@ -224,7 +224,7 @@ export const startupApp = () => {
     // Sets default preferences
     setAppDefaultSettings()
     generateDefaultDirectories()
-    setDefaultCharacter()
+    setDefaultUser()
     setDefaultInstruct()
 
     // setup notifications
