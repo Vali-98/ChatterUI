@@ -200,7 +200,7 @@ const ChatInput = () => {
                                 buttonStyle={{
                                     padding: 2,
                                     backgroundColor: color.neutral._200,
-                                    borderRadius: 16,
+                                    borderRadius: 24,
                                 }}
                                 variant="tertiary"
                                 iconName="right"

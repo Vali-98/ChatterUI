@@ -1,6 +1,5 @@
 import { AppSettings, CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { SSEFetch } from '@lib/engine/SSEFetch'
-import { useInference } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
 import { nativeApplicationVersion } from 'expo-application'
 
