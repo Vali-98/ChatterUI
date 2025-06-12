@@ -20,6 +20,7 @@ const ChatDrawerSearchItem: React.FC<ChatDrawerSearchItemProps> = ({ item, onLoa
             style={{
                 paddingHorizontal: spacing.m,
                 paddingVertical: spacing.m,
+                marginBottom: spacing.s,
                 rowGap: 2,
             }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

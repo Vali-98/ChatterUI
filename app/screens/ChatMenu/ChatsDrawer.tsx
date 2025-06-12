@@ -70,7 +70,7 @@ const ChatsDrawer = () => {
         <Drawer.Body drawerID={Drawer.ID.CHATLIST} drawerStyle={styles.drawer} direction="right">
             <View
                 style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                <Text style={styles.drawerTitle}>Chats</Text>
+                <Text style={styles.drawerTitle}>{showSearchBar ? 'Search' : 'Chats'}</Text>
                 <ThemedButton
                     variant="tertiary"
                     iconName={showSearchBar ? 'close' : 'search1'}
@@ -102,7 +102,7 @@ const ChatsDrawer = () => {
                         showsVerticalScrollIndicator={false}
                         removeClippedSubviews={false}
                     />
-                    <ThemedButton label="New Chat" onPress={handleCreateChat} />
+                    <ThemedButton label="Start New Chat" onPress={handleCreateChat} />
                 </Animated.View>
             )}
             {showSearchResults && (
@@ -143,9 +143,8 @@ const useStyles = () => {
     return StyleSheet.create({
         drawer: {
             backgroundColor: color.neutral._100,
-            width: '80%',
+            width: '100%',
             shadowColor: color.shadow,
-            left: '20%',
             borderTopWidth: 3,
             elevation: 20,
             position: 'absolute',
@@ -158,7 +157,7 @@ const useStyles = () => {
         drawerTitle: {
             color: color.text._300,
             fontSize: fontSize.xl,
-            paddingLeft: spacing.xl,
+            paddingLeft: spacing.s,
         },
 
         title: {
