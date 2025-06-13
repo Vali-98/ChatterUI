@@ -86,7 +86,7 @@ export interface ChatState {
         }
     ) => Promise<void>
     deleteEntry: (index: number) => Promise<void>
-
+    renameChat: (chatId: number, name: string) => void
     // swipe data
     swipe: (index: number, direction: number) => Promise<boolean>
     addSwipe: (index: number, message?: string) => Promise<number | void>
@@ -511,6 +511,15 @@ export namespace Chats {
                 ...state,
                 data: state?.data ? { ...state.data, messages: [...messages] } : state.data,
             }))
+        },
+        renameChat: (chatId: number, name: string) => {
+            const data = get().data
+            if (!data) return
+            if (data.id === chatId)
+                set({
+                    data: { ...data, name: name },
+                })
+            db.mutate.renameChat(chatId, name)
         },
     }))
 
