@@ -81,12 +81,15 @@ const defaultConfig = {
 export namespace Llama {
     export const useEngineData = create<EngineDataProps>()(
         persist(
-            (set) => ({
+            (set, get) => ({
                 config: defaultConfig,
                 setConfiguration: (config: LlamaConfig) => {
                     set({ config: config })
                 },
                 setLastModelLoaded: (model: ModelDataType) => {
+                    if (get().lastMmproj && get().lastModel?.id !== model.id) {
+                        set({ lastMmproj: undefined })
+                    }
                     set({ lastModel: model })
                 },
                 setLastMmprojLoaded: (mmproj: ModelDataType) => {
