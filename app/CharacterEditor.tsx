@@ -343,7 +343,7 @@ const ChracterEditor = () => {
                             justifyContent: 'space-between',
                         }}>
                         <Text style={{ color: color.text._100 }}>
-                            Alternate Greetings
+                            Alternate Greeting{'   '}
                             {characterCard.alternate_greetings.length !== 0 && (
                                 <Text
                                     style={{
