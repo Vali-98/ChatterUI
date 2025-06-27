@@ -91,7 +91,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
             return
         }
         await Chats.db.mutate.updateUser(item.id, userId)
-        Logger.errorToast(`Linked to User: ${userName}`)
+        Logger.infoToast(`Linked to User: ${userName}`)
     }
 
     return (
