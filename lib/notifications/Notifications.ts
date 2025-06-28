@@ -3,11 +3,11 @@ import { AppSettings } from '@lib/constants/GlobalValues'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
-import { mmkv } from '@lib/storage/MMKV'
 import * as Notifications from 'expo-notifications'
-import { router } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { useEffect } from 'react'
 import { Linking, Platform } from 'react-native'
+import { useMMKVBoolean } from 'react-native-mmkv'
 
 export const setupNotifications = () => {
     Notifications.setNotificationHandler({
@@ -60,23 +60,25 @@ export async function registerForPushNotificationsAsync() {
 }
 
 export function useNotificationObserver() {
+    const [autoLoad, _] = useMMKVBoolean(AppSettings.ChatOnStartup)
+    const [useAuth, __] = useMMKVBoolean(AppSettings.LocallyAuthenticateUser)
+    const { chat, loadChat } = Chats.useChat()
+    const { setCard } = Characters.useCharacterCard()
+    const router = useRouter()
+
     useEffect(() => {
         let isMounted = true
 
         async function redirect(notification: Notifications.Notification) {
-            const autoLoad = mmkv.getBoolean(AppSettings.ChatOnStartup)
-            const useAuth = mmkv.getBoolean(AppSettings.LocallyAuthenticateUser)
-            if (autoLoad ?? useAuth) return
-            const chatLoaded = Chats.useChatState.getState().data
-            if (chatLoaded) return
+            if (chat || autoLoad || useAuth) return
             const data = notification.request.content.data
             const chatId = data?.chatId as number | undefined
             const characterId = data?.characterId as number | undefined
             if (chatId && characterId) {
                 Logger.info('Loading chat from notification')
                 try {
-                    await Chats.useChatState.getState().load(chatId)
-                    await Characters.useCharacterCard.getState().setCard(characterId)
+                    await loadChat(chatId)
+                    await setCard(characterId)
                     router.push('/screens/ChatMenu')
                 } catch (e) {
                     Logger.error('Failed to load chat: ' + e)
@@ -99,5 +101,5 @@ export function useNotificationObserver() {
             isMounted = false
             subscription.remove()
         }
-    }, [])
+    }, [autoLoad, useAuth])
 }
