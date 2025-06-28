@@ -15,8 +15,7 @@ export namespace MarkdownStyle {
     export const RenderRules = {
         fence: (node: any, children: any, parent: any, styles: any, inheritedStyles = {}) => {
             const { color, borderRadius, spacing } = Theme.useTheme()
-            // we trim new lines off the end of code blocks because the parser sends an extra one.
-            let { content } = node
+            let { content, sourceInfo } = node
             if (
                 typeof node.content === 'string' &&
                 node.content.charAt(node.content.length - 1) === '\n'
@@ -37,7 +36,7 @@ export namespace MarkdownStyle {
                             borderTopRightRadius: borderRadius.m,
                             marginTop: spacing.sm,
                         }}>
-                        <Text style={{ color: color.text._300 }}>Code</Text>
+                        <Text style={{ color: color.text._300 }}>{sourceInfo || 'Code'}</Text>
                         {content && (
                             <ThemedButton
                                 iconName="copy1"
