@@ -36,8 +36,6 @@ interface ChatActionProps {
     isLastMessage: boolean
 }
 
-const codeBlockRegex = /```(?:\w+)?\n?([\s\S]*?)```/
-
 const ChatActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMessage }) => {
     const { activeIndex, setShowOptions } = optionState(
         useShallow((state) => ({
@@ -45,20 +43,19 @@ const ChatActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMe
             activeIndex: state.activeIndex,
         }))
     )
-
     const showEditor = useChatEditorState((state) => state.show)
-    const handleEnableEdit = () => {
-        if (!nowGenerating) showEditor(index)
-    }
-
     const { color } = Theme.useTheme()
     const [quickDelete, __] = useMMKVBoolean(AppSettings.QuickDelete)
     const { deleteEntry } = Chats.useEntry()
     const { swipe } = Chats.useSwipeData(index)
-
     const { activeChatIndex } = useTTS()
-
     const showOptions = activeIndex === index
+
+    const handleEnableEdit = () => {
+        if (showOptions) setShowOptions(undefined)
+        if (!nowGenerating) showEditor(index)
+    }
+
     useFocusEffect(
         useCallback(() => {
             const backAction = () => {
@@ -74,7 +71,6 @@ const ChatActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMe
     )
     if (!swipe) return
 
-    const code = swipe.swipe.match(codeBlockRegex)
     const isSpeaking = index === activeChatIndex
     if (!isSpeaking && (!showOptions || nowGenerating)) return
 
@@ -146,6 +142,7 @@ const ChatActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMe
                                     color: color.text._500,
                                 }}
                                 onPress={() => {
+                                    if (showOptions) setShowOptions(undefined)
                                     setStringAsync(swipe.swipe)
                                         .then(() => {
                                             Logger.infoToast('Copied')
@@ -170,30 +167,6 @@ const ChatActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMe
                                 onPress={handleEnableEdit}
                             />
                         </Animated.View>
-                        {code && (
-                            <Animated.View
-                                entering={ZoomIn.duration(200)}
-                                exiting={ZoomOut.duration(200)}>
-                                <ThemedButton
-                                    variant="tertiary"
-                                    iconName="codesquareo"
-                                    iconSize={24}
-                                    iconStyle={{
-                                        color: color.text._500,
-                                    }}
-                                    onPress={() => {
-                                        if (code[1])
-                                            setStringAsync(code[1])
-                                                .then(() => {
-                                                    Logger.infoToast('Copied Code')
-                                                })
-                                                .catch(() => {
-                                                    Logger.errorToast('Failed to copy to clipboard')
-                                                })
-                                    }}
-                                />
-                            </Animated.View>
-                        )}
                     </>
                 )}
                 <TTS index={index} />

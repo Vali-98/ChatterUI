@@ -1,8 +1,11 @@
 import Accordion from '@components/views/Accordion'
 import { Theme } from '@lib/theme/ThemeManager'
-import { Platform, StyleSheet, Text } from 'react-native'
+import { Platform, StyleSheet, Text, View } from 'react-native'
 import { MarkdownIt } from 'react-native-markdown-display'
 
+import ThemedButton from '@components/buttons/ThemedButton'
+import { Logger } from '@lib/state/Logger'
+import { setStringAsync } from 'expo-clipboard'
 import doubleQuotePlugin from './MarkdownQuotePlugin'
 import thinkPlugin from './MarkdownThinkPlugin'
 
@@ -10,6 +13,46 @@ export namespace MarkdownStyle {
     export const Rules = MarkdownIt({ typographer: true }).use(thinkPlugin).use(doubleQuotePlugin)
 
     export const RenderRules = {
+        fence: (node: any, children: any, parent: any, styles: any, inheritedStyles = {}) => {
+            const { color } = Theme.useTheme()
+            // we trim new lines off the end of code blocks because the parser sends an extra one.
+            let { content } = node
+            if (
+                typeof node.content === 'string' &&
+                node.content.charAt(node.content.length - 1) === '\n'
+            ) {
+                content = node.content.substring(0, node.content.length - 1)
+            }
+            return (
+                <View>
+                    <Text key={node.key} style={[inheritedStyles, styles.fence]}>
+                        {content}
+                    </Text>
+                    {content && (
+                        <ThemedButton
+                            buttonStyle={{
+                                position: 'absolute',
+                                right: 0,
+                                marginVertical: 18,
+                                marginHorizontal: 8,
+                            }}
+                            iconName="copy1"
+                            variant="tertiary"
+                            iconStyle={{ color: color.text._500 }}
+                            onPress={() => {
+                                setStringAsync(content)
+                                    .then(() => {
+                                        Logger.infoToast('Copied Code')
+                                    })
+                                    .catch(() => {
+                                        Logger.errorToast('Failed to copy to clipboard')
+                                    })
+                            }}
+                        />
+                    )}
+                </View>
+            )
+        },
         double_quote: (node: any, children: any, parent: any, styles: any) => {
             return (
                 <Text key={node.key} style={styles.double_quote}>
