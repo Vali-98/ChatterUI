@@ -14,7 +14,7 @@ export namespace MarkdownStyle {
 
     export const RenderRules = {
         fence: (node: any, children: any, parent: any, styles: any, inheritedStyles = {}) => {
-            const { color } = Theme.useTheme()
+            const { color, borderRadius, spacing } = Theme.useTheme()
             // we trim new lines off the end of code blocks because the parser sends an extra one.
             let { content } = node
             if (
@@ -25,31 +25,39 @@ export namespace MarkdownStyle {
             }
             return (
                 <View>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            paddingVertical: 4,
+                            paddingHorizontal: 12,
+                            backgroundColor: color.neutral._300,
+                            borderTopLeftRadius: borderRadius.m,
+                            borderTopRightRadius: borderRadius.m,
+                            marginTop: spacing.sm,
+                        }}>
+                        <Text style={{ color: color.text._300 }}>Code</Text>
+                        {content && (
+                            <ThemedButton
+                                iconName="copy1"
+                                variant="tertiary"
+                                iconStyle={{ color: color.text._500 }}
+                                onPress={() => {
+                                    setStringAsync(content)
+                                        .then(() => {
+                                            Logger.infoToast('Copied Code')
+                                        })
+                                        .catch(() => {
+                                            Logger.errorToast('Failed to copy to clipboard')
+                                        })
+                                }}
+                            />
+                        )}
+                    </View>
                     <Text key={node.key} style={[inheritedStyles, styles.fence]}>
                         {content}
                     </Text>
-                    {content && (
-                        <ThemedButton
-                            buttonStyle={{
-                                position: 'absolute',
-                                right: 0,
-                                marginVertical: 18,
-                                marginHorizontal: 8,
-                            }}
-                            iconName="copy1"
-                            variant="tertiary"
-                            iconStyle={{ color: color.text._500 }}
-                            onPress={() => {
-                                setStringAsync(content)
-                                    .then(() => {
-                                        Logger.infoToast('Copied Code')
-                                    })
-                                    .catch(() => {
-                                        Logger.errorToast('Failed to copy to clipboard')
-                                    })
-                            }}
-                        />
-                    )}
                 </View>
             )
         },
@@ -218,14 +226,14 @@ export namespace MarkdownStyle {
                 }),
             },
             fence: {
-                color: color.text._400,
-                borderWidth: 1,
-                borderColor: color.neutral._300,
-                backgroundColor: color.neutral._300,
-                paddingHorizontal: spacing.l,
+                color: color.text._300,
+                backgroundColor: color.neutral._400,
+                paddingLeft: spacing.l,
+                paddingRight: spacing.l,
                 paddingVertical: spacing.m,
-                marginVertical: spacing.m,
-                borderRadius: borderRadius.m,
+                marginBottom: spacing.m,
+                borderBottomLeftRadius: borderRadius.m,
+                borderBottomRightRadius: borderRadius.m,
                 ...Platform.select({
                     ios: {
                         fontFamily: 'Courier',
