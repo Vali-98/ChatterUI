@@ -1,6 +1,6 @@
 import { Theme } from '@lib/theme/ThemeManager'
 import Slider from '@react-native-community/slider'
-import { useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 
 type ThemedSliderProps = {
@@ -33,13 +33,10 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
     const { color } = Theme.useTheme()
     const [textValue, setTextValue] = useState(value.toString())
 
-    // This effect ensures that if `value` updates from the parent, this text is properly updated
-    useEffect(() => {
-        if (parseFloat(textValue) !== value)
-            setTextValue(clamp(value, min, max, precision).toString())
-    }, [value])
-
-    const clampSlider = (value: number) => clamp(value, min, max, precision)
+    const clampSlider = useCallback(
+        (value: number) => clamp(value, min, max, precision),
+        [min, max, precision]
+    )
 
     const handleSliderChange = (v: number) => {
         if (!isNaN(clampSlider(v))) onValueChange(clampSlider(v))

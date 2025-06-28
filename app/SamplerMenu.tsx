@@ -137,7 +137,7 @@ const SamplerMenu = () => {
     )
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }} key={currentConfig.name}>
             <TextBoxModal
                 booleans={[showNewSampler, setShowNewSampler]}
                 onConfirm={(text: string) => {

@@ -1,7 +1,6 @@
 import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
-import { useEffect } from 'react'
-import { Text, Pressable, ViewStyle } from 'react-native'
+import { Pressable, Text, ViewStyle } from 'react-native'
 import Animated, {
     BounceIn,
     interpolateColor,
@@ -36,15 +35,12 @@ const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
         }
     })
 
-    useEffect(() => {
-        colorChange.value = withTiming(value ? 1 : 0, { duration: 100 })
-    }, [value])
-
     return (
         <Pressable
             style={{ flexDirection: 'row', alignItems: 'center' }}
             onPress={() => {
                 onChangeValue(!value)
+                colorChange.value = withTiming(!value ? 1 : 0, { duration: 100 })
             }}>
             <Animated.View
                 style={[

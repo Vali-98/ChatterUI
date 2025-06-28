@@ -23,11 +23,10 @@ const ChatMenu = () => {
 
     const { chat, unloadChat, loadChat } = Chats.useChat()
 
-    const { showSettings, showChats, values } = Drawer.useDrawerState(
+    const { showSettings, showChats } = Drawer.useDrawerState(
         useShallow((state) => ({
             showSettings: state.values?.[Drawer.ID.SETTINGS],
             showChats: state.values?.[Drawer.ID.CHATLIST],
-            values: state.values,
         }))
     )
 

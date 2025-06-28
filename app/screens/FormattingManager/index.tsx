@@ -161,6 +161,7 @@ const FormattingManager = () => {
     if (currentInstruct)
         return (
             <SafeAreaView
+                key={currentInstruct.id}
                 style={{
                     marginVertical: spacing.xl,
                     flex: 1,
