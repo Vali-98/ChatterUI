@@ -1,6 +1,12 @@
 import { Storage } from '@lib/enums/Storage'
 import { AppDirectory, readableFileSize } from '@lib/utils/File'
-import { CompletionParams, ContextParams, initLlama, LlamaContext } from 'cui-llama.rn'
+import {
+    CompletionParams,
+    ContextParams,
+    initLlama,
+    LlamaContext,
+    RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER,
+} from 'cui-llama.rn'
 import { ModelDataType } from 'db/schema'
 import { getInfoAsync, writeAsStringAsync } from 'expo-file-system'
 import { create } from 'zustand'
@@ -292,10 +298,12 @@ export namespace Llama {
             return result
         },
         tokenLength: async (text: string, mediaPaths: string[] = []) => {
-            const result = await get().context?.tokenizeAsync(text, {
-                media_paths: mediaPaths.map((item) => item.replace('file://', '')),
-            })
-
+            const result = await get().context?.tokenizeAsync(
+                text + mediaPaths.map(() => RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER).join(),
+                {
+                    media_paths: mediaPaths.map((item) => item.replace('file://', '')),
+                }
+            )
             if (!result) return 0
             return result.tokens.length
         },
