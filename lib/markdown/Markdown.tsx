@@ -337,10 +337,10 @@ export namespace MarkdownStyle {
                         color: color.text._100,
                     },
                     latex_inline: {
-                        color: color.text._100,
+                        color: color.text._300,
                     },
                     latex_block: {
-                        color: color.text._100,
+                        color: color.text._300,
                         marginTop: spacing.l,
                         marginBottom: spacing.sm,
                     },
