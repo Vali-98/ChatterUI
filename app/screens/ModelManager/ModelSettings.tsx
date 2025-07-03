@@ -83,7 +83,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             <SectionTitle>CPU Settings</SectionTitle>
             <View style={{ marginTop: 16 }} />
             {config && (
-                <View>
+                <>
                     <ThemedSlider
                         label="Max Context"
                         value={config.context_length}
@@ -112,6 +112,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                         step={16}
                         disabled={modelImporting || modelLoading}
                     />
+
                     {/* Note: llama.rn does not have any Android gpu acceleration */}
                     {Platform.OS === 'ios' && (
                         <ThemedSlider
@@ -123,7 +124,15 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                             step={1}
                         />
                     )}
-                </View>
+
+                    <ThemedSwitch
+                        label="Context Shift"
+                        value={config.ctx_shift}
+                        onChangeValue={(value) => {
+                            setConfig({ ...config, ctx_shift: value })
+                        }}
+                    />
+                </>
             )}
             <SectionTitle>Advanced Settings</SectionTitle>
             <ThemedSwitch

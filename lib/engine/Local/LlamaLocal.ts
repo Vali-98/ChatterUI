@@ -64,6 +64,7 @@ export type LlamaConfig = {
     threads: number
     gpu_layers: number
     batch: number
+    ctx_shift: boolean
 }
 
 export type EngineDataProps = {
@@ -82,6 +83,7 @@ const defaultConfig = {
     threads: 4,
     gpu_layers: 0,
     batch: 512,
+    ctx_shift: true,
 }
 
 export namespace Llama {
@@ -111,6 +113,13 @@ export namespace Llama {
                 }),
                 storage: createJSONStorage(() => mmkvStorage),
                 version: 1,
+                migrate: (persistedState: any, version) => {
+                    console.log(version)
+                    if (version === 1) {
+                        persistedState.config.ctx_shift = true
+                        Logger.info('Migrated to v2 EngineData')
+                    }
+                },
             }
         )
     )
@@ -146,7 +155,7 @@ export namespace Llama {
                 n_ctx: config.context_length,
                 n_threads: config.threads,
                 n_batch: config.batch,
-                ctx_shift: true,
+                ctx_shift: config.ctx_shift,
                 use_mlock: true,
                 use_mmap: true,
             }
