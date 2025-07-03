@@ -103,6 +103,7 @@ const useStyles = () => {
             justifyContent: 'space-evenly',
             flex: 1,
             marginTop: spacing.sm,
+            zIndex: 32,
         },
 
         swipeText: {

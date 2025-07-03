@@ -12,6 +12,8 @@ import {
     ViewStyle,
     TextInput,
 } from 'react-native'
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type DropdownItemProps = {
     label: string
@@ -59,6 +61,7 @@ const MultiDropdownSheet = <T,>({
     search = false,
     closeOnSelect = true,
 }: DropdownSheetProps<T>) => {
+    const insets = useSafeAreaInsets()
     const styles = useDropdownStyles()
     const { color, spacing } = Theme.useTheme()
     const [showList, setShowList] = useState(false)
@@ -74,6 +77,7 @@ const MultiDropdownSheet = <T,>({
             <Modal
                 transparent
                 statusBarTranslucent
+                navigationBarTranslucent
                 onRequestClose={() => setShowList(false)}
                 visible={showList}
                 animationType="fade">
@@ -83,70 +87,76 @@ const MultiDropdownSheet = <T,>({
                         setShowList(false)
                     }}
                 />
-                <View style={{ flex: 1 }} />
-
-                <View style={styles.listContainer}>
-                    <View
-                        style={{
-                            marginBottom: spacing.xl2,
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                        }}>
-                        <Text style={styles.modalTitle}>{modalTitle}</Text>
-                        <Text style={styles.counterText}>
-                            {selected.length > 0
-                                ? `Selected ${selected.length} item${selected.length > 1 ? 's' : ''}`
-                                : 'No items selected'}
-                        </Text>
-                    </View>
-                    {items.length > 0 ? (
-                        <FlatList
-                            contentContainerStyle={{ rowGap: 2 }}
-                            showsVerticalScrollIndicator={false}
-                            data={items}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={({ item, index }) => (
-                                <DropdownItem
-                                    label={labelExtractor(item)}
-                                    active={selected?.some(
-                                        (e) => labelExtractor(e) === labelExtractor(item)
-                                    )}
-                                    onValueChange={(active) => {
-                                        if (!active && selected.length > 0) {
-                                            const data = selected.filter(
-                                                (e) => labelExtractor(e) !== labelExtractor(item)
-                                            )
-                                            onChangeValue(data)
-                                        } else {
-                                            // we duplicate for a fresh reference
-                                            const data = [...selected]
-                                            if (
-                                                selected.some(
+                <KeyboardAvoidingView
+                    behavior="height"
+                    keyboardVerticalOffset={-insets.bottom}
+                    style={{ flex: 1 }}>
+                    <View style={{ flex: 1 }} />
+                    <View style={styles.listContainer}>
+                        <View
+                            style={{
+                                marginBottom: spacing.xl2,
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                            }}>
+                            <Text style={styles.modalTitle}>{modalTitle}</Text>
+                            <Text style={styles.counterText}>
+                                {selected.length > 0
+                                    ? `Selected ${selected.length} item${selected.length > 1 ? 's' : ''}`
+                                    : 'No items selected'}
+                            </Text>
+                        </View>
+                        {items.length > 0 ? (
+                            <FlatList
+                                contentContainerStyle={{ rowGap: 2 }}
+                                showsVerticalScrollIndicator={false}
+                                data={items}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <DropdownItem
+                                        label={labelExtractor(item)}
+                                        active={selected?.some(
+                                            (e) => labelExtractor(e) === labelExtractor(item)
+                                        )}
+                                        onValueChange={(active) => {
+                                            if (!active && selected.length > 0) {
+                                                const data = selected.filter(
                                                     (e) =>
-                                                        labelExtractor(e) === labelExtractor(item)
+                                                        labelExtractor(e) !== labelExtractor(item)
                                                 )
-                                            )
-                                                return
-                                            data.push(item)
-                                            onChangeValue(data)
-                                        }
-                                    }}
-                                />
-                            )}
-                        />
-                    ) : (
-                        <Text style={styles.emptyText}>No Items</Text>
-                    )}
-                    {search && (
-                        <TextInput
-                            placeholder="Filter..."
-                            placeholderTextColor={color.text._300}
-                            style={styles.searchBar}
-                            value={searchFilter}
-                            onChangeText={setSearchFilter}
-                        />
-                    )}
-                </View>
+                                                onChangeValue(data)
+                                            } else {
+                                                // we duplicate for a fresh reference
+                                                const data = [...selected]
+                                                if (
+                                                    selected.some(
+                                                        (e) =>
+                                                            labelExtractor(e) ===
+                                                            labelExtractor(item)
+                                                    )
+                                                )
+                                                    return
+                                                data.push(item)
+                                                onChangeValue(data)
+                                            }
+                                        }}
+                                    />
+                                )}
+                            />
+                        ) : (
+                            <Text style={styles.emptyText}>No Items</Text>
+                        )}
+                        {search && (
+                            <TextInput
+                                placeholder="Filter..."
+                                placeholderTextColor={color.text._300}
+                                style={styles.searchBar}
+                                value={searchFilter}
+                                onChangeText={setSearchFilter}
+                            />
+                        )}
+                    </View>
+                </KeyboardAvoidingView>
             </Modal>
             <Pressable style={[style, styles.button]} onPress={() => setShowList(true)}>
                 {selected && selected.length > 0 && (
@@ -164,6 +174,7 @@ const MultiDropdownSheet = <T,>({
 export default MultiDropdownSheet
 
 export const useDropdownStyles = () => {
+    const insets = useSafeAreaInsets()
     const { color, spacing, borderRadius } = Theme.useTheme()
     return StyleSheet.create({
         button: {
@@ -190,7 +201,8 @@ export const useDropdownStyles = () => {
         },
 
         listContainer: {
-            paddingVertical: spacing.xl2,
+            paddingTop: spacing.xl2,
+            paddingBottom: insets.bottom + spacing.xl2,
             paddingHorizontal: spacing.xl3,
             flexShrink: 1,
             maxHeight: '70%',

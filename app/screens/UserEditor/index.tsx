@@ -4,6 +4,7 @@ import { View } from 'react-native'
 
 import UserCardEditor from './UserCardEditor'
 import UserDrawer from './UserDrawer'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const UserEditor = () => {
     return (
@@ -11,7 +12,8 @@ const UserEditor = () => {
             config={[
                 { drawerID: Drawer.ID.USERLIST, openDirection: 'left', closeDirection: 'right' },
             ]}>
-            <View
+            <SafeAreaView
+                edges={['bottom']}
                 style={{
                     flex: 1,
                 }}>
@@ -24,7 +26,7 @@ const UserEditor = () => {
                 />
                 <UserCardEditor />
                 <UserDrawer />
-            </View>
+            </SafeAreaView>
         </Drawer.Gesture>
     )
 }

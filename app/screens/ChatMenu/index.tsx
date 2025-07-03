@@ -10,10 +10,12 @@ import ChatWindow from '@screens/ChatMenu/ChatWindow/ChatWindow'
 import ChatsDrawer from '@screens/ChatMenu/ChatsDrawer'
 import SettingsDrawer from '@screens/SettingsDrawer'
 import { useEffect } from 'react'
-import { SafeAreaView, View } from 'react-native'
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
 const ChatMenu = () => {
+    const insets = useSafeAreaInsets()
     const { unloadCharacter, charId } = Characters.useCharacterCard(
         useShallow((state) => ({
             unloadCharacter: state.unloadCard,
@@ -44,17 +46,31 @@ const ChatMenu = () => {
             })
     }
 
+    // TODO: This is a fix for gesture vs 3-button nav for android
+    const getOffset = () => {
+        // assume gesture nav, 54 is arbitrary keyboard nav height
+        if (insets.bottom < 30) return insets.bottom + 54
+        return insets.bottom
+    }
+
     return (
         <Drawer.Gesture
             config={[
-                { drawerID: Drawer.ID.CHATLIST, openDirection: 'left', closeDirection: 'right' },
-                { drawerID: Drawer.ID.SETTINGS, openDirection: 'right', closeDirection: 'left' },
+                {
+                    drawerID: Drawer.ID.CHATLIST,
+                    openDirection: 'left',
+                    closeDirection: 'right',
+                },
+                {
+                    drawerID: Drawer.ID.SETTINGS,
+                    openDirection: 'right',
+                    closeDirection: 'left',
+                },
             ]}>
-            <SafeAreaView
-                style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                }}>
+            <KeyboardAvoidingView
+                keyboardVerticalOffset={getOffset()}
+                behavior="translate-with-padding"
+                style={{ flex: 1, paddingBottom: insets.bottom }}>
                 <HeaderTitle />
                 <HeaderButton
                     headerLeft={() => !showChats && <Drawer.Button drawerID={Drawer.ID.SETTINGS} />}
@@ -77,18 +93,12 @@ const ChatMenu = () => {
                         )
                     }
                 />
-
-                <View
-                    style={{
-                        flex: 1,
-                    }}>
-                    {chat && <ChatWindow />}
-                    <ChatInput />
-                </View>
+                {chat && <ChatWindow />}
+                <ChatInput />
                 <AvatarViewer />
                 <ChatsDrawer />
                 <SettingsDrawer />
-            </SafeAreaView>
+            </KeyboardAvoidingView>
         </Drawer.Gesture>
     )
 }

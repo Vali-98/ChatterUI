@@ -10,6 +10,7 @@ import { FlatList, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 import TemplateItem from './TemplateItem'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const TemplateManager = () => {
     // eslint-disable-next-line react-compiler/react-compiler
@@ -24,7 +25,8 @@ const TemplateManager = () => {
     const { color, spacing } = Theme.useTheme()
 
     return (
-        <View
+        <SafeAreaView
+            edges={['bottom']}
             style={{
                 paddingTop: spacing.xl,
                 paddingHorizontal: spacing.xl,
@@ -84,7 +86,7 @@ const TemplateManager = () => {
                 }}
                 label="Add Template"
             />
-        </View>
+        </SafeAreaView>
     )
 }
 

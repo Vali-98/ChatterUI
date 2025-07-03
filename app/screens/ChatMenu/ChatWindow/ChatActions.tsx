@@ -89,9 +89,8 @@ const ChatActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMe
                     borderRadius: 8,
                     borderWidth: 1,
                     borderColor: color.primary._500,
-                    backgroundColor: color.neutral._300,
+                    backgroundColor: color.neutral._100 + 'cc',
                     bottom: -4,
-                    zIndex: 21,
                     boxShadow: [
                         {
                             offsetX: 1,

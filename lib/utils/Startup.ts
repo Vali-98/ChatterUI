@@ -17,12 +17,8 @@ import {
 } from 'expo-file-system'
 import { router } from 'expo-router'
 import { setBackgroundColorAsync as setUIBackgroundColor } from 'expo-system-ui'
-import { setBackgroundColorAsync as setNavBackgroundColor } from 'expo-navigation-bar'
 import { z } from 'zod'
 
-import { AppDirectory } from './File'
-import { patchAndroidText } from './PatchText'
-import { lockScreenOrientation } from './Screen'
 import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
 import { Characters } from '../state/Characters'
@@ -30,6 +26,9 @@ import { Chats } from '../state/Chat'
 import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
 import { Theme } from '../theme/ThemeManager'
+import { AppDirectory } from './File'
+import { patchAndroidText } from './PatchText'
+import { lockScreenOrientation } from './Screen'
 
 export const loadChatOnInit = async () => {
     if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return
@@ -257,7 +256,6 @@ export const startupApp = () => {
 
     const backgroundColor = Theme.useColorState.getState().color.neutral._100
     setUIBackgroundColor(backgroundColor)
-    setNavBackgroundColor(backgroundColor)
 
     Logger.info('Resetting state values for startup.')
 }

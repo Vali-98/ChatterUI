@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     GestureResponderEvent,
 } from 'react-native'
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
 
 type TextBoxModalProps = {
     booleans: [boolean, (b: boolean) => void]
@@ -63,6 +64,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
             style={{ flex: 1 }}
             transparent
             statusBarTranslucent
+            navigationBarTranslucent
             onRequestClose={handleClose}
             animationType="fade">
             <TouchableOpacity
@@ -73,7 +75,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     justifyContent: 'center',
                 }}>
-                <View style={styles.modalview}>
+                <KeyboardAvoidingView style={styles.modalview}>
                     <Text style={styles.title}>{title}</Text>
                     <View style={styles.inputContainer}>
                         <TextInput
@@ -124,7 +126,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                             />
                         </View>
                     </View>
-                </View>
+                </KeyboardAvoidingView>
             </TouchableOpacity>
         </Modal>
     )

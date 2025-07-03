@@ -10,6 +10,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { Stack, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
 const AddAPI = () => {
@@ -67,7 +68,7 @@ const AddAPI = () => {
     }, [template])
 
     return (
-        <View style={styles.mainContainer}>
+        <SafeAreaView edges={['bottom']} style={styles.mainContainer}>
             <Stack.Screen options={{ title: 'Add Connection' }} />
             <ScrollView
                 style={{ flex: 1 }}
@@ -234,7 +235,7 @@ const AddAPI = () => {
                     router.back()
                 }}
             />
-        </View>
+        </SafeAreaView>
     )
 }
 

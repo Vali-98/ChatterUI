@@ -152,7 +152,7 @@ const useMenuStyle = (): MenuOptionsCustomStyle => {
             padding: spacing.sm,
             borderRadius: borderRadius.l,
             borderWidth: 1,
-            borderColor: color.primary._200,
+            borderColor: color.neutral._300,
         },
         optionsWrapper: {
             backgroundColor: color.neutral._200,
@@ -165,7 +165,7 @@ const useStyles = () => {
 
     return StyleSheet.create({
         anchor: {
-            backgroundColor: color.primary._300,
+            backgroundColor: color.neutral._300,
             padding: 4,
         },
 

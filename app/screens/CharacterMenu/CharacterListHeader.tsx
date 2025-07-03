@@ -13,7 +13,7 @@ import { useFocusEffect } from 'expo-router'
 import { useCallback } from 'react'
 import { BackHandler, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
-import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
+import Animated, { FadeInUp, FadeOutUp, LinearTransition } from 'react-native-reanimated'
 
 import SortButton from './SortButton'
 
@@ -55,7 +55,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
     )
 
     return (
-        <View>
+        <>
             <View
                 style={{
                     flexDirection: 'row',
@@ -108,48 +108,49 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                     />
                 </View>
             </View>
-            {showSearch && (
-                <Animated.View
-                    style={{ paddingHorizontal: 12, paddingVertical: 8, rowGap: 8 }}
-                    entering={FadeInUp.duration(150).withInitialValues({
-                        transform: [{ translateY: -20 }],
-                    })}
-                    exiting={FadeOutUp.duration(100)}>
-                    {showTags && data.length > 0 && (
-                        <StringArrayEditor
+
+            <Animated.View layout={LinearTransition}>
+                {showSearch && (
+                    <Animated.View
+                        entering={FadeInUp}
+                        exiting={FadeOutUp}
+                        style={{ paddingHorizontal: 12, paddingBottom: 8, rowGap: 8 }}>
+                        {showTags && data.length > 0 && (
+                            <StringArrayEditor
+                                containerStyle={{ flex: 0 }}
+                                suggestions={data
+                                    .sort((a, b) => b.tagCount - a.tagCount)
+                                    .map((item) => item.tag)}
+                                label="Tags"
+                                value={tagFilter}
+                                setValue={setTagFilter}
+                                placeholder="Filter Tags..."
+                                filterOnly
+                                showSuggestionsOnEmpty
+                            />
+                        )}
+                        <ThemedTextInput
                             containerStyle={{ flex: 0 }}
-                            suggestions={data
-                                .sort((a, b) => b.tagCount - a.tagCount)
-                                .map((item) => item.tag)}
-                            label="Tags"
-                            value={tagFilter}
-                            setValue={setTagFilter}
-                            placeholder="Filter Tags..."
-                            filterOnly
-                            showSuggestionsOnEmpty
-                        />
-                    )}
-                    <ThemedTextInput
-                        containerStyle={{ flex: 0 }}
-                        value={textFilter}
-                        onChangeText={setTextFilter}
-                        style={{
-                            color: resultLength === 0 ? color.text._700 : color.text._100,
-                        }}
-                        placeholder="Search Name..."
-                    />
-                    {(textFilter || tagFilter.length > 0) && (
-                        <Text
+                            value={textFilter}
+                            onChangeText={setTextFilter}
                             style={{
-                                marginTop: 8,
-                                color: color.text._400,
-                            }}>
-                            Results: {resultLength}
-                        </Text>
-                    )}
-                </Animated.View>
-            )}
-        </View>
+                                color: resultLength === 0 ? color.text._700 : color.text._100,
+                            }}
+                            placeholder="Search Name..."
+                        />
+                        {(textFilter || tagFilter.length > 0) && (
+                            <Text
+                                style={{
+                                    marginTop: 8,
+                                    color: color.text._400,
+                                }}>
+                                Results: {resultLength}
+                            </Text>
+                        )}
+                    </Animated.View>
+                )}
+            </Animated.View>
+        </>
     )
 }
 

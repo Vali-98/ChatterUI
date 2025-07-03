@@ -18,14 +18,15 @@ import Animated, {
     FadeOut,
     LayoutAnimationsValues,
     LinearTransition,
-    SlideInLeft,
-    withDelay,
-    withSpring,
     withTiming,
     ZoomOut,
 } from 'react-native-reanimated'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 import OptionsMenu from './OptionsMenu'
+import { create } from 'zustand'
+import { XAxisOnlyTransition } from '@lib/animations/transitions'
+import { KeyboardStickyView } from 'react-native-keyboard-controller'
 
 export type Attachment = {
     uri: string
@@ -35,7 +36,18 @@ export type Attachment = {
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput)
 
+type ChatInputHeightStoreProps = {
+    height: number
+    setHeight: (n: number) => void
+}
+
+export const chatInputHeightStore = create<ChatInputHeightStoreProps>()((set) => ({
+    height: 54,
+    setHeight: (n) => set({ height: Math.ceil(n) }),
+}))
+
 const ChatInput = () => {
+    const insets = useSafeAreaInsets()
     const { color, borderRadius, spacing } = Theme.useTheme()
     const [sendOnEnter, _] = useMMKVBoolean(AppSettings.SendOnEnter)
     const [attachments, setAttachments] = useState<Attachment[]>([])
@@ -47,6 +59,7 @@ const ChatInput = () => {
             abortFunction: state.abortFunction,
         }))
     )
+    const setHeight = chatInputHeightStore(useShallow((state) => state.setHeight))
 
     const { charName } = Characters.useCharacterCard(
         useShallow((state) => ({
@@ -81,9 +94,30 @@ const ChatInput = () => {
 
     return (
         <View
+            onLayout={(e) => {
+                setHeight(e.nativeEvent.layout.height)
+            }}
             style={{
-                paddingHorizontal: spacing.l,
-                paddingVertical: spacing.l,
+                position: 'absolute',
+                width: '98%',
+                alignSelf: 'center',
+                bottom: insets.bottom,
+                marginVertical: spacing.m,
+                paddingVertical: spacing.sm,
+                paddingHorizontal: spacing.sm,
+                backgroundColor: color.neutral._100 + 'cc',
+                borderWidth: 1,
+                borderColor: color.neutral._200,
+                boxShadow: [
+                    {
+                        offsetX: 1,
+                        offsetY: 1,
+                        color: color.shadow,
+                        spreadDistance: 1,
+                        blurRadius: 4,
+                    },
+                ],
+                borderRadius: 16,
                 rowGap: spacing.m,
             }}>
             <Animated.FlatList
@@ -122,7 +156,6 @@ const ChatInput = () => {
                                 buttonStyle={{
                                     borderWidth: 0,
                                     paddingHorizontal: 2,
-                                    paddingVertical: 2,
                                     position: 'absolute',
                                     alignSelf: 'flex-end',
                                     margin: -4,
@@ -193,14 +226,14 @@ const ChatInput = () => {
                     {hideOptions && (
                         <Animated.View entering={FadeIn} exiting={FadeOut}>
                             <ThemedButton
-                                iconSize={20}
+                                iconSize={18}
                                 iconStyle={{
                                     color: color.text._400,
                                 }}
                                 buttonStyle={{
-                                    padding: 2,
+                                    padding: 5,
                                     backgroundColor: color.neutral._200,
-                                    borderRadius: 24,
+                                    borderRadius: 32,
                                 }}
                                 variant="tertiary"
                                 iconName="right"
@@ -236,37 +269,24 @@ const ChatInput = () => {
                     submitBehavior={sendOnEnter ? 'blurAndSubmit' : 'newline'}
                     onSubmitEditing={sendOnEnter ? handleSend : undefined}
                 />
-                <TouchableOpacity
-                    style={{
-                        borderRadius: borderRadius.m,
-                        backgroundColor: nowGenerating ? color.error._500 : color.primary._500,
-                        padding: spacing.m,
-                    }}
-                    onPress={nowGenerating ? abortResponse : handleSend}>
-                    <MaterialIcons
-                        name={nowGenerating ? 'stop' : 'send'}
-                        color={color.neutral._100}
-                        size={24}
-                    />
-                </TouchableOpacity>
+                <Animated.View layout={XAxisOnlyTransition}>
+                    <TouchableOpacity
+                        style={{
+                            borderRadius: borderRadius.m,
+                            backgroundColor: nowGenerating ? color.error._500 : color.primary._500,
+                            padding: spacing.m,
+                        }}
+                        onPress={nowGenerating ? abortResponse : handleSend}>
+                        <MaterialIcons
+                            name={nowGenerating ? 'stop' : 'send'}
+                            color={color.neutral._100}
+                            size={24}
+                        />
+                    </TouchableOpacity>
+                </Animated.View>
             </View>
         </View>
     )
 }
 
 export default ChatInput
-
-const XAxisOnlyTransition = (values: LayoutAnimationsValues) => {
-    'worklet'
-    return {
-        animations: {
-            originX: withTiming(values.targetOriginX),
-            width: withTiming(values.targetWidth),
-        },
-
-        initialValues: {
-            originX: values.currentOriginX,
-            width: values.currentWidth,
-        },
-    }
-}

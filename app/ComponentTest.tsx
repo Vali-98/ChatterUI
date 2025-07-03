@@ -8,7 +8,8 @@ import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Accordion from '@components/views/Accordion'
 import React, { useState } from 'react'
-import { ScrollView, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 
 const selectorData = [
     { label: 'Item 0', value: '1' },
@@ -34,7 +35,7 @@ const ComponentTest = () => {
     const [sw, setSw] = useState(true)
 
     return (
-        <ScrollView
+        <KeyboardAwareScrollView
             style={{ flex: 1 }}
             contentContainerStyle={{ rowGap: 16, padding: 16 }}
             keyboardShouldPersistTaps="always">
@@ -75,7 +76,7 @@ const ComponentTest = () => {
                 onChangeValue={setSelectedM}
                 labelExtractor={(item) => item.label}
             />
-        </ScrollView>
+        </KeyboardAwareScrollView>
     )
 }
 

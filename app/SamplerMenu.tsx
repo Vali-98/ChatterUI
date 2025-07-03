@@ -17,7 +17,9 @@ import { SamplersManager } from '@lib/state/SamplerState'
 import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 import { useState } from 'react'
-import { ScrollView, StyleSheet, Text, SafeAreaView } from 'react-native'
+import { ScrollView, StyleSheet, Text } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
 const SamplerMenu = () => {
@@ -137,7 +139,7 @@ const SamplerMenu = () => {
     )
 
     return (
-        <SafeAreaView style={{ flex: 1 }} key={currentConfig.name}>
+        <SafeAreaView edges={['bottom']} style={{ flex: 1 }} key={currentConfig.name}>
             <TextBoxModal
                 booleans={[showNewSampler, setShowNewSampler]}
                 onConfirm={(text: string) => {
@@ -169,7 +171,7 @@ const SamplerMenu = () => {
                 labelExtractor={(item) => item.name}
             />
 
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <KeyboardAwareScrollView contentContainerStyle={styles.scrollContainer}>
                 {currentConfig &&
                     getSamplerList().map((item, index) => {
                         const samplerItem = Samplers?.[item.samplerID]
@@ -247,7 +249,7 @@ const SamplerMenu = () => {
                                 )
                         }
                     })}
-            </ScrollView>
+            </KeyboardAwareScrollView>
         </SafeAreaView>
     )
 }

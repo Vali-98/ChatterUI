@@ -6,8 +6,8 @@ import { Characters, CharInfo } from '@lib/state/Characters'
 import { TagHider } from '@lib/state/TagHider'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
-import { SafeAreaView, View } from 'react-native'
-import Animated from 'react-native-reanimated'
+import { View } from 'react-native'
+import Animated, { LinearTransition } from 'react-native-reanimated'
 
 import CharacterListHeader from './CharacterListHeader'
 import CharacterListing from './CharacterListing'
@@ -15,13 +15,9 @@ import CharacterNewMenu from './CharacterNewMenu'
 import CharactersEmpty from './CharactersEmpty'
 import CharactersSearchEmpty from './CharactersSearchEmpty'
 
-type CharacterListProps = {
-    showHeader: boolean
-}
-
 const PAGE_SIZE = 30
 
-const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
+const CharacterList: React.FC = () => {
     const [nowLoading, setNowLoading] = useState(false)
     const { showSearch, searchType, searchOrder, tagFilter, textFilter } =
         CharacterSorter.useSorter()
@@ -52,7 +48,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
     }))
 
     return (
-        <SafeAreaView style={{ paddingVertical: 16, paddingHorizontal: 8, flex: 1 }}>
+        <View style={{ paddingTop: 16, paddingHorizontal: 8, flex: 1 }}>
             <HeaderTitle />
             <HeaderButton
                 headerLeft={() => <Drawer.Button drawerID={Drawer.ID.SETTINGS} />}
@@ -66,6 +62,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
             <View style={{ flex: 1 }}>
                 <CharacterListHeader resultLength={characterList.length} />
                 <Animated.FlatList
+                    layout={LinearTransition}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ rowGap: 8 }}
                     data={characterList}
@@ -96,7 +93,7 @@ const CharacterList: React.FC<CharacterListProps> = ({ showHeader }) => {
             {characterList.length === 0 && data.length !== 0 && updatedAt && (
                 <CharactersSearchEmpty />
             )}
-        </SafeAreaView>
+        </View>
     )
 }
 

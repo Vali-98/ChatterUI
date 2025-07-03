@@ -221,7 +221,7 @@ const ChracterEditor = () => {
     if (!charId) return <Redirect href=".." />
 
     return (
-        <SafeAreaView style={styles.mainContainer}>
+        <SafeAreaView style={styles.mainContainer} edges={['bottom']}>
             <HeaderTitle title="Edit Character" />
             <AvatarViewer editorButton={false} />
             {characterCard && (

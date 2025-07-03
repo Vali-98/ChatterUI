@@ -4,6 +4,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import React from 'react'
 import { StyleSheet, Platform, ScrollView } from 'react-native'
 import Markdown from 'react-native-markdown-display'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const markdownData = `
 # Heading 1
@@ -48,12 +49,6 @@ Inline \`code_inline\` example.
 Here is a block code
 \`\`\`
 
-| Row One  | Row Two | Row Three   |
-|----------|--------:|-------------|
-| Item 1   |  row    | row         |
-| Item 2   |  row    | row         |
-| Item 3   |  row    | row         |
-| Item 4   |  row    | row         |
 
 Latex Plugin:
 - Block:
@@ -64,21 +59,31 @@ $$\\frac{d}{dx} \\left( \\int_{0}^{x} e^{-t^2} \\, dt \\right)^2$$
 
 $s = ut + \\frac{1}{2}at^2$ distance from initial velocity, time and acceleration
 
+| Row One  | Row Two | Row Three   |
+|----------|--------:|-------------|
+| Item 1   |  row    | row         |
+| Item 2   |  row    | row         |
+| Item 3   |  row    | row         |
+| Item 4   |  row    | row         |
+
+
 `
 
 const MarkdownTest = () => {
     const markdownStyle = MarkdownStyle.useMarkdownStyle()
     return (
-        <ScrollView contentContainerStyle={{ padding: 16 }}>
-            <HeaderTitle title="Markdown Test" />
-            <Markdown
-                mergeStyle={false}
-                markdownit={MarkdownStyle.Rules}
-                rules={MarkdownStyle.RenderRules}
-                style={markdownStyle}>
-                {markdownData}
-            </Markdown>
-        </ScrollView>
+        <SafeAreaView edges={['bottom']}>
+            <ScrollView contentContainerStyle={{ padding: 16 }}>
+                <HeaderTitle title="Markdown Test" />
+                <Markdown
+                    mergeStyle={false}
+                    markdownit={MarkdownStyle.Rules}
+                    rules={MarkdownStyle.RenderRules}
+                    style={markdownStyle}>
+                    {markdownData}
+                </Markdown>
+            </ScrollView>
+        </SafeAreaView>
     )
 }
 

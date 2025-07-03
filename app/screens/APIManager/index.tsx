@@ -7,6 +7,7 @@ import { FlatList, Pressable, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 import APIValueItem from './APIValueItem'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const APIManager = () => {
     // eslint-disable-next-line react-compiler/react-compiler
@@ -20,7 +21,8 @@ const APIManager = () => {
 
     const router = useRouter()
     return (
-        <View
+        <SafeAreaView
+            edges={['bottom']}
             style={{
                 paddingTop: spacing.xl,
                 paddingBottom: spacing.xl2,
@@ -74,7 +76,7 @@ const APIManager = () => {
                 onPress={() => router.push('/screens/APIManager/AddAPI')}
                 label="Add Connection"
             />
-        </View>
+        </SafeAreaView>
     )
 }
 

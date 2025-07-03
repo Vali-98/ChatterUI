@@ -62,6 +62,7 @@ const AvatarViewer: React.FC<AvatarViewerProps> = ({ editorButton = true }) => {
         <Modal
             transparent
             statusBarTranslucent
+            navigationBarTranslucent
             style={styles.modal}
             animationType="fade"
             visible={show}

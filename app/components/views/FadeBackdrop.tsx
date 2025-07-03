@@ -11,7 +11,6 @@ const FadeBackrop: React.FC<FadeScreenProps> = ({ handleOverlayClick, children }
     const onBackdropPress = (e: GestureResponderEvent) => {
         if (handleOverlayClick && e.target === e.currentTarget) handleOverlayClick(e)
     }
-
     return (
         <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.absolute}>
             <Pressable onPress={onBackdropPress} style={styles.absolute}>

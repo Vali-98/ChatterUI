@@ -12,6 +12,12 @@ import { groupBy } from '@lib/utils/Array'
 import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'
 import { View } from 'react-native'
+import {
+    KeyboardAvoidingView,
+    KeyboardAwareScrollView,
+    KeyboardStickyView,
+} from 'react-native-keyboard-controller'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type LanguageListItem = {
     [key: string]: Speech.Voice[]
@@ -39,18 +45,16 @@ const TTSMenu = () => {
     const getVoices = (value = false) => {
         Speech.getAvailableVoicesAsync().then((list) => setModelList(list))
     }
-
+    const insets = useSafeAreaInsets()
     return (
-        <View
+        <KeyboardAwareScrollView
             style={{
-                flex: 1,
                 marginVertical: 16,
                 paddingVertical: 16,
                 paddingHorizontal: 16,
-                rowGap: 8,
-            }}>
+            }}
+            contentContainerStyle={{ rowGap: 8 }}>
             <HeaderTitle title="TTS" />
-
             <SectionTitle>Settings</SectionTitle>
 
             <ThemedSwitch
@@ -63,7 +67,6 @@ const TTSMenu = () => {
                     setEnabled(value)
                 }}
             />
-
             <ThemedSwitch
                 value={auto}
                 onChangeValue={(value) => {
@@ -119,24 +122,30 @@ const TTSMenu = () => {
             </View>
 
             <SectionTitle style={{ marginTop: 8 }}>
-                Speaker ({modelList.filter((item) => item.language === lang).length})
+                Voices ({modelList.filter((item) => item.language === lang).length})
             </SectionTitle>
 
             <DropdownSheet
                 style={{ marginBottom: 8 }}
                 search
-                modalTitle="Select Speaker"
+                modalTitle="Select Voice"
                 selected={voice}
                 data={languageList?.[lang] ?? []}
                 labelExtractor={(item) => item.identifier}
-                placeholder="Select Speaker"
+                placeholder="Select Voice"
                 onChangeValue={(item) => setVoice(item)}
             />
-            <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}>
+            <View
+                style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    columnGap: 8,
+                    backgroundColor: color.neutral._100,
+                }}>
                 <ThemedTextInput
                     value={testAudioText}
                     onChangeText={setTestAudioText}
-                    style={{ color: color.text._400, fontStyle: 'italic', flex: 1 }}
+                    style={{ color: color.text._400, fontStyle: 'italic' }}
                 />
                 <ThemedButton
                     label="Test"
@@ -154,7 +163,7 @@ const TTSMenu = () => {
                     }}
                 />
             </View>
-        </View>
+        </KeyboardAwareScrollView>
     )
 }
 

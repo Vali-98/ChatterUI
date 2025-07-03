@@ -7,6 +7,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 import { FlashList } from '@shopify/flash-list'
 import { Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
 const Logs = () => {
@@ -84,19 +85,23 @@ const Logs = () => {
     )
 
     return (
-        <>
+        <SafeAreaView
+            edges={['bottom']}
+            style={{
+                flex: 1,
+            }}>
             <HeaderTitle title="Logs" />
             <HeaderButton headerRight={headerRight} />
-
             <View
                 style={{
-                    backgroundColor: '#000',
                     borderColor: color.primary._500,
                     borderWidth: 1,
-                    margin: 16,
-                    padding: 16,
                     borderRadius: 16,
                     flex: 1,
+                    margin: 16,
+                    backgroundColor: '#000',
+
+                    padding: 16,
                 }}>
                 <FlashList
                     inverted
@@ -114,7 +119,7 @@ const Logs = () => {
                     )}
                 />
             </View>
-        </>
+        </SafeAreaView>
     )
 }
 

@@ -1,7 +1,6 @@
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { mmkvStorage } from '@lib/storage/MMKV'
-import { setBackgroundColorAsync } from 'expo-system-ui'
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
@@ -27,7 +26,6 @@ export namespace Theme {
             (set, get) => ({
                 color: DefaultColorSchemes.lavenderDark,
                 setColor: (color) => {
-                    setBackgroundColorAsync(color.neutral._100)
                     set((state) => ({ ...state, color: color }))
                 },
                 customColors: [],

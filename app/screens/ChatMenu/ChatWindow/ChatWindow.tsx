@@ -12,6 +12,8 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
 import EditorModal from './EditorModal'
+import { chatInputHeightStore } from '../ChatInput'
+import { useShallow } from 'zustand/react/shallow'
 
 type ListItem = {
     index: number
@@ -26,7 +28,7 @@ const ChatWindow = () => {
     const [saveScroll, _] = useMMKVBoolean(AppSettings.SaveScrollPosition)
     const [showModelname, __] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [autoScroll, ___] = useMMKVBoolean(AppSettings.AutoScroll)
-
+    const chatInputHeight = chatInputHeightStore(useShallow((state) => state.height))
     const flatlistRef = useRef<FlatList | null>(null)
 
     const updateScrollPosition = useDebounce((position: number, chatId: number) => {
@@ -51,7 +53,6 @@ const ChatWindow = () => {
                 viewOffset: 32,
             })
     }, [chat?.id, chat?.autoScroll])
-
     const image = useBackgroundImage((state) => state.image)
 
     const list: ListItem[] = (chat?.messages ?? [])
@@ -115,6 +116,7 @@ const ChatWindow = () => {
                         }
                     }, 100)
                 }}
+                contentContainerStyle={{ paddingTop: chatInputHeight }}
             />
         </ImageBackground>
     )

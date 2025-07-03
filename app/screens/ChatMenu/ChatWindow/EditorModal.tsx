@@ -4,7 +4,9 @@ import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 import React, { useEffect, useState } from 'react'
 import { GestureResponderEvent, Modal, StyleSheet, Text, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
 import Animated, { SlideOutDown } from 'react-native-reanimated'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -77,61 +79,68 @@ const EditorModal = () => {
     }
 
     return (
-        <View>
-            <Modal
-                visible={editMode}
-                animationType="fade"
-                transparent
-                statusBarTranslucent
-                onShow={handleAutoFocus}
-                onRequestClose={handleClose}
-                style={{ flex: 1 }}>
-                <FadeBackrop handleOverlayClick={handleOverlayClick} />
-                <View style={{ flex: 1 }} />
-                <Animated.View exiting={SlideOutDown.duration(100)} style={styles.editorContainer}>
-                    <View style={styles.topText}>
-                        <Text numberOfLines={1} style={styles.nameText} ellipsizeMode="tail">
-                            {entry?.name}
-                        </Text>
-                        <Text style={styles.timeText}>{swipe?.send_date.toLocaleTimeString()}</Text>
-                    </View>
+        <Modal
+            visible={editMode}
+            animationType="fade"
+            transparent
+            statusBarTranslucent
+            navigationBarTranslucent
+            onShow={handleAutoFocus}
+            onRequestClose={handleClose}
+            style={{ flex: 1 }}>
+            <FadeBackrop handleOverlayClick={handleOverlayClick} />
+            <KeyboardAvoidingView behavior="height" style={{ flex: 1 }}>
+                <SafeAreaView style={{ flex: 1 }}>
+                    <View style={{ flex: 1 }} />
+                    <Animated.View
+                        exiting={SlideOutDown.duration(100)}
+                        style={styles.editorContainer}>
+                        <View style={styles.topText}>
+                            <Text numberOfLines={1} style={styles.nameText} ellipsizeMode="tail">
+                                {entry?.name}
+                            </Text>
+                            <Text style={styles.timeText}>
+                                {swipe?.send_date.toLocaleTimeString()}
+                            </Text>
+                        </View>
 
-                    <TextInput
-                        ref={inputRef}
-                        style={styles.messageInput}
-                        value={placeholderText}
-                        onChangeText={setPlaceholderText}
-                        textBreakStrategy="simple"
-                        multiline
-                    />
+                        <TextInput
+                            ref={inputRef}
+                            style={styles.messageInput}
+                            value={placeholderText}
+                            onChangeText={setPlaceholderText}
+                            textBreakStrategy="simple"
+                            multiline
+                        />
 
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                        }}>
-                        <ThemedButton
-                            label="Delete"
-                            iconName="delete"
-                            onPress={handleDeleteMessage}
-                            variant="critical"
-                        />
-                        <ThemedButton
-                            iconName="reload1"
-                            variant="tertiary"
-                            label="Reset"
-                            onPress={() => swipeText && setPlaceholderText(swipeText)}
-                        />
-                        <ThemedButton
-                            label="Confirm"
-                            iconName="check"
-                            onPress={handleEditMessage}
-                            variant="secondary"
-                        />
-                    </View>
-                </Animated.View>
-            </Modal>
-        </View>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                            }}>
+                            <ThemedButton
+                                label="Delete"
+                                iconName="delete"
+                                onPress={handleDeleteMessage}
+                                variant="critical"
+                            />
+                            <ThemedButton
+                                iconName="reload1"
+                                variant="tertiary"
+                                label="Reset"
+                                onPress={() => swipeText && setPlaceholderText(swipeText)}
+                            />
+                            <ThemedButton
+                                label="Confirm"
+                                iconName="check"
+                                onPress={handleEditMessage}
+                                variant="secondary"
+                            />
+                        </View>
+                    </Animated.View>
+                </SafeAreaView>
+            </KeyboardAvoidingView>
+        </Modal>
     )
 }
 

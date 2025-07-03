@@ -6,10 +6,10 @@ import PopupMenu from '@components/views/PopupMenu'
 import { DefaultColorSchemes, ThemeColor } from '@lib/theme/ThemeColor'
 import { Theme } from '@lib/theme/ThemeManager'
 import { pickJSONDocument } from '@lib/utils/File'
-import { setBackgroundColorAsync as setUIBackgroundColor } from 'expo-system-ui'
-import { setBackgroundColorAsync as setNavBackgroundColor } from 'expo-navigation-bar'
+import { setBackgroundColorAsync } from 'expo-system-ui'
 import React from 'react'
 import { Text, TouchableOpacity, View, FlatList } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
 type ColorThemeItemProps = {
@@ -55,8 +55,7 @@ const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete
             <TouchableOpacity
                 onPress={() => {
                     setColor(item)
-                    setUIBackgroundColor(item.neutral._100)
-                    setNavBackgroundColor(item.neutral._100)
+                    setBackgroundColorAsync(item.neutral._100)
                 }}
                 style={{
                     borderColor: item.text._100,
@@ -137,7 +136,7 @@ const ColorSelector = () => {
     )
 
     return (
-        <View style={{ padding: 16, rowGap: 16 }}>
+        <SafeAreaView edges={['bottom']} style={{ padding: 16, rowGap: 16 }}>
             <HeaderTitle title="Themes" />
             <HeaderButton
                 headerRight={() => (
@@ -172,7 +171,7 @@ const ColorSelector = () => {
                     />
                 )}
             />
-        </View>
+        </SafeAreaView>
     )
 }
 

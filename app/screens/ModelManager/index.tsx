@@ -16,6 +16,7 @@ import ModelEmpty from './ModelEmpty'
 import ModelItem from './ModelItem'
 import ModelNewMenu from './ModelNewMenu'
 import ModelSettings from './ModelSettings'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const ModelManager = () => {
     const styles = useStyles()
@@ -37,7 +38,7 @@ const ModelManager = () => {
     )
 
     return (
-        <View style={styles.mainContainer}>
+        <SafeAreaView edges={['bottom']} style={styles.mainContainer}>
             <HeaderTitle title={showSettings ? 'Model Settings' : 'Models'} />
             <HeaderButton
                 headerRight={() =>
@@ -158,7 +159,7 @@ const ModelManager = () => {
                 label={showSettings ? 'Back To Models' : 'Show Settings'}
                 onPress={() => setShowSettings(!showSettings)}
             />
-        </View>
+        </SafeAreaView>
     )
 }
 

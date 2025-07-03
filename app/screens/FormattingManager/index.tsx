@@ -20,9 +20,11 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
-import { SafeAreaView, ScrollView, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import Markdown from 'react-native-markdown-display'
 import { useMMKVBoolean } from 'react-native-mmkv'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
 const autoformatterData = [
@@ -161,6 +163,7 @@ const FormattingManager = () => {
     if (currentInstruct)
         return (
             <SafeAreaView
+                edges={['bottom']}
                 key={currentInstruct.id}
                 style={{
                     marginVertical: spacing.xl,
@@ -211,7 +214,7 @@ const FormattingManager = () => {
                     <ThemedButton iconName="save" iconSize={28} variant="tertiary" />
                 </View>
 
-                <ScrollView
+                <KeyboardAwareScrollView
                     showsVerticalScrollIndicator={false}
                     style={{
                         flex: 1,
@@ -587,7 +590,7 @@ const FormattingManager = () => {
                                 setValue={setCurrentInstruct}
                                 multiline
                             />*/}
-                </ScrollView>
+                </KeyboardAwareScrollView>
             </SafeAreaView>
         )
 }
