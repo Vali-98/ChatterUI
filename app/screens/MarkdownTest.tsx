@@ -44,7 +44,7 @@ A list inside a list:
 
 Inline \`code_inline\` example.
 
-\`\`\`
+\`\`\`SourceInfo
 Here is a block code
 \`\`\`
 
@@ -55,6 +55,14 @@ Here is a block code
 | Item 3   |  row    | row         |
 | Item 4   |  row    | row         |
 
+Latex Plugin:
+- Block:
+
+$$\\frac{d}{dx} \\left( \\int_{0}^{x} e^{-t^2} \\, dt \\right)^2$$
+
+- Inline: 
+
+$s = ut + \\frac{1}{2}at^2$ distance from initial velocity, time and acceleration
 
 `
 

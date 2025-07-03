@@ -2,8 +2,8 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import { useTextFilter } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { Chats } from '@lib/state/Chat'
-import React, { useEffect, useRef, useState } from 'react'
-import { View, Animated, Easing, useAnimatedValue } from 'react-native'
+import React, { useRef, useState } from 'react'
+import { Animated, Easing, useAnimatedValue, View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 
 type ChatTextProps = {
@@ -12,7 +12,7 @@ type ChatTextProps = {
 }
 
 const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
-    const markdownStyle = MarkdownStyle.useMarkdownStyle()
+    const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
     const [showHidden, setShowHidden] = useState(false)
     const { swipeText } = Chats.useSwipeData(index)
     const viewRef = useRef<View>(null)
@@ -48,11 +48,7 @@ const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
             <View style={{ minHeight: 10 }} ref={viewRef} onLayout={() => updateHeight()}>
-                <Markdown
-                    mergeStyle={false}
-                    markdownit={MarkdownStyle.Rules}
-                    rules={MarkdownStyle.RenderRules}
-                    style={markdownStyle}>
+                <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
                     {renderedText}
                 </Markdown>
                 {filteredText.found && (

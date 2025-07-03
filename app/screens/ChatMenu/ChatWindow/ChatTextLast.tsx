@@ -13,7 +13,7 @@ type ChatTextProps = {
 }
 
 const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
-    const markdownStyle = MarkdownStyle.useMarkdownStyle()
+    const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
 
     const { swipeText, swipeId } = Chats.useSwipeData(index)
     const { buffer } = Chats.useBuffer()
@@ -63,11 +63,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
                 {swipeId === currentSwipeId && nowGenerating && buffer.data === '' && (
                     <AnimatedEllipsis />
                 )}
-                <Markdown
-                    mergeStyle={false}
-                    markdownit={MarkdownStyle.Rules}
-                    rules={MarkdownStyle.RenderRules}
-                    style={markdownStyle}>
+                <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
                     {nowGenerating && swipeId === currentSwipeId
                         ? buffer.data.trim()
                         : renderedText}

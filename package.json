@@ -71,6 +71,7 @@
     "react-native-collapsible": "^1.6.1",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-markdown-display": "^7.0.2",
+    "react-native-mathjax-svg": "^0.9.9",
     "react-native-mmkv": "^3.1.0",
     "react-native-popup-menu": "^0.17.0",
     "react-native-progress": "^5.0.1",
@@ -79,6 +80,7 @@
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
     "react-native-simple-toast": "^3.2.0",
+    "react-native-svg": "^15.12.0",
     "upgrade": "^1.1.0",
     "zod": "^3.24.1",
     "zustand": "^5.0.4"
