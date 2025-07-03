@@ -76,27 +76,25 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
                 <ChatAttachments index={index} />
                 <View
                     style={{
-                        flexDirection: 'row-reverse',
+                        flexDirection: 'row',
                         justifyContent: 'space-between',
                     }}>
+                    <Text
+                        style={{
+                            color: color.text._500,
+                            fontWeight: '300',
+                            textAlign: 'right',
+                            fontSize: fontSize.s,
+                        }}>
+                        {`Prompt: ${getFiniteValue(0)} t/s`}
+                        {`   Text Gen: ${getFiniteValue(0)} t/s`}
+                    </Text>
+
                     <ChatActions
                         nowGenerating={nowGenerating}
                         isLastMessage={isLastMessage}
                         index={index}
                     />
-                    {showTPS && appMode === 'local' && timings && (
-                        <Text
-                            style={{
-                                color: color.text._500,
-                                fontWeight: '300',
-                                textAlign: 'right',
-                                fontSize: fontSize.s,
-                                zIndex: 20,
-                            }}>
-                            {`Prompt: ${getFiniteValue(timings.prompt_per_second)} t/s`}
-                            {`   Text Gen: ${getFiniteValue(timings.predicted_per_second)} t/s`}
-                        </Text>
-                    )}
                 </View>
             </Pressable>
             {showSwipe && (
