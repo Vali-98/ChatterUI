@@ -70,7 +70,7 @@ export namespace APIState {
                 removeTemplate: (index) => {
                     const templates = get().customTemplates
                     templates.splice(index, 1)
-                    set((state) => ({ ...state, customTemplates: templates }))
+                    set((state) => ({ customTemplates: [...templates] }))
                 },
                 editValue: (newValue, index) => {
                     const values = [...get().values]

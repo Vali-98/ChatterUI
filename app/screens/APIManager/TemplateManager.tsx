@@ -6,11 +6,17 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { getDocumentAsync } from 'expo-document-picker'
 import { readAsStringAsync } from 'expo-file-system'
 import { Stack } from 'expo-router'
-import { FlatList, Text, View } from 'react-native'
+import { FlatList, Linking, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 import TemplateItem from './TemplateItem'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { pickJSONDocument } from '@lib/utils/File'
+import HeaderTitle from '@components/views/HeaderTitle'
+import HeaderButton from '@components/views/HeaderButton'
+import PopupMenu from '@components/views/PopupMenu'
+import TextBoxModal from '@components/views/TextBoxModal'
+import { useState } from 'react'
 
 const TemplateManager = () => {
     // eslint-disable-next-line react-compiler/react-compiler
@@ -21,7 +27,7 @@ const TemplateManager = () => {
             addTemplate: state.addTemplate,
         }))
     )
-
+    const [showPaste, setShowPaste] = useState(false)
     const { color, spacing } = Theme.useTheme()
 
     return (
@@ -33,10 +39,70 @@ const TemplateManager = () => {
                 paddingBottom: spacing.xl2,
                 flex: 1,
             }}>
-            <Stack.Screen
-                options={{
-                    title: 'Template Manager',
+            <HeaderTitle title="Template Manager" />
+            <HeaderButton
+                headerRight={() => (
+                    <PopupMenu
+                        icon="setting"
+                        placement="bottom"
+                        options={[
+                            {
+                                label: 'Import Template',
+                                icon: 'download',
+                                onPress: async (m) => {
+                                    m.current?.close()
+                                    const result = await pickJSONDocument()
+                                    if (!result.success) {
+                                        return
+                                    }
+                                    addTemplate(result.data)
+                                },
+                            },
+                            {
+                                label: 'Paste Template',
+                                icon: 'file1',
+                                onPress: (m) => {
+                                    m.current?.close()
+                                    setShowPaste(true)
+                                },
+                            },
+                            {
+                                label: 'Get Templates',
+                                icon: 'github',
+                                onPress: (m) => {
+                                    m.current?.close()
+                                    Linking.openURL(
+                                        'https://github.com/Vali-98/ChatterUI/discussions/126'
+                                    )
+                                },
+                            },
+                            {
+                                label: 'Learn About Templates',
+                                icon: 'info',
+                                onPress: (m) => {
+                                    m.current?.close()
+                                    Linking.openURL(
+                                        'https://github.com/Vali-98/ChatterUI/blob/dev/docs/CustomTemplates.md'
+                                    )
+                                },
+                            },
+                        ]}
+                    />
+                )}
+            />
+            <TextBoxModal
+                booleans={[showPaste, setShowPaste]}
+                onConfirm={(e) => {
+                    try {
+                        const data = JSON.parse(e)
+                        addTemplate(data)
+                    } catch (e) {
+                        Logger.errorToast('Failed to import: ' + e)
+                    }
                 }}
+                multiline
+                showPaste
+                title="Paste Theme Here"
             />
             {templates.length > 0 && (
                 <FlatList
@@ -69,23 +135,6 @@ const TemplateManager = () => {
                     </Text>
                 </View>
             )}
-
-            <ThemedButton
-                onPress={async () => {
-                    const result = await getDocumentAsync()
-                    if (result.canceled) return
-
-                    const uri = result.assets[0].uri
-                    const data = await readAsStringAsync(uri, { encoding: 'utf8' })
-                    try {
-                        const jsonData = JSON.parse(data)
-                        addTemplate(jsonData)
-                    } catch (e) {
-                        Logger.errorToast('Failed to Import')
-                    }
-                }}
-                label="Add Template"
-            />
         </SafeAreaView>
     )
 }
