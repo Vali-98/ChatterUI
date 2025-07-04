@@ -72,8 +72,9 @@ export type EngineDataProps = {
     lastModel?: ModelDataType
     lastMmproj?: ModelDataType
     setConfiguration: (config: LlamaConfig) => void
-    setLastModelLoaded: (model: ModelDataType) => void
-    setLastMmprojLoaded: (model: ModelDataType) => void
+    setLastModelLoaded: (model: ModelDataType | undefined) => void
+    setLastMmprojLoaded: (model: ModelDataType | undefined) => void
+    maybeClearLastLoaded: (mode: ModelDataType) => void
 }
 
 const sessionFile = `${AppDirectory.SessionPath}llama-session.bin`
@@ -94,14 +95,19 @@ export namespace Llama {
                 setConfiguration: (config: LlamaConfig) => {
                     set({ config: config })
                 },
-                setLastModelLoaded: (model: ModelDataType) => {
-                    if (get().lastMmproj && get().lastModel?.id !== model.id) {
+                setLastModelLoaded: (model: ModelDataType | undefined) => {
+                    if (get().lastModel?.id === model?.id) return
+                    set({ lastModel: model, lastMmproj: undefined })
+                },
+                setLastMmprojLoaded: (mmproj: ModelDataType | undefined) => {
+                    set({ lastMmproj: mmproj })
+                },
+                maybeClearLastLoaded: (data) => {
+                    if (data.id === get().lastModel?.id) {
+                        set({ lastModel: undefined, lastMmproj: undefined })
+                    } else if (data.id === get().lastMmproj?.id) {
                         set({ lastMmproj: undefined })
                     }
-                    set({ lastModel: model })
-                },
-                setLastMmprojLoaded: (mmproj: ModelDataType) => {
-                    set({ lastMmproj: mmproj })
                 },
             }),
             {
@@ -114,7 +120,6 @@ export namespace Llama {
                 storage: createJSONStorage(() => mmkvStorage),
                 version: 1,
                 migrate: (persistedState: any, version) => {
-                    console.log(version)
                     if (version === 1) {
                         persistedState.config.ctx_shift = true
                         Logger.info('Migrated to v2 EngineData')

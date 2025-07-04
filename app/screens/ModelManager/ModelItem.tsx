@@ -41,6 +41,10 @@ const ModelItem: React.FC<ModelItemProps> = ({
         }))
     )
 
+    const maybeClearLastLoaded = Llama.useEngineData(
+        useShallow((state) => state.maybeClearLastLoaded)
+    )
+
     const [showEdit, setShowEdit] = useState(false)
     //@ts-ignore
     const quant: string = item.quantization && GGMLNameMap[item.quantization]
@@ -64,6 +68,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                             await unloadModel()
                         }
                         await Model.deleteModelById(item.id)
+                        maybeClearLastLoaded(item)
                     },
                     type: 'warning',
                 },
