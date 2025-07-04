@@ -79,16 +79,18 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                     }}>
-                    <Text
-                        style={{
-                            color: color.text._500,
-                            fontWeight: '300',
-                            textAlign: 'right',
-                            fontSize: fontSize.s,
-                        }}>
-                        {`Prompt: ${getFiniteValue(0)} t/s`}
-                        {`   Text Gen: ${getFiniteValue(0)} t/s`}
-                    </Text>
+                    {showTPS && appMode === 'local' && timings && (
+                        <Text
+                            style={{
+                                color: color.text._500,
+                                fontWeight: '300',
+                                textAlign: 'right',
+                                fontSize: fontSize.s,
+                            }}>
+                            {`Prompt: ${getFiniteValue(timings.prompt_per_second)} t/s`}
+                            {`   Text Gen: ${getFiniteValue(timings.predicted_per_second)} t/s`}
+                        </Text>
+                    )}
 
                     <ChatActions
                         nowGenerating={nowGenerating}
