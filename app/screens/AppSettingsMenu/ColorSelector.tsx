@@ -3,12 +3,14 @@ import Alert from '@components/views/Alert'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import PopupMenu from '@components/views/PopupMenu'
+import TextBoxModal from '@components/views/TextBoxModal'
+import { Logger } from '@lib/state/Logger'
 import { DefaultColorSchemes, ThemeColor } from '@lib/theme/ThemeColor'
 import { Theme } from '@lib/theme/ThemeManager'
 import { pickJSONDocument } from '@lib/utils/File'
 import { setBackgroundColorAsync } from 'expo-system-ui'
-import React from 'react'
-import { Text, TouchableOpacity, View, FlatList } from 'react-native'
+import React, { useState } from 'react'
+import { Text, TouchableOpacity, View, FlatList, Linking } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -127,13 +129,14 @@ const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete
 }
 
 const ColorSelector = () => {
-    const { color, customColors, addCustomColor } = Theme.useColorState(
+    const { customColors, addCustomColor } = Theme.useColorState(
         useShallow((state) => ({
-            color: state.color,
             customColors: state.customColors,
             addCustomColor: state.addCustomColor,
         }))
     )
+
+    const [showPaste, setShowPaste] = useState(false)
 
     return (
         <SafeAreaView edges={['bottom']} style={{ padding: 16, rowGap: 16 }}>
@@ -155,9 +158,41 @@ const ColorSelector = () => {
                                     m?.current?.close()
                                 },
                             },
+                            {
+                                label: 'Paste Theme',
+                                icon: 'file1',
+                                onPress: (m) => {
+                                    m.current?.close()
+                                    setShowPaste(true)
+                                },
+                            },
+                            {
+                                label: 'Get Themes',
+                                icon: 'github',
+                                onPress: (m) => {
+                                    m.current?.close()
+                                    Linking.openURL(
+                                        'https://github.com/Vali-98/ChatterUI/discussions/218'
+                                    )
+                                },
+                            },
                         ]}
                     />
                 )}
+            />
+            <TextBoxModal
+                booleans={[showPaste, setShowPaste]}
+                onConfirm={(e) => {
+                    try {
+                        const data = JSON.parse(e)
+                        addCustomColor(data)
+                    } catch (e) {
+                        Logger.errorToast('Failed to import: ' + e)
+                    }
+                }}
+                multiline
+                showPaste
+                title="Paste Theme Here"
             />
             <FlatList
                 contentContainerStyle={{ rowGap: 8 }}

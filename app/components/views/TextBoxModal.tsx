@@ -25,6 +25,7 @@ type TextBoxModalProps = {
     errorMessage?: string
     autoFocus?: boolean
     defaultValue?: string
+    multiline?: boolean
 }
 
 const TextBoxModal: React.FC<TextBoxModalProps> = ({
@@ -38,6 +39,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
     errorMessage = 'Name cannot be empty',
     autoFocus = false,
     defaultValue = '',
+    multiline = false,
 }) => {
     const styles = useStyles()
     const { color, spacing } = Theme.useTheme()
@@ -85,6 +87,8 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                             onChangeText={setText}
                             placeholder={placeholder}
                             placeholderTextColor={color.text._700}
+                            multiline={multiline}
+                            numberOfLines={10}
                         />
                         {showPaste && !text && (
                             <TouchableOpacity
