@@ -6,6 +6,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { DefaultColorSchemes, ThemeColor, themeColorSchemaV1 } from './ThemeColor'
+import { Appearance } from 'react-native'
 
 interface ColorStateProps {
     customColors: ThemeColor[]
@@ -24,7 +25,10 @@ export namespace Theme {
     export const useColorState = create<ColorStateProps>()(
         persist(
             (set, get) => ({
-                color: DefaultColorSchemes.lavenderDark,
+                color:
+                    Appearance.getColorScheme() === 'dark'
+                        ? DefaultColorSchemes.lavenderDark
+                        : DefaultColorSchemes.lavenderLight,
                 setColor: (color) => {
                     set((state) => ({ ...state, color: color }))
                 },
