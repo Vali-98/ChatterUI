@@ -10,8 +10,9 @@ import ChatWindow from '@screens/ChatMenu/ChatWindow/ChatWindow'
 import ChatsDrawer from '@screens/ChatMenu/ChatsDrawer'
 import SettingsDrawer from '@screens/SettingsDrawer'
 import { useEffect } from 'react'
+import { View } from 'react-native'
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
 const ChatMenu = () => {
@@ -67,38 +68,54 @@ const ChatMenu = () => {
                     closeDirection: 'left',
                 },
             ]}>
-            <KeyboardAvoidingView
-                keyboardVerticalOffset={getOffset()}
-                behavior="translate-with-padding"
-                style={{ flex: 1, paddingBottom: insets.bottom }}>
-                <HeaderTitle />
-                <HeaderButton
-                    headerLeft={() => !showChats && <Drawer.Button drawerID={Drawer.ID.SETTINGS} />}
-                    headerRight={() =>
-                        !showSettings && (
-                            <>
-                                {!showChats && (
-                                    <ThemedButton
-                                        buttonStyle={{
-                                            marginRight: 16,
-                                        }}
-                                        iconName="plus"
-                                        variant="tertiary"
-                                        iconSize={24}
-                                        onPress={handleCreateChat}
+            <View style={{ flex: 1 }}>
+                <KeyboardAvoidingView
+                    keyboardVerticalOffset={getOffset()}
+                    behavior="translate-with-padding"
+                    style={{ flex: 1, paddingBottom: insets.bottom }}>
+                    <HeaderTitle />
+                    <HeaderButton
+                        headerLeft={() =>
+                            !showChats && <Drawer.Button drawerID={Drawer.ID.SETTINGS} />
+                        }
+                        headerRight={() =>
+                            !showSettings && (
+                                <>
+                                    {!showChats && (
+                                        <ThemedButton
+                                            buttonStyle={{
+                                                marginRight: 16,
+                                            }}
+                                            iconName="plus"
+                                            variant="tertiary"
+                                            iconSize={24}
+                                            onPress={handleCreateChat}
+                                        />
+                                    )}
+                                    <Drawer.Button
+                                        drawerID={Drawer.ID.CHATLIST}
+                                        openIcon="message1"
                                     />
-                                )}
-                                <Drawer.Button drawerID={Drawer.ID.CHATLIST} openIcon="message1" />
-                            </>
-                        )
-                    }
-                />
-                {chat && <ChatWindow />}
-                <ChatInput />
-                <AvatarViewer />
-                <ChatsDrawer />
-                <SettingsDrawer />
-            </KeyboardAvoidingView>
+                                </>
+                            )
+                        }
+                    />
+                    {chat && <ChatWindow />}
+                    <ChatInput />
+                    <AvatarViewer />
+                    <ChatsDrawer />
+                </KeyboardAvoidingView>
+                {/**Drawer has to be outside of the KeyboardAvoidingView */}
+                <View
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        paddingBottom: insets.bottom,
+                        position: 'absolute',
+                    }}>
+                    <SettingsDrawer />
+                </View>
+            </View>
         </Drawer.Gesture>
     )
 }
