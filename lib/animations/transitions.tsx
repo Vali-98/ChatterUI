@@ -24,8 +24,8 @@ export const YAxisOnlyTransition = (values: LayoutAnimationsValues) => {
         },
 
         initialValues: {
-            originY: values.targetOriginY,
-            height: values.targetHeight,
+            originY: values.currentOriginY,
+            height: values.currentHeight,
         },
     }
 }

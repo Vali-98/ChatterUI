@@ -10,9 +10,10 @@ import { FlashList } from '@shopify/flash-list'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
+import { YAxisOnlyTransition } from '@lib/animations/transitions'
 import ChatDrawerItem from './ChatDrawerItem'
 import ChatDrawerSearchItem from './ChatDrawerSearchItem'
 
@@ -95,7 +96,7 @@ const ChatsDrawer = () => {
             {!showSearchResults && (
                 <>
                     <Animated.View
-                        layout={LinearTransition}
+                        layout={YAxisOnlyTransition}
                         entering={FadeIn.duration(200)}
                         style={styles.listContainer}>
                         <FlashList
