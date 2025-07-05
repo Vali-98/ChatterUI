@@ -103,7 +103,6 @@ const ChatMenu = () => {
                     {chat && <ChatWindow />}
                     <ChatInput />
                     <AvatarViewer />
-                    <ChatsDrawer />
                 </KeyboardAvoidingView>
                 {/**Drawer has to be outside of the KeyboardAvoidingView */}
                 <View
@@ -114,6 +113,7 @@ const ChatMenu = () => {
                         position: 'absolute',
                     }}>
                     <SettingsDrawer />
+                    <ChatsDrawer />
                 </View>
             </View>
         </Drawer.Gesture>

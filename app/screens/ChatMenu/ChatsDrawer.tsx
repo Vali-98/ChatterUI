@@ -10,7 +10,7 @@ import { FlashList } from '@shopify/flash-list'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Animated, { FadeIn } from 'react-native-reanimated'
+import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import ChatDrawerItem from './ChatDrawerItem'
@@ -73,37 +73,46 @@ const ChatsDrawer = () => {
                 <Text style={styles.drawerTitle}>{showSearchBar ? 'Search' : 'Chats'}</Text>
                 <ThemedButton
                     variant="tertiary"
-                    iconName={showSearchBar ? 'menufold' : 'search1'}
+                    iconName={showSearchBar ? 'back' : 'search1'}
                     onPress={() => {
                         setShowSearchBar(!showSearchBar)
                         setShowSearchResults(searchQuery.length > 0 && !showSearchBar)
                     }}
                 />
             </View>
-            {showSearchBar && (
-                <ThemedTextInput
-                    placeholder="Search for message..."
-                    containerStyle={{ flex: 0, marginTop: 12, marginBottom: 12 }}
-                    value={searchQuery}
-                    autoCorrect={false}
-                    onChangeText={setSearch}
-                    submitBehavior="submit"
-                />
-            )}
-            {!showSearchResults && (
-                <Animated.View entering={FadeIn.duration(200)} style={styles.listContainer}>
-                    <FlashList
-                        estimatedItemSize={82}
-                        data={data}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={({ item, index }) => (
-                            <ChatDrawerItem item={item} onLoad={handleLoadChat} />
-                        )}
-                        showsVerticalScrollIndicator={false}
-                        removeClippedSubviews={false}
+            <Animated.View key={showSearchBar + ''} entering={FadeIn} exiting={FadeOut}>
+                {showSearchBar && (
+                    <ThemedTextInput
+                        placeholder="Search for message..."
+                        containerStyle={{ flex: 0, marginTop: 12, marginBottom: 12 }}
+                        value={searchQuery}
+                        autoCorrect={false}
+                        onChangeText={setSearch}
+                        submitBehavior="submit"
                     />
-                    <ThemedButton label="Start New Chat" onPress={handleCreateChat} />
-                </Animated.View>
+                )}
+            </Animated.View>
+            {!showSearchResults && (
+                <>
+                    <Animated.View
+                        layout={LinearTransition}
+                        entering={FadeIn.duration(200)}
+                        style={styles.listContainer}>
+                        <FlashList
+                            estimatedItemSize={82}
+                            data={data}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({ item, index }) => (
+                                <ChatDrawerItem item={item} onLoad={handleLoadChat} />
+                            )}
+                            showsVerticalScrollIndicator={false}
+                            removeClippedSubviews={false}
+                        />
+                    </Animated.View>
+                    <Animated.View entering={FadeIn} exiting={FadeOut}>
+                        <ThemedButton label="Start New Chat" onPress={handleCreateChat} />
+                    </Animated.View>
+                </>
             )}
             {showSearchResults && (
                 <Animated.View entering={FadeIn.duration(200)} style={styles.listContainer}>
