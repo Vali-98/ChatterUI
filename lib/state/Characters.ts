@@ -11,19 +11,7 @@ import {
     chats,
     tags,
 } from 'db/schema'
-import {
-    and,
-    asc,
-    desc,
-    eq,
-    exists,
-    gte,
-    inArray,
-    like,
-    notExists,
-    notInArray,
-    sql,
-} from 'drizzle-orm'
+import { and, asc, desc, eq, gte, ilike, inArray, notExists, notInArray, sql } from 'drizzle-orm'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Asset } from 'expo-asset'
 import { randomUUID } from 'expo-crypto'
@@ -34,10 +22,10 @@ import { z } from 'zod'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-import { Logger } from './Logger'
+import { replaceMacroBase } from '@lib/utils/Macros'
 import { mmkvStorage } from '../storage/MMKV'
 import { createPNGWithText, getPngChunkText } from '../utils/PNG'
-import { replaceMacroBase } from '@lib/utils/Macros'
+import { Logger } from './Logger'
 
 export type CharInfo = {
     name: string
@@ -392,7 +380,7 @@ export namespace Characters {
                     where: (characters) => {
                         const base = eq(characters.type, type)
                         const search = searchFilter
-                            ? like(characters.name, `${searchFilter.trim().toLocaleLowerCase()}`)
+                            ? ilike(characters.name, `${searchFilter.trim().toLocaleLowerCase()}`)
                             : undefined
                         const hidden =
                             hiddenTags.length > 0
