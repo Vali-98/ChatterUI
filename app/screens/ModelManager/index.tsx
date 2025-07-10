@@ -1,44 +1,64 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { AntDesign } from '@expo/vector-icons'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { Model } from '@lib/engine/Local/Model'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
-import { StyleSheet, Text, View, FlatList } from 'react-native'
-import * as Progress from 'react-native-progress'
+import { SectionList } from 'react-native'
 import Animated, { Easing, SlideInLeft, SlideOutLeft } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
+import SectionTitle from '@components/text/SectionTitle'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import ModelEmpty from './ModelEmpty'
+import ModelInfoHeader from './ModelInfoHeader'
 import ModelItem from './ModelItem'
 import ModelNewMenu from './ModelNewMenu'
 import ModelSettings from './ModelSettings'
-import { SafeAreaView } from 'react-native-safe-area-context'
 
 const ModelManager = () => {
-    const styles = useStyles()
-    const { color } = Theme.useTheme()
+    const { spacing } = Theme.useTheme()
 
-    const { data, updatedAt } = useLiveQuery(Model.getModelListQuery())
+    const { data: mmprojLinks } = useLiveQuery(Model.getMMPROJLinks())
+
+    const { data: modelList, updatedAt: modelUpdatedAt } = useLiveQuery(
+        Model.getModelListQuery2(),
+        [mmprojLinks]
+    )
+    const { data: mmprojList, updatedAt: mmprojUpdated } = useLiveQuery(Model.getMMPROJListQuery())
 
     const [showSettings, setShowSettings] = useState(false)
-
     const [modelLoading, setModelLoading] = useState(false)
     const [modelImporting, setModelImporting] = useState(false)
 
-    const { modelName, loadProgress, setloadProgress } = Llama.useLlama(
+    const { setloadProgress } = Llama.useLlama(
         useShallow((state) => ({
-            modelName: state.model?.name,
-            loadProgress: state.loadProgress,
             setloadProgress: state.setLoadProgress,
         }))
     )
 
+    const data = [
+        {
+            title: 'Models',
+            data: modelList,
+        },
+        {
+            title: 'Multimodal Adapters',
+            data: mmprojList,
+        },
+    ]
+
     return (
-        <SafeAreaView edges={['bottom']} style={styles.mainContainer}>
+        <SafeAreaView
+            edges={['bottom']}
+            style={{
+                paddingTop: spacing.xl,
+                paddingHorizontal: spacing.xl,
+                paddingBottom: spacing.xl2,
+                flex: 1,
+            }}>
             <HeaderTitle title={showSettings ? 'Model Settings' : 'Models'} />
             <HeaderButton
                 headerRight={() =>
@@ -56,83 +76,23 @@ const ModelManager = () => {
                     style={{ flex: 1 }}
                     entering={SlideInLeft.easing(Easing.inOut(Easing.cubic))}
                     exiting={SlideOutLeft.easing(Easing.inOut(Easing.cubic))}>
-                    <View style={styles.modelContainer}>
-                        {!modelImporting && !modelLoading && data.length !== 0 && (
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                }}>
-                                <Text style={styles.subtitle}>Model Loaded: </Text>
-                                <Text style={styles.modelTitle} ellipsizeMode="tail">
-                                    {modelName ? modelName : 'None'}
-                                </Text>
-                            </View>
-                        )}
-                        {!modelImporting && !modelLoading && data.length === 0 && updatedAt && (
-                            <View>
-                                <Text style={styles.hint}>
-                                    Hint: Press <AntDesign name="addfile" size={16} /> and import a
-                                    GGUF model!
-                                </Text>
-                            </View>
-                        )}
+                    <ModelInfoHeader
+                        modelImporting={modelImporting}
+                        modelLoading={modelLoading}
+                        modelListLength={modelList.length}
+                        modelUpdatedAt={modelUpdatedAt}
+                    />
 
-                        {!modelLoading && modelImporting && (
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Progress.Bar
-                                    style={{ flex: 5 }}
-                                    indeterminate
-                                    indeterminateAnimationDuration={2000}
-                                    color={color.primary._500}
-                                    borderColor={color.neutral._300}
-                                    height={12}
-                                    borderRadius={12}
-                                    width={null}
-                                />
-
-                                <Text
-                                    style={{
-                                        flex: 2,
-                                        color: color.text._100,
-                                        textAlign: 'center',
-                                    }}>
-                                    Importing...
-                                </Text>
-                            </View>
-                        )}
-
-                        {modelLoading && !modelImporting && (
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Progress.Bar
-                                    style={{ flex: 5 }}
-                                    progress={loadProgress / 100}
-                                    color={color.primary._500}
-                                    borderColor={color.neutral._300}
-                                    height={12}
-                                    borderRadius={12}
-                                    width={null}
-                                />
-                                <Text
-                                    style={{
-                                        flex: 1,
-                                        color: color.text._100,
-                                        textAlign: 'center',
-                                    }}>
-                                    {loadProgress}%
-                                </Text>
-                            </View>
-                        )}
-                    </View>
-
-                    {data.length === 0 && updatedAt && <ModelEmpty />}
-
-                    <FlatList
-                        style={styles.list}
-                        data={data}
+                    <SectionList
+                        style={{
+                            marginTop: 16,
+                            flex: 1,
+                        }}
+                        sections={data}
                         renderItem={({ item, index }) => (
                             <ModelItem
                                 item={item}
-                                index={index}
+                                mmprojList={mmprojList}
                                 modelLoading={modelLoading}
                                 setModelLoading={(b: boolean) => {
                                     if (b) setloadProgress(0)
@@ -141,9 +101,19 @@ const ModelManager = () => {
                                 modelImporting={modelImporting}
                             />
                         )}
+                        renderSectionHeader={({ section: { title, data } }) => {
+                            return (
+                                <SectionTitle
+                                    visible={data.length > 0}
+                                    style={{ marginBottom: 16 }}>
+                                    {title}
+                                </SectionTitle>
+                            )
+                        }}
                         keyExtractor={(item) => item.id.toString()}
                         removeClippedSubviews={false}
                         showsVerticalScrollIndicator={false}
+                        ListEmptyComponent={() => <ModelEmpty />}
                     />
                 </Animated.View>
             )}
@@ -164,45 +134,3 @@ const ModelManager = () => {
 }
 
 export default ModelManager
-
-export const useStyles = () => {
-    const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
-
-    return StyleSheet.create({
-        mainContainer: {
-            paddingTop: spacing.xl,
-            paddingHorizontal: spacing.xl,
-            paddingBottom: spacing.xl2,
-            flex: 1,
-        },
-
-        list: {
-            flex: 1,
-        },
-
-        modelContainer: {
-            borderRadius: borderRadius.l,
-            paddingVertical: spacing.l,
-            paddingHorizontal: spacing.xl2,
-            backgroundColor: color.neutral._200,
-            marginBottom: spacing.l,
-        },
-
-        title: {
-            fontSize: fontSize.l,
-            color: color.text._100,
-        },
-
-        modelTitle: {
-            color: color.primary._700,
-        },
-
-        subtitle: {
-            color: color.text._300,
-        },
-
-        hint: {
-            color: color.text._400,
-        },
-    })
-}

@@ -4,8 +4,8 @@ import { Logger } from '@lib/state/Logger'
 import { mmkvStorage } from '@lib/storage/MMKV'
 import { AppDirectory, readableFileSize } from '@lib/utils/File'
 import { loadLlamaModelInfo } from 'cui-llama.rn'
-import { model_data, ModelDataType } from 'db/schema'
-import { eq } from 'drizzle-orm'
+import { model_data, model_mmproj_links, ModelDataType } from 'db/schema'
+import { eq, inArray, notInArray } from 'drizzle-orm'
 import { getDocumentAsync } from 'expo-document-picker'
 import { copyAsync, deleteAsync, getInfoAsync, readDirectoryAsync } from 'expo-file-system'
 import { Platform } from 'react-native'
@@ -15,6 +15,16 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { GGMLNameMap, GGMLType } from './GGML'
 
 export type ModelData = Omit<ModelDataType, 'id' | 'create_date' | 'last_modified'>
+export type ModelListQueryType = Omit<
+    Awaited<ReturnType<typeof Model.getModelListQuery2>>[0],
+    'mmprojLink'
+> & {
+    mmprojLink?: {
+        model_id: number
+        mmproj_id: number
+    }
+}
+const mmprojArchs = ['clip', 'llava']
 
 export namespace Model {
     export const getModelList = async () => {
@@ -28,6 +38,10 @@ export namespace Model {
         if (modelInfo.file_path.startsWith(AppDirectory.ModelPath))
             await deleteModel(modelInfo.file)
         await db.delete(model_data).where(eq(model_data.id, id))
+    }
+
+    export const isMMPROJ = (arch: string) => {
+        return mmprojArchs.includes(arch)
     }
 
     export const importModel = async () => {
@@ -131,11 +145,44 @@ export namespace Model {
         return db.query.model_data.findMany()
     }
 
+    export const getModelListQuery2 = () => {
+        return db.query.model_data.findMany({
+            where: notInArray(model_data.architecture, mmprojArchs),
+            with: {
+                mmprojLink: true,
+            },
+        })
+    }
+
+    export const getMMPROJListQuery = () => {
+        return db.query.model_data.findMany({
+            where: inArray(model_data.architecture, mmprojArchs),
+            with: {
+                mmprojLink: true,
+            },
+        })
+    }
+
+    export const getMMPROJLinks = () => {
+        return db.query.model_mmproj_links.findMany()
+    }
+
+    export const createMMPROJLink = async (
+        model: ModelListQueryType,
+        mmproj: ModelListQueryType
+    ) => {
+        await db.insert(model_mmproj_links).values({ model_id: model.id, mmproj_id: mmproj.id })
+    }
+
+    export const removeMMPROJLink = async (model: ModelListQueryType) => {
+        await db.delete(model_mmproj_links).where(eq(model_mmproj_links.model_id, model.id))
+    }
+
     export const updateName = async (name: string, id: number) => {
         await db.update(model_data).set({ name: name }).where(eq(model_data.id, id))
     }
 
-    export const isInitialEntry = (data: ModelData) => {
+    export const isInitialEntry = (data: ModelListQueryType) => {
         const initial: ModelData = {
             file: '',
             file_path: '',
@@ -150,7 +197,7 @@ export namespace Model {
         for (const key in initial) {
             if (key === 'file' || key === 'file_path') continue
             const initialV = initial[key as keyof ModelData]
-            const dataV = data[key as keyof ModelData]
+            const dataV = data[key as keyof ModelListQueryType]
             if (initialV !== dataV) return false
         }
         return true

@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm'
-import { integer, sqliteTable, text, primaryKey } from 'drizzle-orm/sqlite-core'
+import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 // TAVERN V2 SPEC
 
@@ -313,6 +313,37 @@ export const model_data = sqliteTable('model_data', {
         .notNull()
         .$onUpdateFn(() => Date.now()),
 })
+
+export const model_mmproj_links = sqliteTable(
+    'model_mmproj_links',
+    {
+        model_id: integer('model_id', { mode: 'number' })
+            .notNull()
+            .references(() => model_data.id, { onDelete: 'cascade' }),
+
+        mmproj_id: integer('mmproj_id', { mode: 'number' })
+            .notNull()
+            .references(() => model_data.id, { onDelete: 'cascade' }),
+    },
+    (table) => {
+        return {
+            pk: primaryKey({ columns: [table.model_id, table.mmproj_id] }),
+        }
+    }
+)
+
+export const modelDataRelations = relations(model_data, ({ one }) => ({
+    mmprojLink: one(model_mmproj_links, {
+        relationName: 'model_to_mmproj',
+        fields: [model_data.id],
+        references: [model_mmproj_links.model_id],
+    }),
+    modelLink: one(model_mmproj_links, {
+        relationName: 'mmproj_to_model',
+        fields: [model_data.id],
+        references: [model_mmproj_links.mmproj_id],
+    }),
+}))
 
 // Types
 

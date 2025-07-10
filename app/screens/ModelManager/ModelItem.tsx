@@ -1,9 +1,10 @@
+import DropdownSheet from '@components/input/DropdownSheet'
 import Alert from '@components/views/Alert'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { AntDesign } from '@expo/vector-icons'
 import { GGMLNameMap } from '@lib/engine/Local'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
-import { Model } from '@lib/engine/Local/Model'
+import { Model, ModelListQueryType } from '@lib/engine/Local/Model'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { readableFileSize } from '@lib/utils/File'
@@ -13,10 +14,10 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 type ModelItemProps = {
-    item: ModelDataType
-    index: number
+    item: ModelListQueryType
     modelLoading: boolean
     setModelLoading: (b: boolean) => void
+    mmprojList: ModelDataType[]
     modelImporting: boolean
 }
 
@@ -25,18 +26,17 @@ const ModelItem: React.FC<ModelItemProps> = ({
     modelImporting,
     modelLoading,
     setModelLoading,
-    index,
+    mmprojList,
 }) => {
     const styles = useStyles()
     const { color } = Theme.useTheme()
-
-    const { loadModel, unloadModel, modelId, loadMmproj, unloadMmproj, mmprojId } = Llama.useLlama(
+    const [showMMPROJSelector, setShowMMPROJSelector] = useState(false)
+    const { loadModel, unloadModel, loadMmproj, modelId, mmprojId } = Llama.useLlama(
         useShallow((state) => ({
+            loadMmproj: state.loadMmproj,
             loadModel: state.load,
             unloadModel: state.unload,
             modelId: state.model?.id,
-            loadMmproj: state.loadMmproj,
-            unloadMmproj: state.unloadMmproj,
             mmprojId: state.mmproj?.id,
         }))
     )
@@ -75,7 +75,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
             ],
         })
     }
-    const isMMPROJ = item.architecture === 'clip' || item.architecture === 'llava'
+    const isMMPROJ = Model.isMMPROJ(item.architecture)
     const isLoaded = isMMPROJ ? mmprojId === item.id : modelId === item.id
 
     const disable =
@@ -84,6 +84,8 @@ const ModelItem: React.FC<ModelItemProps> = ({
             : modelId !== undefined
     const disableEdit = isLoaded || modelLoading || isInvalid
     const disableDelete = isLoaded || modelLoading
+
+    const loadToggle = isLoaded ? modelLoading || modelImporting : disable
 
     return (
         <View style={styles.modelContainer}>
@@ -117,70 +119,118 @@ const ModelItem: React.FC<ModelItemProps> = ({
                     <Text style={styles.tag}>Model is Invalid</Text>
                 </View>
             )}
-            {!isInvalid && (
+            {!isInvalid && !isMMPROJ && (
                 <Text style={styles.subtitle}>Context Length: {item.context_length}</Text>
             )}
             <Text style={styles.subtitle}>File: {item.file.replace('.gguf', '')}</Text>
             <View style={styles.buttonContainer}>
+                {!isMMPROJ && mmprojList.length > 0 && (
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={async () => {
+                            if (item.mmprojLink) {
+                                await Model.removeMMPROJLink(item)
+                                return
+                            }
+
+                            setShowMMPROJSelector(!showMMPROJSelector)
+                        }}>
+                        <AntDesign
+                            name={showMMPROJSelector && !item.mmprojLink ? 'close' : 'camerao'}
+                            size={24}
+                            color={disableEdit ? color.text._600 : color.text._300}
+                        />
+                        {item.mmprojLink && (
+                            <AntDesign
+                                name="close"
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    transform: [{ translateX: 10 }],
+                                }}
+                                size={18}
+                                color={disableEdit ? color.text._600 : color.text._300}
+                            />
+                        )}
+                    </TouchableOpacity>
+                )}
                 <TouchableOpacity
                     disabled={disableEdit}
+                    style={styles.button}
                     onPress={() => {
                         setShowEdit(true)
                     }}>
                     <AntDesign
                         name="edit"
-                        style={styles.button}
                         size={24}
                         color={disableEdit ? color.text._600 : color.text._300}
                     />
                 </TouchableOpacity>
                 <TouchableOpacity
                     disabled={disableDelete}
+                    style={styles.button}
                     onPress={() => {
                         handleDeleteModel()
                     }}>
                     <AntDesign
                         name="delete"
-                        style={styles.button}
                         size={24}
                         color={disableDelete ? color.text._600 : color.error._500}
                     />
                 </TouchableOpacity>
-                {!isLoaded && (
+
+                {!isMMPROJ && (
                     <TouchableOpacity
-                        disabled={disable}
+                        disabled={loadToggle}
+                        style={styles.button}
                         onPress={async () => {
-                            const modelLoader = isMMPROJ ? loadMmproj : loadModel
+                            if (isLoaded) {
+                                await unloadModel()
+                                return
+                            }
+
                             setModelLoading(true)
-                            await modelLoader(item).catch((e) => {
+                            await loadModel(item).catch((e) => {
                                 Logger.error(`Failed to load model: ${e}`)
                             })
+                            if (item.mmprojLink) {
+                                const mmprojModel = mmprojList.filter(
+                                    (a) => a.id === item.mmprojLink?.mmproj_id
+                                )?.[0]
+                                if (mmprojModel) {
+                                    await loadMmproj(mmprojModel)
+                                }
+                            }
                             setModelLoading(false)
                         }}>
                         <AntDesign
-                            name="playcircleo"
-                            style={styles.button}
+                            name={isLoaded ? 'closecircleo' : 'playcircleo'}
                             size={24}
-                            color={disable ? color.text._600 : color.text._300}
-                        />
-                    </TouchableOpacity>
-                )}
-                {isLoaded && (
-                    <TouchableOpacity
-                        disabled={modelLoading || modelImporting}
-                        onPress={async () => {
-                            if (isMMPROJ) await unloadMmproj()
-                            else await unloadModel()
-                        }}>
-                        <AntDesign
-                            name="closecircleo"
-                            style={styles.button}
-                            size={24}
-                            color={color.text._100}
+                            color={loadToggle ? color.text._600 : color.text._300}
                         />
                     </TouchableOpacity>
                 )}
             </View>
+            {((showMMPROJSelector && mmprojList.length > 0) || (item.mmprojLink && !isMMPROJ)) && (
+                <DropdownSheet
+                    modalTitle="Select MMPROJ Model"
+                    containerStyle={{ marginTop: 12, marginBottom: 4 }}
+                    data={mmprojList}
+                    selected={
+                        mmprojList.filter((e) => e.id === item.mmprojLink?.mmproj_id)?.[0] ??
+                        undefined
+                    }
+                    labelExtractor={(item) => item.name}
+                    onChangeValue={async (value) => {
+                        try {
+                            if (item.mmprojLink) await Model.removeMMPROJLink(item)
+                            await Model.createMMPROJLink(item, value)
+                        } catch (e) {
+                            Logger.errorToast('Failed to link model: ' + e)
+                        }
+                    }}
+                />
+            )}
         </View>
     )
 }
@@ -229,15 +279,14 @@ const useStyles = () => {
         buttonContainer: {
             flexDirection: 'row',
             flex: 1,
-            justifyContent: 'space-between',
             marginTop: spacing.l,
             borderColor: color.neutral._300,
         },
 
         button: {
             flex: 1,
-            paddingVertical: spacing.m,
-            paddingHorizontal: spacing.xl3,
+            alignItems: 'center',
+            paddingVertical: spacing.s,
         },
     })
 }
