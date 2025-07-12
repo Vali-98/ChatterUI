@@ -4,9 +4,9 @@ import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 import React, { useEffect, useState } from 'react'
 import { GestureResponderEvent, Modal, StyleSheet, Text, TextInput, View } from 'react-native'
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
+import { KeyboardStickyView } from 'react-native-keyboard-controller'
 import Animated, { SlideOutDown } from 'react-native-reanimated'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -38,6 +38,7 @@ const EditorModal = () => {
         }))
     )
     const styles = useStyles()
+    const insets = useSafeAreaInsets()
 
     const { updateEntry, deleteEntry } = Chats.useEntry()
     const { swipeText, swipe } = Chats.useSwipeData(index)
@@ -89,9 +90,9 @@ const EditorModal = () => {
             onRequestClose={handleClose}
             style={{ flex: 1 }}>
             <FadeBackrop handleOverlayClick={handleOverlayClick} />
-            <KeyboardAvoidingView behavior="height" style={{ flex: 1 }}>
-                <SafeAreaView style={{ flex: 1 }}>
-                    <View style={{ flex: 1 }} />
+            <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
+                <View style={{ flex: 1 }} />
+                <KeyboardStickyView offset={{ opened: insets.bottom }}>
                     <Animated.View
                         exiting={SlideOutDown.duration(100)}
                         style={styles.editorContainer}>
@@ -138,8 +139,8 @@ const EditorModal = () => {
                             />
                         </View>
                     </Animated.View>
-                </SafeAreaView>
-            </KeyboardAvoidingView>
+                </KeyboardStickyView>
+            </SafeAreaView>
         </Modal>
     )
 }
