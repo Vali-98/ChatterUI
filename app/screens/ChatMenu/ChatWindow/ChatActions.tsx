@@ -75,7 +75,15 @@ const ChatActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMe
     if (!isSpeaking && (!showOptions || nowGenerating)) return
 
     return (
-        <View style={{ flex: 1, alignItems: 'flex-end' }}>
+        <View
+            style={{
+                flex: 1,
+                alignItems: 'flex-end',
+                position: 'absolute',
+                bottom: -2,
+                right: -4,
+                width: '100%',
+            }}>
             <Animated.View
                 entering={StretchInY.duration(100)}
                 exiting={StretchOutY.duration(100)}
@@ -83,14 +91,12 @@ const ChatActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMe
                     flexDirection: 'row',
                     columnGap: 16,
                     alignItems: 'center',
-                    position: 'absolute',
                     paddingVertical: 4,
                     paddingHorizontal: 16,
                     borderRadius: 8,
                     borderWidth: 1,
                     borderColor: color.primary._500,
                     backgroundColor: color.neutral._100 + 'cc',
-                    bottom: -4,
                     boxShadow: [
                         {
                             offsetX: 1,

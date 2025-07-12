@@ -77,7 +77,6 @@ const ChatBody: React.FC<ChatTextProps> = ({ index, nowGenerating, isLastMessage
                 <View
                     style={{
                         flexDirection: 'row',
-                        justifyContent: 'space-between',
                     }}>
                     {showTPS && appMode === 'local' && timings && (
                         <Text
