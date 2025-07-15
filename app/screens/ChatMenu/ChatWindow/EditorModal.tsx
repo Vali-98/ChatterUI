@@ -4,7 +4,7 @@ import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 import React, { useEffect, useState } from 'react'
 import { GestureResponderEvent, Modal, StyleSheet, Text, TextInput, View } from 'react-native'
-import { KeyboardStickyView } from 'react-native-keyboard-controller'
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
 import Animated, { SlideOutDown } from 'react-native-reanimated'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { create } from 'zustand'
@@ -89,10 +89,10 @@ const EditorModal = () => {
             onShow={handleAutoFocus}
             onRequestClose={handleClose}
             style={{ flex: 1 }}>
-            <FadeBackrop handleOverlayClick={handleOverlayClick} />
-            <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
-                <View style={{ flex: 1 }} />
-                <KeyboardStickyView offset={{ opened: insets.bottom }}>
+            <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+                <FadeBackrop handleOverlayClick={handleOverlayClick} />
+                <SafeAreaView style={{ flex: 1 }}>
+                    <View style={{ flex: 1 }} />
                     <Animated.View
                         exiting={SlideOutDown.duration(100)}
                         style={styles.editorContainer}>
@@ -139,8 +139,8 @@ const EditorModal = () => {
                             />
                         </View>
                     </Animated.View>
-                </KeyboardStickyView>
-            </SafeAreaView>
+                </SafeAreaView>
+            </KeyboardAvoidingView>
         </Modal>
     )
 }
@@ -152,8 +152,8 @@ const useStyles = () => {
 
     return StyleSheet.create({
         editorContainer: {
-            backgroundColor: color.neutral._100,
             flexShrink: 1,
+            backgroundColor: color.neutral._100,
             paddingTop: spacing.xl,
             paddingBottom: spacing.l,
             paddingHorizontal: spacing.xl,

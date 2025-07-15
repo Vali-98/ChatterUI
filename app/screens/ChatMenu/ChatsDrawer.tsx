@@ -16,10 +16,10 @@ import { useShallow } from 'zustand/react/shallow'
 import { YAxisOnlyTransition } from '@lib/animations/transitions'
 import ChatDrawerItem from './ChatDrawerItem'
 import ChatDrawerSearchItem from './ChatDrawerSearchItem'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const ChatsDrawer = () => {
     const styles = useStyles()
-
     const { charId } = Characters.useCharacterCard(useShallow((state) => ({ charId: state.id })))
     const { data } = useLiveQuery(Chats.db.query.chatListQuery(charId ?? 0))
     const setShow = Drawer.useDrawerState((state) => state.setShow)
@@ -149,6 +149,7 @@ export default ChatsDrawer
 
 const useStyles = () => {
     const { color, spacing, fontSize } = Theme.useTheme()
+    const insets = useSafeAreaInsets()
 
     return StyleSheet.create({
         drawer: {
@@ -161,7 +162,7 @@ const useStyles = () => {
             height: '100%',
             paddingHorizontal: spacing.xl,
             paddingTop: spacing.xl,
-            paddingBottom: spacing.xl2,
+            paddingBottom: spacing.xl2 + insets.bottom,
         },
 
         drawerTitle: {

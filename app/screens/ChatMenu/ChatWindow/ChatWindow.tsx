@@ -5,15 +5,15 @@ import { useBackgroundImage } from '@lib/state/BackgroundImage'
 import { Chats } from '@lib/state/Chat'
 import { AppDirectory } from '@lib/utils/File'
 import { ImageBackground } from 'expo-image'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { FlatList } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
+import { useShallow } from 'zustand/react/shallow'
+import { chatInputHeightStore } from '../ChatInput'
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
 import EditorModal from './EditorModal'
-import { chatInputHeightStore } from '../ChatInput'
-import { useShallow } from 'zustand/react/shallow'
 
 type ListItem = {
     index: number
