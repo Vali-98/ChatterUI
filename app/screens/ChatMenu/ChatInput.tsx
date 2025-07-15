@@ -1,8 +1,10 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import PopupMenu from '@components/views/PopupMenu'
 import { MaterialIcons } from '@expo/vector-icons'
+import { XAxisOnlyTransition } from '@lib/animations/transitions'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { generateResponse } from '@lib/engine/Inference'
+import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
 import { Characters } from '@lib/state/Characters'
 import { Chats, useInference } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
@@ -16,17 +18,13 @@ import Animated, {
     BounceIn,
     FadeIn,
     FadeOut,
-    LayoutAnimationsValues,
     LinearTransition,
-    withTiming,
     ZoomOut,
 } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 import OptionsMenu from './OptionsMenu'
-import { create } from 'zustand'
-import { XAxisOnlyTransition } from '@lib/animations/transitions'
-import { KeyboardStickyView } from 'react-native-keyboard-controller'
 
 export type Attachment = {
     uri: string
@@ -48,6 +46,8 @@ export const chatInputHeightStore = create<ChatInputHeightStoreProps>()((set) =>
 
 const ChatInput = () => {
     const insets = useSafeAreaInsets()
+    const inputRef = useUnfocusTextInput()
+
     const { color, borderRadius, spacing } = Theme.useTheme()
     const [sendOnEnter, _] = useMMKVBoolean(AppSettings.SendOnEnter)
     const [attachments, setAttachments] = useState<Attachment[]>([])
@@ -244,6 +244,7 @@ const ChatInput = () => {
                 </Animated.View>
                 <AnimatedTextInput
                     layout={XAxisOnlyTransition}
+                    ref={inputRef}
                     style={{
                         color: color.text._100,
                         backgroundColor: color.neutral._100,

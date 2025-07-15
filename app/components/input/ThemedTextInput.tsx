@@ -1,4 +1,6 @@
+import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
 import { Theme } from '@lib/theme/ThemeManager'
+import { useRef } from 'react'
 import { View, Text, StyleSheet, TextInput, TextInputProps, ViewStyle } from 'react-native'
 
 interface ThemedTextInputProps extends TextInputProps {
@@ -6,6 +8,7 @@ interface ThemedTextInputProps extends TextInputProps {
     description?: string
     value: string
     containerStyle?: ViewStyle
+    autoUnfocus?: boolean
 }
 
 const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
@@ -14,10 +17,13 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
     numberOfLines,
     multiline = false,
     style = undefined,
+    autoUnfocus = true,
     containerStyle = {},
     ...rest
 }) => {
     const { color } = Theme.useTheme()
+    const ref = useUnfocusTextInput()
+
     return (
         <View
             style={{
@@ -34,6 +40,7 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
                 </Text>
             )}
             <TextInput
+                ref={autoUnfocus ? ref : null}
                 multiline={(!!numberOfLines && numberOfLines > 1) || multiline}
                 numberOfLines={numberOfLines}
                 style={[

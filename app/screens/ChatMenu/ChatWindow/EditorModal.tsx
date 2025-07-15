@@ -1,10 +1,11 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import FadeBackrop from '@components/views/FadeBackdrop'
+import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { GestureResponderEvent, Modal, StyleSheet, Text, TextInput, View } from 'react-native'
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
+import { KeyboardAvoidingView, useKeyboardState } from 'react-native-keyboard-controller'
 import Animated, { SlideOutDown } from 'react-native-reanimated'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { create } from 'zustand'
@@ -38,13 +39,15 @@ const EditorModal = () => {
         }))
     )
     const styles = useStyles()
-    const insets = useSafeAreaInsets()
+    const inputRef = useUnfocusTextInput()
 
     const { updateEntry, deleteEntry } = Chats.useEntry()
     const { swipeText, swipe } = Chats.useSwipeData(index)
     const entry = Chats.useEntryData(index)
     const [placeholderText, setPlaceholderText] = useState('')
-
+    const insets = useSafeAreaInsets()
+    const keyboardState = useKeyboardState()
+    const bottomPad = keyboardState.isVisible ? 0 : insets.bottom
     useEffect(() => {
         editMode && swipeText !== undefined && setPlaceholderText(swipeText)
     }, [swipeText, editMode])
@@ -70,8 +73,6 @@ const EditorModal = () => {
         if (e.target === e.currentTarget) handleClose()
     }
 
-    const inputRef = React.createRef<TextInput>()
-
     const handleAutoFocus = () => {
         setTimeout(() => {
             inputRef.current?.focus()
@@ -89,9 +90,12 @@ const EditorModal = () => {
             onShow={handleAutoFocus}
             onRequestClose={handleClose}
             style={{ flex: 1 }}>
-            <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+            <KeyboardAvoidingView
+                behavior="padding"
+                style={{ flex: 1 }}
+                keyboardVerticalOffset={-insets.bottom}>
                 <FadeBackrop handleOverlayClick={handleOverlayClick} />
-                <SafeAreaView style={{ flex: 1 }}>
+                <View style={{ flex: 1 }}>
                     <View style={{ flex: 1 }} />
                     <Animated.View
                         exiting={SlideOutDown.duration(100)}
@@ -139,7 +143,7 @@ const EditorModal = () => {
                             />
                         </View>
                     </Animated.View>
-                </SafeAreaView>
+                </View>
             </KeyboardAvoidingView>
         </Modal>
     )
@@ -149,16 +153,17 @@ export default EditorModal
 
 const useStyles = () => {
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
-
+    const insets = useSafeAreaInsets()
     return StyleSheet.create({
         editorContainer: {
             flexShrink: 1,
             backgroundColor: color.neutral._100,
             paddingTop: spacing.xl,
-            paddingBottom: spacing.l,
+            paddingBottom: spacing.l + insets.bottom,
             paddingHorizontal: spacing.xl,
             borderTopRightRadius: borderRadius.l,
             borderTopLeftRadius: borderRadius.l,
+            marginTop: insets.top,
             rowGap: 12,
         },
 
