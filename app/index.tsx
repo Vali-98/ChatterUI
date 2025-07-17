@@ -5,7 +5,7 @@ import useLocalAuth from '@lib/hooks/LocalAuth'
 import { useNotificationObserver } from '@lib/notifications/Notifications'
 import { Theme } from '@lib/theme/ThemeManager'
 import { loadChatOnInit, startupApp } from '@lib/utils/Startup'
-import CharacterMenu from '@screens/CharacterMenu'
+import CharacterList from '@screens/CharacterListScreen'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { SplashScreen } from 'expo-router'
 import { useEffect, useState } from 'react'
@@ -66,7 +66,7 @@ const Home = () => {
                 </TouchableOpacity>
             </View>
         )
-    if (!firstRender && success) return <CharacterMenu />
+    if (!firstRender && success) return <CharacterList />
     return <HeaderTitle />
 }
 

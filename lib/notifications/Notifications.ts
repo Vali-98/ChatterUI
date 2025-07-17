@@ -79,7 +79,7 @@ export function useNotificationObserver() {
                 try {
                     await loadChat(chatId)
                     await setCard(characterId)
-                    router.push('/screens/ChatMenu')
+                    router.push('/screens/ChatScreen')
                 } catch (e) {
                     Logger.error('Failed to load chat: ' + e)
                 }

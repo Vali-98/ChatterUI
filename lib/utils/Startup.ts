@@ -36,7 +36,7 @@ export const loadChatOnInit = async () => {
     if (!newestChat) return
     await Characters.useCharacterCard.getState().setCard(newestChat.character_id)
     await Chats.useChatState.getState().load(newestChat.id)
-    router.push('/screens/ChatMenu')
+    router.push('/screens/ChatScreen')
 }
 
 const setAppDefaultSettings = () => {
