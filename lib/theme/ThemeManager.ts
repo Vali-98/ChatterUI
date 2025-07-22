@@ -25,10 +25,7 @@ export namespace Theme {
     export const useColorState = create<ColorStateProps>()(
         persist(
             (set, get) => ({
-                color:
-                    Appearance.getColorScheme() === 'dark'
-                        ? DefaultColorSchemes.lavenderDark
-                        : DefaultColorSchemes.lavenderLight,
+                color: DefaultColorSchemes.lavenderDark,
                 setColor: (color) => {
                     set((state) => ({ ...state, color: color }))
                 },
