@@ -313,6 +313,9 @@ export namespace Llama {
         },
         tokenLength: async (text: string, mediaPaths: string[] = []) => {
             const finalPaths = get().mmproj ? mediaPaths : []
+            if (!get().mmproj && mediaPaths.length > 0) {
+                Logger.warnToast('Media was added without MMPROJ model')
+            }
             const result = await get().context?.tokenizeAsync(
                 text + finalPaths.map(() => RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER).join(),
                 {
