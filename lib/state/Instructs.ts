@@ -11,7 +11,10 @@ import { Logger } from './Logger'
 import { mmkvStorage } from '../storage/MMKV'
 import { replaceMacros } from '../state/Macros'
 
-const defaultBooleans = {
+const defaultSystemPromptFormat =
+    '{{system_prefix}}{{system_prompt}}\n{{character_desc}}\n{{personality}}\n{{scenario}}\n{{user_desc}}{{system_suffix}}'
+
+const defaultGenerics = {
     wrap: false,
     macro: false,
     names: false,
@@ -27,6 +30,7 @@ const defaultBooleans = {
     send_audio: true,
     send_documents: true,
     last_image_only: true,
+    system_prompt_format: defaultSystemPromptFormat,
 }
 
 const defaultInstructs: InstructType[] = [
@@ -43,7 +47,7 @@ const defaultInstructs: InstructType[] = [
         user_alignment_message: '',
         activation_regex: '',
         name: 'ChatML',
-        ...defaultBooleans,
+        ...defaultGenerics,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -58,7 +62,7 @@ const defaultInstructs: InstructType[] = [
         user_alignment_message: '',
         activation_regex: '',
         name: 'Alpaca',
-        ...defaultBooleans,
+        ...defaultGenerics,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -73,7 +77,7 @@ const defaultInstructs: InstructType[] = [
         user_alignment_message: '',
         activation_regex: '',
         name: 'Llama 3',
-        ...defaultBooleans,
+        ...defaultGenerics,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -88,7 +92,7 @@ const defaultInstructs: InstructType[] = [
         user_alignment_message: '',
         activation_regex: '',
         name: 'StableLM-Zephyr',
-        ...defaultBooleans,
+        ...defaultGenerics,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -103,7 +107,7 @@ const defaultInstructs: InstructType[] = [
         user_alignment_message: '',
         activation_regex: '',
         name: 'phi3',
-        ...defaultBooleans,
+        ...defaultGenerics,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -118,7 +122,7 @@ const defaultInstructs: InstructType[] = [
         user_alignment_message: '',
         activation_regex: '',
         name: 'Gemma 2',
-        ...defaultBooleans,
+        ...defaultGenerics,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -133,7 +137,7 @@ const defaultInstructs: InstructType[] = [
         user_alignment_message: '',
         activation_regex: '',
         name: 'Mistral V1',
-        ...defaultBooleans,
+        ...defaultGenerics,
     },
     {
         system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
@@ -148,7 +152,7 @@ const defaultInstructs: InstructType[] = [
         user_alignment_message: '',
         activation_regex: 'deepseek',
         name: 'DeepSeek-R1',
-        ...defaultBooleans,
+        ...defaultGenerics,
     },
 ]
 
@@ -210,7 +214,7 @@ export namespace Instructs {
         user_alignment_message: '',
         activation_regex: '',
         name: 'Default',
-        ...defaultBooleans,
+        ...defaultGenerics,
     }
 
     export const useInstruct = create<InstructState>()(
@@ -263,17 +267,27 @@ export namespace Instructs {
                     return newCache
                 },
                 replacedMacros: () => {
-                    const rawinstruct = get().data
-                    if (!rawinstruct) {
+                    const baseInstruct = get().data
+
+                    if (!baseInstruct) {
                         Logger.errorToast('Something wrong happened with Instruct data')
                         return Instructs.defaultInstruct
                     }
-                    const instruct = { ...rawinstruct }
-                    const keys = Object.keys(instruct) as (keyof typeof instruct)[]
-                    keys.forEach((key) => {
-                        if (typeof instruct[key] === 'string')
-                            replaceMacros(instruct[key] as string)
-                    })
+
+                    const instruct: InstructType = {
+                        ...baseInstruct,
+                        system_prompt: replaceMacros(baseInstruct.system_prompt),
+                        system_prefix: replaceMacros(baseInstruct.system_prefix),
+                        system_suffix: replaceMacros(baseInstruct.system_suffix),
+                        input_prefix: replaceMacros(baseInstruct.input_prefix),
+                        input_suffix: replaceMacros(baseInstruct.input_suffix),
+                        output_prefix: replaceMacros(baseInstruct.output_prefix),
+                        last_output_prefix: replaceMacros(baseInstruct.last_output_prefix),
+                        output_suffix: replaceMacros(baseInstruct.output_suffix),
+                        user_alignment_message: replaceMacros(baseInstruct.system_prompt),
+                        stop_sequence: replaceMacros(baseInstruct.stop_sequence),
+                    }
+
                     return instruct
                 },
                 getStopSequence: () => {
@@ -303,7 +317,7 @@ export namespace Instructs {
                 name: Storage.Instruct,
                 storage: createJSONStorage(() => mmkvStorage),
                 partialize: (state) => ({ data: state.data }),
-                version: 6,
+                version: 7,
                 migrate: async (persistedState: any, version) => {
                     if (!version) {
                         persistedState.data.timestamp = false
@@ -346,6 +360,10 @@ export namespace Instructs {
                         persistedState.data.send_audio = true
                         persistedState.data.send_documents = true
                         persistedState.data.last_image_only = true
+                    }
+
+                    if (version === 6) {
+                        persistedState.data.system_prompt_format = defaultSystemPromptFormat
                     }
 
                     return persistedState

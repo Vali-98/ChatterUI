@@ -3,7 +3,7 @@ import { InstructType } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
 
 import { APIConfiguration, APISampler, APIValues } from './APIBuilder.types'
-import { Message } from './ContextBuilder2'
+import { Message } from './ContextBuilder'
 
 export interface RequestBuilderParams {
     apiConfig: APIConfiguration

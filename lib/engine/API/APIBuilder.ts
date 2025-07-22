@@ -4,7 +4,7 @@ import { Logger } from '@lib/state/Logger'
 import { nativeApplicationVersion } from 'expo-application'
 
 import { mmkv } from '@lib/storage/MMKV'
-import { buildContext, ContextBuilderParams } from './ContextBuilder2'
+import { buildContext, ContextBuilderParams } from './ContextBuilder'
 import { buildRequest, RequestBuilderParams } from './RequestBuilder'
 
 export interface APIBuilderParams

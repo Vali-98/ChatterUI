@@ -226,7 +226,7 @@ const FormattingManager = () => {
                     }}>
                     <SectionTitle>Instruct Formatting</SectionTitle>
                     <ThemedTextInput
-                        label="System Sequence"
+                        label="System Prompt"
                         value={currentInstruct.system_prompt}
                         onChangeText={(text) => {
                             setCurrentInstruct({
@@ -235,6 +235,19 @@ const FormattingManager = () => {
                             })
                         }}
                         numberOfLines={5}
+                        multiline
+                    />
+
+                    <ThemedTextInput
+                        label="System Prompt Format"
+                        value={currentInstruct.system_prompt_format}
+                        onChangeText={(text) => {
+                            setCurrentInstruct({
+                                ...currentInstruct,
+                                system_prompt_format: text,
+                            })
+                        }}
+                        numberOfLines={3}
                         multiline
                     />
                     <View style={{ flexDirection: 'row', columnGap: spacing.m }}>

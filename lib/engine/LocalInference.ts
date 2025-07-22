@@ -9,10 +9,13 @@ import { useTTSState } from '@lib/state/TTS'
 import { mmkv } from '@lib/storage/MMKV'
 import { CompletionTimings } from 'db/schema'
 
+import { Characters } from '@lib/state/Characters'
+import { APIBuilderParams } from './API/APIBuilder'
 import { APIConfiguration, APISampler, APIValues } from './API/APIBuilder.types'
 import { buildChatCompletionContext, buildTextCompletionContext } from './API/ContextBuilder'
 import { Llama, LlamaConfig } from './Local/LlamaLocal'
 import { KV } from './Local/Model'
+import { Tokenizer } from './Tokenizer'
 
 export const localSamplerData: APISampler[] = [
     { externalName: 'n_predict', samplerID: SamplerID.GENERATED_LENGTH },
@@ -65,26 +68,30 @@ const buildLocalPayload = async () => {
     const localPreset: LlamaConfig = Llama.useEngineData.getState().config
     let prompt: undefined | string = undefined
     let mediaPaths: string[] = []
-    const inferConfig = { ...localAPIConfig }
     const context = Llama.useLlama.getState().context
-    const completionType = inferConfig.request.completionType
+
+    const fields = await obtainFields()
+
+    if (!fields) {
+        return Logger.error('Failed to build fields')
+    }
+
+    const { apiConfig, ...rest } = fields
+
+    const completionType = apiConfig.request.completionType
     if (context && (await context.isMultimodalEnabled())) {
         const mtmdSupport = await context.getMultimodalSupport()
         if (completionType.type === 'chatCompletions') {
             completionType.supportsAudio = mtmdSupport?.audio
             completionType.supportsImages = mtmdSupport?.vision
-            inferConfig.request.completionType = completionType
+            apiConfig.request.completionType = completionType
         }
     }
     const hasAudio = completionType.type === 'chatCompletions' && completionType.supportsAudio
     const hasImage = completionType.type === 'chatCompletions' && completionType.supportsImages
 
     if (mmkv.getBoolean(AppSettings.UseModelTemplate)) {
-        const messages = await buildChatCompletionContext(
-            localPreset.context_length - n_predict,
-            localAPIConfig,
-            localAPIValues
-        )
+        const messages = await buildChatCompletionContext({ apiConfig, ...rest })
         try {
             if (messages) {
                 const result = await Llama.useLlama
@@ -105,7 +112,7 @@ const buildLocalPayload = async () => {
         }
     }
     if (!prompt) {
-        prompt = await buildTextCompletionContext(localPreset.context_length - n_predict)
+        prompt = await buildTextCompletionContext({ apiConfig, ...rest })
     }
 
     if (!prompt) {
@@ -240,7 +247,9 @@ export const localInference = async () => {
     }
 }
 
-const runLocalCompletion = async (payload: Awaited<ReturnType<typeof buildLocalPayload>>) => {
+const runLocalCompletion = async (
+    payload: NonNullable<Awaited<ReturnType<typeof buildLocalPayload>>>
+) => {
     const replace = RegExp(
         constructReplaceStrings()
             .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
@@ -342,4 +351,79 @@ const localAPIConfig: APIConfiguration = {
         editableModelPath: false,
         selectableModel: false,
     },
+}
+
+// This is the 'big orchestrator' which compiles fields from
+// the whole app to send inference requests
+const obtainFields = async (): Promise<APIBuilderParams | void> => {
+    try {
+        const userState = Characters.useUserCard.getState()
+        const characterState = Characters.useCharacterCard.getState()
+        const chatState = Chats.useChatState.getState()
+
+        const instructState = Instructs.useInstruct.getState()
+
+        const userCard = userState.card
+        if (!userCard) {
+            Logger.errorToast('No loaded user')
+            return
+        }
+
+        const characterCard = characterState.card
+        if (!characterCard) {
+            Logger.errorToast('No loaded character')
+            return
+        }
+        const messages = chatState.data?.messages
+        if (!messages) {
+            Logger.errorToast('No chat character')
+            return
+        }
+
+        const apiValues = localAPIValues
+        if (!apiValues) {
+            Logger.warnToast(`No Active API`)
+            return
+        }
+
+        const apiConfig = localAPIConfig
+        if (!apiConfig) {
+            Logger.errorToast(`Configuration "${apiValues?.configName}" not found`)
+            return
+        }
+        const samplers = SamplersManager.getCurrentSampler()
+        const instructLength = samplers.max_length as number
+        const modelLength = instructLength as number
+        const length = apiConfig.model.useModelContextLength
+            ? Math.min(modelLength, instructLength)
+            : instructLength - (samplers.genamt as number)
+
+        return {
+            apiConfig: Object.assign({}, apiConfig),
+            apiValues: Object.assign({}, apiValues),
+            onData: () => {},
+            onEnd: () => {},
+            instruct: instructState.replacedMacros(),
+            samplers: Object.assign({}, samplers),
+            character: Object.assign({}, characterCard),
+            user: Object.assign({}, userCard),
+            messages: [...messages],
+            stopSequence: instructState.getStopSequence(),
+            stopGenerating: () => {},
+            chatTokenizer: async (entry, index) => {
+                // IMPORTANT - we use -1 for dummy entries
+                if (entry.id === -1) return 0
+                return await chatState.getTokenCount(index)
+            },
+            tokenizer: Tokenizer.getTokenizer(),
+            maxLength: length,
+            cache: {
+                userCache: await characterState.getCache(characterCard.name),
+                characterCache: await userState.getCache(userCard.name),
+                instructCache: await instructState.getCache(characterCard.name, userCard.name),
+            },
+        }
+    } catch (e) {
+        Logger.errorToast('Failed to orchestrate request build: ' + e)
+    }
 }

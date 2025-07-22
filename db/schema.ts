@@ -179,6 +179,9 @@ export const mediaAttachmentsRelations = relations(chatAttachments, ({ one }) =>
 
 // INSTRUCT
 
+const defaultSystemPrompt =
+    '{{system_prefix}}{{system_prompt}}\n{{character_desc}}\n{{personality}}\n{{scenario}}\n{{user_desc}}{{system_suffix}}'
+
 export const instructs = sqliteTable('instructs', {
     id: integer('id', { mode: 'number' }).primaryKey(),
     name: text('name').notNull(),
@@ -198,27 +201,30 @@ export const instructs = sqliteTable('instructs', {
     names: integer('names', { mode: 'boolean' }).notNull(),
     names_force_groups: integer('names_force_groups', { mode: 'boolean' }).notNull(),
 
-    // Additions 3/7/2024, v3
+    // Additions 3/7/2024, v2
     timestamp: integer('timestamp', { mode: 'boolean' }).notNull().default(false),
     examples: integer('examples', { mode: 'boolean' }).notNull().default(true),
     format_type: integer('format_type').notNull().default(0),
 
-    // additions 22/9/2024, v4
+    // additions 22/9/2024, v3
     last_output_prefix: text('last_output_prefix').notNull().default(''),
 
-    // additions 17/10/2024 v5
+    // additions 17/10/2024 v4
     scenario: integer('scenario', { mode: 'boolean' }).notNull().default(true),
     personality: integer('personality', { mode: 'boolean' }).notNull().default(true),
 
-    // additions 5/5/2025 v6
+    // additions 5/5/2025 v5
     hide_think_tags: integer('hide_think_tags', { mode: 'boolean' }).notNull().default(true),
     use_common_stop: integer('use_common_stop', { mode: 'boolean' }).notNull().default(true),
 
-    // additions 22/5/2025 v7
+    // additions 22/5/2025 v6
     send_images: integer('send_images', { mode: 'boolean' }).notNull().default(true),
     send_audio: integer('send_audio', { mode: 'boolean' }).notNull().default(true),
     send_documents: integer('send_documents', { mode: 'boolean' }).notNull().default(true),
     last_image_only: integer('last_image_only', { mode: 'boolean' }).notNull().default(true),
+
+    // additions 21/7/2025 v7
+    system_prompt_format: text('system_prompt_format').notNull().default(defaultSystemPrompt),
 })
 
 // LOREBOOKS
