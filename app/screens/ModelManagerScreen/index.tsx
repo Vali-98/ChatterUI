@@ -102,13 +102,15 @@ const ModelManagerScreen = () => {
                             />
                         )}
                         renderSectionHeader={({ section: { title, data } }) => {
-                            return (
-                                <SectionTitle
-                                    visible={data.length > 0}
-                                    style={{ marginBottom: 16 }}>
-                                    {title}
-                                </SectionTitle>
-                            )
+                            if (mmprojList.length > 0)
+                                return (
+                                    <SectionTitle
+                                        visible={data.length > 0}
+                                        style={{ marginBottom: 16 }}>
+                                        {title}
+                                    </SectionTitle>
+                                )
+                            return <></>
                         }}
                         keyExtractor={(item) => item.id.toString()}
                         removeClippedSubviews={false}
