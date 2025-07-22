@@ -130,6 +130,12 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         onPress={async () => {
                             if (item.mmprojLink) {
                                 await Model.removeMMPROJLink(item)
+                                const mmproj = mmprojList.filter(
+                                    (a) => a.id === item.mmprojLink?.mmproj_id
+                                )?.[0]
+                                if (mmproj) {
+                                    maybeClearLastLoaded(mmproj)
+                                }
                                 return
                             }
 
