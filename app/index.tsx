@@ -56,7 +56,6 @@ const Home = () => {
                 </Text>
                 <Text style={styles.subtitle}></Text>
                 <ThemedButton
-                    buttonStyle={{ marginTop: 12 }}
                     variant="secondary"
                     label="Github Repository"
                     iconName="github"
