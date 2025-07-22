@@ -312,17 +312,19 @@ export namespace Llama {
             return result
         },
         tokenLength: async (text: string, mediaPaths: string[] = []) => {
+            const finalPaths = get().mmproj ? mediaPaths : []
             const result = await get().context?.tokenizeAsync(
-                text + mediaPaths.map(() => RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER).join(),
+                text + finalPaths.map(() => RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER).join(),
                 {
-                    media_paths: mediaPaths.map((item) => item.replace('file://', '')),
+                    media_paths: finalPaths.map((item) => item.replace('file://', '')),
                 }
             )
             if (!result) return 0
             return result.tokens.length
         },
         tokenize: (text: string, media_paths: string[] = []) => {
-            return get().context?.tokenizeSync(text, { media_paths: media_paths })
+            const params = get().mmproj ? { media_paths } : {}
+            return get().context?.tokenizeSync(text, params)
         },
     }))
 

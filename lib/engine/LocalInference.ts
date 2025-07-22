@@ -10,12 +10,14 @@ import { mmkv } from '@lib/storage/MMKV'
 import { CompletionTimings } from 'db/schema'
 
 import { Characters } from '@lib/state/Characters'
-import { APIBuilderParams } from './API/APIBuilder'
 import { APIConfiguration, APISampler, APIValues } from './API/APIBuilder.types'
-import { buildChatCompletionContext, buildTextCompletionContext } from './API/ContextBuilder'
+import {
+    buildChatCompletionContext,
+    buildTextCompletionContext,
+    ContextBuilderParams,
+} from './API/ContextBuilder'
 import { Llama, LlamaConfig } from './Local/LlamaLocal'
 import { KV } from './Local/Model'
-import { Tokenizer } from './Tokenizer'
 
 export const localSamplerData: APISampler[] = [
     { externalName: 'n_predict', samplerID: SamplerID.GENERATED_LENGTH },
@@ -92,6 +94,7 @@ const buildLocalPayload = async () => {
 
     if (mmkv.getBoolean(AppSettings.UseModelTemplate)) {
         const messages = await buildChatCompletionContext({ apiConfig, ...rest })
+
         try {
             if (messages) {
                 const result = await Llama.useLlama
@@ -117,9 +120,11 @@ const buildLocalPayload = async () => {
 
     if (!prompt) {
         Logger.errorToast('Failed to build prompt')
+        return
     }
 
     const finalMediaPaths = hasAudio || hasImage ? { media_paths: mediaPaths } : {}
+
     return {
         ...payloadFields,
         penalize_nl: typeof rep_pen === 'number' && rep_pen > 1,
@@ -355,7 +360,7 @@ const localAPIConfig: APIConfiguration = {
 
 // This is the 'big orchestrator' which compiles fields from
 // the whole app to send inference requests
-const obtainFields = async (): Promise<APIBuilderParams | void> => {
+const obtainFields = async (): Promise<ContextBuilderParams | void> => {
     try {
         const userState = Characters.useUserCard.getState()
         const characterState = Characters.useCharacterCard.getState()
@@ -401,21 +406,17 @@ const obtainFields = async (): Promise<APIBuilderParams | void> => {
         return {
             apiConfig: Object.assign({}, apiConfig),
             apiValues: Object.assign({}, apiValues),
-            onData: () => {},
-            onEnd: () => {},
+
             instruct: instructState.replacedMacros(),
-            samplers: Object.assign({}, samplers),
             character: Object.assign({}, characterCard),
             user: Object.assign({}, userCard),
             messages: [...messages],
-            stopSequence: instructState.getStopSequence(),
-            stopGenerating: () => {},
             chatTokenizer: async (entry, index) => {
                 // IMPORTANT - we use -1 for dummy entries
                 if (entry.id === -1) return 0
                 return await chatState.getTokenCount(index)
             },
-            tokenizer: Tokenizer.getTokenizer(),
+            tokenizer: Llama.useLlama.getState().tokenLength,
             maxLength: length,
             cache: {
                 userCache: await characterState.getCache(characterCard.name),
