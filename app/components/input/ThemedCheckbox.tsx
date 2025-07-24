@@ -1,5 +1,6 @@
 import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
+import { useEffect } from 'react'
 import { Pressable, Text, ViewStyle } from 'react-native'
 import Animated, {
     BounceIn,
@@ -35,12 +36,17 @@ const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
         }
     })
 
+    useEffect(() => {
+        // this useEffect is necessary as onChangeValue may not update value
+        // hence cannot triggered within onPress
+        colorChange.value = withTiming(value ? 1 : 0, { duration: 100 })
+    }, [value])
+
     return (
         <Pressable
             style={{ flexDirection: 'row', alignItems: 'center' }}
             onPress={() => {
                 onChangeValue(!value)
-                colorChange.value = withTiming(!value ? 1 : 0, { duration: 100 })
             }}>
             <Animated.View
                 style={[
