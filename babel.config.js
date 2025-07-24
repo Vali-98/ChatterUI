@@ -6,7 +6,7 @@ module.exports = function (api) {
             ['babel-plugin-react-compiler'], // must run first!
             ['inline-import', { extensions: ['.sql'] }],
             // Required for expo-routerouter/
-            'react-native-reanimated/plugin',
+            'react-native-worklets/plugin',
         ],
     }
 }
