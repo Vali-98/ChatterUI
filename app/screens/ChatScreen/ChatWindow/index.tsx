@@ -32,9 +32,10 @@ const ChatWindow = () => {
     const [autoScroll, ___] = useMMKVBoolean(AppSettings.AutoScroll)
     const chatInputHeight = chatInputHeightStore(useShallow((state) => state.height))
     const flatlistRef = useRef<FlatList | null>(null)
-    const { showSettings } = Drawer.useDrawerState(
+    const { showSettings, showChat } = Drawer.useDrawerState(
         useShallow((state) => ({
             showSettings: state.values?.[Drawer.ID.SETTINGS],
+            showChat: state.values?.[Drawer.ID.CHATLIST],
         }))
     )
 
@@ -88,7 +89,7 @@ const ChatWindow = () => {
             source={{ uri: image ? AppDirectory.Assets + image : '' }}>
             <ChatEditor />
             {showModelname && appMode === 'local' && (
-                <HeaderTitle headerTitle={() => !showSettings && <ChatModelName />} />
+                <HeaderTitle headerTitle={() => !showSettings && !showChat && <ChatModelName />} />
             )}
             <FlatList
                 ref={flatlistRef}
