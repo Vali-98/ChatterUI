@@ -9,11 +9,13 @@ import { useEffect, useRef } from 'react'
 import { FlatList } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
+import Drawer from '@components/views/Drawer'
+import HeaderTitle from '@components/views/HeaderTitle'
 import { useShallow } from 'zustand/react/shallow'
 import { chatInputHeightStore } from '../ChatInput'
+import ChatEditor from './ChatEditor'
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
-import ChatEditor from './ChatEditor'
 
 type ListItem = {
     index: number
@@ -30,6 +32,11 @@ const ChatWindow = () => {
     const [autoScroll, ___] = useMMKVBoolean(AppSettings.AutoScroll)
     const chatInputHeight = chatInputHeightStore(useShallow((state) => state.height))
     const flatlistRef = useRef<FlatList | null>(null)
+    const { showSettings } = Drawer.useDrawerState(
+        useShallow((state) => ({
+            showSettings: state.values?.[Drawer.ID.SETTINGS],
+        }))
+    )
 
     const updateScrollPosition = useDebounce((position: number, chatId: number) => {
         if (chatId) {
@@ -80,7 +87,9 @@ const ChatWindow = () => {
             style={{ flex: 1 }}
             source={{ uri: image ? AppDirectory.Assets + image : '' }}>
             <ChatEditor />
-            {showModelname && appMode === 'local' && <ChatModelName />}
+            {showModelname && appMode === 'local' && (
+                <HeaderTitle headerTitle={() => !showSettings && <ChatModelName />} />
+            )}
             <FlatList
                 ref={flatlistRef}
                 maintainVisibleContentPosition={
