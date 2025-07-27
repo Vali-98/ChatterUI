@@ -398,12 +398,18 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
             Logger.errorToast(`Configuration "${apiValues?.configName}" not found`)
             return
         }
+
+        const engineData = Llama.useLlamaPreferencesStore.getState().config
         const samplers = SamplersManager.getCurrentSampler()
-        const instructLength = samplers.max_length as number
+
+        const instructLength = engineData.context_length
         const modelLength = instructLength as number
         const length = apiConfig.model.useModelContextLength
             ? Math.min(modelLength, instructLength)
-            : instructLength - (samplers.genamt as number)
+            : Math.min(
+                  Math.max(instructLength - (samplers.genamt as number), 0),
+                  samplers.genamt as number
+              )
 
         return {
             apiConfig: Object.assign({}, apiConfig),

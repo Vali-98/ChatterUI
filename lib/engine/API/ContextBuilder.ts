@@ -175,6 +175,10 @@ export const buildChatCompletionContext = async ({
         index--
     }
 
+    if (index >= messages.length - 1) {
+        warnNoMessages()
+    }
+
     if (apiConfig.features.useFirstMessage && apiValues.firstMessage)
         messageBuffer.push({
             role: completionFeats.userRole,
@@ -298,6 +302,10 @@ export const buildTextCompletionContext = async ({
         message_acc_length += shard_length
         message_acc = message_shard + message_acc
         index--
+    }
+
+    if (index >= messages.length - 1) {
+        warnNoMessages()
     }
 
     const examples = character?.mes_example
@@ -437,4 +445,11 @@ export const getSystemPrompt = ({
         systemPromptLength += m.length
     })
     return { systemPrompt, systemPromptLength }
+}
+
+const warnNoMessages = () => {
+    Logger.warnToast('No messages added. Check Logs.')
+    Logger.warn(
+        'No messages were added to the context. This can be caused by:\n- Generated Length is too high, lower it in Formatting\n- Your context length is too low\n- Your first message is too long'
+    )
 }
