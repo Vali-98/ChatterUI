@@ -175,7 +175,7 @@ export const buildChatCompletionContext = async ({
         index--
     }
 
-    if (index >= messages.length - 1) {
+    if (index >= messages.length - 1 && messages.length !== 0) {
         warnNoMessages()
     }
 
@@ -304,7 +304,7 @@ export const buildTextCompletionContext = async ({
         index--
     }
 
-    if (index >= messages.length - 1) {
+    if (index >= messages.length - 1 && messages.length !== 0) {
         warnNoMessages()
     }
 
