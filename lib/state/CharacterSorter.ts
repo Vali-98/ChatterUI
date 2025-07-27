@@ -1,4 +1,5 @@
-import { PersistStore } from '@lib/storage/MMKV'
+import { Storage } from '@lib/enums/Storage'
+import { createMMKVStorage } from '@lib/storage/MMKV'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
@@ -20,7 +21,7 @@ type CharacterListSorterProps = {
 }
 
 export namespace CharacterSorter {
-    export const store = create<CharacterListSorterProps>()(
+    export const useSorterStore = create<CharacterListSorterProps>()(
         persist(
             (set) => ({
                 showSearch: false,
@@ -51,13 +52,15 @@ export namespace CharacterSorter {
                 setOrder: (order) => set({ searchOrder: order }),
                 setType: (type) => set({ searchType: type }),
             }),
-            PersistStore.create(PersistStore.CharacterSearch, {
+            {
+                name: Storage.CharacterSearch,
+                storage: createMMKVStorage(),
                 version: 1,
                 partialize: (item) => ({
                     searchType: item.searchType,
                     searchOrder: item.searchOrder,
                 }),
-            })
+            }
         )
     )
 
@@ -73,7 +76,7 @@ export namespace CharacterSorter {
             setTextFilter,
             tagFilter,
             setTagFilter,
-        } = store(
+        } = useSorterStore(
             useShallow((state) => ({
                 showSearch: state.showSearch,
                 setShowSearch: state.setShowSearch,

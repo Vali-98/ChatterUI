@@ -1,4 +1,4 @@
-import { useAppModeState } from '@lib/state/AppMode'
+import { useAppModeStore } from '@lib/state/AppMode'
 import { Logger } from '@lib/state/Logger'
 import { initLlama, LlamaContext } from 'cui-llama.rn'
 import { Asset } from 'expo-asset'
@@ -21,7 +21,7 @@ type TokenizerState = {
 }
 
 export namespace Tokenizer {
-    export const useDefaultTokenizer = create<TokenizerState>()((set, get) => ({
+    export const useTokenizerState = create<TokenizerState>()((set, get) => ({
         model: undefined,
         tokenize: (text: string) => {
             return get()?.model?.tokenizeSync(text)?.tokens ?? []
@@ -68,15 +68,15 @@ export namespace Tokenizer {
     }
 
     export const getTokenizer = () => {
-        return useAppModeState.getState().appMode === 'local'
-            ? Llama.useLlama.getState().tokenLength
-            : Tokenizer.useDefaultTokenizer.getState().getTokenCount
+        return useAppModeStore.getState().appMode === 'local'
+            ? Llama.useLlamaModelStore.getState().tokenLength
+            : Tokenizer.useTokenizerState.getState().getTokenCount
     }
 
     export const useTokenizer = () => {
-        const defaultTokenizer = useDefaultTokenizer((state) => state.getTokenCount)
-        const llamaTokenizer = Llama.useLlama((state) => state.tokenLength)
-        const appMode = useAppModeState((state) => state.appMode)
+        const defaultTokenizer = useTokenizerState((state) => state.getTokenCount)
+        const llamaTokenizer = Llama.useLlamaModelStore((state) => state.tokenLength)
+        const appMode = useAppModeStore((state) => state.appMode)
         return appMode === 'local' ? llamaTokenizer : defaultTokenizer
     }
 }

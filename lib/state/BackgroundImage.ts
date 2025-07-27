@@ -1,10 +1,10 @@
 import { Storage } from '@lib/enums/Storage'
-import { mmkvStorage } from '@lib/storage/MMKV'
+import { createMMKVStorage } from '@lib/storage/MMKV'
 import { AppDirectory } from '@lib/utils/File'
 import { getDocumentAsync } from 'expo-document-picker'
 import { copyAsync, deleteAsync } from 'expo-file-system'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 
 import { Logger } from './Logger'
 
@@ -14,7 +14,7 @@ type BackgroundImageStateProps = {
     removeImage: () => void
 }
 
-export const useBackgroundImage = create<BackgroundImageStateProps>()(
+export const useBackgroundStore = create<BackgroundImageStateProps>()(
     persist(
         (set, get) => ({
             image: undefined,
@@ -46,7 +46,7 @@ export const useBackgroundImage = create<BackgroundImageStateProps>()(
         {
             name: Storage.BackgroundImage,
             partialize: (state) => ({ image: state.image }),
-            storage: createJSONStorage(() => mmkvStorage),
+            storage: createMMKVStorage(),
             version: 1,
         }
     )

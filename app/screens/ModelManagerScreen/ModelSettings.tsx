@@ -22,7 +22,7 @@ type ModelSettingsProp = {
 }
 
 const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoading, exit }) => {
-    const { config, setConfig } = Llama.useEngineData(
+    const { config, setConfig } = Llama.useLlamaPreferencesStore(
         useShallow((state) => ({
             config: state.config,
             setConfig: state.setConfiguration,

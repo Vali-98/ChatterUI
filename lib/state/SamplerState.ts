@@ -6,11 +6,11 @@ import {
 } from '@lib/constants/SamplerData'
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
-import { mmkvStorage } from '@lib/storage/MMKV'
+import { createMMKVStorage } from '@lib/storage/MMKV'
 import { getDocumentAsync } from 'expo-document-picker'
 import { EncodingType, readAsStringAsync } from 'expo-file-system'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
 
 export type SamplerConfig = {
@@ -29,7 +29,7 @@ export type SamplerStateProps = {
 }
 
 export namespace SamplersManager {
-    export const useSamplerState = create<SamplerStateProps>()(
+    export const useSamplerStore = create<SamplerStateProps>()(
         persist(
             (set, get) => ({
                 currentConfigIndex: 0,
@@ -83,7 +83,7 @@ export namespace SamplersManager {
             }),
             {
                 name: Storage.Samplers,
-                storage: createJSONStorage(() => mmkvStorage),
+                storage: createMMKVStorage(),
                 version: 1,
                 partialize: (state) => ({
                     configList: state.configList,
@@ -105,7 +105,7 @@ export namespace SamplersManager {
             changeConfig,
             updateCurrentConfig,
             configList,
-        } = useSamplerState(
+        } = useSamplerStore(
             useShallow((state) => ({
                 currentPresetIndex: state.currentConfigIndex,
                 samplerConfigs: state.configList,
@@ -131,7 +131,7 @@ export namespace SamplersManager {
     }
 
     export const getCurrentSampler = () => {
-        return useSamplerState.getState().configList[useSamplerState.getState().currentConfigIndex]
+        return useSamplerStore.getState().configList[useSamplerStore.getState().currentConfigIndex]
             .data
     }
 

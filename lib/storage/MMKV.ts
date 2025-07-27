@@ -16,29 +16,6 @@ export const mmkvStorage: StateStorage = {
     },
 }
 
-export enum PersistStore {
-    TagHider = 'tag-hider-storage',
-    CharacterSearch = 'storage-character-search',
-}
-
-export namespace PersistStore {
-    /**
-     * Create a persist config object for zustand-persist
-     * @param name key from PersistStore enum
-     * @param options extra options to merge, e.g. partialize, version overrides
-     */
-    export function create<T>(
-        name: PersistStore,
-        options: Partial<{
-            partialize: (state: T) => Partial<T>
-            version: number
-        }> = {}
-    ) {
-        return {
-            name: name,
-            storage: createJSONStorage(() => mmkvStorage),
-            partialize: options?.partialize ?? ((state: T) => state),
-            ...options,
-        }
-    }
+export const createMMKVStorage = () => {
+    return createJSONStorage(() => mmkvStorage)
 }

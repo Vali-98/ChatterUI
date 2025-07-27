@@ -16,14 +16,14 @@ type ChatEditPopupProps = {
 const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
     const [showRename, setShowRename] = useState<boolean>(false)
 
-    const { charName, charId } = Characters.useCharacterCard(
+    const { charName, charId } = Characters.useCharacterStore(
         useShallow((state) => ({
             charId: state.id,
             charName: state.card?.name ?? 'Unknown',
         }))
     )
 
-    const { userId, userName } = Characters.useUserCard(
+    const { userId, userName } = Characters.useUserStore(
         useShallow((state) => ({
             userId: state.id,
             userName: state.card?.name,

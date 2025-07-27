@@ -39,7 +39,7 @@ type ChatInputHeightStoreProps = {
     setHeight: (n: number) => void
 }
 
-export const chatInputHeightStore = create<ChatInputHeightStoreProps>()((set) => ({
+export const useInputHeightStore = create<ChatInputHeightStoreProps>()((set) => ({
     height: 54,
     setHeight: (n) => set({ height: Math.ceil(n) }),
 }))
@@ -59,15 +59,15 @@ const ChatInput = () => {
             abortFunction: state.abortFunction,
         }))
     )
-    const setHeight = chatInputHeightStore(useShallow((state) => state.setHeight))
+    const setHeight = useInputHeightStore(useShallow((state) => state.setHeight))
 
-    const { charName } = Characters.useCharacterCard(
+    const { charName } = Characters.useCharacterStore(
         useShallow((state) => ({
             charName: state?.card?.name,
         }))
     )
 
-    const { userName } = Characters.useUserCard(
+    const { userName } = Characters.useUserStore(
         useShallow((state) => ({ userName: state.card?.name }))
     )
 

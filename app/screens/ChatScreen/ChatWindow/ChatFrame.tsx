@@ -1,8 +1,8 @@
 import Avatar from '@components/views/Avatar'
-import { useViewerState } from '@lib/state/AvatarViewer'
+import { useAvatarViewerStore } from '@lib/state/AvatarViewer'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
-import { useTTSState } from '@lib/state/TTS'
+import { useTTSStore } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
 import { ReactNode } from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
@@ -20,9 +20,9 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
 
     const message = Chats.useEntryData(index)
-    const setShowViewer = useViewerState((state) => state.setShow)
-    const charImageId = Characters.useCharacterCard((state) => state.card?.image_id) ?? 0
-    const userImageId = Characters.useUserCard((state) => state.card?.image_id) ?? 0
+    const setShowViewer = useAvatarViewerStore((state) => state.setShow)
+    const charImageId = Characters.useCharacterStore((state) => state.card?.image_id) ?? 0
+    const userImageId = Characters.useUserStore((state) => state.card?.image_id) ?? 0
 
     const swipe = message.swipes[message.swipe_id]
 

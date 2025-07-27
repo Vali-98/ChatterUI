@@ -1,12 +1,11 @@
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
-import { mmkvStorage } from '@lib/storage/MMKV'
+import { createMMKVStorage } from '@lib/storage/MMKV'
 import { useMemo } from 'react'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 
 import { DefaultColorSchemes, ThemeColor, themeColorSchemaV1 } from './ThemeColor'
-import { Appearance } from 'react-native'
 
 interface ColorStateProps {
     customColors: ThemeColor[]
@@ -71,7 +70,7 @@ export namespace Theme {
             }),
             {
                 name: Storage.ColorState,
-                storage: createJSONStorage(() => mmkvStorage),
+                storage: createMMKVStorage(),
                 version: 1,
                 partialize: (state) => ({ color: state.color, customColors: state.customColors }),
             }

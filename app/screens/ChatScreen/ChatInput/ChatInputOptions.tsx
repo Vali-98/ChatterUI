@@ -9,7 +9,7 @@ const ChatOptions = () => {
     const router = useRouter()
     const styles = useStyles()
 
-    const setShow = Drawer.useDrawerState((state) => state.setShow)
+    const setShow = Drawer.useDrawerStore((state) => state.setShow)
 
     const setShowChat = (b: boolean) => {
         setShow(Drawer.ID.CHATLIST, b)

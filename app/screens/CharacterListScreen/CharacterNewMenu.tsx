@@ -12,7 +12,7 @@ type CharacterNewMenuProps = {
 }
 
 const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowLoading }) => {
-    const { setCurrentCard } = Characters.useCharacterCard(
+    const { setCurrentCard } = Characters.useCharacterStore(
         useShallow((state) => ({
             setCurrentCard: state.setCard,
             id: state.id,

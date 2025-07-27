@@ -20,9 +20,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const ChatsDrawer = () => {
     const styles = useStyles()
-    const { charId } = Characters.useCharacterCard(useShallow((state) => ({ charId: state.id })))
+    const { charId } = Characters.useCharacterStore(useShallow((state) => ({ charId: state.id })))
     const { data } = useLiveQuery(Chats.db.query.chatListQuery(charId ?? 0))
-    const setShow = Drawer.useDrawerState((state) => state.setShow)
+    const setShow = Drawer.useDrawerStore((state) => state.setShow)
     const setShowDrawer = (b: boolean) => {
         setShow(Drawer.ID.CHATLIST, b)
     }

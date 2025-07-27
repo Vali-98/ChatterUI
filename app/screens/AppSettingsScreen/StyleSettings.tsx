@@ -1,7 +1,7 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
-import { useBackgroundImage } from '@lib/state/BackgroundImage'
+import { useBackgroundStore } from '@lib/state/BackgroundImage'
 import { useRouter } from 'expo-router'
 import React from 'react'
 import { View } from 'react-native'
@@ -10,7 +10,7 @@ import { useShallow } from 'zustand/react/shallow'
 const StyleSettings = () => {
     const router = useRouter()
 
-    const { chatBackground, importBackground, deleteBackground } = useBackgroundImage(
+    const { chatBackground, importBackground, deleteBackground } = useBackgroundStore(
         useShallow((state) => ({
             chatBackground: state.image,
             importBackground: state.importImage,

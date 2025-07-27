@@ -1,7 +1,7 @@
 import { db } from '@db'
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
-import { mmkvStorage } from '@lib/storage/MMKV'
+import { createMMKVStorage } from '@lib/storage/MMKV'
 import { AppDirectory, readableFileSize } from '@lib/utils/File'
 import { loadLlamaModelInfo } from 'cui-llama.rn'
 import { model_data, model_mmproj_links, ModelDataType } from 'db/schema'
@@ -10,7 +10,7 @@ import { getDocumentAsync } from 'expo-document-picker'
 import { copyAsync, deleteAsync, getInfoAsync, readDirectoryAsync } from 'expo-file-system'
 import { Platform } from 'react-native'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 
 import { GGMLNameMap, GGMLType } from './GGML'
 
@@ -287,7 +287,7 @@ type KVStateProps = {
 }
 
 export namespace KV {
-    export const useKVState = create<KVStateProps>()(
+    export const useKVStore = create<KVStateProps>()(
         persist(
             (set, get) => ({
                 kvCacheLoaded: false,
@@ -321,7 +321,7 @@ export namespace KV {
                 partialize: (state) => ({
                     kvCacheTokens: state.kvCacheTokens,
                 }),
-                storage: createJSONStorage(() => mmkvStorage),
+                storage: createMMKVStorage(),
                 version: 1,
             }
         )

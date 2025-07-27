@@ -4,12 +4,12 @@ import { Storage } from '@lib/enums/Storage'
 import { instructs } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 
+import { replaceMacros } from '../state/Macros'
+import { createMMKVStorage } from '../storage/MMKV'
 import { Characters } from './Characters'
 import { Logger } from './Logger'
-import { mmkvStorage } from '../storage/MMKV'
-import { replaceMacros } from '../state/Macros'
 
 const defaultSystemPromptFormat =
     '{{system_prefix}}{{system_prompt}}\n{{character_desc}}\n{{personality}}\n{{scenario}}\n{{user_desc}}{{system_suffix}}'
@@ -295,8 +295,8 @@ export namespace Instructs {
                     const sequence: string[] = []
                     let extras: string[] = []
                     if (instruct.names) {
-                        const userName = Characters.useCharacterCard.getState().card?.name
-                        const charName = Characters.useCharacterCard.getState()?.card?.name
+                        const userName = Characters.useCharacterStore.getState().card?.name
+                        const charName = Characters.useCharacterStore.getState()?.card?.name
                         if (userName) sequence.push(`${userName} :`)
                         if (charName) sequence.push(`${charName} :`)
                     }
@@ -315,7 +315,7 @@ export namespace Instructs {
             }),
             {
                 name: Storage.Instruct,
-                storage: createJSONStorage(() => mmkvStorage),
+                storage: createMMKVStorage(),
                 partialize: (state) => ({ data: state.data }),
                 version: 7,
                 migrate: async (persistedState: any, version) => {

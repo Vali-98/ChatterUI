@@ -136,7 +136,7 @@ export const sendGenerateCompleteNotification = async () => {
     const showMessage = mmkv.getBoolean(AppSettings.ShowNotificationText)
 
     const notificationTitle = showMessage
-        ? (Characters.useCharacterCard.getState().card?.name ?? '')
+        ? (Characters.useCharacterStore.getState().card?.name ?? '')
         : 'Response Complete'
 
     const notificationText = showMessage
@@ -152,7 +152,7 @@ export const sendGenerateCompleteNotification = async () => {
             badge: 0,
             data: {
                 chatId: Chats.useChatState.getState().data?.id,
-                characterId: Characters.useCharacterCard.getState().id,
+                characterId: Characters.useCharacterStore.getState().id,
             },
         },
         trigger: null,
@@ -201,11 +201,11 @@ export namespace Chats {
             const data = (await db.query.chat(chatId)) as ChatData | undefined
 
             if (data?.user_id && mmkv.getBoolean(AppSettings.AutoLoadUser)) {
-                const userID = Characters.useUserCard.getState().id
+                const userID = Characters.useUserStore.getState().id
                 if (userID !== data.user_id) {
                     Logger.info('Autoloading User with ID: ' + data.user_id)
-                    await Characters.useUserCard.getState().setCard(data.user_id)
-                    const name = Characters.useUserCard.getState().card?.name
+                    await Characters.useUserStore.getState().setCard(data.user_id)
+                    const name = Characters.useUserStore.getState().card?.name
                     if (name) {
                         Logger.infoToast('Loading User : ' + name)
                     }
@@ -631,7 +631,7 @@ export namespace Chats {
                     Logger.error('Character does not exist!')
                     return
                 }
-                const userId = Characters.useUserCard.getState().id
+                const userId = Characters.useUserStore.getState().id
                 const charName = card.name
                 return await database.transaction(async (tx) => {
                     if (!card || !charName) return

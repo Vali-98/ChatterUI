@@ -1,6 +1,6 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import { AntDesign, Ionicons } from '@expo/vector-icons'
-import { APIState } from '@lib/engine/API/APIManagerState'
+import { APIManager } from '@lib/engine/API/APIManagerState'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useRouter } from 'expo-router'
 import { FlatList, Pressable, Text, View } from 'react-native'
@@ -14,7 +14,7 @@ import ConnectionItem from './ConnectionItem'
 const ConnectionsManagerScreen = () => {
     // eslint-disable-next-line react-compiler/react-compiler
     'use no memo'
-    const { apiValues } = APIState.useAPIState(
+    const { apiValues } = APIManager.useConnectionsStore(
         useShallow((state) => ({
             apiValues: state.values,
         }))

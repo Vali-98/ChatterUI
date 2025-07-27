@@ -33,7 +33,7 @@ const ModelManagerScreen = () => {
     const [modelLoading, setModelLoading] = useState(false)
     const [modelImporting, setModelImporting] = useState(false)
 
-    const { setloadProgress } = Llama.useLlama(
+    const { setloadProgress } = Llama.useLlamaModelStore(
         useShallow((state) => ({
             setloadProgress: state.setLoadProgress,
         }))

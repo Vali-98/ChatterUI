@@ -5,7 +5,7 @@ import { Chats, useInference } from '@lib/state/Chat'
 import { Instructs } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { SamplersManager } from '@lib/state/SamplerState'
-import { useTTSState } from '@lib/state/TTS'
+import { useTTSStore } from '@lib/state/TTS'
 import { mmkv } from '@lib/storage/MMKV'
 import { CompletionTimings } from 'db/schema'
 
@@ -67,10 +67,10 @@ const buildLocalPayload = async () => {
     const rep_pen = payloadFields?.['penalty_repeat']
     const n_predict =
         (typeof payloadFields?.['n_predict'] === 'number' && payloadFields?.['n_predict']) || 0
-    const localPreset: LlamaConfig = Llama.useEngineData.getState().config
+    const localPreset: LlamaConfig = Llama.useLlamaPreferencesStore.getState().config
     let prompt: undefined | string = undefined
     let mediaPaths: string[] = []
-    const context = Llama.useLlama.getState().context
+    const context = Llama.useLlamaModelStore.getState().context
 
     const fields = await obtainFields()
 
@@ -97,7 +97,7 @@ const buildLocalPayload = async () => {
 
         try {
             if (messages) {
-                const result = await Llama.useLlama
+                const result = await Llama.useLlamaModelStore
                     .getState()
                     .context?.getFormattedChat(messages, null, { jinja: true })
                 if (typeof result === 'string') prompt = result
@@ -156,11 +156,11 @@ const constructReplaceStrings = (): string[] => {
 }
 
 const verifyModelLoaded = async (): Promise<boolean> => {
-    const model = Llama.useLlama.getState().model
+    const model = Llama.useLlamaModelStore.getState().model
 
     // Model Loading Routine
     if (!model) {
-        const lastModel = Llama.useEngineData.getState().lastModel
+        const lastModel = Llama.useLlamaPreferencesStore.getState().lastModel
         const autoLoad = mmkv.getBoolean(AppSettings.AutoLoadLocal)
         // If  autoload is disabled, just return
         if (!autoLoad) {
@@ -177,13 +177,13 @@ const verifyModelLoaded = async (): Promise<boolean> => {
         // attempt to load model
         if (lastModel) {
             Logger.infoToast(`Auto-loading Model: ${lastModel.name}`)
-            await Llama.useLlama.getState().load(lastModel)
+            await Llama.useLlamaModelStore.getState().load(lastModel)
         }
 
-        const lastMmproj = Llama.useEngineData.getState().lastMmproj
+        const lastMmproj = Llama.useLlamaPreferencesStore.getState().lastMmproj
         if (lastMmproj) {
             Logger.infoToast(`Auto-loading MMPROJ: ${lastMmproj.name}`)
-            await Llama.useLlama.getState().loadMmproj(lastMmproj)
+            await Llama.useLlamaModelStore.getState().loadMmproj(lastMmproj)
         }
     }
     return true
@@ -197,7 +197,7 @@ export const localInference = async () => {
         }
 
         // verify that model has been loaded
-        const context = Llama.useLlama.getState().context
+        const context = Llama.useLlamaModelStore.getState().context
 
         if (!context) {
             Logger.warnToast('No Model Loaded')
@@ -213,9 +213,11 @@ export const localInference = async () => {
             return
         }
 
-        if (mmkv.getBoolean(AppSettings.SaveLocalKV) && !KV.useKVState.getState().kvCacheLoaded) {
-            const prompt = Llama.useLlama.getState().tokenize(payload.prompt, payload.media_paths)
-            const result = KV.useKVState.getState().verifyKVCache(prompt?.tokens ?? [])
+        if (mmkv.getBoolean(AppSettings.SaveLocalKV) && !KV.useKVStore.getState().kvCacheLoaded) {
+            const prompt = Llama.useLlamaModelStore
+                .getState()
+                .tokenize(payload.prompt, payload.media_paths)
+            const result = KV.useKVStore.getState().verifyKVCache(prompt?.tokens ?? [])
             if (!result.match) {
                 Alert.alert({
                     title: 'Cache Mismatch',
@@ -226,9 +228,9 @@ export const localInference = async () => {
                             label: 'Load Anyway',
                             onPress: async () => {
                                 Logger.warn('Overriding KV Cache despite mismatch')
-                                const result = await Llama.useLlama.getState().loadKV()
+                                const result = await Llama.useLlamaModelStore.getState().loadKV()
                                 if (result) {
-                                    KV.useKVState.getState().setKvCacheLoaded(true)
+                                    KV.useKVStore.getState().setKvCacheLoaded(true)
                                 }
                                 runLocalCompletion(payload)
                             },
@@ -240,9 +242,9 @@ export const localInference = async () => {
                 return
             }
 
-            const kvloadResult = await Llama.useLlama.getState().loadKV()
+            const kvloadResult = await Llama.useLlamaModelStore.getState().loadKV()
             if (kvloadResult) {
-                KV.useKVState.getState().setKvCacheLoaded(true)
+                KV.useKVStore.getState().setKvCacheLoaded(true)
             }
         }
         await runLocalCompletion(payload)
@@ -263,12 +265,12 @@ const runLocalCompletion = async (
     )
 
     useInference.getState().setAbort(async () => {
-        await Llama.useLlama.getState().stopCompletion()
+        await Llama.useLlamaModelStore.getState().stopCompletion()
     })
 
     const outputStream = (text: string) => {
         Chats.useChatState.getState().insertBuffer(text)
-        useTTSState.getState().insertBuffer(text)
+        useTTSStore.getState().insertBuffer(text)
     }
 
     const outputCompleted = (text: string, timings: CompletionTimings) => {
@@ -280,7 +282,7 @@ const runLocalCompletion = async (
         stopGenerating()
     }
 
-    await Llama.useLlama
+    await Llama.useLlamaModelStore
         .getState()
         .completion(payload, outputStream, outputCompleted)
         .catch((error) => {
@@ -362,8 +364,8 @@ const localAPIConfig: APIConfiguration = {
 // the whole app to send inference requests
 const obtainFields = async (): Promise<ContextBuilderParams | void> => {
     try {
-        const userState = Characters.useUserCard.getState()
-        const characterState = Characters.useCharacterCard.getState()
+        const userState = Characters.useUserStore.getState()
+        const characterState = Characters.useCharacterStore.getState()
         const chatState = Chats.useChatState.getState()
 
         const instructState = Instructs.useInstruct.getState()
@@ -416,7 +418,7 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
                 if (entry.id === -1) return 0
                 return await chatState.getTokenCount(index)
             },
-            tokenizer: Llama.useLlama.getState().tokenLength,
+            tokenizer: Llama.useLlamaModelStore.getState().tokenLength,
             maxLength: length,
             cache: {
                 userCache: await characterState.getCache(characterCard.name),

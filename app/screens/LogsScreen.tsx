@@ -12,7 +12,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 const LogsScreen = () => {
     const { color } = Theme.useTheme()
-    const { logs, flushLogs } = Logger.useLoggerState(
+    const { logs, flushLogs } = Logger.useLoggerStore(
         useShallow((state) => ({
             logs: state.logs,
             flushLogs: state.flushLogs,

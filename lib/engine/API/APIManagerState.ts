@@ -1,8 +1,8 @@
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
-import { mmkvStorage } from '@lib/storage/MMKV'
+import { createMMKVStorage } from '@lib/storage/MMKV'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import { defaultTemplates } from './DefaultAPI'
@@ -24,8 +24,8 @@ type APIStateProps = {
     getTemplates: () => APIConfiguration[]
 }
 
-export namespace APIState {
-    export const useAPIState = create<APIStateProps>()(
+export namespace APIManager {
+    export const useConnectionsStore = create<APIStateProps>()(
         persist(
             (set, get) => ({
                 activeIndex: -1,
@@ -94,7 +94,7 @@ export namespace APIState {
             }),
             {
                 name: Storage.API,
-                storage: createJSONStorage(() => mmkvStorage),
+                storage: createMMKVStorage(),
                 version: 1,
             }
         )

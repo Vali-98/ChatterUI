@@ -12,7 +12,7 @@ import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import useAutosave from '@lib/hooks/AutoSave'
-import { useTextFilterState } from '@lib/hooks/TextFilter'
+import { useTextFilterStore } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { Instructs } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
@@ -50,7 +50,7 @@ const FormattingManager = () => {
     const instructList = data
     const selectedItem = data.filter((item) => item.id === instructID)?.[0]
     const [showNewInstruct, setShowNewInstruct] = useState<boolean>(false)
-    const { textFilter, setTextFilter } = useTextFilterState(
+    const { textFilter, setTextFilter } = useTextFilterStore(
         useShallow((state) => ({
             textFilter: state.filter,
             setTextFilter: state.setFilter,

@@ -30,7 +30,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
     const { color } = Theme.useTheme()
     const styles = useStyles()
 
-    const { loadedCharId, setCurrentCard } = Characters.useCharacterCard(
+    const { loadedCharId, setCurrentCard } = Characters.useCharacterStore(
         useShallow((state) => ({
             loadedCharId: state.id,
             setCurrentCard: state.setCard,

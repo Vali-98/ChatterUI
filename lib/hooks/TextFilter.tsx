@@ -1,15 +1,15 @@
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
-import { mmkvStorage } from '@lib/storage/MMKV'
+import { createMMKVStorage } from '@lib/storage/MMKV'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 
 type TextFilterStateProps = {
     filter: string[]
     setFilter: (arr: string[]) => void
 }
 
-export const useTextFilterState = create<TextFilterStateProps>()(
+export const useTextFilterStore = create<TextFilterStateProps>()(
     persist(
         (set) => ({
             filter: [],
@@ -18,7 +18,7 @@ export const useTextFilterState = create<TextFilterStateProps>()(
         {
             name: Storage.TextFilter,
             version: 1,
-            storage: createJSONStorage(() => mmkvStorage),
+            storage: createMMKVStorage(),
         }
     )
 )
@@ -29,7 +29,7 @@ type RegexResult = {
 }
 
 export const useTextFilter = (inputString: string): RegexResult => {
-    const filters = useTextFilterState((state) => state.filter)
+    const filters = useTextFilterStore((state) => state.filter)
     if (filters.length === 0) return { result: inputString, found: false }
     let newString = inputString
     try {

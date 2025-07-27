@@ -16,7 +16,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
 }) => {
     const router = useRouter()
 
-    const setCurrentCard = Characters.useCharacterCard((state) => state.setCard)
+    const setCurrentCard = Characters.useCharacterStore((state) => state.setCard)
 
     const deleteCard = (menuRef: MenuRef) => {
         Alert.alert({

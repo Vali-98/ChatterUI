@@ -29,13 +29,13 @@ type AlertState = {
 
 namespace Alert {
     export const alert = (props: AlertProps) => {
-        useAlert.getState().show(props)
+        useAlertStore.getState().show(props)
     }
 }
 
 export default Alert
 
-const useAlert = create<AlertState>()((set, get) => ({
+const useAlertStore = create<AlertState>()((set, get) => ({
     visible: false,
     props: {
         title: 'Are You Sure?',
@@ -68,7 +68,7 @@ const AlertButton: React.FC<AlertButtonProps> = ({ label, onPress, type = 'defau
     return (
         <TouchableOpacity
             onPress={async () => {
-                useAlert.getState().hide()
+                useAlertStore.getState().hide()
                 onPress && onPress()
             }}>
             <Text style={buttonStyleMap[type]}>{label}</Text>
@@ -78,7 +78,7 @@ const AlertButton: React.FC<AlertButtonProps> = ({ label, onPress, type = 'defau
 
 export const AlertBox = () => {
     const styles = useStyles()
-    const { visible, props } = useAlert(
+    const { visible, props } = useAlertStore(
         useShallow((state) => ({ visible: state.visible, props: state.props }))
     )
     const handleDismiss = () => {
@@ -87,7 +87,7 @@ export const AlertBox = () => {
             dismiss()
         }
     }
-    const hide = useAlert((state) => state.hide)
+    const hide = useAlertStore((state) => state.hide)
     return (
         <Modal
             visible={visible}

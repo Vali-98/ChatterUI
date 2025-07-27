@@ -6,7 +6,7 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import FadeBackrop from '@components/views/FadeBackdrop'
 import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
-import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
+import { APIManagerValue, APIManager } from '@lib/engine/API/APIManagerState'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useEffect, useState } from 'react'
@@ -31,7 +31,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
     const { color, spacing, fontSize } = Theme.useTheme()
     const styles = useStyles()
 
-    const { editValue, getTemplates } = APIState.useAPIState(
+    const { editValue, getTemplates } = APIManager.useConnectionsStore(
         useShallow((state) => ({
             getTemplates: state.getTemplates,
             editValue: state.editValue,

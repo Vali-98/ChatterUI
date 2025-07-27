@@ -1,7 +1,7 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import Avatar from '@components/views/Avatar'
 import FadeBackrop from '@components/views/FadeBackdrop'
-import { useViewerState } from '@lib/state/AvatarViewer'
+import { useAvatarViewerStore } from '@lib/state/AvatarViewer'
 import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useRouter } from 'expo-router'
@@ -18,7 +18,7 @@ const AvatarViewer: React.FC<AvatarViewerProps> = ({ editorButton = true }) => {
     const router = useRouter()
     const styles = useStyles()
 
-    const { show, setShow, isUser } = useViewerState(
+    const { show, setShow, isUser } = useAvatarViewerStore(
         useShallow((state) => ({
             show: state.showViewer,
             setShow: state.setShow,
@@ -26,14 +26,14 @@ const AvatarViewer: React.FC<AvatarViewerProps> = ({ editorButton = true }) => {
         }))
     )
 
-    const { charName, charImageId } = Characters.useCharacterCard(
+    const { charName, charImageId } = Characters.useCharacterStore(
         useShallow((state) => ({
             charName: state.card?.name,
             charImageId: state.card?.image_id,
         }))
     )
 
-    const { userName, userImageId } = Characters.useUserCard(
+    const { userName, userImageId } = Characters.useUserStore(
         useShallow((state) => ({
             userName: state.card?.name,
             userImageId: state.card?.image_id,

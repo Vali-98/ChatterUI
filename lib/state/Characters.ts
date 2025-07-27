@@ -20,10 +20,10 @@ import * as FS from 'expo-file-system'
 import { useEffect } from 'react'
 import { z } from 'zod'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 
 import { replaceMacroBase } from '@lib/utils/Macros'
-import { mmkvStorage } from '../storage/MMKV'
+import { createMMKVStorage } from '../storage/MMKV'
 import { createPNGWithText, getPngChunkText } from '../utils/PNG'
 import { Logger } from './Logger'
 
@@ -61,7 +61,7 @@ type CharacterCardState = {
 export type CharacterCardData = Awaited<ReturnType<typeof Characters.db.query.cardQuery>>
 
 export namespace Characters {
-    export const useUserCard = create<CharacterCardState>()(
+    export const useUserStore = create<CharacterCardState>()(
         persist(
             (set, get) => ({
                 id: undefined,
@@ -136,7 +136,7 @@ export namespace Characters {
             }),
             {
                 name: Storage.UserCard,
-                storage: createJSONStorage(() => mmkvStorage),
+                storage: createMMKVStorage(),
                 version: 2,
                 partialize: (state) => ({ id: state.id, card: state.card }),
                 migrate: async (persistedState: any, version) => {
@@ -151,7 +151,7 @@ export namespace Characters {
         )
     )
 
-    export const useCharacterCard = create<CharacterCardState>()((set, get) => ({
+    export const useCharacterStore = create<CharacterCardState>()((set, get) => ({
         id: undefined,
         card: undefined,
         tokenCache: undefined,
@@ -192,7 +192,7 @@ export namespace Characters {
         getCache: async (charName: string) => {
             const cache = get().tokenCache
             const card = get().card
-            if (cache?.otherName && cache.otherName === useUserCard.getState().card?.name)
+            if (cache?.otherName && cache.otherName === useUserStore.getState().card?.name)
                 return cache
 
             if (!card)
@@ -932,7 +932,7 @@ export namespace Characters {
     }
 
     export const useCharacterUpdater = () => {
-        const { id, updateCard } = useCharacterCard((state) => ({
+        const { id, updateCard } = useCharacterStore((state) => ({
             id: state.id,
             updateCard: state.updateCard,
         }))
@@ -1028,8 +1028,8 @@ type Macro = {
 export const replaceMacros = (text: string) => {
     if (text === undefined) return ''
     let newText: string = text
-    const charName = Characters.useCharacterCard.getState().card?.name ?? ''
-    const userName = Characters.useUserCard.getState().card?.name ?? ''
+    const charName = Characters.useCharacterStore.getState().card?.name ?? ''
+    const userName = Characters.useUserStore.getState().card?.name ?? ''
     const rules: Macro[] = [
         { macro: '{{user}}', value: userName },
         { macro: '{{char}}', value: charName },

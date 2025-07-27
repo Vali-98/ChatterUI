@@ -1,6 +1,6 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { APIState } from '@lib/engine/API/APIManagerState'
+import { APIManager } from '@lib/engine/API/APIManagerState'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getDocumentAsync } from 'expo-document-picker'
@@ -21,7 +21,7 @@ import { useState } from 'react'
 const TemplateManager = () => {
     // eslint-disable-next-line react-compiler/react-compiler
     'use no memo'
-    const { templates, addTemplate } = APIState.useAPIState(
+    const { templates, addTemplate } = APIManager.useConnectionsStore(
         useShallow((state) => ({
             templates: state.customTemplates,
             addTemplate: state.addTemplate,

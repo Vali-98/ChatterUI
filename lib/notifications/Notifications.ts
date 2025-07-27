@@ -63,7 +63,7 @@ export function useNotificationObserver() {
     const [autoLoad, _] = useMMKVBoolean(AppSettings.ChatOnStartup)
     const [useAuth, __] = useMMKVBoolean(AppSettings.LocallyAuthenticateUser)
     const { chat, loadChat } = Chats.useChat()
-    const { setCard } = Characters.useCharacterCard()
+    const { setCard } = Characters.useCharacterStore()
     const router = useRouter()
 
     useEffect(() => {

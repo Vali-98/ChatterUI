@@ -14,22 +14,22 @@ import { View } from 'react-native'
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
-import { useChatEditorState } from './ChatWindow/ChatEditor'
+import { useChatEditorStore } from './ChatWindow/ChatEditor'
 
 const ChatMenu = () => {
     const insets = useSafeAreaInsets()
-    const { unloadCharacter, charId } = Characters.useCharacterCard(
+    const { unloadCharacter, charId } = Characters.useCharacterStore(
         useShallow((state) => ({
             unloadCharacter: state.unloadCard,
             charId: state.id,
         }))
     )
 
-    const editorVisible = useChatEditorState(useShallow((state) => state.editMode))
+    const editorVisible = useChatEditorStore(useShallow((state) => state.editMode))
 
     const { chat, unloadChat, loadChat } = Chats.useChat()
 
-    const { showSettings, showChats } = Drawer.useDrawerState(
+    const { showSettings, showChats } = Drawer.useDrawerStore(
         useShallow((state) => ({
             showSettings: state.values?.[Drawer.ID.SETTINGS],
             showChats: state.values?.[Drawer.ID.CHATLIST],

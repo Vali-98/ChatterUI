@@ -1,7 +1,7 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import Alert from '@components/views/Alert'
 import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
-import { APIState } from '@lib/engine/API/APIManagerState'
+import { APIManager } from '@lib/engine/API/APIManagerState'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
@@ -15,7 +15,7 @@ type TemplateItemProps = {
 const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
     const { color, spacing, borderWidth, fontSize, borderRadius } = Theme.useTheme()
 
-    const removeTemplate = APIState.useAPIState((state) => state.removeTemplate)
+    const removeTemplate = APIManager.useConnectionsStore((state) => state.removeTemplate)
 
     const handleDelete = () => {
         Alert.alert({

@@ -1,23 +1,23 @@
-import { useAppModeState } from '@lib/state/AppMode'
+import { useAppModeStore } from '@lib/state/AppMode'
 import { Chats, useInference } from '@lib/state/Chat'
 import BackgroundService from 'react-native-background-actions'
 
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
-import { useTTSState } from '@lib/state/TTS'
+import { useTTSStore } from '@lib/state/TTS'
 import { mmkv } from '@lib/storage/MMKV'
 import { useCallback } from 'react'
 import { Characters } from '../state/Characters'
 import { Logger } from '../state/Logger'
 import { APIBuilderParams, buildAndSendRequest } from './API/APIBuilder'
 import { APIConfiguration, APIValues } from './API/APIBuilder.types'
-import { APIState } from './API/APIManagerState'
+import { APIManager } from './API/APIManagerState'
 import { localInference } from './LocalInference'
 import { Tokenizer } from './Tokenizer'
 
 export const regenerateResponse = async (swipeId: number, regenCache: boolean = true) => {
-    const charName = Characters.useCharacterCard.getState().card?.name
+    const charName = Characters.useCharacterStore.getState().card?.name
     const messagesLength = Chats.useChatState.getState()?.data?.messages?.length ?? -1
     const message = Chats.useChatState.getState()?.data?.messages?.[messagesLength - 1]
 
@@ -72,7 +72,7 @@ export const generateResponse = async (swipeId: number) => {
     }
     Chats.useChatState.getState().startGenerating(swipeId)
     Logger.info(`Obtaining response.`)
-    const appMode = useAppModeState.getState().appMode
+    const appMode = useAppModeStore.getState().appMode
 
     if (appMode === 'local') {
         await BackgroundService.start(localInference, completionTaskOptions)
@@ -84,7 +84,7 @@ export const generateResponse = async (swipeId: number) => {
 const useGenerateResponse = () => {
     const startGenerating = Chats.useChatState((state) => state.startGenerating)
     const nowGenerating = useInference((state) => state.nowGenerating)
-    const appMode = useAppModeState((state) => state.appMode)
+    const appMode = useAppModeStore((state) => state.appMode)
 
     const generateResponse = useCallback(
         async (swipeId: number) => {
@@ -114,7 +114,7 @@ const chatInferenceStream = async () => {
     fields.stopGenerating = stop
     fields.onData = (text) => {
         Chats.useChatState.getState().insertBuffer(text)
-        useTTSState.getState().insertBuffer(text)
+        useTTSStore.getState().insertBuffer(text)
     }
     fields.onEnd = async () => {
         const chat = Chats.useChatState.getState().data
@@ -184,10 +184,10 @@ const getModelContextLength = (config: APIConfiguration, values: APIValues): num
 // the whole app to send inference requests
 const obtainFields = async (): Promise<APIBuilderParams | void> => {
     try {
-        const userState = Characters.useUserCard.getState()
-        const characterState = Characters.useCharacterCard.getState()
+        const userState = Characters.useUserStore.getState()
+        const characterState = Characters.useCharacterStore.getState()
         const chatState = Chats.useChatState.getState()
-        const apiState = APIState.useAPIState.getState()
+        const apiState = APIManager.useConnectionsStore.getState()
         const instructState = Instructs.useInstruct.getState()
 
         const userCard = userState.card

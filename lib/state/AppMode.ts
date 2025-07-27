@@ -1,7 +1,7 @@
 import { Storage } from '@lib/enums/Storage'
-import { mmkvStorage } from '@lib/storage/MMKV'
+import { createMMKVStorage } from '@lib/storage/MMKV'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
 
 type AppMode = 'local' | 'remote'
@@ -11,7 +11,7 @@ type AppModeStateProps = {
     setAppMode: (mode: AppMode) => void
 }
 
-export const useAppModeState = create<AppModeStateProps>()(
+export const useAppModeStore = create<AppModeStateProps>()(
     persist(
         (set) => ({
             appMode: 'local',
@@ -21,7 +21,7 @@ export const useAppModeState = create<AppModeStateProps>()(
         }),
         {
             name: Storage.AppMode,
-            storage: createJSONStorage(() => mmkvStorage),
+            storage: createMMKVStorage(),
             partialize: (state) => ({ appMode: state.appMode }),
             version: 1,
         }
@@ -29,7 +29,7 @@ export const useAppModeState = create<AppModeStateProps>()(
 )
 
 export const useAppMode = () => {
-    const { appMode, setAppMode } = useAppModeState(
+    const { appMode, setAppMode } = useAppModeStore(
         useShallow((state) => ({
             appMode: state.appMode,
             setAppMode: state.setAppMode,

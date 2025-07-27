@@ -87,7 +87,7 @@ namespace Drawer {
         children = undefined,
     }) => {
         const styles = useStyles()
-        const { setShow, show } = useDrawerState(
+        const { setShow, show } = useDrawerStore(
             useShallow((state) => ({
                 setShow: state.setShow,
                 show: state.values?.[drawerId],
@@ -130,7 +130,7 @@ namespace Drawer {
         closeIcon = 'close',
         ...rest
     }) => {
-        const { setShow, show } = useDrawerState(
+        const { setShow, show } = useDrawerStore(
             useShallow((state) => ({
                 setShow: state.setShow,
                 show: state.values?.[drawerId],
@@ -150,7 +150,7 @@ namespace Drawer {
     }
 
     export const Gesture: React.FC<DrawerGestureProps> = ({ config, ...rest }) => {
-        const { setShowDrawer, values } = Drawer.useDrawerState(
+        const { setShowDrawer, values } = Drawer.useDrawerStore(
             useShallow((state) => ({
                 setShowDrawer: state.setShow,
                 values: state.values,
@@ -186,7 +186,7 @@ namespace Drawer {
         return <GestureDetector {...rest} gesture={gesture} />
     }
 
-    export const useDrawerState = create<DrawerStateProps>((set) => ({
+    export const useDrawerStore = create<DrawerStateProps>((set) => ({
         values: {},
         setShow: (key, value) =>
             set((state) => ({

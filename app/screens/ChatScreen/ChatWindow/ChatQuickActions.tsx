@@ -13,7 +13,7 @@ import Animated, { StretchInY, StretchOutY, ZoomIn, ZoomOut } from 'react-native
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
-import { useChatEditorState } from './ChatEditor'
+import { useChatEditorStore } from './ChatEditor'
 import ChatTTS from './ChatTTS'
 
 interface OptionsStateProps {
@@ -23,10 +23,10 @@ interface OptionsStateProps {
 
 useInference.subscribe(({ nowGenerating }) => {
     if (nowGenerating) {
-        optionState.getState().setActiveIndex(undefined)
+        useChatActionsState.getState().setActiveIndex(undefined)
     }
 })
-export const optionState = create<OptionsStateProps>()((set) => ({
+export const useChatActionsState = create<OptionsStateProps>()((set) => ({
     setActiveIndex: (n) => set({ activeIndex: n }),
 }))
 
@@ -37,13 +37,13 @@ interface ChatActionProps {
 }
 
 const ChatQuickActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMessage }) => {
-    const { activeIndex, setShowOptions } = optionState(
+    const { activeIndex, setShowOptions } = useChatActionsState(
         useShallow((state) => ({
             setShowOptions: state.setActiveIndex,
             activeIndex: state.activeIndex,
         }))
     )
-    const showEditor = useChatEditorState((state) => state.show)
+    const showEditor = useChatEditorStore((state) => state.show)
     const { color } = Theme.useTheme()
     const [quickDelete, __] = useMMKVBoolean(AppSettings.QuickDelete)
     const { deleteEntry } = Chats.useEntry()

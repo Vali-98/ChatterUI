@@ -22,7 +22,7 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
     const styles = useStyles()
     const { color } = Theme.useTheme()
 
-    const { modelName, loadProgress } = Llama.useLlama(
+    const { modelName, loadProgress } = Llama.useLlamaModelStore(
         useShallow((state) => ({
             modelName: state.model?.name,
             loadProgress: state.loadProgress,

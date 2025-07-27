@@ -4,7 +4,7 @@ import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
 import PopupMenu from '@components/views/PopupMenu'
 import { AntDesign } from '@expo/vector-icons'
-import { useViewerState } from '@lib/state/AvatarViewer'
+import { useAvatarViewerStore } from '@lib/state/AvatarViewer'
 import { CharacterCardData, Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
 import AvatarViewer from '@components/views/AvatarViewer'
@@ -17,7 +17,7 @@ const UserCardEditor = () => {
     const styles = useStyles()
     const { color, spacing } = Theme.useTheme()
 
-    const { userCard, imageID, id, setCard, updateImage } = Characters.useUserCard(
+    const { userCard, imageID, id, setCard, updateImage } = Characters.useUserStore(
         useShallow((state) => ({
             userCard: state.card,
             imageID: state.card?.image_id ?? 0,
@@ -29,7 +29,7 @@ const UserCardEditor = () => {
 
     const [currentCard, setCurrentCard] = useState<CharacterCardData | undefined>(userCard)
 
-    const setShowViewer = useViewerState((state) => state.setShow)
+    const setShowViewer = useAvatarViewerStore((state) => state.setShow)
 
     useEffect(() => {
         setCurrentCard(userCard)

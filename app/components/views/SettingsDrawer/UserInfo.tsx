@@ -9,7 +9,7 @@ import { useShallow } from 'zustand/react/shallow'
 const UserInfo = () => {
     const router = useRouter()
     const { color, spacing, borderWidth, fontSize } = Theme.useTheme()
-    const { userName, imageID } = Characters.useUserCard(
+    const { userName, imageID } = Characters.useUserStore(
         useShallow((state) => ({
             userName: state.card?.name,
             imageID: state.card?.image_id ?? 0,

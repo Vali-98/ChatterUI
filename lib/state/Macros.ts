@@ -11,8 +11,8 @@ export const replaceMacros = (
     options: { extraMacros: Macro[] } = { extraMacros: [] }
 ) => {
     let newtext: string = text
-    const charName = Characters.useCharacterCard.getState().card?.name ?? ''
-    const userName = Characters.useUserCard.getState().card?.name ?? ''
+    const charName = Characters.useCharacterStore.getState().card?.name ?? ''
+    const userName = Characters.useUserStore.getState().card?.name ?? ''
     const rules: Macro[] = [
         { macro: /{{?user}}?/g, value: userName },
         { macro: /{{?char}}?/g, value: charName },

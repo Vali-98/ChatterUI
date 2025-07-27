@@ -1,10 +1,10 @@
 import { Model } from '@lib/engine/Local/Model'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { setupNotifications } from '@lib/notifications/Notifications'
-import { useAppModeState } from '@lib/state/AppMode'
+import { useAppModeStore } from '@lib/state/AppMode'
 import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
-import { useTTSState } from '@lib/state/TTS'
+import { useTTSStore } from '@lib/state/TTS'
 import { getThreads } from '@vali98/react-native-cpu-info'
 import { getCpuFeatures } from 'cui-llama.rn'
 import { DeviceType, getDeviceTypeAsync } from 'expo-device'
@@ -34,7 +34,7 @@ export const loadChatOnInit = async () => {
     if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return
     const newestChat = await Chats.db.query.chatNewest()
     if (!newestChat) return
-    await Characters.useCharacterCard.getState().setCard(newestChat.character_id)
+    await Characters.useCharacterStore.getState().setCard(newestChat.character_id)
     await Chats.useChatState.getState().load(newestChat.id)
     router.push('/screens/ChatScreen')
 }
@@ -86,7 +86,7 @@ const migrateModelData_0_8_4_to_0_8_5 = () => {
         const data = JSON.parse(modelData)
         if (!data) return
         mmkv.delete(oldDef)
-        Llama.useEngineData.getState().setLastModelLoaded(data)
+        Llama.useLlamaPreferencesStore.getState().setLastModelLoaded(data)
     } catch (e) {}
 }
 
@@ -98,11 +98,11 @@ const migrateTTSData_0_8_5_to_0_8_6 = () => {
     */
     if (mmkv.getBoolean('ttsauto')) {
         mmkv.delete('ttsauto')
-        useTTSState.getState().setAuto(true)
+        useTTSStore.getState().setAuto(true)
     }
     if (mmkv.getBoolean('ttsenable')) {
         mmkv.delete('ttsenable')
-        useTTSState.getState().setEnabled(true)
+        useTTSStore.getState().setEnabled(true)
     }
     const speakerData = mmkv.getString('ttsspeaker')
     if (speakerData) {
@@ -117,7 +117,7 @@ const migrateTTSData_0_8_5_to_0_8_6 = () => {
             })
             const result = voiceSchema.safeParse(voiceData)
             if (result.success) {
-                useTTSState.getState().setVoice(voiceData)
+                useTTSStore.getState().setVoice(voiceData)
             } else throw new Error('Schema validation failed')
         } catch (e) {
             Logger.error('Failed to migrate voice from 0.8.5 to 0.8.6')
@@ -146,7 +146,7 @@ const migratePresets_0_8_3_to_0_8_4 = async () => {
     files.map(async (item) => {
         try {
             const data = await readAsStringAsync(`${presetDir}/${item}`)
-            SamplersManager.useSamplerState.getState().addSamplerConfig({
+            SamplersManager.useSamplerStore.getState().addSamplerConfig({
                 data: JSON.parse(data),
                 name: item.replace('.json', ''),
             })
@@ -164,7 +164,7 @@ const migrateAppMode_0_8_5_to_0_8_6 = () => {
     if (!oldAppMode) return
 
     if (oldAppMode === 'local' || oldAppMode === 'remote') {
-        useAppModeState.getState().setAppMode(oldAppMode)
+        useAppModeStore.getState().setAppMode(oldAppMode)
     }
     mmkv.delete(oldKey)
     Logger.warn('Migrated appmode from 0.8.5 to 0.8.6')
@@ -172,7 +172,7 @@ const migrateAppMode_0_8_5_to_0_8_6 = () => {
 
 const createDefaultUserData = async () => {
     const id = await Characters.db.mutate.createCard('User', 'user')
-    Characters.useUserCard.getState().setCard(id)
+    Characters.useUserStore.getState().setCard(id)
 }
 
 const setDefaultUser = async () => {
@@ -184,8 +184,8 @@ const setDefaultUser = async () => {
     } else if (userList?.length === 0) {
         Logger.warn('No Users exist, creating default Users')
         await createDefaultUserData()
-    } else if (userList.length > 0 && !Characters.useUserCard.getState().card) {
-        Characters.useUserCard.getState().setCard(userList[0].id)
+    } else if (userList.length > 0 && !Characters.useUserStore.getState().card) {
+        Characters.useUserStore.getState().setCard(userList[0].id)
     }
 }
 
@@ -244,7 +244,7 @@ export const startupApp = () => {
 
     // Local Model Data in case external models are deleted
     Model.verifyModelList()
-    Tokenizer.useDefaultTokenizer.getState().loadModel()
+    Tokenizer.useTokenizerState.getState().loadModel()
     // migrations for old versions
     migrateModelData_0_7_10_to_0_8_0()
     migrateModelData_0_8_4_to_0_8_5()

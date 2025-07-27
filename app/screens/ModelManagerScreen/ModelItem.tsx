@@ -31,7 +31,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const styles = useStyles()
     const { color } = Theme.useTheme()
     const [showMMPROJSelector, setShowMMPROJSelector] = useState(false)
-    const { loadModel, unloadModel, loadMmproj, modelId, mmprojId } = Llama.useLlama(
+    const { loadModel, unloadModel, loadMmproj, modelId, mmprojId } = Llama.useLlamaModelStore(
         useShallow((state) => ({
             loadMmproj: state.loadMmproj,
             loadModel: state.load,
@@ -41,7 +41,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
         }))
     )
 
-    const maybeClearLastLoaded = Llama.useEngineData(
+    const maybeClearLastLoaded = Llama.useLlamaPreferencesStore(
         useShallow((state) => state.maybeClearLastLoaded)
     )
 

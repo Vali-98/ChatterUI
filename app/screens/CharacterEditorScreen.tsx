@@ -8,7 +8,7 @@ import PopupMenu from '@components/views/PopupMenu'
 import { db } from '@db'
 import { AntDesign } from '@expo/vector-icons'
 import { Tokenizer } from '@lib/engine/Tokenizer'
-import { useViewerState } from '@lib/state/AvatarViewer'
+import { useAvatarViewerStore } from '@lib/state/AvatarViewer'
 import { CharacterCardData, Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
@@ -41,7 +41,7 @@ const ChracterEditorScreen = () => {
             .groupBy(tags.id)
     )
     const { currentCard, setCurrentCard, charId, charName, unloadCharacter } =
-        Characters.useCharacterCard(
+        Characters.useCharacterStore(
             useShallow((state) => ({
                 charId: state.id,
                 currentCard: state.card,
@@ -51,11 +51,11 @@ const ChracterEditorScreen = () => {
             }))
         )
 
-    const getTokenCount = Tokenizer.useDefaultTokenizer((state) => state.getTokenCount)
+    const getTokenCount = Tokenizer.useTokenizerState((state) => state.getTokenCount)
     const [characterCard, setCharacterCard] = useState<CharacterCardData | undefined>(currentCard)
     const { chat, unloadChat } = Chats.useChat()
 
-    const setShowViewer = useViewerState((state) => state.setShow)
+    const setShowViewer = useAvatarViewerStore((state) => state.setShow)
     const [edited, setEdited] = useState(false)
     const [altSwipeIndex, setAltSwipeIndex] = useState(0)
 
@@ -164,7 +164,7 @@ const ChracterEditorScreen = () => {
             type: 'image/*',
         }).then((result: DocumentPicker.DocumentPickerResult) => {
             if (result.canceled || !charId) return
-            Characters.useCharacterCard.getState().updateImage(result.assets[0].uri)
+            Characters.useCharacterStore.getState().updateImage(result.assets[0].uri)
         })
     }
 

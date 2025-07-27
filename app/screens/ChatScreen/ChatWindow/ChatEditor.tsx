@@ -19,7 +19,7 @@ type ChatEditorStateProps = {
 }
 
 //TODO: This is somewhat unsafe, as it always expects index to be valid at 0
-export const useChatEditorState = create<ChatEditorStateProps>()((set) => ({
+export const useChatEditorStore = create<ChatEditorStateProps>()((set) => ({
     index: 0,
     editMode: false,
     hide: () => {
@@ -31,7 +31,7 @@ export const useChatEditorState = create<ChatEditorStateProps>()((set) => ({
 }))
 
 const ChatEditor = () => {
-    const { index, editMode, hide } = useChatEditorState(
+    const { index, editMode, hide } = useChatEditorStore(
         useShallow((state) => ({
             index: state.index,
             editMode: state.editMode,

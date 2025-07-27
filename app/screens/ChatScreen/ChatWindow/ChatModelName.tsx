@@ -6,7 +6,7 @@ import React from 'react'
 import { View, Text, TouchableOpacity } from 'react-native'
 
 const ChatModelName = () => {
-    const model = Llama.useLlama((state) => state.model)
+    const model = Llama.useLlamaModelStore((state) => state.model)
     const { color, spacing, borderRadius } = Theme.useTheme()
 
     const router = useRouter()

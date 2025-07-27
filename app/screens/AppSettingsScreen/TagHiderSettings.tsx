@@ -9,7 +9,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 const TagHiderSettings = () => {
     const [tagHider, setUseTagHider] = useMMKVBoolean(AppSettings.UseTagHider)
-    const { tags, setTags } = TagHider.store(
+    const { tags, setTags } = TagHider.useTagHiderStore(
         useShallow((store) => ({
             tags: store.tags,
             setTags: store.setTags,

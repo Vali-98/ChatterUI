@@ -1,7 +1,7 @@
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useDebounce } from '@lib/hooks/Debounce'
 import { useAppMode } from '@lib/state/AppMode'
-import { useBackgroundImage } from '@lib/state/BackgroundImage'
+import { useBackgroundStore } from '@lib/state/BackgroundImage'
 import { Chats } from '@lib/state/Chat'
 import { AppDirectory } from '@lib/utils/File'
 import { ImageBackground } from 'expo-image'
@@ -12,7 +12,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import Drawer from '@components/views/Drawer'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { useShallow } from 'zustand/react/shallow'
-import { chatInputHeightStore } from '../ChatInput'
+import { useInputHeightStore } from '../ChatInput'
 import ChatEditor from './ChatEditor'
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
@@ -30,9 +30,9 @@ const ChatWindow = () => {
     const [saveScroll, _] = useMMKVBoolean(AppSettings.SaveScrollPosition)
     const [showModelname, __] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [autoScroll, ___] = useMMKVBoolean(AppSettings.AutoScroll)
-    const chatInputHeight = chatInputHeightStore(useShallow((state) => state.height))
+    const chatInputHeight = useInputHeightStore(useShallow((state) => state.height))
     const flatlistRef = useRef<FlatList | null>(null)
-    const { showSettings, showChat } = Drawer.useDrawerState(
+    const { showSettings, showChat } = Drawer.useDrawerStore(
         useShallow((state) => ({
             showSettings: state.values?.[Drawer.ID.SETTINGS],
             showChat: state.values?.[Drawer.ID.CHATLIST],
@@ -61,7 +61,7 @@ const ChatWindow = () => {
                 viewOffset: 32,
             })
     }, [chat?.id, chat?.autoScroll])
-    const image = useBackgroundImage((state) => state.image)
+    const image = useBackgroundStore((state) => state.image)
 
     const list: ListItem[] = (chat?.messages ?? [])
         .map((item, index) => ({

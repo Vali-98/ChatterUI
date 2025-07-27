@@ -1,7 +1,7 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import Alert from '@components/views/Alert'
-import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
+import { APIManagerValue, APIManager } from '@lib/engine/API/APIManagerState'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -18,7 +18,7 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
     const { spacing } = Theme.useTheme()
     const styles = useStyles()
     const [showEditor, setShowEditor] = useState(false)
-    const { removeValue, editValue } = APIState.useAPIState(
+    const { removeValue, editValue } = APIManager.useConnectionsStore(
         useShallow((state) => ({
             removeValue: state.removeValue,
             editValue: state.editValue,

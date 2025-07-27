@@ -16,7 +16,7 @@ const UserList = () => {
     const { data } = useLiveQuery(Characters.db.query.cardListQuery('user'))
 
     const [showNewUser, setShowNewUser] = useState(false)
-    const { setCard, id } = Characters.useUserCard(
+    const { setCard, id } = Characters.useUserStore(
         useShallow((state) => ({
             setCard: state.setCard,
             id: state.id,

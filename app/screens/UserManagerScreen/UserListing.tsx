@@ -26,13 +26,13 @@ const getTimeStamp = (oldtime: number) => {
 const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
     const styles = useStyles()
     const { spacing } = Theme.useTheme()
-    const setShow = Drawer.useDrawerState((state) => state.setShow)
+    const setShow = Drawer.useDrawerStore((state) => state.setShow)
 
     const setShowDrawer = (b: boolean) => {
         setShow(Drawer.ID.USERLIST, b)
     }
 
-    const { userId, setCard } = Characters.useUserCard(
+    const { userId, setCard } = Characters.useUserStore(
         useShallow((state) => ({
             userId: state.id,
             setCard: state.setCard,

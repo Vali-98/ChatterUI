@@ -1,5 +1,6 @@
 import { AppSettings } from '@lib/constants/GlobalValues'
-import { PersistStore } from '@lib/storage/MMKV'
+import { Storage } from '@lib/enums/Storage'
+import { createMMKVStorage } from '@lib/storage/MMKV'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -11,7 +12,7 @@ interface TagHiderStoreProps {
 }
 
 export namespace TagHider {
-    export const store = create<TagHiderStoreProps>()(
+    export const useTagHiderStore = create<TagHiderStoreProps>()(
         persist(
             (set) => ({
                 tags: [],
@@ -19,16 +20,18 @@ export namespace TagHider {
                     set({ tags: newTags })
                 },
             }),
-            PersistStore.create(PersistStore.TagHider, {
+            {
+                name: Storage.TagHider,
+                storage: createMMKVStorage(),
                 version: 1,
                 partialize: (data) => ({ tags: data.tags }),
-            })
+            }
         )
     )
 
     export const useHiddenTags = () => {
         const [tagHider, _] = useMMKVBoolean(AppSettings.UseTagHider)
-        const tags = TagHider.store(useShallow((state) => state.tags))
+        const tags = TagHider.useTagHiderStore(useShallow((state) => state.tags))
         if (!tagHider) return []
         return tags
     }

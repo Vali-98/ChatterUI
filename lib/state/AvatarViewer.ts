@@ -6,7 +6,7 @@ type ViewerStateProps = {
     setShow: (showState: boolean, isUser?: boolean) => void
 }
 
-export const useViewerState = create<ViewerStateProps>()((set) => ({
+export const useAvatarViewerStore = create<ViewerStateProps>()((set) => ({
     showViewer: false,
     isUser: false,
     setShow: (showState: boolean, isUser: boolean = false) =>

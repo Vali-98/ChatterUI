@@ -6,11 +6,11 @@ import { Pressable, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
-import ChatQuickActions, { optionState } from './ChatQuickActions'
+import ChatQuickActions, { useChatActionsState } from './ChatQuickActions'
 import ChatAttachments from './ChatAttachments'
 import ChatText from './ChatText'
 import ChatTextLast from './ChatTextLast'
-import { useChatEditorState } from './ChatEditor'
+import { useChatEditorStore } from './ChatEditor'
 import ChatSwipes from './ChatSwipes'
 
 type ChatTextProps = {
@@ -31,14 +31,14 @@ const ChatBubble: React.FC<ChatTextProps> = ({
     const [showTPS, _] = useMMKVBoolean(AppSettings.ShowTokenPerSecond)
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
 
-    const { activeIndex, setShowOptions } = optionState(
+    const { activeIndex, setShowOptions } = useChatActionsState(
         useShallow((state) => ({
             setShowOptions: state.setActiveIndex,
             activeIndex: state.activeIndex,
         }))
     )
 
-    const showEditor = useChatEditorState((state) => state.show)
+    const showEditor = useChatEditorStore((state) => state.show)
     const handleEnableEdit = () => {
         if (!nowGenerating) showEditor(index)
     }

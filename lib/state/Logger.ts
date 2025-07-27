@@ -1,11 +1,10 @@
 import { Storage } from '@lib/enums/Storage'
-import { Theme } from '@lib/theme/ThemeManager'
 import Toast from 'react-native-simple-toast'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 
 import { AppSettings } from '../constants/GlobalValues'
-import { mmkv, mmkvStorage } from '../storage/MMKV'
+import { createMMKVStorage, mmkv } from '../storage/MMKV'
 
 const toastTime = Toast.SHORT
 const maxloglength = 2000
@@ -30,7 +29,7 @@ type LogStateProps = {
 }
 
 export namespace Logger {
-    export const useLoggerState = create<LogStateProps>()(
+    export const useLoggerStore = create<LogStateProps>()(
         persist(
             (set, get) => ({
                 logs: [],
@@ -45,7 +44,7 @@ export namespace Logger {
             }),
             {
                 name: Storage.Logs,
-                storage: createJSONStorage(() => mmkvStorage),
+                storage: createMMKVStorage(),
                 version: 1,
                 partialize: (state) => ({
                     logs: state.logs,
@@ -65,7 +64,7 @@ export namespace Logger {
     }
 
     const insertLogs = (data: LogEntry) => {
-        useLoggerState.getState().addLog(data)
+        useLoggerStore.getState().addLog(data)
     }
 
     const createLog = (data: string, level: LogLevel): LogEntry => {

@@ -1,9 +1,9 @@
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
-import { mmkvStorage } from '@lib/storage/MMKV'
+import { createMMKVStorage } from '@lib/storage/MMKV'
 import * as Speech from 'expo-speech'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
 
 import { Chats, useInference } from './Chat'
@@ -58,7 +58,7 @@ export const useTTS = () => {
         rate,
         live,
         setLive,
-    } = useTTSState(
+    } = useTTSStore(
         useShallow((state) => ({
             startTTS: state.startTTS,
             stopTTS: state.stopTTS,
@@ -99,15 +99,15 @@ useInference.subscribe(({ nowGenerating }) => {
     if (!nowGenerating) {
         const message = data?.messages?.[length - 1]
         if (!message) return
-        useTTSState
+        useTTSStore
             .getState()
             .handleEndGeneration(length - 1, message.swipes[message.swipe_id].swipe)
     } else {
-        useTTSState.getState().handleStartGeneration(length - 1)
+        useTTSStore.getState().handleStartGeneration(length - 1)
     }
 })
 
-export const useTTSState = create<TTSState>()(
+export const useTTSStore = create<TTSState>()(
     persist(
         (set, get) => ({
             voice: undefined,
@@ -257,7 +257,7 @@ export const useTTSState = create<TTSState>()(
         }),
         {
             name: Storage.TTS,
-            storage: createJSONStorage(() => mmkvStorage),
+            storage: createMMKVStorage(),
             version: 1,
             partialize: (state) => ({
                 enabled: state.enabled,

@@ -9,7 +9,7 @@ import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { Samplers } from '@lib/constants/SamplerData'
 import { APIConfiguration, APISampler } from '@lib/engine/API/APIBuilder.types'
-import { APIState as APIStateNew } from '@lib/engine/API/APIManagerState'
+import { APIManager as APIStateNew } from '@lib/engine/API/APIManagerState'
 import { localSamplerData } from '@lib/engine/LocalInference'
 import { useAppMode } from '@lib/state/AppMode'
 import { Logger } from '@lib/state/Logger'
@@ -38,7 +38,7 @@ const SamplerManagerScreen = () => {
         configList,
     } = SamplersManager.useSamplers()
 
-    const { apiValues, activeIndex, getTemplates } = APIStateNew.useAPIState(
+    const { apiValues, activeIndex, getTemplates } = APIStateNew.useConnectionsStore(
         useShallow((state) => ({
             apiValues: state.values,
             activeIndex: state.activeIndex,

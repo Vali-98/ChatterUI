@@ -4,7 +4,7 @@ import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
-import { APIManagerValue, APIState } from '@lib/engine/API/APIManagerState'
+import { APIManagerValue, APIManager } from '@lib/engine/API/APIManagerState'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { Stack, useRouter } from 'expo-router'
@@ -16,7 +16,7 @@ import { useShallow } from 'zustand/react/shallow'
 const AddConnection = () => {
     const styles = useStyles()
     const router = useRouter()
-    const { addValue, getTemplates } = APIState.useAPIState(
+    const { addValue, getTemplates } = APIManager.useConnectionsStore(
         useShallow((state) => ({
             getTemplates: state.getTemplates,
             addValue: state.addValue,

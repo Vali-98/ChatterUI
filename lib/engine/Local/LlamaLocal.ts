@@ -10,13 +10,13 @@ import {
 import { ModelDataType } from 'db/schema'
 import { getInfoAsync, writeAsStringAsync } from 'expo-file-system'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 
-import { checkGGMLDeprecated } from './GGML'
-import { KV, Model } from './Model'
 import { AppSettings } from '../../constants/GlobalValues'
 import { Logger } from '../../state/Logger'
-import { mmkv, mmkvStorage } from '../../storage/MMKV'
+import { createMMKVStorage, mmkv } from '../../storage/MMKV'
+import { checkGGMLDeprecated } from './GGML'
+import { KV, Model } from './Model'
 
 export type CompletionTimings = {
     predicted_per_token_ms: number
@@ -88,7 +88,7 @@ const defaultConfig = {
 }
 
 export namespace Llama {
-    export const useEngineData = create<EngineDataProps>()(
+    export const useLlamaPreferencesStore = create<EngineDataProps>()(
         persist(
             (set, get) => ({
                 config: defaultConfig,
@@ -117,7 +117,7 @@ export namespace Llama {
                     lastModel: state.lastModel,
                     lastMmproj: state.lastMmproj,
                 }),
-                storage: createJSONStorage(() => mmkvStorage),
+                storage: createMMKVStorage(),
                 version: 1,
                 migrate: (persistedState: any, version) => {
                     if (version === 1) {
@@ -129,13 +129,13 @@ export namespace Llama {
         )
     )
 
-    export const useLlama = create<LlamaState>()((set, get) => ({
+    export const useLlamaModelStore = create<LlamaState>()((set, get) => ({
         context: undefined,
         loadProgress: 0,
         chatCount: 0,
         promptCache: undefined,
         load: async (model: ModelDataType) => {
-            const config = useEngineData.getState().config
+            const config = useLlamaPreferencesStore.getState().config
 
             if (get()?.model?.id === model.id) {
                 return Logger.errorToast('Model Already Loaded!')
@@ -186,8 +186,8 @@ export namespace Llama {
             })
 
             // updated EngineData
-            useEngineData.getState().setLastModelLoaded(model)
-            KV.useKVState.getState().setKvCacheLoaded(false)
+            useLlamaPreferencesStore.getState().setLastModelLoaded(model)
+            KV.useKVStore.getState().setKvCacheLoaded(false)
         },
         loadMmproj: async (model: ModelDataType) => {
             const context = get().context
@@ -205,7 +205,7 @@ export namespace Llama {
                 mmproj: model,
             })
 
-            useEngineData.getState().setLastMmprojLoaded(model)
+            useLlamaPreferencesStore.getState().setLastMmprojLoaded(model)
         },
         setLoadProgress: (progress: number) => {
             set({ loadProgress: progress })
@@ -271,7 +271,7 @@ export namespace Llama {
 
             if (prompt) {
                 const tokens = get().tokenize(prompt, media_paths ?? [])?.tokens
-                KV.useKVState.getState().setKvCacheTokens(tokens ?? [])
+                KV.useKVStore.getState().setKvCacheTokens(tokens ?? [])
             }
 
             if (!(await getInfoAsync(sessionFile)).exists) {
