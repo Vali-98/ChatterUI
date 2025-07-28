@@ -37,7 +37,6 @@ const CharacterList: React.FC = () => {
         ),
         [searchType, searchOrder, textFilter, tagFilter, hiddenTags, pages]
     )
-
     const characterList: CharInfo[] = data.map((item) => ({
         ...item,
         latestChat: item.chats[0]?.id,
@@ -57,10 +56,11 @@ const CharacterList: React.FC = () => {
                 )}
             />
 
-            {data.length === 0 && !showSearch && updatedAt && <CharactersEmpty />}
-
             <View style={{ flex: 1 }}>
-                <CharacterListHeader resultLength={characterList.length} />
+                {(characterList.length > 0 || showSearch) && (
+                    <CharacterListHeader resultLength={characterList.length} />
+                )}
+
                 <Animated.FlatList
                     layout={LinearTransition}
                     showsVerticalScrollIndicator={false}
@@ -87,6 +87,9 @@ const CharacterList: React.FC = () => {
                     onStartReached={() => {
                         setPages(3)
                     }}
+                    ListEmptyComponent={() =>
+                        data.length === 0 && !showSearch && updatedAt && <CharactersEmpty />
+                    }
                 />
             </View>
 

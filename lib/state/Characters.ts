@@ -11,7 +11,7 @@ import {
     chats,
     tags,
 } from 'db/schema'
-import { and, asc, desc, eq, gte, ilike, inArray, notExists, notInArray, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, gte, inArray, like, notExists, notInArray, sql } from 'drizzle-orm'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Asset } from 'expo-asset'
 import { randomUUID } from 'expo-crypto'
@@ -380,7 +380,7 @@ export namespace Characters {
                     where: (characters) => {
                         const base = eq(characters.type, type)
                         const search = searchFilter
-                            ? ilike(characters.name, `${searchFilter.trim().toLocaleLowerCase()}`)
+                            ? like(characters.name, `%${searchFilter.trim().toLocaleLowerCase()}%`)
                             : undefined
                         const hidden =
                             hiddenTags.length > 0
@@ -925,7 +925,6 @@ export namespace Characters {
         if (!fileinfo.exists) {
             Logger.info('Importing default card.')
             const [asset] = await Asset.loadAsync(require('./../../assets/models/aibot.png'))
-            await asset.downloadAsync()
             if (asset.localUri) await FS.copyAsync({ from: asset.localUri, to: cardDefaultDir })
         }
         await createCharacterFromImage(cardDefaultDir)
