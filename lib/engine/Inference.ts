@@ -228,6 +228,12 @@ const obtainFields = async (): Promise<APIBuilderParams | void> => {
             ? Math.min(modelLength, instructLength)
             : instructLength - (samplers.genamt as number)
 
+        let stopSequence = instructState.getStopSequence()
+        const stopSequenceLimit = apiConfig.request.stopSequenceLimit
+        if (stopSequenceLimit && stopSequence.length > stopSequenceLimit) {
+            stopSequence = stopSequence.slice(0, apiConfig.request.stopSequenceLimit)
+            Logger.warn('Stop sequence length exceeds defined stopSequenceLimit')
+        }
         return {
             apiConfig: Object.assign({}, apiConfig),
             apiValues: Object.assign({}, apiValues),
@@ -238,7 +244,7 @@ const obtainFields = async (): Promise<APIBuilderParams | void> => {
             character: Object.assign({}, characterCard),
             user: Object.assign({}, userCard),
             messages: [...messages],
-            stopSequence: instructState.getStopSequence(),
+            stopSequence: stopSequence,
             stopGenerating: () => {},
             chatTokenizer: async (entry, index) => {
                 // IMPORTANT - we use -1 for dummy entries

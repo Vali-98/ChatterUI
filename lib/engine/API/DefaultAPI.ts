@@ -610,6 +610,7 @@ export const defaultTemplates: APIConfiguration[] = [
             stopKey: 'stop',
             promptKey: 'messages',
             removeLength: true,
+            stopSequenceLimit: 5,
         },
 
         payload: {

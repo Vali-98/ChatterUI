@@ -66,6 +66,8 @@ export interface APIRequestFormat {
     removeLength: boolean
     // some APIs like Cohere do not allow negative seed values
     removeSeedifNegative?: boolean
+    // limit stop sequence to a certain number
+    stopSequenceLimit?: number
 }
 // most APIs use the 'openai' format.
 // This is a misnomer as it general means "throw everything in the base level body"
