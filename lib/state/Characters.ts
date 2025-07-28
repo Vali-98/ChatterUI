@@ -921,13 +921,18 @@ export namespace Characters {
         const pngName = filename + '.png'
         const cardDefaultDir = `${FS.documentDirectory}appAssets/${pngName}`
 
-        const fileinfo = await FS.getInfoAsync(cardDefaultDir)
-        if (!fileinfo.exists) {
-            Logger.info('Importing default card.')
-            const [asset] = await Asset.loadAsync(require('./../../assets/models/aibot.png'))
-            if (asset.localUri) await FS.copyAsync({ from: asset.localUri, to: cardDefaultDir })
+        try {
+            const fileinfo = await FS.getInfoAsync(cardDefaultDir)
+            if (!fileinfo.exists) {
+                Logger.info('Importing default card.')
+                const [asset] = await Asset.loadAsync(require('./../../assets/models/aibot.png'))
+                if (asset.localUri) await FS.copyAsync({ from: asset.localUri, to: cardDefaultDir })
+            }
+            await createCharacterFromImage(cardDefaultDir)
+        } catch (e) {
+            Logger.errorToast('Failed to create default character')
+            Logger.error('Error: ' + e)
         }
-        await createCharacterFromImage(cardDefaultDir)
     }
 
     export const useCharacterUpdater = () => {
