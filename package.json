@@ -1,7 +1,7 @@
 {
   "name": "chatterui",
   "main": "expo-router/entry",
-  "version": "0.8.5",
+  "version": "0.8.7",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
