@@ -21,7 +21,6 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
 
     const router = useRouter()
     const [showNewChar, setShowNewChar] = useState<boolean>(false)
-    const [showDownload, setShowDownload] = useState(false)
 
     const handleCreateCharacter = async (text: string) => {
         if (!text) {
@@ -46,25 +45,9 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                 placeholder="Name..."
             />
 
-            <TextBoxModal
-                title="Enter Character Hub or Pygmalion Link"
-                booleans={[showDownload, setShowDownload]}
-                onConfirm={(text) => Characters.importCharacterFromRemote(text)}
-                showPaste
-            />
-
             <PopupMenu
                 icon="adduser"
                 options={[
-                    {
-                        label: 'Download',
-                        onPress: (menu) => {
-                            menu.current?.close()
-                            setShowDownload(true)
-                        },
-
-                        icon: 'clouddownload',
-                    },
                     {
                         label: 'Import From File',
                         onPress: (menu) => {

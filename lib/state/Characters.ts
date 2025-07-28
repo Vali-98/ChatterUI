@@ -795,66 +795,6 @@ export namespace Characters {
         })
     }
 
-    export const importCharacterFromChub = async (character_id: string) => {
-        Logger.infoToast(`Importing character from Chub: ${character_id}`)
-        try {
-            const res = await fetch('https://api.chub.ai/api/characters/download', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    format: 'tavern',
-                    fullPath: character_id,
-                }),
-            })
-            const data = await res.arrayBuffer()
-            const dataArray = new Uint8Array(data)
-            let binaryString = ''
-            dataArray.forEach((byte) => (binaryString += String.fromCharCode(byte)))
-            const cardCacheDir = `${FS.cacheDirectory}${randomUUID()}.png`
-            await FS.writeAsStringAsync(cardCacheDir, btoa(binaryString), { encoding: 'base64' })
-            return createCharacterFromImage(cardCacheDir)
-        } catch (error) {
-            Logger.error(`Could not retreive card. ${error}`)
-        }
-    }
-
-    export const importCharacterFromPyg = async (character_id: string) => {
-        Logger.infoToast(`Loading from Pygmalion with id: ${character_id}`)
-
-        const query = await fetch(
-            `https://server.pygmalion.chat/api/export/character/${character_id}/v2`,
-            {
-                method: 'GET',
-                headers: {
-                    accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-            }
-        )
-        if (query.status !== 200) {
-            Logger.errorToast(`Failed to retrieve card from Pygmalion: ${query.status}`)
-            return
-        }
-
-        const { character } = await query.json()
-
-        const res = await fetch(character.data.avatar, {
-            method: 'GET',
-        })
-        const data = await res.arrayBuffer()
-        const dataArray = new Uint8Array(data)
-        let binaryString = ''
-        dataArray.forEach((byte) => (binaryString += String.fromCharCode(byte)))
-        const uuid = randomUUID()
-
-        const cardCacheDir = `${FS.cacheDirectory}${randomUUID()}.png`
-        await FS.writeAsStringAsync(cardCacheDir, btoa(binaryString), { encoding: 'base64' })
-        await db.mutate.createCharacter(character, `${FS.cacheDirectory}${uuid}.png`)
-        Logger.info('Imported Character: ' + character.data.name)
-    }
-
     export const exportCharacter = async (id: number) => {
         const dbcard = await db.query.card(id)
         if (!dbcard) {
@@ -873,43 +813,6 @@ export namespace Characters {
         if (!fileData) return
         const exportData = createPNGWithText(cardString, fileData)
         await saveStringToDownload(exportData, exportedFileName, 'base64')
-    }
-
-    export const importCharacterFromRemote = async (text: string) => {
-        // UUID standard RFC 4122, only used by pyg for now
-        const uuidRegex =
-            /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
-
-        if (uuidRegex.test(text)) {
-            return importCharacterFromPyg(text)
-        }
-
-        if (/^[^/]+\/[^/]+$/.test(text)) return importCharacterFromChub(text)
-
-        const url = new URL(text)
-        if (/pygmalion.chat/.test(url.hostname)) {
-            const param = new URLSearchParams(text)
-            const character_id = param.get('id')?.replaceAll(`"`, '')
-            const path = url.pathname.replace('/character/', '')
-            if (character_id) return importCharacterFromPyg(character_id)
-            else if (uuidRegex.test(path)) return importCharacterFromPyg(path)
-            else {
-                Logger.errorToast(`Failed to get id from Pygmalion URL`)
-                return
-            }
-        }
-
-        if (/chub.ai|characterhub.org/.test(url.hostname)) {
-            const path = url.pathname.replace('/characters/', '')
-            if (/^[^/]+\/[^/]+$/.test(path)) return importCharacterFromChub(path)
-            else {
-                Logger.errorToast(`Failed to get id from Chub URL`)
-                return
-            }
-        }
-
-        // Regex checks for format of [name][/][character]
-        Logger.errorToast(`URL not recognized`)
     }
 
     export const getImageDir = (imageId: number) => {
