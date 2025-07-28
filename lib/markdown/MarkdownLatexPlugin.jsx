@@ -139,7 +139,7 @@ module.exports = function latexDetectorPlugin(md) {
         return false
     })
 
-    md.core.ruler.after('inline', 'latex_in_code_blocks', function (state) {
+    /*md.core.ruler.after('inline', 'latex_in_code_blocks', function (state) {
         for (const token of state.tokens) {
             if (token.type !== 'inline' || !token.children) continue
 
@@ -165,7 +165,7 @@ module.exports = function latexDetectorPlugin(md) {
         }
 
         return true
-    })
+    })*/
 }
 
 function looksLikeLaTeX(content) {
