@@ -828,7 +828,7 @@ export namespace Characters {
             const fileinfo = await FS.getInfoAsync(cardDefaultDir)
             if (!fileinfo.exists) {
                 Logger.info('Importing default card.')
-                const [asset] = await Asset.loadAsync(require('./../../assets/models/aibot.png'))
+                const [asset] = await Asset.loadAsync(require('./../../assets/models/aibot.raw'))
                 if (asset.localUri) await FS.copyAsync({ from: asset.localUri, to: cardDefaultDir })
             }
             await createCharacterFromImage(cardDefaultDir)
