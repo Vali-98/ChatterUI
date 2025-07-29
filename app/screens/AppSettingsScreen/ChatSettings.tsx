@@ -14,6 +14,8 @@ const ChatSettings = () => {
     const [quickDelete, setQuickDelete] = useMMKVBoolean(AppSettings.QuickDelete)
     const [saveScroll, setSaveScroll] = useMMKVBoolean(AppSettings.SaveScrollPosition)
     const [autoTitle, setAutoTitle] = useMMKVBoolean(AppSettings.AutoGenerateTitle)
+    const [alternate, setAlternate] = useMMKVBoolean(AppSettings.AlternatingChatMode)
+    const [wide, setWide] = useMMKVBoolean(AppSettings.WideChatMode)
 
     const [showTokensPerSecond, setShowTokensPerSecond] = useMMKVBoolean(
         AppSettings.ShowTokenPerSecond
@@ -83,7 +85,21 @@ const ChatSettings = () => {
                 label="Automatically Generate Titles"
                 value={autoTitle}
                 onChangeValue={setAutoTitle}
-                description="Automatically generates titles for chats"
+                description="Automatically generates titles for chats (only in Remote mode)"
+            />
+
+            <ThemedSwitch
+                label="Wide Chat"
+                value={wide}
+                onChangeValue={setWide}
+                description="Removes whitespace for wider chat"
+            />
+
+            <ThemedSwitch
+                label="Alternate User and Character Positions"
+                value={alternate}
+                onChangeValue={setAlternate}
+                description="Left align character chats and right aligns user chats"
             />
         </View>
     )
