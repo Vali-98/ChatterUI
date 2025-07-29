@@ -11,7 +11,7 @@ import { createMMKVStorage } from '../storage/MMKV'
 import { Characters } from './Characters'
 import { Logger } from './Logger'
 
-const defaultSystemPromptFormat =
+export const defaultSystemPromptFormat =
     '{{system_prefix}}{{system_prompt}}\n{{character_desc}}\n{{personality}}\n{{scenario}}\n{{user_desc}}{{system_suffix}}'
 
 const defaultGenerics = {

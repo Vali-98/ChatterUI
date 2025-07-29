@@ -1,7 +1,7 @@
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { CharacterCardData, CharacterTokenCache } from '@lib/state/Characters'
 import { ChatEntry } from '@lib/state/Chat'
-import { InstructTokenCache, InstructType } from '@lib/state/Instructs'
+import { defaultSystemPromptFormat, InstructTokenCache, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'
 import { readAsStringAsync } from 'expo-file-system'
@@ -402,6 +402,14 @@ export const getSystemPrompt = ({
     useSuffix?: boolean
 }) => {
     let systemPrompt = instruct.system_prompt_format
+    if (systemPrompt === undefined) {
+        Logger.warn('System Prompt Format is undefined, falling back to default')
+        systemPrompt = defaultSystemPromptFormat
+    }
+    if (systemPrompt === '') {
+        Logger.warn('System Prompt Format is blank')
+    }
+
     let systemPromptLength = 0
     const macros = [
         {
