@@ -156,7 +156,13 @@ const defaultInstructs: InstructType[] = [
     },
 ]
 
-const commonStopStrings = [
+;('<|im_start|>assistant')
+
+export const outputPrefixes = defaultInstructs
+    .map((item) => item.output_prefix)
+    .filter((item) => !!item)
+
+export const commonStopStrings = [
     '</s>',
     '<|end|>',
     '<|eot_id|>',

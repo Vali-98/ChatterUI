@@ -2,7 +2,7 @@ import Alert from '@components/views/Alert'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { Chats, useInference } from '@lib/state/Chat'
-import { Instructs } from '@lib/state/Instructs'
+import { commonStopStrings, Instructs, outputPrefixes } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSStore } from '@lib/state/TTS'
@@ -55,6 +55,7 @@ const getSamplerFields = (max_length?: number) => {
                     cleanvalue = Math.min(value, max_length)
                 } else if (samplerItem.values.type === 'integer') cleanvalue = Math.floor(value)
             if (item.samplerID === SamplerID.DRY_SEQUENCE_BREAK) {
+                //@ts-expect-error. This is due to a migration
                 cleanvalue = (value as string).split(',')
             }
             return { [item.externalName as SamplerID]: cleanvalue }
@@ -65,8 +66,6 @@ const getSamplerFields = (max_length?: number) => {
 const buildLocalPayload = async () => {
     const payloadFields = getSamplerFields()
     const rep_pen = payloadFields?.['penalty_repeat']
-    const n_predict =
-        (typeof payloadFields?.['n_predict'] === 'number' && payloadFields?.['n_predict']) || 0
     const localPreset: LlamaConfig = Llama.useLlamaPreferencesStore.getState().config
     let prompt: undefined | string = undefined
     let mediaPaths: string[] = []
@@ -91,15 +90,17 @@ const buildLocalPayload = async () => {
     }
     const hasAudio = completionType.type === 'chatCompletions' && completionType.supportsAudio
     const hasImage = completionType.type === 'chatCompletions' && completionType.supportsImages
+    const bufferExists = !!Chats.useChatState.getState().buffer.data
 
     if (mmkv.getBoolean(AppSettings.UseModelTemplate)) {
         const messages = await buildChatCompletionContext({ apiConfig, ...rest })
-
         try {
             if (messages) {
                 const result = await Llama.useLlamaModelStore
                     .getState()
-                    .context?.getFormattedChat(messages, null, { jinja: true })
+                    .context?.getFormattedChat(messages, null, {
+                        jinja: true,
+                    })
                 if (typeof result === 'string') prompt = result
                 // Currently not used since we dont pass in { jinja: true }
                 else if (typeof result === 'object') {
@@ -112,6 +113,24 @@ const buildLocalPayload = async () => {
             }
         } catch (e) {
             Logger.error(`Failed to use template: ${e}`)
+        }
+
+        // we assume that if the buffer is filled during completion
+        // this is a continue sequence
+        // we need to remove the trailing <close_tag> and <think> tags
+        if (bufferExists && prompt) {
+            const removalList = ['<think>', ...outputPrefixes, ...commonStopStrings]
+            let trimmedInput = prompt.trim()
+            for (const removal of removalList) {
+                const test = removal.trim()
+                if (trimmedInput.endsWith(test)) {
+                    const matchIndex = trimmedInput.lastIndexOf(test)
+                    if (matchIndex !== -1) {
+                        trimmedInput = trimmedInput.slice(0, matchIndex).trim()
+                    }
+                }
+            }
+            prompt = trimmedInput
         }
     }
     if (!prompt) {
