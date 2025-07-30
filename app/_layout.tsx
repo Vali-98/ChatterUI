@@ -7,6 +7,8 @@ import { setOptions } from 'expo-splash-screen'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { MenuProvider } from 'react-native-popup-menu'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
+import { SystemBars } from 'react-native-edge-to-edge'
+
 SplashScreen.preventAutoHideAsync()
 setOptions({
     fade: true,
@@ -22,6 +24,7 @@ const Layout = () => {
             <MenuProvider>
                 <AlertBox />
                 <KeyboardProvider>
+                    <SystemBars style="dark" />
                     <Stack
                         screenOptions={{
                             headerBackButtonDisplayMode: 'minimal',
@@ -31,6 +34,7 @@ const Layout = () => {
                             contentStyle: { backgroundColor: color.neutral._100 },
                             headerShadowVisible: false,
                             headerTitleAlign: 'center',
+                            statusBarStyle: 'auto',
                         }}>
                         <Stack.Screen name="index" options={{ animation: 'fade' }} />
                     </Stack>

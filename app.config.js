@@ -82,6 +82,14 @@ module.exports = {
                     'android:largeHeap': true,
                 },
             ],
+            [
+                'react-native-edge-to-edge',
+                {
+                    android: {
+                        parentTheme: 'Default',
+                    },
+                },
+            ],
             'expo-localization',
             'expo-router',
             'expo-sqlite',
