@@ -280,6 +280,7 @@ const getSamplerFields = (
                     cleanvalue = Math.min(value, max_length)
                 } else if (samplerItem.values.type === 'integer') cleanvalue = Math.floor(value)
             if (item.samplerID === SamplerID.DRY_SEQUENCE_BREAK) {
+                //@ts-expect-error. This is due to a migration
                 cleanvalue = (value as string).split(',')
             }
             return { [item.externalName as SamplerID]: cleanvalue }
