@@ -23,6 +23,7 @@ export enum SamplerID {
     PRESENCE_PENALTY = 'presence_pen',
     DO_SAMPLE = 'do_sample',
     EARLY_STOPPING = 'early_stopping',
+    USE_REASONING = 'use_reasoning',
     INCLUDE_REASONING = 'include_reasoning',
     ADD_BOS_TOKEN = 'add_bos_token',
     BAN_EOS_TOKEN = 'ban_eos_token',
@@ -87,7 +88,11 @@ export type SamplerItem = {
     values: SamplerItemValues
 }
 
-export const Samplers: Record<SamplerID, SamplerItem> = {
+function defineSamplers<T extends { [K in SamplerID]: SamplerItem }>(obj: T): T {
+    return obj
+}
+
+export const Samplers = {
     /*Default Sampler definitions here*/
 
     [SamplerID.CONTEXT_LENGTH]: {
@@ -715,7 +720,22 @@ export const Samplers: Record<SamplerID, SamplerItem> = {
             precision: 1,
         },
     },
+    [SamplerID.USE_REASONING]: {
+        internalID: SamplerID.USE_REASONING,
+        friendlyName: 'Use Reasoning',
+        inputType: 'checkbox',
+        macro: '{{use_reasoning}}',
+        values: {
+            type: 'boolean',
+            default: true,
+        },
+    },
 } as const
+
+const dummy = () => {
+    // this is just to typecheck if Samplers contains all SamplerID's
+    defineSamplers(Samplers)
+}
 
 type ValueType<V extends SamplerItemValues> = V extends SamplerStringItem
     ? string
