@@ -92,7 +92,7 @@ const ChatMenu = () => {
                 />
                 <KeyboardAvoidingView
                     enabled={!editorVisible}
-                    keyboardVerticalOffset={insets.bottom + heightOffset + 4}
+                    keyboardVerticalOffset={insets.bottom + heightOffset}
                     behavior="translate-with-padding"
                     style={{ flex: 1, paddingBottom: insets.bottom }}>
                     {chat && <ChatWindow />}

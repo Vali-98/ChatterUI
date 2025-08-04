@@ -231,7 +231,7 @@ const obtainFields = async (): Promise<APIBuilderParams | void> => {
         let stopSequence = instructState.getStopSequence()
         const stopSequenceLimit = apiConfig.request.stopSequenceLimit
         if (stopSequenceLimit && stopSequence.length > stopSequenceLimit) {
-            stopSequence = stopSequence.slice(0, apiConfig.request.stopSequenceLimit)
+            stopSequence = stopSequence.slice(0, stopSequenceLimit)
             Logger.warn('Stop sequence length exceeds defined stopSequenceLimit')
         }
         return {
