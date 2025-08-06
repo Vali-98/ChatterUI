@@ -422,13 +422,7 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
         const samplers = SamplersManager.getCurrentSampler()
 
         const instructLength = engineData.context_length
-        const modelLength = instructLength as number
-        const length = apiConfig.model.useModelContextLength
-            ? Math.min(modelLength, instructLength)
-            : Math.min(
-                  Math.max(instructLength - (samplers.genamt as number), 0),
-                  samplers.genamt as number
-              )
+        const length = Math.max(instructLength - samplers.genamt, 0)
 
         return {
             apiConfig: Object.assign({}, apiConfig),
