@@ -37,8 +37,8 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
                         flexDirection: 'row',
                     }}>
                     <Text style={styles.subtitle}>Model Loaded: </Text>
-                    <Text style={styles.modelTitle} ellipsizeMode="tail">
-                        {modelName ? modelName : 'None'}
+                    <Text style={styles.modelTitle} ellipsizeMode="tail" numberOfLines={1}>
+                        {modelName ?? 'None'}
                     </Text>
                 </View>
             )}
@@ -132,6 +132,7 @@ export const useStyles = () => {
 
         modelTitle: {
             color: color.primary._700,
+            flex: 1,
         },
 
         subtitle: {
