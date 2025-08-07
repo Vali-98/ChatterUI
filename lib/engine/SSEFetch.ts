@@ -34,6 +34,7 @@ export class SSEFetch {
                 ...body,
             })
             if (res.status !== 200 || !res.body) {
+                Logger.error('Status ' + res.status)
                 Logger.error(await res.text())
                 return this.onError()
             }
