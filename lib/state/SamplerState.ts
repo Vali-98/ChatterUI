@@ -130,12 +130,12 @@ export namespace SamplersManager {
         }
     }
 
-    export const getCurrentSampler = () => {
+    export function getCurrentSampler() {
         return useSamplerStore.getState().configList[useSamplerStore.getState().currentConfigIndex]
             .data
     }
 
-    export const importConfigFile = async (): Promise<SamplerConfig | undefined> => {
+    export async function importConfigFile(): Promise<SamplerConfig | undefined> {
         try {
             const result = await getDocumentAsync({ type: ['application/*'] })
             if (
@@ -160,7 +160,7 @@ export namespace SamplersManager {
     }
 }
 
-export const fixSamplerConfig = (config: SamplerConfigData) => {
+export function fixSamplerConfig(config: SamplerConfigData) {
     const existingKeys = Object.keys(config)
     const defaultKeys = Object.values(SamplerID) as SamplerID[]
     let samekeys = true
@@ -169,6 +169,7 @@ export const fixSamplerConfig = (config: SamplerConfigData) => {
             config[key] = parseInt(config[key])
         if (existingKeys.includes(key)) return
         const data = Samplers[key].values.default
+        //@ts-expect-error needs more coercion, but probably fine
         config[key] = data
         samekeys = false
         Logger.debug(`Sampler Config was missing field: ${key}`)

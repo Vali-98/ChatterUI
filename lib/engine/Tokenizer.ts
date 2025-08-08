@@ -26,7 +26,8 @@ export namespace Tokenizer {
         tokenize: (text: string) => {
             return get()?.model?.tokenizeSync(text)?.tokens ?? []
         },
-        getTokenCount: (text: string, image_urls: string[] = []) => {
+        // name this for trace stack
+        getTokenCount: function getTokenCount(text: string, image_urls: string[] = []) {
             const model = get().model
             if (!model) {
                 Logger.warn('Tokenizer not loaded')

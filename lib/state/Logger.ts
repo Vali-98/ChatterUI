@@ -122,4 +122,21 @@ export namespace Logger {
             textColor: 'blue',
         })
     }
+
+    export const errorFn = (e: unknown) => {
+        if (e instanceof Error) {
+            const firstLine = e.stack
+                ?.split('\n')?.[1]
+                ?.trim()
+                ?.replace(/\s*\(.*\)/, '')
+            if (firstLine) {
+                error('Error occured:' + firstLine)
+            }
+        }
+    }
+    export const stackTrace = (e: unknown) => {
+        if (e instanceof Error && e.stack) {
+            error(e.stack)
+        }
+    }
 }

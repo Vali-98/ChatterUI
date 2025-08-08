@@ -16,7 +16,7 @@ import { APIManager } from './API/APIManagerState'
 import { localInference } from './LocalInference'
 import { Tokenizer } from './Tokenizer'
 
-export const regenerateResponse = async (swipeId: number, regenCache: boolean = true) => {
+export async function regenerateResponse(swipeId: number, regenCache: boolean = true) {
     const charName = Characters.useCharacterStore.getState().card?.name
     const messagesLength = Chats.useChatState.getState()?.data?.messages?.length ?? -1
     const message = Chats.useChatState.getState()?.data?.messages?.[messagesLength - 1]
@@ -41,7 +41,7 @@ export const regenerateResponse = async (swipeId: number, regenCache: boolean = 
     await generateResponse(swipeId)
 }
 
-export const continueResponse = async (swipeId: number) => {
+export async function continueResponse(swipeId: number) {
     Logger.info(`Continuing Response`)
     Chats.useChatState.getState().setRegenCache()
     Chats.useChatState.getState().insertLastToBuffer()
@@ -65,7 +65,7 @@ const completionTaskOptions = {
     },
 }
 
-export const generateResponse = async (swipeId: number) => {
+export async function generateResponse(swipeId: number) {
     if (useInference.getState().nowGenerating) {
         Logger.infoToast('Generation already in progress')
         return
@@ -103,7 +103,7 @@ const useGenerateResponse = () => {
     return generateResponse
 }
 
-const chatInferenceStream = async () => {
+async function chatInferenceStream() {
     const fields = await obtainFields()
     const stop = () => Chats.useChatState.getState().stopGenerating()
     if (!fields) {
@@ -182,7 +182,7 @@ const getModelContextLength = (config: APIConfiguration, values: APIValues): num
 
 // This is the 'big orchestrator' which compiles fields from
 // the whole app to send inference requests
-const obtainFields = async (): Promise<APIBuilderParams | void> => {
+async function obtainFields(): Promise<APIBuilderParams | void> {
     try {
         const userState = Characters.useUserStore.getState()
         const characterState = Characters.useCharacterStore.getState()
@@ -260,6 +260,7 @@ const obtainFields = async (): Promise<APIBuilderParams | void> => {
             },
         }
     } catch (e) {
+        Logger.stackTrace(e)
         Logger.errorToast('Failed to orchestrate request build: ' + e)
     }
 }
