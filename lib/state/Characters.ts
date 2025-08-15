@@ -693,17 +693,27 @@ export namespace Characters {
                     Logger.errorToast('Failed to copy card: Card does not exit')
                     return
                 }
-                const imageInfo = await FS.getInfoAsync(getImageDir(card.image_id))
 
+                const imageInfo = await FS.getInfoAsync(getImageDir(card.image_id))
                 const cacheLoc = imageInfo.exists ? `${FS.cacheDirectory}${card.image_id}` : ''
+
                 if (imageInfo.exists)
                     await FS.copyAsync({
                         from: getImageDir(card.image_id),
                         to: cacheLoc,
                     })
+
                 const now = Date.now()
                 card.last_modified = now
                 card.image_id = now
+                if (card.background_image) {
+                    const backgroundId = Date.now()
+                    await FS.copyAsync({
+                        from: getImageDir(card.background_image),
+                        to: getImageDir(backgroundId),
+                    })
+                    card.background_image = backgroundId
+                }
                 const cv2 = convertDBDataToCV2(card)
                 if (!cv2) {
                     Logger.errorToast('Failed to copy card')
