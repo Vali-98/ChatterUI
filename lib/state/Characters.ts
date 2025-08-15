@@ -615,9 +615,11 @@ export namespace Characters {
             export const deleteCard = async (charID: number) => {
                 const data = await database.query.characters.findFirst({
                     where: eq(characters.id, charID),
-                    columns: { image_id: true },
+                    columns: { image_id: true, background_image: true },
                 })
-                if (data) deleteImage(data.image_id)
+                if (data?.image_id) deleteImage(data.image_id)
+                if (data?.background_image) deleteImage(data.background_image)
+
                 await database.delete(characters).where(eq(characters.id, charID))
                 await database
                     .delete(tags)
