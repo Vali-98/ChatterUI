@@ -18,6 +18,7 @@ import m0013 from './0013_unique_namorita.sql';
 import m0014 from './0014_living_scarlet_spider.sql';
 import m0015 from './0015_fat_red_hulk.sql';
 import m0016 from './0016_violet_meteorite.sql';
+import m0017 from './0017_regular_lady_ursula.sql';
 
   export default {
     journal,
@@ -38,7 +39,8 @@ m0012,
 m0013,
 m0014,
 m0015,
-m0016
+m0016,
+m0017
     }
   }
   

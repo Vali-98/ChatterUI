@@ -16,6 +16,8 @@ import { useInputHeightStore } from '../ChatInput'
 import ChatEditor from './ChatEditor'
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
+import { Characters } from '@lib/state/Characters'
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 
 type ListItem = {
     index: number
@@ -26,11 +28,15 @@ type ListItem = {
 
 const ChatWindow = () => {
     const { chat } = Chats.useChat()
+    const charId = Characters.useCharacterStore((state) => state.card?.id)
     const { appMode } = useAppMode()
     const [saveScroll, _] = useMMKVBoolean(AppSettings.SaveScrollPosition)
     const [showModelname, __] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [autoScroll, ___] = useMMKVBoolean(AppSettings.AutoScroll)
     const chatInputHeight = useInputHeightStore(useShallow((state) => state.height))
+    const { data: { background_image: backgroundImage } = {} } = useLiveQuery(
+        Characters.db.query.backgroundImageQuery(charId ?? -1)
+    )
     const flatlistRef = useRef<FlatList | null>(null)
     const { showSettings, showChat } = Drawer.useDrawerStore(
         useShallow((state) => ({
@@ -86,7 +92,13 @@ const ChatWindow = () => {
         <ImageBackground
             cachePolicy="none"
             style={{ flex: 1 }}
-            source={{ uri: image ? AppDirectory.Assets + image : '' }}>
+            source={{
+                uri: backgroundImage
+                    ? Characters.getImageDir(backgroundImage)
+                    : image
+                      ? AppDirectory.Assets + image
+                      : '',
+            }}>
             <ChatEditor />
             {showModelname && appMode === 'local' && (
                 <HeaderTitle headerTitle={() => !showSettings && !showChat && <ChatModelName />} />

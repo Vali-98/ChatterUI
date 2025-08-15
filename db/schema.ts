@@ -25,6 +25,8 @@ export const characters = sqliteTable('characters', {
     last_modified: integer('last_modified', { mode: 'number' })
         .$defaultFn(() => Date.now())
         .$onUpdateFn(() => Date.now()),
+    // addition 15/8/2025
+    background_image: integer('background_image', { mode: 'number' }),
 })
 
 export const characterGreetings = sqliteTable('character_greetings', {

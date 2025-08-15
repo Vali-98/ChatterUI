@@ -1,0 +1,1 @@
+ALTER TABLE `characters` ADD `background_image` integer;

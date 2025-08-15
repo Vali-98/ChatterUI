@@ -462,6 +462,13 @@ export namespace Characters {
                     where: eq(characters.id, charId),
                 })
             }
+
+            export const backgroundImageQuery = (charId: number) => {
+                return database.query.characters.findFirst({
+                    where: eq(characters.id, charId),
+                    columns: { background_image: true },
+                })
+            }
         }
 
         export namespace mutate {
@@ -704,6 +711,48 @@ export namespace Characters {
                     .then(() => Logger.info(`Card cloned: ${card.name}`))
                     .catch((e) => Logger.info(`Failed to clone card: ${e}`))
             }
+
+            export const updateBackground = async (charId: number, imageURI: number) => {
+                await database
+                    .update(characters)
+                    .set({ background_image: imageURI })
+                    .where(eq(characters.id, charId))
+            }
+
+            export const deleteBackground = async (charId: number) => {
+                await database
+                    .update(characters)
+                    .set({ background_image: null })
+                    .where(eq(characters.id, charId))
+            }
+        }
+    }
+
+    export const importBackground = async (charId: number) => {
+        try {
+            const result = await DocumentPicker.getDocumentAsync({
+                copyToCacheDirectory: true,
+                type: ['image/*', 'application/json'],
+            })
+            if (result.canceled) return
+            const dir = result.assets[0].uri
+            if (!dir) return
+            const imageId = Date.now()
+            await copyImage(dir, imageId)
+            await db.mutate.updateBackground(charId, imageId)
+        } catch (e) {
+            Logger.error(`Failed to import background`)
+        }
+    }
+
+    export const deleteBackground = async (charId: number, imageId: number) => {
+        try {
+            const imageDir = getImageDir(imageId)
+            await db.mutate.deleteBackground(charId)
+            FS.deleteAsync(imageDir, { idempotent: true })
+        } catch (e) {
+            Logger.errorToast(`Failed to delete background`)
+            Logger.error(`Error: ` + e)
         }
     }
 
