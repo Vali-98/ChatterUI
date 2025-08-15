@@ -137,6 +137,7 @@ const titleGeneratorStream = async (chatId: number) => {
         return
     }
     fields.samplers.genamt = 50
+    fields.samplers.include_reasoning = false
     let output = ''
     fields.onData = (text) => {
         output += text
