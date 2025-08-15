@@ -251,23 +251,17 @@ const ChracterEditorScreen = () => {
                                         },
                                     },
                                     {
-                                        label: 'Add Background',
+                                        label: 'Change Background',
                                         icon: 'picture',
-                                        onPress: (menu) => {
+                                        onPress: async (menu) => {
                                             menu.current?.close()
-                                            Characters.importBackground(charId)
+                                            await Characters.importBackground(
+                                                charId,
+                                                characterCard.background_image
+                                            )
                                         },
                                     },
-                                    {
-                                        label: 'Remove Background',
-                                        icon: 'delete',
-                                        onPress: (menu) => {
-                                            menu.current?.close()
-                                            if (backgroundImage)
-                                                Characters.deleteBackground(charId, backgroundImage)
-                                        },
-                                        disabled: !backgroundImage,
-                                    },
+
                                     {
                                         label: 'View Image',
                                         icon: 'search1',
@@ -283,6 +277,17 @@ const ChracterEditorScreen = () => {
                                             menu.current?.close()
                                             handleDeleteImage()
                                         },
+                                        warning: true,
+                                    },
+                                    {
+                                        label: 'Remove Background',
+                                        icon: 'delete',
+                                        onPress: (menu) => {
+                                            menu.current?.close()
+                                            if (backgroundImage)
+                                                Characters.deleteBackground(charId, backgroundImage)
+                                        },
+                                        disabled: !backgroundImage,
                                         warning: true,
                                     },
                                 ]}>

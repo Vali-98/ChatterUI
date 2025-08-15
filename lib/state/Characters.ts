@@ -740,7 +740,7 @@ export namespace Characters {
         }
     }
 
-    export const importBackground = async (charId: number) => {
+    export const importBackground = async (charId: number, oldBackground?: number | null) => {
         try {
             const result = await DocumentPicker.getDocumentAsync({
                 copyToCacheDirectory: true,
@@ -750,6 +750,9 @@ export namespace Characters {
             const dir = result.assets[0].uri
             if (!dir) return
             const imageId = Date.now()
+            if (oldBackground) {
+                await deleteImage(oldBackground)
+            }
             await copyImage(dir, imageId)
             await db.mutate.updateBackground(charId, imageId)
         } catch (e) {
@@ -759,9 +762,9 @@ export namespace Characters {
 
     export const deleteBackground = async (charId: number, imageId: number) => {
         try {
-            const imageDir = getImageDir(imageId)
             await db.mutate.deleteBackground(charId)
-            FS.deleteAsync(imageDir, { idempotent: true })
+            await deleteImage(imageId)
+            Logger.info(`Deleted image with id: ` + imageId)
         } catch (e) {
             Logger.errorToast(`Failed to delete background`)
             Logger.error(`Error: ` + e)
