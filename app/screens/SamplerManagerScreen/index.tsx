@@ -7,7 +7,7 @@ import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
-import { Samplers } from '@lib/constants/SamplerData'
+import { SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { APIConfiguration, APISampler } from '@lib/engine/API/APIBuilder.types'
 import { APIManager as APIStateNew } from '@lib/engine/API/APIManagerState'
 import { localSamplerData } from '@lib/engine/LocalInference'
@@ -17,10 +17,11 @@ import { SamplersManager } from '@lib/state/SamplerState'
 import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 import { useState } from 'react'
-import { StyleSheet, Text } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
+import ContextLimitPreview from './ContextLimitPreview'
 
 const SamplerManagerScreen = () => {
     const styles = useStyles()
@@ -95,6 +96,8 @@ const SamplerManagerScreen = () => {
         })
         return true
     }
+
+    const samplerList = getSamplerList()
 
     const headerRight = () => (
         <PopupMenu
@@ -171,9 +174,14 @@ const SamplerManagerScreen = () => {
                 labelExtractor={(item) => item.name}
             />
 
-            <KeyboardAwareScrollView contentContainerStyle={styles.scrollContainer}>
-                {currentConfig &&
-                    getSamplerList().map((item, index) => {
+            {samplerList.length !== 0 && currentConfig && (
+                <KeyboardAwareScrollView contentContainerStyle={styles.scrollContainer}>
+                    {samplerList.some((item) => item.samplerID === SamplerID.GENERATED_LENGTH) && (
+                        <ContextLimitPreview
+                            generatedLength={currentConfig.data[SamplerID.GENERATED_LENGTH]}
+                        />
+                    )}
+                    {samplerList.map((item, index) => {
                         const samplerItem = Samplers?.[item.samplerID]
                         if (!samplerItem)
                             return (
@@ -249,7 +257,24 @@ const SamplerManagerScreen = () => {
                                 )
                         }
                     })}
-            </KeyboardAwareScrollView>
+                </KeyboardAwareScrollView>
+            )}
+            {samplerList.length === 0 && (
+                <View
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        rowGap: 12,
+                    }}>
+                    <Text style={styles.noSamplersText}>No Samplers to Configure</Text>
+                    {appMode === 'remote' && (
+                        <Text style={styles.noSamplersText}>
+                            You probably haven't added an API connection yet
+                        </Text>
+                    )}
+                </View>
+            )}
         </SafeAreaView>
     )
 }
@@ -290,6 +315,10 @@ const useStyles = () => {
             marginVertical: spacing.m,
             borderRadius: spacing.m,
             backgroundColor: color.neutral._300,
+        },
+
+        noSamplersText: {
+            color: color.text._400,
         },
     })
 }

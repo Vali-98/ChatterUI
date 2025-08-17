@@ -135,6 +135,11 @@ export namespace SamplersManager {
             .data
     }
 
+    export function useCurrentSampler(): SamplerConfig | undefined {
+        const { currentConfigIndex, configList } = useSamplers()
+        return configList?.[currentConfigIndex]
+    }
+
     export async function importConfigFile(): Promise<SamplerConfig | undefined> {
         try {
             const result = await getDocumentAsync({ type: ['application/*'] })

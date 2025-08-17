@@ -6,6 +6,7 @@ import { persist } from 'zustand/middleware'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import { defaultTemplates } from './DefaultAPI'
+import { useShallow } from 'zustand/react/shallow'
 
 export interface APIManagerValue extends APIValues {
     active: boolean
@@ -99,6 +100,21 @@ export namespace APIManager {
             }
         )
     )
+
+    export function useActiveValueTemplate() {
+        const { activeIndex, values, getTemplates } = useConnectionsStore(
+            useShallow((store) => ({
+                activeIndex: store.activeIndex,
+                values: store.values,
+                getTemplates: store.getTemplates,
+            }))
+        )
+
+        const apiValue: APIManagerValue | undefined = values[activeIndex]
+        const apiConfig = getTemplates().find((item) => item.name === apiValue?.configName)
+
+        return { apiValue, apiConfig }
+    }
 }
 
 // recursively fill json in case it is incorrect
