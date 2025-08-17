@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
     chatItem: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        paddingVertical: 12,
         paddingHorizontal: 8,
     },
 })

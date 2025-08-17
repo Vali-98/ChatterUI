@@ -11,13 +11,14 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 
 import Drawer from '@components/views/Drawer'
 import HeaderTitle from '@components/views/HeaderTitle'
+import { Characters } from '@lib/state/Characters'
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useShallow } from 'zustand/react/shallow'
 import { useInputHeightStore } from '../ChatInput'
 import ChatEditor from './ChatEditor'
+import ChatFooter from './ChatFooter'
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
-import { Characters } from '@lib/state/Characters'
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 
 type ListItem = {
     index: number
@@ -78,7 +79,7 @@ const ChatWindow = () => {
         }))
         .reverse()
 
-    const renderItems = ({ item, index }: { item: ListItem; index: number }) => {
+    const renderItems = ({ item }: { item: ListItem }) => {
         return (
             <ChatItem
                 index={item.index}
@@ -138,7 +139,11 @@ const ChatWindow = () => {
                         }
                     }, 100)
                 }}
-                contentContainerStyle={{ paddingTop: chatInputHeight }}
+                contentContainerStyle={{
+                    paddingTop: chatInputHeight + 16,
+                    rowGap: 16,
+                }}
+                ListFooterComponent={() => <ChatFooter />}
             />
         </ImageBackground>
     )
