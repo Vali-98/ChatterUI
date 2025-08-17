@@ -14,11 +14,19 @@ const ContextLimitPreview: React.FC<ContextLimitPreviewProps> = ({ generatedLeng
     const contextLimit = useContextLimit()
     const leftover = Math.max(0, contextLimit - generatedLength)
     const limit = leftover / contextLimit
-    const genLengthColor =
-        limit > 0.66 ? color.primary._200 : limit > 0.35 ? color.quote : color.error._300
+    const warning = leftover < Math.min(2048, 0.25 * contextLimit)
+    const genLengthColor = warning ? color.error._300 : color.primary._200
 
     return (
-        <View style={{ marginHorizontal: 16, marginVertical: 12, rowGap: 8 }}>
+        <View
+            style={{
+                borderRadius: 8,
+                padding: 12,
+                marginHorizontal: 4,
+                rowGap: 8,
+                borderWidth: 2,
+                borderColor: color.primary._200,
+            }}>
             <Text style={{ color: color.text._100 }}>
                 Context Allocation <Text style={{ color: color.text._400 }}>({contextLimit})</Text>
             </Text>
@@ -34,9 +42,9 @@ const ContextLimitPreview: React.FC<ContextLimitPreviewProps> = ({ generatedLeng
             <View style={{ flexDirection: 'row', columnGap: 24 }}>
                 <Text style={{ color: color.text._400 }}>
                     <FontAwesome
-                        name="circle"
+                        name={warning ? 'exclamation-circle' : 'circle'}
                         style={{
-                            color: color.neutral._300,
+                            color: warning ? color.error._300 : color.primary._400,
                         }}
                     />{' '}
                     Chat Context: {leftover}
@@ -51,6 +59,11 @@ const ContextLimitPreview: React.FC<ContextLimitPreviewProps> = ({ generatedLeng
                     Generated: {generatedLength}
                 </Text>
             </View>
+            {warning && (
+                <Text style={{ color: color.error._300 }}>
+                    Low Chat Context will forget messages faster
+                </Text>
+            )}
         </View>
     )
 }
