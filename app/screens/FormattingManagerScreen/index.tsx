@@ -50,8 +50,10 @@ const FormattingManager = () => {
     const instructList = data
     const selectedItem = data.filter((item) => item.id === instructID)?.[0]
     const [showNewInstruct, setShowNewInstruct] = useState<boolean>(false)
-    const { textFilter, setTextFilter } = useTextFilterStore(
+    const { textFilter, setTextFilter, sendFilteredText, setSendFilteredText } = useTextFilterStore(
         useShallow((state) => ({
+            sendFilteredText: state.sendFilteredText,
+            setSendFilteredText: state.setSendFilteredText,
             textFilter: state.filter,
             setTextFilter: state.setFilter,
         }))
@@ -560,6 +562,13 @@ const FormattingManager = () => {
                     </Text>
 
                     <StringArrayEditor value={textFilter} setValue={setTextFilter} />
+
+                    <ThemedSwitch
+                        label="Send Filtered Text"
+                        description="Sends the filtered text for inference"
+                        value={sendFilteredText}
+                        onChangeValue={setSendFilteredText}
+                    />
 
                     <SectionTitle>Local Template</SectionTitle>
 

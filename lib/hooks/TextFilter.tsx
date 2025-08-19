@@ -6,14 +6,20 @@ import { persist } from 'zustand/middleware'
 
 type TextFilterStateProps = {
     filter: string[]
+    sendFilteredText: boolean
     setFilter: (arr: string[]) => void
+    setSendFilteredText: (b: boolean) => void
 }
 
 export const useTextFilterStore = create<TextFilterStateProps>()(
     persist(
         (set) => ({
             filter: [],
-            setFilter: (arr) => set((state) => ({ ...state, filter: arr })),
+            sendFilteredText: true,
+            setFilter: (arr) => set({ filter: arr }),
+            setSendFilteredText: (b) => {
+                set({ sendFilteredText: b })
+            },
         }),
         {
             name: Storage.TextFilter,
