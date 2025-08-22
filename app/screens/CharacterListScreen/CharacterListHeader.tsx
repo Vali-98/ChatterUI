@@ -16,12 +16,14 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { FadeInUp, FadeOutUp, LinearTransition } from 'react-native-reanimated'
 
 import SortButton from './SortButton'
+import { Logger } from '@lib/state/Logger'
 
 type CharacterListHeaderProps = {
     resultLength: number
 }
 
 const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength }) => {
+    const [useTagHider, setUseTagHider] = useMMKVBoolean(AppSettings.UseTagHider)
     const { showSearch, setShowSearch, textFilter, setTextFilter, tagFilter, setTagFilter } =
         CharacterSorter.useSorter()
 
@@ -105,6 +107,11 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                             setShowSearch(!showSearch)
                         }}
                         iconSize={24}
+                        delayLongPress={5000}
+                        onLongPress={() => {
+                            setUseTagHider(!useTagHider)
+                            Logger.infoToast('Hider ' + (!useTagHider ? 'Enabled' : 'Disabled'))
+                        }}
                     />
                 </View>
             </View>
