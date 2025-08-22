@@ -52,16 +52,16 @@ const DropdownSheet = <T,>({
                 onRequestClose={() => setShowList(false)}
                 visible={showList}
                 animationType="fade">
-                <FadeBackrop
-                    handleOverlayClick={() => {
-                        setSearchFilter('')
-                        setShowList(false)
-                    }}
-                />
                 <KeyboardAvoidingView
                     behavior="height"
                     keyboardVerticalOffset={-insets.bottom}
                     style={{ flex: 1 }}>
+                    <FadeBackrop
+                        handleOverlayClick={() => {
+                            setSearchFilter('')
+                            setShowList(false)
+                        }}
+                    />
                     <View style={{ flex: 1 }} />
                     <View style={styles.listContainer}>
                         <Text style={styles.modalTitle}>{modalTitle}</Text>
