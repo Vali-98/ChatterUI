@@ -7,6 +7,7 @@ module.exports = function (api) {
             ['inline-import', { extensions: ['.sql'] }],
             // Required for expo-routerouter/
             'react-native-worklets/plugin',
+            ['transform-remove-console', { exclude: ['error', 'warn'] }],
         ],
     }
 }

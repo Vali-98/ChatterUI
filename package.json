@@ -92,6 +92,7 @@
     "@types/base-64": "^1.0.2",
     "@types/mime": "^3.0.4",
     "@types/react": "~19.0.10",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-preset-expo": "~13.0.0",
     "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
