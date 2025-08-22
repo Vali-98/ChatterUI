@@ -14,7 +14,6 @@ import { CharacterCardData, Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
-import { AppDirectory } from '@lib/utils/File'
 import { usePreventRemove } from '@react-navigation/core'
 import { characterTags, tags } from 'db/schema'
 import { count, eq } from 'drizzle-orm'
@@ -23,7 +22,8 @@ import * as DocumentPicker from 'expo-document-picker'
 import { ImageBackground } from 'expo-image'
 import { Redirect, useNavigation } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -234,10 +234,11 @@ const ChracterEditorScreen = () => {
                 <AvatarViewer editorButton={false} />
 
                 {characterCard && (
-                    <ScrollView
+                    <KeyboardAwareScrollView
+                        bottomOffset={16}
                         showsVerticalScrollIndicator={false}
                         keyboardShouldPersistTaps="always"
-                        contentContainerStyle={{ rowGap: 8, paddingBottom: 24 }}>
+                        contentContainerStyle={{ rowGap: 8, paddingBottom: 48 }}>
                         <View style={styles.characterHeader}>
                             <PopupMenu
                                 placement="right"
@@ -372,104 +373,113 @@ const ChracterEditorScreen = () => {
                             value={characterCard?.first_mes}
                             numberOfLines={8}
                         />
-
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                ...styles.input,
-                            }}>
-                            <Text style={{ color: color.text._100 }}>
-                                Alternate Greeting{'   '}
-                                {characterCard.alternate_greetings.length !== 0 && (
-                                    <Text
-                                        style={{
-                                            color: color.text._100,
-                                        }}>
-                                        {altSwipeIndex + 1} /{' '}
-                                        {characterCard.alternate_greetings.length}
-                                    </Text>
-                                )}
-                            </Text>
-
-                            <View style={{ flexDirection: 'row', columnGap: 32 }}>
-                                <TouchableOpacity onPress={handleDeleteAltMessage}>
-                                    {characterCard.alternate_greetings.length !== 0 && (
-                                        <AntDesign
-                                            color={color.error._400}
-                                            name="delete"
-                                            size={20}
-                                        />
-                                    )}
-                                </TouchableOpacity>
-                                {characterCard.alternate_greetings.length > 0 && (
-                                    <TouchableOpacity
-                                        onPress={() =>
-                                            setAltSwipeIndex(Math.max(altSwipeIndex - 1, 0))
-                                        }>
-                                        <AntDesign
-                                            color={
-                                                altSwipeIndex === 0
-                                                    ? color.text._700
-                                                    : color.text._100
-                                            }
-                                            name="left"
-                                            size={20}
-                                        />
-                                    </TouchableOpacity>
-                                )}
-                                {altSwipeIndex === characterCard.alternate_greetings.length - 1 ||
-                                characterCard.alternate_greetings.length === 0 ? (
-                                    <TouchableOpacity onPress={handleAddAltMessage}>
-                                        <AntDesign color={color.text._100} name="plus" size={20} />
-                                    </TouchableOpacity>
-                                ) : (
-                                    <TouchableOpacity
-                                        onPress={() =>
-                                            setAltSwipeIndex(
-                                                Math.min(
-                                                    altSwipeIndex + 1,
-                                                    characterCard.alternate_greetings.length - 1
-                                                )
-                                            )
-                                        }>
-                                        <AntDesign color={color.text._100} name="right" size={20} />
-                                    </TouchableOpacity>
-                                )}
-                            </View>
-                        </View>
-
-                        {characterCard.alternate_greetings.length !== 0 ? (
-                            <ThemedTextInput
-                                multiline
-                                containerStyle={styles.input}
-                                numberOfLines={8}
-                                onChangeText={(mes) => {
-                                    const greetings = [...characterCard.alternate_greetings]
-                                    greetings[altSwipeIndex].greeting = mes
-                                    setCharacterCardEdited({
-                                        ...characterCard,
-                                        alternate_greetings: greetings,
-                                    })
-                                }}
-                                value={
-                                    characterCard?.alternate_greetings?.[altSwipeIndex].greeting ??
-                                    ''
-                                }
-                            />
-                        ) : (
-                            <Text
+                        <View style={styles.input}>
+                            <View
                                 style={{
-                                    borderColor: color.neutral._400,
-                                    borderWidth: 1,
-                                    borderRadius: 8,
-                                    padding: spacing.m,
-                                    color: color.text._500,
-                                    fontStyle: 'italic',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    paddingBottom: 12,
                                 }}>
-                                No Alternate Greetings
-                            </Text>
-                        )}
+                                <Text style={{ color: color.text._100 }}>
+                                    Alternate Greeting{'   '}
+                                    {characterCard.alternate_greetings.length !== 0 && (
+                                        <Text
+                                            style={{
+                                                color: color.text._100,
+                                            }}>
+                                            {altSwipeIndex + 1} /{' '}
+                                            {characterCard.alternate_greetings.length}
+                                        </Text>
+                                    )}
+                                </Text>
+
+                                <View style={{ flexDirection: 'row', columnGap: 32 }}>
+                                    <TouchableOpacity onPress={handleDeleteAltMessage}>
+                                        {characterCard.alternate_greetings.length !== 0 && (
+                                            <AntDesign
+                                                color={color.error._400}
+                                                name="delete"
+                                                size={20}
+                                            />
+                                        )}
+                                    </TouchableOpacity>
+                                    {characterCard.alternate_greetings.length > 0 && (
+                                        <TouchableOpacity
+                                            onPress={() =>
+                                                setAltSwipeIndex(Math.max(altSwipeIndex - 1, 0))
+                                            }>
+                                            <AntDesign
+                                                color={
+                                                    altSwipeIndex === 0
+                                                        ? color.text._700
+                                                        : color.text._100
+                                                }
+                                                name="left"
+                                                size={20}
+                                            />
+                                        </TouchableOpacity>
+                                    )}
+                                    {altSwipeIndex ===
+                                        characterCard.alternate_greetings.length - 1 ||
+                                    characterCard.alternate_greetings.length === 0 ? (
+                                        <TouchableOpacity onPress={handleAddAltMessage}>
+                                            <AntDesign
+                                                color={color.text._100}
+                                                name="plus"
+                                                size={20}
+                                            />
+                                        </TouchableOpacity>
+                                    ) : (
+                                        <TouchableOpacity
+                                            onPress={() =>
+                                                setAltSwipeIndex(
+                                                    Math.min(
+                                                        altSwipeIndex + 1,
+                                                        characterCard.alternate_greetings.length - 1
+                                                    )
+                                                )
+                                            }>
+                                            <AntDesign
+                                                color={color.text._100}
+                                                name="right"
+                                                size={20}
+                                            />
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+                            </View>
+
+                            {characterCard.alternate_greetings.length !== 0 ? (
+                                <ThemedTextInput
+                                    multiline
+                                    numberOfLines={8}
+                                    onChangeText={(mes) => {
+                                        const greetings = [...characterCard.alternate_greetings]
+                                        greetings[altSwipeIndex].greeting = mes
+                                        setCharacterCardEdited({
+                                            ...characterCard,
+                                            alternate_greetings: greetings,
+                                        })
+                                    }}
+                                    value={
+                                        characterCard?.alternate_greetings?.[altSwipeIndex]
+                                            .greeting ?? ''
+                                    }
+                                />
+                            ) : (
+                                <Text
+                                    style={{
+                                        borderColor: color.neutral._400,
+                                        borderWidth: 1,
+                                        borderRadius: 8,
+                                        padding: spacing.m,
+                                        color: color.text._500,
+                                        fontStyle: 'italic',
+                                    }}>
+                                    No Alternate Greetings
+                                </Text>
+                            )}
+                        </View>
 
                         <ThemedTextInput
                             label="Personality"
@@ -546,7 +556,7 @@ const ChracterEditorScreen = () => {
                                 })
                             }}
                         />
-                    </ScrollView>
+                    </KeyboardAwareScrollView>
                 )}
             </ImageBackground>
         </SafeAreaView>
@@ -558,8 +568,9 @@ const useStyles = () => {
     return StyleSheet.create({
         mainContainer: {
             flex: 1,
-            paddingHorizontal: spacing.xl,
-            paddingVertical: spacing.m,
+            paddingHorizontal: spacing.m,
+            paddingTop: spacing.m,
+            paddingBottom: spacing.s,
         },
 
         characterHeader: {
