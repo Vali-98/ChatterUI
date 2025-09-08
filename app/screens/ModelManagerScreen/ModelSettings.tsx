@@ -108,7 +108,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                         value={config.batch}
                         onValueChange={(value) => setConfig({ ...config, batch: value })}
                         min={16}
-                        max={512}
+                        max={1024}
                         step={16}
                         disabled={modelImporting || modelLoading}
                     />
