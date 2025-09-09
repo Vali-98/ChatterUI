@@ -26,8 +26,6 @@ const ChatMenu = () => {
     )
 
     const editorVisible = useChatEditorStore(useShallow((state) => state.editMode))
-    const height = useInputHeightStore((store) => store.height)
-    const heightOffset = height + 4 + ((insets.bottom <= 24 && insets.bottom) || 0)
 
     const { chat, unloadChat, loadChat } = Chats.useChat()
 
@@ -51,7 +49,7 @@ const ChatMenu = () => {
                 if (chatId) loadChat(chatId)
             })
     }
-
+    console.log(insets.bottom)
     return (
         <Drawer.Gesture
             config={[
@@ -91,8 +89,10 @@ const ChatMenu = () => {
                 />
                 <KeyboardAvoidingView
                     enabled={!editorVisible}
-                    keyboardVerticalOffset={heightOffset}
-                    behavior="height"
+                    keyboardVerticalOffset={
+                        insets.bottom + 6 + (insets.bottom <= 24 ? insets.bottom * 2 : 0)
+                    }
+                    behavior="translate-with-padding"
                     style={{ flex: 1, paddingBottom: insets.bottom }}>
                     {chat && <ChatWindow />}
                     <ChatInput />
