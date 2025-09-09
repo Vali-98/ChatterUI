@@ -5,9 +5,10 @@ module.exports = function (api) {
         plugins: [
             ['babel-plugin-react-compiler'], // must run first!
             ['inline-import', { extensions: ['.sql'] }],
-            // Required for expo-routerouter/
-            'react-native-worklets/plugin',
-            ['transform-remove-console', { exclude: ['error', 'warn'] }],
+            ['react-native-worklets/plugin'],
+            ...(process.env.NODE_ENV === 'production'
+                ? [['transform-remove-console', { exclude: ['error', 'warn'] }]]
+                : []),
         ],
     }
 }
