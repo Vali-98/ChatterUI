@@ -44,6 +44,7 @@ type PopupMenuProps = {
     placement?: 'top' | 'right' | 'bottom' | 'left' | 'auto'
     children?: ReactNode
     menuCustomStyle?: ViewStyle
+    moreOptions?: MenuOptionProp[]
 }
 
 const PopupOption: React.FC<PopupOptionProps> = ({
@@ -83,6 +84,7 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
     style = {},
     menuCustomStyle = {},
     options,
+    moreOptions,
     children,
     placement = 'left',
 }) => {
@@ -90,12 +92,24 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
     const { color } = Theme.useTheme()
     const menuStyle = useMenuStyle()
     const [showMenu, setShowMenu] = useState<boolean>(false)
+    const [showMore, setShowMore] = useState<boolean>(false)
+    const showMoreButton = moreOptions && !showMore
+    const toggleMenu = (b: boolean) => {
+        setShowMenu(b)
+        if (!b) setShowMore(b)
+    }
+
     const menuRef: MenuRef = useRef(null)
 
     const backAction = () => {
         if (!menuRef.current || !menuRef.current?.isOpen()) return false
         menuRef.current?.close()
         return true
+    }
+
+    const combinedOptions = [...options]
+    if (moreOptions && showMore) {
+        combinedOptions.push(...moreOptions)
     }
 
     useFocusEffect(() => {
@@ -113,8 +127,8 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
     return (
         <Menu
             ref={menuRef}
-            onOpen={() => setShowMenu(true)}
-            onClose={() => setShowMenu(false)}
+            onOpen={() => toggleMenu(true)}
+            onClose={() => toggleMenu(false)}
             style={menuCustomStyle}
             renderer={Popover}
             rendererProps={{
@@ -135,11 +149,21 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
                 {children}
             </MenuTrigger>
             <MenuOptions customStyles={menuStyle}>
-                {options
+                {combinedOptions
                     .filter((item) => !item.disabled)
                     .map((item) => (
                         <PopupOption {...item} key={item.label} menuRef={menuRef} />
                     ))}
+                {showMoreButton && (
+                    <PopupOption
+                        label="More"
+                        icon="ellipsis1"
+                        onPress={() => {
+                            setShowMore(true)
+                        }}
+                        menuRef={menuRef}
+                    />
+                )}
             </MenuOptions>
         </Menu>
     )
@@ -176,9 +200,10 @@ const useStyles = () => {
             flexDirection: 'row',
             alignItems: 'center',
             columnGap: spacing.l,
-            paddingVertical: spacing.l,
-            paddingRight: spacing.xl2,
-            paddingLeft: spacing.l,
+            paddingTop: spacing.m,
+            paddingBottom: spacing.l,
+            paddingRight: spacing.xl3,
+            paddingLeft: spacing.m,
             borderRadius: spacing.l,
         },
 

@@ -116,6 +116,14 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
                         },
                     },
                     {
+                        label: 'Delete',
+                        icon: 'delete',
+                        warning: true,
+                        onPress: handleDeleteChat,
+                    },
+                ]}
+                moreOptions={[
+                    {
                         label: 'Export',
                         icon: 'download',
                         onPress: (menuRef) => handleExportChat(menuRef),
@@ -129,12 +137,6 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
                         label: 'Link User',
                         icon: 'user',
                         onPress: handleLinkUser,
-                    },
-                    {
-                        label: 'Delete',
-                        icon: 'delete',
-                        warning: true,
-                        onPress: handleDeleteChat,
                     },
                 ]}
             />
