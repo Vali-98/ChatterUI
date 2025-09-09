@@ -94,197 +94,210 @@ const ChatInput = () => {
 
     return (
         <View
-            onLayout={(e) => {
-                setHeight(e.nativeEvent.layout.height)
-            }}
             style={{
                 position: 'absolute',
                 width: '98%',
-                alignSelf: 'center',
-                bottom: insets.bottom,
-                marginVertical: spacing.m,
-                paddingVertical: spacing.sm,
-                paddingHorizontal: spacing.sm,
-                backgroundColor: color.neutral._100 + 'cc',
-                borderWidth: 1,
-                borderColor: color.neutral._200,
-                boxShadow: [
-                    {
-                        offsetX: 1,
-                        offsetY: 1,
-                        color: color.shadow,
-                        spreadDistance: 1,
-                        blurRadius: 4,
-                    },
-                ],
-                borderRadius: 16,
-                rowGap: spacing.m,
+                height: '100%',
+                justifyContent: 'flex-end',
             }}>
-            <Animated.FlatList
-                itemLayoutAnimation={LinearTransition}
-                style={{
-                    display: attachments.length > 0 ? 'flex' : 'none',
-                    padding: spacing.l,
-                    backgroundColor: color.neutral._200,
-                    borderRadius: borderRadius.m,
-                }}
-                horizontal
-                contentContainerStyle={{ columnGap: spacing.xl }}
-                data={attachments}
-                keyExtractor={(item) => item.uri}
-                renderItem={({ item }) => {
-                    return (
-                        <Animated.View
-                            entering={BounceIn}
-                            exiting={ZoomOut.duration(100)}
-                            style={{ alignItems: 'center', maxWidth: 80, rowGap: 8 }}>
-                            <Image
-                                source={{ uri: item.uri }}
-                                style={{
-                                    width: 64,
-                                    height: undefined,
-                                    aspectRatio: 1,
-                                    borderRadius: borderRadius.m,
-                                    borderWidth: 1,
-                                    borderColor: color.primary._500,
-                                }}
-                            />
-
-                            <ThemedButton
-                                iconName="close"
-                                iconSize={20}
-                                buttonStyle={{
-                                    borderWidth: 0,
-                                    paddingHorizontal: 2,
-                                    position: 'absolute',
-                                    alignSelf: 'flex-end',
-                                    margin: -4,
-                                }}
-                                onPress={() => {
-                                    setAttachments(attachments.filter((a) => a.uri !== item.uri))
-                                }}
-                            />
-                        </Animated.View>
-                    )
-                }}
-            />
             <View
+                onLayout={(e) => {
+                    setHeight(e.nativeEvent.layout.height)
+                }}
                 style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    columnGap: spacing.m,
+                    width: '100%',
+                    marginVertical: spacing.m,
+                    paddingVertical: spacing.sm,
+                    paddingHorizontal: spacing.sm,
+                    backgroundColor: color.neutral._100 + 'cc',
+                    borderWidth: 1,
+                    borderColor: color.neutral._200,
+                    boxShadow: [
+                        {
+                            offsetX: 1,
+                            offsetY: 1,
+                            color: color.shadow,
+                            spreadDistance: 1,
+                            blurRadius: 4,
+                        },
+                    ],
+                    borderRadius: 16,
+                    rowGap: spacing.m,
                 }}>
-                <Animated.View layout={XAxisOnlyTransition}>
-                    {!hideOptions && (
-                        <Animated.View
-                            entering={FadeIn}
-                            exiting={FadeOut}
-                            style={{ flexDirection: 'row', columnGap: 8, alignItems: 'center' }}>
-                            <ChatOptions />
-                            <PopupMenu
-                                icon="paperclip"
-                                iconSize={20}
-                                options={[
-                                    {
-                                        label: 'Add Image',
-                                        icon: 'picture',
-                                        onPress: async (menuRef) => {
-                                            menuRef.current?.close()
-                                            const result = await getDocumentAsync({
-                                                type: 'image/*',
-                                                multiple: true,
-                                                copyToCacheDirectory: true,
-                                            })
-                                            if (result.canceled || result.assets.length < 1) return
-
-                                            const newAttachments = result.assets
-                                                .map((item) => ({
-                                                    uri: item.uri,
-                                                    type: 'image',
-                                                    name: item.name,
-                                                }))
-                                                .filter(
-                                                    (item) =>
-                                                        !attachments.some(
-                                                            (a) => a.name === item.name
-                                                        )
-                                                ) as Attachment[]
-                                            setAttachments([...attachments, ...newAttachments])
-                                        },
-                                    },
-                                ]}
-                                style={{
-                                    color: color.text._400,
-                                    padding: 6,
-                                    backgroundColor: color.neutral._200,
-                                    borderRadius: 16,
-                                }}
-                                placement="top"
-                            />
-                        </Animated.View>
-                    )}
-                    {hideOptions && (
-                        <Animated.View entering={FadeIn} exiting={FadeOut}>
-                            <ThemedButton
-                                iconSize={18}
-                                iconStyle={{
-                                    color: color.text._400,
-                                }}
-                                buttonStyle={{
-                                    padding: 5,
-                                    backgroundColor: color.neutral._200,
-                                    borderRadius: 32,
-                                }}
-                                variant="tertiary"
-                                iconName="right"
-                                onPress={() => setHideOptions(false)}
-                            />
-                        </Animated.View>
-                    )}
-                </Animated.View>
-                <AnimatedTextInput
-                    layout={XAxisOnlyTransition}
-                    ref={inputRef}
+                <Animated.FlatList
+                    itemLayoutAnimation={LinearTransition}
                     style={{
-                        color: color.text._100,
-                        backgroundColor: color.neutral._100,
-                        flex: 1,
-                        borderWidth: 2,
-                        borderColor: color.primary._300,
-                        borderRadius: borderRadius.l,
-                        paddingHorizontal: spacing.m,
-                        paddingVertical: spacing.m,
+                        display: attachments.length > 0 ? 'flex' : 'none',
+                        padding: spacing.l,
+                        backgroundColor: color.neutral._200,
+                        borderRadius: borderRadius.m,
                     }}
-                    onPress={() => {
-                        setHideOptions(!!newMessage)
+                    horizontal
+                    contentContainerStyle={{ columnGap: spacing.xl }}
+                    data={attachments}
+                    keyExtractor={(item) => item.uri}
+                    renderItem={({ item }) => {
+                        return (
+                            <Animated.View
+                                entering={BounceIn}
+                                exiting={ZoomOut.duration(100)}
+                                style={{ alignItems: 'center', maxWidth: 80, rowGap: 8 }}>
+                                <Image
+                                    source={{ uri: item.uri }}
+                                    style={{
+                                        width: 64,
+                                        height: undefined,
+                                        aspectRatio: 1,
+                                        borderRadius: borderRadius.m,
+                                        borderWidth: 1,
+                                        borderColor: color.primary._500,
+                                    }}
+                                />
+
+                                <ThemedButton
+                                    iconName="close"
+                                    iconSize={20}
+                                    buttonStyle={{
+                                        borderWidth: 0,
+                                        paddingHorizontal: 2,
+                                        position: 'absolute',
+                                        alignSelf: 'flex-end',
+                                        margin: -4,
+                                    }}
+                                    onPress={() => {
+                                        setAttachments(
+                                            attachments.filter((a) => a.uri !== item.uri)
+                                        )
+                                    }}
+                                />
+                            </Animated.View>
+                        )
                     }}
-                    numberOfLines={6}
-                    placeholder="Message..."
-                    placeholderTextColor={color.text._700}
-                    value={newMessage}
-                    onChangeText={(text) => {
-                        setHideOptions(!!text)
-                        setNewMessage(text)
-                    }}
-                    multiline
-                    submitBehavior={sendOnEnter ? 'blurAndSubmit' : 'newline'}
-                    onSubmitEditing={sendOnEnter ? handleSend : undefined}
                 />
-                <Animated.View layout={XAxisOnlyTransition}>
-                    <TouchableOpacity
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        columnGap: spacing.m,
+                    }}>
+                    <Animated.View layout={XAxisOnlyTransition}>
+                        {!hideOptions && (
+                            <Animated.View
+                                entering={FadeIn}
+                                exiting={FadeOut}
+                                style={{
+                                    flexDirection: 'row',
+                                    columnGap: 8,
+                                    alignItems: 'center',
+                                }}>
+                                <ChatOptions />
+                                <PopupMenu
+                                    icon="paperclip"
+                                    iconSize={20}
+                                    options={[
+                                        {
+                                            label: 'Add Image',
+                                            icon: 'picture',
+                                            onPress: async (menuRef) => {
+                                                menuRef.current?.close()
+                                                const result = await getDocumentAsync({
+                                                    type: 'image/*',
+                                                    multiple: true,
+                                                    copyToCacheDirectory: true,
+                                                })
+                                                if (result.canceled || result.assets.length < 1)
+                                                    return
+
+                                                const newAttachments = result.assets
+                                                    .map((item) => ({
+                                                        uri: item.uri,
+                                                        type: 'image',
+                                                        name: item.name,
+                                                    }))
+                                                    .filter(
+                                                        (item) =>
+                                                            !attachments.some(
+                                                                (a) => a.name === item.name
+                                                            )
+                                                    ) as Attachment[]
+                                                setAttachments([...attachments, ...newAttachments])
+                                            },
+                                        },
+                                    ]}
+                                    style={{
+                                        color: color.text._400,
+                                        padding: 6,
+                                        backgroundColor: color.neutral._200,
+                                        borderRadius: 16,
+                                    }}
+                                    placement="top"
+                                />
+                            </Animated.View>
+                        )}
+                        {hideOptions && (
+                            <Animated.View entering={FadeIn} exiting={FadeOut}>
+                                <ThemedButton
+                                    iconSize={18}
+                                    iconStyle={{
+                                        color: color.text._400,
+                                    }}
+                                    buttonStyle={{
+                                        padding: 5,
+                                        backgroundColor: color.neutral._200,
+                                        borderRadius: 32,
+                                    }}
+                                    variant="tertiary"
+                                    iconName="right"
+                                    onPress={() => setHideOptions(false)}
+                                />
+                            </Animated.View>
+                        )}
+                    </Animated.View>
+                    <AnimatedTextInput
+                        ref={inputRef}
                         style={{
-                            borderRadius: borderRadius.m,
-                            backgroundColor: nowGenerating ? color.error._500 : color.primary._500,
-                            padding: spacing.m,
+                            color: color.text._100,
+                            backgroundColor: color.neutral._100,
+                            flex: 1,
+                            borderWidth: 2,
+                            borderColor: color.primary._300,
+                            borderRadius: borderRadius.l,
+                            paddingHorizontal: spacing.m,
+                            paddingVertical: spacing.m,
                         }}
-                        onPress={nowGenerating ? abortResponse : handleSend}>
-                        <MaterialIcons
-                            name={nowGenerating ? 'stop' : 'send'}
-                            color={color.neutral._100}
-                            size={24}
-                        />
-                    </TouchableOpacity>
-                </Animated.View>
+                        onPress={() => {
+                            setHideOptions(!!newMessage)
+                        }}
+                        numberOfLines={8}
+                        placeholder="Message..."
+                        placeholderTextColor={color.text._700}
+                        value={newMessage}
+                        onChangeText={(text) => {
+                            setHideOptions(!!text)
+                            setNewMessage(text)
+                        }}
+                        multiline
+                        submitBehavior={sendOnEnter ? 'blurAndSubmit' : 'newline'}
+                        onSubmitEditing={sendOnEnter ? handleSend : undefined}
+                    />
+                    <Animated.View layout={XAxisOnlyTransition}>
+                        <TouchableOpacity
+                            style={{
+                                borderRadius: borderRadius.m,
+                                backgroundColor: nowGenerating
+                                    ? color.error._500
+                                    : color.primary._500,
+                                padding: spacing.m,
+                            }}
+                            onPress={nowGenerating ? abortResponse : handleSend}>
+                            <MaterialIcons
+                                name={nowGenerating ? 'stop' : 'send'}
+                                color={color.neutral._100}
+                                size={24}
+                            />
+                        </TouchableOpacity>
+                    </Animated.View>
+                </View>
             </View>
         </View>
     )

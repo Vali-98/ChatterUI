@@ -26,9 +26,7 @@ const ChatMenu = () => {
     )
 
     const editorVisible = useChatEditorStore(useShallow((state) => state.editMode))
-
-    const chatInputHeight = useInputHeightStore(useShallow((state) => state.height))
-    const heightOffset = insets.bottom < 25 ? chatInputHeight : 0
+    const heightOffset = (insets.bottom <= 24 ? insets.bottom * 2 : insets.bottom / 2) + 4
 
     const { chat, unloadChat, loadChat } = Chats.useChat()
 
@@ -92,8 +90,8 @@ const ChatMenu = () => {
                 />
                 <KeyboardAvoidingView
                     enabled={!editorVisible}
-                    keyboardVerticalOffset={insets.bottom + heightOffset}
-                    behavior="translate-with-padding"
+                    keyboardVerticalOffset={heightOffset}
+                    behavior="height"
                     style={{ flex: 1, paddingBottom: insets.bottom }}>
                     {chat && <ChatWindow />}
                     <ChatInput />
