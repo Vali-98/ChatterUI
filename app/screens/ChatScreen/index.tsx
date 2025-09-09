@@ -26,7 +26,8 @@ const ChatMenu = () => {
     )
 
     const editorVisible = useChatEditorStore(useShallow((state) => state.editMode))
-    const heightOffset = (insets.bottom <= 24 ? insets.bottom * 2 : insets.bottom / 2) + 4
+    const height = useInputHeightStore((store) => store.height)
+    const heightOffset = height + 4 + ((insets.bottom <= 24 && insets.bottom) || 0)
 
     const { chat, unloadChat, loadChat } = Chats.useChat()
 
