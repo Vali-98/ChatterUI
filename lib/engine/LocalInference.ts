@@ -301,9 +301,11 @@ const runLocalCompletion = async (
         stopGenerating()
     }
 
+    const engineData = Llama.useLlamaPreferencesStore.getState().config
+
     await Llama.useLlamaModelStore
         .getState()
-        .completion(payload, outputStream, outputCompleted)
+        .completion({ ...payload, n_threads: engineData.threads }, outputStream, outputCompleted)
         .catch((error) => {
             Logger.errorToast(`Failed to generate locally: ${error}`)
             stopGenerating()
