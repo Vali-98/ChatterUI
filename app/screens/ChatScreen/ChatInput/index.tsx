@@ -246,6 +246,7 @@ const ChatInput = () => {
                     )}
                 </Animated.View>
                 <AnimatedTextInput
+                    layout={XAxisOnlyTransition}
                     ref={inputRef}
                     style={{
                         color: color.text._100,
