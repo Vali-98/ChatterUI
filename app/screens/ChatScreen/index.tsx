@@ -49,7 +49,7 @@ const ChatMenu = () => {
                 if (chatId) loadChat(chatId)
             })
     }
-    console.log(insets.bottom)
+
     return (
         <Drawer.Gesture
             config={[
