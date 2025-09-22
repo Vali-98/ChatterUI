@@ -11,6 +11,7 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
+import { usePathname } from 'expo-router/build/hooks'
 import CharacterEditPopup from './CharacterEditPopup'
 
 type CharacterListingProps = {
@@ -24,6 +25,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
     nowLoading,
     setNowLoading,
 }) => {
+    const path = usePathname()
     const router = useRouter()
     const [showTags, _] = useMMKVBoolean(AppSettings.ShowTags)
     const { setShowSearch, setTagFilter, tagFilter } = CharacterSorter.useSorter()
@@ -40,7 +42,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
     const { loadChat } = Chats.useChat()
 
     const setCurrentCharacter = async (charId: number) => {
-        if (nowLoading) return
+        if (nowLoading || path === '/screens/ChatScreen') return
         try {
             setNowLoading(true)
             await setCurrentCard(charId)
