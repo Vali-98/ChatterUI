@@ -1,6 +1,7 @@
 import { useInference } from '@lib/state/Chat'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet } from 'react-native'
 
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import ChatBubble from './ChatBubble'
 import ChatFrame from './ChatFrame'
 
@@ -12,9 +13,11 @@ type ChatItemProps = {
 
 const ChatItem: React.FC<ChatItemProps> = ({ index, isLastMessage, isGreeting }) => {
     const nowGenerating = useInference((state) => state.nowGenerating)
-
     return (
-        <View style={styles.chatItem}>
+        <Animated.View
+            style={[styles.chatItem, { zIndex: index }]}
+            entering={FadeIn.duration(500)}
+            exiting={FadeOut.duration(150)}>
             <ChatFrame index={index} nowGenerating={nowGenerating} isLast={isLastMessage}>
                 <ChatBubble
                     nowGenerating={nowGenerating}
@@ -23,7 +26,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ index, isLastMessage, isGreeting })
                     isGreeting={isGreeting}
                 />
             </ChatFrame>
-        </View>
+        </Animated.View>
     )
 }
 
@@ -31,8 +34,6 @@ export default ChatItem
 
 const styles = StyleSheet.create({
     chatItem: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
         paddingHorizontal: 8,
     },
 })

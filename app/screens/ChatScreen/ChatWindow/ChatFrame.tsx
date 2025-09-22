@@ -41,7 +41,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
     const align = message.is_user && alternate ? 'flex-end' : 'flex-start'
     if (wide)
         return (
-            <View style={{ flex: 1, paddingHorizontal: 8 }}>
+            <View style={{ flex: 1, paddingHorizontal: 8, backgroundColor: color.neutral._100 }}>
                 <View
                     style={{
                         flexDirection: rowDir,

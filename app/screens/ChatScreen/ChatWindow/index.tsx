@@ -19,6 +19,7 @@ import ChatEditor from './ChatEditor'
 import ChatFooter from './ChatFooter'
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
+import Animated, { LinearTransition } from 'react-native-reanimated'
 
 type ListItem = {
     index: number
@@ -104,7 +105,8 @@ const ChatWindow = () => {
             {showModelname && appMode === 'local' && (
                 <HeaderTitle headerTitle={() => !showSettings && !showChat && <ChatModelName />} />
             )}
-            <FlatList
+            <Animated.FlatList
+                itemLayoutAnimation={LinearTransition}
                 ref={flatlistRef}
                 maintainVisibleContentPosition={
                     autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
