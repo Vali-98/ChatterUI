@@ -59,7 +59,6 @@ const createDefaultCard = async () => {
 }
 
 const setCPUFeatures = async () => {
-    if (mmkv.getString(Global.CpuFeatures)) return
     const result = getCpuFeatures()
     mmkv.set(Global.CpuFeatures, JSON.stringify(result))
 }

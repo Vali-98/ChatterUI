@@ -11,7 +11,7 @@ import { readableFileSize } from '@lib/utils/File'
 import { useFocusEffect } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { BackHandler, Platform, View } from 'react-native'
-import { useMMKVBoolean, useMMKVNumber } from 'react-native-mmkv'
+import { useMMKVBoolean, useMMKVNumber, useMMKVObject } from 'react-native-mmkv'
 import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -19,6 +19,13 @@ type ModelSettingsProp = {
     modelImporting: boolean
     modelLoading: boolean
     exit: () => void
+}
+
+type CPUFeatures = {
+    i8mm: boolean
+    armv8: boolean
+    dotprod: boolean
+    adreno: boolean
 }
 
 const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoading, exit }) => {
@@ -33,6 +40,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
     const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)
     const [showModelInChat, setShowModelInChat] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [threadCount, _] = useMMKVNumber(Global.CPUThreads)
+    const [cpuFeatures, __] = useMMKVObject<CPUFeatures>(Global.CpuFeatures)
 
     const [kvSize, setKVSize] = useState(0)
 
@@ -114,7 +122,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                     />
 
                     {/* Note: llama.rn does not have any Android gpu acceleration */}
-                    {Platform.OS === 'ios' && (
+                    {(Platform.OS === 'ios' || cpuFeatures?.adreno) && (
                         <ThemedSlider
                             label="GPU Layers"
                             value={config.gpu_layers}
