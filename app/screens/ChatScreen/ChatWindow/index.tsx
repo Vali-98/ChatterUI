@@ -101,7 +101,6 @@ const ChatWindow = () => {
                       ? AppDirectory.Assets + image
                       : '',
             }}>
-            <ChatEditor />
             {showModelname && appMode === 'local' && (
                 <HeaderTitle headerTitle={() => !showSettings && !showChat && <ChatModelName />} />
             )}

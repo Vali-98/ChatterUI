@@ -6,7 +6,7 @@ import HeaderTitle from '@components/views/HeaderTitle'
 import SettingsDrawer from '@components/views/SettingsDrawer'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
-import ChatInput, { useInputHeightStore } from '@screens/ChatScreen/ChatInput'
+import ChatInput from '@screens/ChatScreen/ChatInput'
 import ChatWindow from '@screens/ChatScreen/ChatWindow'
 import ChatsDrawer from '@screens/ChatScreen/ChatsDrawer'
 import { useEffect } from 'react'
@@ -14,9 +14,9 @@ import { View } from 'react-native'
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
-import { useChatEditorStore } from './ChatWindow/ChatEditor'
+import ChatEditor from './ChatWindow/ChatEditor'
 
-const ChatMenu = () => {
+const ChatScreen = () => {
     const insets = useSafeAreaInsets()
     const { unloadCharacter, charId } = Characters.useCharacterStore(
         useShallow((state) => ({
@@ -24,8 +24,6 @@ const ChatMenu = () => {
             charId: state.id,
         }))
     )
-
-    const editorVisible = useChatEditorStore(useShallow((state) => state.editMode))
 
     const { chat, unloadChat, loadChat } = Chats.useChat()
 
@@ -88,15 +86,15 @@ const ChatMenu = () => {
                     }
                 />
                 <KeyboardAvoidingView
-                    enabled={!editorVisible}
-                    keyboardVerticalOffset={
-                        insets.bottom + 6 + (insets.bottom <= 24 ? insets.bottom * 2 : 0)
-                    }
+                    enabled={false}
+                    keyboardVerticalOffset={insets.bottom + 6}
                     behavior="translate-with-padding"
                     style={{ flex: 1, paddingBottom: insets.bottom }}>
                     {chat && <ChatWindow />}
+
                     <ChatInput />
                     <AvatarViewer />
+                    <ChatEditor />
                 </KeyboardAvoidingView>
                 {/**Drawer has to be outside of the KeyboardAvoidingView */}
                 <SettingsDrawer useInset />
@@ -106,4 +104,4 @@ const ChatMenu = () => {
     )
 }
 
-export default ChatMenu
+export default ChatScreen
