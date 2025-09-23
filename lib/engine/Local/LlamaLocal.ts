@@ -161,12 +161,13 @@ export namespace Llama {
                 n_threads: config.threads,
                 n_batch: config.batch,
                 ctx_shift: config.ctx_shift,
+                n_gpu_layers: config.gpu_layers,
                 use_mlock: true,
                 use_mmap: true,
             }
 
             Logger.info(
-                `\n------ MODEL LOAD -----\n Model Name: ${model.name}\nStarting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}`
+                `\n------ MODEL LOAD -----\n Model Name: ${model.name}\nStarting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}\nGPU Layers: ${params.n_gpu_layers}`
             )
 
             const progressCallback = (progress: number) => {
