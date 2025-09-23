@@ -16,8 +16,8 @@ const ChatItem: React.FC<ChatItemProps> = ({ index, isLastMessage, isGreeting })
     return (
         <Animated.View
             style={[styles.chatItem, { zIndex: index }]}
-            entering={FadeIn.duration(500)}
-            exiting={FadeOut.duration(150)}>
+            entering={FadeIn.duration(150).delay(100)}
+            exiting={FadeOut.duration(250)}>
             <ChatFrame index={index} nowGenerating={nowGenerating} isLast={isLastMessage}>
                 <ChatBubble
                     nowGenerating={nowGenerating}

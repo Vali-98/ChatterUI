@@ -57,6 +57,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                     backgroundColor: color.neutral._200,
                     borderColor: color.neutral._200,
                     borderWidth: 1,
+                    marginBottom: showSwipe ? 0 : 4,
                     paddingVertical: spacing.sm,
                     paddingHorizontal: spacing.m,
                     minHeight: 40,
