@@ -350,7 +350,7 @@ const ChracterEditorScreen = () => {
                             label={`Description Tokens: ${getTokenCount(characterCard?.description ?? '')}`}
                             multiline
                             containerStyle={styles.input}
-                            numberOfLines={8}
+                            numberOfLines={16}
                             onChangeText={(mes) => {
                                 setCharacterCardEdited({
                                     ...characterCard,
@@ -371,7 +371,7 @@ const ChracterEditorScreen = () => {
                                 })
                             }}
                             value={characterCard?.first_mes}
-                            numberOfLines={8}
+                            numberOfLines={16}
                         />
                         <View style={styles.input}>
                             <View
@@ -452,7 +452,7 @@ const ChracterEditorScreen = () => {
                             {characterCard.alternate_greetings.length !== 0 ? (
                                 <ThemedTextInput
                                     multiline
-                                    numberOfLines={8}
+                                    numberOfLines={16}
                                     onChangeText={(mes) => {
                                         const greetings = [...characterCard.alternate_greetings]
                                         greetings[altSwipeIndex].greeting = mes
@@ -485,7 +485,7 @@ const ChracterEditorScreen = () => {
                             label="Personality"
                             multiline
                             containerStyle={styles.input}
-                            numberOfLines={2}
+                            numberOfLines={4}
                             onChangeText={(mes) => {
                                 setCharacterCardEdited({
                                     ...characterCard,
@@ -506,7 +506,7 @@ const ChracterEditorScreen = () => {
                                 })
                             }}
                             value={characterCard?.scenario}
-                            numberOfLines={3}
+                            numberOfLines={4}
                         />
 
                         <ThemedTextInput
@@ -520,7 +520,7 @@ const ChracterEditorScreen = () => {
                                 })
                             }}
                             value={characterCard?.mes_example}
-                            numberOfLines={8}
+                            numberOfLines={16}
                         />
 
                         <StringArrayEditor
