@@ -96,6 +96,7 @@ module.exports = {
             './expo-build-plugins/bgactions.plugin.js',
             './expo-build-plugins/copyjni.plugin.js',
             './expo-build-plugins/usercert.plugin.js',
+            './expo-build-plugins/rnllama.plugin.js',
         ],
         experiments: {
             typedRoutes: true,
