@@ -13,10 +13,9 @@ import Drawer from '@components/views/Drawer'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { Characters } from '@lib/state/Characters'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
-import Animated, { LinearTransition } from 'react-native-reanimated'
+import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 import { useInputHeightStore } from '../ChatInput'
-import ChatEditor from './ChatEditor'
 import ChatFooter from './ChatFooter'
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
@@ -104,8 +103,19 @@ const ChatWindow = () => {
             {showModelname && appMode === 'local' && (
                 <HeaderTitle headerTitle={() => !showSettings && !showChat && <ChatModelName />} />
             )}
-            <Animated.FlatList
-                itemLayoutAnimation={LinearTransition.duration(250)}
+            <FlatList
+                CellRendererComponent={(props: any) => (
+                    <Animated.View
+                        {...props}
+                        layout={LinearTransition.duration(250)
+                            .springify()
+                            .mass(0.5)
+                            .damping(20)
+                            .stiffness(300)}
+                        exiting={FadeOut.duration(250)}
+                        entering={FadeIn.duration(150)}
+                    />
+                )}
                 ref={flatlistRef}
                 maintainVisibleContentPosition={
                     autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
