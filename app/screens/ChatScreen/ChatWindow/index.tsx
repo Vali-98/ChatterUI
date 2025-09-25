@@ -109,11 +109,11 @@ const ChatWindow = () => {
                         {...props}
                         layout={LinearTransition.duration(250)
                             .springify()
-                            .mass(0.5)
+                            .mass(0.3)
                             .damping(20)
                             .stiffness(300)}
-                        exiting={FadeOut.duration(250)}
-                        entering={FadeIn.duration(150)}
+                        exiting={FadeOut.duration(150)}
+                        entering={FadeIn.duration(150).delay(100)}
                     />
                 )}
                 ref={flatlistRef}
