@@ -7,6 +7,9 @@ import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Accordion from '@components/views/Accordion'
+import ContextMenu from '@components/views/ContextMenu'
+import { AntDesign } from '@expo/vector-icons'
+import { Theme } from '@lib/theme/ThemeManager'
 import React, { useState } from 'react'
 import { Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
@@ -33,6 +36,7 @@ const ComponentTestScreen = () => {
     const [textInputData, setTextInputData] = useState('')
     const [checkbox, setCheckbox] = useState(true)
     const [sw, setSw] = useState(true)
+    const { color } = Theme.useTheme()
 
     return (
         <KeyboardAwareScrollView
@@ -41,10 +45,36 @@ const ComponentTestScreen = () => {
             keyboardShouldPersistTaps="always">
             <View style={{ rowGap: 8 }}>
                 {buttonVariants.map((item) => (
-                    //@ts-ignore
+                    //@ts-expect-error
                     <ThemedButton variant={item} key={item} label={`Button Variant: ${item}`} />
                 ))}
             </View>
+
+            <ContextMenu
+                trigger={
+                    <AntDesign
+                        name="edit"
+                        size={20}
+                        style={{
+                            color: color.text._100,
+                            alignSelf: 'center',
+                        }}
+                    />
+                }
+                buttons={[
+                    { label: 'Edit', onPress: () => console.log('Edit pressed') },
+                    { label: 'Delete', onPress: () => console.log('Delete pressed') },
+                    {
+                        label: 'Moresadasdasdasaaasdasdsdas',
+                        submenu: [
+                            { label: 'Sub Option 1', onPress: () => console.log('Sub 1') },
+                            { label: 'Sub Option 2', onPress: () => console.log('Sub 2') },
+                        ],
+                    },
+                ]}
+                placement="bottom"
+            />
+
             <Accordion label="Test Accordion">
                 <Text style={{ color: 'yellow' }}>TEST TEXT</Text>
             </Accordion>
