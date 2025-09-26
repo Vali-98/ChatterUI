@@ -65,14 +65,40 @@ const ComponentTestScreen = () => {
                     { label: 'Edit', onPress: () => console.log('Edit pressed') },
                     { label: 'Delete', onPress: () => console.log('Delete pressed') },
                     {
-                        label: 'Moresadasdasdasaaasdasdsdas',
+                        label: 'More',
                         submenu: [
-                            { label: 'Sub Option 1', onPress: () => console.log('Sub 1') },
-                            { label: 'Sub Option 2', onPress: () => console.log('Sub 2') },
+                            {
+                                label: 'SubOption ',
+                                onPress: () => console.log('Sub 1'),
+                            },
+                            { label: 'SubOptiaaaaoaaan 2', onPress: () => console.log('Sub 2') },
+                        ],
+                    },
+                    {
+                        label: 'More',
+                        submenu: [
+                            {
+                                label: 'SubOption ',
+                                onPress: () => console.log('Sub 1'),
+                            },
+                            { label: 'SubOptiaaaaoaaan 2', onPress: () => console.log('Sub 2') },
+                        ],
+                    },
+                    {
+                        label: 'More',
+                        submenu: [
+                            {
+                                label: 'SubOption ',
+                                onPress: () => console.log('Sub 1'),
+                            },
+                            {
+                                label: 'SubOptiaaaaoaaanaaaaaaaaaaaaa 2',
+                                onPress: () => console.log('Sub 2'),
+                            },
                         ],
                     },
                 ]}
-                placement="bottom"
+                placement="top"
             />
 
             <Accordion label="Test Accordion">

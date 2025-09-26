@@ -1,13 +1,14 @@
 import { AlertBox } from '@components/views/Alert'
+import { PortalHost } from '@components/views/Portal'
 import { rawdb } from '@db'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 import { SplashScreen, Stack } from 'expo-router'
 import { setOptions } from 'expo-splash-screen'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { MenuProvider } from 'react-native-popup-menu'
-import { KeyboardProvider } from 'react-native-keyboard-controller'
 import { SystemBars } from 'react-native-edge-to-edge'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { KeyboardProvider } from 'react-native-keyboard-controller'
+import { MenuProvider } from 'react-native-popup-menu'
 
 SplashScreen.preventAutoHideAsync()
 setOptions({
@@ -22,8 +23,8 @@ const Layout = () => {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <MenuProvider>
-                <AlertBox />
                 <KeyboardProvider>
+                    <AlertBox />
                     <SystemBars style="dark" />
                     <Stack
                         screenOptions={{
@@ -38,6 +39,7 @@ const Layout = () => {
                         }}>
                         <Stack.Screen name="index" options={{ animation: 'fade' }} />
                     </Stack>
+                    <PortalHost />
                 </KeyboardProvider>
             </MenuProvider>
         </GestureHandlerRootView>
