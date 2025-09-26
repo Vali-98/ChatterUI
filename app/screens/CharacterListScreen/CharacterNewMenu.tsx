@@ -1,4 +1,4 @@
-import PopupMenu from '@components/views/PopupMenu'
+import ContextMenu from '@components/views/ContextMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { Characters } from '@lib/state/Characters'
 import { Logger } from '@lib/state/Logger'
@@ -45,22 +45,22 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                 placeholder="Name..."
             />
 
-            <PopupMenu
-                icon="adduser"
-                options={[
+            <ContextMenu
+                triggerIcon="adduser"
+                buttons={[
                     {
                         label: 'Import From File',
-                        onPress: (menu) => {
+                        onPress: (close) => {
                             Characters.importCharacter()
-                            menu.current?.close()
+                            close()
                         },
                         icon: 'upload',
                     },
                     {
                         label: 'Create Character',
-                        onPress: (menu) => {
+                        onPress: (close) => {
                             setShowNewChar(true)
-                            menu.current?.close()
+                            close()
                         },
                         icon: 'edit',
                     },

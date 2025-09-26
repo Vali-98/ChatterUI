@@ -3,9 +3,9 @@ import ThemedCheckbox from '@components/input/ThemedCheckbox'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
+import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { APIConfiguration, APISampler } from '@lib/engine/API/APIBuilder.types'
@@ -100,42 +100,42 @@ const SamplerManagerScreen = () => {
     const samplerList = getSamplerList()
 
     const headerRight = () => (
-        <PopupMenu
-            icon="setting"
-            iconSize={24}
+        <ContextMenu
+            triggerIcon="setting"
+            triggerIconSize={24}
             placement="bottom"
-            options={[
+            buttons={[
                 {
                     label: 'Create Sampler',
                     icon: 'addfile',
-                    onPress: (menu) => {
+                    onPress: (close) => {
                         setShowNewSampler(true)
-                        menu.current?.close()
+                        close()
                     },
                 },
                 {
                     label: 'Export Sampler',
                     icon: 'download',
-                    onPress: (menu) => {
+                    onPress: (close) => {
                         handleExportSampler()
-                        menu.current?.close()
+                        close()
                     },
                 },
                 /*{
                     label: 'Import Sampler',
                     icon: 'upload',
-                    onPress: (menu) => {
+                    onPress: (close) => {
                         handleImportSampler()
-                        menu.current?.close()
+                        close()
                     },
                 },*/
                 {
                     label: 'Delete Sampler',
                     icon: 'delete',
-                    onPress: (menu) => {
-                        if (handleDeleteSampler()) menu.current?.close()
+                    onPress: (close) => {
+                        if (handleDeleteSampler()) close()
                     },
-                    warning: true,
+                    variant: 'warning',
                 },
             ]}
         />

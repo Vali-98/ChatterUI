@@ -45,6 +45,7 @@ export interface ContextMenuProps extends ViewProps {
     triggerStyle?: TextStyle
     buttons: ContextMenuButtonProps[]
     placement?: Placement
+    disabled?: boolean
 }
 
 export type MenuState = {
@@ -111,6 +112,7 @@ const ContextMenu = ({
     triggerIcon = 'questioncircle',
     triggerIconSize = 26,
     triggerStyle,
+    disabled,
 }: ContextMenuProps) => {
     const idRef = useRef<string>(genId())
     const triggerRef = useRef<View>(null)
@@ -165,7 +167,7 @@ const ContextMenu = ({
                     animatedMenuValues.value = {
                         height: 0,
                         width: 0,
-                        opacity: 1,
+                        opacity: 0,
                         top: anchor.y + anchor.height / 2,
                         left: anchor.x + anchor.width / 2,
                     }
@@ -207,7 +209,11 @@ const ContextMenu = ({
     const isOpen = openMenuId === idRef.current
     return (
         <>
-            <Pressable ref={triggerRef} onPress={handleOpen} key={idRef.current}>
+            <Pressable
+                ref={triggerRef}
+                onPress={handleOpen}
+                key={idRef.current}
+                disabled={disabled}>
                 {children}
                 {!children && (
                     <AntDesign
@@ -221,12 +227,7 @@ const ContextMenu = ({
             {isOpen && anchor && (
                 <Portal name={idRef.current}>
                     <Pressable style={StyleSheet.absoluteFill} onPress={handleCloseMenu}>
-                        <Animated.View
-                            style={[styles.menuContainer, animatedMenuStyle]}
-                            exiting={(values: ExitAnimationsValues) => {
-                                'worklet'
-                                return zoomExitingAnimation(values, anchor)
-                            }}>
+                        <Animated.View style={[styles.menuContainer, animatedMenuStyle]}>
                             <View ref={viewRef} onLayout={onLayout}>
                                 <MenuButtons
                                     reposition={reposition}
@@ -417,6 +418,7 @@ const useMenuPosition = () => {
             case 'right':
                 left = anchor.x + anchor.width
                 top = anchor.y - actualHeight / 2
+                break
             case 'left':
                 left = anchor.x - actualWidth
                 top = anchor.y - actualHeight / 2
@@ -443,7 +445,6 @@ const useMenuPosition = () => {
             top = screenHeight - actualHeight - positionOffset
             overshot = true
         }
-
         return { top, left, overshot }
     }
     return getMenuPosition

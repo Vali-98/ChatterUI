@@ -6,9 +6,9 @@ import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
+import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import useAutosave from '@lib/hooks/AutoSave'
@@ -117,43 +117,43 @@ const FormattingManager = () => {
     }
 
     const headerRight = () => (
-        <PopupMenu
-            icon="setting"
-            iconSize={24}
+        <ContextMenu
+            triggerIcon="setting"
+            triggerIconSize={24}
             placement="bottom"
-            options={[
+            buttons={[
                 {
                     label: 'Create Config',
                     icon: 'addfile',
-                    onPress: (menu) => {
+                    onPress: (close) => {
                         setShowNewInstruct(true)
 
-                        menu.current?.close()
+                        close()
                     },
                 },
                 {
                     label: 'Export Config',
                     icon: 'download',
-                    onPress: (menu) => {
+                    onPress: (close) => {
                         handleExportPreset()
-                        menu.current?.close()
+                        close()
                     },
                 },
                 {
                     label: 'Delete Config',
                     icon: 'delete',
-                    onPress: (menu) => {
+                    onPress: (close) => {
                         handleDeletePreset()
-                        menu.current?.close()
+                        close()
                     },
-                    warning: true,
+                    variant: 'warning',
                 },
                 {
                     label: 'Regenerate Default',
                     icon: 'reload1',
-                    onPress: (menu) => {
+                    onPress: (close) => {
                         handleRegenerateDefaults()
-                        menu.current?.close()
+                        close()
                     },
                 },
             ]}

@@ -2,12 +2,12 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
-import PopupMenu from '@components/views/PopupMenu'
+import AvatarViewer from '@components/views/AvatarViewer'
+import ContextMenu from '@components/views/ContextMenu'
 import { AntDesign } from '@expo/vector-icons'
 import { useAvatarViewerStore } from '@lib/state/AvatarViewer'
 import { CharacterCardData, Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
-import AvatarViewer from '@components/views/AvatarViewer'
 import * as DocumentPicker from 'expo-document-picker'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -73,33 +73,33 @@ const UserCardEditor = () => {
         <View style={styles.userContainer}>
             <AvatarViewer editorButton={false} />
             <View style={styles.nameBar}>
-                <PopupMenu
+                <ContextMenu
                     placement="right"
-                    options={[
+                    buttons={[
                         {
                             label: 'Change Image',
                             icon: 'picture',
-                            onPress: (menu) => {
-                                menu.current?.close()
+                            onPress: (close) => {
+                                close()
                                 handleUploadImage()
                             },
                         },
                         {
                             label: 'View Image',
                             icon: 'search1',
-                            onPress: (menu) => {
-                                menu.current?.close()
+                            onPress: (close) => {
+                                close()
                                 setShowViewer(true, true)
                             },
                         },
                         {
                             label: 'Delete Image',
                             icon: 'delete',
-                            onPress: (menu) => {
-                                menu.current?.close()
+                            onPress: (close) => {
+                                close()
                                 handleDeleteImage()
                             },
-                            warning: true,
+                            variant: 'warning',
                         },
                     ]}>
                     <Avatar
@@ -107,7 +107,7 @@ const UserCardEditor = () => {
                         style={styles.userImage}
                     />
                     <AntDesign name="edit" color={color.text._100} style={styles.editHover} />
-                </PopupMenu>
+                </ContextMenu>
                 <ThemedTextInput
                     multiline
                     numberOfLines={10}

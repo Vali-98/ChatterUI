@@ -1,8 +1,8 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import Alert from '@components/views/Alert'
+import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { Logger } from '@lib/state/Logger'
 import { DefaultColorSchemes, ThemeColor } from '@lib/theme/ThemeColor'
@@ -10,7 +10,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { pickJSONDocument } from '@lib/utils/File'
 import { setBackgroundColorAsync } from 'expo-system-ui'
 import React, { useState } from 'react'
-import { Text, TouchableOpacity, View, FlatList, Linking } from 'react-native'
+import { FlatList, Linking, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -143,34 +143,34 @@ const ColorSelector = () => {
             <HeaderTitle title="Themes" />
             <HeaderButton
                 headerRight={() => (
-                    <PopupMenu
-                        icon="setting"
+                    <ContextMenu
+                        triggerIcon="setting"
                         placement="bottom"
-                        options={[
+                        buttons={[
                             {
                                 label: 'Import Theme',
                                 icon: 'download',
-                                onPress: (m) => {
+                                onPress: (close) => {
                                     pickJSONDocument().then((result) => {
                                         if (!result.success) return
                                         addCustomColor(result.data)
                                     })
-                                    m?.current?.close()
+                                    close()
                                 },
                             },
                             {
                                 label: 'Paste Theme',
                                 icon: 'file1',
-                                onPress: (m) => {
-                                    m.current?.close()
+                                onPress: (close) => {
+                                    close()
                                     setShowPaste(true)
                                 },
                             },
                             {
                                 label: 'Get Themes',
                                 icon: 'github',
-                                onPress: (m) => {
-                                    m.current?.close()
+                                onPress: (close) => {
+                                    close()
                                     Linking.openURL(
                                         'https://github.com/Vali-98/ChatterUI/discussions/218'
                                     )

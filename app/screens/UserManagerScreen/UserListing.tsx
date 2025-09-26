@@ -1,11 +1,10 @@
 import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
+import ContextMenu from '@components/views/ContextMenu'
 import Drawer from '@components/views/Drawer'
-import PopupMenu from '@components/views/PopupMenu'
 import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { Menu } from 'react-native-popup-menu'
 import { useShallow } from 'zustand/react/shallow'
 
 type CharacterData = Awaited<ReturnType<typeof Characters.db.query.cardListQuery>>[0]
@@ -39,7 +38,8 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
         }))
     )
 
-    const handleDeleteCard = async (menuRef: React.MutableRefObject<Menu | null>) => {
+    const handleDeleteCard = async (close: () => void) => {
+        close()
         Alert.alert({
             title: 'Delete User',
             description: `Are you sure you want to delete '${user.name}'?\nThis cannot be undone.`,
@@ -49,7 +49,6 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
                     label: 'Delete User',
                     onPress: async () => {
                         await Characters.db.mutate.deleteCard(user.id)
-
                         await Characters.db.query.cardList('user').then(async (list) => {
                             if (list.length === 0) {
                                 const defaultName = 'User'
@@ -70,7 +69,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
         })
     }
 
-    const handleCloneCard = (menuRef: React.MutableRefObject<Menu | null>) => {
+    const handleCloneCard = (close: () => void) => {
         Alert.alert({
             title: `Clone User`,
             description: `Are you sure you want to clone '${user.name}'?`,
@@ -79,7 +78,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
                 {
                     label: 'Clone User',
                     onPress: async () => {
-                        menuRef.current?.close()
+                        close()
                         await Characters.db.mutate.duplicateCard(user.id)
                     },
                 },
@@ -117,11 +116,12 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
                     </View>
                 </View>
 
-                <PopupMenu
-                    style={{ paddingHorizontal: spacing.m }}
+                <ContextMenu
+                    triggerStyle={{ paddingHorizontal: spacing.m }}
                     disabled={false}
-                    icon="edit"
-                    options={[
+                    placement="left"
+                    triggerIcon="edit"
+                    buttons={[
                         {
                             label: 'Clone',
                             icon: 'copy1',
@@ -130,7 +130,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
                         {
                             label: 'Delete',
                             icon: 'delete',
-                            warning: true,
+                            variant: 'warning',
                             onPress: handleDeleteCard,
                         },
                     ]}

@@ -1,7 +1,8 @@
 import Alert from '@components/views/Alert'
-import PopupMenu, { MenuRef } from '@components/views/PopupMenu'
+import ContextMenu from '@components/views/ContextMenu'
 import { CharInfo, Characters } from '@lib/state/Characters'
 import { useRouter } from 'expo-router'
+import { View } from 'react-native'
 
 type CharacterEditPopupProps = {
     characterInfo: CharInfo
@@ -18,7 +19,8 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
 
     const setCurrentCard = Characters.useCharacterStore((state) => state.setCard)
 
-    const deleteCard = (menuRef: MenuRef) => {
+    const deleteCard = (close: () => void) => {
+        close()
         Alert.alert({
             title: 'Delete Character',
             description: `Are you sure you want to delete '${characterInfo.name}'? This cannot be undone.`,
@@ -37,7 +39,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
         })
     }
 
-    const cloneCard = (menuRef: MenuRef) => {
+    const cloneCard = (close: () => void) => {
         Alert.alert({
             title: 'Clone Character',
             description: `Are you sure you want to clone '${characterInfo.name}'?`,
@@ -50,7 +52,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                     onPress: async () => {
                         setNowLoading(true)
                         await Characters.db.mutate.duplicateCard(characterInfo.id)
-                        menuRef.current?.close()
+                        close()
                         setNowLoading(false)
                     },
                 },
@@ -58,26 +60,27 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
         })
     }
 
-    const editCharacter = async (menuRef: MenuRef) => {
+    const editCharacter = async (close: () => void) => {
         if (nowLoading) return
         setNowLoading(true)
         await setCurrentCard(characterInfo.id)
         setNowLoading(false)
-        menuRef.current?.close()
+        close()
         router.push('/screens/CharacterEditorScreen')
     }
 
     return (
-        <PopupMenu
-            style={{ paddingHorizontal: 8 }}
-            disabled={nowLoading}
-            icon="edit"
-            options={[
-                { label: 'Edit', icon: 'edit', onPress: editCharacter },
-                { label: 'Clone', icon: 'copy1', onPress: cloneCard },
-                { label: 'Delete', icon: 'delete', onPress: deleteCard, warning: true },
-            ]}
-        />
+        <View style={{ paddingHorizontal: 6 }}>
+            <ContextMenu
+                triggerIcon="edit"
+                buttons={[
+                    { label: 'Edit', icon: 'edit', onPress: editCharacter },
+                    { label: 'Clone', icon: 'copy1', onPress: cloneCard },
+                    { label: 'Delete', icon: 'delete', onPress: deleteCard, variant: 'warning' },
+                ]}
+                placement="left"
+            />
+        </View>
     )
 }
 

@@ -51,16 +51,6 @@ const ComponentTestScreen = () => {
             </View>
 
             <ContextMenu
-                trigger={
-                    <AntDesign
-                        name="edit"
-                        size={20}
-                        style={{
-                            color: color.text._100,
-                            alignSelf: 'center',
-                        }}
-                    />
-                }
                 buttons={[
                     { label: 'Edit', onPress: () => console.log('Edit pressed') },
                     { label: 'Delete', onPress: () => console.log('Delete pressed') },
@@ -98,8 +88,16 @@ const ComponentTestScreen = () => {
                         ],
                     },
                 ]}
-                placement="top"
-            />
+                placement="bottom">
+                <AntDesign
+                    name="edit"
+                    size={20}
+                    style={{
+                        color: color.text._100,
+                        alignSelf: 'center',
+                    }}
+                />
+            </ContextMenu>
 
             <Accordion label="Test Accordion">
                 <Text style={{ color: 'yellow' }}>TEST TEXT</Text>

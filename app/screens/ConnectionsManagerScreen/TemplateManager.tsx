@@ -1,22 +1,18 @@
-import ThemedButton from '@components/buttons/ThemedButton'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { APIManager } from '@lib/engine/API/APIManagerState'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
-import { getDocumentAsync } from 'expo-document-picker'
-import { readAsStringAsync } from 'expo-file-system'
-import { Stack } from 'expo-router'
 import { FlatList, Linking, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
-import TemplateItem from './TemplateItem'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { pickJSONDocument } from '@lib/utils/File'
-import HeaderTitle from '@components/views/HeaderTitle'
+import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
-import PopupMenu from '@components/views/PopupMenu'
+import HeaderTitle from '@components/views/HeaderTitle'
 import TextBoxModal from '@components/views/TextBoxModal'
+import { pickJSONDocument } from '@lib/utils/File'
 import { useState } from 'react'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import TemplateItem from './TemplateItem'
 
 const TemplateManager = () => {
     // eslint-disable-next-line react-compiler/react-compiler
@@ -42,15 +38,15 @@ const TemplateManager = () => {
             <HeaderTitle title="Template Manager" />
             <HeaderButton
                 headerRight={() => (
-                    <PopupMenu
-                        icon="setting"
+                    <ContextMenu
+                        triggerIcon="setting"
                         placement="bottom"
-                        options={[
+                        buttons={[
                             {
                                 label: 'Import Template',
                                 icon: 'download',
-                                onPress: async (m) => {
-                                    m.current?.close()
+                                onPress: async (close) => {
+                                    close()
                                     const result = await pickJSONDocument()
                                     if (!result.success) {
                                         return
@@ -61,16 +57,16 @@ const TemplateManager = () => {
                             {
                                 label: 'Paste Template',
                                 icon: 'file1',
-                                onPress: (m) => {
-                                    m.current?.close()
+                                onPress: (close) => {
+                                    close()
                                     setShowPaste(true)
                                 },
                             },
                             {
                                 label: 'Get Templates',
                                 icon: 'github',
-                                onPress: (m) => {
-                                    m.current?.close()
+                                onPress: (close) => {
+                                    close()
                                     Linking.openURL(
                                         'https://github.com/Vali-98/ChatterUI/discussions/126'
                                     )
@@ -79,8 +75,8 @@ const TemplateManager = () => {
                             {
                                 label: 'Learn About Templates',
                                 icon: 'info',
-                                onPress: (m) => {
-                                    m.current?.close()
+                                onPress: (close) => {
+                                    close()
                                     Linking.openURL(
                                         'https://github.com/Vali-98/ChatterUI/blob/dev/docs/CustomTemplates.md'
                                     )

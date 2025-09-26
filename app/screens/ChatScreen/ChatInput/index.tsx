@@ -1,5 +1,5 @@
 import ThemedButton from '@components/buttons/ThemedButton'
-import PopupMenu from '@components/views/PopupMenu'
+import ContextMenu from '@components/views/ContextMenu'
 import { MaterialIcons } from '@expo/vector-icons'
 import { XAxisOnlyTransition } from '@lib/animations/transitions'
 import { AppSettings } from '@lib/constants/GlobalValues'
@@ -184,15 +184,15 @@ const ChatInput = () => {
                                 alignItems: 'center',
                             }}>
                             <ChatOptions />
-                            <PopupMenu
-                                icon="paperclip"
-                                iconSize={20}
-                                options={[
+                            <ContextMenu
+                                triggerIcon="paperclip"
+                                triggerIconSize={20}
+                                buttons={[
                                     {
                                         label: 'Add Image',
                                         icon: 'picture',
-                                        onPress: async (menuRef) => {
-                                            menuRef.current?.close()
+                                        onPress: async (close) => {
+                                            close()
                                             const result = await getDocumentAsync({
                                                 type: 'image/*',
                                                 multiple: true,
@@ -216,7 +216,7 @@ const ChatInput = () => {
                                         },
                                     },
                                 ]}
-                                style={{
+                                triggerStyle={{
                                     color: color.text._400,
                                     padding: 6,
                                     backgroundColor: color.neutral._200,

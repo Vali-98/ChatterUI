@@ -1,5 +1,5 @@
 import Alert from '@components/views/Alert'
-import PopupMenu, { MenuRef } from '@components/views/PopupMenu'
+import ContextMenu from '@components/views/ContextMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
@@ -32,7 +32,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
 
     const { deleteChat, loadChat, chatId, unloadChat } = Chats.useChat()
 
-    const handleDeleteChat = (menuRef: MenuRef) => {
+    const handleDeleteChat = (close: () => void) => {
         Alert.alert({
             title: `Delete Chat`,
             description: `Are you sure you want to delete '${item.name}'? This cannot be undone.`,
@@ -52,7 +52,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
                             Logger.errorToast(`Something went wrong with creating a default chat`)
                             unloadChat()
                         }
-                        menuRef.current?.close()
+                        close()
                     },
                     type: 'warning',
                 },
@@ -60,7 +60,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
         })
     }
 
-    const handleCloneChat = (menuRef: MenuRef) => {
+    const handleCloneChat = (close: () => void) => {
         Alert.alert({
             title: `Clone Chat`,
             description: `Are you sure you want to clone '${item.name}'?`,
@@ -70,28 +70,34 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
                     label: 'Clone Chat',
                     onPress: async () => {
                         await Chats.db.mutate.cloneChat(item.id)
-                        menuRef.current?.close()
+                        close()
                     },
                 },
             ],
         })
     }
 
-    const handleExportChat = async (menuRef: MenuRef) => {
+    const handleExportChat = async (close: () => void) => {
         const name = `Chatlogs-${charName}-${item.id}.json`.replaceAll(' ', '_')
         await saveStringToDownload(JSON.stringify(await Chats.db.query.chat(item.id)), name, 'utf8')
-        menuRef.current?.close()
+        close()
         Logger.infoToast(`File: ${name} saved to downloads!`)
     }
 
-    const handleLinkUser = async () => {
-        if (userId === item.user_id) return
+    const handleLinkUser = async (close: () => void) => {
+        if (userId === item.user_id) {
+            Logger.warnToast('This User Is Already Set')
+            close()
+            return
+        }
         if (!userId) {
-            Logger.errorToast('No current User')
+            Logger.errorToast('No Current User')
+            close()
             return
         }
         await Chats.db.mutate.updateUser(item.id, userId)
         Logger.infoToast(`Linked to User: ${userName}`)
+        close()
     }
 
     return (
@@ -104,39 +110,43 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
                 textCheck={(text) => text.length === 0}
                 defaultValue={item.name}
             />
-            <PopupMenu
-                icon="edit"
-                options={[
+            <ContextMenu
+                triggerIcon="edit"
+                placement="left"
+                buttons={[
                     {
                         label: 'Rename',
                         icon: 'edit',
-                        onPress: (menuRef) => {
+                        onPress: (close) => {
                             setShowRename(true)
-                            menuRef.current?.close()
+                            close()
                         },
                     },
                     {
                         label: 'Delete',
                         icon: 'delete',
-                        warning: true,
+                        variant: 'warning',
                         onPress: handleDeleteChat,
                     },
-                ]}
-                moreOptions={[
                     {
-                        label: 'Export',
-                        icon: 'download',
-                        onPress: (menuRef) => handleExportChat(menuRef),
-                    },
-                    {
-                        label: 'Clone',
-                        icon: 'copy1',
-                        onPress: handleCloneChat,
-                    },
-                    {
-                        label: 'Link User',
-                        icon: 'user',
-                        onPress: handleLinkUser,
+                        label: 'More',
+                        submenu: [
+                            {
+                                label: 'Export',
+                                icon: 'download',
+                                onPress: handleExportChat,
+                            },
+                            {
+                                label: 'Clone',
+                                icon: 'copy1',
+                                onPress: handleCloneChat,
+                            },
+                            {
+                                label: 'Link User',
+                                icon: 'user',
+                                onPress: handleLinkUser,
+                            },
+                        ],
                     },
                 ]}
             />

@@ -1,7 +1,7 @@
 import Alert from '@components/views/Alert'
+import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import PopupMenu from '@components/views/PopupMenu'
 import { Logger, LogLevel } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
@@ -59,26 +59,26 @@ const LogsScreen = () => {
     }
 
     const headerRight = () => (
-        <PopupMenu
+        <ContextMenu
             placement="bottom"
-            icon="setting"
-            options={[
+            triggerIcon="setting"
+            buttons={[
                 {
                     label: 'Export Logs',
                     icon: 'export',
-                    onPress: (m) => {
+                    onPress: (close) => {
                         handleExportLogs()
-                        m.current?.close()
+                        close()
                     },
                 },
                 {
                     label: 'Flush Logs',
                     icon: 'delete',
-                    onPress: (m) => {
+                    onPress: (close) => {
                         handleFlushLogs()
-                        m.current?.close()
+                        close()
                     },
-                    warning: true,
+                    variant: 'warning',
                 },
             ]}
         />

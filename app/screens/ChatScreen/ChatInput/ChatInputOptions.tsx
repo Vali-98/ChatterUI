@@ -1,5 +1,5 @@
+import ContextMenu from '@components/views/ContextMenu'
 import Drawer from '@components/views/Drawer'
-import PopupMenu from '@components/views/PopupMenu'
 import { Ionicons } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useRouter } from 'expo-router'
@@ -16,28 +16,28 @@ const ChatOptions = () => {
     }
 
     return (
-        <PopupMenu
-            options={[
+        <ContextMenu
+            buttons={[
                 {
-                    onPress: (m) => {
-                        m.current?.close()
+                    onPress: (close) => {
+                        close()
                         router.back()
                     },
                     label: 'Main Menu',
                     icon: 'back',
                 },
                 {
-                    onPress: (m) => {
-                        m.current?.close()
+                    onPress: (close) => {
+                        close()
                         router.push('/screens/CharacterEditorScreen')
                     },
                     label: 'Edit Character',
                     icon: 'edit',
                 },
                 {
-                    onPress: (m) => {
+                    onPress: (close) => {
                         setShowChat(true)
-                        m.current?.close()
+                        close()
                     },
                     label: 'Chat History',
                     icon: 'paperclip',
@@ -45,7 +45,7 @@ const ChatOptions = () => {
             ]}
             placement="top">
             <Ionicons name="caret-up" style={styles.optionsButton} size={24} />
-        </PopupMenu>
+        </ContextMenu>
     )
 }
 

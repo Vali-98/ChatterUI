@@ -4,8 +4,8 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
 import AvatarViewer from '@components/views/AvatarViewer'
+import ContextMenu from '@components/views/ContextMenu'
 import HeaderTitle from '@components/views/HeaderTitle'
-import PopupMenu from '@components/views/PopupMenu'
 import { db } from '@db'
 import { AntDesign } from '@expo/vector-icons'
 import { Tokenizer } from '@lib/engine/Tokenizer'
@@ -240,22 +240,22 @@ const ChracterEditorScreen = () => {
                         keyboardShouldPersistTaps="always"
                         contentContainerStyle={{ rowGap: 8, paddingBottom: 48 }}>
                         <View style={styles.characterHeader}>
-                            <PopupMenu
+                            <ContextMenu
                                 placement="right"
-                                options={[
+                                buttons={[
                                     {
                                         label: 'Change Image',
                                         icon: 'picture',
-                                        onPress: (menu) => {
-                                            menu.current?.close()
+                                        onPress: (close) => {
+                                            close()
                                             handleImportImage()
                                         },
                                     },
                                     {
                                         label: 'Change Background',
                                         icon: 'picture',
-                                        onPress: async (menu) => {
-                                            menu.current?.close()
+                                        onPress: async (close) => {
+                                            close()
                                             await Characters.importBackground(
                                                 charId,
                                                 characterCard.background_image
@@ -266,30 +266,30 @@ const ChracterEditorScreen = () => {
                                     {
                                         label: 'View Image',
                                         icon: 'search1',
-                                        onPress: (menu) => {
-                                            menu.current?.close()
+                                        onPress: (close) => {
+                                            close()
                                             setShowViewer(true)
                                         },
                                     },
                                     {
                                         label: 'Delete Image',
                                         icon: 'delete',
-                                        onPress: (menu) => {
-                                            menu.current?.close()
+                                        onPress: (close) => {
+                                            close()
                                             handleDeleteImage()
                                         },
-                                        warning: true,
+                                        variant: 'warning',
                                     },
                                     {
                                         label: 'Remove Background',
                                         icon: 'delete',
-                                        onPress: (menu) => {
-                                            menu.current?.close()
+                                        onPress: (close) => {
+                                            close()
                                             if (backgroundImage)
                                                 Characters.deleteBackground(charId, backgroundImage)
                                         },
                                         disabled: !backgroundImage,
-                                        warning: true,
+                                        variant: 'warning',
                                     },
                                 ]}>
                                 <Avatar
@@ -303,7 +303,7 @@ const ChracterEditorScreen = () => {
                                     color={color.text._100}
                                     style={styles.editHover}
                                 />
-                            </PopupMenu>
+                            </ContextMenu>
 
                             <View style={styles.characterHeaderInfo}>
                                 <View style={styles.buttonContainer}>
