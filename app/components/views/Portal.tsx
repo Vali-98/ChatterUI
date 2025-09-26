@@ -68,8 +68,10 @@ const Portal = ({ children, name }: PortalProps) => {
 
     useEffect(() => {
         mount(name, children)
-        return () => unmount(name)
-    }, [name])
+        return () => {
+            unmount(name)
+        }
+    }, [])
 
     useEffect(() => {
         update(name, children)

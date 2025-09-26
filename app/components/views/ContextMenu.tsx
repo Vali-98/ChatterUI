@@ -1,7 +1,18 @@
 // ContextMenu.tsx
+import { AntDesign } from '@expo/vector-icons'
+import { Theme } from '@lib/theme/ThemeManager'
 import { randomUUID } from 'expo-crypto'
-import React, { ReactNode, useEffect, useRef, useState } from 'react'
-import { Dimensions, LayoutRectangle, Pressable, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import {
+    Dimensions,
+    LayoutRectangle,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextStyle,
+    View,
+    ViewProps,
+} from 'react-native'
 import Animated, {
     Easing,
     ExitAnimationsValues,
@@ -12,18 +23,26 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { create } from 'zustand'
 import Portal from './Portal'
+import { scheduleOnRN } from 'react-native-worklets'
 
 export type Placement = 'top' | 'bottom' | 'left' | 'right' | 'auto'
 
 export type ContextMenuButtonProps = {
     key?: string
     label: string
-    onPress?: () => void
+    onPress?: (close: () => void) => void
     submenu?: ContextMenuButtonProps[]
+    icon?: keyof typeof AntDesign.glyphMap
+    iconSize?: number
+    textColor?: string
+    variant?: 'normal' | 'warning'
+    disabled?: boolean
 }
 
-export type ContextMenuProps = {
-    trigger: ReactNode
+export interface ContextMenuProps extends ViewProps {
+    triggerIcon?: keyof typeof AntDesign.glyphMap
+    triggerIconSize?: number
+    triggerStyle?: TextStyle
     buttons: ContextMenuButtonProps[]
     placement?: Placement
 }
@@ -64,7 +83,7 @@ const zoomExitingAnimation = (values: ExitAnimationsValues, anchor: LayoutRectan
         originY: withTiming(originY, { duration }),
         height: withTiming(0, { duration }),
         width: withTiming(0, { duration }),
-        opacity: withTiming(0, { duration }),
+        opacity: withTiming(0, { duration: duration - 50 }),
     }
     const initialValues = {
         originX: values.currentOriginX,
@@ -85,25 +104,35 @@ const defaultAnimatedMenuValues = {
     width: null as number | null,
 }
 
-const ContextMenu = ({ trigger, buttons, placement = 'auto' }: ContextMenuProps) => {
+const ContextMenu = ({
+    buttons,
+    children,
+    placement = 'auto',
+    triggerIcon = 'questioncircle',
+    triggerIconSize = 26,
+    triggerStyle,
+}: ContextMenuProps) => {
     const idRef = useRef<string>(genId())
     const triggerRef = useRef<View>(null)
     const viewRef = useRef<View>(null)
+    const styles = useStyles()
     const { openMenuId, anchor, openMenu, closeMenu } = useContextMenuStore()
     const [expandedSubmenus, setExpandedSubmenus] = useState<string[]>([])
     const runAnimation = useRef(true)
+    const initial = useRef(true)
     const animatedMenuValues = useSharedValue(defaultAnimatedMenuValues)
     const getMenuPosition = useMenuPosition()
+
+    const animatedMenuStyle = useAnimatedStyle(() => {
+        return animatedMenuValues.value
+    })
 
     useEffect(() => {
         if (isOpen) return
         animatedMenuValues.value = defaultAnimatedMenuValues
         runAnimation.current = true
+        initial.current = true
     }, [openMenuId])
-
-    const animatedMenuStyle = useAnimatedStyle(() => {
-        return animatedMenuValues.value
-    })
 
     const handleOpen = () => {
         if (!triggerRef.current) return
@@ -114,27 +143,42 @@ const ContextMenu = ({ trigger, buttons, placement = 'auto' }: ContextMenuProps)
     }
 
     const handleCloseMenu = () => {
-        closeMenu()
         setExpandedSubmenus([])
+        closeMenu()
     }
 
-    const isOpen = openMenuId === idRef.current
+    const reposition = () => {
+        runAnimation.current = true
+        onLayout()
+    }
 
     const onLayout = () => {
         if (!runAnimation.current || !anchor) return
         runAnimation.current = false
         if (viewRef.current) {
             viewRef.current.measure((x, y, width, height) => {
-                const { left, top } = getMenuPosition(anchor, placement, width, height)
+                const { overshot, left, top } = getMenuPosition(anchor, placement, width, height)
                 const duration = 250
                 // setup initial placement
-                animatedMenuValues.value = {
-                    height: 0,
-                    width: 0,
-                    opacity: 1,
-                    top: anchor.y + anchor.height / 2,
-                    left: anchor.x + anchor.width / 2,
+
+                if (initial.current)
+                    animatedMenuValues.value = {
+                        height: 0,
+                        width: 0,
+                        opacity: 1,
+                        top: anchor.y + anchor.height / 2,
+                        left: anchor.x + anchor.width / 2,
+                    }
+                else {
+                    if (!overshot) return
+                    animatedMenuValues.value = {
+                        ...animatedMenuValues.value,
+                        width,
+                        height,
+                        opacity: 1,
+                    }
                 }
+                initial.current = false
                 // animate to final placement
                 animatedMenuValues.value = withTiming(
                     {
@@ -152,7 +196,7 @@ const ContextMenu = ({ trigger, buttons, placement = 'auto' }: ContextMenuProps)
                                 left,
                                 opacity: 1,
                                 height: null,
-                                width: width,
+                                width: null,
                             }
                     }
                 )
@@ -160,10 +204,18 @@ const ContextMenu = ({ trigger, buttons, placement = 'auto' }: ContextMenuProps)
         }
     }
 
+    const isOpen = openMenuId === idRef.current
     return (
         <>
-            <Pressable ref={triggerRef} onPress={handleOpen}>
-                {trigger}
+            <Pressable ref={triggerRef} onPress={handleOpen} key={idRef.current}>
+                {children}
+                {!children && (
+                    <AntDesign
+                        size={triggerIconSize}
+                        style={[styles.menuText, triggerStyle]}
+                        name={triggerIcon}
+                    />
+                )}
             </Pressable>
 
             {isOpen && anchor && (
@@ -177,6 +229,7 @@ const ContextMenu = ({ trigger, buttons, placement = 'auto' }: ContextMenuProps)
                             }}>
                             <View ref={viewRef} onLayout={onLayout}>
                                 <MenuButtons
+                                    reposition={reposition}
                                     buttons={buttons}
                                     onClose={handleCloseMenu}
                                     expandedSubmenus={expandedSubmenus}
@@ -198,6 +251,7 @@ const MenuButtons = ({
     setExpandedSubmenus,
     hidden = false,
     isSubmenu = false,
+    reposition,
 }: {
     buttons: ContextMenuButtonProps[]
     onClose: () => void
@@ -205,7 +259,9 @@ const MenuButtons = ({
     setExpandedSubmenus: (menus: string[]) => void
     hidden?: boolean
     isSubmenu?: boolean
+    reposition: () => void
 }) => {
+    const styles = useStyles()
     const menuAnimatedValues = useSharedValue(
         hidden
             ? {
@@ -227,7 +283,7 @@ const MenuButtons = ({
             viewRef.current.measure((_, __, ___, height) => {
                 menuAnimatedValues.value = withTiming(
                     {
-                        height: height,
+                        height: height + 8 * buttons.length,
                         paddingVertical: 4,
                     },
                     { duration: 250, easing: Easing.quad },
@@ -237,6 +293,7 @@ const MenuButtons = ({
                                 height: null,
                                 paddingVertical: 4,
                             }
+                            scheduleOnRN(reposition)
                         }
                     }
                 )
@@ -252,62 +309,87 @@ const MenuButtons = ({
                         height: 0,
                         paddingVertical: 0,
                     },
-                    { duration: 250 }
+                    { duration: 250 },
+                    (finished) => finished && scheduleOnRN(reposition)
                 )
             })
         }
     }, [hidden])
 
+    const textColors = {
+        warning: styles.menuTextError,
+        normal: styles.menuText,
+    }
+
     return (
         <Animated.View style={[styles.menu, height]}>
-            <View ref={viewRef}>
-                {buttons.map((btn) => {
-                    const key = useRef(randomUUID()).current
-                    const hasSubmenu = !!btn.submenu
-                    return (
-                        <View key={key}>
-                            <Pressable
-                                style={styles.menuItem}
-                                onPress={() => {
-                                    if (hasSubmenu) {
-                                        if (expandedSubmenus.includes(key))
-                                            setExpandedSubmenus(
-                                                expandedSubmenus.filter((item) => item !== key)
-                                            )
-                                        else setExpandedSubmenus([...expandedSubmenus, key])
-                                    } else {
-                                        btn.onPress?.()
-                                        onClose()
-                                    }
-                                }}>
-                                <Text>{btn.label}</Text>
-                                {hasSubmenu && (
-                                    <Text style={{ marginLeft: 8 }}>
-                                        {expandedSubmenus.includes(key) ? '▲' : '▶'}
-                                    </Text>
-                                )}
-                            </Pressable>
+            <View ref={viewRef} style={{ rowGap: 8 }}>
+                {buttons
+                    .filter((item) => !item.disabled)
+                    .map((item) => {
+                        const key = useRef(randomUUID()).current
+                        const hasSubmenu = !!item.submenu
+                        const textStyle = item.textColor
+                            ? { color: item.textColor }
+                            : textColors[item.variant ?? 'normal']
+                        return (
+                            <View key={key}>
+                                <Pressable
+                                    style={styles.menuItem}
+                                    onPress={() => {
+                                        if (hasSubmenu) {
+                                            if (expandedSubmenus.includes(key))
+                                                setExpandedSubmenus(
+                                                    expandedSubmenus.filter((item) => item !== key)
+                                                )
+                                            else setExpandedSubmenus([...expandedSubmenus, key])
+                                        } else {
+                                            item.onPress?.(onClose)
+                                        }
+                                    }}>
+                                    {item.icon && (
+                                        <AntDesign
+                                            name={item.icon}
+                                            style={textStyle}
+                                            size={item.iconSize ?? 18}
+                                        />
+                                    )}
+                                    {!item.icon && hasSubmenu && (
+                                        <AntDesign
+                                            style={textStyle}
+                                            size={item.iconSize ?? 12}
+                                            name={
+                                                expandedSubmenus.includes(key)
+                                                    ? 'caretup'
+                                                    : 'caretdown'
+                                            }
+                                        />
+                                    )}
+                                    <Text style={textStyle}>{item.label}</Text>
+                                </Pressable>
 
-                            {hasSubmenu && (
-                                <View style={styles.subMenu}>
-                                    <MenuButtons
-                                        isSubmenu
-                                        buttons={btn.submenu!}
-                                        onClose={onClose}
-                                        expandedSubmenus={expandedSubmenus}
-                                        setExpandedSubmenus={setExpandedSubmenus}
-                                        hidden={!expandedSubmenus.includes(key) || hidden}
-                                    />
-                                </View>
-                            )}
-                        </View>
-                    )
-                })}
+                                {hasSubmenu && (
+                                    <View style={styles.subMenu}>
+                                        <MenuButtons
+                                            reposition={reposition}
+                                            isSubmenu
+                                            buttons={item.submenu!}
+                                            onClose={onClose}
+                                            expandedSubmenus={expandedSubmenus}
+                                            setExpandedSubmenus={setExpandedSubmenus}
+                                            hidden={!expandedSubmenus.includes(key) || hidden}
+                                        />
+                                    </View>
+                                )}
+                            </View>
+                        )
+                    })}
             </View>
         </Animated.View>
     )
 }
-
+const positionOffset = 0
+const minWidth = 128
 const useMenuPosition = () => {
     const insets = useSafeAreaInsets()
 
@@ -317,69 +399,99 @@ const useMenuPosition = () => {
         menuWidth: number,
         menuHeight: number
     ) => {
-        const { width: screenWidth, height: screenHeight } = Dimensions.get('window')
+        const { width: screenWidth, height: sHeight } = Dimensions.get('window')
+        const screenHeight = sHeight - insets.top - insets.bottom
         let top = anchor.y + anchor.height
         let left = anchor.x
-
+        const actualWidth = Math.max(minWidth + positionOffset, menuWidth + positionOffset)
+        const actualHeight = menuHeight + positionOffset
         switch (placement) {
             case 'top':
-                top = anchor.y - menuHeight
-                left = anchor.x + anchor.width / 2 - menuWidth / 2
+                top = anchor.y - actualHeight
+                left = anchor.x + anchor.width / 2 - actualWidth / 2
                 break
             case 'bottom':
                 top = anchor.y + anchor.height
-                left = anchor.x + anchor.width / 2 - menuWidth / 2
-                break
-            case 'left':
-                left = anchor.x + menuWidth
-                top = Math.max(anchor.y - menuHeight / 2, insets.top)
+                left = anchor.x + anchor.width / 2 - actualWidth / 2
                 break
             case 'right':
-                left = anchor.x - menuWidth
-                top = Math.max(anchor.y - menuHeight / 2, insets.top)
+                left = anchor.x + anchor.width
+                top = anchor.y - actualHeight / 2
+            case 'left':
+                left = anchor.x - actualWidth
+                top = anchor.y - actualHeight / 2
                 break
             case 'auto':
             default:
-                // prevent overflow
-                if (anchor.y + menuHeight > screenHeight - insets.bottom)
-                    top = anchor.y - menuHeight
-                if (anchor.x + menuWidth > screenWidth) left = screenWidth - menuWidth - 8
                 break
         }
+        let overshot = false
+        // overflow prevention
+        if (left < 0) {
+            left = 0
+            overshot = true
+        } else if (left + actualWidth > screenWidth) {
+            left = screenWidth - actualWidth - positionOffset
+            overshot = true
+        }
 
-        return { position: 'absolute' as const, top, left }
+        // Clamp vertically
+        if (top < 0) {
+            top = 0
+            overshot = true
+        } else if (top + actualHeight > screenHeight) {
+            top = screenHeight - actualHeight - positionOffset
+            overshot = true
+        }
+
+        return { top, left, overshot }
     }
     return getMenuPosition
 }
 
-const styles = StyleSheet.create({
-    menuContainer: {
-        position: 'absolute',
-        borderRadius: 8,
-        backgroundColor: '#f9f9f9',
-        elevation: 5,
-        overflow: 'scroll',
-    },
-    menu: {
-        backgroundColor: 'white',
-        minWidth: 100,
-        borderRadius: 8,
-        paddingVertical: 4,
-        overflow: 'scroll',
-    },
-    menuItem: {
-        backgroundColor: 'white',
-        padding: 12,
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    subMenu: {
-        paddingLeft: 8,
-        backgroundColor: '#f6f6f6',
-    },
-})
+const useStyles = () => {
+    const { color } = Theme.useTheme()
+    return StyleSheet.create({
+        menuContainer: {
+            margin: 4,
+            position: 'absolute',
+            borderRadius: 8,
+            backgroundColor: color.neutral._200,
+            elevation: 5,
+            overflow: 'scroll',
+            borderColor: color.neutral._300,
+            borderWidth: 1,
+        },
+        menu: {
+            backgroundColor: color.neutral._200,
+            minWidth: minWidth,
+            borderColor: color.neutral._300,
+            borderWidth: 1,
+            paddingHorizontal: 4,
+            borderRadius: 8,
+            overflow: 'scroll',
+        },
+        menuItem: {
+            padding: 12,
+            paddingRight: 24,
+            minWidth: minWidth,
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            columnGap: 12,
+        },
+        menuText: {
+            color: color.text._300,
+        },
+        menuTextError: {
+            color: color.error._300,
+        },
+        subMenu: {
+            backgroundColor: color.neutral._100,
+            borderRadius: 8,
+        },
+    })
+}
 
 export default ContextMenu
 
