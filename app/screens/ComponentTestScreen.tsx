@@ -87,6 +87,19 @@ const ComponentTestScreen = () => {
                             },
                         ],
                     },
+                    {
+                        label: 'More',
+                        submenu: [
+                            {
+                                label: 'SubOption ',
+                                onPress: () => console.log('Sub 1'),
+                            },
+                            {
+                                label: 'SubOptiaaaaoaaanaaaaaaaaaaaaa 2',
+                                onPress: () => console.log('Sub 2'),
+                            },
+                        ],
+                    },
                 ]}
                 placement="bottom">
                 <AntDesign
