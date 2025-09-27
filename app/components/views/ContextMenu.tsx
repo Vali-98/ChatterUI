@@ -182,7 +182,8 @@ const ContextMenu = ({
                     _width,
                     _height,
                     animatedMenuValues.value.top,
-                    animatedMenuValues.value.left
+                    animatedMenuValues.value.left,
+                    wasOvershot.current
                 )
                 const duration = 250
                 // setup initial placement
@@ -198,6 +199,7 @@ const ContextMenu = ({
                 } else {
                     if (!overshot && !wasOvershot.current) return
                     wasOvershot.current = overshot
+                    console.log(wasOvershot)
                     animatedMenuValues.value = {
                         ...animatedMenuValues.value,
                         width,
@@ -427,7 +429,8 @@ const useMenuPosition = () => {
         menuWidth: number,
         menuHeight: number,
         currentTop: number,
-        currentLeft: number
+        currentLeft: number,
+        wasOvershot: boolean
     ) => {
         const { width: screenWidth, height: sHeight } = Dimensions.get('window')
         const screenHeight = sHeight - insets.top
@@ -446,11 +449,11 @@ const useMenuPosition = () => {
                 break
             case 'right':
                 left = anchor.x + anchor.width
-                top = currentTop !== 0 ? currentTop : anchor.y - actualHeight / 2
+                top = currentTop !== 0 && !wasOvershot ? currentTop : anchor.y - actualHeight / 2
                 break
             case 'left':
                 left = anchor.x - actualWidth
-                top = currentTop !== 0 ? currentTop : anchor.y - actualHeight / 2
+                top = currentTop !== 0 && !wasOvershot ? currentTop : anchor.y - actualHeight / 2
                 break
             case 'auto':
             default:
