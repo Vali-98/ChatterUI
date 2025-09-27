@@ -25,11 +25,11 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
     const targetHeight = useRef(-1)
     const firstRender = useRef(true)
 
-    const handleAnimateHeight = (newheight: number) => {
+    const handleAnimateHeight = (newheight: number, heightDelta: number = 1) => {
         animHeight.stopAnimation(() =>
             Animated.timing(animHeight, {
                 toValue: newheight,
-                duration: 300,
+                duration: 300 * heightDelta,
                 useNativeDriver: false,
                 easing: Easing.inOut((x) => x * x),
             }).start()
@@ -45,7 +45,10 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
                 const newHeight = measuredHeight + overflowPadding
                 if (targetHeight.current === newHeight) return
                 if (targetHeight.current > -1) animHeight.setValue(targetHeight.current)
-                handleAnimateHeight(newHeight)
+                handleAnimateHeight(
+                    newHeight,
+                    Math.max(1, Math.abs(newHeight - targetHeight.current) / 150)
+                )
                 targetHeight.current = newHeight
             })
         }
