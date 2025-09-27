@@ -122,6 +122,7 @@ const ContextMenu = ({
     const [expandedSubmenus, setExpandedSubmenus] = useState<string[]>([])
     const runAnimation = useRef(true)
     const initial = useRef(true)
+    const wasOvershot = useRef(true)
     const animatedMenuValues = useSharedValue(defaultAnimatedMenuValues)
     const getMenuPosition = useMenuPosition()
 
@@ -172,7 +173,8 @@ const ContextMenu = ({
                         left: anchor.x + anchor.width / 2,
                     }
                 else {
-                    if (!overshot) return
+                    if (!overshot && !wasOvershot.current) return
+                    wasOvershot.current = overshot
                     animatedMenuValues.value = {
                         ...animatedMenuValues.value,
                         width,
@@ -211,7 +213,7 @@ const ContextMenu = ({
         <>
             <Pressable
                 ref={triggerRef}
-                onPress={handleOpen}
+                onPressIn={handleOpen}
                 key={idRef.current}
                 disabled={disabled}>
                 {children}
