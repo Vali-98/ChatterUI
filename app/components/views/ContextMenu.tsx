@@ -2,6 +2,7 @@
 import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
 import { randomUUID } from 'expo-crypto'
+import { useFocusEffect } from 'expo-router'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
     BackHandler,
@@ -15,17 +16,15 @@ import {
     ViewProps,
 } from 'react-native'
 import Animated, {
-    Easing,
     ExitAnimationsValues,
     useAnimatedStyle,
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { scheduleOnRN } from 'react-native-worklets'
 import { create } from 'zustand'
 import Portal from './Portal'
-import { scheduleOnRN } from 'react-native-worklets'
-import { useFocusEffect } from 'expo-router'
 
 export type Placement = 'top' | 'bottom' | 'left' | 'right' | 'auto'
 
@@ -530,9 +529,3 @@ const useStyles = () => {
 }
 
 export default ContextMenu
-
-/**
- * @TODO:
- * - [x] Nested Animations
- * - [ ] Styling
- */
