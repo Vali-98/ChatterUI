@@ -181,7 +181,9 @@ const ContextMenu = ({
                     anchor,
                     placement,
                     _width,
-                    _height
+                    _height,
+                    animatedMenuValues.value.top,
+                    animatedMenuValues.value.left
                 )
                 const duration = 250
                 // setup initial placement
@@ -313,7 +315,7 @@ const MenuButtons = ({
                         height: height + 8 * buttons.length,
                         paddingVertical: 4,
                     },
-                    { duration: 250, easing: Easing.quad },
+                    { duration: 250 },
                     (finished) => {
                         if (finished) {
                             menuAnimatedValues.value = {
@@ -415,7 +417,7 @@ const MenuButtons = ({
         </Animated.View>
     )
 }
-const positionOffset = 8
+const positionOffset = 4
 const minWidth = 128
 const useMenuPosition = () => {
     const insets = useSafeAreaInsets()
@@ -424,10 +426,12 @@ const useMenuPosition = () => {
         anchor: LayoutRectangle,
         placement: Placement,
         menuWidth: number,
-        menuHeight: number
+        menuHeight: number,
+        currentTop: number,
+        currentLeft: number
     ) => {
         const { width: screenWidth, height: sHeight } = Dimensions.get('window')
-        const screenHeight = sHeight - insets.top - insets.bottom
+        const screenHeight = sHeight - insets.top
         let top = anchor.y + anchor.height
         let left = anchor.x
         const actualWidth = Math.max(minWidth + positionOffset, menuWidth + positionOffset)
@@ -443,11 +447,11 @@ const useMenuPosition = () => {
                 break
             case 'right':
                 left = anchor.x + anchor.width
-                top = anchor.y - actualHeight / 2
+                top = currentTop !== 0 ? currentTop : anchor.y - actualHeight / 2
                 break
             case 'left':
                 left = anchor.x - actualWidth
-                top = anchor.y - actualHeight / 2
+                top = currentTop !== 0 ? currentTop : anchor.y - actualHeight / 2
                 break
             case 'auto':
             default:
@@ -456,21 +460,23 @@ const useMenuPosition = () => {
         let overshot = false
         // overflow prevention
         if (left < 0) {
-            left = 0
+            left = 0 + positionOffset
             overshot = true
         } else if (left + actualWidth > screenWidth) {
             left = screenWidth - actualWidth - positionOffset
             overshot = true
         }
 
-        // Clamp vertically
+        // Clamp values to keep menu on screen
         if (top < insets.top) {
+            console.log(`top overshot`)
             top = insets.top
             overshot = true
         } else if (top + actualHeight > screenHeight) {
             top = screenHeight - actualHeight - positionOffset
             overshot = true
         }
+
         return {
             top,
             left,
@@ -486,7 +492,6 @@ const useStyles = () => {
     const { color } = Theme.useTheme()
     return StyleSheet.create({
         menuContainer: {
-            margin: 4,
             position: 'absolute',
             borderRadius: 8,
             backgroundColor: color.neutral._200,
