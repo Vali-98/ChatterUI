@@ -159,12 +159,17 @@ const ContextMenu = ({
         if (!runAnimation.current || !anchor) return
         runAnimation.current = false
         if (viewRef.current) {
-            viewRef.current.measure((x, y, width, height) => {
-                const { overshot, left, top } = getMenuPosition(anchor, placement, width, height)
+            viewRef.current.measure((x, y, _width, _height) => {
+                const { overshot, left, top, width, height } = getMenuPosition(
+                    anchor,
+                    placement,
+                    _width,
+                    _height
+                )
                 const duration = 250
                 // setup initial placement
 
-                if (initial.current)
+                if (initial.current) {
                     animatedMenuValues.value = {
                         height: 0,
                         width: 0,
@@ -172,7 +177,7 @@ const ContextMenu = ({
                         top: anchor.y + anchor.height / 2,
                         left: anchor.x + anchor.width / 2,
                     }
-                else {
+                } else {
                     if (!overshot && !wasOvershot.current) return
                     wasOvershot.current = overshot
                     animatedMenuValues.value = {
@@ -184,6 +189,7 @@ const ContextMenu = ({
                 }
                 initial.current = false
                 // animate to final placement
+
                 animatedMenuValues.value = withTiming(
                     {
                         top,
@@ -326,7 +332,7 @@ const MenuButtons = ({
 
     return (
         <Animated.View style={[styles.menu, height]}>
-            <View ref={viewRef} style={{ rowGap: 8 }}>
+            <View ref={viewRef} style={{ rowGap: 4 }}>
                 {buttons
                     .filter((item) => !item.disabled)
                     .map((item) => {
@@ -391,7 +397,7 @@ const MenuButtons = ({
         </Animated.View>
     )
 }
-const positionOffset = 0
+const positionOffset = 8
 const minWidth = 128
 const useMenuPosition = () => {
     const insets = useSafeAreaInsets()
@@ -447,7 +453,13 @@ const useMenuPosition = () => {
             top = screenHeight - actualHeight - positionOffset
             overshot = true
         }
-        return { top, left, overshot }
+        return {
+            top,
+            left,
+            overshot,
+            width: actualWidth - positionOffset,
+            height: actualHeight - positionOffset,
+        }
     }
     return getMenuPosition
 }
@@ -462,13 +474,11 @@ const useStyles = () => {
             backgroundColor: color.neutral._200,
             elevation: 5,
             overflow: 'scroll',
-            borderColor: color.neutral._300,
-            borderWidth: 1,
         },
         menu: {
             backgroundColor: color.neutral._200,
             minWidth: minWidth,
-            borderColor: color.neutral._300,
+            borderColor: color.neutral._400,
             borderWidth: 1,
             paddingHorizontal: 4,
             borderRadius: 8,
