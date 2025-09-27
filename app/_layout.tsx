@@ -8,7 +8,6 @@ import { setOptions } from 'expo-splash-screen'
 import { SystemBars } from 'react-native-edge-to-edge'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
-import { MenuProvider } from 'react-native-popup-menu'
 
 SplashScreen.preventAutoHideAsync()
 setOptions({
@@ -22,26 +21,24 @@ const Layout = () => {
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <MenuProvider>
-                <KeyboardProvider>
-                    <AlertBox />
-                    <SystemBars style="dark" />
-                    <Stack
-                        screenOptions={{
-                            headerBackButtonDisplayMode: 'minimal',
-                            headerStyle: { backgroundColor: color.neutral._100 },
-                            headerTitleStyle: { color: color.text._100 },
-                            headerTintColor: color.text._100,
-                            contentStyle: { backgroundColor: color.neutral._100 },
-                            headerShadowVisible: false,
-                            headerTitleAlign: 'center',
-                            statusBarStyle: 'auto',
-                        }}>
-                        <Stack.Screen name="index" options={{ animation: 'fade' }} />
-                    </Stack>
-                    <PortalHost />
-                </KeyboardProvider>
-            </MenuProvider>
+            <KeyboardProvider>
+                <AlertBox />
+                <SystemBars style="dark" />
+                <Stack
+                    screenOptions={{
+                        headerBackButtonDisplayMode: 'minimal',
+                        headerStyle: { backgroundColor: color.neutral._100 },
+                        headerTitleStyle: { color: color.text._100 },
+                        headerTintColor: color.text._100,
+                        contentStyle: { backgroundColor: color.neutral._100 },
+                        headerShadowVisible: false,
+                        headerTitleAlign: 'center',
+                        statusBarStyle: 'auto',
+                    }}>
+                    <Stack.Screen name="index" options={{ animation: 'fade' }} />
+                </Stack>
+                <PortalHost />
+            </KeyboardProvider>
         </GestureHandlerRootView>
     )
 }
