@@ -2,17 +2,17 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import { FontAwesome } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getStringAsync } from 'expo-clipboard'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
-    View,
-    Text,
-    Modal,
-    TextInput,
-    StyleSheet,
-    TouchableOpacity,
     GestureResponderEvent,
+    Modal,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native'
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 
 type TextBoxModalProps = {
     booleans: [boolean, (b: boolean) => void]
@@ -27,7 +27,7 @@ type TextBoxModalProps = {
     defaultValue?: string
     multiline?: boolean
 }
-
+// @TODO: Cleanup this API
 const TextBoxModal: React.FC<TextBoxModalProps> = ({
     booleans: [showModal, setShowModal],
     onConfirm = (text) => {},
@@ -75,62 +75,65 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                 style={{
                     flex: 1,
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    justifyContent: 'center',
                 }}>
-                <KeyboardAvoidingView style={styles.modalview}>
-                    <Text style={styles.title}>{title}</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            autoFocus={autoFocus}
-                            style={styles.input}
-                            value={text}
-                            onChangeText={setText}
-                            placeholder={placeholder}
-                            placeholderTextColor={color.text._700}
-                            multiline={multiline}
-                            numberOfLines={10}
-                        />
-                        {showPaste && !text && (
-                            <TouchableOpacity
-                                style={styles.inputButton}
-                                onPress={async () => {
-                                    setText(await getStringAsync())
-                                }}>
-                                <FontAwesome name="paste" size={24} color={color.text._100} />
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                    {showError && <Text style={styles.errorMessage}>{errorMessage}</Text>}
-                    <View style={{ flexDirection: 'row' }}>
-                        <View style={styles.buttonContainer}>
-                            <ThemedButton
-                                label="Cancel"
-                                variant="tertiary"
-                                onPress={() => handleClose()}
-                                buttonStyle={{
-                                    paddingVertical: spacing.l,
-                                    paddingHorizontal: spacing.xl,
-                                }}
+                <KeyboardAwareScrollView
+                    style={{ flex: 1 }}
+                    contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
+                    <View style={styles.modalview}>
+                        <Text style={styles.title}>{title}</Text>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                autoFocus={autoFocus}
+                                style={styles.input}
+                                value={text}
+                                onChangeText={setText}
+                                placeholder={placeholder}
+                                placeholderTextColor={color.text._700}
+                                multiline={multiline}
+                                numberOfLines={10}
                             />
-                            <ThemedButton
-                                label="Confirm"
-                                variant="secondary"
-                                onPress={() => {
-                                    if (textCheck(text)) {
-                                        setShowError(true)
-                                        return
-                                    }
-                                    onConfirm(text)
-                                    handleClose()
-                                }}
-                                buttonStyle={{
-                                    paddingVertical: spacing.l,
-                                    paddingHorizontal: spacing.xl,
-                                }}
-                            />
+                            {showPaste && !text && (
+                                <TouchableOpacity
+                                    style={styles.inputButton}
+                                    onPress={async () => {
+                                        setText(await getStringAsync())
+                                    }}>
+                                    <FontAwesome name="paste" size={24} color={color.text._100} />
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                        {showError && <Text style={styles.errorMessage}>{errorMessage}</Text>}
+                        <View style={{ flexDirection: 'row' }}>
+                            <View style={styles.buttonContainer}>
+                                <ThemedButton
+                                    label="Cancel"
+                                    variant="tertiary"
+                                    onPress={() => handleClose()}
+                                    buttonStyle={{
+                                        paddingVertical: spacing.l,
+                                        paddingHorizontal: spacing.xl,
+                                    }}
+                                />
+                                <ThemedButton
+                                    label="Confirm"
+                                    variant="secondary"
+                                    onPress={() => {
+                                        if (textCheck(text)) {
+                                            setShowError(true)
+                                            return
+                                        }
+                                        onConfirm(text)
+                                        handleClose()
+                                    }}
+                                    buttonStyle={{
+                                        paddingVertical: spacing.l,
+                                        paddingHorizontal: spacing.xl,
+                                    }}
+                                />
+                            </View>
                         </View>
                     </View>
-                </KeyboardAvoidingView>
+                </KeyboardAwareScrollView>
             </TouchableOpacity>
         </Modal>
     )
@@ -147,7 +150,7 @@ const useStyles = () => {
         },
 
         modalview: {
-            margin: spacing.xl,
+            margin: spacing.xl2,
             backgroundColor: color.neutral._200,
             borderRadius: borderRadius.xl,
             paddingHorizontal: spacing.xl2,
