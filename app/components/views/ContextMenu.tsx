@@ -2,8 +2,9 @@
 import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
 import { randomUUID } from 'expo-crypto'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
+    BackHandler,
     Dimensions,
     LayoutRectangle,
     Pressable,
@@ -24,6 +25,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { create } from 'zustand'
 import Portal from './Portal'
 import { scheduleOnRN } from 'react-native-worklets'
+import { useFocusEffect } from 'expo-router'
 
 export type Placement = 'top' | 'bottom' | 'left' | 'right' | 'auto'
 
@@ -126,6 +128,7 @@ const ContextMenu = ({
     const animatedMenuValues = useSharedValue(defaultAnimatedMenuValues)
     const getMenuPosition = useMenuPosition()
 
+    const isOpen = openMenuId === idRef.current
     const animatedMenuStyle = useAnimatedStyle(() => {
         return animatedMenuValues.value
     })
@@ -154,6 +157,20 @@ const ContextMenu = ({
         runAnimation.current = true
         onLayout()
     }
+
+    useFocusEffect(
+        useCallback(() => {
+            const backAction = () => {
+                if (isOpen) {
+                    handleCloseMenu()
+                    return true
+                }
+                return false
+            }
+            const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
+            return () => handler.remove()
+        }, [isOpen])
+    )
 
     const onLayout = () => {
         if (!runAnimation.current || !anchor) return
@@ -214,10 +231,11 @@ const ContextMenu = ({
         }
     }
 
-    const isOpen = openMenuId === idRef.current
     return (
         <>
             <Pressable
+                //@TODO: Better 'isOpen' styling for anchor
+                style={{ opacity: isOpen ? 0.5 : 1 }}
                 ref={triggerRef}
                 onPressIn={handleOpen}
                 key={idRef.current}
@@ -446,8 +464,8 @@ const useMenuPosition = () => {
         }
 
         // Clamp vertically
-        if (top < 0) {
-            top = 0
+        if (top < insets.top) {
+            top = insets.top
             overshot = true
         } else if (top + actualHeight > screenHeight) {
             top = screenHeight - actualHeight - positionOffset
