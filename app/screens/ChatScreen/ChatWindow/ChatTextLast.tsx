@@ -47,7 +47,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
                 if (targetHeight.current > -1) animHeight.setValue(targetHeight.current)
                 handleAnimateHeight(
                     newHeight,
-                    Math.max(1, Math.abs(newHeight - targetHeight.current) / 150)
+                    Math.max(1, Math.abs(newHeight - targetHeight.current) / 200)
                 )
                 targetHeight.current = newHeight
             })
