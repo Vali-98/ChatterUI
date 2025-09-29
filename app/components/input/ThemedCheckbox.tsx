@@ -79,6 +79,7 @@ const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
                 <Text
                     style={{
                         paddingLeft: 12,
+                        flex: 1,
                         color: value ? theme.color.text._100 : theme.color.text._400,
                     }}>
                     {label}

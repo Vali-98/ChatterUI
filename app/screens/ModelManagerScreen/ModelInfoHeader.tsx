@@ -32,15 +32,12 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
     return (
         <View style={styles.modelContainer}>
             {!modelImporting && !modelLoading && modelListLength !== 0 && (
-                <View
-                    style={{
-                        flexDirection: 'row',
-                    }}>
-                    <Text style={styles.subtitle}>Model Loaded: </Text>
+                <Text style={styles.subtitle}>
+                    Model Loaded:{' '}
                     <Text style={styles.modelTitle} ellipsizeMode="tail" numberOfLines={1}>
                         {modelName ?? 'None'}
                     </Text>
-                </View>
+                </Text>
             )}
             {!modelImporting && !modelLoading && modelListLength === 0 && modelUpdatedAt && (
                 <View>

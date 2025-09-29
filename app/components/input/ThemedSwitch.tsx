@@ -33,6 +33,7 @@ const ThemedSwitch: React.FC<ThemedSwitchProps> = ({
                 {label && (
                     <Text
                         style={{
+                            flex: 1,
                             marginLeft: spacing.xl,
                             color: value ? color.text._100 : color.text._300,
                         }}>
