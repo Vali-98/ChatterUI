@@ -90,6 +90,7 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@types/base-64": "^1.0.2",
+    "@types/lodash.merge": "^4.6.9",
     "@types/mime": "^3.0.4",
     "@types/react": "~19.0.10",
     "babel-plugin-transform-remove-console": "^6.9.4",

@@ -22,6 +22,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 import ContextLimitPreview from './ContextLimitPreview'
+import HorizontalSelector from '@components/input/HorizontalSelector'
 
 const SamplerManagerScreen = () => {
     const styles = useStyles()
@@ -250,6 +251,29 @@ const SamplerManagerScreen = () => {
                                         label={samplerItem.friendlyName}
                                     />
                                 )
+                            case 'selector':
+                                return (
+                                    <HorizontalSelector
+                                        key={item.samplerID}
+                                        label={samplerItem.friendlyName}
+                                        values={samplerItem.values.values.map((item) => ({
+                                            label: item.charAt(0).toUpperCase() + item.slice(1),
+                                            value: item,
+                                        }))}
+                                        selected={currentConfig.data[item.samplerID]}
+                                        onPress={(text) => {
+                                            updateCurrentConfig({
+                                                ...currentConfig,
+                                                data: {
+                                                    ...currentConfig.data,
+                                                    [item.samplerID]: text,
+                                                },
+                                            })
+                                        }}
+                                    />
+                                )
+
+                                break
                             //case 'custom':
                             default:
                                 return (

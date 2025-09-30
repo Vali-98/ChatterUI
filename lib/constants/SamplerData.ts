@@ -23,8 +23,6 @@ export enum SamplerID {
     PRESENCE_PENALTY = 'presence_pen',
     DO_SAMPLE = 'do_sample',
     EARLY_STOPPING = 'early_stopping',
-    USE_REASONING = 'use_reasoning',
-    INCLUDE_REASONING = 'include_reasoning',
     ADD_BOS_TOKEN = 'add_bos_token',
     BAN_EOS_TOKEN = 'ban_eos_token',
     SKIP_SPECIAL_TOKENS = 'skip_special_tokens',
@@ -48,15 +46,29 @@ export enum SamplerID {
     XTC_THRESHOLD = 'xtc_threshold',
     XTC_PROBABILITY = 'xtc_probability',
     KEEP_ALIVE_DURATION = 'keep_alive_duration',
+
+    // Reasoning API
+    // This is mostly for OpenRouter compatibility:
+    // https://openrouter.ai/docs/api-reference/chat-completion
+
+    REASONING_EFFORT = 'reasoning_effort',
+    REASONING_MAX_TOKENS = 'reasoning_max_tokens',
+    REASONING_EXCLUDE = 'include_reasoning',
 }
 
-type InputType = 'slider' | 'textinput' | 'checkbox' | 'custom' | 'split'
+type InputType = 'slider' | 'textinput' | 'checkbox' | 'custom' | 'split' | 'selector'
 
 type SamplerStringItem = { type: 'string'; default: string }
 
 type SamplerObjectItem = { type: 'object'; default: object }
 
 type SamplerBooleanItem = { type: 'boolean'; default: boolean }
+
+type SamplerStringSelector<T extends readonly string[]> = {
+    type: 'selector_string'
+    values: T
+    default: T[number]
+}
 
 type SamplerNumberItem = {
     type: 'integer' | 'float'
@@ -79,6 +91,7 @@ type SamplerItemValues =
     | SamplerNumberItem
     | SamplerObjectItem
     | SamplerStringArray
+    | SamplerStringSelector<readonly string[]>
 
 export type SamplerItem = {
     internalID: SamplerID
@@ -469,11 +482,11 @@ export const Samplers = {
             precision: 2,
         },
     },
-    [SamplerID.INCLUDE_REASONING]: {
-        internalID: SamplerID.INCLUDE_REASONING,
-        friendlyName: 'Include Reasoning',
+    [SamplerID.REASONING_EXCLUDE]: {
+        internalID: SamplerID.REASONING_EXCLUDE,
+        friendlyName: 'Exclude Reasoning',
         inputType: 'checkbox',
-        macro: '{{include_reasoning}}',
+        macro: '{{exclude_reasoning}}',
         values: {
             type: 'boolean',
             default: false,
@@ -720,14 +733,30 @@ export const Samplers = {
             precision: 1,
         },
     },
-    [SamplerID.USE_REASONING]: {
-        internalID: SamplerID.USE_REASONING,
-        friendlyName: 'Use Reasoning',
-        inputType: 'checkbox',
-        macro: '{{use_reasoning}}',
+    [SamplerID.REASONING_EFFORT]: {
+        internalID: SamplerID.REASONING_EFFORT,
+        friendlyName: 'Reasoning Effort',
+        inputType: 'selector',
+        macro: '{{reasoning_effort}}',
         values: {
-            type: 'boolean',
-            default: true,
+            type: 'selector_string',
+            default: '',
+            values: ['high', 'medium', 'low'],
+        },
+    },
+
+    [SamplerID.REASONING_MAX_TOKENS]: {
+        internalID: SamplerID.REASONING_MAX_TOKENS,
+        friendlyName: 'Reasoning Tokens',
+        inputType: 'slider',
+        macro: '{{reasoning_tokens}}',
+        values: {
+            type: 'integer',
+            min: 0,
+            max: 16000,
+            default: 0,
+            step: 1,
+            precision: 0,
         },
     },
 } as const

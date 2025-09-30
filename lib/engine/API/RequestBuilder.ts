@@ -5,6 +5,8 @@ import { SamplersManager } from '@lib/state/SamplerState'
 import { APIConfiguration, APISampler, APIValues } from './APIBuilder.types'
 import { Message } from './ContextBuilder'
 
+import merge from 'lodash.merge'
+
 export interface RequestBuilderParams {
     apiConfig: APIConfiguration
     apiValues: APIValues
@@ -270,7 +272,7 @@ const getSamplerFields = (
         max_length = getModelContextLength(config, values)
     }
 
-    return [...config.request.samplerFields]
+    return config.request.samplerFields
         .map((item: APISampler) => {
             const value = samplers[item.samplerID]
             const samplerItem = Samplers[item.samplerID]
@@ -283,7 +285,21 @@ const getSamplerFields = (
                 //@ts-expect-error. This is due to a migration
                 cleanvalue = (value as string).split(',')
             }
-            return { [item.externalName as SamplerID]: cleanvalue }
+
+            if (reasoning.includes(item.samplerID) && !cleanvalue) {
+                return {}
+            }
+
+            if (reasoning.includes(item.samplerID)) {
+                return { reasoning: { [item.externalName]: cleanvalue } }
+            }
+            return { [item.externalName]: cleanvalue }
         })
-        .reduce((acc, obj) => Object.assign(acc, obj), {})
+        .reduce((acc, obj) => merge(acc, obj), {})
 }
+
+const reasoning = [
+    SamplerID.REASONING_EFFORT,
+    SamplerID.REASONING_EXCLUDE,
+    SamplerID.REASONING_MAX_TOKENS,
+]

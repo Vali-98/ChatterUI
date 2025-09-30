@@ -450,13 +450,15 @@ export const defaultTemplates: APIConfiguration[] = [
             samplerFields: [
                 { externalName: 'max_context_length', samplerID: SamplerID.CONTEXT_LENGTH },
                 { externalName: 'max_tokens', samplerID: SamplerID.GENERATED_LENGTH },
-                { externalName: 'include_reasoning', samplerID: SamplerID.INCLUDE_REASONING },
                 { externalName: 'stream', samplerID: SamplerID.STREAMING },
                 { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
                 { externalName: 'presence_penalty', samplerID: SamplerID.PRESENCE_PENALTY },
                 { externalName: 'frequency_penalty', samplerID: SamplerID.FREQUENCY_PENALTY },
                 { externalName: 'top_p', samplerID: SamplerID.TOP_P },
                 { externalName: 'top_k', samplerID: SamplerID.TOP_K },
+                { externalName: 'exclude', samplerID: SamplerID.REASONING_EXCLUDE },
+                { externalName: 'effort', samplerID: SamplerID.REASONING_EFFORT },
+                { externalName: 'max_tokens', samplerID: SamplerID.REASONING_MAX_TOKENS },
                 { externalName: 'seed', samplerID: SamplerID.SEED },
             ],
             completionType: {
