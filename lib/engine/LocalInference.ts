@@ -33,6 +33,7 @@ export const localSamplerData: APISampler[] = [
     { externalName: 'penalty_last_n', samplerID: SamplerID.REPETITION_PENALTY_RANGE },
     { externalName: 'penalty_repeat', samplerID: SamplerID.REPETITION_PENALTY },
     { externalName: 'penalty_present', samplerID: SamplerID.PRESENCE_PENALTY },
+    { externalName: 'enable_thinking', samplerID: SamplerID.ENABLE_THINKING },
     { externalName: 'penalty_freq', samplerID: SamplerID.FREQUENCY_PENALTY },
     { externalName: 'xtc_t', samplerID: SamplerID.XTC_THRESHOLD },
     { externalName: 'xtc_p', samplerID: SamplerID.XTC_PROBABILITY },
@@ -62,10 +63,11 @@ const getSamplerFields = (max_length?: number) => {
         })
         .reduce((acc, obj) => Object.assign(acc, obj), {})
 }
-// TODO: Use new builders
+
 const buildLocalPayload = async () => {
     const payloadFields = getSamplerFields()
     const rep_pen = payloadFields?.['penalty_repeat']
+    const reasoning = payloadFields?.['enable_thinking'] as boolean
     const localPreset: LlamaConfig = Llama.useLlamaPreferencesStore.getState().config
     let prompt: undefined | string = undefined
     let mediaPaths: string[] = []
@@ -100,6 +102,7 @@ const buildLocalPayload = async () => {
                     .getState()
                     .context?.getFormattedChat(messages, null, {
                         jinja: true,
+                        enable_thinking: reasoning,
                     })
                 if (typeof result === 'string') prompt = result
                 // Currently not used since we dont pass in { jinja: true }

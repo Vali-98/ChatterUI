@@ -53,7 +53,9 @@ export enum SamplerID {
 
     REASONING_EFFORT = 'reasoning_effort',
     REASONING_MAX_TOKENS = 'reasoning_max_tokens',
-    REASONING_EXCLUDE = 'include_reasoning',
+    REASONING_EXCLUDE = 'reasoning_exclude',
+
+    ENABLE_THINKING = 'enable_thinking',
 }
 
 type InputType = 'slider' | 'textinput' | 'checkbox' | 'custom' | 'split' | 'selector'
@@ -757,6 +759,16 @@ export const Samplers = {
             default: 0,
             step: 1,
             precision: 0,
+        },
+    },
+    [SamplerID.ENABLE_THINKING]: {
+        internalID: SamplerID.ENABLE_THINKING,
+        friendlyName: 'Enable Thinking',
+        inputType: 'checkbox',
+        macro: '{{enable_thinking}}',
+        values: {
+            type: 'boolean',
+            default: true,
         },
     },
 } as const
