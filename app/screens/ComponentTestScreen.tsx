@@ -1,5 +1,6 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
+import HorizontalSelector from '@components/input/HorizontalSelector'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedCheckbox from '@components/input/ThemedCheckbox'
@@ -30,6 +31,7 @@ const buttonVariants = ['primary', 'secondary', 'tertiary', 'critical', 'disable
 
 const ComponentTestScreen = () => {
     const [selected, setSelected] = useState<(typeof selectorData)[0]>(selectorData[0])
+    const [hSelected, setHSelected] = useState('medium')
     const [selectedM, setSelectedM] = useState<typeof selectorData>([])
     const [slider, setSlider] = useState(0)
     const [data, setData] = useState<string[]>([])
@@ -49,6 +51,19 @@ const ComponentTestScreen = () => {
                     <ThemedButton variant={item} key={item} label={`Button Variant: ${item}`} />
                 ))}
             </View>
+
+            <HorizontalSelector
+                label="Selector"
+                description="Example description for Selector"
+                values={['high', 'medium', 'low'].map((item) => ({
+                    label: item.charAt(0).toUpperCase() + item.slice(1),
+                    value: item,
+                }))}
+                selected={hSelected}
+                onPress={(s) => {
+                    setHSelected(s)
+                }}
+            />
 
             <ContextMenu
                 buttons={[
