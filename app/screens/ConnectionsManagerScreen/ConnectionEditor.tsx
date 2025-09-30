@@ -45,6 +45,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
 
     useEffect(() => {
         setValues(originalValues)
+        handleGetModelList()
     }, [originalValues])
 
     useEffect(() => {
