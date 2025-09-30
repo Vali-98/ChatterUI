@@ -92,19 +92,48 @@ export const buildAndSendRequest = async ({
 
         const replaceStrings = constructReplaceStrings(stopSequence)
 
+        const parseOutput = (
+            event: any,
+            pattern: string,
+            prefixThinkTag: boolean = false,
+            prefixExitThink: boolean = false
+        ) => {
+            try {
+                const data = getNestedValue(
+                    typeof event === 'string' ? JSON.parse(event) : event,
+                    pattern
+                )
+                const text = data.replaceAll(replaceStrings, '')
+                if (text && prefixExitThink) onData('</think>')
+                if (text && prefixThinkTag) onData('<think>')
+                if (text) onData(text)
+                return !!text?.trim()
+            } catch (e) {}
+            return false
+        }
+        let inReasoning = false
+        const isChatCompletions = apiConfig.request.completionType.type === 'chatCompletions'
+
         return sendFunc({
             endpoint: apiValues.endpoint,
             payload: payload,
             onEvent: (event) => {
-                try {
-                    const data = getNestedValue(
-                        typeof event === 'string' ? JSON.parse(event) : event,
-                        apiConfig.request.responseParsePattern
-                    )
-                    const text = data.replaceAll(replaceStrings, '')
-
-                    onData(text)
-                } catch (e) {}
+                if (
+                    parseOutput(event, apiConfig.request.responseParsePattern, false, inReasoning)
+                ) {
+                    inReasoning = false
+                    return
+                }
+                const reasonPattern = apiConfig.request.reasoningParsePattern
+                // do not prefix think tags on text completions
+                if (
+                    reasonPattern &&
+                    isChatCompletions &&
+                    parseOutput(event, reasonPattern, !inReasoning)
+                ) {
+                    inReasoning = true
+                    return
+                }
             },
             onEnd: onEnd,
             header: header,

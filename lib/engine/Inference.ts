@@ -113,6 +113,10 @@ async function chatInferenceStream() {
     }
     fields.stopGenerating = stop
     fields.onData = (text) => {
+        if (text === '<think>' || text === '</think>') {
+            const currentBuffer = Chats.useChatState.getState().buffer.data
+            if (currentBuffer.includes(text)) return
+        }
         Chats.useChatState.getState().insertBuffer(text)
         useTTSStore.getState().insertBuffer(text)
     }
@@ -137,7 +141,7 @@ const titleGeneratorStream = async (chatId: number) => {
         return
     }
     fields.samplers.genamt = 50
-    fields.samplers.include_reasoning = false
+    fields.samplers.reasoning_max_tokens = 0
     let output = ''
     fields.onData = (text) => {
         output += text

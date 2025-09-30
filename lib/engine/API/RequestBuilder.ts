@@ -289,7 +289,11 @@ const getSamplerFields = (
             if (item.samplerID === SamplerID.REASONING_EFFORT && cleanvalue === 'disabled') {
                 return {}
             }
-            if (reasoning.includes(item.samplerID) && !cleanvalue) {
+            if (
+                (item.samplerID === SamplerID.REASONING_EFFORT ||
+                    item.samplerID === SamplerID.REASONING_MAX_TOKENS) &&
+                !cleanvalue
+            ) {
                 return {}
             }
             if (reasoning.includes(item.samplerID)) {
