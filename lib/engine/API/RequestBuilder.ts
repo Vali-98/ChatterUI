@@ -286,10 +286,12 @@ const getSamplerFields = (
                 cleanvalue = (value as string).split(',')
             }
 
+            if (item.samplerID === SamplerID.REASONING_EFFORT && cleanvalue === 'disabled') {
+                return {}
+            }
             if (reasoning.includes(item.samplerID) && !cleanvalue) {
                 return {}
             }
-
             if (reasoning.includes(item.samplerID)) {
                 return { reasoning: { [item.externalName]: cleanvalue } }
             }

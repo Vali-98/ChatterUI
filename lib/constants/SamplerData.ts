@@ -741,7 +741,7 @@ export const Samplers = {
         values: {
             type: 'selector_string',
             default: '',
-            values: ['high', 'medium', 'low'],
+            values: ['disabled', 'low', 'medium', 'high'],
         },
     },
 
