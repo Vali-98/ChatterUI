@@ -31,6 +31,7 @@ const HorizontalSelector = <T,>({
 }: HorizontalSelectorProps<T>) => {
     const { color, spacing, fontSize } = Theme.useTheme()
     const viewRef = useRef<View>(null)
+    const initialRender = useRef(true)
     const animatedValues = useSharedValue({
         top: 0,
         left: 0,
@@ -51,9 +52,10 @@ const HorizontalSelector = <T,>({
                     width: width - 4,
                     height: height - 4,
                 },
-                { duration: 300, easing: Easing.out(Easing.ease) }
+                { duration: initialRender.current ? 0 : 300, easing: Easing.out(Easing.ease) }
             )
         })
+        initialRender.current = false
     }, [selected])
 
     return (
