@@ -114,9 +114,9 @@ const ChatInput = () => {
             }}
             style={{
                 position: 'absolute',
-                width: '100%',
-                bottom: 4 + insets.bottom,
-                marginVertical: spacing.m,
+                width: '98%',
+                alignSelf: 'center',
+                bottom: 4,
                 paddingVertical: spacing.sm,
                 paddingHorizontal: spacing.sm,
                 backgroundColor: color.neutral._100 + 'cc',

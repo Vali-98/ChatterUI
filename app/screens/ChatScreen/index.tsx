@@ -11,7 +11,8 @@ import ChatWindow from '@screens/ChatScreen/ChatWindow'
 import ChatsDrawer from '@screens/ChatScreen/ChatsDrawer'
 import { useEffect } from 'react'
 import { View } from 'react-native'
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
+import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 import ChatEditor from './ChatWindow/ChatEditor'
@@ -24,6 +25,14 @@ const ChatScreen = () => {
             charId: state.id,
         }))
     )
+
+    const { height, progress } = useReanimatedKeyboardAnimation()
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            paddingBottom: (-height.value - insets.bottom) * progress.value + insets.bottom,
+            flex: 1,
+        }
+    })
 
     const { chat, unloadChat, loadChat } = Chats.useChat()
 
@@ -48,6 +57,31 @@ const ChatScreen = () => {
             })
     }
 
+    const renderHeaderButtonRight = () => {
+        return (
+            !showSettings && (
+                <>
+                    {!showChats && (
+                        <ThemedButton
+                            buttonStyle={{
+                                marginRight: 16,
+                            }}
+                            iconName="plus"
+                            variant="tertiary"
+                            iconSize={24}
+                            onPress={handleCreateChat}
+                        />
+                    )}
+                    <Drawer.Button drawerID={Drawer.ID.CHATLIST} openIcon="message1" />
+                </>
+            )
+        )
+    }
+
+    const renderHeaderButtonLeft = () => {
+        return !showChats && <Drawer.Button drawerID={Drawer.ID.SETTINGS} />
+    }
+
     return (
         <Drawer.Gesture
             config={[
@@ -63,39 +97,20 @@ const ChatScreen = () => {
                 },
             ]}>
             <View style={{ flex: 1 }}>
-                <HeaderTitle />
-                <HeaderButton
-                    headerLeft={() => !showChats && <Drawer.Button drawerID={Drawer.ID.SETTINGS} />}
-                    headerRight={() =>
-                        !showSettings && (
-                            <>
-                                {!showChats && (
-                                    <ThemedButton
-                                        buttonStyle={{
-                                            marginRight: 16,
-                                        }}
-                                        iconName="plus"
-                                        variant="tertiary"
-                                        iconSize={24}
-                                        onPress={handleCreateChat}
-                                    />
-                                )}
-                                <Drawer.Button drawerID={Drawer.ID.CHATLIST} openIcon="message1" />
-                            </>
-                        )
-                    }
-                />
-                <KeyboardAvoidingView
-                    enabled={false}
-                    keyboardVerticalOffset={insets.bottom + 6}
-                    behavior="translate-with-padding"
-                    style={{ flex: 1, paddingBottom: insets.bottom }}>
-                    {chat && <ChatWindow />}
+                <Animated.View style={animatedStyle}>
+                    <HeaderTitle />
+                    <HeaderButton
+                        headerLeft={renderHeaderButtonLeft}
+                        headerRight={renderHeaderButtonRight}
+                    />
+                    <View style={{ flex: 1 }}>
+                        {chat && <ChatWindow />}
+                        <ChatInput />
+                        <AvatarViewer />
+                        <ChatEditor />
+                    </View>
+                </Animated.View>
 
-                    <ChatInput />
-                    <AvatarViewer />
-                    <ChatEditor />
-                </KeyboardAvoidingView>
                 {/**Drawer has to be outside of the KeyboardAvoidingView */}
                 <SettingsDrawer useInset />
                 <ChatsDrawer />

@@ -1,24 +1,24 @@
+import Drawer from '@components/views/Drawer'
+import HeaderTitle from '@components/views/HeaderTitle'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useDebounce } from '@lib/hooks/Debounce'
 import { useAppMode } from '@lib/state/AppMode'
 import { useBackgroundStore } from '@lib/state/BackgroundImage'
+import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { AppDirectory } from '@lib/utils/File'
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { ImageBackground } from 'expo-image'
 import { useEffect, useRef } from 'react'
 import { FlatList } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
-
-import Drawer from '@components/views/Drawer'
-import HeaderTitle from '@components/views/HeaderTitle'
-import { Characters } from '@lib/state/Characters'
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 import { useInputHeightStore } from '../ChatInput'
 import ChatFooter from './ChatFooter'
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
+import ChatHeaderGradient from './ChatHeaderGradient'
 
 type ListItem = {
     index: number
@@ -103,6 +103,7 @@ const ChatWindow = () => {
             {showModelname && appMode === 'local' && (
                 <HeaderTitle headerTitle={() => !showSettings && !showChat && <ChatModelName />} />
             )}
+
             <FlatList
                 CellRendererComponent={(props: any) => (
                     <Animated.View
@@ -151,11 +152,14 @@ const ChatWindow = () => {
                     }, 100)
                 }}
                 contentContainerStyle={{
-                    paddingTop: chatInputHeight + 16,
-                    rowGap: 16,
+                    paddingTop: chatInputHeight,
+                    paddingBottom: 32,
+                    rowGap: 8,
                 }}
                 ListFooterComponent={() => <ChatFooter />}
             />
+
+            <ChatHeaderGradient />
         </ImageBackground>
     )
 }

@@ -86,7 +86,8 @@
     "react-native-worklets": "^0.5.0",
     "upgrade": "^1.1.0",
     "zod": "^3.24.1",
-    "zustand": "^5.0.4"
+    "zustand": "^5.0.4",
+    "expo-linear-gradient": "~14.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
