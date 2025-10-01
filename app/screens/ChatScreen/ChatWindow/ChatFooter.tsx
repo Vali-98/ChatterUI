@@ -7,7 +7,7 @@ const ChatFooter = () => {
     const { color, fontSize } = Theme.useTheme()
 
     return (
-        <View>
+        <View style={{ paddingBottom: 8 }}>
             <Text
                 style={{
                     color: color.text._700,
