@@ -623,6 +623,25 @@ export namespace Chats {
                     return { ...item, sendDate: new Date(item.sendDate * 1000) }
                 })
             }
+
+            export const chatWithoutId = async (chatId: number, limit?: number) => {
+                return await database.query.chats.findFirst({
+                    where: eq(chats.id, chatId),
+                    columns: { id: false },
+                    with: {
+                        messages: {
+                            columns: { id: false },
+                            orderBy: chatEntries.order,
+                            with: {
+                                swipes: {
+                                    columns: { id: false },
+                                },
+                            },
+                            ...(limit && { limit: limit }),
+                        },
+                    },
+                })
+            }
         }
         export namespace mutate {
             export const createChat = async (charId: number) => {
@@ -780,50 +799,38 @@ export namespace Chats {
                 await database.delete(chatEntries).where(eq(chatEntries.id, entryId))
             }
 
-            export const cloneChat = async (chatId: number, limit?: number) => {
-                const result = await database.query.chats.findFirst({
-                    where: eq(chats.id, chatId),
-                    columns: { id: false },
-                    with: {
-                        messages: {
-                            columns: { id: false },
-                            orderBy: chatEntries.order,
-                            with: {
-                                swipes: {
-                                    columns: { id: false },
-                                },
-                            },
-                            ...(limit && { limit: limit }),
-                        },
-                    },
-                })
-                if (!result) return
-
-                result.last_modified = Date.now()
-
+            export const cloneChat = async (
+                chat: NonNullable<Awaited<ReturnType<typeof query.chatWithoutId>>>
+            ) => {
+                chat.last_modified = Date.now()
                 const [{ newChatId }, ..._] = await database
                     .insert(chats)
-                    .values(result)
+                    .values(chat)
                     .returning({ newChatId: chats.id })
 
-                result.messages.forEach((item) => {
+                chat.messages.forEach((item) => {
                     item.chat_id = newChatId
                 })
-
                 const newEntryIds = await database
                     .insert(chatEntries)
-                    .values(result.messages)
+                    .values(chat.messages)
                     .returning({ newEntryId: chatEntries.id })
 
-                result.messages.forEach((item, index) => {
+                chat.messages.forEach((item, index) => {
                     item.swipes.forEach((item2) => {
                         item2.entry_id = newEntryIds[index].newEntryId
                     })
                 })
-
-                const swipes = result.messages.map((item) => item.swipes).flat()
-
+                const swipes = chat.messages.map((item) => item.swipes).flat()
                 await database.insert(chatSwipes).values(swipes)
+            }
+
+            export const cloneChatFromId = async (chatId: number, limit?: number) => {
+                const result = await query.chatWithoutId(chatId, limit)
+                if (!result) return
+
+                result.last_modified = Date.now()
+                await cloneChat(result)
             }
 
             export const renameChat = async (chatId: number, name: string) => {

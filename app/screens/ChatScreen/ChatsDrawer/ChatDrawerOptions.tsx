@@ -69,7 +69,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
                 {
                     label: 'Clone Chat',
                     onPress: async () => {
-                        await Chats.db.mutate.cloneChat(item.id)
+                        await Chats.db.mutate.cloneChatFromId(item.id)
                         close()
                     },
                 },

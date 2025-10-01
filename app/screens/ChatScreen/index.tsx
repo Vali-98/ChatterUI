@@ -16,6 +16,9 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 import ChatEditor from './ChatWindow/ChatEditor'
+import { pickStringDocument } from '@lib/utils/File'
+import { ChatImportSchema } from '@lib/utils/ChatSchema'
+import { Logger } from '@lib/state/Logger'
 
 const ChatScreen = () => {
     const insets = useSafeAreaInsets()
@@ -25,6 +28,7 @@ const ChatScreen = () => {
             charId: state.id,
         }))
     )
+    const userId = Characters.useUserStore(useShallow((state) => state.id))
 
     const { height, progress } = useReanimatedKeyboardAnimation()
     const animatedStyle = useAnimatedStyle(() => {
@@ -57,11 +61,49 @@ const ChatScreen = () => {
             })
     }
 
+    const handleImportChat = async () => {
+        if (!charId || !userId) {
+            Logger.errorToast('You are somehow importing a chat without a character or user')
+            return
+        }
+        const file = await pickStringDocument({ multiple: false, type: 'application/json' })
+        if (!file.success) return
+        const result = ChatImportSchema.safeParse(JSON.parse(file.data))
+        if (!result.success) {
+            Logger.errorToast('Failed to Import')
+            Logger.error('Incorrect format')
+            return
+        }
+        const chat = result.data
+        chat.character_id = charId
+        chat.scroll_offset = 0
+        delete chat.id
+        chat.messages = chat.messages.map((message) => {
+            delete message.id
+            message.swipes = message.swipes.map((swipe) => {
+                delete swipe.id
+                return swipe
+            })
+            message.attachments = []
+            return message
+        })
+
+        if (chat.user_id) {
+            const userExists = await Characters.db.query.card(chat.user_id)
+            if (!userExists) {
+                chat.user_id = null
+            }
+        }
+
+        chat.last_modified = Date.now()
+        Chats.db.mutate.cloneChat(chat)
+    }
+
     const renderHeaderButtonRight = () => {
         return (
             !showSettings && (
                 <>
-                    {!showChats && (
+                    {!showChats ? (
                         <ThemedButton
                             buttonStyle={{
                                 marginRight: 16,
@@ -70,6 +112,16 @@ const ChatScreen = () => {
                             variant="tertiary"
                             iconSize={24}
                             onPress={handleCreateChat}
+                        />
+                    ) : (
+                        <ThemedButton
+                            buttonStyle={{
+                                marginRight: 16,
+                            }}
+                            iconName="download"
+                            variant="tertiary"
+                            iconSize={20}
+                            onPress={handleImportChat}
                         />
                     )}
                     <Drawer.Button drawerID={Drawer.ID.CHATLIST} openIcon="message1" />
