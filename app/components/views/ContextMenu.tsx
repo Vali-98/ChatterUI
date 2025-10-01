@@ -329,10 +329,11 @@ const ContextMenuWindow: React.FC<ContextMenuWindowProps> = ({
             <View ref={viewRef} style={{ rowGap: 4 }}>
                 {buttons
                     .filter((item) => !item.disabled)
-                    .map((item) => {
+                    .map((item, index) => {
                         return (
                             <ContextMenuButton
                                 {...item}
+                                key={index.toString()}
                                 reposition={reposition}
                                 handleCloseMenu={handleCloseMenu}
                                 expandedSubmenus={expandedSubmenus}
