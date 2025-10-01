@@ -79,9 +79,19 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
 
     const handleExportChat = async (close: () => void) => {
         const name = `Chatlogs-${charName}-${item.id}.json`.replaceAll(' ', '_')
-        await saveStringToDownload(JSON.stringify(await Chats.db.query.chat(item.id)), name, 'utf8')
+        const chat = await Chats.db.query.chat(item.id)
+        if (chat) {
+            try {
+                await saveStringToDownload(JSON.stringify(chat), name, 'utf8')
+                Logger.infoToast(`File: ${name} saved to downloads!`)
+            } catch (e) {
+                Logger.errorToast('Failed to export chat')
+                Logger.error(`${e}`)
+            }
+        } else {
+            Logger.errorToast('Chat is undefined')
+        }
         close()
-        Logger.infoToast(`File: ${name} saved to downloads!`)
     }
 
     const handleLinkUser = async (close: () => void) => {
