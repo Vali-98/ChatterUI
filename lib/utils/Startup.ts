@@ -19,6 +19,8 @@ import { router } from 'expo-router'
 import { setBackgroundColorAsync as setUIBackgroundColor } from 'expo-system-ui'
 import { z } from 'zod'
 
+import { useChatInputTextStore } from '@screens/ChatScreen/ChatInput'
+import { setTextIntentEnabled, useTextIntentOnForeground } from '@vali98/react-native-process-text'
 import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
 import { Characters } from '../state/Characters'
@@ -30,13 +32,28 @@ import { AppDirectory } from './File'
 import { patchAndroidText } from './PatchText'
 import { lockScreenOrientation } from './Screen'
 
-export const loadChatOnInit = async () => {
-    if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return
+const loadNewestChat = async () => {
+    Logger.info('Loading latest chat')
     const newestChat = await Chats.db.query.chatNewest()
     if (!newestChat) return
     await Characters.useCharacterStore.getState().setCard(newestChat.character_id)
     await Chats.useChatState.getState().load(newestChat.id)
+}
+
+export const loadChatOnInit = async () => {
+    if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return
+    await loadNewestChat()
     router.push('/screens/ChatScreen')
+}
+
+export const useTextIntentFocus = () => {
+    return useTextIntentOnForeground(async (text) => {
+        if (!text) return
+        useChatInputTextStore.getState().setText(text)
+        if (router.canDismiss()) router.dismissAll()
+        router.push('/screens/ChatScreen')
+        await loadNewestChat()
+    }, [])
 }
 
 const setAppDefaultSettings = () => {
@@ -169,6 +186,13 @@ const migrateAppMode_0_8_5_to_0_8_6 = () => {
     Logger.warn('Migrated appmode from 0.8.5 to 0.8.6')
 }
 
+const migrateTextIntent_0_8_8_to_0_8_9 = () => {
+    if (!mmkv.getBoolean(Global.InstallTextIntentDisable)) {
+        mmkv.set(Global.InstallTextIntentDisable, true)
+        setTextIntentEnabled(false)
+    }
+}
+
 const createDefaultUserData = async () => {
     const id = await Characters.db.mutate.createCard('User', 'user')
     Characters.useUserStore.getState().setCard(id)
@@ -250,7 +274,7 @@ export const startupApp = () => {
     migratePresets_0_8_3_to_0_8_4()
     migrateTTSData_0_8_5_to_0_8_6()
     migrateAppMode_0_8_5_to_0_8_6()
-
+    migrateTextIntent_0_8_8_to_0_8_9()
     lockScreenOrientation()
 
     const backgroundColor = Theme.useColorState.getState().color.neutral._100

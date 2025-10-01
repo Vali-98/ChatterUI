@@ -4,15 +4,15 @@ import { AntDesign } from '@expo/vector-icons'
 import useLocalAuth from '@lib/hooks/LocalAuth'
 import { useNotificationObserver } from '@lib/notifications/Notifications'
 import { Theme } from '@lib/theme/ThemeManager'
-import { loadChatOnInit, startupApp } from '@lib/utils/Startup'
+import { loadChatOnInit, startupApp, useTextIntentFocus } from '@lib/utils/Startup'
 import CharacterList from '@screens/CharacterListScreen'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { SplashScreen } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-import migrations from '../db/migrations/migrations'
 import ThemedButton from '@components/buttons/ThemedButton'
+import migrations from '../db/migrations/migrations'
 
 const Home = () => {
     const { color } = Theme.useTheme()
@@ -23,6 +23,7 @@ const Home = () => {
     const [firstRender, setFirstRender] = useState<boolean>(true)
 
     useNotificationObserver()
+    useTextIntentFocus()
 
     useEffect(() => {
         if (authorized && success) {

@@ -6,6 +6,7 @@ import { View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import CharacterSettings from './CharacterSettings'
 import ChatSettings from './ChatSettings'
+import ChatWindowSettings from './ChatWindowSettings'
 import DatabaseSettings from './DatabaseSettings'
 import GeneratingSettings from './GeneratingSettings'
 import NotificationSettings from './NotificationSettings'
@@ -28,6 +29,7 @@ const AppSettingsMenu = () => {
 
             <StyleSettings />
             <ChatSettings />
+            <ChatWindowSettings />
             <CharacterSettings />
             <GeneratingSettings />
             <NotificationSettings />

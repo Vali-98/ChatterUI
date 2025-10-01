@@ -90,6 +90,7 @@ module.exports = {
                     },
                 },
             ],
+            ['@vali98/react-native-process-text', { label: 'Ask In ChatterUi' }],
             'expo-localization',
             'expo-router',
             'expo-sqlite',

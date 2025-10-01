@@ -108,6 +108,7 @@ export const enum Global {
 
     CpuFeatures = 'cpufeatures',
     CPUThreads = 'constants-cpu-threads',
+    InstallTextIntentDisable = 'install-text-intent-disable',
 }
 
 export enum AppSettings {

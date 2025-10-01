@@ -44,6 +44,16 @@ export const useInputHeightStore = create<ChatInputHeightStoreProps>()((set) => 
     setHeight: (n) => set({ height: Math.ceil(n) }),
 }))
 
+type ChatInputTextStoreProps = {
+    text: string
+    setText: (text: string) => void
+}
+
+export const useChatInputTextStore = create<ChatInputTextStoreProps>()((set) => ({
+    text: '',
+    setText: (text) => set({ text }),
+}))
+
 const ChatInput = () => {
     const insets = useSafeAreaInsets()
     const inputRef = useUnfocusTextInput()
@@ -71,7 +81,12 @@ const ChatInput = () => {
         useShallow((state) => ({ userName: state.card?.name }))
     )
 
-    const [newMessage, setNewMessage] = useState<string>('')
+    const { newMessage, setNewMessage } = useChatInputTextStore(
+        useShallow((state) => ({
+            newMessage: state.text,
+            setNewMessage: state.setText,
+        }))
+    )
 
     const abortResponse = async () => {
         Logger.info(`Aborting Generation`)
