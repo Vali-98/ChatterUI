@@ -268,6 +268,10 @@ export const startupApp = () => {
     // Local Model Data in case external models are deleted
     Model.verifyModelList()
     Tokenizer.useTokenizerState.getState().loadModel()
+
+    // Fix any missing samplers
+    SamplersManager.useSamplerStore.getState().fixConfigs()
+
     // migrations for old versions
     migrateModelData_0_7_10_to_0_8_0()
     migrateModelData_0_8_4_to_0_8_5()
