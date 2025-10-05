@@ -742,7 +742,7 @@ export const Samplers = {
         macro: '{{reasoning_effort}}',
         values: {
             type: 'selector_string',
-            default: '',
+            default: 'disabled',
             values: ['disabled', 'low', 'medium', 'high'],
         },
     },
@@ -778,13 +778,16 @@ const dummy = () => {
     defineSamplers(Samplers)
 }
 
-type ValueType<V extends SamplerItemValues> = V extends SamplerStringItem
-    ? string
-    : V extends SamplerObjectItem
-      ? object
-      : V extends SamplerNumberItem
-        ? number
-        : boolean
+type ValueType<V extends SamplerItemValues> =
+    V extends SamplerStringSelector<infer T>
+        ? T[number]
+        : V extends SamplerStringItem
+          ? string
+          : V extends SamplerObjectItem
+            ? object
+            : V extends SamplerNumberItem
+              ? number
+              : boolean
 
 type SamplerValueMap = {
     [ID in keyof typeof Samplers]: ValueType<(typeof Samplers)[ID]['values']>
