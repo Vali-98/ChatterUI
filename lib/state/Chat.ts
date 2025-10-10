@@ -823,6 +823,7 @@ export namespace Chats {
                 })
                 const swipes = chat.messages.map((item) => item.swipes).flat()
                 await database.insert(chatSwipes).values(swipes)
+                return newChatId
             }
 
             export const cloneChatFromId = async (chatId: number, limit?: number) => {
@@ -830,7 +831,8 @@ export namespace Chats {
                 if (!result) return
 
                 result.last_modified = Date.now()
-                await cloneChat(result)
+                const newChatid = await cloneChat(result)
+                return newChatid
             }
 
             export const renameChat = async (chatId: number, name: string) => {

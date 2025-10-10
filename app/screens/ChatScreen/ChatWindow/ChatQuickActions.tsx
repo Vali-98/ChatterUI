@@ -15,6 +15,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { useChatEditorStore } from './ChatEditor'
 import ChatTTS from './ChatTTS'
+import Alert from '@components/views/Alert'
 
 interface OptionsStateProps {
     activeIndex?: number
@@ -47,6 +48,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isL
     const { color } = Theme.useTheme()
     const [quickDelete, __] = useMMKVBoolean(AppSettings.QuickDelete)
     const { deleteEntry } = Chats.useEntry()
+    const { chatId, loadChat } = Chats.useChat()
     const { swipe } = Chats.useSwipeData(index)
     const { activeChatIndex } = useTTS()
     const showOptions = activeIndex === index
@@ -54,6 +56,29 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isL
     const handleEnableEdit = () => {
         if (showOptions) setShowOptions(undefined)
         if (!nowGenerating) showEditor(index)
+    }
+
+    const handleFork = () => {
+        if (!chatId) return
+        Alert.alert({
+            title: 'Fork Chat',
+            description: 'This will create a clone of this chat from this message',
+            buttons: [
+                { label: 'Cancel' },
+                {
+                    label: 'Fork Chat',
+                    onPress: async () => {
+                        const newChatId = await Chats.db.mutate.cloneChatFromId(chatId, index + 1)
+                        if (!newChatId) {
+                            Logger.errorToast('Failed to clone chat')
+                            return
+                        }
+                        setShowOptions(undefined)
+                        loadChat(newChatId)
+                    },
+                },
+            ],
+        })
     }
 
     useFocusEffect(
@@ -136,6 +161,21 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isL
                                 />
                             </Animated.View>
                         )}
+
+                        <Animated.View
+                            entering={ZoomIn.duration(200)}
+                            exiting={ZoomOut.duration(200)}>
+                            <ThemedButton
+                                variant="tertiary"
+                                iconName="fork"
+                                iconSize={22}
+                                iconStyle={{
+                                    color: color.text._500,
+                                }}
+                                onPress={handleFork}
+                            />
+                        </Animated.View>
+
                         <Animated.View
                             entering={ZoomIn.duration(200)}
                             exiting={ZoomOut.duration(200)}>
