@@ -803,26 +803,30 @@ export namespace Chats {
                 chat: NonNullable<Awaited<ReturnType<typeof query.chatWithoutId>>>
             ) => {
                 chat.last_modified = Date.now()
-                const [{ newChatId }, ..._] = await database
-                    .insert(chats)
-                    .values(chat)
-                    .returning({ newChatId: chats.id })
 
-                chat.messages.forEach((item) => {
-                    item.chat_id = newChatId
-                })
-                const newEntryIds = await database
-                    .insert(chatEntries)
-                    .values(chat.messages)
-                    .returning({ newEntryId: chatEntries.id })
+                const newChatId = await database.transaction(async (tx) => {
+                    const [{ newChatId }, ..._] = await tx
+                        .insert(chats)
+                        .values(chat)
+                        .returning({ newChatId: chats.id })
 
-                chat.messages.forEach((item, index) => {
-                    item.swipes.forEach((item2) => {
-                        item2.entry_id = newEntryIds[index].newEntryId
+                    chat.messages.forEach((item) => {
+                        item.chat_id = newChatId
                     })
+                    const newEntryIds = await tx
+                        .insert(chatEntries)
+                        .values(chat.messages)
+                        .returning({ newEntryId: chatEntries.id })
+
+                    chat.messages.forEach((message, index) => {
+                        message.swipes.forEach((swipe) => {
+                            swipe.entry_id = newEntryIds[index].newEntryId
+                        })
+                    })
+                    const swipes = chat.messages.map((item) => item.swipes).flat()
+                    await tx.insert(chatSwipes).values(swipes)
+                    return newChatId
                 })
-                const swipes = chat.messages.map((item) => item.swipes).flat()
-                await database.insert(chatSwipes).values(swipes)
                 return newChatId
             }
 
