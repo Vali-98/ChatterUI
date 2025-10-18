@@ -9,6 +9,7 @@ import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Accordion from '@components/views/Accordion'
 import ContextMenu from '@components/views/ContextMenu'
+import InputSheet from '@components/views/InputSheet'
 import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
 import React, { useState } from 'react'
@@ -39,6 +40,7 @@ const ComponentTestScreen = () => {
     const [checkbox, setCheckbox] = useState(true)
     const [sw, setSw] = useState(true)
     const { color } = Theme.useTheme()
+    const [showInputSheet, setShowInputSheet] = useState(false)
 
     return (
         <KeyboardAwareScrollView
@@ -62,6 +64,18 @@ const ComponentTestScreen = () => {
                 selected={hSelected}
                 onPress={(s) => {
                     setHSelected(s)
+                }}
+            />
+
+            <ThemedButton onPress={() => setShowInputSheet(true)} label="Show Sheet" />
+
+            <InputSheet
+                title="Test Input"
+                description="Example description"
+                visible={showInputSheet}
+                setVisible={setShowInputSheet}
+                onConfirm={(text) => {
+                    console.log(text)
                 }}
             />
 

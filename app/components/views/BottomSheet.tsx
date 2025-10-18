@@ -1,6 +1,8 @@
 import { Theme } from '@lib/theme/ThemeManager'
 import React, { ReactNode } from 'react'
-import { KeyboardAvoidingView, Modal, View, ViewStyle } from 'react-native'
+import { Modal, View, ViewStyle } from 'react-native'
+import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import FadeBackrop from './FadeBackdrop'
 
@@ -21,6 +23,14 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
 }) => {
     const { color, spacing } = Theme.useTheme()
     const insets = useSafeAreaInsets()
+    const { height, progress } = useReanimatedKeyboardAnimation()
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            paddingBottom: (-height.value - insets.bottom) * progress.value,
+            flex: 1,
+            alignItems: 'flex-end',
+        }
+    })
     return (
         <Modal
             transparent
@@ -30,22 +40,20 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                 setVisible(false)
                 onClose?.()
             }}
+            style={{ flex: 1 }}
             visible={visible}
             animationType="fade">
-            <KeyboardAvoidingView
-                behavior="height"
-                keyboardVerticalOffset={-insets.bottom}
-                style={{ flex: 1 }}>
+            <Animated.View style={[animatedStyle]}>
                 <FadeBackrop handleOverlayClick={() => setVisible(false)} />
                 <View style={{ flex: 1 }} />
-                <View
+                <Animated.View
                     style={[
                         {
                             paddingTop: spacing.xl2,
                             paddingBottom: insets.bottom + spacing.xl2,
                             paddingHorizontal: spacing.xl3,
-                            flexShrink: 1,
                             maxHeight: '70%',
+                            width: '100%',
                             borderTopLeftRadius: spacing.xl2,
                             borderTopRightRadius: spacing.xl2,
                             backgroundColor: color.neutral._100,
@@ -53,8 +61,8 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                         sheetStyle,
                     ]}>
                     {children}
-                </View>
-            </KeyboardAvoidingView>
+                </Animated.View>
+            </Animated.View>
         </Modal>
     )
 }
