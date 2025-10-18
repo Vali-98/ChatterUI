@@ -7,6 +7,7 @@ import { useDropdownStyles } from './MultiDropdownSheet'
 import FadeBackrop from '../views/FadeBackdrop'
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import BottomSheet from '@components/views/BottomSheet'
 
 type DropdownSheetProps<T> = {
     containerStyle?: ViewStyle
@@ -35,7 +36,6 @@ const DropdownSheet = <T,>({
     search = false,
     closeOnSelect = true,
 }: DropdownSheetProps<T>) => {
-    const insets = useSafeAreaInsets()
     const styles = useDropdownStyles()
     const [showList, setShowList] = useState(false)
     const [searchFilter, setSearchFilter] = useState('')
@@ -45,65 +45,47 @@ const DropdownSheet = <T,>({
     )
     return (
         <View style={containerStyle}>
-            <Modal
-                transparent
-                statusBarTranslucent
-                navigationBarTranslucent
-                onRequestClose={() => setShowList(false)}
+            <BottomSheet
                 visible={showList}
-                animationType="fade">
-                <KeyboardAvoidingView
-                    behavior="height"
-                    keyboardVerticalOffset={-insets.bottom}
-                    style={{ flex: 1 }}>
-                    <FadeBackrop
-                        handleOverlayClick={() => {
-                            setSearchFilter('')
-                            setShowList(false)
-                        }}
+                setVisible={setShowList}
+                onClose={() => {
+                    setSearchFilter('')
+                }}>
+                <Text style={styles.modalTitle}>{modalTitle}</Text>
+                {items.length > 0 ? (
+                    <FlatList
+                        contentContainerStyle={{ rowGap: 2 }}
+                        showsVerticalScrollIndicator={false}
+                        data={items}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item }) => (
+                            <Pressable
+                                style={
+                                    selected && labelExtractor(item) === labelExtractor(selected)
+                                        ? styles.listItemSelected
+                                        : styles.listItem
+                                }
+                                onPress={() => {
+                                    onChangeValue(item)
+                                    setShowList(!closeOnSelect)
+                                }}>
+                                <Text style={styles.listItemText}>{labelExtractor(item)}</Text>
+                            </Pressable>
+                        )}
                     />
-                    <View style={{ flex: 1 }} />
-                    <View style={styles.listContainer}>
-                        <Text style={styles.modalTitle}>{modalTitle}</Text>
-                        {items.length > 0 ? (
-                            <FlatList
-                                contentContainerStyle={{ rowGap: 2 }}
-                                showsVerticalScrollIndicator={false}
-                                data={items}
-                                keyExtractor={(item, index) => index.toString()}
-                                renderItem={({ item, index }) => (
-                                    <Pressable
-                                        style={
-                                            selected &&
-                                            labelExtractor(item) === labelExtractor(selected)
-                                                ? styles.listItemSelected
-                                                : styles.listItem
-                                        }
-                                        onPress={() => {
-                                            onChangeValue(item)
-                                            setShowList(!closeOnSelect)
-                                        }}>
-                                        <Text style={styles.listItemText}>
-                                            {labelExtractor(item)}
-                                        </Text>
-                                    </Pressable>
-                                )}
-                            />
-                        ) : (
-                            <Text style={styles.emptyText}>No Items</Text>
-                        )}
-                        {search && (
-                            <TextInput
-                                placeholder="Filter..."
-                                placeholderTextColor={theme.color.text._300}
-                                style={styles.searchBar}
-                                value={searchFilter}
-                                onChangeText={setSearchFilter}
-                            />
-                        )}
-                    </View>
-                </KeyboardAvoidingView>
-            </Modal>
+                ) : (
+                    <Text style={styles.emptyText}>No Items</Text>
+                )}
+                {search && (
+                    <TextInput
+                        placeholder="Filter..."
+                        placeholderTextColor={theme.color.text._300}
+                        style={styles.searchBar}
+                        value={searchFilter}
+                        onChangeText={setSearchFilter}
+                    />
+                )}
+            </BottomSheet>
             <Pressable style={[style, styles.button]} onPress={() => setShowList(true)}>
                 {selected && <Text style={styles.buttonText}>{labelExtractor(selected)}</Text>}
                 {!selected && <Text style={styles.placeholderText}>{placeholder}</Text>}
