@@ -21,6 +21,7 @@ import { z } from 'zod'
 
 import { useChatInputTextStore } from '@screens/ChatScreen/ChatInput'
 import { setTextIntentEnabled, useTextIntentOnForeground } from '@vali98/react-native-process-text'
+import * as KeepAwake from 'expo-keep-awake'
 import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
 import { Characters } from '../state/Characters'
@@ -212,6 +213,12 @@ const setDefaultUser = async () => {
     }
 }
 
+const setKeepAwake = async () => {
+    const keepAwake = mmkv.getBoolean(AppSettings.KeepAwake)
+    if (keepAwake) KeepAwake.activateKeepAwakeAsync()
+    else KeepAwake.deactivateKeepAwake()
+}
+
 const setDefaultInstruct = () => {
     Instructs.db.query.instructList().then(async (list) => {
         if (!list) {
@@ -260,6 +267,9 @@ export const startupApp = () => {
 
     // set cpu thread count
     setCPUThreads()
+
+    // set keep awake settings
+    setKeepAwake()
 
     // patch for Bold Text bug
     // refer to https://github.com/Vali-98/ChatterUI/issues/161

@@ -142,6 +142,7 @@ export enum AppSettings {
     AutoGenerateTitle = 'settings-auto-generate-title',
     WideChatMode = 'settings-wide-chat-mode',
     AlternatingChatMode = 'settings-alternative-chat-mode',
+    KeepAwake = 'settings-keep-awake',
 }
 
 /**
@@ -178,6 +179,7 @@ export const AppSettingsDefault: Record<AppSettings, boolean> = {
     [AppSettings.AutoGenerateTitle]: true,
     [AppSettings.WideChatMode]: false,
     [AppSettings.AlternatingChatMode]: false,
+    [AppSettings.KeepAwake]: true,
 }
 
 export const CLAUDE_VERSION = '2023-06-01'
