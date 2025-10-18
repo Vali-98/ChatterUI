@@ -33,7 +33,7 @@ const InputSheet: React.FC<InputSheetProps> = ({
     defaultValue = '',
     multiline = false,
 }) => {
-    const [text, setText] = useState('')
+    const [text, setText] = useState(defaultValue)
     const [errorMessage, setErrorMessage] = useState('')
     const { color, fontSize, spacing } = Theme.useTheme()
 
