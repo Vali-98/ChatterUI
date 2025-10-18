@@ -1,6 +1,6 @@
 import DropdownSheet from '@components/input/DropdownSheet'
 import Alert from '@components/views/Alert'
-import TextBoxModal from '@components/views/TextBoxModal'
+import InputSheet from '@components/views/InputSheet'
 import { AntDesign } from '@expo/vector-icons'
 import { GGMLNameMap } from '@lib/engine/Local'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
@@ -89,8 +89,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
 
     return (
         <View style={styles.modelContainer}>
-            <TextBoxModal
-                booleans={[showEdit, setShowEdit]}
+            <InputSheet
+                visible={showEdit}
+                setVisible={setShowEdit}
                 onConfirm={async (name) => {
                     await Model.updateName(name, item.id)
                 }}

@@ -3,7 +3,7 @@ import Alert from '@components/views/Alert'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import TextBoxModal from '@components/views/TextBoxModal'
+import InputSheet from '@components/views/InputSheet'
 import { Logger } from '@lib/state/Logger'
 import { DefaultColorSchemes, ThemeColor } from '@lib/theme/ThemeColor'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -180,8 +180,9 @@ const ColorSelector = () => {
                     />
                 )}
             />
-            <TextBoxModal
-                booleans={[showPaste, setShowPaste]}
+            <InputSheet
+                visible={showPaste}
+                setVisible={setShowPaste}
                 onConfirm={(e) => {
                     try {
                         const data = JSON.parse(e)
@@ -191,7 +192,6 @@ const ColorSelector = () => {
                     }
                 }}
                 multiline
-                showPaste
                 title="Paste Theme Here"
             />
             <FlatList

@@ -1,6 +1,6 @@
 import Alert from '@components/views/Alert'
 import ContextMenu from '@components/views/ContextMenu'
-import TextBoxModal from '@components/views/TextBoxModal'
+import InputSheet from '@components/views/InputSheet'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
@@ -112,12 +112,14 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item }) => {
 
     return (
         <View>
-            <TextBoxModal
-                booleans={[showRename, setShowRename]}
+            <InputSheet
+                title="Rename Chat"
+                visible={showRename}
+                setVisible={setShowRename}
                 onConfirm={async (text) => {
                     await Chats.db.mutate.renameChat(item.id, text)
                 }}
-                textCheck={(text) => text.length === 0}
+                verifyText={(text) => (text.length === 0 ? 'Name cannot be empty' : '')}
                 defaultValue={item.name}
             />
             <ContextMenu

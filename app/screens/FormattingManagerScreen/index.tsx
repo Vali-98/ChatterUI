@@ -9,7 +9,7 @@ import Alert from '@components/views/Alert'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import TextBoxModal from '@components/views/TextBoxModal'
+import InputSheet from '@components/views/InputSheet'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import useAutosave from '@lib/hooks/AutoSave'
 import { useTextFilterStore } from '@lib/hooks/TextFilter'
@@ -160,7 +160,7 @@ const FormattingManager = () => {
         />
     )
 
-    useAutosave({ data: currentInstruct, onSave: () => handleSaveInstruct(false), interval: 3000 })
+    useAutosave({ data: currentInstruct, onSave: () => handleSaveInstruct(false), interval: 1000 })
 
     if (currentInstruct)
         return (
@@ -174,8 +174,15 @@ const FormattingManager = () => {
                 <HeaderTitle title="Formatting" />
                 <HeaderButton headerRight={headerRight} />
                 <View>
-                    <TextBoxModal
-                        booleans={[showNewInstruct, setShowNewInstruct]}
+                    <InputSheet
+                        title="New Instruct Preset"
+                        visible={showNewInstruct}
+                        setVisible={setShowNewInstruct}
+                        verifyText={(text) =>
+                            instructList.some((item) => item.name === text)
+                                ? 'Config already exists'
+                                : ''
+                        }
                         onConfirm={(text) => {
                             if (instructList.some((item) => item.name === text)) {
                                 Logger.warnToast(`Config name already exists.`)
@@ -200,6 +207,7 @@ const FormattingManager = () => {
                         paddingBottom: spacing.l,
                         flexDirection: 'row',
                         alignItems: 'center',
+                        columnGap: spacing.m,
                     }}>
                     <DropdownSheet
                         containerStyle={{ flex: 1 }}

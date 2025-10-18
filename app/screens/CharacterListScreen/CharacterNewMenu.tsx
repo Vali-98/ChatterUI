@@ -1,5 +1,5 @@
 import ContextMenu from '@components/views/ContextMenu'
-import TextBoxModal from '@components/views/TextBoxModal'
+import InputSheet from '@components/views/InputSheet'
 import { Characters } from '@lib/state/Characters'
 import { Logger } from '@lib/state/Logger'
 import { useRouter } from 'expo-router'
@@ -38,11 +38,14 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
 
     return (
         <>
-            <TextBoxModal
-                booleans={[showNewChar, setShowNewChar]}
+            <InputSheet
+                visible={showNewChar}
+                setVisible={setShowNewChar}
                 title="Create New Character"
                 onConfirm={handleCreateCharacter}
+                verifyText={(text) => (text.length === 0 ? 'Name cannot be empty' : '')}
                 placeholder="Name..."
+                autoFocus
             />
 
             <ContextMenu

@@ -80,7 +80,6 @@ const InputSheet: React.FC<InputSheetProps> = ({
 
                 <View
                     style={{
-                        paddingTop: spacing.xl,
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                     }}>

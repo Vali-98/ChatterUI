@@ -1,5 +1,4 @@
 import ThemedButton from '@components/buttons/ThemedButton'
-import TextBoxModal from '@components/views/TextBoxModal'
 import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
 import { FlashList } from '@shopify/flash-list'
@@ -8,6 +7,7 @@ import React, { useState } from 'react'
 import { Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
+import InputSheet from '@components/views/InputSheet'
 import UserListing from './UserListing'
 
 const UserList = () => {
@@ -27,9 +27,11 @@ const UserList = () => {
 
     return (
         <View style={{ flex: 1 }}>
-            <TextBoxModal
+            <InputSheet
+                visible={showNewUser}
+                setVisible={setShowNewUser}
+                title="Create New user"
                 autoFocus
-                booleans={[showNewUser, setShowNewUser]}
                 onConfirm={async (text) => {
                     const id = await Characters.db.mutate.createCard(text, 'user')
                     await setCard(id)

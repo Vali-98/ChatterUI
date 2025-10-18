@@ -1,4 +1,5 @@
 import DropdownSheet from '@components/input/DropdownSheet'
+import HorizontalSelector from '@components/input/HorizontalSelector'
 import ThemedCheckbox from '@components/input/ThemedCheckbox'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedTextInput from '@components/input/ThemedTextInput'
@@ -6,7 +7,7 @@ import Alert from '@components/views/Alert'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import TextBoxModal from '@components/views/TextBoxModal'
+import InputSheet from '@components/views/InputSheet'
 import { SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { APIConfiguration, APISampler } from '@lib/engine/API/APIBuilder.types'
 import { APIManager as APIStateNew } from '@lib/engine/API/APIManagerState'
@@ -22,7 +23,6 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 import ContextLimitPreview from './ContextLimitPreview'
-import HorizontalSelector from '@components/input/HorizontalSelector'
 
 const SamplerManagerScreen = () => {
     const styles = useStyles()
@@ -144,8 +144,10 @@ const SamplerManagerScreen = () => {
 
     return (
         <SafeAreaView edges={['bottom']} style={{ flex: 1 }} key={currentConfig.name}>
-            <TextBoxModal
-                booleans={[showNewSampler, setShowNewSampler]}
+            <InputSheet
+                title="New Sampler Preset"
+                visible={showNewSampler}
+                setVisible={setShowNewSampler}
                 onConfirm={(text: string) => {
                     if (text === '') {
                         Logger.errorToast(`Sampler name cannot be empty`)

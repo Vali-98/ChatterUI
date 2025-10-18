@@ -8,7 +8,7 @@ import { useShallow } from 'zustand/react/shallow'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import TextBoxModal from '@components/views/TextBoxModal'
+import InputSheet from '@components/views/InputSheet'
 import { pickJSONDocument } from '@lib/utils/File'
 import { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -86,8 +86,9 @@ const TemplateManager = () => {
                     />
                 )}
             />
-            <TextBoxModal
-                booleans={[showPaste, setShowPaste]}
+            <InputSheet
+                visible={showPaste}
+                setVisible={setShowPaste}
                 onConfirm={(e) => {
                     try {
                         const data = JSON.parse(e)
@@ -97,8 +98,7 @@ const TemplateManager = () => {
                     }
                 }}
                 multiline
-                showPaste
-                title="Paste Theme Here"
+                title="Paste Template Here"
             />
             {templates.length > 0 && (
                 <FlatList
