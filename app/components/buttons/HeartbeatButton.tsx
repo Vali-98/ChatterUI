@@ -13,7 +13,6 @@ const enum ResponseStatus {
 
 type HeartbeatButtonProps = {
     api: string
-    buttonText?: string
     apiFormat?: (url: string) => string
     callback?: () => void
     messageNeutral?: string
@@ -24,7 +23,6 @@ type HeartbeatButtonProps = {
 
 const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
     api,
-    buttonText = 'Test',
     apiFormat = (url: string) => {
         try {
             const newurl = new URL('v1/models', api)
