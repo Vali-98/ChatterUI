@@ -69,7 +69,6 @@ const ChatWindow = () => {
     useEffect(() => {
         if (!scrollCause || !scrollIndex) return
         const isSave = scrollCause === 'saveScroll'
-        console.log('fire')
         if (!saveScroll && isSave) return
         const offset = Math.min(Math.max(0, scrollIndex + (isSave ? 1 : 0)), list.length - 1)
 
