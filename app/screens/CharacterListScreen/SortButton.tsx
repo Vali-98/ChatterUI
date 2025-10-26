@@ -36,7 +36,12 @@ const SortButton: React.FC<SortButtonProps> = ({ type, label }) => {
             {isCurrent && (
                 <AntDesign
                     size={14}
-                    name={searchOrder === 'asc' ? 'caretup' : 'caretdown'}
+                    name={
+                        (searchOrder === 'asc' && type === 'modified') ||
+                        (searchOrder === 'desc' && type === 'name')
+                            ? 'caretup'
+                            : 'caretdown'
+                    }
                     color={color.text._100}
                 />
             )}
