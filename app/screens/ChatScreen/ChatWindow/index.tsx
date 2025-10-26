@@ -70,7 +70,7 @@ const ChatWindow = () => {
         if (!scrollCause || !scrollIndex) return
         const isSave = scrollCause === 'saveScroll'
         if (!saveScroll && isSave) return
-        const offset = Math.min(Math.max(0, scrollIndex + (isSave ? 1 : 0)), list.length - 1)
+        const offset = Math.max(0, scrollIndex + (isSave ? 1 : 0))
 
         if (offset > 2)
             flatlistRef.current?.scrollToIndex({
@@ -78,7 +78,7 @@ const ChatWindow = () => {
                 animated: scrollCause === 'search',
                 viewOffset: 32,
             })
-    }, [scrollCause, scrollIndex, list.length, saveScroll])
+    }, [scrollCause, scrollIndex, saveScroll])
 
     const renderItems = ({ item }: { item: ListItem }) => {
         return (
