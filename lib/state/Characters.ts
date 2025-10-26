@@ -1,3 +1,4 @@
+import { extractPngTextChunk, replacePngTextChunk } from '@vali98/react-native-png-utils'
 import { and, asc, desc, eq, gte, inArray, like, notExists, notInArray, sql } from 'drizzle-orm'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Asset } from 'expo-asset'
@@ -25,7 +26,6 @@ import {
 
 import { Logger } from './Logger'
 import { createMMKVStorage } from '../storage/MMKV'
-import { createPNGWithText, getPngChunkText } from '../utils/PNG'
 
 export type CharInfo = {
     name: string
@@ -794,20 +794,25 @@ export namespace Characters {
     }
 
     export const createCharacterFromImage = async (uri: string) => {
-        const file = await FS.readAsStringAsync(uri, { encoding: FS.EncodingType.Base64 })
-        if (!file) {
-            Logger.errorToast(`Failed to create card - Image could not be retrieved`)
-            return
+        try {
+            const file = await FS.readAsStringAsync(uri, { encoding: FS.EncodingType.Base64 })
+            if (!file) {
+                Logger.errorToast(`Failed to create card - Image could not be retrieved`)
+                return
+            }
+
+            const card = JSON.parse(extractPngTextChunk(file))
+
+            if (card === undefined) {
+                Logger.errorToast('No character was found.')
+                return
+            }
+
+            await createCharacterFromV2JSON(card, uri)
+        } catch (e) {
+            Logger.errorToast('Failed to create character')
+            Logger.error(`${e}`)
         }
-
-        const card = getPngChunkText(file)
-
-        if (card === undefined) {
-            Logger.errorToast('No character was found.')
-            return
-        }
-
-        await createCharacterFromV2JSON(card, uri)
     }
 
     const createCharacterFromV1JSON = async (data: any, uri: string | undefined = undefined) => {
@@ -873,7 +878,8 @@ export namespace Characters {
             Logger.error('Could not get file data for export: ' + JSON.stringify(e))
         })
         if (!fileData) return
-        const exportData = createPNGWithText(cardString, fileData)
+        const exportData = replacePngTextChunk(fileData, cardString)
+
         await saveStringToDownload(exportData, exportedFileName, 'base64')
     }
 
