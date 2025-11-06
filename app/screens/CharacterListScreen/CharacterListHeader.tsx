@@ -115,7 +115,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                     />
                     <ThemedButton
                         variant="tertiary"
-                        iconName={showSearch ? 'close' : 'search1'}
+                        iconName={showSearch ? 'close' : 'search'}
                         onPress={() => {
                             setShowSearch(!showSearch)
                         }}

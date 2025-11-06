@@ -1,5 +1,6 @@
+import { MaterialIcons } from '@expo/vector-icons'
 import { useEffect, useRef } from 'react'
-import { View, Text, ViewStyle, Pressable } from 'react-native'
+import { Pressable, Text, View, ViewStyle } from 'react-native'
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -13,6 +14,8 @@ type HorizontalSelectorProps<T> = {
     values: {
         label: string
         value: T
+        icon?: keyof typeof MaterialIcons.glyphMap
+        iconSize?: number
     }[]
     selected: T
     onPress: (selected: T) => void
@@ -64,7 +67,7 @@ const HorizontalSelector = <T,>({
             {label && (
                 <Text
                     style={{
-                        flex: 1,
+                        flex: style?.flex ?? 1,
                         color: color.text._100,
                     }}>
                     {label}
@@ -73,7 +76,7 @@ const HorizontalSelector = <T,>({
 
             <View
                 style={{
-                    flex: 1,
+                    flex: style?.flex ?? 1,
                     flexDirection: 'row',
                     justifyContent: 'space-evenly',
                     borderColor: color.primary._200,
@@ -104,7 +107,17 @@ const HorizontalSelector = <T,>({
                                 flex: 1,
                                 paddingVertical: spacing.m,
                                 alignItems: 'center',
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                columnGap: 8,
                             }}>
+                            {item.icon && (
+                                <MaterialIcons
+                                    name={item.icon}
+                                    size={item.iconSize ?? 16}
+                                    color={color.text[isSelected ? '_200' : '_500']}
+                                />
+                            )}
                             <Text
                                 style={{
                                     color: color.text[isSelected ? '_200' : '_500'],

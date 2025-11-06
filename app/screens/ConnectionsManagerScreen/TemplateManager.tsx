@@ -57,7 +57,7 @@ const TemplateManager = () => {
                             },
                             {
                                 label: 'Paste Template',
-                                icon: 'file1',
+                                icon: 'file',
                                 onPress: (close) => {
                                     close()
                                     setShowPaste(true)

@@ -266,7 +266,7 @@ const ChracterEditorScreen = () => {
 
                                     {
                                         label: 'View Image',
-                                        icon: 'search1',
+                                        icon: 'search',
                                         onPress: (close) => {
                                             close()
                                             setShowViewer(true)

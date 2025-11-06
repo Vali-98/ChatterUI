@@ -25,7 +25,7 @@ const ChatOptions = () => {
                         router.back()
                     },
                     label: 'Main Menu',
-                    icon: 'back',
+                    icon: 'backward',
                 },
                 {
                     onPress: (close) => {
@@ -41,7 +41,7 @@ const ChatOptions = () => {
                         close()
                     },
                     label: 'Chat History',
-                    icon: 'paperclip',
+                    icon: 'paper-clip',
                 },
             ]}
             placement="top">

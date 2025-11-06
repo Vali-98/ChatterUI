@@ -74,7 +74,7 @@ const ChatsDrawer = () => {
                 <Text style={styles.drawerTitle}>{showSearchBar ? 'Search' : 'Chats'}</Text>
                 <ThemedButton
                     variant="tertiary"
-                    iconName={showSearchBar ? 'back' : 'search1'}
+                    iconName={showSearchBar ? 'backward' : 'search'}
                     onPress={() => {
                         setShowSearchBar(!showSearchBar)
                         setShowSearchResults(searchQuery.length > 0 && !showSearchBar)
@@ -101,7 +101,6 @@ const ChatsDrawer = () => {
                         style={styles.listContainer}>
                         <FlashList
                             keyboardShouldPersistTaps="always"
-                            estimatedItemSize={82}
                             data={data}
                             keyExtractor={(item) => item.id.toString()}
                             renderItem={({ item, index }) => (
@@ -122,7 +121,6 @@ const ChatsDrawer = () => {
                         <Text style={styles.resultCount}>Results: {searchResults.length}</Text>
                     )}
                     <FlashList
-                        estimatedItemSize={92}
                         data={searchResults}
                         keyExtractor={(item) => item.swipeId.toString()}
                         renderItem={({ item }) => (

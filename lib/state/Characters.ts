@@ -3,7 +3,7 @@ import { and, asc, desc, eq, gte, inArray, like, notExists, notInArray, sql } fr
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Asset } from 'expo-asset'
 import * as DocumentPicker from 'expo-document-picker'
-import * as FS from 'expo-file-system'
+import * as FS from 'expo-file-system/legacy'
 import { useEffect } from 'react'
 import { z } from 'zod'
 import { create } from 'zustand'

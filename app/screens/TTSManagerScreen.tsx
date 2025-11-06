@@ -109,7 +109,7 @@ const TTSManagerScreen = () => {
                         onChangeValue={(item) => setLang(item)}
                     />
                     <ThemedButton
-                        iconName="reload1"
+                        iconName="reload"
                         iconSize={20}
                         onPress={() => getVoices()}
                         variant="secondary"

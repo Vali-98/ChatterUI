@@ -6,7 +6,7 @@ import {
     documentDirectory,
     getInfoAsync,
     makeDirectoryAsync,
-} from 'expo-file-system'
+} from 'expo-file-system/legacy'
 import { create } from 'zustand'
 
 import { useAppModeStore } from '@lib/state/AppMode'

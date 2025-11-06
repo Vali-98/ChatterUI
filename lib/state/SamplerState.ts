@@ -1,5 +1,5 @@
 import { getDocumentAsync } from 'expo-document-picker'
-import { EncodingType, readAsStringAsync } from 'expo-file-system'
+import { EncodingType, readAsStringAsync } from 'expo-file-system/legacy'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'

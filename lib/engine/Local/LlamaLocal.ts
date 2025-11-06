@@ -5,7 +5,7 @@ import {
     LlamaContext,
     RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER,
 } from 'cui-llama.rn'
-import { getInfoAsync, writeAsStringAsync } from 'expo-file-system'
+import { getInfoAsync, writeAsStringAsync } from 'expo-file-system/legacy'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 

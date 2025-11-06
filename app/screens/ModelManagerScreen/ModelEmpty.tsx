@@ -12,7 +12,7 @@ const ModelEmpty = () => {
                 alignItems: 'center',
                 flex: 1,
             }}>
-            <AntDesign name="unknowfile1" size={60} color={color.text._700} />
+            <AntDesign name="file-unknown" size={60} color={color.text._700} />
             <Text
                 style={{
                     color: color.text._700,

@@ -109,7 +109,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
             delayLongPress={300}
             buttons={[
                 { label: 'Edit', icon: 'edit', onPress: editCharacter },
-                { label: 'Clone', icon: 'copy1', onPress: cloneCard },
+                { label: 'Clone', icon: 'copy', onPress: cloneCard },
                 { label: 'Delete', icon: 'delete', onPress: deleteCard, variant: 'warning' },
             ]}
             placement="center">

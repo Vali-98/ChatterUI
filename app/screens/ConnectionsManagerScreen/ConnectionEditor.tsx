@@ -201,7 +201,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                                     onPress={() => {
                                         handleGetModelList()
                                     }}
-                                    iconName="reload1"
+                                    iconName="reload"
                                     iconSize={18}
                                     variant="secondary"
                                 />

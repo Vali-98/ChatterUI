@@ -237,7 +237,7 @@ const ColorSelector = () => {
                             },
                             {
                                 label: 'Paste Theme',
-                                icon: 'file1',
+                                icon: 'file',
                                 onPress: (close) => {
                                     close()
                                     setShowPaste(true)

@@ -1,4 +1,4 @@
-import { readAsStringAsync } from 'expo-file-system'
+import { readAsStringAsync } from 'expo-file-system/legacy'
 
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { CharacterCardData, CharacterTokenCache } from '@lib/state/Characters'

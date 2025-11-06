@@ -78,7 +78,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     buttons,
     children,
     placement = 'auto',
-    triggerIcon = 'questioncircle',
+    triggerIcon = 'question-circle',
     triggerIconSize = 26,
     triggerStyle,
     disabled,
@@ -396,7 +396,7 @@ const ContextMenuButton: React.FC<
                     <AntDesign
                         style={textStyle}
                         size={iconSize ?? 12}
-                        name={expandedSubmenus.includes(key) ? 'caretup' : 'caretdown'}
+                        name={expandedSubmenus.includes(key) ? 'caret-up' : 'caret-down'}
                     />
                 )}
                 <Text style={textStyle}>{label}</Text>

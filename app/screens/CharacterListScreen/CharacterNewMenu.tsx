@@ -50,7 +50,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
             />
 
             <ContextMenu
-                triggerIcon="adduser"
+                triggerIcon="user-add"
                 buttons={[
                     {
                         label: 'Import From File',

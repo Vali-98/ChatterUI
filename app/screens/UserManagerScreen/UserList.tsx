@@ -59,7 +59,6 @@ const UserList = () => {
                     showsVerticalScrollIndicator={false}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item, index }) => <UserListing user={item} />}
-                    estimatedItemSize={100}
                     initialScrollIndex={Math.max(currentIndex, 0)}
                 />
                 <ThemedButton label="New User" onPress={() => setShowNewUser(true)} />

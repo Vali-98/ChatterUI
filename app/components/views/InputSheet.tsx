@@ -101,7 +101,7 @@ const InputSheet: React.FC<InputSheetProps> = ({
                         />
                         <ThemedButton
                             iconStyle={{ color: color.text._400 }}
-                            iconName="copy1"
+                            iconName="copy"
                             variant="tertiary"
                         />
                     </View>

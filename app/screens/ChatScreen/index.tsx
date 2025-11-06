@@ -68,7 +68,7 @@ const ChatScreen = () => {
             Logger.errorToast('You are somehow importing a chat without a character or user')
             return
         }
-        const file = await pickStringDocument({ multiple: false, type: 'application/json' })
+        const file = await pickStringDocument({ type: 'application/json' })
         if (!file.success) return
         const result = ChatImportSchema.safeParse(JSON.parse(file.data))
         if (!result.success) {
@@ -126,7 +126,7 @@ const ChatScreen = () => {
                             onPress={handleImportChat}
                         />
                     )}
-                    <Drawer.Button drawerID={Drawer.ID.CHATLIST} openIcon="message1" />
+                    <Drawer.Button drawerID={Drawer.ID.CHATLIST} openIcon="message" />
                 </>
             )
         )

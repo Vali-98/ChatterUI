@@ -125,7 +125,7 @@ const FormattingManager = () => {
             buttons={[
                 {
                     label: 'Create Config',
-                    icon: 'addfile',
+                    icon: 'file-add',
                     onPress: (close) => {
                         setShowNewInstruct(true)
 
@@ -151,7 +151,7 @@ const FormattingManager = () => {
                 },
                 {
                     label: 'Regenerate Default',
-                    icon: 'reload1',
+                    icon: 'reload',
                     onPress: (close) => {
                         handleRegenerateDefaults()
                         close()

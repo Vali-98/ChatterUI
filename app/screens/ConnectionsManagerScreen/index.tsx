@@ -38,7 +38,7 @@ const ConnectionsManagerScreen = () => {
                         onPressIn={() => {
                             router.push('/screens/ConnectionsManagerScreen/TemplateManager')
                         }}>
-                        <AntDesign name="file1" color={color.text._400} size={26} />
+                        <AntDesign name="file" color={color.text._400} size={26} />
                     </Pressable>
                 )}
             />

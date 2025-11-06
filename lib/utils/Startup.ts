@@ -8,7 +8,7 @@ import {
     makeDirectoryAsync,
     readAsStringAsync,
     readDirectoryAsync,
-} from 'expo-file-system'
+} from 'expo-file-system/legacy'
 import * as KeepAwake from 'expo-keep-awake'
 import { router } from 'expo-router'
 import { setBackgroundColorAsync as setUIBackgroundColor } from 'expo-system-ui'

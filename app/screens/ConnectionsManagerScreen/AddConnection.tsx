@@ -196,7 +196,7 @@ const AddConnection = () => {
                                 onPress={() => {
                                     handleGetModelList()
                                 }}
-                                iconName="reload1"
+                                iconName="reload"
                                 iconSize={18}
                                 variant="secondary"
                             />

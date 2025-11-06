@@ -1,13 +1,10 @@
-import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 import { SplashScreen, Stack } from 'expo-router'
 import { setOptions } from 'expo-splash-screen'
-import { SystemBars } from 'react-native-edge-to-edge'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
 
-import { AlertBox } from '@components/views/Alert'
+import { AlertProvider } from '@components/views/Alert'
 import { PortalHost } from '@components/views/Portal'
-import { rawdb } from '@db'
 import { Theme } from '@lib/theme/ThemeManager'
 
 SplashScreen.preventAutoHideAsync()
@@ -17,14 +14,12 @@ setOptions({
 })
 
 const Layout = () => {
-    useDrizzleStudio(rawdb)
     const { color } = Theme.useTheme()
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <KeyboardProvider>
-                <AlertBox />
-                <SystemBars style="dark" />
+                <AlertProvider />
                 <Stack
                     screenOptions={{
                         headerBackButtonDisplayMode: 'minimal',

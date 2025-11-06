@@ -43,7 +43,7 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
             {!modelImporting && !modelLoading && modelListLength === 0 && modelUpdatedAt && (
                 <View>
                     <Text style={styles.hint}>
-                        Hint: Press <AntDesign name="addfile" size={16} /> and import a GGUF model!
+                        Hint: Press <AntDesign name="file-add" size={16} /> and import a GGUF model!
                     </Text>
                 </View>
             )}

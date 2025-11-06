@@ -1,11 +1,11 @@
 import { initLlama, LlamaContext } from 'cui-llama.rn'
 import { NativeEmbeddingResult } from 'cui-llama.rn/lib/typescript/NativeRNLlama'
-import { documentDirectory } from 'expo-file-system'
+import { documentDirectory } from 'expo-file-system/legacy'
 import { useState } from 'react'
 import { Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { create } from 'zustand'
 
-import { rawdb } from '@db'
+import { sqliteDB } from '@db'
 import { LlamaConfig } from '@lib/engine/Local/LlamaLocal'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -33,7 +33,7 @@ const EmbeddingScreen = () => {
             .fill(0)
             .map((item) => 2 * (Math.random() - 0.5))}]`
         //const input = `[-0.200, 0.250, 0.341, -0.211, 0.645, 0.935, -0.316, -0.924]`
-        const data = await rawdb.getAllAsync(`select
+        const data = await sqliteDB.getAllAsync(`select
         id,
         distance
         from vec_examples
@@ -139,11 +139,11 @@ const EmbeddingScreen = () => {
 export default EmbeddingScreen
 
 const deleteTables = async () => {
-    rawdb.execSync(`drop table if exists vec_examples`)
+    sqliteDB.execSync(`drop table if exists vec_examples`)
 }
 
 const createTables = async () => {
-    rawdb
+    sqliteDB
         .execAsync(
             `create virtual table vec_examples using vec0(
     id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -174,7 +174,7 @@ const insertData = async () => {
 
     //await ddb.insert(vec_table).values([input]);
 
-    rawdb.runSync(`insert into vec_examples(id, sample_embedding)
+    sqliteDB.runSync(`insert into vec_examples(id, sample_embedding)
     values
       (1, '[-0.200, 0.250, 0.341, -0.211, 0.645, 0.935, -0.316, -0.924]'),
       (2, '[0.443, -0.501, 0.355, -0.771, 0.707, -0.708, -0.185, 0.362]'),

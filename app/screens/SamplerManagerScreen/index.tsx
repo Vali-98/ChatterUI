@@ -105,7 +105,7 @@ const SamplerManagerScreen = () => {
             buttons={[
                 {
                     label: 'Create Sampler',
-                    icon: 'addfile',
+                    icon: 'file-add',
                     onPress: (close) => {
                         setShowNewSampler(true)
                         close()

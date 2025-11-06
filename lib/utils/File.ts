@@ -1,35 +1,90 @@
 import { localDownload } from '@vali98/react-native-fs'
 import { getDocumentAsync } from 'expo-document-picker'
-import {
-    cacheDirectory,
-    documentDirectory,
-    readAsStringAsync,
-    writeAsStringAsync,
-} from 'expo-file-system'
+import { File, Paths } from 'expo-file-system'
 
 import { Logger } from '../state/Logger'
 
 export const AppDirectory = {
-    ModelPath: `${documentDirectory}models/`,
-    SessionPath: `${documentDirectory}session/`,
-    CharacterPath: `${documentDirectory}characters/`,
-    Assets: `${documentDirectory}appAssets/`,
-    Attachments: `${documentDirectory}attachments/`,
+    ModelPath: `${Paths.document}models/`,
+    SessionPath: `${Paths.document}session/`,
+    CharacterPath: `${Paths.document}characters/`,
+    Assets: `${Paths.document}appAssets/`,
+    Attachments: `${Paths.document}attachments/`,
 }
 
-/**
- *
- * @param data string data of file
- * @param filename filename to be written, include extension
- * @param encoding encoding of file
- */
+export namespace FileUtils {
+    export const getDocumentDir = (dir: string) => {
+        return `${Paths.document}${dir}`
+    }
+
+    export const getCacheDir = (dir: string) => {
+        return `${Paths.cache}${dir}`
+    }
+
+    /**
+     *
+     * @param data string data of file
+     * @param filename filename to be written, include extension
+     * @param encoding encoding of file
+     */
+    export const saveStringToDownload = async (
+        data: string,
+        filename: string,
+        encoding: 'base64' | `utf8`
+    ) => {
+        new File(Paths.cache, filename).write(data, { encoding })
+        await localDownload((Paths.cache + filename).replace('file://', '')).catch((e) =>
+            Logger.error('Failed to download: ' + e)
+        )
+    }
+
+    export const pickText = async (params: { type?: string } = {}): Promise<PickerResult> => {
+        return pickFile(async (file) => {
+            return await file.text()
+        }, params)
+    }
+
+    export const pickBase64 = async (params: { type?: string } = {}): Promise<PickerResult> => {
+        return pickFile(async (file) => {
+            return await file.base64()
+        }, params)
+    }
+
+    export const pickJSON = async (params: { type?: string } = {}): Promise<PickerResult> => {
+        const result = await pickText(params)
+        if (!result.success) return result
+        try {
+            return { success: true, data: JSON.parse(result.data) }
+        } catch {
+            return { success: false }
+        }
+    }
+
+    const pickFile = async (
+        fileReader: (file: File) => Promise<string>,
+        { type = '*/*' }: { type?: string } = {}
+    ): Promise<PickerResult> => {
+        const result = await getDocumentAsync({ type: type })
+        if (result.canceled) {
+            return { success: false }
+        }
+        const [asset] = result.assets
+        const file = new File(asset.uri)
+        let data = await fileReader(file)
+        if (!data) {
+            return { success: false }
+        }
+        return { success: true, data: data }
+    }
+}
+
 export const saveStringToDownload = async (
     data: string,
     filename: string,
     encoding: 'base64' | `utf8`
 ) => {
-    await writeAsStringAsync(cacheDirectory + filename, data, { encoding })
-    await localDownload(cacheDirectory?.replace('file://', '') + filename).catch((e) =>
+    new File(Paths.cache, filename).write(data, { encoding })
+    await localDownload((Paths.cache + filename).replace('file://', '')).catch((e) =>
         Logger.error('Failed to download: ' + e)
     )
 }
@@ -38,8 +93,9 @@ type PickerResult = { success: false } | { success: true; data: string }
 
 type JSONPickerResult = { success: false } | { success: true; data: any }
 
-export const pickJSONDocument = async (multiple: boolean = false): Promise<JSONPickerResult> => {
-    const result = await pickStringDocument({ type: 'application/json', multiple: multiple })
+/**@deprecated */
+export const pickJSONDocument = async (): Promise<JSONPickerResult> => {
+    const result = await pickStringDocument({ type: 'application/json' })
     if (!result.success) return result
     try {
         const jsonData = JSON.parse(result.data)
@@ -49,12 +105,11 @@ export const pickJSONDocument = async (multiple: boolean = false): Promise<JSONP
     }
 }
 
+/**@deprecated */
 export const pickStringDocument = async ({
-    multiple = false,
     encoding = 'utf8',
     type = '*/*',
 }: {
-    multiple?: boolean
     encoding?: 'utf8' | 'base64'
     type?: string
 } = {}): Promise<PickerResult> => {
@@ -63,9 +118,11 @@ export const pickStringDocument = async ({
         return { success: false }
     }
     const uri = result.assets[0].uri
-    const data = await readAsStringAsync(uri, { encoding: encoding }).catch((e) => {
-        Logger.info(`Failed to read file: ${e}`)
-    })
+    const file = new File(uri)
+    let data = ''
+    if (encoding === 'utf8') data = await file.text()
+    else data = file.base64()
+
     if (!data) {
         return { success: false }
     }

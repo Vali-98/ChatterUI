@@ -105,8 +105,7 @@ const LogsScreen = () => {
                     padding: 16,
                 }}>
                 <FlashList
-                    inverted
-                    estimatedItemSize={30}
+                    maintainVisibleContentPosition={{ startRenderingFromBottom: true }}
                     data={logitems}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (

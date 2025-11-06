@@ -1,7 +1,7 @@
 import { loadLlamaModelInfo } from 'cui-llama.rn'
 import { eq, inArray, notInArray } from 'drizzle-orm'
 import { getDocumentAsync } from 'expo-document-picker'
-import { copyAsync, deleteAsync, getInfoAsync, readDirectoryAsync } from 'expo-file-system'
+import { copyAsync, deleteAsync, getInfoAsync, readDirectoryAsync } from 'expo-file-system/legacy'
 import { Platform } from 'react-native'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'

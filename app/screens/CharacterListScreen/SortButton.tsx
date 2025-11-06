@@ -39,8 +39,8 @@ const SortButton: React.FC<SortButtonProps> = ({ type, label }) => {
                     name={
                         (searchOrder === 'asc' && type === 'modified') ||
                         (searchOrder === 'desc' && type === 'name')
-                            ? 'caretup'
-                            : 'caretdown'
+                            ? 'caret-up'
+                            : 'caret-down'
                     }
                     color={color.text._100}
                 />

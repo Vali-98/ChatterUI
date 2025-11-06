@@ -1,5 +1,5 @@
 import { getDocumentAsync } from 'expo-document-picker'
-import { copyAsync, deleteAsync } from 'expo-file-system'
+import { copyAsync, deleteAsync } from 'expo-file-system/legacy'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 

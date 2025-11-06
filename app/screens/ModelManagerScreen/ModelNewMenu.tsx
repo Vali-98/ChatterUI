@@ -29,7 +29,7 @@ const ModelNewMenu: React.FC<ModelNewMenuProps> = ({ modelImporting, setModelImp
         <View>
             <ContextMenu
                 placement="bottom"
-                triggerIcon="addfile"
+                triggerIcon="file-add"
                 disabled={modelImporting}
                 buttons={[
                     {

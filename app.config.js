@@ -82,14 +82,6 @@ module.exports = {
                     'android:largeHeap': true,
                 },
             ],
-            [
-                'react-native-edge-to-edge',
-                {
-                    android: {
-                        parentTheme: 'Default',
-                    },
-                },
-            ],
             ['@vali98/react-native-process-text', { label: 'Ask In ChatterUi' }],
             [
                 'expo-camera',
@@ -97,11 +89,11 @@ module.exports = {
                     cameraPermission: 'Allow ChatterUI to access your camera',
                 },
             ],
+            ['expo-sqlite', { withSQLiteVecExtension: true }],
             'expo-localization',
             'expo-router',
-            'expo-sqlite',
+            'expo-font',
             './expo-build-plugins/bgactions.plugin.js',
-            './expo-build-plugins/copyjni.plugin.js',
             './expo-build-plugins/usercert.plugin.js',
             './expo-build-plugins/rnllama.plugin.js',
         ],

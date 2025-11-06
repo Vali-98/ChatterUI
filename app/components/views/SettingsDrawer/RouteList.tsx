@@ -79,7 +79,7 @@ const getPaths = (remote: boolean): ButtonData[] => [
     {
         name: 'Sampler',
         path: '/screens/SamplerManagerScreen',
-        icon: 'barschart',
+        icon: 'control',
     },
     {
         name: 'Formatting',
@@ -95,7 +95,7 @@ const getPaths = (remote: boolean): ButtonData[] => [
         : {
               name: 'Models',
               path: '/screens/ModelManagerScreen',
-              icon: 'folderopen',
+              icon: 'branches',
           },
     {
         name: 'TTS',
@@ -105,12 +105,12 @@ const getPaths = (remote: boolean): ButtonData[] => [
     {
         name: 'Logs',
         path: '/screens/LogsScreen',
-        icon: 'codesquareo',
+        icon: 'code',
     },
     {
         name: 'About',
         path: '/screens/AboutScreen',
-        icon: 'infocirlceo',
+        icon: 'info-circle',
     },
     {
         name: 'Settings',

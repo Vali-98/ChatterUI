@@ -1,4 +1,3 @@
-import React, { ReactNode } from 'react'
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
@@ -14,10 +13,6 @@ namespace Alert {
 }
 
 export default Alert
-
-type AlertProviderProps = {
-    children: ReactNode
-}
 
 const AlertButton: React.FC<AlertButtonProps> = ({ label, onPress, type = 'default' }) => {
     const styles = useStyles()
@@ -37,7 +32,7 @@ const AlertButton: React.FC<AlertButtonProps> = ({ label, onPress, type = 'defau
     )
 }
 
-export const AlertBox = () => {
+export const AlertProvider = () => {
     const styles = useStyles()
     const { visible, props } = useAlertStore(
         useShallow((state) => ({ visible: state.visible, props: state.props }))
@@ -73,15 +68,6 @@ export const AlertBox = () => {
                 </View>
             </Animated.View>
         </Modal>
-    )
-}
-
-export const AlertProvider: React.FC<AlertProviderProps> = ({ children }) => {
-    return (
-        <View style={{ flex: 1 }}>
-            <AlertBox />
-            {children}
-        </View>
     )
 }
 

@@ -1,6 +1,6 @@
 import { and, count, desc, eq, getTableColumns, like, sql } from 'drizzle-orm'
 import { randomUUID } from 'expo-crypto'
-import { copyAsync, deleteAsync, getInfoAsync } from 'expo-file-system'
+import { copyAsync, deleteAsync, getInfoAsync } from 'expo-file-system/legacy'
 import * as Notifications from 'expo-notifications'
 import mime from 'mime/lite'
 import { create } from 'zustand'

@@ -144,7 +144,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                             setShowMMPROJSelector(!showMMPROJSelector)
                         }}>
                         <AntDesign
-                            name={showMMPROJSelector && !item.mmprojLink ? 'close' : 'camerao'}
+                            name={showMMPROJSelector && !item.mmprojLink ? 'close' : 'camera'}
                             size={24}
                             color={disableEdit ? color.text._600 : color.text._300}
                         />
@@ -212,7 +212,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                             setModelLoading(false)
                         }}>
                         <AntDesign
-                            name={isLoaded ? 'closecircleo' : 'playcircleo'}
+                            name={isLoaded ? 'close-circle' : 'play-circle'}
                             size={24}
                             color={loadToggle ? color.text._600 : color.text._300}
                         />

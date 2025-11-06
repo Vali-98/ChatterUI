@@ -97,7 +97,7 @@ const ChatEditor = () => {
                     variant="critical"
                 />
                 <ThemedButton
-                    iconName="reload1"
+                    iconName="reload"
                     variant="tertiary"
                     label="Reset"
                     onPress={() => swipeText && setPlaceholderText(swipeText)}

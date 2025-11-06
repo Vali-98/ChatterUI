@@ -228,12 +228,12 @@ const ChatInput = () => {
                             }}>
                             <ChatOptions />
                             <ContextMenu
-                                triggerIcon="paperclip"
+                                triggerIcon="paper-clip"
                                 triggerIconSize={20}
                                 buttons={[
                                     {
                                         label: 'Take Picture',
-                                        icon: 'camerao',
+                                        icon: 'camera',
                                         onPress: (close) => {
                                             setShowCamera(true)
                                             close()

@@ -4,6 +4,6 @@ import { openDatabaseSync } from 'expo-sqlite'
 import * as schema from './schema'
 
 //deleteDatabaseAsync('db.db')
-export const rawdb = openDatabaseSync('db.db', { enableChangeListener: true })
-export const db = drizzle(rawdb, { schema })
-rawdb.execAsync('PRAGMA foreign_keys = ON;')
+export const sqliteDB = openDatabaseSync('db.db', { enableChangeListener: true })
+export const db = drizzle(sqliteDB, { schema })
+sqliteDB.execAsync('PRAGMA foreign_keys = ON;')

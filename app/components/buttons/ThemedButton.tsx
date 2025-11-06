@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 import { ReactNode } from 'react'
 import {
     PressableProps,
@@ -163,14 +163,23 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
                 },
                 buttonStyle,
             ])}>
-            {!icon && iconName && (
-                <AntDesign
-                    name={iconName}
-                    size={iconSize}
-                    style={iconStyle}
-                    color={theme.labelStyle.color}
-                />
-            )}
+            {!icon &&
+                iconName &&
+                (iconName !== 'search' ? (
+                    <AntDesign
+                        name={iconName}
+                        size={iconSize}
+                        style={iconStyle}
+                        color={theme.labelStyle.color}
+                    />
+                ) : (
+                    <MaterialIcons
+                        name={'search'}
+                        size={iconSize}
+                        style={iconStyle}
+                        color={theme.labelStyle.color}
+                    />
+                ))}
             {icon}
             {label && <TText style={[theme.labelStyle, labelStyle]}>{label}</TText>}
         </AnimatedPressable>

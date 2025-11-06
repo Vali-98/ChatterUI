@@ -1,7 +1,7 @@
 import { localDownload } from '@vali98/react-native-fs'
 import { reloadAppAsync } from 'expo'
 import { getDocumentAsync } from 'expo-document-picker'
-import { copyAsync, deleteAsync, documentDirectory } from 'expo-file-system'
+import { copyAsync, deleteAsync, documentDirectory } from 'expo-file-system/legacy'
 import React from 'react'
 import { Text, View } from 'react-native'
 

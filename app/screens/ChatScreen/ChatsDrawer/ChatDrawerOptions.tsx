@@ -153,7 +153,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                             },
                             {
                                 label: 'Clone',
-                                icon: 'copy1',
+                                icon: 'copy',
                                 onPress: handleCloneChat,
                             },
                             {

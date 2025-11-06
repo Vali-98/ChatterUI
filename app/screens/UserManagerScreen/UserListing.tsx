@@ -89,7 +89,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
             buttons={[
                 {
                     label: 'Clone',
-                    icon: 'copy1',
+                    icon: 'copy',
                     onPress: handleCloneCard,
                 },
                 {

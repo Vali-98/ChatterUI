@@ -182,7 +182,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isL
                             exiting={ZoomOut.duration(200)}>
                             <ThemedButton
                                 variant="tertiary"
-                                iconName="copy1"
+                                iconName="copy"
                                 iconSize={22}
                                 iconStyle={{
                                     color: color.text._500,

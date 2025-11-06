@@ -36,7 +36,7 @@ export namespace MarkdownStyle {
                         </Text>
                         {content && (
                             <ThemedButton
-                                iconName="copy1"
+                                iconName="copy"
                                 variant="tertiary"
                                 iconStyle={{ color: styles.fenceHeader.color }}
                                 onPress={() => {
