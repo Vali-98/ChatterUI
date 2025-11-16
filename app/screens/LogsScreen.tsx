@@ -20,7 +20,6 @@ const LogsScreen = () => {
         }))
     )
 
-    const logitems = logs.toReversed()
     const handleExportLogs = () => {
         if (!logs) return
         const data = logs
@@ -106,7 +105,7 @@ const LogsScreen = () => {
                 }}>
                 <FlashList
                     maintainVisibleContentPosition={{ startRenderingFromBottom: true }}
-                    data={logitems}
+                    data={logs}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
                         <Text
