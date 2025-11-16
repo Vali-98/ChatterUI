@@ -1,24 +1,24 @@
 import { localDownload } from '@vali98/react-native-fs'
 import { getDocumentAsync } from 'expo-document-picker'
-import { File, Paths } from 'expo-file-system'
+import { Directory, File, Paths } from 'expo-file-system'
 
 import { Logger } from '../state/Logger'
 
 export const AppDirectory = {
-    ModelPath: `${Paths.document}models/`,
-    SessionPath: `${Paths.document}session/`,
-    CharacterPath: `${Paths.document}characters/`,
-    Assets: `${Paths.document}appAssets/`,
-    Attachments: `${Paths.document}attachments/`,
+    ModelPath: `${Paths.document.uri}models/`,
+    SessionPath: `${Paths.document.uri}session/`,
+    CharacterPath: `${Paths.document.uri}characters/`,
+    Assets: `${Paths.document.uri}appAssets/`,
+    Attachments: `${Paths.document.uri}attachments/`,
 }
 
 export namespace FileUtils {
     export const getDocumentDir = (dir: string) => {
-        return `${Paths.document}${dir}`
+        return `${Paths.document.uri}${dir}`
     }
 
     export const getCacheDir = (dir: string) => {
-        return `${Paths.cache}${dir}`
+        return `${Paths.cache.uri}${dir}`
     }
 
     /**
@@ -33,7 +33,7 @@ export namespace FileUtils {
         encoding: 'base64' | `utf8`
     ) => {
         new File(Paths.cache, filename).write(data, { encoding })
-        await localDownload((Paths.cache + filename).replace('file://', '')).catch((e) =>
+        await localDownload((Paths.cache.uri + filename).replace('file://', '')).catch((e) =>
             Logger.error('Failed to download: ' + e)
         )
     }
@@ -84,7 +84,7 @@ export const saveStringToDownload = async (
     encoding: 'base64' | `utf8`
 ) => {
     new File(Paths.cache, filename).write(data, { encoding })
-    await localDownload((Paths.cache + filename).replace('file://', '')).catch((e) =>
+    await localDownload((Paths.cache.uri + filename).replace('file://', '')).catch((e) =>
         Logger.error('Failed to download: ' + e)
     )
 }
@@ -145,4 +145,56 @@ export const readableFileSize = (size: number) => {
         const sizeInGB = size / gb
         return `${sizeInGB.toFixed(2)} GB`
     }
+}
+
+export const listFiles = (path: string) => {
+    return new Directory(path)
+        .listAsRecords()
+        .filter((item) => !item.isDirectory)
+        .map((item) => item.uri)
+}
+
+export const fileExists = (path: string) => {
+    return new File(path).exists
+}
+
+export const copyFile = ({ from, to }: { from: string; to: string }) => {
+    try {
+        new File(from).copy(new File(to))
+        return true
+    } catch (e) {
+        Logger.error('Failed to copy: ' + e)
+        return false
+    }
+}
+
+export const deleteFile = (path: string) => {
+    try {
+        const file = new File(path)
+        if (file.exists) file.delete()
+        return true
+    } catch (e) {
+        Logger.error('Failed to delete: ' + e)
+        return false
+    }
+}
+
+export const readBase64Async = async (path: string) => {
+    return await new File(path).base64()
+}
+
+export const readStringAsync = async (path: string) => {
+    return await new File(path).text()
+}
+
+export const writeBase64File = async (path: string, content: string) => {
+    return await new File(path).write(content, { encoding: 'base64' })
+}
+
+export const fileInfo = (path: string) => {
+    return new File(path)
+}
+
+export const makeDirectory = async (path: string) => {
+    new Directory(path).create({ idempotent: true })
 }

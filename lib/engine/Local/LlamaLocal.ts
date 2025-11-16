@@ -5,12 +5,11 @@ import {
     LlamaContext,
     RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER,
 } from 'cui-llama.rn'
-import { getInfoAsync, writeAsStringAsync } from 'expo-file-system/legacy'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 import { Storage } from '@lib/enums/Storage'
-import { AppDirectory, readableFileSize } from '@lib/utils/File'
+import { AppDirectory, fileExists, readableFileSize, writeBase64File } from '@lib/utils/File'
 import { ModelDataType } from 'db/schema'
 
 import { checkGGMLDeprecated } from './GGML'
@@ -276,9 +275,9 @@ export namespace Llama {
                 KV.useKVStore.getState().setKvCacheTokens(tokens ?? [])
             }
 
-            if (!(await getInfoAsync(sessionFile)).exists) {
+            if (!fileExists(sessionFile)) {
                 Logger.warn('Session file does not exist, creating...')
-                await writeAsStringAsync(sessionFile, '', { encoding: 'base64' })
+                await writeBase64File(sessionFile, '')
             }
 
             const now = performance.now()
@@ -297,8 +296,7 @@ export namespace Llama {
                 Logger.errorToast('No Model Loaded')
                 return false
             }
-            const data = await getInfoAsync(sessionFile)
-            if (!data.exists) {
+            if (!fileExists(sessionFile)) {
                 Logger.warn('No Cache found')
                 return false
             }

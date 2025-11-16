@@ -1,11 +1,10 @@
 import { getDocumentAsync } from 'expo-document-picker'
-import { copyAsync, deleteAsync } from 'expo-file-system/legacy'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 import { Storage } from '@lib/enums/Storage'
 import { createMMKVStorage } from '@lib/storage/MMKV'
-import { AppDirectory } from '@lib/utils/File'
+import { AppDirectory, copyFile, deleteFile } from '@lib/utils/File'
 
 import { Logger } from './Logger'
 
@@ -29,7 +28,7 @@ export const useBackgroundStore = create<BackgroundImageStateProps>()(
                     if (result.canceled) return
                     const uri = result.assets[0].uri
                     const name = result.assets[0].name
-                    await copyAsync({ from: uri, to: AppDirectory.Assets + name })
+                    copyFile({ from: uri, to: AppDirectory.Assets + name })
 
                     set({ image: name })
                     Logger.infoToast('Successfully Imported!')
@@ -39,7 +38,7 @@ export const useBackgroundStore = create<BackgroundImageStateProps>()(
             },
             removeImage: () => {
                 const imageName = get().image
-                if (imageName) deleteAsync(AppDirectory.Assets + imageName, { idempotent: true })
+                if (imageName) deleteFile(AppDirectory.Assets + imageName)
                 set({ image: undefined })
                 Logger.warnToast('Background Deleted!')
             },

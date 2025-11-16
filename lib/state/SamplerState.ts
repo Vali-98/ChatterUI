@@ -1,5 +1,4 @@
 import { getDocumentAsync } from 'expo-document-picker'
-import { EncodingType, readAsStringAsync } from 'expo-file-system/legacy'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
@@ -13,6 +12,7 @@ import {
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
+import { readStringAsync } from '@lib/utils/File'
 
 export type SamplerConfig = {
     name: string
@@ -146,13 +146,12 @@ export namespace SamplersManager {
                 Logger.errorToast(`Invalid File Type!`)
                 return
             }
-            const name = result.assets[0].name
-                .replace(`.json`, '')
-                .replace('.settings', '')
-                .replace(' ', '_')
-            const data = await readAsStringAsync(result.assets[0].uri, {
-                encoding: EncodingType.UTF8,
-            })
+            const {
+                assets: [asset],
+            } = result
+            const name = asset.name.replace(`.json`, '').replace('.settings', '').replace(' ', '_')
+            const data = await readStringAsync(asset.uri)
+
             return { data: JSON.parse(data), name: name }
         } catch (e) {
             Logger.errorToast(`Failed to import: ${e}`)

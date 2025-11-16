@@ -1,6 +1,5 @@
 import { and, count, desc, eq, getTableColumns, like, sql } from 'drizzle-orm'
 import { randomUUID } from 'expo-crypto'
-import { copyAsync, deleteAsync, getInfoAsync } from 'expo-file-system/legacy'
 import * as Notifications from 'expo-notifications'
 import mime from 'mime/lite'
 import { create } from 'zustand'
@@ -9,7 +8,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { db as database } from '@db'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { replaceMacros } from '@lib/state/Macros'
-import { AppDirectory } from '@lib/utils/File'
+import { AppDirectory, copyFile, deleteFile, fileInfo } from '@lib/utils/File'
 import { convertToFormatInstruct } from '@lib/utils/TextFormat'
 import {
     chatAttachments,
@@ -778,11 +777,7 @@ export namespace Chats {
                 const attachments = await database.query.chatAttachments.findMany({
                     where: eq(chatAttachments.chat_entry_id, entryId),
                 })
-                await Promise.all(
-                    attachments.map(
-                        async (item) => await deleteAsync(item.uri, { idempotent: true })
-                    )
-                )
+                await Promise.all(attachments.map(async (item) => deleteFile(item.uri)))
 
                 await database.delete(chatEntries).where(eq(chatEntries.id, entryId))
             }
@@ -837,8 +832,8 @@ export namespace Chats {
 
             export const createAttachment = async (entryId: number, uri: string) => {
                 const attachmentId = randomUUID()
-                const fileInfo = await getInfoAsync(uri, {})
-                if (!fileInfo.exists || fileInfo.isDirectory) return
+                const info = fileInfo(uri)
+                if (!info.exists) return
 
                 const name = uri.split('/').pop() ?? 'unknown'
                 const extension = name.split('.').pop()?.toLowerCase()
@@ -846,7 +841,7 @@ export namespace Chats {
                 const type = mimeType?.split('/')?.[0]
                 if (!name || !extension || !mimeType || !type || !validExtensionTypes(type)) return
                 const newURI = AppDirectory.Attachments + attachmentId + '.' + extension
-                await copyAsync({
+                copyFile({
                     from: uri,
                     to: newURI,
                 })

@@ -3,7 +3,7 @@ import { and, asc, desc, eq, gte, inArray, like, notExists, notInArray, sql } fr
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Asset } from 'expo-asset'
 import * as DocumentPicker from 'expo-document-picker'
-import * as FS from 'expo-file-system/legacy'
+import { Paths } from 'expo-file-system'
 import { useEffect } from 'react'
 import { z } from 'zod'
 import { create } from 'zustand'
@@ -12,7 +12,14 @@ import { persist } from 'zustand/middleware'
 import { db as database } from '@db'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Storage } from '@lib/enums/Storage'
-import { saveStringToDownload } from '@lib/utils/File'
+import {
+    copyFile,
+    deleteFile,
+    fileExists,
+    readBase64Async,
+    readStringAsync,
+    saveStringToDownload,
+} from '@lib/utils/File'
 import { replaceMacroBase } from '@lib/utils/Macros'
 import {
     characterGreetings,
@@ -690,22 +697,24 @@ export namespace Characters {
                     Logger.errorToast('Failed to copy card: Card does not exit')
                     return
                 }
+                const imageDir = getImageDir(card.image_id)
+                const imageCacheDir = `${Paths.cache.uri}${card.image_id}`
+                let cacheLoc = ''
 
-                const imageInfo = await FS.getInfoAsync(getImageDir(card.image_id))
-                const cacheLoc = imageInfo.exists ? `${FS.cacheDirectory}${card.image_id}` : ''
-
-                if (imageInfo.exists)
-                    await FS.copyAsync({
-                        from: getImageDir(card.image_id),
+                if (fileExists(imageDir)) {
+                    cacheLoc = imageCacheDir
+                    copyFile({
+                        from: imageDir,
                         to: cacheLoc,
                     })
+                }
 
                 const now = Date.now()
                 card.last_modified = now
                 card.image_id = now
                 if (card.background_image) {
                     const backgroundId = Date.now()
-                    await FS.copyAsync({
+                    await copyFile({
                         from: getImageDir(card.background_image),
                         to: getImageDir(backgroundId),
                     })
@@ -770,11 +779,11 @@ export namespace Characters {
     }
 
     export const deleteImage = async (imageID: number) => {
-        await FS.deleteAsync(getImageDir(imageID), { idempotent: true })
+        await deleteFile(getImageDir(imageID))
     }
 
     export const copyImage = async (uri: string, imageID: number) => {
-        await FS.copyAsync({
+        copyFile({
             from: uri,
             to: getImageDir(imageID),
         })
@@ -795,14 +804,12 @@ export namespace Characters {
 
     export const createCharacterFromImage = async (uri: string) => {
         try {
-            const file = await FS.readAsStringAsync(uri, { encoding: FS.EncodingType.Base64 })
+            const file = await readBase64Async(uri)
             if (!file) {
                 Logger.errorToast(`Failed to create card - Image could not be retrieved`)
                 return
             }
-
             const card = JSON.parse(extractPngTextChunk(file))
-
             if (card === undefined) {
                 Logger.errorToast('No character was found.')
                 return
@@ -851,7 +858,7 @@ export namespace Characters {
             const isJSON = item.mimeType?.includes('application/json')
             try {
                 if (isJSON) {
-                    const data = await FS.readAsStringAsync(item.uri)
+                    const data = await readStringAsync(item.uri)
                     await createCharacterFromV2JSON(JSON.parse(data))
                 }
 
@@ -872,11 +879,7 @@ export namespace Characters {
         // name can be empty string, should at least have something
         const exportedFileName = (dbcard.name ?? 'Character') + '.png'
         const cardString = JSON.stringify(convertDBDataToCV2(dbcard))
-        const fileData = await FS.readAsStringAsync(imagePath, {
-            encoding: FS.EncodingType.Base64,
-        }).catch((e) => {
-            Logger.error('Could not get file data for export: ' + JSON.stringify(e))
-        })
+        const fileData = await readBase64Async(imagePath)
         if (!fileData) return
         const exportData = replacePngTextChunk(fileData, cardString)
 
@@ -884,20 +887,19 @@ export namespace Characters {
     }
 
     export const getImageDir = (imageId: number) => {
-        return `${FS.documentDirectory}characters/${imageId}.png`
+        return `${Paths.document.uri}characters/${imageId}.png`
     }
 
     export const createDefaultCard = async () => {
         const filename = 'aibot'
         const pngName = filename + '.png'
-        const cardDefaultDir = `${FS.documentDirectory}appAssets/${pngName}`
+        const cardDefaultDir = `${Paths.document.uri}appAssets/${pngName}`
 
         try {
-            const fileinfo = await FS.getInfoAsync(cardDefaultDir)
-            if (!fileinfo.exists) {
+            if (!fileExists(cardDefaultDir)) {
                 Logger.info('Importing default card.')
                 const [asset] = await Asset.loadAsync(require('./../../assets/models/aibot.raw'))
-                if (asset.localUri) await FS.copyAsync({ from: asset.localUri, to: cardDefaultDir })
+                if (asset.localUri) copyFile({ from: asset.localUri, to: cardDefaultDir })
             }
             await createCharacterFromImage(cardDefaultDir)
         } catch (e) {

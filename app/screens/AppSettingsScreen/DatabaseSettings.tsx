@@ -1,7 +1,7 @@
 import { localDownload } from '@vali98/react-native-fs'
 import { reloadAppAsync } from 'expo'
 import { getDocumentAsync } from 'expo-document-picker'
-import { copyAsync, deleteAsync, documentDirectory } from 'expo-file-system/legacy'
+import { Paths } from 'expo-file-system'
 import React from 'react'
 import { Text, View } from 'react-native'
 
@@ -10,12 +10,15 @@ import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
+import { copyFile, deleteFile } from '@lib/utils/File'
 import appConfig from 'app.config'
 
 const appVersion = appConfig.expo.version
 
+const dbPath = Paths.document.uri + '/SQLite/db.db'
+
 const exportDB = async (notify: boolean = true) => {
-    await localDownload(`${documentDirectory}/SQLite/db.db`.replace('file://', ''))
+    await localDownload(dbPath.replace('file://', ''))
         .then(() => {
             if (notify) Logger.infoToast('Download Successful!')
         })
@@ -25,20 +28,14 @@ const exportDB = async (notify: boolean = true) => {
 const importDB = async (uri: string, name: string) => {
     const copyDB = async () => {
         await exportDB(false)
-        await deleteAsync(`${documentDirectory}SQLite/db.db`).catch(() => {
-            Logger.debug('Somehow the db is already deleted')
-        })
-        await copyAsync({
-            from: uri,
-            to: `${documentDirectory}SQLite/db.db`,
-        })
-            .then(() => {
-                Logger.info('Copy Successful, Restarting now.')
-                reloadAppAsync()
+        deleteFile(dbPath)
+        if (
+            copyFile({
+                from: uri,
+                to: dbPath,
             })
-            .catch((e) => {
-                Logger.errorToast(`Failed to import database: ${e}`)
-            })
+        )
+            reloadAppAsync()
     }
 
     const dbAppVersion = name.split('-')?.[0]

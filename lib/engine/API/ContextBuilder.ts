@@ -1,5 +1,3 @@
-import { readAsStringAsync } from 'expo-file-system/legacy'
-
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { CharacterCardData, CharacterTokenCache } from '@lib/state/Characters'
 import { ChatEntry } from '@lib/state/Chat'
@@ -7,6 +5,7 @@ import { defaultSystemPromptFormat, InstructTokenCache, InstructType } from '@li
 import { Logger } from '@lib/state/Logger'
 import { replaceMacros } from '@lib/state/Macros'
 import { mmkv } from '@lib/storage/MMKV'
+import { readBase64Async } from '@lib/utils/File'
 import { Macro } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
@@ -135,7 +134,7 @@ export const buildChatCompletionContext = async ({
 
             const images: ContentTypes[] = await Promise.all(
                 attachments.map(async (item) => {
-                    const base64data = await readAsStringAsync(item.uri, { encoding: 'base64' })
+                    const base64data = await readBase64Async(item.uri)
                     if (item.type === 'image')
                         return {
                             type: 'image_url',

@@ -2,13 +2,7 @@ import { getThreads } from '@vali98/react-native-cpu-info'
 import { setTextIntentEnabled, useTextIntentOnForeground } from '@vali98/react-native-process-text'
 import { getCpuFeatures } from 'cui-llama.rn'
 import { DeviceType, getDeviceTypeAsync } from 'expo-device'
-import {
-    deleteAsync,
-    documentDirectory,
-    makeDirectoryAsync,
-    readAsStringAsync,
-    readDirectoryAsync,
-} from 'expo-file-system/legacy'
+import { Paths } from 'expo-file-system'
 import * as KeepAwake from 'expo-keep-awake'
 import { router } from 'expo-router'
 import { setBackgroundColorAsync as setUIBackgroundColor } from 'expo-system-ui'
@@ -23,8 +17,7 @@ import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSStore } from '@lib/state/TTS'
 
-import { AppDirectory } from './File'
-import { patchAndroidText } from './PatchText'
+import { AppDirectory, deleteFile, listFiles, makeDirectory, readStringAsync } from './File'
 import { lockScreenOrientation } from './Screen'
 import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
@@ -150,25 +143,19 @@ const migrateTTSData_0_8_5_to_0_8_6 = () => {
 
 export const generateDefaultDirectories = async () => {
     // Removed: 'instruct', 'persona', 'presets', 'lorebooks'
-    Object.values(AppDirectory).map(async (dir) => {
-        await makeDirectoryAsync(`${dir}`, {})
-            .then(() =>
-                Logger.info(
-                    `Successfully made directory: ${dir.replace(`${documentDirectory}`, '')}`
-                )
-            )
-            .catch(() => {})
+    Object.values(AppDirectory).map((dir) => {
+        makeDirectory(dir)
     })
 }
 
 const migratePresets_0_8_3_to_0_8_4 = async () => {
-    const presetDir = `${documentDirectory}presets`
-    const files = await readDirectoryAsync(presetDir)
-    if (files.length === 0) return
+    const presetPath = `${Paths.document.uri}presets`
+    const files = listFiles(presetPath)
 
+    if (files.length === 0) return
     files.map(async (item) => {
         try {
-            const data = await readAsStringAsync(`${presetDir}/${item}`)
+            const data = await readStringAsync(`${presetPath}/${item}`)
             SamplersManager.useSamplerStore.getState().addSamplerConfig({
                 data: JSON.parse(data),
                 name: item.replace('.json', ''),
@@ -177,7 +164,7 @@ const migratePresets_0_8_3_to_0_8_4 = async () => {
             Logger.error(`Failed to migrate preset ${item}: ${e}`)
         }
     })
-    await deleteAsync(presetDir)
+    deleteFile(presetPath)
 }
 
 const migrateAppMode_0_8_5_to_0_8_6 = () => {
@@ -279,7 +266,7 @@ export const startupApp = () => {
 
     // patch for Bold Text bug
     // refer to https://github.com/Vali-98/ChatterUI/issues/161
-    patchAndroidText()
+    // patchAndroidText()
 
     // Local Model Data in case external models are deleted
     Model.verifyModelList()

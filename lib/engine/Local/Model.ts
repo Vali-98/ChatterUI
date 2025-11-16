@@ -1,7 +1,6 @@
 import { loadLlamaModelInfo } from 'cui-llama.rn'
 import { eq, inArray, notInArray } from 'drizzle-orm'
 import { getDocumentAsync } from 'expo-document-picker'
-import { copyAsync, deleteAsync, getInfoAsync, readDirectoryAsync } from 'expo-file-system/legacy'
 import { Platform } from 'react-native'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -10,7 +9,15 @@ import { db } from '@db'
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
-import { AppDirectory, readableFileSize } from '@lib/utils/File'
+import {
+    AppDirectory,
+    copyFile,
+    deleteFile,
+    fileExists,
+    fileInfo,
+    listFiles,
+    readableFileSize,
+} from '@lib/utils/File'
 import { model_data, model_mmproj_links, ModelDataType } from 'db/schema'
 
 import { GGMLNameMap, GGMLType } from './GGML'
@@ -29,7 +36,7 @@ const mmprojArchs = ['clip', 'llava']
 
 export namespace Model {
     export const getModelList = async () => {
-        return await readDirectoryAsync(AppDirectory.ModelPath)
+        return listFiles(AppDirectory.ModelPath)
     }
 
     export const deleteModelById = async (id: number) => {
@@ -54,17 +61,10 @@ export namespace Model {
             const name = file.name
             const newdir = `${AppDirectory.ModelPath}${name}`
             Logger.infoToast('Importing file...')
-            const success = await copyAsync({
+            const success = copyFile({
                 from: file.uri,
                 to: newdir,
             })
-                .then(() => {
-                    return true
-                })
-                .catch((error) => {
-                    Logger.errorToast(`Import Failed: ${error.message}`)
-                    return false
-                })
             if (!success) return
 
             // database routine here
@@ -89,13 +89,8 @@ export namespace Model {
         })
     }
 
-    export const getModelExists = async (path: string) => {
-        return await getInfoAsync(path)
-            .then((result) => result.exists)
-            .catch((e) => {
-                Logger.error(`${e}`)
-                return false
-            })
+    export const getModelExists = (path: string) => {
+        return fileExists(path)
     }
 
     export const verifyModelList = async () => {
@@ -106,7 +101,7 @@ export namespace Model {
         if (Platform.OS === 'android')
             // cull not required on iOS
             modelList.forEach(async (item) => {
-                if (item.name === '' || !(await getModelExists(item.file_path))) {
+                if (item.name === '' || !getModelExists(item.file_path)) {
                     Logger.warnToast(`Model Missing, its entry will be deleted: ${item.name}`)
                     await db.delete(model_data).where(eq(model_data.id, item.id))
                 }
@@ -231,7 +226,7 @@ export namespace Model {
 
             const modelInfo: any = await loadLlamaModelInfo(file_path)
             let fileSize = 0
-            const fileResult = await getInfoAsync(file_path)
+            const fileResult = fileInfo(file_path)
             if (fileResult.exists) {
                 fileSize = fileResult.size
             }
@@ -251,7 +246,7 @@ export namespace Model {
             return true
         } catch (e) {
             Logger.errorToast(`Failed to create data: ${e}`)
-            if (deleteOnFailure) deleteAsync(file_path, { idempotent: true })
+            if (deleteOnFailure) deleteFile(file_path)
             return false
         }
     }
@@ -268,7 +263,7 @@ export namespace Model {
 
     const deleteModel = async (name: string) => {
         if (!(await modelExists(name))) return
-        return await deleteAsync(`${AppDirectory.ModelPath}${name}`)
+        return deleteFile(`${AppDirectory.ModelPath}${name}`)
     }
 }
 
@@ -331,18 +326,16 @@ export namespace KV {
     export const sessionFile = `${AppDirectory.SessionPath}llama-session.bin`
 
     export const getKVSize = async () => {
-        const data = await getInfoAsync(sessionFile)
+        const data = fileInfo(sessionFile)
         return data.exists ? data.size : 0
     }
 
     export const deleteKV = async () => {
-        if ((await getInfoAsync(sessionFile)).exists) {
-            await deleteAsync(sessionFile)
-        }
+        deleteFile(sessionFile)
     }
 
     export const kvInfo = async () => {
-        const data = await getInfoAsync(sessionFile)
+        const data = fileInfo(sessionFile)
         if (!data.exists) {
             Logger.warn('No KV Cache found')
             return

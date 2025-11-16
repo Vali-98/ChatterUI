@@ -1,6 +1,6 @@
 import { initLlama, LlamaContext } from 'cui-llama.rn'
 import { NativeEmbeddingResult } from 'cui-llama.rn/lib/typescript/NativeRNLlama'
-import { documentDirectory } from 'expo-file-system/legacy'
+import { Paths } from 'expo-file-system'
 import { useState } from 'react'
 import { Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { create } from 'zustand'
@@ -193,7 +193,7 @@ export namespace EmbeddingState {
         model: undefined,
         loadModel: async (preset: LlamaConfig) => {
             const model = await initLlama({
-                model: documentDirectory + 'models/allminifp16.gguf',
+                model: Paths.document.uri + 'models/allminifp16.gguf',
                 n_threads: preset.threads,
                 n_batch: preset.batch,
                 embedding: true,

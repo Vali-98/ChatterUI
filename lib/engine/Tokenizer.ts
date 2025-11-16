@@ -1,16 +1,10 @@
 import { initLlama, LlamaContext } from 'cui-llama.rn'
 import { Asset } from 'expo-asset'
-import {
-    copyAsync,
-    deleteAsync,
-    documentDirectory,
-    getInfoAsync,
-    makeDirectoryAsync,
-} from 'expo-file-system/legacy'
 import { create } from 'zustand'
 
 import { useAppModeStore } from '@lib/state/AppMode'
 import { Logger } from '@lib/state/Logger'
+import { AppDirectory, copyFile, fileExists } from '@lib/utils/File'
 
 import { Llama } from './Local/LlamaLocal'
 
@@ -20,6 +14,8 @@ type TokenizerState = {
     getTokenCount: (text: string, image_urls?: string[]) => number
     loadModel: () => Promise<void>
 }
+
+const tokenizerModelDir = `${AppDirectory.Assets}llama3tokenizer.gguf`
 
 export namespace Tokenizer {
     export const useTokenizerState = create<TokenizerState>()((set, get) => ({
@@ -44,7 +40,7 @@ export namespace Tokenizer {
             })
 
             const context = await initLlama({
-                model: documentDirectory + 'appAssets/llama3tokenizer.gguf',
+                model: tokenizerModelDir,
                 vocab_only: true,
                 use_mlock: true,
             })
@@ -53,20 +49,11 @@ export namespace Tokenizer {
     }))
 
     const importModelFromRes = async () => {
-        const folderDir = `${documentDirectory}appAssets/`
-        const folderExists = (await getInfoAsync(folderDir)).exists
-        if (!folderExists) await makeDirectoryAsync(`${documentDirectory}appAssets`)
-        const modelDir = `${folderDir}llama3tokenizer.gguf`
-        const modelExists = (await getInfoAsync(modelDir)).exists
-        if (modelExists) return
+        if (fileExists(tokenizerModelDir)) return
         Logger.info('Importing Tokenizer')
         const [asset] = await Asset.loadAsync(require('./../../assets/models/llama3tokenizer.gguf'))
         await asset.downloadAsync()
-        if (asset.localUri) await copyAsync({ from: asset.localUri, to: modelDir })
-    }
-
-    export const debugDeleteModel = async () => {
-        await deleteAsync(documentDirectory + 'appAssets')
+        if (asset.localUri) copyFile({ from: asset.localUri, to: tokenizerModelDir })
     }
 
     export const getTokenizer = () => {
