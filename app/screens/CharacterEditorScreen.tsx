@@ -20,7 +20,7 @@ import AvatarViewer from '@components/views/AvatarViewer'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { db } from '@db'
-import { Tokenizer } from '@lib/engine/Tokenizer'
+import { useDebounceTokenizer } from '@lib/hooks/Tokenizer'
 import { CharacterCardData, Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
@@ -54,8 +54,8 @@ const ChracterEditorScreen = () => {
             }))
         )
 
-    const getTokenCount = Tokenizer.useTokenizerState((state) => state.getTokenCount)
     const [characterCard, setCharacterCard] = useState<CharacterCardData | undefined>(currentCard)
+    const descriptionTokens = useDebounceTokenizer(characterCard?.description ?? '', 300)
     const { chat, unloadChat } = Chats.useChat()
     const { data: { background_image: backgroundImage } = {} } = useLiveQuery(
         Characters.db.query.backgroundImageQuery(charId ?? -1)
@@ -348,7 +348,7 @@ const ChracterEditorScreen = () => {
 
                         <ThemedTextInput
                             scrollEnabled
-                            label={`Description Tokens: ${getTokenCount(characterCard?.description ?? '')}`}
+                            label={`Description Tokens: ${descriptionTokens}`}
                             multiline
                             containerStyle={styles.input}
                             numberOfLines={16}
