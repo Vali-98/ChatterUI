@@ -16,17 +16,20 @@ export class SSEFetch {
     private onError = () => {}
     private onClose = () => {}
     private closeStream = () => {}
-
+    private cancelled = false
     public abort() {
         this.abortController.abort()
+
         this.closeStream()
-        this.closeStream = () => {}
+        this.closeStream = () => {
+            this.cancelled = true
+        }
     }
 
     public async start(values: SSEValues) {
         this.abortController = new AbortController()
         const body = values.method === 'POST' ? { body: values.body } : {}
-
+        this.cancelled = false
         try {
             const res = await fetch(values.endpoint, {
                 signal: this.abortController.signal,
@@ -39,10 +42,18 @@ export class SSEFetch {
                 Logger.error(await res.text())
                 return this.onError()
             }
-            this.closeStream = res.body.cancel
-            //@ts-expect-error incorrect typing by expo/fetch
-            for await (const chunk of res.body) {
-                const data = this.decoder.decode(chunk)
+            const reader = res.body.getReader()
+            this.closeStream = () => {
+                try {
+                    reader.cancel()
+                    this.cancelled = true
+                } catch {}
+            }
+            while (true) {
+                const { value, done } = await reader.read()
+                if (done || this.cancelled) break
+
+                const data = this.decoder.decode(value)
                 const output = parseSSE(data)
                 output.forEach((item) => this.onEvent(item))
             }
