@@ -1,3 +1,4 @@
+import { getStringAsync } from 'expo-clipboard'
 import React, { useState } from 'react'
 import { Text, View } from 'react-native'
 
@@ -103,6 +104,10 @@ const InputSheet: React.FC<InputSheetProps> = ({
                             iconStyle={{ color: color.text._400 }}
                             iconName="copy"
                             variant="tertiary"
+                            onPress={async () => {
+                                const paste = await getStringAsync()
+                                if (paste) setText((text) => text + paste)
+                            }}
                         />
                     </View>
                     <ThemedButton
