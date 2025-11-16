@@ -11,7 +11,7 @@ import { Llama } from './Local/LlamaLocal'
 type TokenizerState = {
     model?: LlamaContext
     tokenize: (text: string) => number[]
-    getTokenCount: (text: string, image_urls?: string[]) => number
+    getTokenCount: (text: string, image_urls?: string[]) => Promise<number>
     loadModel: () => Promise<void>
 }
 
@@ -24,27 +24,28 @@ export namespace Tokenizer {
             return get()?.model?.tokenizeSync(text)?.tokens ?? []
         },
         // name this for trace stack
-        getTokenCount: function getTokenCount(text: string, image_urls: string[] = []) {
+        getTokenCount: async function getTokenCount(text: string, image_urls: string[] = []) {
             const model = get().model
             if (!model) {
                 Logger.warn('Tokenizer not loaded')
                 return 0
             }
-            return model.tokenizeSync(text).tokens.length + image_urls.length * 512
+            return (await model.tokenizeAsync(text)).tokens.length + image_urls.length * 512
         },
         loadModel: async () => {
             if (get().model) return
-
-            await importModelFromRes().catch((e) => {
-                Logger.error('Could not import Tokenizer: ' + e)
-            })
-
-            const context = await initLlama({
-                model: tokenizerModelDir,
-                vocab_only: true,
-                use_mlock: true,
-            })
-            set({ model: context })
+            try {
+                await importModelFromRes().catch((e) => {
+                    Logger.error('Could not import Tokenizer: ' + e)
+                })
+                const context = await initLlama({
+                    model: tokenizerModelDir,
+                    vocab_only: true,
+                })
+                set({ model: context })
+            } catch (e) {
+                Logger.error('Failed to load tokenizer: ' + e)
+            }
         },
     }))
 
