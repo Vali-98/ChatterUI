@@ -400,18 +400,19 @@ export namespace Chats {
         ) => {
             const messages = get()?.data?.messages
             if (!messages) return 0
-
-            const swipe_id = messages[index].swipe_id
-
-            const attachmentLength = messages[index].attachments.length
+            const message = messages[index]
+            const swipe_id = message.swipe_id
+            const swipe = message.swipes[swipe_id]
+            const attachmentLength = message.attachments.length
             const attachmentCount = options.addAttachments
                 ? options.lastImageOnly
                     ? 1
                     : attachmentLength
                 : 0
 
-            const { token_count, attachment_count } = messages[index].swipes[swipe_id]
-            if (token_count && attachmentCount === attachment_count) return token_count
+            const { token_count, attachment_count } = swipe
+            if (token_count !== undefined && attachmentCount === (attachment_count ?? 0))
+                return token_count
             const getTokenCount = Tokenizer.getTokenizer()
 
             const new_token_count = await getTokenCount(
