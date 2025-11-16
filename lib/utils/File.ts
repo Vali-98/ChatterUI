@@ -192,7 +192,7 @@ export const writeBase64File = async (path: string, content: string) => {
 }
 
 export const fileInfo = (path: string) => {
-    return new File(path)
+    return new File(path).info()
 }
 
 export const makeDirectory = async (path: string) => {
