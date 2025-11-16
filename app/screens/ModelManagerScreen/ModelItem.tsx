@@ -88,6 +88,14 @@ const ModelItem: React.FC<ModelItemProps> = ({
 
     const loadToggle = isLoaded ? modelLoading || modelImporting : disable
 
+    const tags = [
+        item.params === 'N/A' ? 'No Param Size' : item.params,
+        quant,
+        readableFileSize(item.file_size),
+        item.architecture,
+        item.file_path.startsWith('content') ? 'External' : 'Internal',
+    ]
+
     return (
         <View style={styles.modelContainer}>
             <InputSheet
@@ -103,17 +111,13 @@ const ModelItem: React.FC<ModelItemProps> = ({
             <Text style={styles.title}>{item.name}</Text>
             {!isInvalid && (
                 <View style={styles.tagContainer}>
-                    <Text style={styles.tag}>
-                        {item.params === 'N/A' ? 'No Param Size' : item.params}
-                    </Text>
-                    <Text style={styles.tag}>{quant}</Text>
-                    <Text style={styles.tag}>{readableFileSize(item.file_size)}</Text>
-                    <Text style={{ ...styles.tag, textTransform: 'capitalize' }}>
-                        {item.architecture}
-                    </Text>
-                    <Text style={styles.tag}>
-                        {item.file_path.startsWith('content') ? 'External' : 'Internal'}
-                    </Text>
+                    {tags.map((tag) => {
+                        return (
+                            <Text key={tag} style={styles.tag} numberOfLines={1}>
+                                {tag}
+                            </Text>
+                        )
+                    })}
                 </View>
             )}
             {isInvalid && (
@@ -258,8 +262,8 @@ const useStyles = () => {
         },
 
         tagContainer: {
-            columnGap: 4,
-            rowGap: 4,
+            columnGap: 2,
+            rowGap: 2,
             paddingTop: spacing.m,
             paddingBottom: spacing.m,
             flexDirection: 'row',
@@ -274,6 +278,7 @@ const useStyles = () => {
             paddingHorizontal: spacing.m,
             paddingVertical: spacing.s,
             color: color.text._300,
+            textTransform: 'capitalize',
         },
         title: {
             fontSize: fontSize.l,
