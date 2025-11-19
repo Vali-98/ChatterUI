@@ -5,6 +5,7 @@ import { KeyboardProvider } from 'react-native-keyboard-controller'
 
 import { AlertProvider } from '@components/views/Alert'
 import { PortalHost } from '@components/views/Portal'
+import { useAppStateNotificationObserver } from '@lib/notifications/Notifications'
 import { Theme } from '@lib/theme/ThemeManager'
 
 SplashScreen.preventAutoHideAsync()
@@ -15,7 +16,7 @@ setOptions({
 
 const Layout = () => {
     const { color } = Theme.useTheme()
-
+    useAppStateNotificationObserver()
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <KeyboardProvider>

@@ -8,7 +8,6 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { db } from '@db'
 import useLocalAuth from '@lib/hooks/LocalAuth'
-import { useNotificationObserver } from '@lib/notifications/Notifications'
 import { Theme } from '@lib/theme/ThemeManager'
 import { loadChatOnInit, startupApp, useTextIntentFocus } from '@lib/utils/Startup'
 import CharacterList from '@screens/CharacterListScreen'
@@ -23,7 +22,6 @@ const Home = () => {
 
     const [firstRender, setFirstRender] = useState<boolean>(true)
 
-    useNotificationObserver()
     useTextIntentFocus()
 
     useEffect(() => {
