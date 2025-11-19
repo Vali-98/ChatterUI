@@ -1,5 +1,5 @@
 import * as Notifications from 'expo-notifications'
-import { useRouter } from 'expo-router'
+import { usePathname, useRouter } from 'expo-router'
 import { useEffect } from 'react'
 import { Linking, Platform } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -66,10 +66,10 @@ export function useNotificationObserver() {
     const { chat, loadChat } = Chats.useChat()
     const { setCard } = Characters.useCharacterStore()
     const router = useRouter()
+    const path = usePathname()
 
     useEffect(() => {
         let isMounted = true
-
         async function redirect(notification: Notifications.Notification) {
             if (chat ?? autoLoad ?? useAuth) return
             const data = notification.request.content.data
@@ -80,19 +80,22 @@ export function useNotificationObserver() {
                 try {
                     await loadChat(chatId)
                     await setCard(characterId)
-                    router.push('/screens/ChatScreen')
+                    if (path !== '/screens/ChatScreen') {
+                        router.dismissTo('/')
+                        router.push('/screens/ChatScreen')
+                        Notifications.clearLastNotificationResponse()
+                    }
                 } catch (e) {
                     Logger.error('Failed to load chat: ' + e)
                 }
             }
         }
 
-        Notifications.getLastNotificationResponseAsync().then((response) => {
-            if (!isMounted || !response?.notification) {
-                return
-            }
-            redirect(response?.notification)
-        })
+        const response = Notifications.getLastNotificationResponse()
+        if (!isMounted || !response?.notification) {
+            return
+        }
+        redirect(response?.notification)
 
         const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
             redirect(response.notification)
@@ -102,5 +105,5 @@ export function useNotificationObserver() {
             isMounted = false
             subscription.remove()
         }
-    }, [autoLoad, useAuth, chat, loadChat, router, setCard])
+    }, [autoLoad, useAuth, chat, loadChat, router, setCard, path])
 }
