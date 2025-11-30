@@ -228,7 +228,7 @@ export namespace Model {
             let fileSize = 0
             const fileResult = fileInfo(file_path)
             if (fileResult.exists) {
-                fileSize = fileResult.size
+                fileSize = fileResult.size ?? 0
             }
             const modelType = modelInfo?.['general.architecture']
             const modelDataEntry = {
@@ -327,7 +327,7 @@ export namespace KV {
 
     export const getKVSize = async () => {
         const data = fileInfo(sessionFile)
-        return data.exists ? data.size : 0
+        return data.size ?? 0
     }
 
     export const deleteKV = async () => {
@@ -340,6 +340,6 @@ export namespace KV {
             Logger.warn('No KV Cache found')
             return
         }
-        Logger.info(`Size of KV cache: ${Math.floor(data.size * 0.000001)} MB`)
+        Logger.info(`Size of KV cache: ${Math.floor(data.size ?? 0 * 0.000001)} MB`)
     }
 }
