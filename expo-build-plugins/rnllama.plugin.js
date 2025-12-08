@@ -24,7 +24,7 @@ function withLlamaRn(config, options = {}) {
         enableEntitlements = true,
         entitlementsProfile = 'production',
         forceCxx20 = true,
-        enableOpenCL = true, // ✅ enabled by default
+        enableOpenCLAndHexagon = true,
     } = options
 
     // 1) Conditionally add iOS entitlements
@@ -86,22 +86,33 @@ function withLlamaRn(config, options = {}) {
     }
 
     // 3) Add Android <uses-native-library> for OpenCL
-    if (enableOpenCL) {
+    if (enableOpenCLAndHexagon) {
         config = withAndroidManifest(config, (c) => {
             const app = c.modResults.manifest.application?.[0]
             if (!app) return c
 
-            if (!app['uses-native-library']) {
+            if (!app?.['uses-native-library']) {
                 app['uses-native-library'] = []
             }
 
             const libs = app['uses-native-library']
-            const alreadyExists = libs.some((lib) => lib.$['android:name'] === 'libOpenCL.so')
+            const openclAlreadyExists = libs.some((lib) => lib.$['android:name'] === 'libOpenCL.so')
+            const cdsprpcAlreadyExists = libs.some(
+                (lib) => lib.$['android:name'] === 'libcdsprpc.so'
+            )
 
-            if (!alreadyExists) {
+            if (!openclAlreadyExists) {
                 libs.push({
                     $: {
                         'android:name': 'libOpenCL.so',
+                        'android:required': 'false',
+                    },
+                })
+            }
+            if (!cdsprpcAlreadyExists) {
+                libs.push({
+                    $: {
+                        'android:name': 'libcdsprpc.so',
                         'android:required': 'false',
                     },
                 })
