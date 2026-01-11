@@ -1,5 +1,4 @@
 import { initLlama, LlamaContext } from 'cui-llama.rn'
-import { NativeEmbeddingResult } from 'cui-llama.rn/lib/typescript/NativeRNLlama'
 import { Paths } from 'expo-file-system'
 import { useState } from 'react'
 import { Text, TextInput, TouchableOpacity, View } from 'react-native'
@@ -90,7 +89,7 @@ const EmbeddingScreen = () => {
                     let s1 = 0
                     let s2 = 0
                     let dotprod = 0
-                    v1?.embedding.forEach((item, index) => {
+                    v1?.embedding.forEach((item: any, index: number) => {
                         dotprod += v1.embedding[index] * v2.embedding[index]
                         s1 += v1.embedding[index] * v1.embedding[index]
                         s2 += v2.embedding[index] * v2.embedding[index]
@@ -185,7 +184,7 @@ const insertData = async () => {
 type EmbeddingStoreState = {
     model: undefined | LlamaContext
     loadModel: (preset: LlamaConfig) => Promise<void>
-    getEmbedding: (text: string) => Promise<NativeEmbeddingResult | undefined>
+    getEmbedding: (text: string) => Promise<any | undefined>
 }
 
 export namespace EmbeddingState {

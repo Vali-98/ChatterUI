@@ -1,3 +1,4 @@
+import { closeFd, getContentFd } from '@vali98/react-native-fs'
 import {
     CompletionParams,
     ContextParams,
@@ -56,7 +57,7 @@ export type LlamaState = {
     ) => Promise<void>
     stopCompletion: () => Promise<void>
     tokenLength: (text: string, mediaPaths?: string[]) => Promise<number>
-    tokenize: (text: string, media_paths?: string[]) => { tokens: number[] } | undefined
+    tokenize: (text: string, media_paths?: string[]) => Promise<{ tokens: number[] } | undefined>
 }
 
 export type LlamaConfig = {
@@ -155,8 +156,13 @@ export namespace Llama {
                 await get().unload()
             }
 
+            let model_path = model.file_path
+            if (model.file_path.includes('content://')) {
+                model_path = (await getContentFd(model_path)) ?? model_path
+            }
+
             const params: ContextParams = {
-                model: model.file_path,
+                model: model_path,
                 n_ctx: config.context_length,
                 n_threads: config.threads,
                 n_batch: config.batch,
@@ -176,6 +182,9 @@ export namespace Llama {
 
             const llamaContext = await initLlama(params, progressCallback).catch((error) => {
                 Logger.errorToast(`Could Not Load Model: ${error} `)
+                if (model.file_path.includes('content://')) {
+                    closeFd(model_path)
+                }
             })
 
             if (!llamaContext) return
@@ -194,13 +203,25 @@ export namespace Llama {
             const context = get().context
             if (!context) return
 
-            Logger.info('Loading MMPROJ')
-            await context
-                .initMultimodal({ path: model.file_path, use_gpu: true })
-                .catch((e) => Logger.errorToast('Failed to load MMPROJ: ' + e))
+            let model_path = model.file_path
+            if (model.file_path.includes('content://')) {
+                model_path = (await getContentFd(model_path)) ?? model_path
+            }
 
-            // TODO: Fix previewing model capabilities
-            // refer to https://github.com/mybigday/llama.rn/issues/151
+            Logger.info('Loading MMPROJ')
+            await context.initMultimodal({ path: model_path, use_gpu: true }).catch((e) => {
+                if (model.file_path.includes('content://')) {
+                    closeFd(model_path)
+                }
+
+                Logger.errorToast('Failed to load MMPROJ: ' + e)
+            })
+            if (await context.isMultimodalEnabled()) {
+                const capabilities = await context.getMultimodalSupport()
+                Logger.info(
+                    `MMPROJ Loaded:\n- Vision: ${capabilities.vision}\n- Audio: ${capabilities.audio}`
+                )
+            }
 
             set({
                 mmproj: model,
@@ -271,7 +292,7 @@ export namespace Llama {
             }
 
             if (prompt) {
-                const tokens = get().tokenize(prompt, media_paths ?? [])?.tokens
+                const tokens = (await get().tokenize(prompt, media_paths ?? []))?.tokens
                 KV.useKVStore.getState().setKvCacheTokens(tokens ?? [])
             }
 
@@ -316,7 +337,7 @@ export namespace Llama {
             if (!get().mmproj && mediaPaths.length > 0) {
                 Logger.warnToast('Media was added without MMPROJ model')
             }
-            const result = await get().context?.tokenizeAsync(
+            const result = await get().context?.tokenize(
                 text + finalPaths.map(() => RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER).join(),
                 {
                     media_paths: finalPaths.map((item) => item.replace('file://', '')),
@@ -325,9 +346,9 @@ export namespace Llama {
             if (!result) return 0
             return result.tokens.length
         },
-        tokenize: (text: string, media_paths: string[] = []) => {
+        tokenize: async (text: string, media_paths: string[] = []) => {
             const params = get().mmproj ? { media_paths } : {}
-            return get().context?.tokenizeSync(text, params)
+            return await get().context?.tokenize(text, params)
         },
     }))
 
@@ -335,14 +356,14 @@ export namespace Llama {
         return (
             `\n[Prompt Timings]` +
             (timings.prompt_n > 0
-                ? `\nPrompt Per Token: ${timings.prompt_per_token_ms} ms/token` +
+                ? `\nPrompt Per Token: ${timings.prompt_per_token_ms.toFixed(2)} ms/token` +
                   `\nPrompt Per Second: ${timings.prompt_per_second?.toFixed(2) ?? 0} tokens/s` +
                   `\nPrompt Time: ${(timings.prompt_ms / 1000).toFixed(2)}s` +
                   `\nPrompt Tokens: ${timings.prompt_n} tokens`
                 : '\nNo Tokens Processed') +
             `\n\n[Predicted Timings]` +
             (timings.predicted_n > 0
-                ? `\nPredicted Per Token: ${timings.predicted_per_token_ms} ms/token` +
+                ? `\nPredicted Per Token: ${timings.predicted_per_token_ms.toFixed(2)} ms/token` +
                   `\nPredicted Per Second: ${timings.predicted_per_second?.toFixed(2) ?? 0} tokens/s` +
                   `\nPrediction Time: ${(timings.predicted_ms / 1000).toFixed(2)}s` +
                   `\nPredicted Tokens: ${timings.predicted_n} tokens\n`

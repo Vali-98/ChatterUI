@@ -1,6 +1,5 @@
-import { getThreads } from '@vali98/react-native-cpu-info'
+import { getThreads, getCpuFeatures } from '@vali98/react-native-cpu-info'
 import { setTextIntentEnabled, useTextIntentOnForeground } from '@vali98/react-native-process-text'
-import { getCpuFeatures } from 'cui-llama.rn'
 import { DeviceType, getDeviceTypeAsync } from 'expo-device'
 import { Paths } from 'expo-file-system'
 import * as KeepAwake from 'expo-keep-awake'

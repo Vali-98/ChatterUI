@@ -145,7 +145,7 @@ const buildLocalPayload = async () => {
         return
     }
 
-    const finalMediaPaths = (hasAudio ?? hasImage) ? { media_paths: mediaPaths } : {}
+    const finalMediaPaths = hasAudio || hasImage ? { media_paths: mediaPaths } : {}
 
     return {
         ...payloadFields,
@@ -236,7 +236,7 @@ export const localInference = async () => {
         }
 
         if (mmkv.getBoolean(AppSettings.SaveLocalKV) && !KV.useKVStore.getState().kvCacheLoaded) {
-            const prompt = Llama.useLlamaModelStore
+            const prompt = await Llama.useLlamaModelStore
                 .getState()
                 .tokenize(payload.prompt, payload.media_paths)
             const result = KV.useKVStore.getState().verifyKVCache(prompt?.tokens ?? [])

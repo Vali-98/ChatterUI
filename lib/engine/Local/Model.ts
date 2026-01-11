@@ -1,3 +1,4 @@
+import { getContentFd, persistContentPermission } from '@vali98/react-native-fs'
 import { loadLlamaModelInfo } from 'cui-llama.rn'
 import { eq, inArray, notInArray } from 'drizzle-orm'
 import { getDocumentAsync } from 'expo-document-picker'
@@ -84,8 +85,10 @@ export namespace Model {
                 return
             }
 
-            if (await createModelDataExternal(file.uri, file.name, true))
+            if (await createModelDataExternal(file.uri, file.name)) {
+                persistContentPermission(file.uri)
                 Logger.infoToast(`Model Imported Sucessfully!`)
+            }
         })
     }
 
@@ -223,8 +226,11 @@ export namespace Model {
 
             // This will load GGUF KV-pairs
             // refer to https://github.com/ggml-org/ggml/blob/master/docs/gguf.md#standardized-key-value-pairs
+            let loadable_path = file_path
+            if (loadable_path.includes('content://'))
+                loadable_path = (await getContentFd(loadable_path)) ?? loadable_path
 
-            const modelInfo: any = await loadLlamaModelInfo(file_path)
+            const modelInfo: any = await loadLlamaModelInfo(loadable_path)
             let fileSize = 0
             const fileResult = fileInfo(file_path)
             if (fileResult.exists) {

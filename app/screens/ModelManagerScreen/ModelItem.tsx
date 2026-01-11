@@ -111,9 +111,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
             <Text style={styles.title}>{item.name}</Text>
             {!isInvalid && (
                 <View style={styles.tagContainer}>
-                    {tags.map((tag) => {
+                    {tags.map((tag, i) => {
                         return (
-                            <Text key={tag} style={styles.tag} numberOfLines={1}>
+                            <Text key={i} style={styles.tag} numberOfLines={1}>
                                 {tag}
                             </Text>
                         )
@@ -206,9 +206,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
                                 Logger.error(`Failed to load model: ${e}`)
                             })
                             if (item.mmprojLink) {
-                                const mmprojModel = mmprojList.filter(
+                                const [mmprojModel] = mmprojList.filter(
                                     (a) => a.id === item.mmprojLink?.mmproj_id
-                                )?.[0]
+                                )
                                 if (mmprojModel) {
                                     await loadMmproj(mmprojModel)
                                 }
