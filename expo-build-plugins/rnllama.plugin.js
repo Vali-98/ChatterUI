@@ -1,25 +1,13 @@
-const {
-    withDangerousMod,
-    withXcodeProject,
-    withAndroidManifest,
-    createRunOncePlugin,
-} = require('@expo/config-plugins')
-const fs = require('fs')
-const path = require('path')
+import pkg from '@expo/config-plugins'
+import * as fs from 'fs'
+import * as path from 'path'
 
 const PLUGIN_NAME = 'llama-rn-plugin'
 const PLUGIN_VERSION = '1.0.0'
 
-/**
- * @typedef {Object} PluginOptions
- * @property {boolean} [enableEntitlements=true] Enable adding iOS entitlements
- * @property {string}  [entitlementsProfile='production'] EAS build profile name to enable entitlements for
- * @property {boolean} [forceCxx20=true] Force C++20 for all Pods targets
- * @property {boolean} [enableOpenCL=true] Enable <uses-native-library> in AndroidManifest
- */
+const { withDangerousMod, withXcodeProject, withAndroidManifest, createRunOncePlugin } = pkg
 
-/** @type {import('@expo/config-plugins').ConfigPlugin<PluginOptions>} */
-function withLlamaRn(config, options = {}) {
+const withLlamaRn = (config, options = {}) => {
     const {
         enableEntitlements = true,
         entitlementsProfile = 'production',
@@ -27,10 +15,11 @@ function withLlamaRn(config, options = {}) {
         enableOpenCLAndHexagon = true,
     } = options
 
-    // 1) Conditionally add iOS entitlements
     const isProdProfile =
         process.env.EAS_BUILD_PROFILE === entitlementsProfile ||
-        process.env.NODE_ENV === 'production'
+        process.env.NODE_ENV === 'production' ||
+        (Array.isArray(entitlementsProfile) &&
+            entitlementsProfile.includes(process.env.EAS_BUILD_PROFILE || ''))
 
     if (enableEntitlements && isProdProfile) {
         config.ios = config.ios || {}
@@ -39,34 +28,39 @@ function withLlamaRn(config, options = {}) {
         config.ios.entitlements['com.apple.developer.kernel.increased-memory-limit'] = true
     }
 
-    // 2) Enforce C++20 for app target and all Pods
     if (forceCxx20) {
-        // 2a) App target via Xcode project settings
         config = withXcodeProject(config, (c) => {
             const project = c.modResults
             const configs = project.pbxXCBuildConfigurationSection()
-            for (const key in configs) {
-                const cfg = configs[key]
-                if (typeof cfg !== 'object' || !cfg.buildSettings) continue
+            Object.values(configs).forEach((cfg) => {
+                if (typeof cfg !== 'object' || !cfg.buildSettings) {
+                    return
+                }
+
                 cfg.buildSettings['CLANG_CXX_LANGUAGE_STANDARD'] = '"gnu++20"'
                 cfg.buildSettings['CLANG_CXX_LIBRARY'] = '"libc++"'
+
                 const current = String(cfg.buildSettings['OTHER_CPLUSPLUSFLAGS'] || '$(inherited)')
+
                 if (!current.includes('-std=gnu++20')) {
                     cfg.buildSettings['OTHER_CPLUSPLUSFLAGS'] = '"$(inherited) -std=gnu++20"'
-                } else if (!current.startsWith('"')) {
+                    return
+                }
+
+                if (!current.startsWith('"')) {
                     cfg.buildSettings['OTHER_CPLUSPLUSFLAGS'] = `"${current}"`
                 }
-            }
+            })
+
             return c
         })
 
-        // 2b) Pods targets via Podfile post_install
         config = withDangerousMod(config, [
             'ios',
             async (c) => {
                 const podfilePath = path.join(c.modRequest.projectRoot, 'ios', 'Podfile')
                 if (!fs.existsSync(podfilePath)) return c
-                let contents = fs.readFileSync(podfilePath, 'utf8')
+                const contents = fs.readFileSync(podfilePath, 'utf8')
 
                 if (contents.includes('LLAMA_RN_CXX20')) return c
 
@@ -85,7 +79,6 @@ function withLlamaRn(config, options = {}) {
         ])
     }
 
-    // 3) Add Android <uses-native-library> for OpenCL
     if (enableOpenCLAndHexagon) {
         config = withAndroidManifest(config, (c) => {
             const app = c.modResults.manifest.application?.[0]
@@ -124,4 +117,4 @@ function withLlamaRn(config, options = {}) {
     return config
 }
 
-module.exports = createRunOncePlugin(withLlamaRn, PLUGIN_NAME, PLUGIN_VERSION)
+export default createRunOncePlugin(withLlamaRn, PLUGIN_NAME, PLUGIN_VERSION)
