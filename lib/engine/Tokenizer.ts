@@ -38,10 +38,13 @@ export namespace Tokenizer {
                 await importModelFromRes().catch((e) => {
                     Logger.error('Could not import Tokenizer: ' + e)
                 })
+                Logger.info('Loading Tokenizer')
                 const context = await initLlama({
                     model: tokenizerModelDir,
                     vocab_only: true,
+                    n_gpu_layers: 0,
                 })
+                Logger.info('Tokenizer Loaded')
                 set({ model: context })
             } catch (e) {
                 Logger.error('Failed to load tokenizer: ' + e)
