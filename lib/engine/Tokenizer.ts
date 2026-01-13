@@ -43,7 +43,7 @@ export namespace Tokenizer {
                     model: tokenizerModelDir,
                     vocab_only: true,
                     n_gpu_layers: 0,
-                    devices: [],
+                    devices: ['CPU'],
                 })
                 Logger.info('Tokenizer Loaded')
                 set({ model: context })
