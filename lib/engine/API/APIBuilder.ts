@@ -110,7 +110,7 @@ export const buildAndSendRequest = async ({
                 if (text) onData(text)
                 return !!text?.trim()
             } catch (e) {
-                console.log(e)
+                Logger.error(JSON.stringify(e))
             }
             return false
         }
