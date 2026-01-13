@@ -1,11 +1,12 @@
 import { useFocusEffect } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { BackHandler, Platform, View } from 'react-native'
-import { useMMKVBoolean, useMMKVNumber, useMMKVObject } from 'react-native-mmkv'
+import { useMMKVBoolean, useMMKVNumber } from 'react-native-mmkv'
 import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
+import HorizontalSelector from '@components/input/HorizontalSelector'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
@@ -13,6 +14,7 @@ import Alert from '@components/views/Alert'
 import { AppSettings, Global } from '@lib/constants/GlobalValues'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { KV } from '@lib/engine/Local/Model'
+import useBackendDevices from '@lib/hooks/BackendDevices'
 import { Logger } from '@lib/state/Logger'
 import { readableFileSize } from '@lib/utils/File'
 
@@ -22,12 +24,7 @@ type ModelSettingsProp = {
     exit: () => void
 }
 
-type CPUFeatures = {
-    i8mm: boolean
-    armv8: boolean
-    dotprod: boolean
-    adreno: boolean
-}
+const deviceLabels = { GPUOpenCL: 'OpenCL', HTP0: 'Hexagon', CPU: 'CPU' }
 
 const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoading, exit }) => {
     const { config, setConfig } = Llama.useLlamaPreferencesStore(
@@ -37,11 +34,12 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
         }))
     )
 
+    const devices = useBackendDevices()
+
     const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
     const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)
     const [showModelInChat, setShowModelInChat] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [threadCount] = useMMKVNumber(Global.CPUThreads)
-    const [cpuFeatures] = useMMKVObject<CPUFeatures>(Global.CpuFeatures)
 
     const [kvSize, setKVSize] = useState(0)
 
@@ -123,7 +121,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                     />
 
                     {/* Note: llama.rn does not have any Android gpu acceleration */}
-                    {(Platform.OS === 'ios' || cpuFeatures?.adreno) && (
+                    {(Platform.OS === 'ios' || devices.length > 1) && (
                         <ThemedSlider
                             label="GPU Layers"
                             value={config.gpu_layers}
@@ -142,6 +140,22 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                             setConfig({ ...config, ctx_shift: value })
                         }}
                     />
+
+                    {devices.length > 1 && (
+                        <HorizontalSelector
+                            style={{ paddingBottom: 12 }}
+                            label="Backend Device"
+                            values={devices.map((item) => ({
+                                label: deviceLabels[item as keyof typeof deviceLabels] ?? item,
+                                value: item,
+                            }))}
+                            selected={config.devices?.[0]}
+                            onPress={(value) => {
+                                const devices = value === 'CPU' ? [value] : [value, 'CPU']
+                                setConfig({ ...config, devices })
+                            }}
+                        />
+                    )}
                 </>
             )}
             <SectionTitle>Advanced Settings</SectionTitle>

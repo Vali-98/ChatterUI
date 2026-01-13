@@ -66,6 +66,7 @@ export type LlamaConfig = {
     gpu_layers: number
     batch: number
     ctx_shift: boolean
+    devices: string[]
 }
 
 export type EngineDataProps = {
@@ -86,6 +87,7 @@ const defaultConfig = {
     gpu_layers: 0,
     batch: 512,
     ctx_shift: true,
+    devices: [],
 }
 
 export namespace Llama {
@@ -119,11 +121,15 @@ export namespace Llama {
                     lastMmproj: state.lastMmproj,
                 }),
                 storage: createMMKVStorage(),
-                version: 1,
+                version: 3,
                 migrate: (persistedState: any, version) => {
                     if (version === 1) {
                         persistedState.config.ctx_shift = true
                         Logger.info('Migrated to v2 EngineData')
+                    }
+                    if (version === 2) {
+                        persistedState.config.devices = []
+                        Logger.info('Migrated to v3 EngineData')
                     }
                 },
             }
@@ -170,6 +176,7 @@ export namespace Llama {
                 n_gpu_layers: config.gpu_layers,
                 use_mlock: true,
                 use_mmap: true,
+                devices: config.devices,
             }
 
             Logger.info(
