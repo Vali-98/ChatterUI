@@ -75,7 +75,6 @@ export function useAppStateNotificationObserver() {
                 const data = notification.request.content.data
                 const chatId = data?.chatId as number | undefined
                 const characterId = data?.characterId as number | undefined
-                console.log(chatId, characterId, notification)
                 if (chatId && characterId) {
                     Logger.info('Loading chat from notification')
                     try {
