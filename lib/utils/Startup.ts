@@ -1,4 +1,4 @@
-import { getThreads, getCpuFeatures } from '@vali98/react-native-cpu-info'
+import { getCpuFeatures, getThreads } from '@vali98/react-native-cpu-info'
 import { setTextIntentEnabled, useTextIntentOnForeground } from '@vali98/react-native-process-text'
 import { DeviceType, getDeviceTypeAsync } from 'expo-device'
 import { Paths } from 'expo-file-system'
@@ -17,6 +17,7 @@ import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSStore } from '@lib/state/TTS'
 
 import { AppDirectory, deleteFile, listFiles, makeDirectory, readStringAsync } from './File'
+import { patchAndroidText } from './PatchText'
 import { lockScreenOrientation } from './Screen'
 import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
@@ -259,6 +260,10 @@ export const startupApp = () => {
 
     // set cpu thread count
     setCPUThreads()
+
+    // patch Android text for bold Accessibility, still an issue here:
+    // https://github.com/Vali-98/ChatterUI/issues/511
+    patchAndroidText()
 
     // set keep awake settings
     setKeepAwake()
