@@ -270,7 +270,7 @@ export const startupApp = () => {
 
     // patch for Bold Text bug
     // refer to https://github.com/Vali-98/ChatterUI/issues/161
-    // patchAndroidText()
+    patchAndroidText()
 
     // Local Model Data in case external models are deleted
     Model.verifyModelList()
