@@ -115,8 +115,9 @@ export namespace Model {
 
         // create data as migration step
         fileList.forEach(async (item) => {
-            if (modelList.some((model_data) => model_data.file === item)) return
-            await createModelData(`${item}`)
+            if (modelList.some((model_data) => model_data.file === item) || !item) return
+            Logger.info(`Creating Model Data for: ${item}`)
+            await createModelData(item)
         })
     }
 

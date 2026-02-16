@@ -121,7 +121,7 @@ export const pickStringDocument = async ({
     const file = new File(uri)
     let data = ''
     if (encoding === 'utf8') data = await file.text()
-    else data = file.base64()
+    else data = await file.base64()
 
     if (!data) {
         return { success: false }
@@ -151,7 +151,11 @@ export const listFiles = (path: string) => {
     return new Directory(path)
         .listAsRecords()
         .filter((item) => !item.isDirectory)
-        .map((item) => item.uri)
+        .map((item) => {
+            const uri = item.uri.endsWith('/') ? item.uri.slice(0, -1) : item.uri
+            return uri.slice(uri.lastIndexOf('/') + 1)
+        })
+        .filter((item): item is string => !!item)
 }
 
 export const fileExists = (path: string) => {
