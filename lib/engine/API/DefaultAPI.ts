@@ -29,7 +29,7 @@ export const defaultTemplates: APIConfiguration[] = [
             requestType: 'stream',
             samplerFields: [
                 { externalName: 'max_context_length', samplerID: SamplerID.CONTEXT_LENGTH },
-                { externalName: 'max_tokens', samplerID: SamplerID.GENERATED_LENGTH },
+                { externalName: 'max_completion_tokens', samplerID: SamplerID.GENERATED_LENGTH },
                 { externalName: 'stream', samplerID: SamplerID.STREAMING },
                 { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
                 { externalName: 'top_p', samplerID: SamplerID.TOP_P },
