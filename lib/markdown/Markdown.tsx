@@ -1,11 +1,12 @@
 import { setStringAsync } from 'expo-clipboard'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { MarkdownIt } from 'react-native-markdown-display'
 import MathJax from 'react-native-mathjax-svg'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import Accordion from '@components/views/Accordion'
+import { ChatStyle } from '@lib/state/ChatStyle'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -116,6 +117,24 @@ export namespace MarkdownStyle {
 
     export const useMarkdownStyle = () => {
         const { color, spacing, borderRadius } = Theme.useTheme()
+        const { fontSize, textWeight } = ChatStyle.useChatStyle()
+
+        const getModifiedFontSize = useCallback(
+            (size: number) =>
+                Math.max(ChatStyle.MIN_FONT_SIZE, ChatStyle.sizeModifierMap[fontSize] + size),
+            [fontSize]
+        )
+
+        const getModifiedFontWeight = useCallback(
+            (weight: number) => {
+                const newWeight = Math.max(
+                    200,
+                    Math.min(900, weight + (ChatStyle.weightModifierMap?.[textWeight] ?? 0))
+                )
+                return `${newWeight}` as any
+            },
+            [textWeight]
+        )
 
         return useMemo(
             () =>
@@ -127,39 +146,39 @@ export namespace MarkdownStyle {
                     // Headings
                     heading1: {
                         flexDirection: 'row',
-                        fontSize: 32,
+                        fontSize: getModifiedFontSize(32),
                         color: color.text._100,
-                        fontWeight: '500',
+                        fontWeight: getModifiedFontWeight(500),
                     },
                     heading2: {
                         flexDirection: 'row',
-                        fontSize: 24,
+                        fontSize: getModifiedFontSize(24),
                         color: color.text._100,
-                        fontWeight: '500',
+                        fontWeight: getModifiedFontWeight(500),
                     },
                     heading3: {
                         flexDirection: 'row',
-                        fontSize: 18,
+                        fontSize: getModifiedFontSize(18),
                         color: color.text._100,
-                        fontWeight: '500',
+                        fontWeight: getModifiedFontWeight(500),
                     },
                     heading4: {
                         flexDirection: 'row',
-                        fontSize: 16,
+                        fontSize: getModifiedFontSize(16),
                         color: color.text._100,
-                        fontWeight: '500',
+                        fontWeight: getModifiedFontWeight(500),
                     },
                     heading5: {
                         flexDirection: 'row',
-                        fontSize: 13,
+                        fontSize: getModifiedFontSize(13),
                         color: color.text._100,
-                        fontWeight: '500',
+                        fontWeight: getModifiedFontWeight(500),
                     },
                     heading6: {
                         flexDirection: 'row',
-                        fontSize: 11,
+                        fontSize: getModifiedFontSize(11),
                         color: color.text._100,
-                        fontWeight: '500',
+                        fontWeight: getModifiedFontWeight(500),
                     },
 
                     // Horizontal Rule
@@ -171,7 +190,7 @@ export namespace MarkdownStyle {
 
                     // Emphasis
                     strong: {
-                        fontWeight: 'bold',
+                        fontWeight: getModifiedFontWeight(700),
                         color: color.text._100,
                     },
                     em: {
@@ -335,6 +354,8 @@ export namespace MarkdownStyle {
                     // Text Output
                     text: {},
                     textgroup: {
+                        fontSize: getModifiedFontSize(14),
+                        fontWeight: getModifiedFontWeight(400),
                         color: color.text._100,
                     },
                     latex_inline: {
@@ -367,7 +388,7 @@ export namespace MarkdownStyle {
                     inline: {},
                     span: {},
                 }),
-            [color, spacing, borderRadius]
+            [color, spacing, borderRadius, getModifiedFontSize, getModifiedFontWeight]
         )
     }
 }

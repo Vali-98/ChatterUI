@@ -37,10 +37,6 @@ const patchRender = () => {
     // @ts-expect-error
     const oldRender = Text.render ?? Text.prototype?.render
     const style = StyleSheet.create({ font: { fontFamily: 'Roboto' } })
-    if (!oldRender) {
-        console.error('Text.render or Text.prototype.render is not defined, cannot patch font.')
-        return
-    }
 
     if (Text.prototype?.render) {
         Text.prototype.render = function (...args: any[]) {
@@ -59,7 +55,7 @@ const patchRender = () => {
             })
         }
     } else {
-        console.error('Text.render or Text.prototype.render is not defined, cannot patch font.')
+        Logger.warn('Text.render or Text.prototype.render is not defined, cannot patch font.')
     }
 }
 

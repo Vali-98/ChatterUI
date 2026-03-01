@@ -13,4 +13,5 @@ export enum Storage {
     ColorState = 'colorscheme-storage',
     TagHider = 'tag-hider-storage',
     CharacterSearch = 'storage-character-search',
+    ChatStyle = 'storage-chat-text-styling',
 }
