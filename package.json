@@ -31,7 +31,7 @@
     "@shopify/flash-list": "2.0.2",
     "@vali98/react-native-cpu-info": "^0.2.0",
     "@vali98/react-native-fs": "^0.2.1",
-    "@vali98/react-native-png-utils": "^0.1.1",
+    "@vali98/react-native-png-utils": "^0.1.2",
     "@vali98/react-native-process-text": "^0.1.3",
     "babel-plugin-inline-import": "^3.0.0",
     "babel-plugin-react-compiler": "^19.0.0-beta-af1b7da-20250417",
