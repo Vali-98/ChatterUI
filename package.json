@@ -36,7 +36,7 @@
     "babel-plugin-inline-import": "^3.0.0",
     "babel-plugin-react-compiler": "^19.0.0-beta-af1b7da-20250417",
     "cui-llama.rn": "^1.11.6",
-    "drizzle-kit": "^0.31.7",
+    "drizzle-kit": "^0.31.9",
     "drizzle-orm": "^0.36.2",
     "eslint-plugin-react-compiler": "^0.0.0-experimental-7c1344f-20241009",
     "expo": "~54.0.32",
@@ -113,7 +113,7 @@
     "typescript": "~5.9.2"
   },
   "overrides": {
-    "markdown-it": "14.1.0"
+    "markdown-it": "14.1.1"
   },
   "private": true
 }
