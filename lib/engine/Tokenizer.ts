@@ -35,9 +35,7 @@ export namespace Tokenizer {
         loadModel: async () => {
             if (get().model) return
             try {
-                await importModelFromRes().catch((e) => {
-                    Logger.error('Could not import Tokenizer: ' + e)
-                })
+                await importModelFromRes()
                 Logger.info('Loading Tokenizer')
                 const context = await initLlama({
                     model: tokenizerModelDir,
