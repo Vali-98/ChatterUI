@@ -17,7 +17,7 @@ import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSStore } from '@lib/state/TTS'
 
 import { AppDirectory, deleteFile, listFiles, makeDirectory, readStringAsync } from './File'
-import { patchAndroidText } from './PatchText'
+// import { patchAndroidText } from './PatchText'
 import { lockScreenOrientation } from './Screen'
 import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
@@ -263,14 +263,10 @@ export const startupApp = () => {
 
     // patch Android text for bold Accessibility, still an issue here:
     // https://github.com/Vali-98/ChatterUI/issues/511
-    patchAndroidText()
+    // patchAndroidText()
 
     // set keep awake settings
     setKeepAwake()
-
-    // patch for Bold Text bug
-    // refer to https://github.com/Vali-98/ChatterUI/issues/161
-    patchAndroidText()
 
     // Local Model Data in case external models are deleted
     Model.verifyModelList()
