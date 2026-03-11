@@ -5,6 +5,7 @@ import BackgroundService from 'react-native-background-actions'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
+import { ToolState } from '@lib/state/ToolState'
 import { useTTSStore } from '@lib/state/TTS'
 import { mmkv } from '@lib/storage/MMKV'
 import { useCallback } from 'react'
@@ -15,6 +16,8 @@ import { APIConfiguration, APIValues } from './API/APIBuilder.types'
 import { APIManager } from './API/APIManagerState'
 import { localInference } from './LocalInference'
 import { Tokenizer } from './Tokenizer'
+import { executeToolCalls } from './Tools/ToolExecutor'
+import { AccumulatedToolCall } from './Tools/ToolTypes'
 
 export async function regenerateResponse(swipeId: number, regenCache: boolean = true) {
     const charName = Characters.useCharacterStore.getState().card?.name
@@ -77,7 +80,18 @@ export async function generateResponse(swipeId: number) {
     if (appMode === 'local') {
         await BackgroundService.start(localInference, completionTaskOptions)
     } else {
-        await BackgroundService.start(chatInferenceStream, completionTaskOptions)
+        // Check if tools are enabled for the current API and character
+        const characterId = Characters.useCharacterStore.getState().card?.id
+        const tools = ToolState.useToolStore.getState().getToolsPayload(characterId)
+        const apiState = APIManager.useConnectionsStore.getState()
+        const apiValues = apiState.values[apiState.activeIndex]
+        const apiConfig = apiValues
+            ? apiState.getTemplates().find((t) => t.name === apiValues.configName)
+            : undefined
+        const useTools = tools.length > 0 && apiConfig?.features?.useTools
+
+        const inferFn = useTools ? chatInferenceStreamWithTools : chatInferenceStream
+        await BackgroundService.start(inferFn, completionTaskOptions)
     }
 }
 // TODO: Use this
@@ -130,6 +144,129 @@ async function chatInferenceStream() {
     })
 }
 
+const MAX_TOOL_ROUNDS = 10
+
+async function chatInferenceStreamWithTools() {
+    const stop = () => Chats.useChatState.getState().stopGenerating()
+    let round = 0
+
+    while (round < MAX_TOOL_ROUNDS) {
+        round++
+        Logger.info(`Tool calling round ${round}`)
+
+        const fields = await obtainFields()
+        if (!fields) {
+            Logger.error('Chat Inference Failed')
+            stop()
+            return
+        }
+
+        // Get enabled tools for current character
+        const characterId = Characters.useCharacterStore.getState().card?.id
+        const tools = ToolState.useToolStore.getState().getToolsPayload(characterId)
+
+        let toolCallsReceived: AccumulatedToolCall[] = []
+        let streamComplete = false
+
+        fields.stopGenerating = stop
+        fields.onData = (text) => {
+            Chats.useChatState.getState().insertBuffer(text)
+            useTTSStore.getState().insertBuffer(text)
+        }
+
+        fields.tools = tools
+        fields.onToolCalls = (toolCalls: AccumulatedToolCall[]) => {
+            toolCallsReceived = toolCalls
+        }
+
+        // Wait for this round to complete
+        await new Promise<void>(async (resolve) => {
+            fields.onEnd = async () => {
+                streamComplete = true
+                resolve()
+            }
+            const abort = await buildAndSendRequest(fields)
+            useInference.getState().setAbort(() => {
+                Logger.debug('Running Abort')
+                if (abort) abort()
+                resolve() // unblock on abort
+            })
+        })
+
+        // Check if generation was stopped (user abort)
+        if (!useInference.getState().nowGenerating) {
+            Logger.info('Tool calling loop aborted by user')
+            return
+        }
+
+        // No tool calls — normal text response, we're done
+        if (toolCallsReceived.length === 0) {
+            // Run auto-title generation if needed
+            const chat = Chats.useChatState.getState().data
+            if (
+                mmkv.getBoolean(AppSettings.AutoGenerateTitle) &&
+                chat &&
+                chat.name === 'New Chat'
+            ) {
+                Logger.info('Generating Title')
+                titleGeneratorStream(chat.id)
+            }
+            stop()
+            return
+        }
+
+        // Tool calls received!
+        Logger.info(
+            `Received ${toolCallsReceived.length} tool call(s): ${toolCallsReceived.map((tc) => tc.function.name).join(', ')}`
+        )
+
+        // 1. Save the assistant message with its buffer content
+        await Chats.useChatState.getState().updateFromBuffer()
+
+        // 2. Persist tool_calls metadata on the current swipe
+        const messages = Chats.useChatState.getState().data?.messages
+        if (messages && messages.length > 0) {
+            await Chats.useChatState.getState().updateSwipeToolCalls(
+                messages.length - 1,
+                toolCallsReceived.map((tc) => ({
+                    id: tc.id,
+                    type: tc.type,
+                    function: tc.function,
+                }))
+            )
+        }
+
+        // 3. Execute all tool calls
+        const results = await executeToolCalls(toolCallsReceived)
+        for (const result of results) {
+            Logger.info(
+                `Tool ${result.name}: ${result.is_error ? 'ERROR' : 'OK'} - ${result.content.substring(0, 100)}`
+            )
+        }
+
+        // 4. Add tool result entries to the chat
+        for (const result of results) {
+            await Chats.useChatState.getState().addToolCallEntry(
+                result.tool_call_id,
+                result.name,
+                result.content
+            )
+        }
+
+        // 5. Add a new empty assistant entry for the next round
+        const charName = Characters.useCharacterStore.getState().card?.name ?? ''
+        await Chats.useChatState.getState().addEntry(charName, false, '')
+        Chats.useChatState.getState().setBuffer({ data: '' })
+
+        // Loop continues — next iteration will rebuild context including tool results
+    }
+
+    if (round >= MAX_TOOL_ROUNDS) {
+        Logger.warn('Tool calling loop reached maximum rounds (' + MAX_TOOL_ROUNDS + ')')
+    }
+    stop()
+}
+
 const titleGeneratorStream = async (chatId: number) => {
     const fields = await obtainFields()
     if (!fields) {
@@ -160,6 +297,7 @@ const titleGeneratorStream = async (chatId: number) => {
         chat_id: -1,
         name: '',
         is_user: true,
+        role: null,
         order: 0,
         swipe_id: 0,
         swipes: [
@@ -171,6 +309,8 @@ const titleGeneratorStream = async (chatId: number) => {
                 gen_started: new Date(),
                 gen_finished: new Date(),
                 timings: null,
+                tool_calls: null,
+                tool_call_id: null,
             },
         ],
         attachments: [],

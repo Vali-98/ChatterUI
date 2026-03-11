@@ -7,6 +7,7 @@ import { mmkv } from '@lib/storage/MMKV'
 import { readAsStringAsync } from 'expo-file-system'
 
 import { replaceMacros } from '@lib/state/Macros'
+import { ToolCallData } from 'db/schema'
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import { Macro } from '@lib/utils/Macros'
 
@@ -42,7 +43,12 @@ type ContentTypes =
     | { type: 'image_url'; image_url: { url: string } }
     | { type: 'input_audio'; input_audio: { data: string; format: string } }
 
-export type Message = { role: string; [x: string]: ContentTypes[] | string }
+export type Message = {
+    role: string
+    tool_call_id?: string
+    tool_calls?: ToolCallData[]
+    [x: string]: ContentTypes[] | string | ToolCallData[] | null | undefined
+}
 
 export const buildContext = async (params: ContextBuilderParams) => {
     if (params.apiConfig.request.completionType.type === 'chatCompletions') {
@@ -126,7 +132,42 @@ export const buildChatCompletionContext = async ({
             index--
             continue
         }
-        const role = message.is_user ? completionFeats.userRole : completionFeats.assistantRole
+
+        // Determine role: tool messages use 'tool', otherwise use is_user to pick user/assistant
+        const role =
+            message.role === 'tool'
+                ? 'tool'
+                : message.is_user
+                  ? completionFeats.userRole
+                  : completionFeats.assistantRole
+
+        // Handle tool result messages specially
+        if (message.role === 'tool' && swipe_data.tool_call_id) {
+            messageBuffer.push({
+                role: 'tool',
+                tool_call_id: swipe_data.tool_call_id,
+                [completionFeats.contentName]: swipe_data.swipe,
+            })
+            total_length += len
+            index--
+            continue
+        }
+
+        // Handle assistant messages with tool_calls
+        if (
+            !message.is_user &&
+            swipe_data.tool_calls &&
+            swipe_data.tool_calls.length > 0
+        ) {
+            messageBuffer.push({
+                role: completionFeats.assistantRole,
+                [completionFeats.contentName]: swipe_data.swipe || null,
+                tool_calls: swipe_data.tool_calls,
+            })
+            total_length += len
+            index--
+            continue
+        }
 
         if (message.attachments.length > 0) {
             Logger.warn('Image output is incomplete')

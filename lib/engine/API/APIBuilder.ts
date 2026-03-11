@@ -1,5 +1,7 @@
 import { AppSettings, CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { SSEFetch } from '@lib/engine/SSEFetch'
+import { ToolCallAccumulator } from '@lib/engine/Tools/ToolCallAccumulator'
+import { AccumulatedToolCall, OpenAIToolDefinition } from '@lib/engine/Tools/ToolTypes'
 import { Logger } from '@lib/state/Logger'
 import { nativeApplicationVersion } from 'expo-application'
 
@@ -14,6 +16,9 @@ export interface APIBuilderParams
     onEnd: (data: string) => void
     stopSequence: string[]
     stopGenerating: () => void
+    // Tool calling support
+    tools?: OpenAIToolDefinition[]
+    onToolCalls?: (toolCalls: AccumulatedToolCall[]) => void
 }
 
 export const buildAndSendRequest = async ({
@@ -33,6 +38,8 @@ export const buildAndSendRequest = async ({
     messageLoader,
     maxLength,
     cache,
+    tools,
+    onToolCalls,
 }: APIBuilderParams) => {
     try {
         let payload: any = undefined
@@ -64,6 +71,7 @@ export const buildAndSendRequest = async ({
             instruct,
             prompt,
             stopSequence,
+            tools,
         })
 
         if (!payload) {
@@ -92,21 +100,44 @@ export const buildAndSendRequest = async ({
 
         const replaceStrings = constructReplaceStrings(stopSequence)
 
+        // Use ToolCallAccumulator when tools are provided
+        const useToolAccumulator = tools && tools.length > 0
+        const accumulator = useToolAccumulator ? new ToolCallAccumulator() : null
+
         return sendFunc({
             endpoint: apiValues.endpoint,
             payload: payload,
             onEvent: (event) => {
                 try {
-                    const data = getNestedValue(
-                        typeof event === 'string' ? JSON.parse(event) : event,
-                        apiConfig.request.responseParsePattern
-                    )
-                    const text = data.replaceAll(replaceStrings, '')
+                    const parsed = typeof event === 'string' ? JSON.parse(event) : event
 
-                    onData(text)
+                    if (accumulator) {
+                        // Tool-aware parsing: extract both text and tool call chunks
+                        const { text } = accumulator.processChunk(parsed)
+                        if (text) {
+                            const cleaned = text.replaceAll(replaceStrings, '')
+                            onData(cleaned)
+                        }
+                    } else {
+                        // Original text-only parsing
+                        const data = getNestedValue(
+                            parsed,
+                            apiConfig.request.responseParsePattern
+                        )
+                        if (data) {
+                            const text = data.replaceAll(replaceStrings, '')
+                            onData(text)
+                        }
+                    }
                 } catch (e) {}
             },
-            onEnd: onEnd,
+            onEnd: (data: string) => {
+                // Check if accumulator captured tool calls
+                if (accumulator && accumulator.isToolCall() && onToolCalls) {
+                    onToolCalls(accumulator.getToolCalls())
+                }
+                onEnd(data)
+            },
             header: header,
             stopGenerating: stopGenerating,
         })
@@ -260,7 +291,7 @@ const readableStreamResponse = async (senderParams: SenderParams) => {
 }
 
 const constructReplaceStrings = (stopSequence: string[]) => {
-    const replace = RegExp(
+    return RegExp(
         stopSequence.map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join(`|`),
         'g'
     )

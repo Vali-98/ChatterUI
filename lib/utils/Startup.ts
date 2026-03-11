@@ -1,5 +1,7 @@
 import { Model } from '@lib/engine/Local/Model'
+import { registerBuiltinTools } from '@lib/engine/Tools/builtins'
 import { Tokenizer } from '@lib/engine/Tokenizer'
+import { ToolState } from '@lib/state/ToolState'
 import { setupNotifications } from '@lib/notifications/Notifications'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { Instructs } from '@lib/state/Instructs'
@@ -256,6 +258,10 @@ export const startupApp = () => {
 
     const backgroundColor = Theme.useColorState.getState().color.neutral._100
     setUIBackgroundColor(backgroundColor)
+
+    // Register built-in tool handlers and seed DB definitions
+    registerBuiltinTools()
+    ToolState.initializeTools()
 
     Logger.info('Resetting state values for startup.')
 }
