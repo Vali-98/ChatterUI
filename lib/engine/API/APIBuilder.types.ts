@@ -32,6 +32,7 @@ export interface APIFeatures {
     useKey: boolean
     useModel: boolean
     multipleModels: boolean
+    useTools?: boolean
 }
 
 export interface APIRequestFormat {

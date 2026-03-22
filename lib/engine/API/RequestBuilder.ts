@@ -1,6 +1,7 @@
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { InstructType } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
+import { OpenAIToolDefinition } from '@lib/engine/Tools/ToolTypes'
 
 import { APIConfiguration, APISampler, APIValues } from './APIBuilder.types'
 import { Message } from './ContextBuilder'
@@ -12,6 +13,7 @@ export interface RequestBuilderParams {
     instruct: InstructType
     stopSequence: string[]
     prompt: string | Message[]
+    tools?: OpenAIToolDefinition[]
 }
 
 type SamplerField = {
@@ -25,9 +27,10 @@ export const buildRequest = async ({
     instruct,
     prompt,
     stopSequence,
+    tools,
 }: RequestBuilderParams) => {
     const samplerFields = getSamplerFields(apiConfig, apiValues, samplers)
-    const fields = await buildFields(apiConfig, apiValues, samplerFields, stopSequence, prompt)
+    const fields = await buildFields(apiConfig, apiValues, samplerFields, stopSequence, prompt, tools)
 
     switch (apiConfig.payload.type) {
         case 'openai':
@@ -45,13 +48,17 @@ export const buildRequest = async ({
     }
 }
 
-const openAIRequest = async ({ payloadFields, model, stop, prompt }: Field) => {
-    return {
+const openAIRequest = async ({ payloadFields, model, stop, prompt, tools }: Field) => {
+    const request: any = {
         ...payloadFields,
         ...model,
         ...stop,
         ...prompt,
     }
+    if (tools && tools.length > 0) {
+        request.tools = tools
+    }
+    return request
 }
 
 const ollamaRequest = async ({ payloadFields, model, stop, prompt }: Field) => {
@@ -194,7 +201,8 @@ const buildFields = async (
     values: APIValues,
     payloadFields: SamplerField,
     stopSeq: string[],
-    promptData: string | Message[]
+    promptData: string | Message[],
+    tools?: OpenAIToolDefinition[]
 ) => {
     // Model Data
     const model = config.features.useModel
@@ -234,7 +242,7 @@ const buildFields = async (
 
     const prompt = { [config.request.promptKey]: promptData }
 
-    return { payloadFields, model, stop, prompt, length }
+    return { payloadFields, model, stop, prompt, length, tools }
 }
 
 const getNestedValue = (obj: any, path: string) => {

@@ -13,6 +13,7 @@ import {
     chatSwipes,
     ChatType,
     CompletionTimings,
+    ToolCallData,
 } from 'db/schema'
 import { and, count, desc, eq, getTableColumns, like, sql } from 'drizzle-orm'
 import { randomUUID } from 'expo-crypto'
@@ -113,6 +114,14 @@ export interface ChatState {
     ) => Promise<number>
     stopGenerating: () => void
     startGenerating: (swipeId: number) => void
+
+    // tool calling
+    addToolCallEntry: (
+        toolCallId: string,
+        toolName: string,
+        result: string
+    ) => Promise<number | void>
+    updateSwipeToolCalls: (index: number, toolCalls: ToolCallData[]) => Promise<void>
 }
 
 type InferenceStateType = {
@@ -130,7 +139,11 @@ type OutputBuffer = {
     error?: string
 }
 
-type ChatSwipeUpdated = Pick<ChatSwipe, 'swipe' | 'id'> & Partial<Omit<ChatSwipe, 'swipe' | 'id'>>
+type ChatSwipeUpdated = Pick<ChatSwipe, 'swipe' | 'id'> &
+    Partial<Omit<ChatSwipe, 'swipe' | 'id'>> & {
+        tool_calls?: ToolCallData[]
+        tool_call_id?: string
+    }
 // TODO: Functionalize and move elsewhere
 export const sendGenerateCompleteNotification = async () => {
     const showMessage = mmkv.getBoolean(AppSettings.ShowNotificationText)
@@ -521,6 +534,53 @@ export namespace Chats {
                 })
             db.mutate.renameChat(chatId, name)
         },
+
+        // Tool calling methods
+        addToolCallEntry: async (
+            toolCallId: string,
+            toolName: string,
+            result: string
+        ) => {
+            const messages = get().data?.messages
+            const chatId = get().data?.id
+            if (!messages || !chatId) return
+            const order = messages.length > 0 ? messages[messages.length - 1].order + 1 : 0
+            const entry = await db.mutate.createEntry(
+                chatId,
+                toolName,
+                false,
+                order,
+                result,
+                [],
+                'tool',
+                toolCallId
+            )
+            if (entry) messages.push(entry)
+            set((state) => ({
+                ...state,
+                data: state?.data ? { ...state.data, messages: [...messages] } : state.data,
+            }))
+            return entry?.swipes[0].id
+        },
+
+        updateSwipeToolCalls: async (index: number, toolCalls: ToolCallData[]) => {
+            const messages = get().data?.messages
+            if (!messages) return
+            const message = messages[index]
+            if (!message) return
+            const swipe = message.swipes[message.swipe_id]
+            if (!swipe) return
+            swipe.tool_calls = toolCalls
+            await db.mutate.updateChatSwipe({
+                id: swipe.id,
+                swipe: swipe.swipe,
+                tool_calls: toolCalls,
+            })
+            set((state) => ({
+                ...state,
+                data: state?.data ? { ...state.data, messages: [...messages] } : state.data,
+            }))
+        },
     }))
 
     export namespace db {
@@ -691,7 +751,9 @@ export namespace Chats {
                 isUser: boolean,
                 order: number,
                 message: string,
-                attachments: string[] = []
+                attachments: string[] = [],
+                role?: 'user' | 'assistant' | 'tool' | 'system',
+                toolCallId?: string
             ) => {
                 const [{ entryId }, ...__] = await database
                     .insert(chatEntries)
@@ -700,11 +762,16 @@ export namespace Chats {
                         name: name,
                         is_user: isUser,
                         order: order,
+                        ...(role ? { role } : {}),
                     })
                     .returning({ entryId: chatEntries.id })
                 await database
                     .insert(chatSwipes)
-                    .values({ swipe: replaceMacros(message), entry_id: entryId })
+                    .values({
+                        swipe: replaceMacros(message),
+                        entry_id: entryId,
+                        ...(toolCallId ? { tool_call_id: toolCallId } : {}),
+                    })
 
                 await Promise.all(
                     attachments.map(async (uri) => {
@@ -944,6 +1011,7 @@ export namespace Chats {
         chat_id: -1,
         name: '',
         is_user: false,
+        role: null,
         order: -1,
         swipe_id: 0,
         swipes: [
@@ -955,6 +1023,8 @@ export namespace Chats {
                 gen_started: new Date(),
                 gen_finished: new Date(),
                 timings: null,
+                tool_calls: null,
+                tool_call_id: null,
             },
         ],
         attachments: [],

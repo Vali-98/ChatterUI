@@ -97,6 +97,11 @@ const getPaths = (remote: boolean): ButtonData[] => [
               icon: 'folderopen',
           },
     {
+        name: 'Tools',
+        path: '/screens/ToolManagerScreen',
+        icon: 'tool',
+    },
+    {
         name: 'TTS',
         path: '/screens/TTSManagerScreen',
         icon: 'sound',

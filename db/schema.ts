@@ -62,6 +62,7 @@ export const characterRelations = relations(characters, ({ many }) => ({
     tags: many(characterTags),
     lorebooks: many(characterLorebooks),
     chats: many(chats),
+    tools: many(toolDefinitions),
 }))
 
 export const greetingsRelations = relations(characterGreetings, ({ one }) => ({
@@ -113,6 +114,8 @@ export const chatEntries = sqliteTable('chat_entries', {
     name: text('name').notNull(),
     order: integer('order').notNull(),
     swipe_id: integer('swipe_id', { mode: 'number' }).default(0).notNull(),
+    // addition: tool calling support
+    role: text('role', { enum: ['user', 'assistant', 'tool', 'system'] }),
 })
 
 export const chatSwipes = sqliteTable('chat_swipes', {
@@ -134,6 +137,9 @@ export const chatSwipes = sqliteTable('chat_swipes', {
         .notNull()
         .$defaultFn(() => new Date()),
     timings: text('timings', { mode: 'json' }).$type<CompletionTimings>(),
+    // addition: tool calling support
+    tool_calls: text('tool_calls', { mode: 'json' }).$type<ToolCallData[]>(),
+    tool_call_id: text('tool_call_id'),
 })
 
 export const chatsRelations = relations(chats, ({ many, one }) => ({
@@ -176,6 +182,28 @@ export const mediaAttachmentsRelations = relations(chatAttachments, ({ one }) =>
     entry: one(chatEntries, {
         fields: [chatAttachments.chat_entry_id],
         references: [chatEntries.id],
+    }),
+}))
+
+// TOOL DEFINITIONS
+
+export const toolDefinitions = sqliteTable('tool_definitions', {
+    id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+    name: text('name').notNull(),
+    description: text('description').notNull().default(''),
+    parameters_schema: text('parameters_schema', { mode: 'json' }).$type<object>().notNull(),
+    enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
+    builtin: integer('builtin', { mode: 'boolean' }).notNull().default(false),
+    character_id: integer('character_id', { mode: 'number' }).references(() => characters.id, {
+        onDelete: 'cascade',
+    }),
+    created_at: integer('created_at', { mode: 'number' }).$defaultFn(() => Date.now()),
+})
+
+export const toolDefinitionsRelations = relations(toolDefinitions, ({ one }) => ({
+    character: one(characters, {
+        fields: [toolDefinitions.character_id],
+        references: [characters.id],
     }),
 }))
 
@@ -372,3 +400,11 @@ export type CompletionTimings = {
     prompt_ms: number
     prompt_n: number
 }
+
+export type ToolCallData = {
+    id: string
+    type: 'function'
+    function: { name: string; arguments: string }
+}
+
+export type ToolDefinitionType = typeof toolDefinitions.$inferSelect

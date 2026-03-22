@@ -23,6 +23,7 @@ export const defaultTemplates: APIConfiguration[] = [
             useKey: true,
             useModel: true,
             multipleModels: false,
+            useTools: true,
         },
 
         request: {
@@ -443,6 +444,7 @@ export const defaultTemplates: APIConfiguration[] = [
             usePrefill: false,
             useFirstMessage: false,
             multipleModels: false,
+            useTools: true,
         },
 
         request: {
@@ -582,6 +584,7 @@ export const defaultTemplates: APIConfiguration[] = [
             useKey: true,
             useModel: true,
             multipleModels: false,
+            useTools: true,
         },
 
         request: {
@@ -650,6 +653,7 @@ export const defaultTemplates: APIConfiguration[] = [
             useKey: true,
             useModel: true,
             multipleModels: false,
+            useTools: true,
         },
 
         request: {
@@ -718,6 +722,7 @@ export const defaultTemplates: APIConfiguration[] = [
             useKey: true,
             useModel: true,
             multipleModels: false,
+            useTools: true,
         },
 
         request: {
