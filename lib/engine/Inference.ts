@@ -149,6 +149,7 @@ const MAX_TOOL_ROUNDS = 10
 async function chatInferenceStreamWithTools() {
     const stop = () => Chats.useChatState.getState().stopGenerating()
     let round = 0
+    let abortedByUser = false
 
     while (round < MAX_TOOL_ROUNDS) {
         round++
@@ -166,9 +167,11 @@ async function chatInferenceStreamWithTools() {
         const tools = ToolState.useToolStore.getState().getToolsPayload(characterId)
 
         let toolCallsReceived: AccumulatedToolCall[] = []
-        let streamComplete = false
 
-        fields.stopGenerating = stop
+        // No-op: readableStreamResponse calls stopGenerating on stream close,
+        // which would kill the loop after round 1 if we passed the real stop().
+        // The loop manages its own lifecycle and calls stop() when actually done.
+        fields.stopGenerating = () => {}
         fields.onData = (text) => {
             Chats.useChatState.getState().insertBuffer(text)
             useTTSStore.getState().insertBuffer(text)
@@ -182,20 +185,21 @@ async function chatInferenceStreamWithTools() {
         // Wait for this round to complete
         await new Promise<void>(async (resolve) => {
             fields.onEnd = async () => {
-                streamComplete = true
                 resolve()
             }
             const abort = await buildAndSendRequest(fields)
             useInference.getState().setAbort(() => {
                 Logger.debug('Running Abort')
                 if (abort) abort()
+                abortedByUser = true
                 resolve() // unblock on abort
             })
         })
 
         // Check if generation was stopped (user abort)
-        if (!useInference.getState().nowGenerating) {
+        if (abortedByUser) {
             Logger.info('Tool calling loop aborted by user')
+            stop()
             return
         }
 
