@@ -79,6 +79,32 @@ const ChatEditor = () => {
             inputRef.current?.setSelection(placeholderText.length, placeholderText.length)
         }, 1)
     }
+    
+      // ==========================================
+  // 🚀 GEMU EDITION: OFFLINE PROMPT ENHANCER
+  // ==========================================
+  const handleEnhancePrompt = async () => {
+    // 1. Check if the box is empty using Vali-98's exact variable
+    if (!placeholderText || placeholderText.trim() === '') return; 
+
+    const originalText = placeholderText;
+    
+    // 2. Show the user we are working
+    setPlaceholderText("✨ Enhancing prompt offline...");
+
+    try {
+      // 3. The hidden system prompt! 
+      const finalEnhancedText = `[System: Expand this idea into a detailed prompt] -> ${originalText}`;
+      
+      // 4. Update the text box instantly
+      setPlaceholderText(finalEnhancedText);
+    } catch (error) {
+      // 5. Fail-safe
+      setPlaceholderText(originalText);
+    }
+  };
+  // ==========================================
+
 
     return (
         <Modal
@@ -117,6 +143,25 @@ const ChatEditor = () => {
                             textBreakStrategy="simple"
                             multiline
                         />
+                        
+                                  {/* ========================================== */}
+          {/* 🚀 GEMU EDITION: THE SPARKLE BUTTON        */}
+          {/* ========================================== */}
+          <TouchableOpacity 
+            onPress={handleEnhancePrompt}
+            style={{
+              padding: 10,
+              backgroundColor: '#3b3b3b', 
+              borderRadius: 8,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginVertical: 5
+            }}
+          >
+            <Text style={{ fontSize: 18 }}>✨</Text>
+          </TouchableOpacity>
+          {/* ========================================== */}
+
 
                         <View
                             style={{
