@@ -1,29 +1,45 @@
-name: Build Workflow
+name: Build Gemu Edition APK
 
-on:
-    push:
-        branches:
-            - master
-            - dev
-        paths-ignore:
-            - 'README.md'
-            - '.github/ISSUE_TEMPLATE/*'
+# This lets you trigger the build manually by pressing a button!
+on: 
+  workflow_dispatch: 
 
 jobs:
-    trigger-build:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Connect Tailscale
-              uses: tailscale/github-action@v3
-              with:
-                  oauth-client-id: ${{secrets.TS_OAUTH_CLIENT_ID}}
-                  oauth-secret: ${{secrets.TS_OAUTH_SECRET}}
-                  tags: tag:chatterui-cd
+  build-android:
+    runs-on: ubuntu-latest
 
-            - name: Trigger Build
-              run: |
-                  if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-                    curl -N -sS --max-time 1200 -X GET ${{ secrets.TS_BUILD_API }} || true
-                  elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
-                    curl -N -sS --max-time 1200 -X GET ${{ secrets.TS_BUILD_DEV_API }} || true
-                  fi
+    steps:
+      # 1. Grab the code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # 2. Setup Node.js (React Native needs this)
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # 3. Setup Java (Android needs this)
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # 4. Install dependencies
+      - name: Install Packages
+        run: npm install
+
+      # 5. Build the actual APK!
+      - name: Build Android Release
+        run: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew assembleRelease
+
+      # 6. Upload the APK so you can download it to your phone
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: ChatterUI-Gemu-Edition
+          path: android/app/build/outputs/apk/release/app-release.apk
