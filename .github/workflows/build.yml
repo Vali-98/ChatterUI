@@ -1,37 +1,29 @@
-name: Build Gemu Edition APK
+name: Build Workflow
 
-on: 
-  workflow_dispatch: 
+on:
+    push:
+        branches:
+            - master
+            - dev
+        paths-ignore:
+            - 'README.md'
+            - '.github/ISSUE_TEMPLATE/*'
 
 jobs:
-  build-android:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    trigger-build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Connect Tailscale
+              uses: tailscale/github-action@v3
+              with:
+                  oauth-client-id: ${{secrets.TS_OAUTH_CLIENT_ID}}
+                  oauth-secret: ${{secrets.TS_OAUTH_SECRET}}
+                  tags: tag:chatterui-cd
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Install Packages
-        run: npm install --legacy-peer-deps
-
-      - name: Build Android APK
-        run: |
-          cd android
-          chmod +x ./gradlew
-          ./gradlew assembleRelease
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
-        with:
-          name: ChatterUI-Gemu-Edition
-          path: android/app/build/outputs/apk/release/app-release.apk
+            - name: Trigger Build
+              run: |
+                  if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+                    curl -N -sS --max-time 1200 -X GET ${{ secrets.TS_BUILD_API }} || true
+                  elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+                    curl -N -sS --max-time 1200 -X GET ${{ secrets.TS_BUILD_DEV_API }} || true
+                  fi
