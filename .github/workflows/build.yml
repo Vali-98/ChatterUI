@@ -1,9 +1,9 @@
 name: Build Workflow
 
 on:
-    push:
-        branches:
-            - master
+  workflow_dispatch: 
+  push:
+    branches: [ "master" ]
             - dev
         paths-ignore:
             - 'README.md'
