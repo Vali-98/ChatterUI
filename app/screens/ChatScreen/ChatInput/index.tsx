@@ -12,7 +12,6 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { getDocumentAsync } from 'expo-document-picker'
 import { Image } from 'expo-image'
 import React, { useState } from 'react'
-// 🚀 GEMU FIX: Added 'Text' to the import list so our custom buttons don't crash!
 import { TextInput, TouchableOpacity, View, Text } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, {
@@ -75,35 +74,23 @@ const ChatInput = () => {
     const [newMessage, setNewMessage] = useState<string>('')
 
     // ==========================================
-    // 🚀 GEMU EDITION: MASTER COMMAND CENTER LOGIC
+    // 🚀 GEMU EDITION: INVISIBLE TOGGLE STATES
     // ==========================================
-    const handleEnhancePrompt = () => {
-        if (!newMessage || newMessage.trim() === '') return;
-        const originalText = newMessage;
-        setNewMessage("✨ Enhancing prompt offline...");
-        setTimeout(() => {
-            setNewMessage(`[System: Expand this idea into a detailed prompt] -> ${originalText}`);
-        }, 100);
-    };
+    const [isFixOn, setIsFixOn] = useState(false);
+    const [isLogicOn, setIsLogicOn] = useState(false);
+    const [isFunOn, setIsFunOn] = useState(false);
+    const [isMaxOn, setIsMaxOn] = useState(false);
 
-    const handleFormatText = () => {
-        if (!newMessage || newMessage.trim() === '') return;
-        setNewMessage(`[System: Fix all grammar, spelling, and format this text beautifully] -> ${newMessage}`);
-    };
-
-    const handleLogicMode = () => {
-        if (!newMessage || newMessage.trim() === '') return;
-        setNewMessage(`[System: Answer with strict logic, step-by-step reasoning, and high accuracy. No fluff.] -> ${newMessage}`);
-    };
-
-    const handleCreativeMode = () => {
-        if (!newMessage || newMessage.trim() === '') return;
-        setNewMessage(`[System: Be highly creative, engaging, use emojis, and act like a fun persona!] -> ${newMessage}`);
+    // This ensures only ONE button can be active at a time!
+    const toggleMode = (mode: string) => {
+        setIsFixOn(mode === 'fix' ? !isFixOn : false);
+        setIsLogicOn(mode === 'logic' ? !isLogicOn : false);
+        setIsFunOn(mode === 'fun' ? !isFunOn : false);
+        setIsMaxOn(mode === 'max' ? !isMaxOn : false);
     };
 
     const handleVoiceInput = () => {
-        // Phase 1: UI Hook. Phase 2: Microphone API Injection!
-        setNewMessage("[🎙️ Voice Input Module Loading...]");
+        Logger.infoToast("🎙️ Voice module requires native Microphone permissions first!");
     };
     // ==========================================
 
@@ -113,16 +100,41 @@ const ChatInput = () => {
     }
 
     const handleSend = async () => {
-        if (newMessage.trim() !== '' || attachments.length > 0)
-            await addEntry(
-                userName ?? '',
-                true,
-                newMessage,
-                attachments.map((item) => item.uri)
-            )
+        if (newMessage.trim() === '' && attachments.length === 0) return;
+
+        // 🚀 GEMU: Invisible Injection Engine!
+        // This attaches the instructions in the background, never ruining your text box.
+        let finalMessage = newMessage;
+        
+        if (isFixOn) {
+            finalMessage = "[System: Fix all grammar, spelling, and format this text beautifully.]\n\n" + finalMessage;
+        } else if (isLogicOn) {
+            finalMessage = "[System: Answer with strict logic, step-by-step reasoning, and high accuracy. No fluff.]\n\n" + finalMessage;
+        } else if (isFunOn) {
+            finalMessage = "[System: Be highly creative, engaging, use emojis, and act like a fun persona!]\n\n" + finalMessage;
+        } else if (isMaxOn) {
+            finalMessage = "[System: Expand this short idea into a highly detailed and complex prompt.]\n\n" + finalMessage;
+        }
+
+        await addEntry(
+            userName ?? '',
+            true,
+            finalMessage, // Send the invisibly modified message!
+            attachments.map((item) => item.uri)
+        )
+        
         const swipeId = await addEntry(charName ?? '', false, '')
+        
+        // Clear the text box
         setNewMessage('')
         setAttachments([])
+        
+        // Turn all toggles off after sending
+        setIsFixOn(false);
+        setIsLogicOn(false);
+        setIsFunOn(false);
+        setIsMaxOn(false);
+        
         if (swipeId) generateResponse(swipeId)
     }
 
@@ -156,27 +168,27 @@ const ChatInput = () => {
             }}>
             
             {/* ========================================== */}
-            {/* 🚀 GEMU EDITION: THE MASTER COMMAND ROW UI   */}
+            {/* 🚀 GEMU EDITION: THE SMART TOGGLE ROW UI   */}
             {/* ========================================== */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 5 }}>
                 <TouchableOpacity onPress={handleVoiceInput} style={{ padding: 6, backgroundColor: '#d32f2f', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
                     <Text style={{ color: '#ffffff', fontWeight: 'bold', fontSize: 11 }}>🎙️ Voice</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={handleFormatText} style={{ padding: 6, backgroundColor: '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
-                    <Text style={{ color: '#00e676', fontWeight: 'bold', fontSize: 11 }}>🪄 Fix</Text>
+                <TouchableOpacity onPress={() => toggleMode('fix')} style={{ padding: 6, backgroundColor: isFixOn ? '#00e676' : '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
+                    <Text style={{ color: isFixOn ? '#000000' : '#00e676', fontWeight: 'bold', fontSize: 11 }}>🪄 Fix</Text>
                 </TouchableOpacity>
                 
-                <TouchableOpacity onPress={handleLogicMode} style={{ padding: 6, backgroundColor: '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
-                    <Text style={{ color: '#00b0ff', fontWeight: 'bold', fontSize: 11 }}>🧠 Logic</Text>
+                <TouchableOpacity onPress={() => toggleMode('logic')} style={{ padding: 6, backgroundColor: isLogicOn ? '#00b0ff' : '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
+                    <Text style={{ color: isLogicOn ? '#000000' : '#00b0ff', fontWeight: 'bold', fontSize: 11 }}>🧠 Logic</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={handleCreativeMode} style={{ padding: 6, backgroundColor: '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
-                    <Text style={{ color: '#ff4081', fontWeight: 'bold', fontSize: 11 }}>🎨 Fun</Text>
+                <TouchableOpacity onPress={() => toggleMode('fun')} style={{ padding: 6, backgroundColor: isFunOn ? '#ff4081' : '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
+                    <Text style={{ color: isFunOn ? '#000000' : '#ff4081', fontWeight: 'bold', fontSize: 11 }}>🎨 Fun</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={handleEnhancePrompt} style={{ padding: 6, backgroundColor: '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
-                    <Text style={{ color: '#ffeb3b', fontWeight: 'bold', fontSize: 11 }}>✨ Max</Text>
+                <TouchableOpacity onPress={() => toggleMode('max')} style={{ padding: 6, backgroundColor: isMaxOn ? '#ffeb3b' : '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
+                    <Text style={{ color: isMaxOn ? '#000000' : '#ffeb3b', fontWeight: 'bold', fontSize: 11 }}>✨ Max</Text>
                 </TouchableOpacity>
             </View>
             {/* ========================================== */}
