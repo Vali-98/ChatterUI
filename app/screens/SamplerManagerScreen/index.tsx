@@ -17,7 +17,8 @@ import { SamplersManager } from '@lib/state/SamplerState'
 import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 import { useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+// 🚀 GEMU FIX: Added TouchableOpacity and TouchableHighlight for our custom buttons!
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
@@ -25,7 +26,7 @@ import ContextLimitPreview from './ContextLimitPreview'
 
 const SamplerManagerScreen = () => {
     const styles = useStyles()
-    const { spacing } = Theme.useTheme()
+    const { spacing, color } = Theme.useTheme()
     const { appMode } = useAppMode()
     const [showNewSampler, setShowNewSampler] = useState<boolean>(false)
 
@@ -67,11 +68,6 @@ const SamplerManagerScreen = () => {
         ).then(() => {
             Logger.infoToast('Downloaded Sampler Configuration!')
         })
-    }
-
-    const handleImportSampler = () => {
-        //TODO : Implement
-        Logger.errorToast('Importing Not Implemented')
     }
 
     const handleDeleteSampler = () => {
@@ -121,14 +117,6 @@ const SamplerManagerScreen = () => {
                         menu.current?.close()
                     },
                 },
-                /*{
-                    label: 'Import Sampler',
-                    icon: 'upload',
-                    onPress: (menu) => {
-                        handleImportSampler()
-                        menu.current?.close()
-                    },
-                },*/
                 {
                     label: 'Delete Sampler',
                     icon: 'delete',
@@ -173,6 +161,33 @@ const SamplerManagerScreen = () => {
                 }}
                 labelExtractor={(item) => item.name}
             />
+
+            {/* ========================================== */}
+            {/* 🚀 GEMU EDITION: SAMPLER OVERDRIVE PRESETS */}
+            {/* ========================================== */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: spacing.xl, paddingBottom: 10 }}>
+                <TouchableOpacity 
+                    onPress={() => {
+                        // Hacker override: Force standard values no matter the ID
+                        let newData = { ...currentConfig.data, temperature: 0.1, top_p: 0.1, repetition_penalty: 1.15, top_k: 40 };
+                        updateCurrentConfig({ ...currentConfig, data: newData });
+                        Logger.infoToast("🧠 Strict Logic Profile Loaded!");
+                    }}
+                    style={{ padding: 12, backgroundColor: color.primary._600, borderRadius: 8, flex: 1, marginHorizontal: 4, alignItems: 'center' }}>
+                    <Text style={{ color: color.text._100, fontWeight: 'bold' }}>🧠 Strict Logic</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                    onPress={() => {
+                        let newData = { ...currentConfig.data, temperature: 0.9, top_p: 0.95, repetition_penalty: 1.05, top_k: 100 };
+                        updateCurrentConfig({ ...currentConfig, data: newData });
+                        Logger.infoToast("🎨 Creative Profile Loaded!");
+                    }}
+                    style={{ padding: 12, backgroundColor: color.primary._600, borderRadius: 8, flex: 1, marginHorizontal: 4, alignItems: 'center' }}>
+                    <Text style={{ color: color.text._100, fontWeight: 'bold' }}>🎨 Creative</Text>
+                </TouchableOpacity>
+            </View>
+            {/* ========================================== */}
 
             {samplerList.length !== 0 && currentConfig && (
                 <KeyboardAwareScrollView contentContainerStyle={styles.scrollContainer}>
@@ -250,7 +265,6 @@ const SamplerManagerScreen = () => {
                                         label={samplerItem.friendlyName}
                                     />
                                 )
-                            //case 'custom':
                             default:
                                 return (
                                     <Text style={styles.warningText}>Invalid Sampler Field!</Text>
