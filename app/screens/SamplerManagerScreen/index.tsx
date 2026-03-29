@@ -162,14 +162,19 @@ const SamplerManagerScreen = () => {
                 labelExtractor={(item) => item.name}
             />
 
-            {/* ========================================== */}
+                        {/* ========================================== */}
             {/* 🚀 GEMU EDITION: SAMPLER OVERDRIVE PRESETS */}
             {/* ========================================== */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: spacing.xl, paddingBottom: 10 }}>
                 <TouchableOpacity 
                     onPress={() => {
-                        // Hacker override: Force standard values no matter the ID
-                        let newData = { ...currentConfig.data, temperature: 0.1, top_p: 0.1, repetition_penalty: 1.15, top_k: 40 };
+                        let newData = { 
+                            ...currentConfig.data, 
+                            [SamplerID.TEMPERATURE]: 0.1, 
+                            [SamplerID.TOP_P]: 0.1, 
+                            [SamplerID.REPETITION_PENALTY]: 1.15, 
+                            [SamplerID.TOP_K]: 40 
+                        };
                         updateCurrentConfig({ ...currentConfig, data: newData });
                         Logger.infoToast("🧠 Strict Logic Profile Loaded!");
                     }}
@@ -179,7 +184,13 @@ const SamplerManagerScreen = () => {
 
                 <TouchableOpacity 
                     onPress={() => {
-                        let newData = { ...currentConfig.data, temperature: 0.9, top_p: 0.95, repetition_penalty: 1.05, top_k: 100 };
+                        let newData = { 
+                            ...currentConfig.data, 
+                            [SamplerID.TEMPERATURE]: 0.9, 
+                            [SamplerID.TOP_P]: 0.95, 
+                            [SamplerID.REPETITION_PENALTY]: 1.05, 
+                            [SamplerID.TOP_K]: 100 
+                        };
                         updateCurrentConfig({ ...currentConfig, data: newData });
                         Logger.infoToast("🎨 Creative Profile Loaded!");
                     }}
