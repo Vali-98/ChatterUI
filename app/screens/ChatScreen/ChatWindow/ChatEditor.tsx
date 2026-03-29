@@ -4,7 +4,8 @@ import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 import React, { useEffect, useState } from 'react'
-import { GestureResponderEvent, Modal, StyleSheet, Text, TextInput, View } from 'react-native'
+// 🚀 GEMU FIX: ADDED TouchableOpacity TO THE IMPORT LIST SO THE APP DOESN'T CRASH!
+import { GestureResponderEvent, Modal, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native'
 import { KeyboardAvoidingView, useKeyboardState } from 'react-native-keyboard-controller'
 import Animated, { SlideOutDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -18,7 +19,6 @@ type ChatEditorStateProps = {
     show: (index: number) => void
 }
 
-//TODO: This is somewhat unsafe, as it always expects index to be valid at 0
 export const useChatEditorStore = create<ChatEditorStateProps>()((set) => ({
     index: 0,
     editMode: false,
@@ -52,7 +52,6 @@ const ChatEditor = () => {
         editMode && swipeText !== undefined && setPlaceholderText(swipeText)
     }, [swipeText, editMode])
 
-    // TODO: This should safely return if invalid values were given
     if (swipeText === undefined) return
 
     const handleEditMessage = () => {
@@ -80,31 +79,39 @@ const ChatEditor = () => {
         }, 1)
     }
     
-      // ==========================================
+  // ==========================================
   // 🚀 GEMU EDITION: OFFLINE PROMPT ENHANCER
   // ==========================================
   const handleEnhancePrompt = async () => {
-    // 1. Check if the box is empty using Vali-98's exact variable
     if (!placeholderText || placeholderText.trim() === '') return; 
-
     const originalText = placeholderText;
-    
-    // 2. Show the user we are working
     setPlaceholderText("✨ Enhancing prompt offline...");
-
     try {
-      // 3. The hidden system prompt! 
       const finalEnhancedText = `[System: Expand this idea into a detailed prompt] -> ${originalText}`;
-      
-      // 4. Update the text box instantly
       setPlaceholderText(finalEnhancedText);
     } catch (error) {
-      // 5. Fail-safe
       setPlaceholderText(originalText);
     }
   };
-  // ==========================================
 
+  // ==========================================
+  // 🚀 GEMU EDITION: MOOD & FORMAT PRESETS
+  // ==========================================
+  const handleFormatText = () => {
+    if (!placeholderText || placeholderText.trim() === '') return;
+    setPlaceholderText(`[System: Fix all grammar, spelling, and format this text beautifully] -> ${placeholderText}`);
+  };
+
+  const handleLogicMode = () => {
+    if (!placeholderText || placeholderText.trim() === '') return;
+    setPlaceholderText(`[System: Answer with strict logic, step-by-step reasoning, and high accuracy. No fluff.] -> ${placeholderText}`);
+  };
+
+  const handleCreativeMode = () => {
+    if (!placeholderText || placeholderText.trim() === '') return;
+    setPlaceholderText(`[System: Be highly creative, engaging, use emojis, and act like a fun persona!] -> ${placeholderText}`);
+  };
+  // ==========================================
 
     return (
         <Modal
@@ -135,6 +142,24 @@ const ChatEditor = () => {
                             </Text>
                         </View>
 
+          {/* ========================================== */}
+          {/* 🚀 GEMU EDITION: THE COMMAND CENTER ROW      */}
+          {/* ========================================== */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 8, paddingHorizontal: 5, marginTop: 10 }}>
+            <TouchableOpacity onPress={handleFormatText} style={{ padding: 8, backgroundColor: '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
+              <Text style={{ color: '#00e676', fontWeight: 'bold' }}>🪄 Fix</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity onPress={handleLogicMode} style={{ padding: 8, backgroundColor: '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
+              <Text style={{ color: '#00b0ff', fontWeight: 'bold' }}>🧠 Logic</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={handleCreativeMode} style={{ padding: 8, backgroundColor: '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
+              <Text style={{ color: '#ff4081', fontWeight: 'bold' }}>🎨 Creative</Text>
+            </TouchableOpacity>
+          </View>
+          {/* ========================================== */}
+
                         <TextInput
                             ref={inputRef}
                             style={styles.messageInput}
@@ -144,7 +169,7 @@ const ChatEditor = () => {
                             multiline
                         />
                         
-                                  {/* ========================================== */}
+          {/* ========================================== */}
           {/* 🚀 GEMU EDITION: THE SPARKLE BUTTON        */}
           {/* ========================================== */}
           <TouchableOpacity 
@@ -155,13 +180,12 @@ const ChatEditor = () => {
               borderRadius: 8,
               alignItems: 'center',
               justifyContent: 'center',
-              marginVertical: 5
+              marginVertical: 10
             }}
           >
-            <Text style={{ fontSize: 18 }}>✨</Text>
+            <Text style={{ fontSize: 18 }}>✨ Auto-Enhance Message</Text>
           </TouchableOpacity>
           {/* ========================================== */}
-
 
                         <View
                             style={{
@@ -211,7 +235,6 @@ const useStyles = () => {
             marginTop: insets.top,
             rowGap: 12,
         },
-
         topText: {
             flexDirection: 'row',
             alignItems: 'flex-end',
@@ -220,17 +243,14 @@ const useStyles = () => {
             borderTopRightRadius: spacing.m,
             borderTopLeftRadius: spacing.m,
         },
-
         nameText: {
             color: color.text._100,
             fontSize: fontSize.l,
         },
-
         timeText: {
             color: color.text._400,
             fontSize: fontSize.s,
         },
-
         messageInput: {
             color: color.text._100,
             borderColor: color.neutral._400,
