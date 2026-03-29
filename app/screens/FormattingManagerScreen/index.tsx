@@ -20,7 +20,8 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
-import { Text, View } from 'react-native'
+// 🚀 GEMU FIX: Imported TouchableOpacity for the Auto-Formatter UI
+import { Text, View, TouchableOpacity } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import Markdown from 'react-native-markdown-display'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -58,6 +59,54 @@ const FormattingManager = () => {
             setTextFilter: state.setFilter,
         }))
     )
+
+    // ==========================================
+    // 🚀 GEMU EDITION: AUTOMATIC FORMATTER LOGIC
+    // ==========================================
+    const applyAutoFormat = (formatType: string) => {
+        if (!currentInstruct) return;
+        let newInstruct = { ...currentInstruct };
+
+        if (formatType === 'ChatML') {
+            newInstruct.system_prefix = "<|im_start|>system\n";
+            newInstruct.system_suffix = "<|im_end|>\n";
+            newInstruct.input_prefix = "<|im_start|>user\n";
+            newInstruct.input_suffix = "<|im_end|>\n<|im_start|>assistant\n";
+            newInstruct.output_prefix = "";
+            newInstruct.output_suffix = "<|im_end|>\n";
+            newInstruct.stop_sequence = "<|im_end|>";
+            Logger.infoToast("⚙️ ChatML Tokens Applied!");
+        } else if (formatType === 'Llama3') {
+            newInstruct.system_prefix = "<|start_header_id|>system<|end_header_id|>\n\n";
+            newInstruct.system_suffix = "<|eot_id|>";
+            newInstruct.input_prefix = "<|start_header_id|>user<|end_header_id|>\n\n";
+            newInstruct.input_suffix = "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
+            newInstruct.output_prefix = "";
+            newInstruct.output_suffix = "<|eot_id|>";
+            newInstruct.stop_sequence = "<|eot_id|>";
+            Logger.infoToast("🦙 Llama 3 Tokens Applied!");
+        } else if (formatType === 'Alpaca') {
+            newInstruct.system_prefix = "";
+            newInstruct.system_suffix = "\n\n";
+            newInstruct.input_prefix = "### Instruction:\n";
+            newInstruct.input_suffix = "\n\n### Response:\n";
+            newInstruct.output_prefix = "";
+            newInstruct.output_suffix = "\n\n";
+            newInstruct.stop_sequence = "### Instruction:";
+            Logger.infoToast("🦙 Alpaca Tokens Applied!");
+        } else if (formatType === 'Mistral') {
+            newInstruct.system_prefix = "<s>[INST] ";
+            newInstruct.system_suffix = " [/INST] ";
+            newInstruct.input_prefix = "[INST] ";
+            newInstruct.input_suffix = " [/INST] ";
+            newInstruct.output_prefix = "";
+            newInstruct.output_suffix = "</s>";
+            newInstruct.stop_sequence = "</s>";
+            Logger.infoToast("🌪️ Mistral Tokens Applied!");
+        }
+        setCurrentInstruct(newInstruct);
+    };
+    // ==========================================
 
     const handleSaveInstruct = (log: boolean) => {
         if (currentInstruct && instructID)
@@ -127,7 +176,6 @@ const FormattingManager = () => {
                     icon: 'addfile',
                     onPress: (menu) => {
                         setShowNewInstruct(true)
-
                         menu.current?.close()
                     },
                 },
@@ -226,7 +274,44 @@ const FormattingManager = () => {
                         rowGap: spacing.xl,
                         paddingHorizontal: spacing.xl,
                     }}>
+                    
+                    <SectionTitle>Model Auto-Formatter ⚡</SectionTitle>
+                    <Text style={{ color: color.text._400, marginBottom: -10 }}>
+                        Instantly fill correct token prefixes for popular architectures:
+                    </Text>
+
+                    {/* ========================================== */}
+                    {/* 🚀 GEMU EDITION: AUTO-FORMATTER BUTTONS    */}
+                    {/* ========================================== */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 5, flexWrap: 'wrap', gap: 8 }}>
+                        <TouchableOpacity 
+                            onPress={() => applyAutoFormat('ChatML')}
+                            style={{ padding: 10, backgroundColor: color.primary._600, borderRadius: 8, flex: 1, alignItems: 'center', minWidth: '22%' }}>
+                            <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 13 }}>ChatML</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            onPress={() => applyAutoFormat('Llama3')}
+                            style={{ padding: 10, backgroundColor: color.primary._600, borderRadius: 8, flex: 1, alignItems: 'center', minWidth: '22%' }}>
+                            <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 13 }}>Llama 3</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            onPress={() => applyAutoFormat('Alpaca')}
+                            style={{ padding: 10, backgroundColor: color.primary._600, borderRadius: 8, flex: 1, alignItems: 'center', minWidth: '22%' }}>
+                            <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 13 }}>Alpaca</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            onPress={() => applyAutoFormat('Mistral')}
+                            style={{ padding: 10, backgroundColor: color.primary._600, borderRadius: 8, flex: 1, alignItems: 'center', minWidth: '22%' }}>
+                            <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 13 }}>Mistral</Text>
+                        </TouchableOpacity>
+                    </View>
+                    {/* ========================================== */}
+
                     <SectionTitle>Instruct Formatting</SectionTitle>
+
                     <ThemedTextInput
                         label="System Prompt"
                         value={currentInstruct.system_prompt}
@@ -578,40 +663,6 @@ const FormattingManager = () => {
                         value={useTemplate}
                         onChangeValue={setUseTemplate}
                     />
-
-                    {/* @TODO: Macros are always replaced - people may want this to be changed
-                            <CheckboxTitle
-                                name="Replace Macro In Sequences"
-                                varname="macro"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                            />
-                            */}
-
-                    {/*  Groups are not implemented - leftover from ST
-                            <CheckboxTitle
-                                name="Force for Groups and Personas"
-                                varname="names_force_groups"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                            />
-                            */}
-                    {/* Activates Instruct when model is loaded with specific name that matches regex
-                    
-                            <TextBox
-                                name="Activation Regex"
-                                varname="activation_regex"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                            />*/}
-                    {/*    User Alignment Messages may be needed in future, might be removed on CCv3
-                            <TextBox
-                                name="User Alignment"
-                                varname="user_alignment_message"
-                                body={currentInstruct}
-                                setValue={setCurrentInstruct}
-                                multiline
-                            />*/}
                 </KeyboardAwareScrollView>
             </SafeAreaView>
         )
