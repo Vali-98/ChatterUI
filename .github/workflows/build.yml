@@ -27,7 +27,7 @@ jobs:
       - name: Build Android App Engine
         run: npx expo prebuild --platform android
 
-            - name: Compile APK
+      - name: Compile APK
         run: |
           cd android
           echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g" >> gradle.properties
