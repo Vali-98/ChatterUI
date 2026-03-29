@@ -26,6 +26,7 @@ import Markdown from 'react-native-markdown-display'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
+import { Llama } from '@lib/engine/Local/LlamaLocal'
 
 const autoformatterData = [
     { label: 'Disabled', example: '*<No Formatting>*' },
@@ -59,54 +60,7 @@ const FormattingManager = () => {
         }))
     )
 
-    const applyAutoFormat = (formatType: string) => {
-        if (!currentInstruct) return;
-        let newInstruct = { ...currentInstruct };
-
-        if (formatType === 'ChatML') {
-            newInstruct.system_prefix = "<|im_start|>system\n";
-            newInstruct.system_suffix = "<|im_end|>\n";
-            newInstruct.input_prefix = "<|im_start|>user\n";
-            newInstruct.input_suffix = "<|im_end|>\n<|im_start|>assistant\n";
-            newInstruct.output_prefix = "";
-            newInstruct.output_suffix = "<|im_end|>\n";
-            newInstruct.stop_sequence = "<|im_end|>";
-            Logger.infoToast("⚙️ ChatML Tokens Applied!");
-        } else if (formatType === 'Llama3') {
-            newInstruct.system_prefix = "<|start_header_id|>system<|end_header_id|>\n\n";
-            newInstruct.system_suffix = "<|eot_id|>";
-            newInstruct.input_prefix = "<|start_header_id|>user<|end_header_id|>\n\n";
-            newInstruct.input_suffix = "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
-            newInstruct.output_prefix = "";
-            newInstruct.output_suffix = "<|eot_id|>";
-            newInstruct.stop_sequence = "<|eot_id|>";
-            Logger.infoToast("🦙 Llama 3 Tokens Applied!");
-        } else if (formatType === 'Alpaca') {
-            newInstruct.system_prefix = "";
-            newInstruct.system_suffix = "\n\n";
-            newInstruct.input_prefix = "### Instruction:\n";
-            newInstruct.input_suffix = "\n\n### Response:\n";
-            newInstruct.output_prefix = "";
-            newInstruct.output_suffix = "\n\n";
-            newInstruct.stop_sequence = "### Instruction:";
-            Logger.infoToast("🦙 Alpaca Tokens Applied!");
-        } else if (formatType === 'Mistral') {
-            newInstruct.system_prefix = "<s>[INST] ";
-            newInstruct.system_suffix = " [/INST] ";
-            newInstruct.input_prefix = "[INST] ";
-            newInstruct.input_suffix = " [/INST] ";
-            newInstruct.output_prefix = "";
-            newInstruct.output_suffix = "</s>";
-            newInstruct.stop_sequence = "</s>";
-            Logger.infoToast("🌪️ Mistral Tokens Applied!");
-        }
-        setCurrentInstruct(newInstruct);
-    };
-
-    const handleSaveInstruct = (log: boolean) => {
-        if (currentInstruct && instructID)
-            Instructs.db.mutate.updateInstruct(instructID, currentInstruct)
-    }
+    import { Llama } from '@lib/engine/Local/LlamaLocal'
 
     const handleRegenerateDefaults = () => {
         Alert.alert({
