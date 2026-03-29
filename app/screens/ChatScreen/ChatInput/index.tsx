@@ -12,7 +12,8 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { getDocumentAsync } from 'expo-document-picker'
 import { Image } from 'expo-image'
 import React, { useState } from 'react'
-import { TextInput, TouchableOpacity, View } from 'react-native'
+// 🚀 GEMU FIX: Added 'Text' to the import list so our custom buttons don't crash!
+import { TextInput, TouchableOpacity, View, Text } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, {
     BounceIn,
@@ -73,6 +74,39 @@ const ChatInput = () => {
 
     const [newMessage, setNewMessage] = useState<string>('')
 
+    // ==========================================
+    // 🚀 GEMU EDITION: MASTER COMMAND CENTER LOGIC
+    // ==========================================
+    const handleEnhancePrompt = () => {
+        if (!newMessage || newMessage.trim() === '') return;
+        const originalText = newMessage;
+        setNewMessage("✨ Enhancing prompt offline...");
+        setTimeout(() => {
+            setNewMessage(`[System: Expand this idea into a detailed prompt] -> ${originalText}`);
+        }, 100);
+    };
+
+    const handleFormatText = () => {
+        if (!newMessage || newMessage.trim() === '') return;
+        setNewMessage(`[System: Fix all grammar, spelling, and format this text beautifully] -> ${newMessage}`);
+    };
+
+    const handleLogicMode = () => {
+        if (!newMessage || newMessage.trim() === '') return;
+        setNewMessage(`[System: Answer with strict logic, step-by-step reasoning, and high accuracy. No fluff.] -> ${newMessage}`);
+    };
+
+    const handleCreativeMode = () => {
+        if (!newMessage || newMessage.trim() === '') return;
+        setNewMessage(`[System: Be highly creative, engaging, use emojis, and act like a fun persona!] -> ${newMessage}`);
+    };
+
+    const handleVoiceInput = () => {
+        // Phase 1: UI Hook. Phase 2: Microphone API Injection!
+        setNewMessage("[🎙️ Voice Input Module Loading...]");
+    };
+    // ==========================================
+
     const abortResponse = async () => {
         Logger.info(`Aborting Generation`)
         if (abortFunction) await abortFunction()
@@ -120,6 +154,33 @@ const ChatInput = () => {
                 borderRadius: 16,
                 rowGap: spacing.m,
             }}>
+            
+            {/* ========================================== */}
+            {/* 🚀 GEMU EDITION: THE MASTER COMMAND ROW UI   */}
+            {/* ========================================== */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 5 }}>
+                <TouchableOpacity onPress={handleVoiceInput} style={{ padding: 6, backgroundColor: '#d32f2f', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
+                    <Text style={{ color: '#ffffff', fontWeight: 'bold', fontSize: 11 }}>🎙️ Voice</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={handleFormatText} style={{ padding: 6, backgroundColor: '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
+                    <Text style={{ color: '#00e676', fontWeight: 'bold', fontSize: 11 }}>🪄 Fix</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity onPress={handleLogicMode} style={{ padding: 6, backgroundColor: '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
+                    <Text style={{ color: '#00b0ff', fontWeight: 'bold', fontSize: 11 }}>🧠 Logic</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={handleCreativeMode} style={{ padding: 6, backgroundColor: '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
+                    <Text style={{ color: '#ff4081', fontWeight: 'bold', fontSize: 11 }}>🎨 Fun</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={handleEnhancePrompt} style={{ padding: 6, backgroundColor: '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
+                    <Text style={{ color: '#ffeb3b', fontWeight: 'bold', fontSize: 11 }}>✨ Max</Text>
+                </TouchableOpacity>
+            </View>
+            {/* ========================================== */}
+
             <Animated.FlatList
                 itemLayoutAnimation={LinearTransition}
                 style={{
