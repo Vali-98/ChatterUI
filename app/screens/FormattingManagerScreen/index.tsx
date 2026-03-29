@@ -20,7 +20,6 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
-// 🚀 GEMU FIX: Imported TouchableOpacity for the Auto-Formatter UI
 import { Text, View, TouchableOpacity } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import Markdown from 'react-native-markdown-display'
@@ -60,9 +59,6 @@ const FormattingManager = () => {
         }))
     )
 
-    // ==========================================
-    // 🚀 GEMU EDITION: AUTOMATIC FORMATTER LOGIC
-    // ==========================================
     const applyAutoFormat = (formatType: string) => {
         if (!currentInstruct) return;
         let newInstruct = { ...currentInstruct };
@@ -106,7 +102,6 @@ const FormattingManager = () => {
         }
         setCurrentInstruct(newInstruct);
     };
-    // ==========================================
 
     const handleSaveInstruct = (log: boolean) => {
         if (currentInstruct && instructID)
@@ -280,9 +275,6 @@ const FormattingManager = () => {
                         Instantly fill correct token prefixes for popular architectures:
                     </Text>
 
-                    {/* ========================================== */}
-                    {/* 🚀 GEMU EDITION: AUTO-FORMATTER BUTTONS    */}
-                    {/* ========================================== */}
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 5, flexWrap: 'wrap', gap: 8 }}>
                         <TouchableOpacity 
                             onPress={() => applyAutoFormat('ChatML')}
@@ -308,7 +300,40 @@ const FormattingManager = () => {
                             <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 13 }}>Mistral</Text>
                         </TouchableOpacity>
                     </View>
-                    {/* ========================================== */}
+
+                    <SectionTitle>Quick Personas 🎭</SectionTitle>
+                    <Text style={{ color: color.text._400, marginBottom: -10 }}>
+                        Instantly override the system prompt for a new personality:
+                    </Text>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 5, flexWrap: 'wrap', gap: 8 }}>
+                        <TouchableOpacity 
+                            onPress={() => {
+                                setCurrentInstruct({ ...currentInstruct, system_prompt: "You are Gemu, a highly intelligent and friendly AI assistant. Answer accurately, be concise, and use emojis." });
+                                Logger.infoToast("🤖 Gemu Persona Loaded!");
+                            }}
+                            style={{ padding: 10, backgroundColor: color.primary._700, borderRadius: 8, flex: 1, alignItems: 'center', minWidth: '30%' }}>
+                            <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 13 }}>🤖 Gemu</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            onPress={() => {
+                                setCurrentInstruct({ ...currentInstruct, system_prompt: "You are an expert 10x software engineer. Provide extremely concise answers, strictly focusing on the correct code, avoiding fluff and pleasantries." });
+                                Logger.infoToast("👨‍💻 Strict Coder Loaded!");
+                            }}
+                            style={{ padding: 10, backgroundColor: color.primary._700, borderRadius: 8, flex: 1, alignItems: 'center', minWidth: '30%' }}>
+                            <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 13 }}>👨‍💻 Coder</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            onPress={() => {
+                                setCurrentInstruct({ ...currentInstruct, system_prompt: "You are a master storyteller and creative writer. Use vivid imagery, rich vocabulary, and engaging narratives to respond." });
+                                Logger.infoToast("📚 Storyteller Loaded!");
+                            }}
+                            style={{ padding: 10, backgroundColor: color.primary._700, borderRadius: 8, flex: 1, alignItems: 'center', minWidth: '30%' }}>
+                            <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 13 }}>📚 Story</Text>
+                        </TouchableOpacity>
+                    </View>
 
                     <SectionTitle>Instruct Formatting</SectionTitle>
 
