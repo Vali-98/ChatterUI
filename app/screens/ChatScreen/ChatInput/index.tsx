@@ -98,7 +98,7 @@ const ChatInput = () => {
     const handleSend = async () => {
         if (newMessage.trim() === '' && attachments.length === 0) return;
 
-        // 🚀 GEMU: Invisible Injection Engine!
+        // 🚀 GEMU: Invisible C.R.E.A.T.E. Injection Engine!
         let finalMessage = newMessage;
         
         if (activeMode === 'fix') {
@@ -108,13 +108,25 @@ const ChatInput = () => {
         } else if (activeMode === 'fun') {
             finalMessage = "[System: Be highly creative, engaging, use emojis, and act like a fun persona!]\n\n" + finalMessage;
         } else if (activeMode === 'max') {
-            finalMessage = "[System: Expand this short idea into a highly detailed and complex prompt.]\n\n" + finalMessage;
+            // THE OFFLINE C.R.E.A.T.E. AUTO-ENHANCER!
+            finalMessage = `[SYSTEM AUTO-ENHANCER ACTIVE]
+You are an Elite AI Prompt Engineer. The user has provided a raw, quick prompt below. Ignore any spelling or grammar mistakes.
+Instead of answering normally, internally upgrade this prompt using the C.R.E.A.T.E. formula before executing it:
+- Character: Assume the role of a world-class expert on this topic.
+- Request: Identify and flawlessly execute the core task.
+- Example: Apply high-quality references and industry standards.
+- Adjustments: Optimize the structure for maximum impact and engagement.
+- Type of output: Format beautifully (use Markdown, tables, or bullets if it makes sense).
+- Extra Guidance: Ensure zero hallucinations and make it easy to understand.
+
+Now, execute the user's raw request using this elite C.R.E.A.T.E. framework:
+` + finalMessage;
         }
 
         await addEntry(
             userName ?? '',
             true,
-            finalMessage, // Send the invisibly modified message!
+            finalMessage, // Send the invisibly enhanced C.R.E.A.T.E. message!
             attachments.map((item) => item.uri)
         )
         
@@ -364,7 +376,7 @@ const ChatInput = () => {
                     onPress={() => {
                         setHideOptions(!!newMessage)
                     }}
-                    placeholder="Message Gemu..."
+                    placeholder="Message..."
                     placeholderTextColor={color.text._600}
                     value={newMessage}
                     onChangeText={(text) => {
