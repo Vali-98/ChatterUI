@@ -74,24 +74,20 @@ const ChatInput = () => {
     const [newMessage, setNewMessage] = useState<string>('')
 
     // ==========================================
-    // 🚀 GEMU EDITION: INVISIBLE TOGGLE STATES
+    // 🚀 GEMU EDITION: CHATGPT STYLE STATE
     // ==========================================
-    const [isFixOn, setIsFixOn] = useState(false);
-    const [isLogicOn, setIsLogicOn] = useState(false);
-    const [isFunOn, setIsFunOn] = useState(false);
-    const [isMaxOn, setIsMaxOn] = useState(false);
+    const [showModifiers, setShowModifiers] = useState(false);
+    const [activeMode, setActiveMode] = useState<string | null>(null);
 
-    // This ensures only ONE button can be active at a time!
-    const toggleMode = (mode: string) => {
-        setIsFixOn(mode === 'fix' ? !isFixOn : false);
-        setIsLogicOn(mode === 'logic' ? !isLogicOn : false);
-        setIsFunOn(mode === 'fun' ? !isFunOn : false);
-        setIsMaxOn(mode === 'max' ? !isMaxOn : false);
-    };
-
-    const handleVoiceInput = () => {
-        Logger.infoToast("🎙️ Voice module requires native Microphone permissions first!");
-    };
+    const getModeConfig = (mode: string | null) => {
+        switch(mode) {
+            case 'fix': return { icon: '🪄', name: 'Fix', color: '#00e676', bg: '#00e67620' };
+            case 'logic': return { icon: '🧠', name: 'Logic', color: '#00b0ff', bg: '#00b0ff20' };
+            case 'fun': return { icon: '🎨', name: 'Fun', color: '#ff4081', bg: '#ff408120' };
+            case 'max': return { icon: '✨', name: 'Max', color: '#ffeb3b', bg: '#ffeb3b20' };
+            default: return null;
+        }
+    }
     // ==========================================
 
     const abortResponse = async () => {
@@ -103,16 +99,15 @@ const ChatInput = () => {
         if (newMessage.trim() === '' && attachments.length === 0) return;
 
         // 🚀 GEMU: Invisible Injection Engine!
-        // This attaches the instructions in the background, never ruining your text box.
         let finalMessage = newMessage;
         
-        if (isFixOn) {
+        if (activeMode === 'fix') {
             finalMessage = "[System: Fix all grammar, spelling, and format this text beautifully.]\n\n" + finalMessage;
-        } else if (isLogicOn) {
+        } else if (activeMode === 'logic') {
             finalMessage = "[System: Answer with strict logic, step-by-step reasoning, and high accuracy. No fluff.]\n\n" + finalMessage;
-        } else if (isFunOn) {
+        } else if (activeMode === 'fun') {
             finalMessage = "[System: Be highly creative, engaging, use emojis, and act like a fun persona!]\n\n" + finalMessage;
-        } else if (isMaxOn) {
+        } else if (activeMode === 'max') {
             finalMessage = "[System: Expand this short idea into a highly detailed and complex prompt.]\n\n" + finalMessage;
         }
 
@@ -125,18 +120,17 @@ const ChatInput = () => {
         
         const swipeId = await addEntry(charName ?? '', false, '')
         
-        // Clear the text box
         setNewMessage('')
         setAttachments([])
         
-        // Turn all toggles off after sending
-        setIsFixOn(false);
-        setIsLogicOn(false);
-        setIsFunOn(false);
-        setIsMaxOn(false);
+        // Reset everything after sending
+        setActiveMode(null);
+        setShowModifiers(false);
         
         if (swipeId) generateResponse(swipeId)
     }
+
+    const activeConfig = getModeConfig(activeMode);
 
     return (
         <View
@@ -163,34 +157,56 @@ const ChatInput = () => {
                         blurRadius: 4,
                     },
                 ],
-                borderRadius: 16,
+                borderRadius: 24, // ChatGPT Pill Shape!
                 rowGap: spacing.m,
             }}>
             
             {/* ========================================== */}
-            {/* 🚀 GEMU EDITION: THE SMART TOGGLE ROW UI   */}
+            {/* 🚀 GEMU EDITION: EXPANDABLE MENU           */}
             {/* ========================================== */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 5 }}>
-                <TouchableOpacity onPress={handleVoiceInput} style={{ padding: 6, backgroundColor: '#d32f2f', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
-                    <Text style={{ color: '#ffffff', fontWeight: 'bold', fontSize: 11 }}>🎙️ Voice</Text>
-                </TouchableOpacity>
+            {showModifiers && (
+                <Animated.View entering={FadeIn} exiting={FadeOut} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 5, paddingTop: 4 }}>
+                    {['fix', 'logic', 'fun', 'max'].map((mode) => {
+                        const config = getModeConfig(mode);
+                        return (
+                            <TouchableOpacity 
+                                key={mode}
+                                onPress={() => {
+                                    setActiveMode(activeMode === mode ? null : mode);
+                                    setShowModifiers(false); // Auto-hide menu on select!
+                                }}
+                                style={{ padding: 8, backgroundColor: '#2d2d2d', borderRadius: 16, flex: 1, marginHorizontal: 2, alignItems: 'center', borderWidth: 1, borderColor: activeMode === mode ? config?.color : 'transparent' }}>
+                                <Text style={{ color: config?.color, fontWeight: 'bold', fontSize: 11 }}>{config?.icon} {config?.name}</Text>
+                            </TouchableOpacity>
+                        );
+                    })}
+                </Animated.View>
+            )}
 
-                <TouchableOpacity onPress={() => toggleMode('fix')} style={{ padding: 6, backgroundColor: isFixOn ? '#00e676' : '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
-                    <Text style={{ color: isFixOn ? '#000000' : '#00e676', fontWeight: 'bold', fontSize: 11 }}>🪄 Fix</Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity onPress={() => toggleMode('logic')} style={{ padding: 6, backgroundColor: isLogicOn ? '#00b0ff' : '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
-                    <Text style={{ color: isLogicOn ? '#000000' : '#00b0ff', fontWeight: 'bold', fontSize: 11 }}>🧠 Logic</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => toggleMode('fun')} style={{ padding: 6, backgroundColor: isFunOn ? '#ff4081' : '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
-                    <Text style={{ color: isFunOn ? '#000000' : '#ff4081', fontWeight: 'bold', fontSize: 11 }}>🎨 Fun</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => toggleMode('max')} style={{ padding: 6, backgroundColor: isMaxOn ? '#ffeb3b' : '#2d2d2d', borderRadius: 8, flex: 1, marginHorizontal: 2, alignItems: 'center' }}>
-                    <Text style={{ color: isMaxOn ? '#000000' : '#ffeb3b', fontWeight: 'bold', fontSize: 11 }}>✨ Max</Text>
-                </TouchableOpacity>
-            </View>
+            {/* ========================================== */}
+            {/* 🚀 GEMU EDITION: CHATGPT ACTIVE PILL       */}
+            {/* ========================================== */}
+            {activeMode && !showModifiers && (
+                <Animated.View entering={FadeIn} exiting={FadeOut} style={{ paddingHorizontal: spacing.m, paddingBottom: 2, paddingTop: 6 }}>
+                    <TouchableOpacity 
+                        onPress={() => setActiveMode(null)}
+                        style={{
+                            alignSelf: 'flex-start',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            backgroundColor: activeConfig?.bg,
+                            paddingVertical: 6,
+                            paddingHorizontal: 12,
+                            borderRadius: 16,
+                            borderWidth: 1,
+                            borderColor: activeConfig?.color,
+                        }}>
+                        <Text style={{ color: activeConfig?.color, fontWeight: 'bold', fontSize: 12 }}>
+                            {activeConfig?.icon} {activeConfig?.name}  ✕
+                        </Text>
+                    </TouchableOpacity>
+                </Animated.View>
+            )}
             {/* ========================================== */}
 
             <Animated.FlatList
@@ -244,7 +260,7 @@ const ChatInput = () => {
             <View
                 style={{
                     flexDirection: 'row',
-                    alignItems: 'center',
+                    alignItems: 'flex-end', // Aligns items to the bottom for multiline text!
                     columnGap: spacing.m,
                 }}>
                 <Animated.View layout={XAxisOnlyTransition}>
@@ -252,7 +268,7 @@ const ChatInput = () => {
                         <Animated.View
                             entering={FadeIn}
                             exiting={FadeOut}
-                            style={{ flexDirection: 'row', columnGap: 8, alignItems: 'center' }}>
+                            style={{ flexDirection: 'row', columnGap: 8, alignItems: 'center', paddingBottom: 8 }}>
                             <ChatOptions />
                             <PopupMenu
                                 icon="paperclip"
@@ -294,10 +310,26 @@ const ChatInput = () => {
                                 }}
                                 placement="top"
                             />
+                            
+                            {/* 🚀 GEMU EDITION: THE SPARKLE TRIGGER BUTTON */}
+                            <TouchableOpacity 
+                                onPress={() => setShowModifiers(!showModifiers)} 
+                                style={{ 
+                                    padding: 6, 
+                                    backgroundColor: showModifiers ? color.primary._600 : color.neutral._200, 
+                                    borderRadius: 16 
+                                }}>
+                                <MaterialIcons 
+                                    name="auto-awesome" 
+                                    size={20} 
+                                    color={showModifiers ? color.text._100 : color.text._400} 
+                                />
+                            </TouchableOpacity>
+
                         </Animated.View>
                     )}
                     {hideOptions && (
-                        <Animated.View entering={FadeIn} exiting={FadeOut}>
+                        <Animated.View entering={FadeIn} exiting={FadeOut} style={{ paddingBottom: 8 }}>
                             <ThemedButton
                                 iconSize={18}
                                 iconStyle={{
@@ -322,18 +354,18 @@ const ChatInput = () => {
                         color: color.text._100,
                         backgroundColor: color.neutral._100,
                         flex: 1,
-                        borderWidth: 2,
-                        borderColor: color.primary._300,
+                        borderWidth: 0, // Removed border for modern look!
                         borderRadius: borderRadius.l,
                         paddingHorizontal: spacing.m,
-                        paddingVertical: spacing.m,
+                        paddingTop: 12,
+                        paddingBottom: 12,
+                        maxHeight: 120, // Prevents box from getting too tall
                     }}
                     onPress={() => {
                         setHideOptions(!!newMessage)
                     }}
-                    numberOfLines={6}
-                    placeholder="Message..."
-                    placeholderTextColor={color.text._700}
+                    placeholder="Message Gemu..."
+                    placeholderTextColor={color.text._600}
                     value={newMessage}
                     onChangeText={(text) => {
                         setHideOptions(!!text)
@@ -343,18 +375,19 @@ const ChatInput = () => {
                     submitBehavior={sendOnEnter ? 'blurAndSubmit' : 'newline'}
                     onSubmitEditing={sendOnEnter ? handleSend : undefined}
                 />
-                <Animated.View layout={XAxisOnlyTransition}>
+                <Animated.View layout={XAxisOnlyTransition} style={{ paddingBottom: 6 }}>
                     <TouchableOpacity
                         style={{
-                            borderRadius: borderRadius.m,
-                            backgroundColor: nowGenerating ? color.error._500 : color.primary._500,
+                            borderRadius: 24,
+                            backgroundColor: nowGenerating ? color.error._500 : (newMessage.trim() || attachments.length > 0) ? color.primary._500 : color.neutral._300,
                             padding: spacing.m,
                         }}
+                        disabled={!nowGenerating && newMessage.trim() === '' && attachments.length === 0}
                         onPress={nowGenerating ? abortResponse : handleSend}>
                         <MaterialIcons
-                            name={nowGenerating ? 'stop' : 'send'}
+                            name={nowGenerating ? 'stop' : 'arrow-upward'} // ChatGPT style Up Arrow!
                             color={color.neutral._100}
-                            size={24}
+                            size={20}
                         />
                     </TouchableOpacity>
                 </Animated.View>
