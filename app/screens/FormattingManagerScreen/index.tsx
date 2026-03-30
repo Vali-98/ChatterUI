@@ -26,6 +26,8 @@ import Markdown from 'react-native-markdown-display'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
+
+// 🚀 GEMU FIX: Imported Llama engine for auto-detect!
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 
 const autoformatterData = [
@@ -60,7 +62,62 @@ const FormattingManager = () => {
         }))
     )
 
-    import { Llama } from '@lib/engine/Local/LlamaLocal'
+    // ==========================================
+    // 🚀 GEMU EDITION: SMART AUTO-FORMATTER
+    // ==========================================
+    const loadedModel = Llama.useLlamaModelStore((state) => state.model);
+
+    const applySmartFormat = () => {
+        if (!currentInstruct) return;
+        let newInstruct = { ...currentInstruct };
+        const modelName = loadedModel?.name?.toLowerCase() || "";
+
+        if (modelName.includes('llama')) {
+            newInstruct.system_prefix = "<|start_header_id|>system<|end_header_id|>\n\n";
+            newInstruct.system_suffix = "<|eot_id|>";
+            newInstruct.input_prefix = "<|start_header_id|>user<|end_header_id|>\n\n";
+            newInstruct.input_suffix = "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
+            newInstruct.output_prefix = "";
+            newInstruct.output_suffix = "<|eot_id|>";
+            newInstruct.stop_sequence = "<|eot_id|>";
+            Logger.infoToast("🦙 Auto-Detected: Llama 3 Tokens Applied!");
+        } else if (modelName.includes('mistral')) {
+            newInstruct.system_prefix = "<s>[INST] ";
+            newInstruct.system_suffix = " [/INST] ";
+            newInstruct.input_prefix = "[INST] ";
+            newInstruct.input_suffix = " [/INST] ";
+            newInstruct.output_prefix = "";
+            newInstruct.output_suffix = "</s>";
+            newInstruct.stop_sequence = "</s>";
+            Logger.infoToast("🌪️ Auto-Detected: Mistral Tokens Applied!");
+        } else if (modelName.includes('alpaca')) {
+            newInstruct.system_prefix = "";
+            newInstruct.system_suffix = "\n\n";
+            newInstruct.input_prefix = "### Instruction:\n";
+            newInstruct.input_suffix = "\n\n### Response:\n";
+            newInstruct.output_prefix = "";
+            newInstruct.output_suffix = "\n\n";
+            newInstruct.stop_sequence = "### Instruction:";
+            Logger.infoToast("🦙 Auto-Detected: Alpaca Tokens Applied!");
+        } else {
+            // Default Fallback
+            newInstruct.system_prefix = "<|im_start|>system\n";
+            newInstruct.system_suffix = "<|im_end|>\n";
+            newInstruct.input_prefix = "<|im_start|>user\n";
+            newInstruct.input_suffix = "<|im_end|>\n<|im_start|>assistant\n";
+            newInstruct.output_prefix = "";
+            newInstruct.output_suffix = "<|im_end|>\n";
+            newInstruct.stop_sequence = "<|im_end|>";
+            Logger.infoToast("⚙️ Auto-Detected: Default ChatML Applied!");
+        }
+        setCurrentInstruct(newInstruct);
+    };
+    // ==========================================
+
+    const handleSaveInstruct = (log: boolean) => {
+        if (currentInstruct && instructID)
+            Instructs.db.mutate.updateInstruct(instructID, currentInstruct)
+    }
 
     const handleRegenerateDefaults = () => {
         Alert.alert({
@@ -226,32 +283,14 @@ const FormattingManager = () => {
                     
                     <SectionTitle>Model Auto-Formatter ⚡</SectionTitle>
                     <Text style={{ color: color.text._400, marginBottom: -10 }}>
-                        Instantly fill correct token prefixes for popular architectures:
+                        Instantly detect the loaded model and apply correct tokens:
                     </Text>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 5, flexWrap: 'wrap', gap: 8 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', paddingBottom: 5, marginTop: 15 }}>
                         <TouchableOpacity 
-                            onPress={() => applyAutoFormat('ChatML')}
-                            style={{ padding: 10, backgroundColor: color.primary._600, borderRadius: 8, flex: 1, alignItems: 'center', minWidth: '22%' }}>
-                            <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 13 }}>ChatML</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity 
-                            onPress={() => applyAutoFormat('Llama3')}
-                            style={{ padding: 10, backgroundColor: color.primary._600, borderRadius: 8, flex: 1, alignItems: 'center', minWidth: '22%' }}>
-                            <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 13 }}>Llama 3</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity 
-                            onPress={() => applyAutoFormat('Alpaca')}
-                            style={{ padding: 10, backgroundColor: color.primary._600, borderRadius: 8, flex: 1, alignItems: 'center', minWidth: '22%' }}>
-                            <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 13 }}>Alpaca</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity 
-                            onPress={() => applyAutoFormat('Mistral')}
-                            style={{ padding: 10, backgroundColor: color.primary._600, borderRadius: 8, flex: 1, alignItems: 'center', minWidth: '22%' }}>
-                            <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 13 }}>Mistral</Text>
+                            onPress={applySmartFormat}
+                            style={{ padding: 12, backgroundColor: color.primary._600, borderRadius: 8, flex: 1, alignItems: 'center' }}>
+                            <Text style={{ color: color.text._100, fontWeight: 'bold', fontSize: 14 }}>⚡ Auto-Detect Tokens</Text>
                         </TouchableOpacity>
                     </View>
 
