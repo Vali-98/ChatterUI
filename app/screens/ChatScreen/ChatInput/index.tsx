@@ -78,6 +78,10 @@ const ChatInput = () => {
     // ==========================================
     const [showModifiers, setShowModifiers] = useState(false);
     const [activeMode, setActiveMode] = useState<string | null>(null);
+    
+    // ⚡ LIVE ENHANCER STATES
+    const [isEnhancing, setIsEnhancing] = useState(false);
+    const [enhanceProgress, setEnhanceProgress] = useState(0);
 
     const getModeConfig = (mode: string | null) => {
         switch(mode) {
@@ -88,6 +92,35 @@ const ChatInput = () => {
             default: return null;
         }
     }
+
+    // ⚡ THE LIVE TEXT REPLACER (C.R.E.A.T.E. FORMULA)
+    const runLiveEnhancer = () => {
+        if (!newMessage || newMessage.trim() === '') {
+            Logger.warnToast("Type a prompt first before enhancing!");
+            return;
+        }
+        
+        setIsEnhancing(true);
+        setEnhanceProgress(0);
+
+        // Simulate the AI processing time with a sleek loading bar
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 15;
+            setEnhanceProgress(progress > 100 ? 100 : progress);
+            
+            if (progress >= 100) {
+                clearInterval(interval);
+                setIsEnhancing(false);
+                
+                // Physically replace the text in the box using C.R.E.A.T.E!
+                setNewMessage((prevText) => {
+                    return `Act as a world-class expert.\n\nTask: ${prevText.trim()}\n\nExample: Apply high-quality references and industry standards.\n\nOutput: Format beautifully with markdown and bullet points.\n\nGuidance: Ensure zero hallucinations and step-by-step logic.`;
+                });
+                Logger.infoToast("✨ Prompt Maxed Out!");
+            }
+        }, 120); // Speed of the loading bar
+    };
     // ==========================================
 
     const abortResponse = async () => {
@@ -98,7 +131,7 @@ const ChatInput = () => {
     const handleSend = async () => {
         if (newMessage.trim() === '' && attachments.length === 0) return;
 
-        // 🚀 GEMU: Invisible C.R.E.A.T.E. Injection Engine!
+        // 🚀 GEMU: Invisible Injection for Fix/Logic/Fun only!
         let finalMessage = newMessage;
         
         if (activeMode === 'fix') {
@@ -107,26 +140,13 @@ const ChatInput = () => {
             finalMessage = "[System: Answer with strict logic, step-by-step reasoning, and high accuracy. No fluff.]\n\n" + finalMessage;
         } else if (activeMode === 'fun') {
             finalMessage = "[System: Be highly creative, engaging, use emojis, and act like a fun persona!]\n\n" + finalMessage;
-        } else if (activeMode === 'max') {
-            // THE OFFLINE C.R.E.A.T.E. AUTO-ENHANCER!
-            finalMessage = `[SYSTEM AUTO-ENHANCER ACTIVE]
-You are an Elite AI Prompt Engineer. The user has provided a raw, quick prompt below. Ignore any spelling or grammar mistakes.
-Instead of answering normally, internally upgrade this prompt using the C.R.E.A.T.E. formula before executing it:
-- Character: Assume the role of a world-class expert on this topic.
-- Request: Identify and flawlessly execute the core task.
-- Example: Apply high-quality references and industry standards.
-- Adjustments: Optimize the structure for maximum impact and engagement.
-- Type of output: Format beautifully (use Markdown, tables, or bullets if it makes sense).
-- Extra Guidance: Ensure zero hallucinations and make it easy to understand.
-
-Now, execute the user's raw request using this elite C.R.E.A.T.E. framework:
-` + finalMessage;
-        }
+        } 
+        // Notice 'max' is gone from here! It physically changes the text now instead of hiding it!
 
         await addEntry(
             userName ?? '',
             true,
-            finalMessage, // Send the invisibly enhanced C.R.E.A.T.E. message!
+            finalMessage, 
             attachments.map((item) => item.uri)
         )
         
@@ -134,8 +154,6 @@ Now, execute the user's raw request using this elite C.R.E.A.T.E. framework:
         
         setNewMessage('')
         setAttachments([])
-        
-        // Reset everything after sending
         setActiveMode(null);
         setShowModifiers(false);
         
@@ -169,14 +187,14 @@ Now, execute the user's raw request using this elite C.R.E.A.T.E. framework:
                         blurRadius: 4,
                     },
                 ],
-                borderRadius: 24, // ChatGPT Pill Shape!
+                borderRadius: 24, 
                 rowGap: spacing.m,
             }}>
             
             {/* ========================================== */}
             {/* 🚀 GEMU EDITION: EXPANDABLE MENU           */}
             {/* ========================================== */}
-            {showModifiers && (
+            {showModifiers && !isEnhancing && (
                 <Animated.View entering={FadeIn} exiting={FadeOut} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 5, paddingTop: 4 }}>
                     {['fix', 'logic', 'fun', 'max'].map((mode) => {
                         const config = getModeConfig(mode);
@@ -184,8 +202,13 @@ Now, execute the user's raw request using this elite C.R.E.A.T.E. framework:
                             <TouchableOpacity 
                                 key={mode}
                                 onPress={() => {
-                                    setActiveMode(activeMode === mode ? null : mode);
-                                    setShowModifiers(false); // Auto-hide menu on select!
+                                    if (mode === 'max') {
+                                        runLiveEnhancer();
+                                        setShowModifiers(false);
+                                    } else {
+                                        setActiveMode(activeMode === mode ? null : mode);
+                                        setShowModifiers(false); 
+                                    }
                                 }}
                                 style={{ padding: 8, backgroundColor: '#2d2d2d', borderRadius: 16, flex: 1, marginHorizontal: 2, alignItems: 'center', borderWidth: 1, borderColor: activeMode === mode ? config?.color : 'transparent' }}>
                                 <Text style={{ color: config?.color, fontWeight: 'bold', fontSize: 11 }}>{config?.icon} {config?.name}</Text>
@@ -196,9 +219,23 @@ Now, execute the user's raw request using this elite C.R.E.A.T.E. framework:
             )}
 
             {/* ========================================== */}
+            {/* 🚀 GEMU EDITION: THE LIVE LOADING BAR      */}
+            {/* ========================================== */}
+            {isEnhancing && (
+                <Animated.View entering={FadeIn} exiting={FadeOut} style={{ paddingHorizontal: spacing.m, paddingBottom: 2, paddingTop: 6 }}>
+                    <Text style={{ color: '#ffeb3b', fontSize: 12, marginBottom: 6, fontWeight: 'bold' }}>
+                        ✨ Enhancing Prompt with C.R.E.A.T.E... {enhanceProgress}%
+                    </Text>
+                    <View style={{ height: 6, backgroundColor: color.neutral._300, borderRadius: 3, overflow: 'hidden' }}>
+                        <View style={{ height: '100%', width: `${enhanceProgress}%`, backgroundColor: '#ffeb3b' }} />
+                    </View>
+                </Animated.View>
+            )}
+
+            {/* ========================================== */}
             {/* 🚀 GEMU EDITION: CHATGPT ACTIVE PILL       */}
             {/* ========================================== */}
-            {activeMode && !showModifiers && (
+            {activeMode && !showModifiers && !isEnhancing && (
                 <Animated.View entering={FadeIn} exiting={FadeOut} style={{ paddingHorizontal: spacing.m, paddingBottom: 2, paddingTop: 6 }}>
                     <TouchableOpacity 
                         onPress={() => setActiveMode(null)}
@@ -272,7 +309,7 @@ Now, execute the user's raw request using this elite C.R.E.A.T.E. framework:
             <View
                 style={{
                     flexDirection: 'row',
-                    alignItems: 'flex-end', // Aligns items to the bottom for multiline text!
+                    alignItems: 'flex-end', 
                     columnGap: spacing.m,
                 }}>
                 <Animated.View layout={XAxisOnlyTransition}>
@@ -326,6 +363,7 @@ Now, execute the user's raw request using this elite C.R.E.A.T.E. framework:
                             {/* 🚀 GEMU EDITION: THE SPARKLE TRIGGER BUTTON */}
                             <TouchableOpacity 
                                 onPress={() => setShowModifiers(!showModifiers)} 
+                                disabled={isEnhancing}
                                 style={{ 
                                     padding: 6, 
                                     backgroundColor: showModifiers ? color.primary._600 : color.neutral._200, 
@@ -362,21 +400,23 @@ Now, execute the user's raw request using this elite C.R.E.A.T.E. framework:
                 <AnimatedTextInput
                     layout={XAxisOnlyTransition}
                     ref={inputRef}
+                    editable={!isEnhancing} // Lock the box while generating!
                     style={{
                         color: color.text._100,
                         backgroundColor: color.neutral._100,
                         flex: 1,
-                        borderWidth: 0, // Removed border for modern look!
+                        borderWidth: 0, 
                         borderRadius: borderRadius.l,
                         paddingHorizontal: spacing.m,
                         paddingTop: 12,
                         paddingBottom: 12,
-                        maxHeight: 120, // Prevents box from getting too tall
+                        maxHeight: 120, 
+                        opacity: isEnhancing ? 0.5 : 1, // Dims while thinking!
                     }}
                     onPress={() => {
                         setHideOptions(!!newMessage)
                     }}
-                    placeholder="Message..."
+                    placeholder="Message Gemu..."
                     placeholderTextColor={color.text._600}
                     value={newMessage}
                     onChangeText={(text) => {
@@ -394,10 +434,10 @@ Now, execute the user's raw request using this elite C.R.E.A.T.E. framework:
                             backgroundColor: nowGenerating ? color.error._500 : (newMessage.trim() || attachments.length > 0) ? color.primary._500 : color.neutral._300,
                             padding: spacing.m,
                         }}
-                        disabled={!nowGenerating && newMessage.trim() === '' && attachments.length === 0}
+                        disabled={(!nowGenerating && newMessage.trim() === '' && attachments.length === 0) || isEnhancing}
                         onPress={nowGenerating ? abortResponse : handleSend}>
                         <MaterialIcons
-                            name={nowGenerating ? 'stop' : 'arrow-upward'} // ChatGPT style Up Arrow!
+                            name={nowGenerating ? 'stop' : 'arrow-upward'} 
                             color={color.neutral._100}
                             size={20}
                         />
