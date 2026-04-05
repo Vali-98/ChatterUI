@@ -1,7 +1,6 @@
 import { setStringAsync } from 'expo-clipboard'
-import { useFocusEffect } from 'expo-router'
 import React, { useCallback } from 'react'
-import { BackHandler, View } from 'react-native'
+import { View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { StretchInY, StretchOutY, ZoomIn, ZoomOut } from 'react-native-reanimated'
 import { create } from 'zustand'
@@ -10,6 +9,7 @@ import { useShallow } from 'zustand/react/shallow'
 import ThemedButton from '@components/buttons/ThemedButton'
 import Alert from '@components/views/Alert'
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { useBackAction } from '@lib/hooks/BackAction'
 import { Chats, useInference } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
 import { useTTS } from '@lib/state/TTS'
@@ -82,19 +82,14 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isL
         })
     }
 
-    useFocusEffect(
-        useCallback(() => {
-            const backAction = () => {
-                if (showOptions && swipe) {
-                    setShowOptions(undefined)
-                    return true
-                }
-                return false
-            }
-            const handler = BackHandler.addEventListener('hardwareBackPress', backAction)
-            return () => handler.remove()
-        }, [showOptions, setShowOptions, swipe])
-    )
+    const backAction = useCallback(() => {
+        if (!showOptions || !swipe) return false
+        setShowOptions(undefined)
+        return true
+    }, [showOptions, setShowOptions, swipe])
+
+    useBackAction(backAction)
+
     if (!swipe) return
 
     const isSpeaking = index === activeChatIndex
