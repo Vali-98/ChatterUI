@@ -1,17 +1,4 @@
-const thinkTags = [
-    {
-        open: /^<think\b[^>]*>/,
-        close: '</think>',
-    },
-    {
-        open: /^<\|channel>thought/,
-        close: '<channel|>',
-    },
-    {
-        open: /^<seed:think>/,
-        close: '</seed:think>',
-    },
-]
+import thinkTags from './ThinkTags'
 
 module.exports = function thinkPlugin(md) {
     md.block.ruler.before('paragraph', 'think', function (state, startLine, endLine, silent) {

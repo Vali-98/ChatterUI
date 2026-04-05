@@ -1,4 +1,5 @@
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { buildThinkRules } from '@lib/markdown/ThinkTags'
 import { CharacterCardData, CharacterTokenCache } from '@lib/state/Characters'
 import { ChatEntry } from '@lib/state/Chat'
 import { defaultSystemPromptFormat, InstructTokenCache, InstructType } from '@lib/state/Instructs'
@@ -330,15 +331,12 @@ export const buildTextCompletionContext = async ({
 
     return payload
 }
-const thinkRule = {
-    macro: /<think>[\s\S]*?<\/think>/g,
-    value: '',
-}
+const thinkRule = buildThinkRules()
 
 const getMacroRules = (instruct: InstructType) => {
     const data: Macro[] = []
     if (instruct.hide_think_tags) {
-        data.push(thinkRule)
+        data.concat(thinkRule)
     }
     // for expansion
     return data
