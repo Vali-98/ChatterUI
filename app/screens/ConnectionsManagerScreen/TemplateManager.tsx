@@ -72,7 +72,7 @@ const TemplateManager = () => {
                                 onPress: (m) => {
                                     m.current?.close()
                                     Linking.openURL(
-                                        'https://github.com/Vali-98/ChatterUI/discussions/126'
+                                        'https://github.com/Darren Bradley/AmeizoAI/discussions/126'
                                     )
                                 },
                             },
@@ -82,7 +82,7 @@ const TemplateManager = () => {
                                 onPress: (m) => {
                                     m.current?.close()
                                     Linking.openURL(
-                                        'https://github.com/Vali-98/ChatterUI/blob/dev/docs/CustomTemplates.md'
+                                        'https://github.com/Darren Bradley/AmeizoAI/blob/dev/docs/CustomTemplates.md'
                                     )
                                 },
                             },

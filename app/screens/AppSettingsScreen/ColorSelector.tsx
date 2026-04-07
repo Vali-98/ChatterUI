@@ -172,7 +172,7 @@ const ColorSelector = () => {
                                 onPress: (m) => {
                                     m.current?.close()
                                     Linking.openURL(
-                                        'https://github.com/Vali-98/ChatterUI/discussions/218'
+                                        'https://github.com/Darren Bradley/AmeizoAI/discussions/218'
                                     )
                                 },
                             },

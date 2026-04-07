@@ -574,7 +574,7 @@ const FormattingManager = () => {
 
                     <ThemedSwitch
                         label="Use Built-In Local Model Template"
-                        description="When in Local Mode, ChatterUI automatically uses the instruct template provided by the loaded model. Disable this if you want messages to be formatted using Instruct instead. System Prompt however is always used."
+                        description="When in Local Mode, AmeizoAI automatically uses the instruct template provided by the loaded model. Disable this if you want messages to be formatted using Instruct instead. System Prompt however is always used."
                         value={useTemplate}
                         onChangeValue={setUseTemplate}
                     />

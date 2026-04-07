@@ -32,7 +32,7 @@ const AboutScreen = () => {
                 <Image source={require('../../assets/images/icon.png')} style={styles.icon} />
             </TouchableOpacity>
 
-            <Text style={styles.titleText}>ChatterUI</Text>
+            <Text style={styles.titleText}>AmeizoAI</Text>
             <Text style={styles.subtitleText}>
                 Version {version} {devMode && '[DEV MODE]'}
             </Text>
@@ -52,14 +52,14 @@ const AboutScreen = () => {
             )}
 
             <Text style={styles.body}>
-                ChatterUI is a free and open-source application developed by Vali-98
+                AmeizoAI is a free and open-source application developed by Darren Bradley
             </Text>
             <Text style={{ marginBottom: spacing.xl3, ...styles.body }}>
                 This app is a passion project I develop in my free time. If you're enjoying the app,
                 consider supporting its development!
             </Text>
             <Text style={{ ...styles.body, marginBottom: spacing.m }}>
-                Donate to ChatterUI here:
+                Donate to AmeizoAI here:
             </Text>
 
             <SupportButton />
@@ -74,7 +74,7 @@ const AboutScreen = () => {
                 iconName="github"
                 iconSize={20}
                 onPress={() => {
-                    Linking.openURL('https://github.com/Vali-98/ChatterUI')
+                    Linking.openURL('https://github.com/Darren Bradley/AmeizoAI')
                 }}
             />
         </View>

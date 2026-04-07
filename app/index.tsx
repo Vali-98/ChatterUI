@@ -61,7 +61,7 @@ const Home = () => {
                     iconName="github"
                     iconSize={20}
                     onPress={() => {
-                        Linking.openURL('https://github.com/Vali-98/ChatterUI')
+                        Linking.openURL('https://github.com/Darren Bradley/AmeizoAI')
                     }}
                 />
             </View>

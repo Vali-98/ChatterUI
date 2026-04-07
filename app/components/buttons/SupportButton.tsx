@@ -14,7 +14,7 @@ const SupportButton = () => {
                 Linking.openURL('https://ko-fi.com/vali98')
             }}
             variant="secondary"
-            label="Support ChatterUI"
+            label="Support AmeizoAI"
             icon={<FontAwesome name="coffee" size={16} color={theme.color.primary._700} />}
         />
     )

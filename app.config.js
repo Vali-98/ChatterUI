@@ -2,13 +2,13 @@ const IS_DEV = process.env.APP_VARIANT === 'development'
 
 module.exports = {
     expo: {
-        name: IS_DEV ? 'ChatterUI (DEV)' : 'ChatterUI',
+        name: IS_DEV ? 'AmeizoAI (DEV)' : 'AmeizoAI',
         newArchEnabled: true,
-        slug: 'ChatterUI',
-        version: '0.8.8',
+        slug: 'AmeizoAI',
+        version: '1.0.0',
         orientation: 'default',
         icon: './assets/images/icon.png',
-        scheme: 'chatterui',
+        scheme: 'ameizoai',
         userInterfaceStyle: 'automatic',
         assetBundlePatterns: ['**/*'],
         ios: {
@@ -18,8 +18,8 @@ module.exports = {
                 tinted: './assets/images/icon.png',
             },
             supportsTablet: true,
-            package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
-            bundleIdentifier: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
+            package: IS_DEV ? 'com.darrenbradley.ameizoaiDev' : 'com.darrenbradley.ameizoai',
+            bundleIdentifier: IS_DEV ? 'com.darrenbradley.ameizoaiDev' : 'com.Vali98.ChatterUI',
         },
         android: {
             adaptiveIcon: {
@@ -65,7 +65,7 @@ module.exports = {
             [
                 'expo-splash-screen',
                 {
-                    backgroundColor: '#000000',
+                    backgroundColor: '#FF8C00',
                     image: './assets/images/adaptive-icon.png',
                     imageWidth: 200,
                 },
@@ -86,7 +86,7 @@ module.exports = {
                 'react-native-edge-to-edge',
                 {
                     android: {
-                        parentTheme: 'Default',
+                        parentTheme: 'Defult',
                     },
                 },
             ],

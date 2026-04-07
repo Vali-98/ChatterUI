@@ -37,7 +37,7 @@ const ModelNewMenu: React.FC<ModelNewMenuProps> = ({ modelImporting, setModelImp
                 disabled={modelImporting}
                 options={[
                     {
-                        label: 'Copy Model Into ChatterUI',
+                        label: 'Copy Model Into AmeizoAI',
                         icon: 'download',
                         onPress: handleImportModel,
                     },
