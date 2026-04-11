@@ -1,4 +1,4 @@
-import {AppState, AppStateStatus} from 'react-native';
+import { AppState, AppStateStatus } from 'react-native'
 import Alert from '@components/views/Alert'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
@@ -216,25 +216,27 @@ const verifyModelLoaded = async (): Promise<boolean> => {
 let appState: AppStateStatus = AppState.currentState
 
 const setupAppStateListener = () => {
-    AppState.addEventListener('change', handleAppStateChange);
-};
+    AppState.addEventListener('change', handleAppStateChange)
+}
 
-setupAppStateListener();
+setupAppStateListener()
 
 const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-    Logger.infoToast(`App state change: ${appState} → ${nextAppState}`);
+    Logger.infoToast(`App state change: ${appState} → ${nextAppState}`)
 
-    if ( appState.match(/inactive|background/) && nextAppState === 'active') {
-      // Coming to foreground - check if we need to reload auto-released model
+    if (appState.match(/inactive|background/) && nextAppState === 'active') {
+        // Coming to foreground - check if we need to reload auto-released model
         const autoLoad = mmkv.getBoolean(AppSettings.AutoLoadLocalOnForeground)
         const model = Llama.useLlamaModelStore.getState().model
         if (!model && autoLoad) {
             const lastModel = Llama.useLlamaPreferencesStore.getState().lastModel
             if (lastModel) {
                 Logger.infoToast(`Auto-loading Model: ${lastModel.name}`)
-                await Llama.useLlamaModelStore.getState().load(lastModel).catch((e) => {
-                    Logger.warnToast(`Failed to load model: ${e}`)
-                })
+                await Llama.useLlamaModelStore
+                .getState()
+                .load(lastModel).catch((e) => {
+                        Logger.warnToast(`Failed to load model: ${e}`)
+                    })
             }
             const lastMmproj = Llama.useLlamaPreferencesStore.getState().lastMmproj
             if (lastMmproj) {
@@ -247,15 +249,15 @@ const handleAppStateChange = async (nextAppState: AppStateStatus) => {
         const autoLoad = mmkv.getBoolean(AppSettings.AutoLoadLocalOnForeground)
         const model = Llama.useLlamaModelStore.getState().model
         if (model && autoLoad) {
-            Logger.infoToast('Active → Background: Auto-releasing context');
+            Logger.infoToast('Active → Background: Auto-releasing context')
             await Llama.useLlamaModelStore.getState().unloadModel()
         }
     } else {
         // NO action (per requirements)
-         Logger.infoToast('No auto-release action for' + appState + '→' + nextAppState);
+         Logger.infoToast('No auto-release action for' + appState + '→' + nextAppState)
     }
-    appState = nextAppState;
-};
+    appState = nextAppState
+}
 
 export const localInference = async () => {
     try {
