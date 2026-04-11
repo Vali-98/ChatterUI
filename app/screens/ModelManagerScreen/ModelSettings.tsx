@@ -170,6 +170,11 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                 onChangeValue={setAutoloadLocal}
             />
             <ThemedSwitch
+                label="Automatically Load Model on Foreground"
+                value={autoloadLocalonforeground}
+                onChangeValue={setAutoloadLocalonforeground}
+            />
+            <ThemedSwitch
                 label="Save Local KV"
                 value={saveKV}
                 onChangeValue={setSaveKV}
