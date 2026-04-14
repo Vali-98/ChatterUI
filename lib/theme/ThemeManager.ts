@@ -117,6 +117,7 @@ export namespace Theme {
                         persistedState.lightColor = DefaultColorSchemes.lavenderLight
                         persistedState.useSystemDarkMode = false
                     }
+                    return persistedState
                 },
             }
         )
