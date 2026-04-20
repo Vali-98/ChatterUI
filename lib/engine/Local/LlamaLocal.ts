@@ -274,7 +274,7 @@ export namespace Llama {
             }
 
             return llamaContext
-                .completion(params, (data: any) => {
+                .completion(params, (data) => {
                     callback(data.token)
                 })
                 .then(async ({ text, timings }: CompletionOutput) => {
