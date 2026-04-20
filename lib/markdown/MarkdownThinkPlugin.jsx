@@ -1,6 +1,8 @@
 import { thinkTags } from './ThinkTags'
 
-module.exports = function thinkPlugin(md) {
+export default thinkPlugin
+
+function thinkPlugin(md) {
     md.block.ruler.before('paragraph', 'think', function (state, startLine, endLine, silent) {
         let tagLine = -1
         let activeTag = null
