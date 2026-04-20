@@ -51,6 +51,7 @@ export const defaultTemplates: APIConfiguration[] = [
             responseParsePattern: 'choices.0.delta.content',
             useStop: true,
             stopKey: 'stop',
+            stopSequenceLimit: 5,
             promptKey: 'messages',
             removeLength: true,
         },
