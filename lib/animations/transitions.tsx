@@ -1,5 +1,11 @@
 import { LayoutRectangle } from 'react-native'
-import { ExitAnimationsValues, LayoutAnimationsValues, withTiming } from 'react-native-reanimated'
+import {
+    EntryAnimationsValues,
+    ExitAnimationsValues,
+    LayoutAnimation,
+    LayoutAnimationsValues,
+    withTiming,
+} from 'react-native-reanimated'
 
 export const XAxisOnlyTransition = (values: LayoutAnimationsValues) => {
     'worklet'
@@ -52,4 +58,77 @@ export const ZoomOutToAnchor = (values: ExitAnimationsValues, anchor: LayoutRect
     }
 
     return { initialValues, animations }
+}
+
+const DEFAULT_ENTERING_SPEED = 150
+const DEFAULT_EXITING_SPEED = 150
+
+export function ExpandHeightIn(values: EntryAnimationsValues): LayoutAnimation {
+    'worklet'
+
+    return {
+        initialValues: {
+            height: 0,
+            opacity: 0,
+        },
+
+        animations: {
+            height: withTiming(values.targetHeight, { duration: DEFAULT_ENTERING_SPEED }),
+            opacity: withTiming(1, { duration: DEFAULT_ENTERING_SPEED }),
+        },
+    }
+}
+
+export function ExpandHeightUpIn(values: EntryAnimationsValues): LayoutAnimation {
+    'worklet'
+
+    return {
+        initialValues: {
+            height: 0,
+            originY: values.targetOriginY + values.targetHeight,
+            opacity: 0,
+        },
+
+        animations: {
+            originY: withTiming(values.targetOriginY, { duration: DEFAULT_ENTERING_SPEED }),
+            opacity: withTiming(1, { duration: DEFAULT_ENTERING_SPEED }),
+            height: withTiming(values.targetHeight, { duration: DEFAULT_ENTERING_SPEED }),
+        },
+    }
+}
+
+export function ShrinkHeightOut(values: ExitAnimationsValues): LayoutAnimation {
+    'worklet'
+
+    return {
+        initialValues: {
+            height: values.currentHeight,
+            opacity: 1,
+        },
+
+        animations: {
+            height: withTiming(0, { duration: DEFAULT_EXITING_SPEED }),
+            opacity: withTiming(0.3, { duration: DEFAULT_EXITING_SPEED }),
+        },
+    }
+}
+
+export function ShrinkHeightUpOut(values: ExitAnimationsValues): LayoutAnimation {
+    'worklet'
+
+    return {
+        initialValues: {
+            height: values.currentHeight,
+            originY: values.currentOriginY,
+            opacity: 1,
+        },
+
+        animations: {
+            originY: withTiming(values.currentGlobalOriginY + values.currentHeight, {
+                duration: DEFAULT_EXITING_SPEED,
+            }),
+            height: withTiming(0, { duration: DEFAULT_EXITING_SPEED }),
+            opacity: withTiming(0.3, { duration: DEFAULT_EXITING_SPEED }),
+        },
+    }
 }
