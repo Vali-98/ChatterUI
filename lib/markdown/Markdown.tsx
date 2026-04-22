@@ -354,7 +354,6 @@ export namespace MarkdownStyle {
                     // Text Output
                     text: {},
                     textgroup: {
-                        fontSize: getModifiedFontSize(14),
                         fontWeight: getModifiedFontWeight(400),
                         color: color.text._100,
                     },
