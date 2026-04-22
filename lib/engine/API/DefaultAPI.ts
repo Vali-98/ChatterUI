@@ -678,6 +678,7 @@ export const defaultTemplates: APIConfiguration[] = [
             authHeader: 'Authorization',
             authPrefix: 'Bearer ',
             responseParsePattern: 'choices.0.delta.content',
+            reasoningParsePattern: 'choices.0.delta.reasoning_content',
             useStop: true,
             stopKey: 'stop',
             promptKey: 'messages',
