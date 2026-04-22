@@ -1,4 +1,4 @@
-import { getContentFd, persistContentPermission } from '@vali98/react-native-fs'
+import { copyFileSAF, getContentFd, persistContentPermission } from '@vali98/react-native-fs'
 import { loadLlamaModelInfo } from 'cui-llama.rn'
 import { eq, inArray, notInArray } from 'drizzle-orm'
 import { getDocumentAsync } from 'expo-document-picker'
@@ -62,10 +62,26 @@ export namespace Model {
             const name = file.name
             const newdir = `${AppDirectory.ModelPath}${name}`
             Logger.infoToast('Importing file...')
-            const success = copyFile({
-                from: file.uri,
-                to: newdir,
-            })
+            let success = false
+            console.log(file.uri, '\n', newdir)
+
+            if (file.uri.startsWith('content://') && Platform.OS === 'android') {
+                await copyFileSAF(file.uri, newdir.replace('file://', ''))
+                    .then(() => {
+                        success = true
+                    })
+                    .catch((e) => {
+                        Logger.warnToast('Failed to copy')
+                        Logger.warn(JSON.stringify(e))
+                        success = false
+                    })
+            } else {
+                success = await copyFile({
+                    from: file.uri,
+                    to: newdir,
+                })
+            }
+
             if (!success) return
 
             // database routine here

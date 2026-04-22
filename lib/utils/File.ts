@@ -162,7 +162,11 @@ export const fileExists = (path: string) => {
     return new File(path).exists
 }
 
-export const copyFile = ({ from, to }: { from: string; to: string }) => {
+export const directoryExists = (path: string) => {
+    return new Directory(path).exists
+}
+
+export const copyFile = async ({ from, to }: { from: string; to: string }) => {
     try {
         new File(from).copy(new File(to))
         return true
