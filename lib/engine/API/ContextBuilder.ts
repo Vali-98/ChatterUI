@@ -91,6 +91,7 @@ export const buildChatCompletionContext = async ({
 
     const initial = systemPrompt
     let total_length = systemPromptLength
+    let first_message_reached = false
 
     const payload: Message[] = [
         {
@@ -172,13 +173,24 @@ export const buildChatCompletionContext = async ({
                 ),
             })
         }
-
+        first_message_reached = index === 0
         total_length += len
         index--
     }
 
     if (index >= messages.length - 1 && messages.length !== 0) {
         warnNoMessages()
+    }
+
+    const examples = character?.mes_example
+    if (
+        first_message_reached &&
+        instruct.examples &&
+        examples &&
+        total_length + characterCache.examples_length < maxLength
+    ) {
+        payload[0][completionFeats.contentName] += replaceMacrosInternal(examples, instruct)
+        total_length += characterCache.examples_length
     }
 
     if (apiConfig.features.useFirstMessage && apiValues.firstMessage)
@@ -331,6 +343,7 @@ export const buildTextCompletionContext = async ({
 
     return payload
 }
+
 const thinkRule = buildThinkRules()
 
 const getMacroRules = (instruct: InstructType) => {
