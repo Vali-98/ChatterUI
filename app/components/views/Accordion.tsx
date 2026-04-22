@@ -27,7 +27,7 @@ const Accordion: React.FC<AccordionProps> = ({
             <Pressable
                 onPress={() => setShow(!show)}
                 style={{
-                    backgroundColor: color.primary._300,
+                    backgroundColor: color.neutral._300,
                     paddingVertical: spacing.m,
                     borderTopLeftRadius: borderRadius.m,
                     borderTopRightRadius: borderRadius.m,
@@ -50,7 +50,9 @@ const Accordion: React.FC<AccordionProps> = ({
             {show && (
                 <View
                     style={{
-                        backgroundColor: color.neutral._400,
+                        backgroundColor: color.neutral._100,
+                        borderColor: color.neutral._300,
+                        borderWidth: 2,
                         paddingHorizontal: spacing.l,
                         paddingTop: spacing.l,
                         paddingBottom: spacing.m,
