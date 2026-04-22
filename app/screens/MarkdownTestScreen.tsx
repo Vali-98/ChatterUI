@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -67,21 +67,81 @@ $s = ut + \\frac{1}{2}at^2$ distance from initial velocity, time and acceleratio
 | Item 4   |  row    | row         |
 
 
+# Quote Testing
+
+1. Basic curly quote direction (must pass)
+“hello world”
+She said “hello”
+“start” middle “end”
+
+2. Simple nesting (core test)
+“outer “inner” outer”
+“He said “she said “nested” quote” end”
+“a “b “c” b” a”
+
+3. Broken / malformed nesting (important edge cases)
+”broken start“
+“missing close
+missing open”
+“outer ”inner“ outer”
+
+4. Mixed ASCII + curly quotes (very common in real content)
+"simple ascii"
+“mixed "ascii" inside”
+"outer “inner” outer"
+“outer "inner” mixed"
+
+
+5. Adjacent quotes (token boundary stress test)
+\“”“triple start”
+“a”“b”“c”
+“”“”
+
+6. Empty / minimal content
+“”
+""
+“a”
+
+7. Punctuation-heavy realism (real Markdown usage)
+She said “hello, world!” and left.
+“Wait—what?” he asked.
+The label reads “version 2.0 (beta)”.
+
+8. Deep nesting stress test (stack requirement reveal)
+“1 “2 “3 “4” 3” 2” 1”
+
+9. No-quote baseline (should remain untouched)
+hello world
+this is (normal text)
+no quotes here at all
+
+10. Mixed formatting noise (real-world Markdown-like text)
+Here is “quoted text” and here is more “nested “deep” quote” content.
+Text before “quote” text after, then “another “level” inside”.
+
+
+11. Known crash cause
+"Test *"*
+"Test _"_ test
+
 `
 
 const MarkdownTestScreen = () => {
     const markdownStyle = MarkdownStyle.useMarkdownStyle()
+    console.log(markdownStyle.heading2)
     return (
-        <SafeAreaView edges={['bottom']}>
-            <ScrollView contentContainerStyle={{ padding: 16 }}>
-                <HeaderTitle title="Markdown Test" />
-                <Markdown
-                    mergeStyle={false}
-                    markdownit={MarkdownStyle.Rules}
-                    rules={MarkdownStyle.RenderRules}
-                    style={markdownStyle}>
-                    {markdownData}
-                </Markdown>
+        <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+            <HeaderTitle title="Markdown Test" />
+            <ScrollView contentContainerStyle={{ padding: 16, flexGrow: 1 }} style={{ flex: 1 }}>
+                <View style={{ flex: 1 }}>
+                    <Markdown
+                        mergeStyle={false}
+                        markdownit={MarkdownStyle.Rules}
+                        rules={MarkdownStyle.RenderRules}
+                        style={markdownStyle}>
+                        {markdownData}
+                    </Markdown>
+                </View>
             </ScrollView>
         </SafeAreaView>
     )
