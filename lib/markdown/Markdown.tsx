@@ -312,14 +312,14 @@ export namespace MarkdownStyle {
 
                     // Tables
                     table: {
-                        borderWidth: 1,
-                        borderColor: color.primary._200,
+                        borderWidth: 2,
+                        borderColor: color.neutral._300,
                         borderRadius: borderRadius.m,
                         marginBottom: spacing.m,
                         overflow: 'hidden',
                     },
                     thead: {
-                        backgroundColor: color.neutral._100,
+                        backgroundColor: color.neutral._300,
                     },
                     tbody: {
                         backgroundColor: color.neutral._200,
