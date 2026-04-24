@@ -250,6 +250,7 @@ export namespace Llama {
                 model: undefined,
                 mmproj: undefined,
             })
+            Logger.info('Model Unloaded')
         },
         unloadMmproj: async () => {
             if (!get().mmproj) return
