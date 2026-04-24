@@ -10,9 +10,8 @@ const ChatHeaderGradient = () => {
             style={{
                 position: 'absolute',
                 width: '100%',
-                left: -8,
                 top: 0,
-                height: 16,
+                height: 8,
             }}
         />
     )
