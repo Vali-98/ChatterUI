@@ -875,15 +875,19 @@ export namespace Characters {
             Logger.error('Exported card does not exist!')
             return
         }
-        const imagePath = getImageDir(dbcard.image_id)
         // name can be empty string, should at least have something
-        const exportedFileName = (dbcard.name ?? 'Character') + '.png'
+        const exportedFileName = dbcard.name ?? 'Character'
         const cardString = JSON.stringify(convertDBDataToCV2(dbcard))
-        const fileData = await readBase64Async(imagePath)
-        if (!fileData) return
-        const exportData = replacePngTextChunk(fileData, cardString)
 
-        await saveStringToDownload(exportData, exportedFileName, 'base64')
+        const imagePath = getImageDir(dbcard.image_id)
+        if (fileExists(imagePath)) {
+            const fileData = await readBase64Async(imagePath)
+            if (!fileData) return
+            const exportData = replacePngTextChunk(fileData, cardString)
+            await saveStringToDownload(exportData, exportedFileName + '.png', 'base64')
+        } else {
+            await saveStringToDownload(cardString, exportedFileName + '.json', 'utf8')
+        }
     }
 
     export const getImageDir = (imageId: number) => {
