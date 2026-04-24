@@ -32,5 +32,6 @@ export default ChatItem
 const styles = StyleSheet.create({
     chatItem: {
         paddingHorizontal: 4,
+        marginBottom: 4,
     },
 })
