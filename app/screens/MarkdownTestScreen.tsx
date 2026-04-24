@@ -128,7 +128,7 @@ Text before “quote” text after, then “another “level” inside”.
 
 const MarkdownTestScreen = () => {
     const markdownStyle = MarkdownStyle.useMarkdownStyle()
-    console.log(markdownStyle.heading2)
+
     return (
         <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
             <HeaderTitle title="Markdown Test" />
