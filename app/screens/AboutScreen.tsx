@@ -56,8 +56,7 @@ const AboutScreen = () => {
                 ChatterUI is a free and open-source application developed by Vali-98
             </Text>
             <Text style={{ marginBottom: spacing.xl3, ...styles.body }}>
-                {`This app is a passion project I develop in my free time. If you're enjoying the app,
-                consider supporting its development!`}
+                {`This app is a passion project I develop in my free time. If you're enjoying the app, consider supporting its development!`}
             </Text>
             <Text style={{ ...styles.body, marginBottom: spacing.m }}>
                 Donate to ChatterUI here:
