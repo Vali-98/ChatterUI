@@ -3,6 +3,7 @@ import merge from 'lodash.merge'
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { InstructType } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
+import { getNestedValue } from '@lib/utils/Parsing'
 
 import { APIConfiguration, APISampler, APIValues } from './APIBuilder.types'
 import { Message } from './ContextBuilder'
@@ -240,13 +241,6 @@ const buildFields = async (
     const prompt = { [config.request.promptKey]: promptData }
 
     return { payloadFields, model, stop, prompt, length }
-}
-
-const getNestedValue = (obj: any, path: string) => {
-    if (path === '') return obj
-    const keys = path.split('.')
-    const value = keys.reduce((acc, key) => acc?.[key], obj)
-    return value ?? null
 }
 
 const getModelName = (config: APIConfiguration, values: APIValues) => {

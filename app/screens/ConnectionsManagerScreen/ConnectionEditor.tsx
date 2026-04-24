@@ -13,6 +13,7 @@ import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { APIManager, APIManagerValue } from '@lib/engine/API/APIManagerState'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
+import { getNestedValue } from '@lib/utils/Parsing'
 
 type ConnectionEditorProps = {
     index: number
@@ -266,11 +267,4 @@ const useStyles = () => {
             color: color.text._400,
         },
     })
-}
-
-const getNestedValue = (obj: any, path: string) => {
-    if (path === '') return obj
-    const keys = path.split('.')
-    const value = keys.reduce((acc, key) => acc?.[key], obj)
-    return value ?? null
 }

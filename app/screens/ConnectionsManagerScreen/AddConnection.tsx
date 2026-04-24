@@ -13,6 +13,7 @@ import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { APIManagerValue, APIManager } from '@lib/engine/API/APIManagerState'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
+import { getNestedValue } from '@lib/utils/Parsing'
 
 const AddConnection = () => {
     const styles = useStyles()
@@ -272,11 +273,4 @@ const useStyles = () => {
             paddingBottom: spacing.xl2,
         },
     })
-}
-
-const getNestedValue = (obj: any, path: string) => {
-    if (path === '') return obj
-    const keys = path.split('.')
-    const value = keys.reduce((acc, key) => acc?.[key], obj)
-    return value ?? null
 }

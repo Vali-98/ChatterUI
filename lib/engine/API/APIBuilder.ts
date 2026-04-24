@@ -4,6 +4,7 @@ import { AppSettings, CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { SSEFetch } from '@lib/engine/SSEFetch'
 import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'
+import { getNestedValue } from '@lib/utils/Parsing'
 
 import { APIConfiguration } from './APIBuilder.types'
 import { buildContext, ContextBuilderParams } from './ContextBuilder'
@@ -95,7 +96,7 @@ export const buildAndSendRequest = async ({
 
         const parseOutput = (
             event: any,
-            pattern: string,
+            pattern: string | string[],
             prefixThinkTag: boolean = false,
             prefixExitThink: boolean = false
         ) => {
@@ -296,12 +297,6 @@ const constructReplaceStrings = (stopSequence: string[]) => {
         'g'
     )
     return replace
-}
-
-const getNestedValue = (obj: any, path: string) => {
-    const keys = path.split('.')
-    const value = keys.reduce((acc, key) => acc?.[key], obj)
-    return value ?? null
 }
 
 const responses: Record<
