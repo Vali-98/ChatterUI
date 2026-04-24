@@ -8,25 +8,32 @@ const ChatFooter = () => {
     const { color, fontSize } = Theme.useTheme()
 
     return (
-        <View style={{ paddingBottom: 8 }}>
-            <Text
+        <View
+            style={{
+                paddingBottom: 8,
+                flex: 1,
+                justifyContent: 'center',
+                flexDirection: 'row',
+            }}>
+            <View
                 style={{
-                    color: color.text._700,
-                    textAlign: 'center',
-                    fontSize: fontSize.s,
+                    backgroundColor: color.neutral._100 + '22',
+                    borderRadius: 8,
+                    paddingHorizontal: 12,
+                    paddingVertical: 4,
+                    marginBottom: 12,
                 }}>
-                Start of chat
-            </Text>
-            {chatLength !== undefined && chatLength <= 1 && (
                 <Text
                     style={{
                         color: color.text._700,
                         textAlign: 'center',
                         fontSize: fontSize.s,
                     }}>
-                    Send a message to begin!
+                    {chatLength !== undefined && chatLength <= 1
+                        ? 'Send a message to begin!'
+                        : 'Start of chat'}
                 </Text>
-            )}
+            </View>
         </View>
     )
 }
