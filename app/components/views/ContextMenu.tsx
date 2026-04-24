@@ -6,6 +6,7 @@ import {
     BackHandler,
     Dimensions,
     GestureResponderEvent,
+    LayoutChangeEvent,
     LayoutRectangle,
     Pressable,
     StyleSheet,
@@ -19,7 +20,6 @@ import Animated, {
     LinearTransition,
     useAnimatedStyle,
     useSharedValue,
-    withSpring,
     withTiming,
 } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -64,7 +64,7 @@ export interface ContextMenuProps extends ViewProps {
 }
 
 const CONTEXT_MENU_MIN_WIDTH = 128
-const OFFSET = 4
+const OFFSET = 8
 
 const ContextMenu: React.FC<ContextMenuProps> = ({
     buttons,
@@ -94,20 +94,16 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     const [anchor, setAnchor] = useState<LayoutRectangle | null>(null)
 
     const handleOpen = (event: GestureResponderEvent) => {
-        if (!triggerRef.current) return
-
-        const isCentered = placement === 'center'
         const ne = event.nativeEvent
 
-        triggerRef.current.measure((x, y, width, height, pageX, pageY) => {
-            setAnchor({
-                x: isCentered ? ne.pageX : pageX,
-                y: isCentered ? ne.pageY : pageY,
-                width: width,
-                height: height,
-            })
-            openMenu(idRef)
+        setAnchor({
+            x: ne.pageX,
+            y: ne.pageY,
+            width: 0,
+            height: 0,
         })
+
+        openMenu(idRef)
     }
 
     const handleCloseMenu = useCallback(() => {
@@ -171,6 +167,66 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     )
 }
 
+function computePosition(
+    anchor: LayoutRectangle,
+    placement: Placement,
+    width: number,
+    height: number,
+    safe: { top: number; bottom: number; left: number; right: number }
+) {
+    let top = 0
+    let left = 0
+
+    switch (placement) {
+        case 'right':
+            top = anchor.y + OFFSET
+            left = anchor.x + OFFSET
+            break
+
+        case 'left':
+            top = anchor.y + OFFSET
+            left = anchor.x - width - OFFSET
+            break
+
+        case 'bottom':
+            top = anchor.y + OFFSET
+            left = anchor.x - width / 2
+            break
+
+        case 'top':
+            top = anchor.y - height - OFFSET
+            left = anchor.x - width / 2
+            break
+
+        case 'center':
+            top = anchor.y - height / 2
+            left = anchor.x - width / 2
+            break
+
+        case 'auto':
+        default: {
+            const fitsRight = anchor.x + width <= safe.right
+            const fitsLeft = anchor.x - width >= safe.left
+
+            if (fitsRight) {
+                top = anchor.y + OFFSET
+                left = anchor.x + OFFSET
+            } else if (fitsLeft) {
+                top = anchor.y + OFFSET
+                left = anchor.x - width - OFFSET
+            } else {
+                top = anchor.y - height - OFFSET
+                left = anchor.x - width / 2
+            }
+        }
+    }
+
+    const clampedLeft = Math.max(safe.left, Math.min(left, safe.right - width))
+    const clampedTop = Math.max(safe.top, Math.min(top, safe.bottom - height))
+
+    return { top: clampedTop, left: clampedLeft }
+}
+
 const MenuContent = ({
     anchor,
     placement,
@@ -185,55 +241,57 @@ const MenuContent = ({
     const styles = useStyles()
     const insets = useSafeAreaInsets()
 
-    const { width: screenWidth, height: screenHeightRaw } = Dimensions.get('window')
-    const screenHeight = screenHeightRaw - insets.top
+    const { width: screenWidth, height: screenHeight } = Dimensions.get('window')
 
-    // approximate size (no measurement loop)
-    const estimatedWidth = 180
-    const estimatedHeight = buttons.length * 48
+    const [menuSize, setMenuSize] = useState({ width: 0, height: 0 })
 
-    let top = anchor.y + anchor.height
-    let left = anchor.x
+    const topSV = useSharedValue(0)
+    const leftSV = useSharedValue(0)
 
-    if (placement === 'top') {
-        top = anchor.y - estimatedHeight
-        left = anchor.x + anchor.width / 2 - estimatedWidth / 2
-    }
-
-    if (placement === 'bottom') {
-        top = anchor.y + anchor.height
-        left = anchor.x + anchor.width / 2 - estimatedWidth / 2
-    }
-    if (placement === 'left') left = anchor.x - estimatedWidth
-    if (placement === 'right') left = anchor.x + anchor.width
-    if (placement === 'center') {
-        top = anchor.y
-        left = anchor.x
-    }
-
-    // clamp
-    left = Math.max(OFFSET, Math.min(left, screenWidth - estimatedWidth - OFFSET))
-    top = Math.max(insets.top, Math.min(top, screenHeight - estimatedHeight - OFFSET))
-
-    // animation
-    const scale = useSharedValue(0.95)
-    const opacity = useSharedValue(0)
+    const initial = useRef(true)
 
     useEffect(() => {
-        scale.value = withSpring(1)
-        opacity.value = withTiming(1, { duration: 150 })
-    }, [opacity, scale])
+        const safeBounds = {
+            top: insets.top + OFFSET,
+            bottom: screenHeight - insets.bottom - OFFSET,
+            left: insets.left + OFFSET,
+            right: screenWidth - insets.right - OFFSET,
+        }
+
+        const { width, height } = menuSize
+        if (width === 0 || height === 0) return
+
+        const { top, left } = computePosition(anchor, placement, width, height, safeBounds)
+
+        const duration = initial.current ? 0 : 200
+
+        topSV.value = withTiming(top, { duration })
+        leftSV.value = withTiming(left, { duration })
+
+        if (initial.current) initial.current = false
+    }, [menuSize, anchor, placement, topSV, leftSV, insets, screenHeight, screenWidth])
 
     const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-        opacity: opacity.value,
-        top: top,
-        left: left,
+        top: topSV.value,
+        left: leftSV.value,
     }))
+
+    const handleLayout = useCallback((e: LayoutChangeEvent) => {
+        const { width, height } = e.nativeEvent.layout
+
+        setMenuSize((prev) => {
+            if (Math.abs(prev.width - width) < 2 && Math.abs(prev.height - height) < 2) {
+                return prev
+            }
+            return { width, height }
+        })
+    }, [])
 
     return (
         <Animated.View style={[styles.menuContainer, animatedStyle]}>
-            <MenuList buttons={buttons} onClose={onClose} placement={placement} />
+            <View onLayout={handleLayout}>
+                <MenuList buttons={buttons} onClose={onClose} placement={placement} />
+            </View>
         </Animated.View>
     )
 }
@@ -325,7 +383,7 @@ const useStyles = () => {
             minWidth: CONTEXT_MENU_MIN_WIDTH,
             borderColor: color.neutral._400,
             borderWidth: 1,
-            paddingHorizontal: 4,
+            padding: 4,
             borderRadius: 8,
             overflow: 'hidden',
         },
