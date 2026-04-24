@@ -332,6 +332,7 @@ export namespace MarkdownStyle {
                         borderBottomWidth: 1,
                         borderColor: color.neutral._300,
                         flexDirection: 'row',
+                        fontSize: getModifiedFontSize(14),
                     },
                     td: {
                         flex: 1,
@@ -355,6 +356,7 @@ export namespace MarkdownStyle {
 
                     // Text Output
                     text: {},
+
                     textgroup: {
                         fontWeight: getModifiedFontWeight(400),
                         color: color.text._100,
@@ -375,6 +377,7 @@ export namespace MarkdownStyle {
                         width: '100%',
                         color: color.text._100,
                         marginVertical: spacing.sm,
+                        fontSize: getModifiedFontSize(14),
                     },
 
                     hardbreak: {
