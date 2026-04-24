@@ -94,7 +94,6 @@ module.exports = {
             'expo-router',
             'expo-font',
             'expo-image',
-            'expo-sharing',
             './expo-build-plugins/bgactions.plugin.js',
             './expo-build-plugins/usercert.plugin.js',
             './expo-build-plugins/rnllama.plugin.js',
