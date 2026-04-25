@@ -7,7 +7,7 @@ import { mmkv } from '@lib/storage/MMKV'
 import { getNestedValue } from '@lib/utils/Parsing'
 
 import { APIConfiguration } from './APIBuilder.types'
-import { buildContext, ContextBuilderParams } from './ContextBuilder'
+import { buildContext, ContextBuilderParams } from './ContextBuilder2'
 import { buildRequest, RequestBuilderParams } from './RequestBuilder'
 
 export interface APIBuilderParams
