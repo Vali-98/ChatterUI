@@ -52,9 +52,7 @@ export const characterTags = sqliteTable(
             .notNull()
             .references(() => tags.id, { onDelete: 'cascade' }),
     },
-    (table) => {
-        return { pk: primaryKey({ columns: [table.character_id, table.tag_id] }) }
-    }
+    (table) => [primaryKey({ columns: [table.character_id, table.tag_id] })]
 )
 
 export const characterRelations = relations(characters, ({ many }) => ({
@@ -265,9 +263,7 @@ export const characterLorebooks = sqliteTable(
             onDelete: 'cascade',
         }),
     },
-    (table) => {
-        return { pk: primaryKey({ columns: [table.character_id, table.lorebook_id] }) }
-    }
+    (table) => [primaryKey({ columns: [table.character_id, table.lorebook_id] })]
 )
 
 export const lorebooksRelations = relations(lorebooks, ({ many }) => ({
@@ -333,11 +329,7 @@ export const model_mmproj_links = sqliteTable(
             .notNull()
             .references(() => model_data.id, { onDelete: 'cascade' }),
     },
-    (table) => {
-        return {
-            pk: primaryKey({ columns: [table.model_id, table.mmproj_id] }),
-        }
-    }
+    (table) => [primaryKey({ columns: [table.model_id, table.mmproj_id] })]
 )
 
 export const modelDataRelations = relations(model_data, ({ one }) => ({
