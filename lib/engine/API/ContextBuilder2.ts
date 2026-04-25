@@ -200,9 +200,7 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
         return true
     }
 
-    /**
-     * 1️⃣ INITIAL MESSAGES
-     */
+    // initial message collector
     let index = messages.length - 1
 
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -355,7 +353,7 @@ const getValidAttachments = (
     instruct: InstructType,
     hasImage: boolean
 ) => {
-    // has image is used for last_image_only checking
+    // hasImage is used for last_image_only checking
     let hasImageNew = hasImage
     const audioAttachments = entry.attachments.filter(
         (item) => item.type === 'audio' && instruct.send_audio && config.supportsAudio
