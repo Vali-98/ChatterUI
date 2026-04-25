@@ -306,7 +306,7 @@ export const defaultTemplates: APIConfiguration[] = [
         features: {
             useKey: true,
             useModel: true,
-            usePrefill: true,
+            usePrefill: false,
             useFirstMessage: false,
             multipleModels: false,
         },
