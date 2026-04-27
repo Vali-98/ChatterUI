@@ -219,7 +219,10 @@ export namespace Chats {
                     with: {
                         messages: {
                             with: {
-                                swipes: true,
+                                swipes: {
+                                    where: eq(chatSwipes.active, true),
+                                    limit: 1,
+                                },
                                 attachments: true,
                             },
                         },

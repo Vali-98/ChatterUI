@@ -121,7 +121,7 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
         index: number,
         isLast: boolean
     ): Promise<boolean> => {
-        const swipe = message.swipes.find((item) => item.active)
+        const swipe = message.swipes[0]
         if (!swipe) {
             Logger.errorToast('Entry without valid swipe found')
             return false
