@@ -33,7 +33,8 @@ web-build/
 npm-debug.*
 yarn-debug.*
 yarn-error.*
- 
+*.db
+
 # macOS
 .DS_Store
 *.pem
