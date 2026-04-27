@@ -151,9 +151,10 @@ export const useInference = create<InferenceStateType>((set, get) => ({
             Logger.info(`Saving Chat`)
             await Chats.useChatState.getState().updateFromBuffer(swipeId)
         }
-        Chats.useChatState.getState().setBuffer({ data: '' })
-
-        set({ nowGenerating: false, currentSwipeId: undefined })
+        requestAnimationFrame(() => {
+            set({ nowGenerating: false, currentSwipeId: undefined })
+            Chats.useChatState.getState().setBuffer({ data: '' })
+        })
         if (mmkv.getBoolean(AppSettings.NotifyOnComplete)) sendGenerateCompleteNotification()
     },
     setAbort: (fn) => {
