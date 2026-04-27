@@ -121,7 +121,11 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
         index: number,
         isLast: boolean
     ): Promise<boolean> => {
-        const swipe = message.swipes[message.swipe_id]
+        const swipe = message.swipes.find((item) => item.active)
+        if (!swipe) {
+            Logger.errorToast('Entry without valid swipe found')
+            return false
+        }
         const swipeLen = await chatTokenizer(message, index)
 
         const timestamp = instruct.timestamp
@@ -328,7 +332,7 @@ export const buildTextCompletionContext = async (params: ContextBuilderParams) =
         output += shard
         len++
     }
-    console.log('ended', endedAtAssistant)
+
     if (!endedAtAssistant) output += instruct.last_output_prefix
 
     return replaceMacrosInternal(output, instruct)
