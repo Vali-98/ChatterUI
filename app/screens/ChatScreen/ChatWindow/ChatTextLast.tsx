@@ -18,16 +18,18 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
     const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
 
     const { buffer } = Chats.useBuffer()
-
     const [showHidden, setShowHidden] = useState(false)
     const viewRef = useRef<View>(null)
     const currentSwipeId = useInference((state) => state.currentSwipeId)
     const animHeight = useAnimatedValue(-1)
     const targetHeight = useRef(-1)
     const firstRender = useRef(true)
-
+    const isMounted = useRef(false)
     const updateHeight = useCallback(() => {
-        if (firstRender.current) return (firstRender.current = false)
+        if (firstRender.current) {
+            if (isMounted.current) firstRender.current = false
+            return
+        }
         const showPadding = nowGenerating && buffer.data
         const overflowPadding = showPadding ? 12 : 0
         if (viewRef.current) {
@@ -51,14 +53,22 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
     }, [animHeight, buffer.data, nowGenerating])
 
     useEffect(() => {
-        if (!nowGenerating && !firstRender.current) setTimeout(() => updateHeight(), 400)
+        if (!nowGenerating && !firstRender.current && isMounted.current)
+            setTimeout(() => updateHeight(), 400)
     }, [nowGenerating, updateHeight])
 
-    const filteredText = useTextFilter(swipe.swipe.trim() ?? '')
-    const renderedText = showHidden ? swipe.swipe.trim() : filteredText.result
+    const filteredText = useTextFilter(swipe.swipe ?? '')
+    const renderedText = showHidden ? swipe.swipe : filteredText.result
+
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
-            <View style={{ minHeight: 10 }} ref={viewRef} onLayout={updateHeight}>
+            <View
+                style={{ minHeight: 10 }}
+                ref={viewRef}
+                onLayout={() => {
+                    updateHeight()
+                    isMounted.current = true
+                }}>
                 {swipe.id === currentSwipeId && nowGenerating && buffer.data === '' && (
                     <AnimatedEllipsis />
                 )}

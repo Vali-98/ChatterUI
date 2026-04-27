@@ -17,6 +17,7 @@ const ChatText: React.FC<ChatTextProps> = ({ swipeText }) => {
     const animHeight = useAnimatedValue(-1)
     const targetHeight = useRef(-1)
     const firstRender = useRef(true)
+    const isMounted = useRef(false)
 
     const handleAnimateHeight = (newheight: number) => {
         animHeight.stopAnimation(() =>
@@ -28,9 +29,8 @@ const ChatText: React.FC<ChatTextProps> = ({ swipeText }) => {
             }).start()
         )
     }
-
     const updateHeight = () => {
-        if (firstRender.current) return (firstRender.current = false)
+        if (firstRender.current) return (firstRender.current = !isMounted.current)
         if (viewRef.current) {
             viewRef.current.measure((x, y, width, measuredHeight) => {
                 if (targetHeight.current === measuredHeight) return
@@ -45,7 +45,13 @@ const ChatText: React.FC<ChatTextProps> = ({ swipeText }) => {
     const renderedText = showHidden ? swipeText?.trim() : filteredText.result
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
-            <View style={{ minHeight: 10 }} ref={viewRef} onLayout={() => updateHeight()}>
+            <View
+                style={{ minHeight: 10 }}
+                ref={viewRef}
+                onLayout={() => {
+                    updateHeight()
+                    isMounted.current = true
+                }}>
                 <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
                     {renderedText}
                 </Markdown>
