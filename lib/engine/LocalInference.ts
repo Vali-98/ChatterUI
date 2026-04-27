@@ -165,7 +165,7 @@ const constructStopSequence = (): string[] => {
 
 const stopGenerating = () => {
     // kept this helper for extendability
-    Chats.useChatState.getState().stopGenerating()
+    useInference.getState().stopGenerating()
 }
 
 const constructReplaceStrings = (): string[] => {
@@ -291,15 +291,16 @@ const runLocalCompletion = async (
     })
 
     const outputStream = (text: string) => {
-        Chats.useChatState.getState().insertBuffer(text)
+        Chats.useChatState.getState().insertToBuffer(text)
         useTTSStore.getState().insertBuffer(text)
     }
 
     const outputCompleted = (text: string, timings: CompletionTimings) => {
-        const regenCache = Chats.useChatState.getState().getRegenCache()
-        Chats.useChatState
-            .getState()
-            .setBuffer({ data: (regenCache + text).replaceAll(replace, ''), timings: timings })
+        // @TODO: Maybe fix this
+        // const regenCache = Chats.useChatState.getState().getRegenCache()
+        // Chats.useChatState
+        //   .getState()
+        //  .setBuffer({ data: (regenCache + text).replaceAll(replace, ''), timings: timings })
         if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(`Completion Output:\n${text}`)
         stopGenerating()
     }
@@ -390,7 +391,6 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
     try {
         const userState = Characters.useUserStore.getState()
         const characterState = Characters.useCharacterStore.getState()
-        const chatState = Chats.useChatState.getState()
 
         const instructState = Instructs.useInstruct.getState()
 
@@ -405,9 +405,15 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
             Logger.errorToast('No loaded character')
             return
         }
-        const messages = chatState.data?.messages
+        const chatId = await Chats.useChatState.getState().id
+        if (!chatId) {
+            Logger.errorToast('No active chat')
+            return
+        }
+
+        const messages = (await Chats.db.query.chat(chatId))?.messages
         if (!messages) {
-            Logger.errorToast('No chat character')
+            Logger.errorToast('No chat found')
             return
         }
 
@@ -440,7 +446,9 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
             chatTokenizer: async (entry, index) => {
                 // IMPORTANT - we use -1 for dummy entries
                 if (entry.id === -1) return 0
-                return await chatState.getTokenCount(index)
+                const [activeSwipe] = entry.swipes.filter((item) => item.active)
+                if (!activeSwipe) return 0
+                return activeSwipe.token_count ?? 0
             },
             tokenizer: Llama.useLlamaModelStore.getState().tokenLength,
             maxLength: length,

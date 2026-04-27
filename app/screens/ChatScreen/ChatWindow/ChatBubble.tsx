@@ -6,6 +6,7 @@ import { AppSettings } from '@lib/constants/GlobalValues'
 import { useAppMode } from '@lib/state/AppMode'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
+import { ChatSwipe } from 'db/schema'
 
 import ChatAttachments from './ChatAttachments'
 import { useChatEditorStore } from './ChatEditor'
@@ -19,15 +20,18 @@ type ChatTextProps = {
     nowGenerating: boolean
     isLastMessage: boolean
     isGreeting: boolean
+    entry: Chats.db.live.LiveEntry
+    swipe: ChatSwipe
 }
 
 const ChatBubble: React.FC<ChatTextProps> = ({
     index,
     nowGenerating,
+    entry,
     isLastMessage,
     isGreeting,
+    swipe,
 }) => {
-    const message = Chats.useEntryData(index)
     const { appMode } = useAppMode()
     const [showTPS] = useMMKVBoolean(AppSettings.ShowTokenPerSecond)
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
@@ -40,18 +44,19 @@ const ChatBubble: React.FC<ChatTextProps> = ({
 
     const showEditor = useChatEditorStore((state) => state.show)
     const handleEnableEdit = () => {
-        if (!nowGenerating) showEditor(index)
+        if (!nowGenerating) showEditor(entry.id)
     }
 
-    const hasSwipes = message?.swipes?.length > 1
-    const showSwipe = !message.is_user && isLastMessage && (hasSwipes || !isGreeting)
-    const timings = message.swipes[message.swipe_id].timings
+    if (!entry || !swipe) return
+
+    const showSwipe = !entry.is_user && isLastMessage && !isGreeting
+    const timings = swipe.timings
 
     return (
         <View>
             <Pressable
                 onPress={() => {
-                    setShowOptions(nowGenerating ? undefined : index)
+                    setShowOptions(nowGenerating ? undefined : entry.id)
                 }}
                 style={{
                     backgroundColor: color.neutral._200,
@@ -75,11 +80,11 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                 }}
                 onLongPress={handleEnableEdit}>
                 {isLastMessage ? (
-                    <ChatTextLast nowGenerating={nowGenerating} index={index} />
+                    <ChatTextLast nowGenerating={nowGenerating} swipe={swipe} />
                 ) : (
-                    <ChatText nowGenerating={nowGenerating} index={index} />
+                    <ChatText swipeText={swipe.swipe} />
                 )}
-                <ChatAttachments index={index} />
+                <ChatAttachments entry={entry} />
                 <View
                     style={{
                         flexDirection: 'row',
@@ -100,12 +105,14 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                     <ChatQuickActions
                         nowGenerating={nowGenerating}
                         isLastMessage={isLastMessage}
+                        entryId={entry.id}
+                        swipe={swipe}
                         index={index}
                     />
                 </View>
             </Pressable>
             {showSwipe && (
-                <ChatSwipes index={index} nowGenerating={nowGenerating} isGreeting={isGreeting} />
+                <ChatSwipes swipe={swipe} nowGenerating={nowGenerating} isGreeting={isGreeting} />
             )}
         </View>
     )

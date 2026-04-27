@@ -306,20 +306,30 @@ export const buildTextCompletionContext = async (params: ContextBuilderParams) =
     const { instruct } = params
 
     let output = systemPrompt + instruct.system_suffix
-
+    let len = 0
+    let endedAtAssistant = false
     for (const msg of messages) {
-        let shard = msg.role === 'user' ? instruct.input_prefix : instruct.output_prefix
+        let outPrefix = instruct.output_prefix
+        let outSuffix = instruct.output_suffix
+        if (len === messages.length - 1 && msg.role === 'assistant') {
+            outPrefix = instruct.last_output_prefix
+            outSuffix = ''
+            endedAtAssistant = true
+        }
+
+        let shard = msg.role === 'user' ? instruct.input_prefix : outPrefix
 
         shard += msg.content
 
-        shard += msg.role === 'user' ? instruct.input_suffix : instruct.output_suffix
+        shard += msg.role === 'user' ? instruct.input_suffix : outSuffix
 
-        if (instruct.wrap) shard += '\n'
+        if (instruct.wrap && !endedAtAssistant) shard += '\n'
 
         output += shard
+        len++
     }
-
-    output += instruct.last_output_prefix
+    console.log('ended', endedAtAssistant)
+    if (!endedAtAssistant) output += instruct.last_output_prefix
 
     return replaceMacrosInternal(output, instruct)
 }

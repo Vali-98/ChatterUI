@@ -32,12 +32,9 @@ export async function registerForPushNotificationsAsync() {
         })
     }
 
-    const { status: existingStatus } = await Notifications.getPermissionsAsync()
-    let finalStatus = existingStatus
-    if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync()
-        finalStatus = status
-    }
+    // @TODO: Figure this out
+    // const permissions = await Notifications.getPermissionsAsync()
+    let finalStatus = 'granted'
     if (finalStatus !== 'granted') {
         Alert.alert({
             title: 'Permission Required',
@@ -63,12 +60,12 @@ export async function registerForPushNotificationsAsync() {
 export function useAppStateNotificationObserver() {
     const [autoLoad] = useMMKVBoolean(AppSettings.ChatOnStartup)
     const [useAuth] = useMMKVBoolean(AppSettings.LocallyAuthenticateUser)
-    const { chat, loadChat } = Chats.useChat()
+    const { chatId: chatActive, setId } = Chats.useChat()
     const { setCard } = Characters.useCharacterStore()
 
     const redirect = useCallback(
         async (notification: Notifications.Notification) => {
-            if (chat ?? autoLoad ?? useAuth) return
+            if (chatActive ?? autoLoad ?? useAuth) return
 
             const data = notification.request.content.data
             const chatId = data?.chatId as number | undefined
@@ -77,7 +74,7 @@ export function useAppStateNotificationObserver() {
             if (chatId && characterId) {
                 Logger.info('Loading chat from notification')
                 try {
-                    await loadChat(chatId)
+                    await setId(chatId)
                     await setCard(characterId)
                     router.navigate('/screens/ChatScreen')
                     Notifications.clearLastNotificationResponse()
@@ -86,7 +83,7 @@ export function useAppStateNotificationObserver() {
                 }
             }
         },
-        [chat, autoLoad, useAuth, loadChat, setCard]
+        [chatActive, autoLoad, useAuth, setId, setCard]
     )
 
     useEffect(() => {

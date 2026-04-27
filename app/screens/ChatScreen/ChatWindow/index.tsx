@@ -13,34 +13,40 @@ import { useDebounce } from '@lib/hooks/Debounce'
 import { useAppMode } from '@lib/state/AppMode'
 import { useBackgroundStore } from '@lib/state/BackgroundImage'
 import { Characters } from '@lib/state/Characters'
-import { Chats } from '@lib/state/Chat'
+import { Chats, ScrollData } from '@lib/state/Chat'
 import { AppDirectory } from '@lib/utils/File'
 
-import { useInputHeightStore } from '../ChatInput'
 import ChatFooter from './ChatFooter'
+import ChatHeader from './ChatHeader'
 import ChatHeaderGradient from './ChatHeaderGradient'
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
 
 type ListItem = {
     index: number
-    key: string
+    entryId: number
     isLastMessage: boolean
     isGreeting: boolean
 }
 
-const ChatWindow = () => {
-    const { chat } = Chats.useChat()
+type ChatWindowProps = {
+    chatId: number
+    scrollData?: ScrollData
+}
+
+const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
     const charId = Characters.useCharacterStore((state) => state.card?.id)
     const { appMode } = useAppMode()
     const [saveScroll] = useMMKVBoolean(AppSettings.SaveScrollPosition)
     const [showModelname] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [autoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
-    const chatInputHeight = useInputHeightStore(useShallow((state) => state.height))
     const { data: { background_image: backgroundImage } = {} } = useLiveQuery(
         Characters.db.query.backgroundImageQuery(charId ?? -1)
     )
-    const { cause: scrollCause, index: scrollIndex } = chat?.autoScroll ?? {}
+
+    const { data: entryIdList } = useLiveQuery(Chats.db.live.entryIdList(chatId), [chatId])
+
+    const { cause: scrollCause, index: scrollIndex } = scrollData ?? {}
     const flatlistRef = useRef<FlatList | null>(null)
     const { showSettings, showChat } = Drawer.useDrawerStore(
         useShallow((state) => ({
@@ -56,15 +62,6 @@ const ChatWindow = () => {
     }, 200)
 
     const image = useBackgroundStore((state) => state.image)
-
-    const list: ListItem[] = (chat?.messages ?? [])
-        .map((item, index) => ({
-            index: index,
-            key: item.id.toString(),
-            isGreeting: index === 0,
-            isLastMessage: !!chat?.messages && index === chat?.messages.length - 1,
-        }))
-        .reverse()
 
     useEffect(() => {
         if (!scrollCause || !scrollIndex) return
@@ -84,6 +81,7 @@ const ChatWindow = () => {
         return (
             <ChatItem
                 index={item.index}
+                entryId={item.entryId}
                 isLastMessage={item.isLastMessage}
                 isGreeting={item.isGreeting}
             />
@@ -124,17 +122,22 @@ const ChatWindow = () => {
                 }
                 keyboardShouldPersistTaps="handled"
                 inverted
-                data={list}
-                keyExtractor={(item) => item.key}
+                data={entryIdList.map((item, index) => ({
+                    index: index,
+                    entryId: item.id,
+                    isGreeting: index === entryIdList.length - 1,
+                    isLastMessage: index === 0,
+                }))}
+                keyExtractor={(item) => item.entryId.toString()}
                 renderItem={renderItems}
                 scrollEventThrottle={16}
                 onViewableItemsChanged={(item) => {
                     const index = item.viewableItems?.at(0)?.index
 
-                    if (index && chat?.id)
+                    if (index && chatId)
                         updateScrollPosition(
                             index - (item.viewableItems.length === 1 ? 1 : 0),
-                            chat.id
+                            chatId
                         )
                 }}
                 onScrollToIndexFailed={(error) => {
@@ -143,7 +146,7 @@ const ChatWindow = () => {
                         animated: true,
                     })
                     setTimeout(() => {
-                        if (list.length !== 0 && flatlistRef.current !== null) {
+                        if (entryIdList.length !== 0 && flatlistRef.current !== null) {
                             flatlistRef.current?.scrollToIndex({
                                 index: error.index,
                                 animated: true,
@@ -153,11 +156,11 @@ const ChatWindow = () => {
                     }, 100)
                 }}
                 contentContainerStyle={{
-                    paddingTop: chatInputHeight,
                     paddingBottom: 32,
                     rowGap: 8,
                 }}
-                ListFooterComponent={() => <ChatFooter />}
+                ListFooterComponent={() => <ChatFooter chatLength={entryIdList.length} />}
+                ListHeaderComponent={() => <ChatHeader />}
             />
 
             <ChatHeaderGradient />

@@ -63,7 +63,6 @@ export namespace Model {
             const newdir = `${AppDirectory.ModelPath}${name}`
             Logger.infoToast('Importing file...')
             let success = false
-            console.log(file.uri, '\n', newdir)
 
             if (file.uri.startsWith('content://') && Platform.OS === 'android') {
                 await copyFileSAF(file.uri, newdir.replace('file://', ''))

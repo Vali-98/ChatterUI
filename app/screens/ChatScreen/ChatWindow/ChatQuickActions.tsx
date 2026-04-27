@@ -14,12 +14,13 @@ import { Chats, useInference } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
 import { useTTS } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
+import { ChatSwipe } from 'db/schema'
 
 import { useChatEditorStore } from './ChatEditor'
 import ChatTTS from './ChatTTS'
 
 interface OptionsStateProps {
-    activeIndex?: number
+    activeEntryId?: number
     setActiveIndex: (n: number | undefined) => void
 }
 
@@ -29,34 +30,42 @@ useInference.subscribe(({ nowGenerating }) => {
     }
 })
 export const useChatActionsState = create<OptionsStateProps>()((set, get) => ({
-    setActiveIndex: (n) => set({ activeIndex: get().activeIndex === n ? undefined : n }),
+    setActiveIndex: (n) => set({ activeEntryId: get().activeEntryId === n ? undefined : n }),
 }))
 
 interface ChatActionProps {
-    index: number
+    entryId: number
     nowGenerating: boolean
     isLastMessage: boolean
+    swipe: ChatSwipe
+    index: number
 }
 
-const ChatQuickActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isLastMessage }) => {
-    const { activeIndex, setShowOptions } = useChatActionsState(
+const ChatQuickActions: React.FC<ChatActionProps> = ({
+    entryId,
+    nowGenerating,
+    isLastMessage,
+    swipe,
+    index,
+}) => {
+    const { activeEntryId, setShowOptions } = useChatActionsState(
         useShallow((state) => ({
             setShowOptions: state.setActiveIndex,
-            activeIndex: state.activeIndex,
+            activeEntryId: state.activeEntryId,
         }))
     )
+
     const showEditor = useChatEditorStore((state) => state.show)
     const { color } = Theme.useTheme()
     const [quickDelete] = useMMKVBoolean(AppSettings.QuickDelete)
-    const { deleteEntry } = Chats.useEntry()
-    const { chatId, loadChat } = Chats.useChat()
-    const { swipe } = Chats.useSwipeData(index)
-    const { activeChatIndex } = useTTS()
-    const showOptions = activeIndex === index
+    const { chatId, setId } = Chats.useChat()
+
+    const { activeChatId } = useTTS()
+    const showOptions = activeEntryId === entryId
 
     const handleEnableEdit = () => {
         if (showOptions) setShowOptions(undefined)
-        if (!nowGenerating) showEditor(index)
+        if (!nowGenerating) showEditor(entryId)
     }
 
     const handleFork = () => {
@@ -75,7 +84,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isL
                             return
                         }
                         setShowOptions(undefined)
-                        loadChat(newChatId)
+                        setId(newChatId)
                     },
                 },
             ],
@@ -92,7 +101,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isL
 
     if (!swipe) return
 
-    const isSpeaking = index === activeChatIndex
+    const isSpeaking = entryId === activeChatId
     if (!isSpeaking && (!showOptions || nowGenerating)) return
 
     return (
@@ -144,7 +153,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isL
                                     }}
                                     onPress={() => {
                                         if (showOptions) setShowOptions(undefined)
-                                        deleteEntry(index)
+                                        Chats.db.mutate.deleteChatEntry(entryId)
                                     }}
                                 />
                                 <View
@@ -210,7 +219,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ index, nowGenerating, isL
                         </Animated.View>
                     </>
                 )}
-                <ChatTTS index={index} />
+                <ChatTTS swipe={swipe} />
             </Animated.View>
         </View>
     )

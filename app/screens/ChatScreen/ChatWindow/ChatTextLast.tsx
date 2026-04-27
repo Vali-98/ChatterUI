@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { View, Animated, Easing, useAnimatedValue } from 'react-native'
+import { Animated, Easing, useAnimatedValue, View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 
 import ThemedButton from '@components/buttons/ThemedButton'
@@ -7,16 +7,16 @@ import AnimatedEllipsis from '@components/text/AnimatedEllipsis'
 import { useTextFilter } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { Chats, useInference } from '@lib/state/Chat'
+import { ChatSwipe } from 'db/schema'
 
 type ChatTextProps = {
     nowGenerating: boolean
-    index: number
+    swipe: ChatSwipe
 }
 
-const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
+const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
     const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
 
-    const { swipeText, swipeId } = Chats.useSwipeData(index)
     const { buffer } = Chats.useBuffer()
 
     const [showHidden, setShowHidden] = useState(false)
@@ -54,16 +54,16 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
         if (!nowGenerating && !firstRender.current) setTimeout(() => updateHeight(), 400)
     }, [nowGenerating, updateHeight])
 
-    const filteredText = useTextFilter(swipeText?.trim() ?? '')
-    const renderedText = showHidden ? swipeText?.trim() : filteredText.result
+    const filteredText = useTextFilter(swipe.swipe.trim() ?? '')
+    const renderedText = showHidden ? swipe.swipe.trim() : filteredText.result
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
             <View style={{ minHeight: 10 }} ref={viewRef} onLayout={updateHeight}>
-                {swipeId === currentSwipeId && nowGenerating && buffer.data === '' && (
+                {swipe.id === currentSwipeId && nowGenerating && buffer.data === '' && (
                     <AnimatedEllipsis />
                 )}
                 <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
-                    {nowGenerating && swipeId === currentSwipeId
+                    {nowGenerating && swipe.id === currentSwipeId
                         ? buffer.data.trim()
                         : renderedText}
                 </Markdown>

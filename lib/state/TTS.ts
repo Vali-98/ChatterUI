@@ -10,7 +10,7 @@ import { createMMKVStorage } from '@lib/storage/MMKV'
 import { Chats, useInference } from './Chat'
 
 type TTSState = {
-    activeChatIndex?: number
+    activeChatId?: number
     voice?: Speech.Voice
     enabled: boolean
     auto: boolean
@@ -45,25 +45,11 @@ const sentenceEndRegex =
     /(?<=[^\d])([。…？！.?!])(?:["'`*_)]*)\s+(?=[A-Z0-9])|([。…？！.?!])(?:["'`*_)]*)$/gm
 
 export const useTTS = () => {
-    const {
-        startTTS,
-        activeChatIndex,
-        stopTTS,
-        setVoice,
-        setEnabled,
-        setAuto,
-        setRate,
-        auto,
-        enabled,
-        voice,
-        rate,
-        live,
-        setLive,
-    } = useTTSStore(
+    const props = useTTSStore(
         useShallow((state) => ({
             startTTS: state.startTTS,
             stopTTS: state.stopTTS,
-            activeChatIndex: state.activeChatIndex,
+            activeChatId: state.activeChatId,
             setVoice: state.setVoice,
             setEnabled: state.setEnabled,
             setAuto: state.setAuto,
@@ -76,35 +62,20 @@ export const useTTS = () => {
             setLive: state.setLiveTTS,
         }))
     )
-    return {
-        startTTS,
-        activeChatIndex,
-        stopTTS,
-        setVoice,
-        setEnabled,
-        setAuto,
-        setRate,
-        auto,
-        enabled,
-        voice,
-        rate,
-        live,
-        setLive,
-    }
+    return props
 }
 
-useInference.subscribe(({ nowGenerating }) => {
-    const data = Chats.useChatState.getState().data
-    const length = data?.messages?.length
-    if (!length) return
+useInference.subscribe(async ({ nowGenerating }) => {
+    const chatId = Chats.useChatState.getState().id
+
+    if (!chatId) return
+    const swipe = await Chats.db.query.chatLatestSwipe(chatId)
+    if (!swipe) return
+
     if (!nowGenerating) {
-        const message = data?.messages?.[length - 1]
-        if (!message) return
-        useTTSStore
-            .getState()
-            .handleEndGeneration(length - 1, message.swipes[message.swipe_id].swipe)
+        useTTSStore.getState().handleEndGeneration(swipe.id, swipe.swipe)
     } else {
-        useTTSStore.getState().handleStartGeneration(length - 1)
+        useTTSStore.getState().handleStartGeneration(swipe.id)
     }
 })
 
@@ -116,10 +87,10 @@ export const useTTSStore = create<TTSState>()(
             auto: false,
             liveTTS: false,
             rate: 1,
-            activeChatIndex: undefined,
-            startTTS: async (text: string, index: number) => {
+            activeChatId: undefined,
+            startTTS: async (text: string, chatId: number) => {
                 const clearIndex = () => {
-                    if (get().activeChatIndex === index) set({ activeChatIndex: undefined })
+                    if (get().activeChatId === chatId) set({ activeChatId: undefined })
                 }
 
                 const currentSpeaker = get().voice
@@ -146,7 +117,7 @@ export const useTTSStore = create<TTSState>()(
                     item.replaceAll(/[*"]/g, '').trim()
                 )
                 Logger.debug('TTS started with ' + cleanedchunks.length + ' chunks')
-                set({ activeChatIndex: index })
+                set({ activeChatId: chatId })
                 cleanedchunks.forEach((chunk, index) =>
                     Speech.speak(chunk, {
                         language: currentSpeaker?.language,
@@ -162,7 +133,7 @@ export const useTTSStore = create<TTSState>()(
             },
             stopTTS: async () => {
                 Logger.info('TTS stopped')
-                set({ buffer: '', activeChatIndex: undefined, pauseLive: get().liveTTS })
+                set({ buffer: '', activeChatId: undefined, pauseLive: get().liveTTS })
                 await Speech.stop()
             },
             setEnabled: (b: boolean) => {
@@ -207,7 +178,7 @@ export const useTTSStore = create<TTSState>()(
             handleStartGeneration: async (lastIndex) => {
                 if (get().enabled && get().liveTTS) {
                     await Speech.stop()
-                    set({ activeChatIndex: lastIndex })
+                    set({ activeChatId: lastIndex })
                 }
                 set({ pauseLive: false })
             },
@@ -221,11 +192,11 @@ export const useTTSStore = create<TTSState>()(
                 if (!get().pauseLive && buffer.trim()) {
                     const clean = cleanMarkdown(buffer)
                     if (clean) {
-                        set({ activeChatIndex: lastIndex })
-                        get().speak(clean, () => set({ activeChatIndex: undefined }))
+                        set({ activeChatId: lastIndex })
+                        get().speak(clean, () => set({ activeChatId: undefined }))
                     }
                 } else {
-                    set({ activeChatIndex: undefined })
+                    set({ activeChatId: undefined })
                 }
                 set({ buffer: '' })
             },

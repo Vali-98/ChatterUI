@@ -1,57 +1,68 @@
 import { AntDesign } from '@expo/vector-icons'
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { continueResponse, generateResponse, regenerateResponse } from '@lib/engine/Inference'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
+import { ChatSwipe } from 'db/schema'
 
 type SwipesProps = {
     nowGenerating: boolean
     isGreeting: boolean
-    index: number
+    swipe: ChatSwipe
 }
 
-const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index }) => {
+const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, swipe }) => {
     const styles = useStyles()
     const { color } = Theme.useTheme()
+    const { data: swipeIdListData } = useLiveQuery(Chats.db.live.swipeIdList(swipe.entry_id), [])
+    const swipeIdList = swipeIdListData.map((item) => item.id)
 
-    const { swipeChat, addSwipe } = Chats.useSwipes()
-    const { swipeText, swipeId, swipeIndex, swipesLength } = Chats.useSwipeData(index)
+    const currentIndex = swipeIdList.indexOf(swipe.id)
+    if (!swipeIdList || currentIndex === -1) return
 
     const handleSwipeLeft = () => {
-        swipeChat(index, -1)
+        if (currentIndex <= 0) return
+        const newSwipeId = swipeIdList[currentIndex - 1]
+        if (newSwipeId) Chats.db.mutate.activateSwipe(newSwipeId)
     }
 
     const handleSwipeRight = async (message: string) => {
-        const atLimit = await swipeChat(index, 1)
-        if (atLimit && !isGreeting) {
-            const id = await addSwipe(index, message)
-            if (!id) return
-            if (message) continueResponse(id)
-            else generateResponse(id)
+        if (currentIndex >= swipeIdList.length - 1) {
+            const newSwipe = await Chats.db.mutate.createSwipe(swipe.entry_id, message)
+            if (!newSwipe) return
+            if (message) continueResponse(newSwipe)
+            else generateResponse(newSwipe.id)
+        } else {
+            const newSwipeId = swipeIdList[currentIndex + 1]
+            if (newSwipeId) Chats.db.mutate.activateSwipe(newSwipeId)
         }
     }
 
-    const isLastAltGreeting = isGreeting && swipeIndex === swipesLength - 1
+    const isLastAltGreeting = isGreeting && currentIndex === swipeIdList.length
+    const isFirstSwipe = currentIndex === 0
+
+    const disahleSwipeRight = nowGenerating || isFirstSwipe
 
     return (
         <View style={styles.swipesItem}>
             <TouchableOpacity
                 style={styles.swipeButton}
                 onPress={handleSwipeLeft}
-                disabled={nowGenerating || swipeIndex === 0}>
+                disabled={disahleSwipeRight}>
                 <AntDesign
                     name="left"
                     size={20}
-                    color={swipeIndex === 0 || nowGenerating ? color.text._600 : color.text._300}
+                    color={disahleSwipeRight ? color.text._600 : color.text._300}
                 />
             </TouchableOpacity>
 
-            {index !== 0 && (
+            {!isGreeting && (
                 <TouchableOpacity
-                    onPress={() => swipeId && regenerateResponse(swipeId)}
-                    onLongPress={() => swipeId && regenerateResponse(swipeId, false)}
+                    onPress={() => regenerateResponse(swipe)}
+                    onLongPress={() => regenerateResponse(swipe, false)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
                     <AntDesign
@@ -63,12 +74,12 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index })
             )}
 
             <Text style={styles.swipeText}>
-                {swipeIndex + 1} / {swipesLength}
+                {currentIndex + 1} / {swipeIdList.length}
             </Text>
 
-            {index !== 0 && (
+            {!isGreeting && (
                 <TouchableOpacity
-                    onPress={() => swipeId && continueResponse(swipeId)}
+                    onPress={() => continueResponse(swipe)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
                     <AntDesign
@@ -82,7 +93,7 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index })
             <TouchableOpacity
                 style={styles.swipeButton}
                 onPress={() => handleSwipeRight('')}
-                onLongPress={() => handleSwipeRight(swipeText ?? '')}
+                onLongPress={() => handleSwipeRight(swipe.swipe ?? '')}
                 disabled={nowGenerating || isLastAltGreeting}>
                 <AntDesign
                     name="right"

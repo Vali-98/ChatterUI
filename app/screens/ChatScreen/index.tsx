@@ -40,7 +40,7 @@ const ChatScreen = () => {
         }
     })
 
-    const { chat, unloadChat, loadChat } = Chats.useChat()
+    const { chatId, setId, resetId, scrollData } = Chats.useChat()
 
     const { showSettings, showChats } = Drawer.useDrawerStore(
         useShallow((state) => ({
@@ -52,14 +52,14 @@ const ChatScreen = () => {
     useEffect(() => {
         return () => {
             unloadCharacter()
-            unloadChat()
+            resetId()
         }
-    }, [unloadCharacter, unloadChat])
+    }, [unloadCharacter, resetId])
 
     const handleCreateChat = async () => {
         if (charId)
             Chats.db.mutate.createChat(charId).then((chatId) => {
-                if (chatId) loadChat(chatId)
+                if (chatId) setId(chatId)
             })
     }
 
@@ -98,7 +98,7 @@ const ChatScreen = () => {
         }
 
         chat.last_modified = Date.now()
-        Chats.db.mutate.cloneChat(chat)
+        // Chats.db.mutate.cloneChat(chat)
     }
 
     const renderHeaderButtonRight = () => {
@@ -158,7 +158,9 @@ const ChatScreen = () => {
                         headerRight={renderHeaderButtonRight}
                     />
                     <View style={{ flex: 1 }}>
-                        {chat && <ChatWindow />}
+                        {typeof chatId === 'number' && (
+                            <ChatWindow chatId={chatId} scrollData={scrollData} />
+                        )}
                         <ChatInput />
                         <AvatarViewer />
                         <ChatEditor />

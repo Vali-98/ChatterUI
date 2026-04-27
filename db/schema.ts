@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm'
-import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 // TAVERN V2 SPEC
 
@@ -109,30 +109,39 @@ export const chatEntries = sqliteTable('chat_entries', {
         .references(() => chats.id, { onDelete: 'cascade' }),
     is_user: integer('is_user', { mode: 'boolean' }).notNull(),
     name: text('name').notNull(),
+    /** @deprecated this value is never used */
     order: integer('order').notNull(),
+    /** @deprecated use 'chatSwipe.active' instead */
     swipe_id: integer('swipe_id', { mode: 'number' }).default(0).notNull(),
 })
 
-export const chatSwipes = sqliteTable('chat_swipes', {
-    id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    entry_id: integer('entry_id', { mode: 'number' })
-        .notNull()
-        .references(() => chatEntries.id, { onDelete: 'cascade' }),
-    swipe: text('swipe').notNull().default(''),
+export const chatSwipes = sqliteTable(
+    'chat_swipes',
+    {
+        id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+        entry_id: integer('entry_id', { mode: 'number' })
+            .notNull()
+            .references(() => chatEntries.id, { onDelete: 'cascade' }),
+        swipe: text('swipe').notNull().default(''),
 
-    send_date: integer('send_date', { mode: 'timestamp' })
-        .notNull()
-        .$defaultFn(() => new Date()),
+        send_date: integer('send_date', { mode: 'timestamp' })
+            .notNull()
+            .$defaultFn(() => new Date()),
 
-    gen_started: integer('gen_started', { mode: 'timestamp' })
-        .notNull()
-        .$defaultFn(() => new Date()),
+        gen_started: integer('gen_started', { mode: 'timestamp' })
+            .notNull()
+            .$defaultFn(() => new Date()),
 
-    gen_finished: integer('gen_finished', { mode: 'timestamp' })
-        .notNull()
-        .$defaultFn(() => new Date()),
-    timings: text('timings', { mode: 'json' }).$type<CompletionTimings>(),
-})
+        gen_finished: integer('gen_finished', { mode: 'timestamp' })
+            .notNull()
+            .$defaultFn(() => new Date()),
+        timings: text('timings', { mode: 'json' }).$type<CompletionTimings>(),
+        active: integer('active', { mode: 'boolean' }).notNull().default(false),
+        token_length: integer('token_length', { mode: 'number' }),
+        reset_length: integer('reset_length', { mode: 'number' }),
+    },
+    (table) => [index('chat_swipes_entry_active_idx').on(table.entry_id, table.active)]
+)
 
 export const chatsRelations = relations(chats, ({ many, one }) => ({
     messages: many(chatEntries),

@@ -5,17 +5,14 @@ import Markdown from 'react-native-markdown-display'
 import ThemedButton from '@components/buttons/ThemedButton'
 import { useTextFilter } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
-import { Chats } from '@lib/state/Chat'
 
 type ChatTextProps = {
-    nowGenerating: boolean
-    index: number
+    swipeText: string
 }
 
-const ChatText: React.FC<ChatTextProps> = ({ nowGenerating, index }) => {
+const ChatText: React.FC<ChatTextProps> = ({ swipeText }) => {
     const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
     const [showHidden, setShowHidden] = useState(false)
-    const { swipeText } = Chats.useSwipeData(index)
     const viewRef = useRef<View>(null)
     const animHeight = useAnimatedValue(-1)
     const targetHeight = useRef(-1)

@@ -24,7 +24,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
     const path = usePathname()
     const router = useRouter()
 
-    const { loadChat } = Chats.useChat()
+    const { setId } = Chats.useChat()
 
     const setCurrentCharacter = async () => {
         if (nowLoading || path === '/screens/ChatScreen' || !character.id) return
@@ -39,7 +39,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                 Logger.errorToast('Chat creation backup has failed! Please report.')
                 return
             }
-            await loadChat(chatId)
+            await setId(chatId)
             setNowLoading(false)
             router.push('/screens/ChatScreen')
         } catch (error) {

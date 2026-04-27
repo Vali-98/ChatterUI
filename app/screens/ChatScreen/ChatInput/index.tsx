@@ -56,7 +56,6 @@ const ChatInput = () => {
     const [attachments, setAttachments] = useState<Attachment[]>([])
     const [hideOptions, setHideOptions] = useState(false)
     const [showCamera, setShowCamera] = useState(false)
-    const { addEntry } = Chats.useEntry()
     const { nowGenerating, abortFunction } = useInference(
         useShallow((state) => ({
             nowGenerating: state.nowGenerating,
@@ -70,6 +69,8 @@ const ChatInput = () => {
             charName: state?.card?.name,
         }))
     )
+
+    const { chatId } = Chats.useChat()
 
     const { userName } = Characters.useUserStore(
         useShallow((state) => ({ userName: state.card?.name }))
@@ -88,16 +89,20 @@ const ChatInput = () => {
     }
 
     const handleSend = async () => {
+        if (!chatId) return
+
         if (newMessage.trim() !== '' || attachments.length > 0)
-            await addEntry(
+            Chats.db.mutate.createEntry(
+                chatId,
                 userName ?? '',
                 true,
                 newMessage,
                 attachments.map((item) => item.uri)
             )
-        const swipeId = await addEntry(charName ?? '', false, '')
+        const result = await Chats.db.mutate.createEntry(chatId, charName ?? '', false, '')
         setNewMessage('')
         setAttachments([])
+        const swipeId = result?.swipes?.[0]?.id
         if (swipeId) generateResponse(swipeId)
     }
 

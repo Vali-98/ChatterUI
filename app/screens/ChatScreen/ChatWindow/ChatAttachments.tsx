@@ -4,14 +4,12 @@ import ScaledImage from '@components/views/ScaledImage'
 import { Chats } from '@lib/state/Chat'
 
 type ChatAttachmentsProps = {
-    index: number
+    entry: Chats.db.live.LiveEntry
 }
 
-const ChatAttachments: React.FC<ChatAttachmentsProps> = ({ index }) => {
-    const message = Chats.useEntryData(index)
-
-    if (message.attachments.length < 1) return
-    const images = message.attachments.filter((item) => item.type === 'image')
+const ChatAttachments: React.FC<ChatAttachmentsProps> = ({ entry }) => {
+    if (entry.attachments.length < 1) return
+    const images = entry.attachments.filter((item) => item.type === 'image')
     // const audio = message.attachments.filter((item) => item.type === 'audio')
     // const documents = message.attachments.filter((item) => item.type === 'document')
     return (

@@ -1,10 +1,8 @@
 import { Text, View } from 'react-native'
 
-import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 
-const ChatFooter = () => {
-    const { chatLength } = Chats.useChat()
+const ChatFooter = ({ chatLength }: { chatLength: number }) => {
     const { color, fontSize } = Theme.useTheme()
 
     return (

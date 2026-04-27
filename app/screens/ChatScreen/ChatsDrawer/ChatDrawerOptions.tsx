@@ -32,7 +32,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
         }))
     )
 
-    const { deleteChat, loadChat, chatId, unloadChat } = Chats.useChat()
+    const { setId, chatId, resetId } = Chats.useChat()
 
     const handleDeleteChat = (close: () => void) => {
         Alert.alert({
@@ -43,16 +43,16 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                 {
                     label: 'Delete Chat',
                     onPress: async () => {
-                        await deleteChat(item.id)
+                        await Chats.db.mutate.deleteChat(item.id)
                         if (charId && chatId === item.id) {
                             const returnedChatId = await Chats.db.query.chatNewestId(charId)
                             const chatId = returnedChatId
                                 ? returnedChatId
                                 : await Chats.db.mutate.createChat(charId)
-                            chatId && (await loadChat(chatId))
+                            chatId && (await setId(chatId))
                         } else if (item.id === chatId) {
                             Logger.errorToast(`Something went wrong with creating a default chat`)
-                            unloadChat()
+                            resetId()
                         }
                         close()
                     },

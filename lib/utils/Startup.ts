@@ -32,7 +32,7 @@ const loadNewestChat = async () => {
     const newestChat = await Chats.db.query.chatNewest()
     if (!newestChat) return
     await Characters.useCharacterStore.getState().setCard(newestChat.character_id)
-    await Chats.useChatState.getState().load(newestChat.id)
+    await Chats.useChatState.getState().setId(newestChat.id)
 }
 
 export const loadChatOnInit = async () => {

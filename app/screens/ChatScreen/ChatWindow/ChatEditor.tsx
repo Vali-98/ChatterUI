@@ -1,7 +1,7 @@
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { create } from 'zustand'
-import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
@@ -10,7 +10,7 @@ import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type ChatEditorStateProps = {
-    index: number
+    entryId: number
     editMode: boolean
     hide: () => void
     show: (index: number) => void
@@ -18,45 +18,40 @@ type ChatEditorStateProps = {
 
 //TODO: This is somewhat unsafe, as it always expects index to be valid at 0
 export const useChatEditorStore = create<ChatEditorStateProps>()((set) => ({
-    index: 0,
+    entryId: 0,
     editMode: false,
     hide: () => {
         set({ editMode: false })
     },
     show: (index) => {
-        set({ editMode: true, index: index })
+        set({ editMode: true, entryId: index })
     },
 }))
 
 const ChatEditor = () => {
-    const { index, editMode, hide } = useChatEditorStore(
-        useShallow((state) => ({
-            index: state.index,
-            editMode: state.editMode,
-            hide: state.hide,
-        }))
-    )
+    const { entryId, editMode, hide } = useChatEditorStore()
     const styles = useStyles()
-
-    const { updateEntry, deleteEntry } = Chats.useEntry()
-    const { swipeText, swipe } = Chats.useSwipeData(index)
-    const entry = Chats.useEntryData(index)
+    const { data: entry } = useLiveQuery(Chats.db.live.entry(entryId), [entryId])
+    const { data: swipe } = useLiveQuery(Chats.db.live.activeSwipeByEntry(entryId), [entryId])
     const [placeholderText, setPlaceholderText] = useState('')
+
+    const swipeText = swipe?.swipe
     useEffect(() => {
-        editMode && swipeText !== undefined && setPlaceholderText(swipeText)
+        editMode && setPlaceholderText(swipeText ?? '')
     }, [swipeText, editMode])
 
     // TODO: This should safely return if invalid values were given
-    if (swipeText === undefined) return
+    if (swipe === undefined) return
 
     const handleEditMessage = () => {
         hide()
-        updateEntry(index, placeholderText)
+        if (placeholderText !== swipeText)
+            Chats.db.mutate.updateChatSwipe(swipe.id, placeholderText)
     }
 
     const handleDeleteMessage = () => {
         hide()
-        deleteEntry(index)
+        Chats.db.mutate.deleteChatEntry(entryId)
     }
 
     const handleClose = () => {

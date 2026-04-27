@@ -56,7 +56,7 @@ const ChracterEditorScreen = () => {
 
     const [characterCard, setCharacterCard] = useState<CharacterCardData | undefined>(currentCard)
     const descriptionTokens = useDebounceTokenizer(characterCard?.description ?? '', 300)
-    const { chat, unloadChat } = Chats.useChat()
+    const { chatId, resetId } = Chats.useChat()
     const { data: { background_image: backgroundImage } = {} } = useLiveQuery(
         Characters.db.query.backgroundImageQuery(charId ?? -1)
     )
@@ -130,7 +130,7 @@ const ChracterEditorScreen = () => {
                     onPress: () => {
                         Characters.db.mutate.deleteCard(charId ?? -1)
                         unloadCharacter()
-                        unloadChat()
+                        resetId()
                         setEdited(false)
                         Logger.info(`Deleted character: ${charName}`)
                     },
@@ -142,9 +142,9 @@ const ChracterEditorScreen = () => {
 
     useEffect(() => {
         return () => {
-            if (!chat) unloadCharacter()
+            if (!chatId) unloadCharacter()
         }
-    }, [chat, unloadCharacter])
+    }, [chatId, unloadCharacter])
 
     const handleDeleteImage = () => {
         Alert.alert({

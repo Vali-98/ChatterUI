@@ -27,7 +27,7 @@ const ChatsDrawer = () => {
         setShow(Drawer.ID.CHATLIST, b)
     }
 
-    const { loadChat } = Chats.useChat()
+    const { setId } = Chats.useChat()
 
     const [searchResults, setSearchResults] = useState<
         Awaited<ReturnType<typeof Chats.db.query.searchChat>>
@@ -37,11 +37,8 @@ const ChatsDrawer = () => {
     const [showSearchResults, setShowSearchResults] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
 
-    const handleLoadChat = async (
-        chatId: number,
-        setOffset?: { type: 'index' | 'entryId'; value: number }
-    ) => {
-        await loadChat(chatId, setOffset)
+    const handleLoadChat = async (chatId: number) => {
+        await setId(chatId)
         setShowDrawer(false)
     }
 

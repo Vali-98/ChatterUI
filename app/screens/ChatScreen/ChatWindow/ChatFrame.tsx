@@ -8,24 +8,34 @@ import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
 import { Theme } from '@lib/theme/ThemeManager'
+import { ChatSwipe } from 'db/schema'
 
 type ChatFrameProps = {
     children?: ReactNode
     index: number
+    entry: Chats.db.live.LiveEntry
+    swipe: ChatSwipe
     nowGenerating: boolean
     isLast?: boolean
 }
 
-const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, isLast }) => {
+const ChatFrame: React.FC<ChatFrameProps> = ({
+    children,
+    index,
+    nowGenerating,
+    isLast,
+    entry,
+    swipe,
+}) => {
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
     const [wide] = useMMKVBoolean(AppSettings.WideChatMode)
     const [alternate] = useMMKVBoolean(AppSettings.AlternatingChatMode)
-    const message = Chats.useEntryData(index)
+
     const setShowViewer = useAvatarViewerStore((state) => state.setShow)
     const charImageId = Characters.useCharacterStore((state) => state.card?.image_id) ?? 0
     const userImageId = Characters.useUserStore((state) => state.card?.image_id) ?? 0
 
-    const swipe = message.swipes[message.swipe_id]
+    if (!swipe) return
 
     const getDeltaTime = () =>
         Math.round(
@@ -38,8 +48,8 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
         )
     const deltaTime = getDeltaTime()
 
-    const rowDir = message.is_user && alternate ? 'row-reverse' : 'row'
-    const align = message.is_user && alternate ? 'flex-end' : 'flex-start'
+    const rowDir = entry.is_user && alternate ? 'row-reverse' : 'row'
+    const align = entry.is_user && alternate ? 'flex-end' : 'flex-start'
     if (wide)
         return (
             <View
@@ -56,17 +66,17 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                         alignItems: 'center',
                         marginBottom: spacing.l,
                     }}>
-                    <TouchableOpacity onPress={() => setShowViewer(true, message.is_user)}>
+                    <TouchableOpacity onPress={() => setShowViewer(true, entry.is_user)}>
                         <Avatar
                             style={{
                                 width: 48,
                                 height: 48,
                                 borderRadius: borderRadius.xl,
-                                marginRight: message.is_user && alternate ? 0 : spacing.l,
-                                marginLeft: message.is_user && alternate ? spacing.l : 0,
+                                marginRight: entry.is_user && alternate ? 0 : spacing.l,
+                                marginLeft: entry.is_user && alternate ? spacing.l : 0,
                             }}
                             targetImage={Characters.getImageDir(
-                                message.is_user ? userImageId : charImageId
+                                entry.is_user ? userImageId : charImageId
                             )}
                         />
                     </TouchableOpacity>
@@ -76,7 +86,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                                 fontSize: fontSize.l,
                                 color: color.text._100,
                             }}>
-                            {message.name}
+                            {entry.name}
                         </Text>
                         <View style={{ columnGap: 12, flexDirection: rowDir }}>
                             <Text style={{ fontSize: fontSize.s, color: color.text._400 }}>
@@ -85,7 +95,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                             <Text style={{ color: color.text._700, fontSize: fontSize.s }}>
                                 #{index}
                             </Text>
-                            {deltaTime !== undefined && !message.is_user && index !== 0 && (
+                            {deltaTime !== undefined && !entry.is_user && index !== 0 && (
                                 <Text style={{ color: color.text._700, fontSize: fontSize.s }}>
                                     {deltaTime}s
                                 </Text>
@@ -104,7 +114,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                     alignItems: 'center',
                 }}>
                 <View style={{ rowGap: spacing.m, alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => setShowViewer(true, message.is_user)}>
+                    <TouchableOpacity onPress={() => setShowViewer(true, entry.is_user)}>
                         <Avatar
                             style={{
                                 width: 48,
@@ -114,13 +124,13 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                                 marginRight: spacing.m,
                             }}
                             targetImage={Characters.getImageDir(
-                                message.is_user ? userImageId : charImageId
+                                entry.is_user ? userImageId : charImageId
                             )}
                         />
                     </TouchableOpacity>
 
                     <Text style={{ color: color.text._400 }}>#{index}</Text>
-                    {deltaTime !== undefined && !message.is_user && index !== 0 && (
+                    {deltaTime !== undefined && !entry.is_user && index !== 0 && (
                         <Text style={{ color: color.text._400 }}>{deltaTime}s</Text>
                     )}
                 </View>
@@ -134,7 +144,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                                 color: color.text._100,
                                 marginRight: spacing.sm,
                             }}>
-                            {message.name}
+                            {entry.name}
                         </Text>
                         <Text style={{ fontSize: fontSize.s, color: color.text._400 }}>
                             {swipe.gen_finished.toLocaleTimeString()}
