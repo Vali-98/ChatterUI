@@ -1,7 +1,6 @@
 import * as Speech from 'expo-speech'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { useShallow } from 'zustand/react/shallow'
 
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
@@ -10,7 +9,7 @@ import { createMMKVStorage } from '@lib/storage/MMKV'
 import { Chats, useInference } from './Chat'
 
 type TTSState = {
-    activeChatId?: number
+    activeSwipeId?: number
     voice?: Speech.Voice
     enabled: boolean
     auto: boolean
@@ -44,27 +43,6 @@ type TTSState = {
 const sentenceEndRegex =
     /(?<=[^\d])([。…？！.?!])(?:["'`*_)]*)\s+(?=[A-Z0-9])|([。…？！.?!])(?:["'`*_)]*)$/gm
 
-export const useTTS = () => {
-    const props = useTTSStore(
-        useShallow((state) => ({
-            startTTS: state.startTTS,
-            stopTTS: state.stopTTS,
-            activeChatId: state.activeChatId,
-            setVoice: state.setVoice,
-            setEnabled: state.setEnabled,
-            setAuto: state.setAuto,
-            setRate: state.setRate,
-            auto: state.auto,
-            enabled: state.enabled,
-            voice: state.voice,
-            rate: state.rate,
-            live: state.liveTTS,
-            setLive: state.setLiveTTS,
-        }))
-    )
-    return props
-}
-
 useInference.subscribe(async ({ nowGenerating }) => {
     const chatId = Chats.useChatState.getState().id
 
@@ -87,10 +65,10 @@ export const useTTSStore = create<TTSState>()(
             auto: false,
             liveTTS: false,
             rate: 1,
-            activeChatId: undefined,
-            startTTS: async (text: string, chatId: number) => {
+            activeSwipeId: undefined,
+            startTTS: async (text: string, swipeId: number) => {
                 const clearIndex = () => {
-                    if (get().activeChatId === chatId) set({ activeChatId: undefined })
+                    if (get().activeSwipeId === swipeId) set({ activeSwipeId: undefined })
                 }
 
                 const currentSpeaker = get().voice
@@ -117,23 +95,25 @@ export const useTTSStore = create<TTSState>()(
                     item.replaceAll(/[*"]/g, '').trim()
                 )
                 Logger.debug('TTS started with ' + cleanedchunks.length + ' chunks')
-                set({ activeChatId: chatId })
-                cleanedchunks.forEach((chunk, index) =>
-                    Speech.speak(chunk, {
-                        language: currentSpeaker?.language,
-                        voice: currentSpeaker?.identifier,
-                        onDone: () => {
-                            index === cleanedchunks.length - 1 && clearIndex()
-                        },
-                        onStopped: () => clearIndex(),
-                        rate: get().rate,
-                    })
-                )
-                if (cleanedchunks.length === 0) clearIndex()
+                set({ activeSwipeId: swipeId })
+                try {
+                    cleanedchunks.forEach((chunk, index) =>
+                        get().speak(
+                            chunk,
+                            () => {
+                                index === cleanedchunks.length - 1 && clearIndex()
+                            },
+                            () => clearIndex()
+                        )
+                    )
+                    if (cleanedchunks.length === 0) clearIndex()
+                } catch (e) {
+                    console.log(e)
+                }
             },
             stopTTS: async () => {
                 Logger.info('TTS stopped')
-                set({ buffer: '', activeChatId: undefined, pauseLive: get().liveTTS })
+                set({ buffer: '', activeSwipeId: undefined, pauseLive: get().liveTTS })
                 await Speech.stop()
             },
             setEnabled: (b: boolean) => {
@@ -159,9 +139,9 @@ export const useTTSStore = create<TTSState>()(
                 Speech.speak(text, {
                     language: currentSpeaker?.language,
                     voice: currentSpeaker?.identifier,
+                    rate: get().rate,
                     onDone: onDone,
                     onStopped: onStop,
-                    rate: get().rate,
                 })
             },
 
@@ -178,7 +158,7 @@ export const useTTSStore = create<TTSState>()(
             handleStartGeneration: async (lastIndex) => {
                 if (get().enabled && get().liveTTS) {
                     await Speech.stop()
-                    set({ activeChatId: lastIndex })
+                    set({ activeSwipeId: lastIndex })
                 }
                 set({ pauseLive: false })
             },
@@ -192,11 +172,11 @@ export const useTTSStore = create<TTSState>()(
                 if (!get().pauseLive && buffer.trim()) {
                     const clean = cleanMarkdown(buffer)
                     if (clean) {
-                        set({ activeChatId: lastIndex })
-                        get().speak(clean, () => set({ activeChatId: undefined }))
+                        set({ activeSwipeId: lastIndex })
+                        get().speak(clean, () => set({ activeSwipeId: undefined }))
                     }
                 } else {
-                    set({ activeChatId: undefined })
+                    set({ activeSwipeId: undefined })
                 }
                 set({ buffer: '' })
             },

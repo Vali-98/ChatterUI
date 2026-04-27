@@ -4,7 +4,7 @@ import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated'
 
 import { useInference } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
-import { useTTS } from '@lib/state/TTS'
+import { useTTSStore } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
 import { ChatSwipe } from 'db/schema'
 
@@ -14,12 +14,11 @@ type TTSProps = {
 
 const ChatTTS: React.FC<TTSProps> = ({ swipe }) => {
     const { color } = Theme.useTheme()
-    const { startTTS, activeChatId, stopTTS, enabled } = useTTS()
+    const { startTTS, activeSwipeId: activeChatId, stopTTS, enabled } = useTTSStore()
     const swipeText = swipe.swipe
     const nowGenerating = useInference((state) => state.nowGenerating)
     const isSpeaking = swipe.id === activeChatId
     const handleSpeak = async () => {
-        Logger.info('Starting TTS')
         swipeText && (await startTTS(swipeText, swipe.id))
     }
 

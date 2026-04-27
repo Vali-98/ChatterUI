@@ -12,7 +12,7 @@ import { AppSettings } from '@lib/constants/GlobalValues'
 import { useBackAction } from '@lib/hooks/BackAction'
 import { Chats, useInference } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
-import { useTTS } from '@lib/state/TTS'
+import { useTTSStore } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
 import { ChatSwipe } from 'db/schema'
 
@@ -60,7 +60,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
     const [quickDelete] = useMMKVBoolean(AppSettings.QuickDelete)
     const { chatId, setId } = Chats.useChat()
 
-    const { activeChatId } = useTTS()
+    const { activeSwipeId } = useTTSStore()
     const showOptions = activeEntryId === entryId
 
     const handleEnableEdit = () => {
@@ -101,7 +101,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
 
     if (!swipe) return
 
-    const isSpeaking = entryId === activeChatId
+    const isSpeaking = entryId === activeSwipeId
     if (!isSpeaking && (!showOptions || nowGenerating)) return
 
     return (

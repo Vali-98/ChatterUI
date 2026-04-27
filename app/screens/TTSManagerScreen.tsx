@@ -11,7 +11,7 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import SectionTitle from '@components/text/SectionTitle'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { Logger } from '@lib/state/Logger'
-import { useTTS } from '@lib/state/TTS'
+import { useTTSStore } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
 import { groupBy } from '@lib/utils/Array'
 
@@ -21,8 +21,18 @@ type LanguageListItem = {
 
 const TTSManagerScreen = () => {
     const { color } = Theme.useTheme()
-    const { voice, setVoice, enabled, setEnabled, auto, setAuto, rate, setRate, live, setLive } =
-        useTTS()
+    const {
+        voice,
+        setVoice,
+        enabled,
+        setEnabled,
+        auto,
+        setAuto,
+        rate,
+        setRate,
+        liveTTS,
+        setLiveTTS,
+    } = useTTSStore()
     const [lang, setLang] = useState(voice?.language ?? 'en-US')
     const [modelList, setModelList] = useState<Speech.Voice[]>([])
     const languageList: LanguageListItem = groupBy(modelList, 'language')
@@ -67,7 +77,7 @@ const TTSManagerScreen = () => {
                 value={auto}
                 onChangeValue={(value) => {
                     if (value) {
-                        setLive(false)
+                        setLiveTTS(false)
                     }
                     setAuto(value)
                 }}
@@ -75,12 +85,12 @@ const TTSManagerScreen = () => {
             />
 
             <ThemedSwitch
-                value={live}
+                value={liveTTS}
                 onChangeValue={(value) => {
                     if (value) {
                         setAuto(false)
                     }
-                    setLive(value)
+                    setLiveTTS(value)
                 }}
                 label="Automatically TTS During Inference"
             />
