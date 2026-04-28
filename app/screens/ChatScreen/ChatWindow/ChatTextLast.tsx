@@ -24,37 +24,37 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
     const animHeight = useAnimatedValue(-1)
     const targetHeight = useRef(-1)
     const firstRender = useRef(true)
-    const isMounted = useRef(false)
-    const updateHeight = useCallback(() => {
-        if (firstRender.current) {
-            if (isMounted.current) firstRender.current = false
-            return
-        }
-        const showPadding = nowGenerating && buffer.data
-        const overflowPadding = showPadding ? 12 : 0
-        if (viewRef.current) {
-            viewRef.current.measure((x, y, width, measuredHeight) => {
-                const newHeight = measuredHeight + overflowPadding
-                if (targetHeight.current === newHeight) return
-                if (targetHeight.current > -1) animHeight.setValue(targetHeight.current)
 
-                animHeight.stopAnimation(() =>
-                    Animated.timing(animHeight, {
-                        toValue: newHeight,
-                        duration:
-                            300 * Math.max(1, Math.abs(newHeight - targetHeight.current) / 1000),
-                        useNativeDriver: false,
-                        easing: Easing.inOut((x) => x * x),
-                    }).start()
-                )
-                targetHeight.current = newHeight
-            })
-        }
+    const updateHeight = useCallback(() => {
+        viewRef.current?.measure((_, __, ___, measuredHeight) => {
+            if (firstRender.current) {
+                firstRender.current = false
+                animHeight.setValue(measuredHeight)
+                return
+            }
+            const showPadding = nowGenerating && buffer.data
+            const overflowPadding = showPadding ? 12 : 0
+            const newHeight = measuredHeight + overflowPadding
+
+            if (targetHeight.current === newHeight) return
+            if (targetHeight.current > -1) animHeight.setValue(targetHeight.current)
+
+            animHeight.stopAnimation(() =>
+                Animated.timing(animHeight, {
+                    toValue: newHeight,
+                    duration: 300 * Math.max(1, Math.abs(newHeight - targetHeight.current) / 1000),
+                    useNativeDriver: false,
+                    easing: Easing.inOut((x) => x * x),
+                }).start()
+            )
+            targetHeight.current = newHeight
+        })
     }, [animHeight, buffer.data, nowGenerating])
 
     useEffect(() => {
-        if (!nowGenerating && !firstRender.current && isMounted.current)
+        if (!nowGenerating && !firstRender.current) {
             setTimeout(() => updateHeight(), 400)
+        }
     }, [nowGenerating, updateHeight])
 
     const filteredText = useTextFilter(swipe.swipe ?? '')
@@ -62,13 +62,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
 
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
-            <View
-                style={{ minHeight: 10 }}
-                ref={viewRef}
-                onLayout={() => {
-                    updateHeight()
-                    isMounted.current = true
-                }}>
+            <View style={{ minHeight: 10 }} ref={viewRef} onLayout={updateHeight}>
                 {swipe.id === currentSwipeId && nowGenerating && buffer.data === '' && (
                     <AnimatedEllipsis />
                 )}

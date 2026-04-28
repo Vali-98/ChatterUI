@@ -17,7 +17,6 @@ const ChatText: React.FC<ChatTextProps> = ({ swipeText }) => {
     const animHeight = useAnimatedValue(-1)
     const targetHeight = useRef(-1)
     const firstRender = useRef(true)
-    const isMounted = useRef(false)
 
     const handleAnimateHeight = (newheight: number) => {
         animHeight.stopAnimation(() =>
@@ -30,28 +29,23 @@ const ChatText: React.FC<ChatTextProps> = ({ swipeText }) => {
         )
     }
     const updateHeight = () => {
-        if (firstRender.current) return (firstRender.current = !isMounted.current)
-        if (viewRef.current) {
-            viewRef.current.measure((x, y, width, measuredHeight) => {
-                if (targetHeight.current === measuredHeight) return
-                if (targetHeight.current > -1) animHeight.setValue(targetHeight.current)
-                handleAnimateHeight(measuredHeight)
-                targetHeight.current = measuredHeight
-            })
-        }
+        viewRef.current?.measure((_, __, ___, measuredHeight) => {
+            if (firstRender.current) {
+                animHeight.setValue(measuredHeight)
+                return (firstRender.current = false)
+            }
+            if (targetHeight.current === measuredHeight) return
+            if (targetHeight.current > -1) animHeight.setValue(targetHeight.current)
+            handleAnimateHeight(measuredHeight)
+            targetHeight.current = measuredHeight
+        })
     }
 
     const filteredText = useTextFilter(swipeText?.trim() ?? '')
     const renderedText = showHidden ? swipeText?.trim() : filteredText.result
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
-            <View
-                style={{ minHeight: 10 }}
-                ref={viewRef}
-                onLayout={() => {
-                    updateHeight()
-                    isMounted.current = true
-                }}>
+            <View style={{ minHeight: 10 }} ref={viewRef} onLayout={updateHeight}>
                 <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
                     {renderedText}
                 </Markdown>
