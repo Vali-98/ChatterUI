@@ -1,6 +1,6 @@
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { StyleSheet, View } from 'react-native'
 
+import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
 import { Chats, useInference } from '@lib/state/Chat'
 
 import ChatBubble from './ChatBubble'
@@ -15,14 +15,14 @@ type ChatItemProps = {
 
 const ChatItem: React.FC<ChatItemProps> = ({ index, isLastMessage, isGreeting, entryId }) => {
     const nowGenerating = useInference((state) => state.nowGenerating)
-    const { data: entry } = useLiveQuery(Chats.db.live.entry(entryId))
-    const { data: swipe } = useLiveQuery(Chats.db.live.activeSwipeByEntry(entryId))
+    const { data: entry } = useLiveQueryJoined(Chats.db.live.entry(entryId))
+    const swipe = entry?.swipes[0]
+
     if (!entry || !swipe) return
 
     return (
         <View style={[styles.chatItem, { zIndex: index }]}>
             <ChatFrame
-                swipe={swipe}
                 index={index}
                 nowGenerating={nowGenerating}
                 isLast={isLastMessage}
@@ -33,7 +33,6 @@ const ChatItem: React.FC<ChatItemProps> = ({ index, isLastMessage, isGreeting, e
                     index={index}
                     isLastMessage={isLastMessage}
                     isGreeting={isGreeting}
-                    swipe={swipe}
                 />
             </ChatFrame>
         </View>

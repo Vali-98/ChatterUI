@@ -8,25 +8,16 @@ import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
 import { Theme } from '@lib/theme/ThemeManager'
-import { ChatSwipe } from 'db/schema'
 
 type ChatFrameProps = {
     children?: ReactNode
     index: number
     entry: Chats.db.live.LiveEntry
-    swipe: ChatSwipe
     nowGenerating: boolean
     isLast?: boolean
 }
 
-const ChatFrame: React.FC<ChatFrameProps> = ({
-    children,
-    index,
-    nowGenerating,
-    isLast,
-    entry,
-    swipe,
-}) => {
+const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, isLast, entry }) => {
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
     const [wide] = useMMKVBoolean(AppSettings.WideChatMode)
     const [alternate] = useMMKVBoolean(AppSettings.AlternatingChatMode)
@@ -34,7 +25,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({
     const setShowViewer = useAvatarViewerStore((state) => state.setShow)
     const charImageId = Characters.useCharacterStore((state) => state.card?.image_id) ?? 0
     const userImageId = Characters.useUserStore((state) => state.card?.image_id) ?? 0
-
+    const swipe = entry.swipes[0]
     if (!swipe) return
 
     const getDeltaTime = () =>

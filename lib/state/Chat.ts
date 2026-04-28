@@ -674,6 +674,10 @@ export namespace Chats {
                     where: eq(chatEntries.id, entryId),
                     with: {
                         attachments: true,
+                        swipes: {
+                            limit: 1,
+                            where: eq(chatSwipes.active, true),
+                        },
                     },
                 })
             }

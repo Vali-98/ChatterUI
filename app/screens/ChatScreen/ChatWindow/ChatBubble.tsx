@@ -6,7 +6,6 @@ import { AppSettings } from '@lib/constants/GlobalValues'
 import { useAppMode } from '@lib/state/AppMode'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
-import { ChatSwipe } from 'db/schema'
 
 import ChatAttachments from './ChatAttachments'
 import { useChatEditorStore } from './ChatEditor'
@@ -21,7 +20,6 @@ type ChatTextProps = {
     isLastMessage: boolean
     isGreeting: boolean
     entry: Chats.db.live.LiveEntry
-    swipe: ChatSwipe
 }
 
 const ChatBubble: React.FC<ChatTextProps> = ({
@@ -30,7 +28,6 @@ const ChatBubble: React.FC<ChatTextProps> = ({
     entry,
     isLastMessage,
     isGreeting,
-    swipe,
 }) => {
     const { appMode } = useAppMode()
     const [showTPS] = useMMKVBoolean(AppSettings.ShowTokenPerSecond)
@@ -47,6 +44,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
         if (!nowGenerating) showEditor(entry.id)
     }
 
+    const swipe = entry.swipes[0]
     if (!entry || !swipe) return
 
     const showSwipe = !entry.is_user && isLastMessage && !isGreeting
