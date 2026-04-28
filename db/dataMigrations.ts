@@ -1,4 +1,4 @@
-import { count, sql } from 'drizzle-orm'
+import { count, eq, sql } from 'drizzle-orm'
 
 import { db } from '@db'
 import { Logger } from '@lib/state/Logger'
@@ -16,13 +16,16 @@ const migrationRoutines: Record<MigrationId, () => Promise<void>> = {
             .select({ swipeCount: count(chatSwipes.id) })
             .from(chatSwipes)
 
-        if (swipeCount === 0) return // assume fresh install
+        if (swipeCount === 0) return Logger.info('swipe_id migration skipped, no messages') // assume fresh install
 
         const [{ activeCount }] = await db
             .select({ activeCount: count(chatSwipes.id) })
             .from(chatSwipes)
+            .where(eq(chatSwipes.active, true))
 
-        if (activeCount > 0) return // assume matched well
+        if (activeCount > 0) return Logger.info('swipe_id migration skipped, active exists') // assume matched well
+
+        Logger.info('swipe_id migration running')
 
         await db.get(sql`
             UPDATE chat_swipes
