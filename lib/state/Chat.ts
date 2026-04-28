@@ -405,8 +405,9 @@ export namespace Chats {
                             .returning({ entryId: chatEntries.id })
 
                         await tx.insert(chatSwipes).values(
-                            greetings.map((item) => ({
+                            greetings.map((item, index) => ({
                                 entry_id: entryId,
+                                active: index === 0,
                                 swipe: convertToFormatInstruct(replaceMacros(item)),
                             }))
                         )
