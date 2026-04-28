@@ -108,7 +108,7 @@ export const useTTSStore = create<TTSState>()(
                     )
                     if (cleanedchunks.length === 0) clearIndex()
                 } catch (e) {
-                    console.log(e)
+                    Logger.error(`Failed to run TTS: ${e}`)
                 }
             },
             stopTTS: async () => {
