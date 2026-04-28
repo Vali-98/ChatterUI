@@ -15,6 +15,7 @@ import { useChatInputTextStore } from '@lib/state/components/ChatInput'
 import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSStore } from '@lib/state/TTS'
+import { migrateData } from 'db/dataMigrations'
 
 import { AppDirectory, deleteFile, listFiles, makeDirectory, readStringAsync } from './File'
 // import { patchAndroidText } from './PatchText'
@@ -283,7 +284,7 @@ export const startupApp = () => {
     migrateAppMode_0_8_5_to_0_8_6()
     migrateTextIntent_0_8_8_to_0_8_9()
     lockScreenOrientation()
-
+    migrateData()
     const backgroundColor = Theme.useColorState.getState().color.neutral._100
     setUIBackgroundColor(backgroundColor)
 

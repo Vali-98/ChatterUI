@@ -134,13 +134,6 @@
             "when": 1777208521850,
             "tag": "0018_nice_loki",
             "breakpoints": true
-        },
-        {
-            "idx": 19,
-            "version": "6",
-            "when": 1777283090340,
-            "tag": "0019_sync-swipe-id",
-            "breakpoints": true
         }
     ]
 }
