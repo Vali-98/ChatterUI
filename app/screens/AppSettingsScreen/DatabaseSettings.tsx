@@ -12,6 +12,7 @@ import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { copyFile, deleteFile } from '@lib/utils/File'
 import appConfig from 'app.config'
+import { migrateData } from 'db/dataMigrations'
 
 const appVersion = appConfig.expo.version
 
@@ -29,13 +30,11 @@ const importDB = async (uri: string, name: string) => {
     const copyDB = async () => {
         await exportDB(false)
         deleteFile(dbPath)
-        if (
-            copyFile({
-                from: uri,
-                to: dbPath,
-            })
-        )
-            reloadAppAsync()
+        const result = await copyFile({
+            from: uri,
+            to: dbPath,
+        })
+        if (result) reloadAppAsync()
     }
 
     const dbAppVersion = name.split('-')?.[0]
@@ -49,6 +48,21 @@ const importDB = async (uri: string, name: string) => {
             ],
         })
     } else copyDB()
+}
+
+const rerunMigrations = () => {
+    Alert.alert({
+        title: `Rerun Migrations`,
+        description: `Rerunning migrations may destory your database. Be sure to export a backup.`,
+        buttons: [
+            { label: 'Cancel' },
+            {
+                label: 'Rerun Migrations',
+                onPress: () => migrateData({ bypass: true }),
+                type: 'warning',
+            },
+        ],
+    })
 }
 
 const DatabaseSettings = () => {
@@ -102,6 +116,8 @@ const DatabaseSettings = () => {
                     })
                 }}
             />
+
+            <ThemedButton label="Rerun Migrations" variant="secondary" onPress={rerunMigrations} />
         </View>
     )
 }
