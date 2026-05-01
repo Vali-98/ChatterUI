@@ -21,7 +21,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ index, isLastMessage, isGreeting, e
     if (!entry || !swipe) return
 
     return (
-        <View style={[styles.chatItem, { zIndex: index }]}>
+        <View style={[styles.chatItem, { zIndex: index, paddingBottom: index === 0 ? 4 : 0 }]}>
             <ChatFrame
                 index={index}
                 nowGenerating={nowGenerating}
@@ -44,6 +44,5 @@ export default ChatItem
 const styles = StyleSheet.create({
     chatItem: {
         paddingHorizontal: 4,
-        marginBottom: 4,
     },
 })

@@ -1,6 +1,6 @@
 import { AntDesign } from '@expo/vector-icons'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
-import React from 'react'
+import React, { useCallback } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { continueResponse, generateResponse, regenerateResponse } from '@lib/engine/Inference'
@@ -21,7 +21,16 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, swipe })
     const swipeIdList = swipeIdListData.map((item) => item.id)
 
     const currentIndex = swipeIdList.indexOf(swipe.id)
-    if (!swipeIdList || currentIndex === -1) return
+
+    const getTextColor = useCallback(
+        (b: boolean) => {
+            return b ? color.text._600 : color.text._300
+        },
+        [color]
+    )
+
+    // return if no list, bad index, or if no alt greetings
+    if (!swipeIdList || currentIndex === -1 || (isGreeting && swipeIdList.length === 1)) return
 
     const handleSwipeLeft = () => {
         if (currentIndex <= 0) return
@@ -41,22 +50,19 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, swipe })
         }
     }
 
-    const isLastAltGreeting = isGreeting && currentIndex === swipeIdList.length
+    const isLastAltGreeting = isGreeting && currentIndex === swipeIdList.length - 1
     const isFirstSwipe = currentIndex === 0
 
-    const disahleSwipeRight = nowGenerating || isFirstSwipe
+    const disableSwipeLeft = nowGenerating || isFirstSwipe
+    const disableSwipeRight = nowGenerating || isLastAltGreeting
 
     return (
         <View style={styles.swipesItem}>
             <TouchableOpacity
                 style={styles.swipeButton}
                 onPress={handleSwipeLeft}
-                disabled={disahleSwipeRight}>
-                <AntDesign
-                    name="left"
-                    size={20}
-                    color={disahleSwipeRight ? color.text._600 : color.text._300}
-                />
+                disabled={disableSwipeLeft}>
+                <AntDesign name="left" size={20} color={getTextColor(disableSwipeLeft)} />
             </TouchableOpacity>
 
             {!isGreeting && (
@@ -65,11 +71,7 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, swipe })
                     onLongPress={() => regenerateResponse(swipe, false)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
-                    <AntDesign
-                        name="retweet"
-                        size={20}
-                        color={nowGenerating ? color.text._600 : color.text._300}
-                    />
+                    <AntDesign name="retweet" size={20} color={getTextColor(nowGenerating)} />
                 </TouchableOpacity>
             )}
 
@@ -82,11 +84,7 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, swipe })
                     onPress={() => continueResponse(swipe)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
-                    <AntDesign
-                        name="forward"
-                        size={20}
-                        color={nowGenerating ? color.text._600 : color.text._300}
-                    />
+                    <AntDesign name="forward" size={20} color={getTextColor(nowGenerating)} />
                 </TouchableOpacity>
             )}
 
@@ -94,12 +92,8 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, swipe })
                 style={styles.swipeButton}
                 onPress={() => handleSwipeRight('')}
                 onLongPress={() => handleSwipeRight(swipe.swipe ?? '')}
-                disabled={nowGenerating || isLastAltGreeting}>
-                <AntDesign
-                    name="right"
-                    size={20}
-                    color={isLastAltGreeting || nowGenerating ? color.text._400 : color.text._300}
-                />
+                disabled={disableSwipeRight}>
+                <AntDesign name="right" size={20} color={getTextColor(disableSwipeRight)} />
             </TouchableOpacity>
         </View>
     )

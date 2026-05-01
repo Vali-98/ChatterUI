@@ -47,7 +47,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
     const swipe = entry.swipes[0]
     if (!entry || !swipe) return
 
-    const showSwipe = !entry.is_user && isLastMessage && !isGreeting
+    const showSwipe = !entry.is_user && isLastMessage
     const timings = swipe.timings
 
     return (
