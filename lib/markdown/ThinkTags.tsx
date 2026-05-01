@@ -11,6 +11,10 @@ export const thinkTags = [
         open: /^<seed:think>/,
         close: '</seed:think>',
     },
+    {
+        open: /^<thought\b[^>]*>/,
+        close: '</thought>',
+    },
 ]
 
 function escapeRegex(str: string) {
