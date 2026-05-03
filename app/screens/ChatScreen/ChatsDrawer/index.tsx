@@ -1,5 +1,4 @@
 import { FlashList } from '@shopify/flash-list'
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
@@ -10,6 +9,7 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import Drawer from '@components/views/Drawer'
 import { YAxisOnlyTransition } from '@lib/animations/transitions'
 import { useDebounce } from '@lib/hooks/Debounce'
+import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
@@ -21,7 +21,7 @@ import ChatDrawerSearchItem from './ChatDrawerSearchItem'
 const ChatsDrawer = () => {
     const styles = useStyles()
     const { charId } = Characters.useCharacterStore(useShallow((state) => ({ charId: state.id })))
-    const { data } = useLiveQuery(Chats.db.query.chatListQuery(charId ?? 0), [charId])
+    const { data } = useLiveQueryJoined(Chats.db.query.chatListQuery(charId ?? 0), [charId])
     const setShow = Drawer.useDrawerStore((state) => state.setShow)
     const setShowDrawer = (b: boolean) => {
         setShow(Drawer.ID.CHATLIST, b)
