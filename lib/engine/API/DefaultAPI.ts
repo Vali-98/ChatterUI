@@ -597,7 +597,6 @@ export const defaultTemplates: APIConfiguration[] = [
                 { externalName: 'stream', samplerID: SamplerID.STREAMING },
                 { externalName: 'temperature', samplerID: SamplerID.TEMPERATURE },
                 { externalName: 'top_p', samplerID: SamplerID.TOP_P },
-                // { externalName: 'presence_penalty', samplerID: SamplerID.PRESENCE_PENALTY }, //not supported by gemini models
             ],
             completionType: {
                 type: 'chatCompletions',
