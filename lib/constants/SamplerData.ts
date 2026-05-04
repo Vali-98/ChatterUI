@@ -78,7 +78,8 @@ type SamplerNumberItem = {
     min: number
     max: number
     step: number
-    precision?: number
+    precision: number
+    ignoreIf: number
 }
 
 type SamplerStringArray = {
@@ -122,6 +123,7 @@ export const Samplers = {
             default: 8192,
             step: 16,
             precision: 0,
+            ignoreIf: 0,
         },
     },
     [SamplerID.STREAMING]: {
@@ -146,6 +148,7 @@ export const Samplers = {
             default: 256,
             step: 1,
             precision: 0,
+            ignoreIf: 0,
         },
     },
     [SamplerID.TEMPERATURE]: {
@@ -160,6 +163,7 @@ export const Samplers = {
             default: 1,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.DYNATEMP_RANGE]: {
@@ -169,11 +173,12 @@ export const Samplers = {
         macro: '{{dynatemp_range}}',
         values: {
             type: 'float',
-            min: 0.01,
+            min: 0,
             max: 10,
             default: 1,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.MIN_P]: {
@@ -188,6 +193,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.XTC_PROBABILITY]: {
@@ -202,6 +208,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.XTC_THRESHOLD]: {
@@ -216,6 +223,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.TOP_P]: {
@@ -230,6 +238,7 @@ export const Samplers = {
             default: 1,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.TOP_A]: {
@@ -244,6 +253,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.TOP_K]: {
@@ -258,6 +268,7 @@ export const Samplers = {
             default: 100,
             step: 1,
             precision: 0,
+            ignoreIf: 0,
         },
     },
     [SamplerID.REPETITION_PENALTY]: {
@@ -272,6 +283,7 @@ export const Samplers = {
             default: 1,
             step: 0.01,
             precision: 2,
+            ignoreIf: 1,
         },
     },
     [SamplerID.REPETITION_PENALTY_RANGE]: {
@@ -281,11 +293,12 @@ export const Samplers = {
         macro: '{{rep_pen_range}}',
         values: {
             type: 'integer',
-            min: 1,
+            min: 0,
             max: 4096,
             default: 1,
             step: 1,
             precision: 0,
+            ignoreIf: 0,
         },
     },
     [SamplerID.REPETITION_PENALTY_SLOPE]: {
@@ -295,11 +308,12 @@ export const Samplers = {
         macro: '{{rep_pen_slope}}',
         values: {
             type: 'float',
-            min: 1,
+            min: 0,
             max: 10,
             default: 1,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.ENCODER_REPETITION_PENALTY]: {
@@ -309,11 +323,12 @@ export const Samplers = {
         macro: '{{enc_rep_pen}}',
         values: {
             type: 'float',
-            min: 0.8,
+            min: 0,
             max: 1.5,
             default: 1,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.FREQUENCY_PENALTY]: {
@@ -328,6 +343,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.PRESENCE_PENALTY]: {
@@ -342,6 +358,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.NO_REPEAT_NGRAM_SIZE]: {
@@ -356,6 +373,7 @@ export const Samplers = {
             default: 0,
             step: 1,
             precision: 0,
+            ignoreIf: 0,
         },
     },
     [SamplerID.MIN_LENGTH]: {
@@ -370,6 +388,7 @@ export const Samplers = {
             default: 0,
             step: 1,
             precision: 0,
+            ignoreIf: 0,
         },
     },
     [SamplerID.SMOOTHING_FACTOR]: {
@@ -384,6 +403,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.TYPICAL]: {
@@ -398,6 +418,7 @@ export const Samplers = {
             default: 1,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.TAIL_FREE_SAMPLING]: {
@@ -412,6 +433,7 @@ export const Samplers = {
             default: 1,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.EPSILON_CUTOFF]: {
@@ -426,6 +448,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.ETA_CUTOFF]: {
@@ -440,6 +463,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.MIROSTAT_MODE]: {
@@ -454,6 +478,7 @@ export const Samplers = {
             default: 0,
             step: 1,
             precision: 0,
+            ignoreIf: 0,
         },
     },
     [SamplerID.MIROSTAT_TAU]: {
@@ -468,6 +493,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.MIROSTAT_ETA]: {
@@ -482,6 +508,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.REASONING_EXCLUDE]: {
@@ -566,6 +593,7 @@ export const Samplers = {
             max: 100000,
             step: 1,
             precision: 0,
+            ignoreIf: -1,
         },
     },
     [SamplerID.KEEP_ALIVE_DURATION]: {
@@ -580,6 +608,7 @@ export const Samplers = {
             max: 14400,
             step: 1,
             precision: 0,
+            ignoreIf: -1,
         },
     },
     // THIS MAY BE AN ARRAY OBJECT
@@ -600,11 +629,12 @@ export const Samplers = {
         macro: '{{guidance_scale}}',
         values: {
             type: 'float',
-            min: 0.01,
+            min: 0,
             max: 4,
             default: 0.01,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.NEGATIVE_PROMPT]: {
@@ -624,11 +654,12 @@ export const Samplers = {
         macro: '{{num_beams}}',
         values: {
             type: 'integer',
-            min: 1,
+            min: 0,
             max: 20,
             default: 1,
             step: 1,
             precision: 0,
+            ignoreIf: 0,
         },
     },
     [SamplerID.EARLY_STOPPING]: {
@@ -653,6 +684,7 @@ export const Samplers = {
             default: 0,
             step: 0.1,
             precision: 1,
+            ignoreIf: 0,
         },
     },
     [SamplerID.PENALTY_ALPHA]: {
@@ -667,6 +699,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.DRY_MULTIPLIER]: {
@@ -681,6 +714,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.DRY_BASE]: {
@@ -695,6 +729,7 @@ export const Samplers = {
             default: 0,
             step: 0.01,
             precision: 2,
+            ignoreIf: 0,
         },
     },
     [SamplerID.DRY_ALLOWED_LENGTH]: {
@@ -709,6 +744,7 @@ export const Samplers = {
             default: 0,
             step: 1,
             precision: 0,
+            ignoreIf: 0,
         },
     },
     [SamplerID.DRY_SEQUENCE_BREAK]: {
@@ -733,6 +769,7 @@ export const Samplers = {
             default: 0,
             step: 1,
             precision: 1,
+            ignoreIf: -1,
         },
     },
     [SamplerID.REASONING_EFFORT]: {
@@ -759,6 +796,7 @@ export const Samplers = {
             default: 0,
             step: 1,
             precision: 0,
+            ignoreIf: 0,
         },
     },
     [SamplerID.ENABLE_THINKING]: {

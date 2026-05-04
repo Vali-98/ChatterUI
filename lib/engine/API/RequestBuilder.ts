@@ -274,10 +274,21 @@ const getSamplerFields = (
             const value = samplers[item.samplerID]
             const samplerItem = Samplers[item.samplerID]
             let cleanvalue = value
-            if (typeof value === 'number')
-                if (item.samplerID === 'max_length' && max_length) {
-                    cleanvalue = Math.min(value, max_length)
-                } else if (samplerItem.values.type === 'integer') cleanvalue = Math.floor(value)
+            if (typeof value === 'number') {
+                const type = samplerItem.values.type
+                if (
+                    type === 'float' ||
+                    (type === 'integer' && value === samplerItem.values.ignoreIf)
+                ) {
+                    return {}
+                }
+
+                if (item.samplerID === 'max_length') {
+                    cleanvalue = Math.min(value, max_length ?? value)
+                } else if (type === 'integer') {
+                    cleanvalue = Math.floor(value)
+                }
+            }
             if (item.samplerID === SamplerID.DRY_SEQUENCE_BREAK) {
                 //@ts-expect-error. This is due to a migration
                 cleanvalue = (value as string).split(',')
