@@ -101,7 +101,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
 
     if (!swipe) return
 
-    const isSpeaking = entryId === activeSwipeId
+    const isSpeaking = swipe.id === activeSwipeId
     if (!isSpeaking && (!showOptions || nowGenerating)) return
 
     return (
