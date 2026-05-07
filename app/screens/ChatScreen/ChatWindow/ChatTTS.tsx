@@ -14,10 +14,10 @@ type TTSProps = {
 
 const ChatTTS: React.FC<TTSProps> = ({ swipe }) => {
     const { color } = Theme.useTheme()
-    const { startTTS, activeSwipeId: activeChatId, stopTTS, enabled } = useTTSStore()
+    const { startTTS, activeSwipeId, stopTTS, enabled } = useTTSStore()
     const swipeText = swipe.swipe
     const nowGenerating = useInference((state) => state.nowGenerating)
-    const isSpeaking = swipe.id === activeChatId
+    const isSpeaking = swipe.id === activeSwipeId
     const handleSpeak = async () => {
         swipeText && (await startTTS(swipeText, swipe.id))
     }
