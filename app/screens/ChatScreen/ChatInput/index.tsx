@@ -53,6 +53,7 @@ const ChatInput = () => {
 
     const { color, borderRadius, spacing } = Theme.useTheme()
     const [sendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
+    const [disableSend, setDisableSend] = useState(false)
     const [attachments, setAttachments] = useState<Attachment[]>([])
     const [hideOptions, setHideOptions] = useState(false)
     const [showCamera, setShowCamera] = useState(false)
@@ -90,7 +91,7 @@ const ChatInput = () => {
 
     const handleSend = async () => {
         if (!chatId) return
-
+        setDisableSend(true)
         if (newMessage.trim() !== '' || attachments.length > 0)
             Chats.db.mutate.createEntry(
                 chatId,
@@ -99,11 +100,18 @@ const ChatInput = () => {
                 newMessage,
                 attachments.map((item) => item.uri)
             )
-        const result = await Chats.db.mutate.createEntry(chatId, charName ?? '', false, '')
-        setNewMessage('')
-        setAttachments([])
-        const swipeId = result?.swipes?.[0]?.id
-        if (swipeId) generateResponse(swipeId)
+        try {
+            const result = await Chats.db.mutate.createEntry(chatId, charName ?? '', false, '')
+            setNewMessage('')
+            setAttachments([])
+            const swipeId = result?.swipes?.[0]?.id
+            if (swipeId) generateResponse(swipeId)
+        } catch (e) {
+            Logger.errorToast('Failed to send message')
+            Logger.error(JSON.stringify(e))
+        } finally {
+            setDisableSend(false)
+        }
     }
 
     const handlePickImage = async () => {
@@ -312,6 +320,7 @@ const ChatInput = () => {
                 />
                 <Animated.View layout={XAxisOnlyTransition}>
                     <TouchableOpacity
+                        disabled={disableSend}
                         style={{
                             borderRadius: borderRadius.m,
                             backgroundColor: nowGenerating ? color.error._500 : color.primary._500,
