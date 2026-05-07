@@ -14,7 +14,7 @@ type TTSState = {
     enabled: boolean
     auto: boolean
     rate: number
-    startTTS: (text: string, index: number) => Promise<void>
+    startTTS: (text: string, swipeId: number) => Promise<void>
     stopTTS: () => Promise<void>
     setEnabled: (b: boolean) => void
     setAuto: (b: boolean) => void
@@ -23,8 +23,8 @@ type TTSState = {
     setLiveTTS: (b: boolean) => void
 
     speak: (text: string, onDone?: () => void, onStop?: () => void) => void
-    handleEndGeneration: (lastIndex: number, text: string) => Promise<void>
-    handleStartGeneration: (lastIndex: number) => void
+    handleEndGeneration: (swipeId: number, text: string) => Promise<void>
+    handleStartGeneration: (swipeId: number) => void
     // stream TTS
     liveTTS: boolean
     pauseLive?: boolean
@@ -145,20 +145,20 @@ export const useTTSStore = create<TTSState>()(
                 })
             },
 
-            handleEndGeneration: async (lastIndex, text) => {
+            handleEndGeneration: async (swipeId, text) => {
                 if (!get().enabled) return
                 if (get().liveTTS) {
-                    get().clearAndRunBuffer(lastIndex)
+                    get().clearAndRunBuffer(swipeId)
                 } else if (get().auto) {
                     await get().stopTTS()
-                    get().startTTS(text, lastIndex)
+                    get().startTTS(text, swipeId)
                 }
             },
 
-            handleStartGeneration: async (lastIndex) => {
+            handleStartGeneration: async (swipeId) => {
                 if (get().enabled && get().liveTTS) {
                     await Speech.stop()
-                    set({ activeSwipeId: lastIndex })
+                    set({ activeSwipeId: swipeId })
                 }
                 set({ pauseLive: false })
             },
