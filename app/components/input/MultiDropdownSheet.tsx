@@ -1,5 +1,6 @@
 import { Entypo } from '@expo/vector-icons'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
 
 import BottomSheet from '@components/views/BottomSheet'
@@ -51,6 +52,7 @@ const MultiDropdownSheet = <T,>({
     search = false,
     closeOnSelect = true,
 }: DropdownSheetProps<T>) => {
+    const { t } = useTranslation()
     const styles = useDropdownStyles()
     const { color, spacing } = Theme.useTheme()
     const [showList, setShowList] = useState(false)
@@ -117,7 +119,7 @@ const MultiDropdownSheet = <T,>({
                         )}
                     />
                 ) : (
-                    <Text style={styles.emptyText}>No Items</Text>
+                    <Text style={styles.emptyText}>{t('common.noitems')}</Text>
                 )}
                 {search && (
                     <TextInput
@@ -131,7 +133,9 @@ const MultiDropdownSheet = <T,>({
             </BottomSheet>
             <Pressable style={[style, styles.button]} onPress={() => setShowList(true)}>
                 {selected && selected.length > 0 && (
-                    <Text style={styles.buttonText}>{selected.length} Items Selected</Text>
+                    <Text style={styles.buttonText}>
+                        {selected.length} {t('common.selected')}
+                    </Text>
                 )}
                 {(!selected || selected.length === 0) && (
                     <Text style={styles.placeholderText}>{placeholder}</Text>

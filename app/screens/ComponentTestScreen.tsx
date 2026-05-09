@@ -1,7 +1,9 @@
+/* eslint-disable i18next/no-literal-string */
 import { AntDesign } from '@expo/vector-icons'
 import React, { useState } from 'react'
 import { Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
@@ -44,136 +46,148 @@ const ComponentTestScreen = () => {
     const [showInputSheet, setShowInputSheet] = useState(false)
 
     return (
-        <KeyboardAwareScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{ rowGap: 16, padding: 16 }}
-            keyboardShouldPersistTaps="always">
-            <View style={{ rowGap: 8 }}>
-                {buttonVariants.map((item) => (
-                    //@ts-expect-error
-                    <ThemedButton variant={item} key={item} label={`Button Variant: ${item}`} />
-                ))}
-            </View>
+        <SafeAreaView style={{ flex: 1 }}>
+            <KeyboardAwareScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={{ rowGap: 16, padding: 16 }}
+                keyboardShouldPersistTaps="always">
+                <View style={{ rowGap: 8 }}>
+                    {buttonVariants.map((item) => (
+                        //@ts-expect-error
+                        <ThemedButton variant={item} key={item} label={`Button Variant: ${item}`} />
+                    ))}
+                </View>
 
-            <HorizontalSelector
-                label="Selector"
-                description="Example description for Selector"
-                values={['high', 'medium', 'low'].map((item) => ({
-                    label: item.charAt(0).toUpperCase() + item.slice(1),
-                    value: item,
-                }))}
-                selected={hSelected}
-                onPress={(s) => {
-                    setHSelected(s)
-                }}
-            />
-
-            <ThemedButton onPress={() => setShowInputSheet(true)} label="Show Sheet" />
-
-            <InputSheet
-                title="Test Input"
-                description="Example description"
-                visible={showInputSheet}
-                setVisible={setShowInputSheet}
-                onConfirm={(text) => {
-                    console.log(text)
-                }}
-            />
-
-            <ContextMenu
-                buttons={[
-                    { label: 'Edit', onPress: () => console.log('Edit pressed') },
-                    { label: 'Delete', onPress: () => console.log('Delete pressed') },
-                    {
-                        label: 'More',
-                        submenu: [
-                            {
-                                label: 'SubOption ',
-                                onPress: () => console.log('Sub 1'),
-                            },
-                            { label: 'SubOptiaaaaoaaan 2', onPress: () => console.log('Sub 2') },
-                        ],
-                    },
-                    {
-                        label: 'More',
-                        submenu: [
-                            {
-                                label: 'SubOption ',
-                                onPress: () => console.log('Sub 1'),
-                            },
-                            { label: 'SubOptiaaaaoaaan 2', onPress: () => console.log('Sub 2') },
-                        ],
-                    },
-                    {
-                        label: 'More',
-                        submenu: [
-                            {
-                                label: 'SubOption ',
-                                onPress: () => console.log('Sub 1'),
-                            },
-                            {
-                                label: 'SubOptiaaaaoaaanaaaaaaaaaaaaa 2',
-                                onPress: () => console.log('Sub 2'),
-                            },
-                        ],
-                    },
-                    {
-                        label: 'More',
-                        submenu: [
-                            {
-                                label: 'SubOption ',
-                                onPress: () => console.log('Sub 1'),
-                            },
-                            {
-                                label: 'SubOptiaaaaoaaanaaaaaaaaaaaaa 2',
-                                onPress: () => console.log('Sub 2'),
-                            },
-                        ],
-                    },
-                ]}
-                placement="bottom">
-                <AntDesign
-                    name="edit"
-                    size={20}
-                    style={{
-                        color: color.text._100,
-                        alignSelf: 'center',
+                <HorizontalSelector
+                    label="Selector"
+                    description="Example description for Selector"
+                    values={['high', 'medium', 'low'].map((item) => ({
+                        label: item.charAt(0).toUpperCase() + item.slice(1),
+                        value: item,
+                    }))}
+                    selected={hSelected}
+                    onPress={(s) => {
+                        setHSelected(s)
                     }}
                 />
-            </ContextMenu>
 
-            <Accordion label="Test Accordion">
-                <Text style={{ color: 'yellow' }}>TEST TEXT</Text>
-            </Accordion>
-            <StringArrayEditor label="Test Input Label" value={data} setValue={setData} />
-            <ThemedCheckbox label="Test Checkbox" value={checkbox} onChangeValue={setCheckbox} />
-            <ThemedSwitch label="Test Switch" value={sw} onChangeValue={setSw} />
-            <ThemedSlider
-                value={slider}
-                onValueChange={setSlider}
-                min={0}
-                max={10}
-                step={1}
-                label="Test Slider"
-            />
-            <ThemedTextInput
-                label="Test Text"
-                value={textInputData}
-                onChangeText={setTextInputData}
-            />
-            <DropdownSheet
-                data={selectorData}
-                selected={selected}
-                onChangeValue={setSelected}
-                labelExtractor={(item) => item.label}
-            />
-            <MultiDropdownSheet
-                data={selectorData}
-                selected={selectedM}
-                onChangeValue={setSelectedM}
-                labelExtractor={(item) => item.label}
-            />
-        </KeyboardAwareScrollView>
+                <ThemedButton onPress={() => setShowInputSheet(true)} label="Show Sheet" />
+
+                <InputSheet
+                    title="Test Input"
+                    description="Example description"
+                    visible={showInputSheet}
+                    setVisible={setShowInputSheet}
+                    onConfirm={(text) => {
+                        console.log(text)
+                    }}
+                />
+
+                <ContextMenu
+                    buttons={[
+                        { label: 'Edit', onPress: () => console.log('Edit pressed') },
+                        { label: 'Delete', onPress: () => console.log('Delete pressed') },
+                        {
+                            label: 'More',
+                            submenu: [
+                                {
+                                    label: 'SubOption ',
+                                    onPress: () => console.log('Sub 1'),
+                                },
+                                {
+                                    label: 'SubOptiaaaaoaaan 2',
+                                    onPress: () => console.log('Sub 2'),
+                                },
+                            ],
+                        },
+                        {
+                            label: 'More',
+                            submenu: [
+                                {
+                                    label: 'SubOption ',
+                                    onPress: () => console.log('Sub 1'),
+                                },
+                                {
+                                    label: 'SubOptiaaaaoaaan 2',
+                                    onPress: () => console.log('Sub 2'),
+                                },
+                            ],
+                        },
+                        {
+                            label: 'More',
+                            submenu: [
+                                {
+                                    label: 'SubOption ',
+                                    onPress: () => console.log('Sub 1'),
+                                },
+                                {
+                                    label: 'SubOptiaaaaoaaanaaaaaaaaaaaaa 2',
+                                    onPress: () => console.log('Sub 2'),
+                                },
+                            ],
+                        },
+                        {
+                            label: 'More',
+                            submenu: [
+                                {
+                                    label: 'SubOption ',
+                                    onPress: () => console.log('Sub 1'),
+                                },
+                                {
+                                    label: 'SubOptiaaaaoaaanaaaaaaaaaaaaa 2',
+                                    onPress: () => console.log('Sub 2'),
+                                },
+                            ],
+                        },
+                    ]}
+                    placement="bottom">
+                    <AntDesign
+                        name="edit"
+                        size={20}
+                        style={{
+                            color: color.text._100,
+                            alignSelf: 'center',
+                        }}
+                    />
+                </ContextMenu>
+
+                <Accordion label="Test Accordion">
+                    <Text style={{ color: 'yellow' }}>TEST TEXT</Text>
+                </Accordion>
+                <StringArrayEditor label="Test Input Label" value={data} setValue={setData} />
+                <ThemedCheckbox
+                    label="Test Checkbox"
+                    value={checkbox}
+                    onChangeValue={setCheckbox}
+                />
+                <ThemedSwitch label="Test Switch" value={sw} onChangeValue={setSw} />
+                <ThemedSlider
+                    value={slider}
+                    onValueChange={setSlider}
+                    min={0}
+                    max={10}
+                    step={1}
+                    label="Test Slider"
+                />
+                <ThemedTextInput
+                    label="Test Text"
+                    value={textInputData}
+                    onChangeText={setTextInputData}
+                />
+                <DropdownSheet
+                    data={selectorData}
+                    selected={selected}
+                    onChangeValue={setSelected}
+                    labelExtractor={(item) => item.label}
+                />
+                <MultiDropdownSheet
+                    data={selectorData}
+                    selected={selectedM}
+                    onChangeValue={setSelectedM}
+                    labelExtractor={(item) => item.label}
+                />
+            </KeyboardAwareScrollView>
+        </SafeAreaView>
     )
 }
 

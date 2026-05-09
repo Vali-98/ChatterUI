@@ -1,5 +1,6 @@
 import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 
@@ -20,6 +21,7 @@ type LanguageListItem = {
 }
 
 const TTSManagerScreen = () => {
+    const { t } = useTranslation()
     const { color } = Theme.useTheme()
     const {
         voice,
@@ -61,7 +63,7 @@ const TTSManagerScreen = () => {
             }}
             contentContainerStyle={{ rowGap: 8 }}>
             <HeaderTitle title="TTS" />
-            <SectionTitle>Settings</SectionTitle>
+            <SectionTitle>{t('common.settings')}</SectionTitle>
 
             <ThemedSwitch
                 label="Enable"
@@ -106,7 +108,7 @@ const TTSManagerScreen = () => {
             />
 
             <SectionTitle style={{ marginTop: 8 }}>
-                Language ({Object.keys(languageList).length})
+                {t('tts.language')} ({Object.keys(languageList).length})
             </SectionTitle>
             <View style={{ marginTop: 8 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}>
@@ -128,7 +130,7 @@ const TTSManagerScreen = () => {
             </View>
 
             <SectionTitle style={{ marginTop: 8 }}>
-                Voices ({modelList.filter((item) => item.language === lang).length})
+                {t('tts.voices')} ({modelList.filter((item) => item.language === lang).length})
             </SectionTitle>
 
             <DropdownSheet

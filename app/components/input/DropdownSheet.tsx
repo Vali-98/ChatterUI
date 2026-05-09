@@ -1,5 +1,6 @@
 import { Entypo } from '@expo/vector-icons'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { FlatList, Pressable, Text, TextInput, View, ViewStyle } from 'react-native'
 
 import BottomSheet from '@components/views/BottomSheet'
@@ -41,6 +42,7 @@ const DropdownSheet = <T,>({
     const items = data.filter((item) =>
         labelExtractor(item).toLowerCase().includes(searchFilter.toLowerCase())
     )
+    const { t } = useTranslation()
     return (
         <View style={containerStyle}>
             <BottomSheet
@@ -72,7 +74,7 @@ const DropdownSheet = <T,>({
                         )}
                     />
                 ) : (
-                    <Text style={styles.emptyText}>No Items</Text>
+                    <Text style={styles.emptyText}>{t('common.noitems')}</Text>
                 )}
                 {search && (
                     <TextInput

@@ -7,6 +7,7 @@ import { AlertProvider } from '@components/views/Alert'
 import { PortalHost } from '@components/views/Portal'
 import { useAppStateNotificationObserver } from '@lib/notifications/Notifications'
 import { Theme } from '@lib/theme/ThemeManager'
+import '../i18n/i18n'
 
 SplashScreen.preventAutoHideAsync()
 setOptions({

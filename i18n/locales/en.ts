@@ -1,0 +1,117 @@
+export default {
+    common: {
+        back: 'Back',
+        noitems: 'No Items',
+        tryagain: 'Try Again',
+        result: 'Result',
+        results: 'Results',
+        selected: 'Selected',
+        suggestions: 'Suggestions',
+        chatterui: 'ChatterUI',
+        version: 'Version',
+        devmode: 'DEV MODE',
+        settings: 'Settings',
+        cpu: 'CPU',
+    },
+
+    tts: {
+        language: 'Language',
+        voices: 'Voices',
+    },
+
+    auth: {
+        needed: 'Authorization Required',
+    },
+
+    db: {
+        migrationerror: {
+            title: 'Database Migration Failed!',
+            description:
+                'If you are seeing this, something has gone terribly wrong. Report this error below, include a screenshot of the log above.',
+        },
+    },
+
+    character: {
+        list: {
+            sortby: 'Sort By',
+        },
+    },
+
+    about: {
+        body1: 'ChatterUI is a free and open-source application developed by Vali-98',
+        body2: "This app is a passion project I develop in my free time. If you're enjoying the app, consider supporting its development!",
+        donate: 'Donate to ChatterUI here:',
+        report: 'Got an issue? Report it here:',
+        logs: "Don't forget to add your Logs!",
+    },
+
+    users: {
+        profilecount: 'User Profiles',
+        hint1: 'Hint: Swipe Left or press',
+        hint2: 'to open the Users drawer',
+        hint: 'Hint: Swipe Left or press <icon/> to open the Users drawer',
+    },
+
+    sampler: {
+        notsuported: 'Sampler ID [{{id}}] Not Supported',
+        invalid: 'Invalid Sampler Field!',
+        empty: 'No Samplers to Configure',
+    },
+
+    contextlimit: {
+        allocation: 'Context Allocation',
+        chat: 'Chat Context',
+        generated: 'Generated',
+        warning: 'Low Chat Context will forget messages faster',
+    },
+
+    model: {
+        empty: 'No Models Found. Try Importing Some!',
+        settings: {
+            advanced: 'Advanced Settings',
+            cpu: 'CPU Settings',
+        },
+        item: {
+            invalid: 'Model is Invalid',
+            contextlength: 'Context Length',
+            file: 'File',
+        },
+        info: {
+            loaded: 'Model Loaded',
+            hint: 'Hint: Press <icon /> and import a GGUF model!',
+        },
+    },
+
+    instruct: {
+        formatting: 'Instruct Formatting',
+        macros: 'Macros & Character Card',
+        attachments: 'Attachments',
+        textformatter: {
+            title: 'Text Formatter',
+            description: 'Automatically formats first message to the style below',
+        },
+        hiddentext: {
+            title: 'Hidden Text',
+
+            description: 'Hides text that matches regex patterns defined below. (case insensitive)',
+        },
+        localtemplate: {
+            title: 'Local Template',
+            label: 'Use Built-In Local Model Template',
+            description:
+                'When in Local Mode, ChatterUI automatically uses the instruct template provided by the loaded model. Disable this if you want messages to be formatted using Instruct instead. System Prompt however is always used.',
+        },
+        filteredtext: {
+            label: 'Send Filtered Text',
+            description: 'Sends the filtered text for inference',
+        },
+    },
+
+    connections: {
+        manager: {
+            header: 'Connections',
+            empty: 'No Connections Added',
+            add: 'Add Connection',
+        },
+    },
+}

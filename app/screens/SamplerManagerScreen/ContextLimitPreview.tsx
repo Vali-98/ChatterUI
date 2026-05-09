@@ -1,5 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 import * as Progress from 'react-native-progress'
 
@@ -11,6 +12,7 @@ interface ContextLimitPreviewProps {
 }
 
 const ContextLimitPreview: React.FC<ContextLimitPreviewProps> = ({ generatedLength }) => {
+    const { t } = useTranslation()
     const { color } = Theme.useTheme()
     const contextLimit = useContextLimit()
     const leftover = Math.max(0, contextLimit - generatedLength)
@@ -29,7 +31,8 @@ const ContextLimitPreview: React.FC<ContextLimitPreviewProps> = ({ generatedLeng
                 borderColor: color.primary._200,
             }}>
             <Text style={{ color: color.text._100 }}>
-                Context Allocation <Text style={{ color: color.text._400 }}>({contextLimit})</Text>
+                {t('contextlimit.allocation')}{' '}
+                <Text style={{ color: color.text._400 }}>({contextLimit})</Text>
             </Text>
             <Progress.Bar
                 progress={limit}
@@ -48,7 +51,7 @@ const ContextLimitPreview: React.FC<ContextLimitPreviewProps> = ({ generatedLeng
                             color: warning ? color.error._300 : color.primary._400,
                         }}
                     />{' '}
-                    Chat Context: {leftover}
+                    {t('contextlimit.chat')}: {leftover}
                 </Text>
                 <Text style={{ color: color.text._400 }}>
                     <FontAwesome
@@ -57,13 +60,11 @@ const ContextLimitPreview: React.FC<ContextLimitPreviewProps> = ({ generatedLeng
                             color: genLengthColor,
                         }}
                     />{' '}
-                    Generated: {generatedLength}
+                    {t('contextlimit.generated')}: {generatedLength}
                 </Text>
             </View>
             {warning && (
-                <Text style={{ color: color.error._300 }}>
-                    Low Chat Context will forget messages faster
-                </Text>
+                <Text style={{ color: color.error._300 }}>{t('contextlimit.warning')}</Text>
             )}
         </View>
     )

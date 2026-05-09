@@ -1,5 +1,6 @@
 import { AntDesign } from '@expo/vector-icons'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -29,6 +30,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
     setModelLoading,
     mmprojList,
 }) => {
+    const { t } = useTranslation()
     const styles = useStyles()
     const { color } = Theme.useTheme()
     const [showMMPROJSelector, setShowMMPROJSelector] = useState(false)
@@ -122,13 +124,17 @@ const ModelItem: React.FC<ModelItemProps> = ({
             )}
             {isInvalid && (
                 <View style={styles.tagContainer}>
-                    <Text style={styles.tag}>Model is Invalid</Text>
+                    <Text style={styles.tag}>{t('model.item.invalid')}</Text>
                 </View>
             )}
             {!isInvalid && !isMMPROJ && (
-                <Text style={styles.subtitle}>Context Length: {item.context_length}</Text>
+                <Text style={styles.subtitle}>
+                    {t('model.item.contextlength')}: {item.context_length}
+                </Text>
             )}
-            <Text style={styles.subtitle}>File: {item.file.replace('.gguf', '')}</Text>
+            <Text style={styles.subtitle}>
+                {t('model.item.file')}: {item.file.replace('.gguf', '')}
+            </Text>
             <View style={styles.buttonContainer}>
                 {!isMMPROJ && mmprojList.length > 0 && (
                     <TouchableOpacity

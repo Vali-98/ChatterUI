@@ -1,5 +1,6 @@
 import { AntDesign } from '@expo/vector-icons'
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     Text,
     TextInput,
@@ -41,6 +42,7 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
     filterOnly = false,
     showSuggestionsOnEmpty = false,
 }) => {
+    const { t } = useTranslation()
     const { color, borderRadius } = Theme.useTheme()
     const styles = useStyles()
     const [newData, setNewData] = useState('')
@@ -94,7 +96,7 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
                         }}>
                         {!filterOnly && (
                             <Text style={{ color: color.text._400, marginBottom: 4 }}>
-                                Suggestions
+                                {t('common.suggestions')}
                             </Text>
                         )}
                         <ScrollView

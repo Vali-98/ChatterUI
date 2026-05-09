@@ -3,10 +3,11 @@ const expoConfig = require('eslint-config-expo/flat')
 const internalPlugin = require('eslint-plugin-internal')
 const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended')
 const reactCompilerPlugin = require('eslint-plugin-react-compiler')
-
+const i18nextPlugin = require('eslint-plugin-i18next')
 module.exports = defineConfig([
     expoConfig,
     eslintPluginPrettierRecommended,
+    i18nextPlugin.configs['flat/recommended'],
     {
         ignores: ['dist/*'],
     },

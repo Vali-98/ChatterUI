@@ -1,6 +1,7 @@
 import { FlashList } from '@shopify/flash-list'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -12,6 +13,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import UserListing from './UserListing'
 
 const UserList = () => {
+    const { t } = useTranslation()
     const { color, spacing, fontSize } = Theme.useTheme()
 
     const { data } = useLiveQuery(Characters.db.query.cardListQuery('user'))
@@ -50,7 +52,7 @@ const UserList = () => {
                         fontSize: fontSize.l,
                         color: color.text._300,
                     }}>
-                    User Profiles ({data.length})
+                    {t('user.profilecount')} ({data.length})
                 </Text>
             </View>
             <View style={{ flex: 1 }}>

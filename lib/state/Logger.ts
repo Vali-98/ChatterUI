@@ -83,8 +83,11 @@ export namespace Logger {
         insertLogs(logItem)
     }
 
-    export const infoToast = (data: string) => {
+    export const infoToast = (data: string, internal?: string) => {
         info(data)
+        if (internal) {
+            info(internal)
+        }
         Toast.show(data, toastTime)
     }
 
@@ -94,8 +97,11 @@ export namespace Logger {
         insertLogs(logItem)
     }
 
-    export const warnToast = (data: string) => {
+    export const warnToast = (data: string, internal?: string) => {
         warn(data)
+        if (internal) {
+            warn(internal)
+        }
         Toast.show(data, toastTime, { textColor: 'yellow' })
     }
 
@@ -105,8 +111,11 @@ export namespace Logger {
         insertLogs(logItem)
     }
 
-    export const errorToast = (data: string) => {
+    export const errorToast = (data: string, internal?: string) => {
         error(data)
+        if (internal) {
+            error(internal)
+        }
         Toast.show(data, toastTime, { textColor: 'red' })
     }
 
@@ -117,8 +126,11 @@ export namespace Logger {
         insertLogs(logItem)
     }
 
-    export const debugToast = (data: string) => {
+    export const debugToast = (data: string, internal?: string) => {
         error(data)
+        if (internal) {
+            error(internal)
+        }
         Toast.show(data, toastTime, {
             textColor: 'blue',
         })

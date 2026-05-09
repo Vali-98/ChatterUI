@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -27,6 +28,7 @@ import { saveStringToDownload } from '@lib/utils/File'
 import ContextLimitPreview from './ContextLimitPreview'
 
 const SamplerManagerScreen = () => {
+    const { t } = useTranslation()
     const styles = useStyles()
     const { spacing } = Theme.useTheme()
     const { appMode } = useAppMode()
@@ -186,7 +188,7 @@ const SamplerManagerScreen = () => {
                         if (!samplerItem)
                             return (
                                 <Text key={item.samplerID} style={styles.unsupported}>
-                                    Sampler ID {`[${item.samplerID}]`} Not Supported
+                                    {t('sampler.notSupported', { id: item.samplerID })}
                                 </Text>
                             )
                         switch (samplerItem.inputType) {
@@ -274,7 +276,7 @@ const SamplerManagerScreen = () => {
                             //case 'custom':
                             default:
                                 return (
-                                    <Text style={styles.warningText}>Invalid Sampler Field!</Text>
+                                    <Text style={styles.warningText}>{t('sampler.invalid')}</Text>
                                 )
                         }
                     })}
@@ -288,7 +290,7 @@ const SamplerManagerScreen = () => {
                         justifyContent: 'center',
                         rowGap: 12,
                     }}>
-                    <Text style={styles.noSamplersText}>No Samplers to Configure</Text>
+                    <Text style={styles.noSamplersText}>{t('sampler.empty')}</Text>
                     {appMode === 'remote' && (
                         <Text style={styles.noSamplersText}>
                             {`You probably haven't added an API connection yet`}

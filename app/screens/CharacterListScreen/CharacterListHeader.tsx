@@ -2,6 +2,7 @@ import { count, eq, notInArray } from 'drizzle-orm'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useFocusEffect } from 'expo-router'
 import { useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { BackHandler, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
@@ -25,6 +26,7 @@ type CharacterListHeaderProps = {
 }
 
 const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength }) => {
+    const { t } = useTranslation()
     const [useTagHider, setUseTagHider] = useMMKVBoolean(AppSettings.UseTagHider)
     const { showSearch, setShowSearch, textFilter, setTextFilter, tagFilter, setTagFilter } =
         CharacterSorter.useSorterStore(
@@ -90,7 +92,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                             color: color.text._400,
                             fontSize: 16,
                         }}>
-                        Sort By
+                        {t('character.list.sortby')}
                     </Text>
                     <SortButton type="modified" label="Recent" />
                     <SortButton type="name" label="Name" />
@@ -165,7 +167,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                                     marginTop: 8,
                                     color: color.text._400,
                                 }}>
-                                Results: {resultLength}
+                                {t('common.results')}: {resultLength}
                             </Text>
                         )}
                     </Animated.View>

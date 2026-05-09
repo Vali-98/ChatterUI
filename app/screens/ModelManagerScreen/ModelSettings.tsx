@@ -1,5 +1,6 @@
 import { useFocusEffect } from 'expo-router'
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { BackHandler, Platform, View } from 'react-native'
 import { useMMKVBoolean, useMMKVNumber } from 'react-native-mmkv'
 import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated'
@@ -27,6 +28,7 @@ type ModelSettingsProp = {
 const deviceLabels = { GPUOpenCL: 'OpenCL', HTP0: 'Hexagon', CPU: 'CPU' }
 
 const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoading, exit }) => {
+    const { t } = useTranslation()
     const { config, setConfig } = Llama.useLlamaPreferencesStore(
         useShallow((state) => ({
             config: state.config,
@@ -87,7 +89,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             style={{ flex: 1 }}
             entering={SlideInRight.easing(Easing.inOut(Easing.cubic))}
             exiting={SlideOutRight.easing(Easing.inOut(Easing.cubic))}>
-            <SectionTitle>CPU Settings</SectionTitle>
+            <SectionTitle>{t('model.settings.cpu')}</SectionTitle>
             <View style={{ marginTop: 16 }} />
             {config && (
                 <>
@@ -158,7 +160,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                     )}
                 </>
             )}
-            <SectionTitle>Advanced Settings</SectionTitle>
+            <SectionTitle>{t('model.settings.advanced')}</SectionTitle>
             <ThemedSwitch
                 label="Show Model Name In Chat"
                 value={showModelInChat}

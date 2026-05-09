@@ -1,5 +1,6 @@
 import { AntDesign, Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
+import { useTranslation } from 'react-i18next'
 import { FlatList, Pressable, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
@@ -13,8 +14,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import ConnectionItem from './ConnectionItem'
 
 const ConnectionsManagerScreen = () => {
-    // eslint-disable-next-line react-compiler/react-compiler
-    'use no memo'
+    const { t } = useTranslation()
     const { apiValues } = APIManager.useConnectionsStore(
         useShallow((state) => ({
             apiValues: state.values,
@@ -31,7 +31,7 @@ const ConnectionsManagerScreen = () => {
                 paddingBottom: spacing.xl2,
                 flex: 1,
             }}>
-            <HeaderTitle title="API Manager" />
+            <HeaderTitle title={t('connections.manager.header')} />
             <HeaderButton
                 headerRight={() => (
                     <Pressable
@@ -65,7 +65,7 @@ const ConnectionsManagerScreen = () => {
                             fontStyle: 'italic',
                             marginTop: spacing.l,
                         }}>
-                        No Connections Added
+                        {t('connections.manager.empty')}
                     </Text>
                 </View>
             )}
@@ -75,7 +75,7 @@ const ConnectionsManagerScreen = () => {
                     marginHorizontal: spacing.xl,
                 }}
                 onPress={() => router.push('/screens/ConnectionsManagerScreen/AddConnection')}
-                label="Add Connection"
+                label={t('connections.manager.add')}
             />
         </SafeAreaView>
     )

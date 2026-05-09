@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import Markdown from 'react-native-markdown-display'
@@ -36,6 +37,7 @@ const autoformatterData = [
 ]
 
 const FormattingManager = () => {
+    const { t } = useTranslation()
     const markdownStyle = MarkdownStyle.useMarkdownStyle()
     const [useTemplate, setUseTemplate] = useMMKVBoolean(AppSettings.UseModelTemplate)
     const { currentInstruct, loadInstruct, setCurrentInstruct } = Instructs.useInstruct(
@@ -235,7 +237,7 @@ const FormattingManager = () => {
                         rowGap: spacing.xl,
                         paddingHorizontal: spacing.xl,
                     }}>
-                    <SectionTitle>Instruct Formatting</SectionTitle>
+                    <SectionTitle>{t('instruct.formatting')}</SectionTitle>
                     <ThemedTextInput
                         label="System Prompt"
                         value={currentInstruct.system_prompt}
@@ -383,7 +385,7 @@ const FormattingManager = () => {
                         }}
                     />
 
-                    <SectionTitle>Macros & Character Card</SectionTitle>
+                    <SectionTitle>{t('instruct.macros')}</SectionTitle>
 
                     <View
                         style={{
@@ -467,7 +469,7 @@ const FormattingManager = () => {
                         </View>
                     </View>
 
-                    <SectionTitle>Attachments</SectionTitle>
+                    <SectionTitle>{t('instruct.attachments')}</SectionTitle>
 
                     <View
                         style={{
@@ -522,12 +524,12 @@ const FormattingManager = () => {
                     </View>
 
                     <View style={{ rowGap: 8 }}>
-                        <SectionTitle>Text Formatter</SectionTitle>
+                        <SectionTitle>{t('instruct.textformatter.title')}</SectionTitle>
                         <Text
                             style={{
                                 color: color.text._400,
                             }}>
-                            Automatically formats first message to the style below:
+                            {t('instruct.textformatter.description')}:
                         </Text>
                         <View
                             style={{
@@ -562,28 +564,28 @@ const FormattingManager = () => {
                         </View>
                     </View>
 
-                    <SectionTitle>Hidden Text</SectionTitle>
+                    <SectionTitle>{t('instruct.hiddentext.title')}</SectionTitle>
                     <Text
                         style={{
                             color: color.text._400,
                         }}>
-                        Hides text that matches regex patterns defined below. (case insensitive)
+                        {t('instruct.hiddentext.description')}
                     </Text>
 
                     <StringArrayEditor value={textFilter} setValue={setTextFilter} />
 
                     <ThemedSwitch
-                        label="Send Filtered Text"
-                        description="Sends the filtered text for inference"
+                        label={t('instruct.filteredtext.label')}
+                        description={t('instruct.filteredtext.description')}
                         value={sendFilteredText}
                         onChangeValue={setSendFilteredText}
                     />
 
-                    <SectionTitle>Local Template</SectionTitle>
+                    <SectionTitle>{t('instruct.localtemplate.title')}</SectionTitle>
 
                     <ThemedSwitch
-                        label="Use Built-In Local Model Template"
-                        description="When in Local Mode, ChatterUI automatically uses the instruct template provided by the loaded model. Disable this if you want messages to be formatted using Instruct instead. System Prompt however is always used."
+                        label={t('instruct.localtemplate.label')}
+                        description={t('instruct.localtemplate.description')}
                         value={useTemplate}
                         onChangeValue={setUseTemplate}
                     />

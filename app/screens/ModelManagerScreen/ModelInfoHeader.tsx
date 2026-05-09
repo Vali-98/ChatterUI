@@ -1,5 +1,6 @@
 import { AntDesign } from '@expo/vector-icons'
 import React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { View, Text, StyleSheet } from 'react-native'
 import * as Progress from 'react-native-progress'
 import { useShallow } from 'zustand/react/shallow'
@@ -20,6 +21,7 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
     modelListLength,
     modelUpdatedAt,
 }) => {
+    const { t } = useTranslation()
     const styles = useStyles()
     const { color } = Theme.useTheme()
 
@@ -34,7 +36,7 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
         <View style={styles.modelContainer}>
             {!modelImporting && !modelLoading && modelListLength !== 0 && (
                 <Text style={styles.subtitle}>
-                    Model Loaded:{' '}
+                    {t('model.info.loaded')}:{' '}
                     <Text style={styles.modelTitle} ellipsizeMode="tail" numberOfLines={1}>
                         {modelName ?? 'None'}
                     </Text>
@@ -43,7 +45,12 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
             {!modelImporting && !modelLoading && modelListLength === 0 && modelUpdatedAt && (
                 <View>
                     <Text style={styles.hint}>
-                        Hint: Press <AntDesign name="file-add" size={16} /> and import a GGUF model!
+                        <Trans
+                            i18nKey="model.info.hint"
+                            components={{
+                                icon: <AntDesign name="file-add" size={16} />,
+                            }}
+                        />
                     </Text>
                 </View>
             )}

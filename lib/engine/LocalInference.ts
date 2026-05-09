@@ -279,20 +279,24 @@ export const localInference = async () => {
 const runLocalCompletion = async (
     payload: NonNullable<Awaited<ReturnType<typeof buildLocalPayload>>>
 ) => {
-    const replace = RegExp(
+    const stopRegex = RegExp(
         constructReplaceStrings()
             .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
             .join(`|`),
         'g'
     )
 
+    const cleanStopString = (text: string) => {
+        return text.replaceAll(stopRegex, '')
+    }
+
     useInference.getState().setAbort(async () => {
         await Llama.useLlamaModelStore.getState().stopCompletion()
     })
 
     const outputStream = (text: string) => {
-        Chats.useChatState.getState().insertToBuffer(text)
-        useTTSStore.getState().insertBuffer(text)
+        Chats.useChatState.getState().insertToBuffer(cleanStopString(text))
+        useTTSStore.getState().insertBuffer(cleanStopString(text))
     }
 
     const outputCompleted = (text: string, timings: CompletionTimings) => {

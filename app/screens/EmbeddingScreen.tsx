@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string */
 import { initLlama, LlamaContext } from 'cui-llama.rn'
 import { Paths } from 'expo-file-system'
 import { useState } from 'react'

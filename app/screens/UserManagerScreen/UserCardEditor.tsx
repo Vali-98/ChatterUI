@@ -1,6 +1,7 @@
 import { AntDesign } from '@expo/vector-icons'
 import * as DocumentPicker from 'expo-document-picker'
 import React, { useEffect, useState } from 'react'
+import { Trans } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -145,8 +146,12 @@ const UserCardEditor = () => {
                     marginTop: spacing.xl2,
                     alignSelf: 'center',
                 }}>
-                Hint: Swipe Left or press <AntDesign name="menu-unfold" size={16} /> to open the
-                Users drawer
+                <Trans
+                    i18nKey="users.hint"
+                    components={{
+                        icon: <AntDesign name="menu-unfold" size={16} />,
+                    }}
+                />
             </Text>
             <ThemedButton label="Save" onPress={saveCard} iconName="save" />
         </View>
