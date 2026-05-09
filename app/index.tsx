@@ -14,9 +14,7 @@ import CharacterList from '@screens/CharacterListScreen'
 
 import migrations from '../db/migrations/migrations'
 
-const Home = () => {
-    const { color } = Theme.useTheme()
-    const styles = useStyles()
+const useStartupRoutine = () => {
     const { success, error } = useMigrations(db, migrations)
     const { authorized, retry } = useLocalAuth()
 
@@ -43,6 +41,15 @@ const Home = () => {
         }
         if (error) SplashScreen.hideAsync()
     }, [success, error])
+
+    return { firstRender, authorized, retry }
+}
+
+const Home = () => {
+    const { color } = Theme.useTheme()
+    const styles = useStyles()
+    const { success, error } = useMigrations(db, migrations)
+    const { authorized, retry, firstRender } = useStartupRoutine()
 
     if (error)
         return (
