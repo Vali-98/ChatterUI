@@ -27,8 +27,8 @@ const DropdownSheet = <T,>({
     style,
     selected = undefined,
     data = [],
-    placeholder = 'Select Item...',
-    modalTitle = 'Select Item',
+    placeholder: propPlaceholder, // Renamed to avoid conflict
+    modalTitle: propModalTitle, // Renamed to avoid conflict
     labelExtractor = (data) => {
         return data as string
     },
@@ -39,10 +39,16 @@ const DropdownSheet = <T,>({
     const [showList, setShowList] = useState(false)
     const [searchFilter, setSearchFilter] = useState('')
     const theme = Theme.useTheme()
+    const { t } = useTranslation()
+
+    // Translate default placeholder and modal title if not provided
+    const placeholder = propPlaceholder ?? t('dropdown.selectItem')
+    const modalTitle = propModalTitle ?? t('dropdown.selectItem')
+
     const items = data.filter((item) =>
         labelExtractor(item).toLowerCase().includes(searchFilter.toLowerCase())
     )
-    const { t } = useTranslation()
+
     return (
         <View style={containerStyle}>
             <BottomSheet
@@ -78,7 +84,7 @@ const DropdownSheet = <T,>({
                 )}
                 {search && (
                     <TextInput
-                        placeholder="Filter..."
+                        placeholder={t('dropdown.filter')}
                         placeholderTextColor={theme.color.text._300}
                         style={styles.searchBar}
                         value={searchFilter}

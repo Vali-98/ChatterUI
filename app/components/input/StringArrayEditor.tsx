@@ -30,13 +30,13 @@ type StringArrayEditorProps = {
 }
 
 const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
-    containerStyle = undefined,
-    label = undefined,
+    containerStyle,
+    label,
     value,
     setValue,
-    replaceNewLine = undefined,
+    replaceNewLine,
     allowDuplicates = false,
-    placeholder = 'Enter value...',
+    placeholder,
     allowBlank = false,
     suggestions = [],
     filterOnly = false,
@@ -55,11 +55,11 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
 
     const addData = (newData: string) => {
         if (newData === '') {
-            Logger.warnToast('Value cannot be empty')
+            Logger.warnToast(t('stringArrayEditor.emptyValueError'))
             return
         }
         if (value.includes(newData)) {
-            Logger.warnToast('Value already exists')
+            Logger.warnToast(t('stringArrayEditor.duplicateValueError'))
             return
         }
         setNewData('')
@@ -131,11 +131,16 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
                         onChangeText={setNewData}
                         keyboardType="default"
                         multiline
-                        placeholder={placeholder}
+                        placeholder={placeholder ?? t('stringArrayEditor.placeholder')}
                         placeholderTextColor={color.text._700}
                     />
 
-                    {!filterOnly && <ThemedButton label="Add" onPress={() => addData(newData)} />}
+                    {!filterOnly && (
+                        <ThemedButton
+                            label={t('stringArrayEditor.add')}
+                            onPress={() => addData(newData)}
+                        />
+                    )}
                 </View>
             </View>
         </View>

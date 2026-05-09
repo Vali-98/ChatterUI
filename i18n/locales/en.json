@@ -11,59 +11,53 @@
         "version": "Version",
         "devmode": "DEV MODE",
         "settings": "Settings",
-        "cpu": "CPU"
+        "cpu": "CPU",
+        "test": "Test",
+        "save": "Save",
+        "edit": "Edit",
+        "close": "Close"
     },
-
     "tts": {
         "language": "Language",
         "voices": "Voices"
     },
-
     "auth": {
         "needed": "Authorization Required"
     },
-
     "db": {
         "migrationerror": {
             "title": "Database Migration Failed!",
             "description": "If you are seeing this, something has gone terribly wrong. Report this error below, include a screenshot of the log above."
         }
     },
-
     "character": {
         "list": {
             "sortby": "Sort By"
         }
     },
-
     "about": {
         "body1": "ChatterUI is a free and open-source application developed by Vali-98",
         "body2": "This app is a passion project I develop in my free time. If you're enjoying the app, consider supporting its development!",
         "donate": "Donate to ChatterUI here:",
         "report": "Got an issue? Report it here:",
-        "logs": "Don't forget to add your Logs!"
+        "logs": "Don't forget to add your Logs!",
+        "donateButton": "Support ChatterUI"
     },
-
     "users": {
         "profilecount": "User Profiles",
-        "hint1": "Hint: Swipe Left or press",
-        "hint2": "to open the Users drawer",
         "hint": "Hint: Swipe Left or press <icon/> to open the Users drawer"
     },
-
     "sampler": {
         "notsuported": "Sampler ID [{{id}}] Not Supported",
         "invalid": "Invalid Sampler Field!",
         "empty": "No Samplers to Configure"
     },
-
     "contextlimit": {
         "allocation": "Context Allocation",
         "chat": "Chat Context",
         "generated": "Generated",
         "warning": "Low Chat Context will forget messages faster"
     },
-
     "model": {
         "empty": "No Models Found. Try Importing Some!",
         "settings": {
@@ -80,7 +74,6 @@
             "hint": "Hint: Press <icon /> and import a GGUF model!"
         }
     },
-
     "instruct": {
         "formatting": "Instruct Formatting",
         "macros": "Macros & Character Card",
@@ -91,7 +84,6 @@
         },
         "hiddentext": {
             "title": "Hidden Text",
-
             "description": "Hides text that matches regex patterns defined below. (case insensitive)"
         },
         "localtemplate": {
@@ -104,12 +96,33 @@
             "description": "Sends the filtered text for inference"
         }
     },
-
     "connections": {
         "manager": {
             "header": "Connections",
             "empty": "No Connections Added",
             "add": "Add Connection"
-        }
+        },
+        "notConnected": "Not Connected",
+        "failedToConnect": "Failed To Connect",
+        "connected": "Connected"
+    },
+    "dropdown": {
+        "selectItem": "Select Item",
+        "filter": "Filter..."
+    },
+    "horizontalSelector": {
+        "label": "Selector Label",
+        "description": "Optional helpful description for the selector."
+    },
+    "multiDropdown": {
+        "counter_one": "Selected {{count}} item",
+        "counter_other": "Selected {{count}} items",
+        "noItemsSelected": "No items selected"
+    },
+    "stringArrayEditor": {
+        "placeholder": "Enter value...",
+        "emptyValueError": "Value cannot be empty",
+        "duplicateValueError": "Value already exists",
+        "add": "Add"
     }
 }

@@ -1,5 +1,6 @@
 import { getStringAsync } from 'expo-clipboard'
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
 import ThemedButton from '@components/buttons/ThemedButton'
@@ -36,6 +37,7 @@ const InputSheet: React.FC<InputSheetProps> = ({
     defaultValue = '',
     multiline = false,
 }) => {
+    const { t } = useTranslation()
     const [text, setText] = useState(defaultValue)
     const [errorMessage, setErrorMessage] = useState('')
     const { color, fontSize, spacing } = Theme.useTheme()
@@ -87,7 +89,11 @@ const InputSheet: React.FC<InputSheetProps> = ({
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                     }}>
-                    <ThemedButton label="Cancel" variant="secondary" onPress={handleClose} />
+                    <ThemedButton
+                        label={t('common.close')}
+                        variant="secondary"
+                        onPress={handleClose}
+                    />
                     <View
                         style={{
                             flexDirection: 'row',
@@ -111,7 +117,7 @@ const InputSheet: React.FC<InputSheetProps> = ({
                         />
                     </View>
                     <ThemedButton
-                        label="Confirm"
+                        label={t('common.save')}
                         onPress={() => {
                             const result = verifyText(text)
                             if (result) setErrorMessage(result)

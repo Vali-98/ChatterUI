@@ -44,8 +44,8 @@ const MultiDropdownSheet = <T,>({
     style,
     selected,
     data = [],
-    placeholder = 'Select Item...',
-    modalTitle = 'Select Item',
+    placeholder,
+    modalTitle,
     labelExtractor = (data) => {
         return data as string
     },
@@ -57,6 +57,9 @@ const MultiDropdownSheet = <T,>({
     const { color, spacing } = Theme.useTheme()
     const [showList, setShowList] = useState(false)
     const [searchFilter, setSearchFilter] = useState('')
+
+    const finalPlaceholder = placeholder ?? t('dropdown.selectItem')
+    const finalModalTitle = modalTitle ?? t('dropdown.selectItem')
 
     const items = data.filter((item) =>
         labelExtractor(item)
@@ -77,11 +80,11 @@ const MultiDropdownSheet = <T,>({
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                     }}>
-                    <Text style={styles.modalTitle}>{modalTitle}</Text>
+                    <Text style={styles.modalTitle}>{finalModalTitle}</Text>
                     <Text style={styles.counterText}>
                         {selected.length > 0
-                            ? `Selected ${selected.length} item${selected.length > 1 ? 's' : ''}`
-                            : 'No items selected'}
+                            ? t('multiDropdown.counter', { count: selected.length })
+                            : t('multiDropdown.noItemsSelected')}
                     </Text>
                 </View>
                 {items.length > 0 ? (
@@ -123,7 +126,7 @@ const MultiDropdownSheet = <T,>({
                 )}
                 {search && (
                     <TextInput
-                        placeholder="Filter..."
+                        placeholder={t('dropdown.filter')}
                         placeholderTextColor={color.text._300}
                         style={styles.searchBar}
                         value={searchFilter}
@@ -138,7 +141,7 @@ const MultiDropdownSheet = <T,>({
                     </Text>
                 )}
                 {(!selected || selected.length === 0) && (
-                    <Text style={styles.placeholderText}>{placeholder}</Text>
+                    <Text style={styles.placeholderText}>{finalPlaceholder}</Text>
                 )}
                 <Entypo name="chevron-down" color={color.primary._800} size={18} />
             </Pressable>

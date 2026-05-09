@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
 import { Theme } from '@lib/theme/ThemeManager'
@@ -31,25 +32,26 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
             return ''
         }
     },
-    messageNeutral = 'Not Connected',
-    messageError = 'Failed To Connect',
-    messageOK = 'Connected',
+    messageNeutral,
+    messageError: propMessageError,
+    messageOK: propMessageOK,
     headers = {},
     callback = () => {},
 }) => {
     const { color } = Theme.useTheme()
+    const { t } = useTranslation()
     const [status, setStatus] = useState<ResponseStatus>(ResponseStatus.DEFAULT)
 
-    const StatusMessage = () => {
+    const StatusMessage = useCallback(() => {
         switch (status) {
             case ResponseStatus.DEFAULT:
-                return messageNeutral
+                return messageNeutral ?? t('connections.notConnected')
             case ResponseStatus.ERROR:
-                return messageError
+                return propMessageError ?? t('connections.failedToConnect')
             case ResponseStatus.OK:
-                return messageOK
+                return propMessageOK ?? t('connections.connected')
         }
-    }
+    }, [status, messageNeutral, propMessageError, propMessageOK, t])
 
     const handleCheck = useCallback(async () => {
         const endpoint = apiFormat(api)
@@ -90,7 +92,7 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
 
     return (
         <View style={{ flexDirection: 'row', marginTop: 8 }}>
-            <ThemedButton label="Test" onPress={handleCheck} variant="secondary" />
+            <ThemedButton label={t('common.test')} onPress={handleCheck} variant="secondary" />
             <View
                 style={{
                     marginLeft: 4,

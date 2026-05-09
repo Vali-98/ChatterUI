@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
@@ -12,6 +13,7 @@ import RouteList from './RouteList'
 import UserInfo from './UserInfo'
 
 const SettingsDrawer = () => {
+    const { t } = useTranslation()
     const { color, spacing } = Theme.useTheme()
     const [devMode] = useMMKVBoolean(AppSettings.DevMode)
 
@@ -32,8 +34,7 @@ const SettingsDrawer = () => {
                     marginTop: spacing.l,
                     marginBottom: spacing.xl2,
                 }}>
-                {__DEV__ && 'DEV BUILD\t'}
-                {devMode && 'DEV MODE\t'}
+                {(__DEV__ || devMode) && t('common.devmode') + '\t'}
                 {'v' + appConfig.expo.version}
             </Text>
             <View style={{ marginHorizontal: spacing.xl2 }}>
