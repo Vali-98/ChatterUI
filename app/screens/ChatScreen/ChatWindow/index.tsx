@@ -123,7 +123,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                 keyboardShouldPersistTaps="handled"
                 inverted
                 data={entryIdList.map((item, index) => ({
-                    index: index,
+                    index: entryIdList.length - index - 1,
                     entryId: item.id,
                     isGreeting: index === entryIdList.length - 1,
                     isLastMessage: index === 0,
