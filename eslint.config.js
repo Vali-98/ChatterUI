@@ -1,13 +1,16 @@
 const { defineConfig } = require('eslint/config')
 const expoConfig = require('eslint-config-expo/flat')
+const i18nextPlugin = require('eslint-plugin-i18next').configs['flat/recommended']
 const internalPlugin = require('eslint-plugin-internal')
 const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended')
 const reactCompilerPlugin = require('eslint-plugin-react-compiler')
-const i18nextPlugin = require('eslint-plugin-i18next')
+
+const i18nRules = require('./eslint/i18n-settings')
+
 module.exports = defineConfig([
     expoConfig,
     eslintPluginPrettierRecommended,
-    i18nextPlugin.configs['flat/recommended'],
+    i18nextPlugin,
     {
         ignores: ['dist/*'],
     },
@@ -42,6 +45,7 @@ module.exports = defineConfig([
                     'newlines-between': 'always',
                 },
             ],
+            'i18next/no-literal-string': ['warn', i18nRules],
         },
     },
 ])
