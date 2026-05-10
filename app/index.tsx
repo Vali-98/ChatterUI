@@ -62,7 +62,7 @@ const Home = () => {
                 <Text style={styles.subtitle} />
                 <ThemedButton
                     variant="secondary"
-                    label="Github Repository"
+                    label="Github"
                     iconName="github"
                     iconSize={20}
                     onPress={() => {

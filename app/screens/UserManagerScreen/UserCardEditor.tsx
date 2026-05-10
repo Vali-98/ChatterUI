@@ -1,7 +1,7 @@
 import { AntDesign } from '@expo/vector-icons'
 import * as DocumentPicker from 'expo-document-picker'
 import React, { useEffect, useState } from 'react'
-import { Trans } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -16,6 +16,7 @@ import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const UserCardEditor = () => {
+    const { t } = useTranslation()
     const styles = useStyles()
     const { color, spacing } = Theme.useTheme()
 
@@ -56,12 +57,12 @@ const UserCardEditor = () => {
 
     const handleDeleteImage = () => {
         Alert.alert({
-            title: `Delete Image`,
-            description: `Are you sure you want to delete this image? This cannot be undone.`,
+            title: t('users.edit.image.delete'),
+            description: t('users.edit.image.deletedesc'),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.cancel') },
                 {
-                    label: 'Delete Image',
+                    label: t('users.edit.image.delete'),
                     onPress: () => {
                         Characters.deleteImage(imageID)
                     },
@@ -79,7 +80,7 @@ const UserCardEditor = () => {
                     placement="right"
                     buttons={[
                         {
-                            label: 'Change Image',
+                            label: t('users.edit.image.change'),
                             icon: 'picture',
                             onPress: (close) => {
                                 close()
@@ -87,7 +88,7 @@ const UserCardEditor = () => {
                             },
                         },
                         {
-                            label: 'View Image',
+                            label: t('users.edit.image.view'),
                             icon: 'search',
                             onPress: (close) => {
                                 close()
@@ -95,7 +96,7 @@ const UserCardEditor = () => {
                             },
                         },
                         {
-                            label: 'Delete Image',
+                            label: t('users.edit.image.delete'),
                             icon: 'delete',
                             onPress: (close) => {
                                 close()
@@ -113,7 +114,7 @@ const UserCardEditor = () => {
                 <ThemedTextInput
                     multiline
                     numberOfLines={10}
-                    label="Name"
+                    label={t('common.name')}
                     value={currentCard?.name ?? ''}
                     onChangeText={(text) => {
                         if (currentCard)
@@ -122,13 +123,13 @@ const UserCardEditor = () => {
                                 name: text,
                             })
                     }}
-                    placeholder="Empty names are discouraged!"
+                    placeholder={t('users.nameplaceholder')}
                 />
             </View>
             <ThemedTextInput
                 multiline
                 numberOfLines={10}
-                label="Description"
+                label={t('common.description')}
                 value={currentCard?.description ?? ''}
                 onChangeText={(text) => {
                     if (currentCard)
@@ -153,7 +154,7 @@ const UserCardEditor = () => {
                     }}
                 />
             </Text>
-            <ThemedButton label="Save" onPress={saveCard} iconName="save" />
+            <ThemedButton label={t('common.save')} onPress={saveCard} iconName="save" />
         </View>
     )
 }

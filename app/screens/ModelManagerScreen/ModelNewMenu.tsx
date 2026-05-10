@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
 import ContextMenu from '@components/views/ContextMenu'
@@ -9,6 +10,7 @@ type ModelNewMenuProps = {
 }
 
 const ModelNewMenu: React.FC<ModelNewMenuProps> = ({ modelImporting, setModelImporting }) => {
+    const { t } = useTranslation()
     const handleSetExternal = async (close: () => void) => {
         close()
         if (modelImporting) return
@@ -33,12 +35,12 @@ const ModelNewMenu: React.FC<ModelNewMenuProps> = ({ modelImporting, setModelImp
                 disabled={modelImporting}
                 buttons={[
                     {
-                        label: 'Copy Model Into ChatterUI',
+                        label: t('model.copymodel'),
                         icon: 'download',
                         onPress: handleImportModel,
                     },
                     {
-                        label: 'Use External Model',
+                        label: t('model.externalmodel'),
                         icon: 'link',
                         onPress: handleSetExternal,
                     },

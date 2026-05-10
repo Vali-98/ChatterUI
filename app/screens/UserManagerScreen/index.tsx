@@ -1,12 +1,15 @@
-import { Stack } from 'expo-router'
+import { useTranslation } from 'react-i18next'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import Drawer from '@components/views/Drawer'
+import HeaderButton from '@components/views/HeaderButton'
+import HeaderTitle from '@components/views/HeaderTitle'
 
 import UserCardEditor from './UserCardEditor'
 import UserDrawer from './UserDrawer'
 
 const UserManagerScreen = () => {
+    const { t } = useTranslation()
     return (
         <Drawer.Gesture
             config={[
@@ -17,13 +20,8 @@ const UserManagerScreen = () => {
                 style={{
                     flex: 1,
                 }}>
-                <Stack.Screen
-                    options={{
-                        title: 'Edit User',
-                        animation: 'simple_push',
-                        headerRight: () => <Drawer.Button drawerID={Drawer.ID.USERLIST} />,
-                    }}
-                />
+                <HeaderTitle title={t('users.edit.title')} />
+                <HeaderButton headerRight={() => <Drawer.Button drawerID={Drawer.ID.USERLIST} />} />
                 <UserCardEditor />
                 <UserDrawer />
             </SafeAreaView>

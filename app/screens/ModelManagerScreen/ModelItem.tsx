@@ -54,18 +54,18 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const isInvalid = Model.isInitialEntry(item)
     const handleDeleteModel = () => {
         Alert.alert({
-            title: 'Delete Model',
+            title: t('model.alert.deletemodel.title'),
             description:
-                `Are you sure you want to delete "${item.name}"?\n\nThis cannot be undone!` +
+                t('model.alert.deletemodel.description', { name: item.name }) +
                 (!isInvalid
                     ? !item.file_path.startsWith('content')
-                        ? `\n\nThis operation will clear up ${readableFileSize(item.file_size)}`
-                        : '\n\n(This will not delete external model files, just this entry)'
+                        ? t('model.alert.deletemodel.internal', readableFileSize(item.file_size))
+                        : t('model.alert.deletemodel.external')
                     : ''),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.cancel') },
                 {
-                    label: 'Delete Model',
+                    label: t('model.alert.deletemodel.title'),
                     onPress: async () => {
                         if (modelId === item.id) {
                             await unloadModel()

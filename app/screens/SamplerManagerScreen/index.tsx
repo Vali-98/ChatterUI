@@ -70,23 +70,23 @@ const SamplerManagerScreen = () => {
             `${currentConfig.name}.json`,
             'utf8'
         ).then(() => {
-            Logger.infoToast('Downloaded Sampler Configuration!')
+            Logger.infoToast(t('sampler.toast.exportok'))
         })
     }
 
     const handleDeleteSampler = () => {
         if (configList.length === 1) {
-            Logger.errorToast(`Cannot Delete Last Configuration`)
+            Logger.errorToast(t('sampler.toast.lastconfig'))
             return false
         }
 
         Alert.alert({
-            title: `Delete Sampler`,
-            description: `Are you sure you want to delete '${currentConfig.name}'?`,
+            title: t('sampler.alert.delete.title'),
+            description: t('sampler.alert.delete.description', { name: currentConfig.name }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.cancel') },
                 {
-                    label: 'Delete Sampler',
+                    label: t('sampler.alert.delete.title'),
                     onPress: async () => {
                         deleteSamplerConfig(currentConfigIndex)
                     },
@@ -106,7 +106,7 @@ const SamplerManagerScreen = () => {
             placement="bottom"
             buttons={[
                 {
-                    label: 'Create Sampler',
+                    label: t('sampler.create'),
                     icon: 'file-add',
                     onPress: (close) => {
                         setShowNewSampler(true)
@@ -114,7 +114,7 @@ const SamplerManagerScreen = () => {
                     },
                 },
                 {
-                    label: 'Export Sampler',
+                    label: t('sampler.export'),
                     icon: 'download',
                     onPress: (close) => {
                         handleExportSampler()
@@ -130,7 +130,7 @@ const SamplerManagerScreen = () => {
                     },
                 },*/
                 {
-                    label: 'Delete Sampler',
+                    label: t('sampler.delete'),
                     icon: 'delete',
                     onPress: (close) => {
                         if (handleDeleteSampler()) close()
@@ -144,25 +144,25 @@ const SamplerManagerScreen = () => {
     return (
         <SafeAreaView edges={['bottom']} style={{ flex: 1 }} key={currentConfig.name}>
             <InputSheet
-                title="New Sampler Preset"
+                title={t('sampler.new')}
                 visible={showNewSampler}
                 setVisible={setShowNewSampler}
                 onConfirm={(text: string) => {
                     if (text === '') {
-                        Logger.errorToast(`Sampler name cannot be empty`)
+                        Logger.errorToast(t('sampler.toast.emptyname'))
                         return
                     }
 
                     for (const item of configList)
                         if (item.name === text) {
-                            Logger.errorToast(`Sampler name already exists.`)
+                            Logger.errorToast(t('sampler.toast.exists'))
                             return
                         }
                     addSamplerConfig({ name: text, data: currentConfig.data })
                 }}
             />
 
-            <HeaderTitle title="Samplers" />
+            <HeaderTitle title={t('sampler.title')} />
             <HeaderButton headerRight={headerRight} />
 
             <DropdownSheet
@@ -292,9 +292,7 @@ const SamplerManagerScreen = () => {
                     }}>
                     <Text style={styles.noSamplersText}>{t('sampler.empty')}</Text>
                     {appMode === 'remote' && (
-                        <Text style={styles.noSamplersText}>
-                            {`You probably haven't added an API connection yet`}
-                        </Text>
+                        <Text style={styles.noSamplersText}>{t('sampler.nosamplers')}</Text>
                     )}
                 </View>
             )}

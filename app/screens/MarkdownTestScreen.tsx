@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string */
 import React from 'react'
 import { ScrollView, View } from 'react-native'
 import Markdown from 'react-native-markdown-display'

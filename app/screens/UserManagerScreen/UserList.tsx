@@ -33,7 +33,7 @@ const UserList = () => {
             <InputSheet
                 visible={showNewUser}
                 setVisible={setShowNewUser}
-                title="Create New user"
+                title={t('users.create')}
                 autoFocus
                 onConfirm={async (text) => {
                     const id = await Characters.db.mutate.createCard(text, 'user')
@@ -52,7 +52,7 @@ const UserList = () => {
                         fontSize: fontSize.l,
                         color: color.text._300,
                     }}>
-                    {t('user.profilecount')} ({data.length})
+                    {t('users.profilecount')} ({data.length})
                 </Text>
             </View>
             <View style={{ flex: 1 }}>
@@ -63,7 +63,7 @@ const UserList = () => {
                     renderItem={({ item, index }) => <UserListing user={item} />}
                     initialScrollIndex={Math.max(currentIndex, 0)}
                 />
-                <ThemedButton label="New User" onPress={() => setShowNewUser(true)} />
+                <ThemedButton label={t('users.create')} onPress={() => setShowNewUser(true)} />
             </View>
         </View>
     )

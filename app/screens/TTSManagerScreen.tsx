@@ -38,7 +38,7 @@ const TTSManagerScreen = () => {
     const [lang, setLang] = useState(voice?.language ?? 'en-US')
     const [modelList, setModelList] = useState<Speech.Voice[]>([])
     const languageList: LanguageListItem = groupBy(modelList, 'language')
-    const [testAudioText, setTestAudioText] = useState('This is a test audio')
+    const [testAudioText, setTestAudioText] = useState(t('tts.test'))
 
     const languages = Object.keys(languageList)
         .sort()
@@ -66,7 +66,7 @@ const TTSManagerScreen = () => {
             <SectionTitle>{t('common.settings')}</SectionTitle>
 
             <ThemedSwitch
-                label="Enable"
+                label={t('common.enable')}
                 value={enabled}
                 onChangeValue={(value) => {
                     if (value) {
@@ -83,7 +83,7 @@ const TTSManagerScreen = () => {
                     }
                     setAuto(value)
                 }}
-                label="Automatically TTS After Inference"
+                label={t('tts.autoafter')}
             />
 
             <ThemedSwitch
@@ -94,11 +94,11 @@ const TTSManagerScreen = () => {
                     }
                     setLiveTTS(value)
                 }}
-                label="Automatically TTS During Inference"
+                label={t('tts.live')}
             />
 
             <ThemedSlider
-                label="Speed"
+                label={t('tts.speed')}
                 min={0.1}
                 max={2.5}
                 step={0.1}
@@ -117,7 +117,7 @@ const TTSManagerScreen = () => {
                         selected={lang}
                         data={languages}
                         labelExtractor={(item) => item}
-                        placeholder="Select Language"
+                        placeholder={t('tts.selectlang')}
                         onChangeValue={(item) => setLang(item)}
                     />
                     <ThemedButton
@@ -136,11 +136,11 @@ const TTSManagerScreen = () => {
             <DropdownSheet
                 style={{ marginBottom: 8 }}
                 search
-                modalTitle="Select Voice"
+                modalTitle={t('tts.selectvoice')}
                 selected={voice}
                 data={languageList?.[lang] ?? []}
                 labelExtractor={(item) => item.identifier}
-                placeholder="Select Voice"
+                placeholder={t('tts.selectvoice')}
                 onChangeValue={(item) => setVoice(item)}
             />
             <View
@@ -156,11 +156,11 @@ const TTSManagerScreen = () => {
                     style={{ color: color.text._400, fontStyle: 'italic' }}
                 />
                 <ThemedButton
-                    label="Test"
+                    label={t('common.test')}
                     variant="secondary"
                     onPress={() => {
                         if (voice === undefined) {
-                            Logger.warnToast(`No Speaker Chosen`)
+                            Logger.warnToast(t('tts.nospeaker'))
                             return
                         }
                         Speech.speak(testAudioText, {

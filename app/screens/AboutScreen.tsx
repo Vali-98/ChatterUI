@@ -30,7 +30,7 @@ const AboutScreen = () => {
     const version = 'v' + appConfig.expo.version
     return (
         <View style={styles.container}>
-            <HeaderTitle title="About" />
+            <HeaderTitle title={t('common.about')} />
             <TouchableOpacity activeOpacity={0.8} onPress={updateCounter}>
                 <Image source={require('../../assets/images/icon.png')} style={styles.icon} />
             </TouchableOpacity>
@@ -41,7 +41,7 @@ const AboutScreen = () => {
             </Text>
             {devMode && (
                 <ThemedButton
-                    label="Disable Dev Mode"
+                    label={t('about.disabledev')}
                     variant="critical"
                     buttonStyle={{
                         marginTop: spacing.xl,
@@ -49,7 +49,7 @@ const AboutScreen = () => {
                     onPress={() => {
                         setCounter(0)
                         setDevMode(false)
-                        Logger.info('Dev mode disabled')
+                        Logger.info(t('about.disabledevmes'))
                     }}
                 />
             )}
@@ -66,7 +66,7 @@ const AboutScreen = () => {
             <ThemedButton
                 buttonStyle={{ marginTop: spacing.m }}
                 variant="secondary"
-                label="Github Repository"
+                label="Github"
                 iconName="github"
                 iconSize={20}
                 onPress={() => {

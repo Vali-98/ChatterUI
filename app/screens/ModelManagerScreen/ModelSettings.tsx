@@ -66,15 +66,15 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
 
     const handleDeleteKV = () => {
         Alert.alert({
-            title: 'Delete KV Cache',
-            description: `Are you sure you want to delete the KV Cache? This cannot be undone. \n\n This will clear up ${readableFileSize(kvSize)} of space.`,
+            title: t('model.alert.deletekv.title'),
+            description: t('model.alert.deletekv.description', { size: readableFileSize(kvSize) }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.delete') },
                 {
-                    label: 'Delete KV Cache',
+                    label: t('model.alert.deletekv.title'),
                     onPress: async () => {
                         await KV.deleteKV()
-                        Logger.info('KV Cache deleted!')
+                        Logger.info(t('model.toast.deletekv'))
                         getKVSize()
                     },
                     type: 'warning',
@@ -94,7 +94,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             {config && (
                 <>
                     <ThemedSlider
-                        label="Max Context"
+                        label={t('model.maxcontext')}
                         value={config.context_length}
                         onValueChange={(value) => setConfig({ ...config, context_length: value })}
                         min={1024}
@@ -103,7 +103,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                         disabled={modelImporting || modelLoading}
                     />
                     <ThemedSlider
-                        label="Threads"
+                        label={t('model.threads')}
                         value={config.threads}
                         onValueChange={(value) => setConfig({ ...config, threads: value })}
                         min={1}
@@ -113,7 +113,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                     />
 
                     <ThemedSlider
-                        label="Batch"
+                        label={t('model.batch')}
                         value={config.batch}
                         onValueChange={(value) => setConfig({ ...config, batch: value })}
                         min={16}
@@ -125,7 +125,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                     {/* Note: llama.rn does not have any Android gpu acceleration */}
                     {(Platform.OS === 'ios' || devices.length > 1) && (
                         <ThemedSlider
-                            label="GPU Layers"
+                            label={t('model.gpulayers')}
                             value={config.gpu_layers}
                             onValueChange={(value) => setConfig({ ...config, gpu_layers: value })}
                             min={0}
@@ -136,7 +136,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                     )}
 
                     <ThemedSwitch
-                        label="Context Shift"
+                        label={t('model.contextshift')}
                         value={config.ctx_shift}
                         onChangeValue={(value) => {
                             setConfig({ ...config, ctx_shift: value })
@@ -146,7 +146,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                     {devices.length > 1 && (
                         <HorizontalSelector
                             style={{ paddingBottom: 12 }}
-                            label="Backend Device"
+                            label={t('model.backenddev')}
                             values={devices.map((item) => ({
                                 label: deviceLabels[item as keyof typeof deviceLabels] ?? item,
                                 value: item,
@@ -162,29 +162,25 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             )}
             <SectionTitle>{t('model.settings.advanced')}</SectionTitle>
             <ThemedSwitch
-                label="Show Model Name In Chat"
+                label={t('model.modelnamechat')}
                 value={showModelInChat}
                 onChangeValue={setShowModelInChat}
             />
             <ThemedSwitch
-                label="Automatically Load Model on Chat"
+                label={t('model.autoload')}
                 value={autoloadLocal}
                 onChangeValue={setAutoloadLocal}
             />
             <ThemedSwitch
-                label="Save Local KV"
+                label={t('model.savekv')}
                 value={saveKV}
                 onChangeValue={setSaveKV}
-                description={
-                    saveKV
-                        ? ''
-                        : 'Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV cache file may be very big and negatively impact battery life!'
-                }
+                description={saveKV ? '' : t('model.savekvdesc')}
             />
             {saveKV && (
                 <ThemedButton
                     buttonStyle={{ marginTop: 8 }}
-                    label={'Purge KV Cache (' + readableFileSize(kvSize) + ')'}
+                    label={t('model.purgekv', { size: readableFileSize(kvSize) })}
                     onPress={handleDeleteKV}
                     variant={kvSize === 0 ? 'disabled' : 'critical'}
                 />

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -16,6 +17,7 @@ type CharacterListingProps = {
 }
 
 const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
+    const { t } = useTranslation()
     const styles = useStyles()
     const setShow = Drawer.useDrawerStore((state) => state.setShow)
 
@@ -33,16 +35,17 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
     const handleDeleteCard = async (close: () => void) => {
         close()
         Alert.alert({
-            title: 'Delete User',
-            description: `Are you sure you want to delete '${user.name}'?\nThis cannot be undone.`,
+            title: t('users.edit.card.delete'),
+            description: t('users.edit.card.deletedesc', { name: user.name }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.cancel') },
                 {
-                    label: 'Delete User',
+                    label: t('users.edit.card.delete'),
                     onPress: async () => {
                         await Characters.db.mutate.deleteCard(user.id)
                         await Characters.db.query.cardList('user').then(async (list) => {
                             if (list.length === 0) {
+                                // eslint-disable-next-line i18next/no-literal-string
                                 const defaultName = 'User'
                                 const id = await Characters.db.mutate.createCard(
                                     defaultName,
@@ -63,12 +66,12 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
 
     const handleCloneCard = (close: () => void) => {
         Alert.alert({
-            title: `Clone User`,
-            description: `Are you sure you want to clone '${user.name}'?`,
+            title: t('users.edit.card.clone'),
+            description: t('users.edit.card.clonedesc', { name: user.name }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.cancel') },
                 {
-                    label: 'Clone User',
+                    label: t('users.edit.card.clone'),
                     onPress: async () => {
                         close()
                         await Characters.db.mutate.duplicateCard(user.id)
@@ -88,12 +91,12 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
             placement="center"
             buttons={[
                 {
-                    label: 'Clone',
+                    label: t('common.clone'),
                     icon: 'copy',
                     onPress: handleCloneCard,
                 },
                 {
-                    label: 'Delete',
+                    label: t('common.delete'),
                     icon: 'delete',
                     variant: 'warning',
                     onPress: handleDeleteCard,

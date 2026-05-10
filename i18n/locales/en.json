@@ -15,11 +15,28 @@
         "test": "Test",
         "save": "Save",
         "edit": "Edit",
-        "close": "Close"
+        "close": "Close",
+        "clone": "Clone",
+        "name": "Name",
+        "description": "Description",
+        "about": "About",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "enable": "Enable",
+        "disable": "Disable",
+        "internal": "Internal",
+        "external": "External"
     },
     "tts": {
         "language": "Language",
-        "voices": "Voices"
+        "voices": "Voices",
+        "test": "This is a test audio",
+        "autoafter": "Automatically TTS After Inference",
+        "live": "Automatically TTS During Inference",
+        "speed": "Speed",
+        "selectlang": "Select Language",
+        "selectvoice": "Select Voice",
+        "nospeaker": "No Speaker Chosen"
     },
     "auth": {
         "needed": "Authorization Required"
@@ -41,16 +58,53 @@
         "donate": "Donate to ChatterUI here:",
         "report": "Got an issue? Report it here:",
         "logs": "Don't forget to add your Logs!",
-        "donateButton": "Support ChatterUI"
+        "donateButton": "Support ChatterUI",
+        "disabledev": "Disable Dev Mode",
+        "disabledevmes": "Dev mode disabled."
     },
     "users": {
+        "edit": {
+            "title": "Edit User",
+            "image": {
+                "change": "Change Image",
+                "view": "View Image",
+                "delete": "Delete Image",
+                "deletedesc": "Are you sure you want to delete this image?\nThis cannot be undone."
+            },
+            "card": {
+                "delete": "Delete User",
+                "deletedesc": "Are you sure you want to delete '{{name}}'?\nThis cannot be undone.",
+                "clone": "Clone User",
+                "clonedesc": "Are you sure you want to clone '{{name}}'?"
+            }
+        },
+        "nameplaceholder": "Empty names are discouraged",
         "profilecount": "User Profiles",
-        "hint": "Hint: Swipe Left or press <icon/> to open the Users drawer"
+        "hint": "Hint: Swipe Left or press <icon/> to open the Users drawer",
+        "create": "Create New User"
     },
     "sampler": {
+        "title": "Samplers",
         "notsuported": "Sampler ID [{{id}}] Not Supported",
         "invalid": "Invalid Sampler Field!",
-        "empty": "No Samplers to Configure"
+        "empty": "No Samplers to Configure",
+        "toast": {
+            "exportok": "Exported Sampler Configuration!",
+            "lastconfig": "Cannot Delete Last Configuration",
+            "emptyname": "Sampler name cannot be empty",
+            "exists": "Sampler name already exists."
+        },
+        "alert": {
+            "delete": {
+                "title": "Delete Sampler",
+                "description": "Are you sure you want to delete '{{name}}'?"
+            }
+        },
+        "create": "Create Sampler",
+        "export": "Export Sampler",
+        "delete": "Delete Sampler",
+        "new": "New Sampler Preset",
+        "nosamplers": "You probably haven't added an API connection yet"
     },
     "contextlimit": {
         "allocation": "Context Allocation",
@@ -61,6 +115,7 @@
     "model": {
         "empty": "No Models Found. Try Importing Some!",
         "settings": {
+            "title": "Model Settings",
             "advanced": "Advanced Settings",
             "cpu": "CPU Settings"
         },
@@ -72,7 +127,37 @@
         "info": {
             "loaded": "Model Loaded",
             "hint": "Hint: Press <icon /> and import a GGUF model!"
-        }
+        },
+        "alert": {
+            "deletekv": {
+                "title": "Delete KV Cache",
+                "description": "Are you sure you want to delete the KV Cache? This cannot be undone. \n\n This will clear up {{size}} of space."
+            },
+            "deletemodel": {
+                "title": "Delete Model",
+                "description": "Are you sure you want to delete '{{name}}'?\n\nThis cannot be undone!",
+                "internal": "\n\nThis operation will clear up {{size}}",
+                "external": "\n\n(This will not delete external model files, just this entry)"
+            }
+        },
+        "toast": {
+            "deletekv": "KV Cache deleted!"
+        },
+        "title": "Models",
+        "mtmd": "Multimodal Adapters",
+        "maxcontext": "Max Context",
+        "threads": "Threads",
+        "batch": "Batch",
+        "gpulayers": "GPU Layers",
+        "contextshift": "Context Shift",
+        "backenddev": "Backend Device",
+        "modelnamechat": "Show Model Name In Chat",
+        "autoload": "Automatically Load Model On Chat",
+        "savekv": "Save Local KV",
+        "savekvdesc": "Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV cache file may be very big and negatively impact battery life!",
+        "purgekv": "Purge KV Cache ({{size}})",
+        "copymodel": "Copy Model Into ChatterUI",
+        "externalmodel": "Use External Model"
     },
     "instruct": {
         "formatting": "Instruct Formatting",
