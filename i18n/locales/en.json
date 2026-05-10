@@ -124,5 +124,10 @@
         "emptyValueError": "Value cannot be empty",
         "duplicateValueError": "Value already exists",
         "add": "Add"
+    },
+    "appmode": {
+        "title": "App Mode",
+        "remote": "Remote",
+        "local": "Local"
     }
 }
