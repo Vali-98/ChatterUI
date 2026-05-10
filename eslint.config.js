@@ -14,7 +14,6 @@ module.exports = defineConfig([
     {
         ignores: ['dist/*'],
     },
-
     {
         files: ['**/*.{js,jsx,ts,tsx,d.ts}'],
         languageOptions: {
@@ -45,6 +44,11 @@ module.exports = defineConfig([
                     'newlines-between': 'always',
                 },
             ],
+        },
+    },
+    {
+        files: ['app/**/*.{tsx,ts}'],
+        rules: {
             'i18next/no-literal-string': ['warn', i18nRules],
         },
     },

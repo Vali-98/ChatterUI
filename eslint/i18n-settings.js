@@ -259,7 +259,7 @@ const entityFilter = new RegExp(`^(${Object.values(entities).join('|')})+$`)
 
 module.exports = {
     framework: 'react',
-    mode: 'jsx-only',
+    mode: 'all',
     'jsx-components': {
         include: [],
         exclude: ['Trans'],
@@ -287,6 +287,10 @@ module.exports = {
             /^\p{Emoji}+$/u,
             /https?:\/\/\S+/,
             'Github',
+            'en',
+            'en-US',
+            'Hexagon',
+            'OpenCL',
         ],
     },
     callees: {
@@ -304,11 +308,13 @@ module.exports = {
             'indexOf',
             'endsWith',
             'startsWith',
+            'groupBy',
+            'saveStringToDownload',
         ],
     },
     'object-properties': {
         include: ['label', 'title', 'description'],
-        exclude: ['[A-Z_-]+'],
+        exclude: ['[A-Z_-]+', 'type'],
     },
     'class-properties': {
         include: [],
