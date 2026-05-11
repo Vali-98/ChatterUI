@@ -79,7 +79,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     delayLongPress,
     longPress,
 }) => {
-    const [idRef] = useState(() => `context-menu-${randomUUID()}`)
+    const [idRef] = useState(() => {
+        // eslint-disable-next-line i18next/no-literal-string
+        return `context-menu-${randomUUID()}`
+    })
     const triggerRef = useRef<View>(null)
     const styles = useStyles()
 

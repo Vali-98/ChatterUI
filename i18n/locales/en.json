@@ -48,9 +48,83 @@
             "description": "If you are seeing this, something has gone terribly wrong. Report this error below, include a screenshot of the log above."
         }
     },
+    "navigation": {
+        "sampler": "Sampler",
+        "formatting": "Formatting",
+        "api": "API",
+        "models": "Models",
+        "tts": "TTS",
+        "logs": "Logs",
+        "about": "About",
+        "settings": "Settings",
+        "dev_components": "[DEV] Components",
+        "dev_colortest": "[DEV] ColorTest",
+        "dev_markdown": "[DEV] Markdown"
+    },
     "character": {
         "list": {
-            "sortby": "Sort By"
+            "sortby": "Sort By",
+            "chatcreationfailed": "Chat creation backup has failed! Please report.",
+            "loaderror": "Couldn't load character: {{error}}",
+            "recent": "Recent",
+            "name": "Name",
+            "hiderenabled": "Hider Enabled",
+            "hiderdisabled": "Hider Disabled",
+            "searchbytags": "Search By Tags",
+            "searchbyname": "Search By Name",
+            "nomessages": "No Messages",
+            "nameempty": "Name Cannot Be Empty!",
+            "createnewcharacter": "Create New Character",
+            "namecannotbeempty": "Name cannot be empty",
+            "importfromfile": "Import From File",
+            "createcharacter": "Create Character",
+            "nocharactersfound": "No Characters Found. Try Importing Some!"
+        },
+        "editor": {
+            "unsavedchanges": {
+                "title": "Unsaved Changes",
+                "description": "You have unsaved changes, leaving now will discard your progress.",
+                "discard": "Discard Changes"
+            },
+            "deletecharacter": {
+                "title": "Delete Character",
+                "description": "Are you sure you want to delete '{{name}}'? This cannot be undone.",
+                "confirm": "Delete Character"
+            },
+            "clonecharacter": {
+                "title": "Clone Character",
+                "description": "Are you sure you want to clone '{{name}}'?",
+                "confirm": "Clone Character"
+            },
+            "deleteimage": {
+                "title": "Delete Image",
+                "description": "Are you sure you want to delete this image? This cannot be undone.",
+                "confirm": "Delete Image"
+            },
+            "exportfailed": "Failed to export",
+            "exported": "Card Exported!",
+            "exporterror": "Could not export: {{error}}",
+            "saved": "Card Saved!",
+            "deleted": "Deleted character: {{name}}",
+            "deletealtmessage": {
+                "title": "Delete Alternate Message",
+                "description": "Are you sure you want to delete this alternate message? This cannot be undone.",
+                "confirm": "Delete"
+            },
+            "title": "Edit Character",
+            "changeimage": "Change Image",
+            "changebackground": "Change Background",
+            "viewimage": "View Image",
+            "removebackground": "Remove Background",
+            "export": "Export",
+            "descriptiontokens": "Description Tokens: {{count}}",
+            "firstmessage": "First Message",
+            "alternategreeting": "Alternate Greeting",
+            "noalternategreetings": "No Alternate Greetings",
+            "personality": "Personality",
+            "scenario": "Scenario",
+            "examplemessages": "Example Messages",
+            "tags": "Tags"
         }
     },
     "about": {
@@ -61,7 +135,9 @@
         "logs": "Don't forget to add your Logs!",
         "donateButton": "Support ChatterUI",
         "disabledev": "Disable Dev Mode",
-        "disabledevmes": "Dev mode disabled."
+        "disabledevmes": "Dev mode disabled.",
+        "devmodeenabled": "You have enabled dev mode.",
+        "versionprefix": "v"
     },
     "users": {
         "edit": {

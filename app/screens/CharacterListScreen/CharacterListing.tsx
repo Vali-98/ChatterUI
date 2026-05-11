@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
@@ -23,6 +24,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
     nowLoading,
     setNowLoading,
 }) => {
+    const { t } = useTranslation()
     const [showTags] = useMMKVBoolean(AppSettings.ShowTags)
     const { setShowSearch, setTagFilter, tagFilter } = CharacterSorter.useSorterStore(
         useShallow((state) => ({
@@ -34,7 +36,8 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
     const styles = useStyles()
 
     const getPreviewText = () => {
-        if (character.latestSwipe === undefined || !character.latestName) return 'No Messages'
+        if (character.latestSwipe === undefined || !character.latestName)
+            return t('character.list.nomessages')
         return character.latestName + ':  ' + character.latestSwipe.trim()
     }
 

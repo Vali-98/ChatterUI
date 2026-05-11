@@ -21,13 +21,13 @@ const AboutScreen = () => {
     const updateCounter = () => {
         if (devMode) return
         if (counter === 6) {
-            Logger.infoToast(`You have enabled dev mode.`)
+            Logger.infoToast(t('about.devmodeenabled'))
             setDevMode(true)
         }
         setCounter(counter + 1)
     }
 
-    const version = 'v' + appConfig.expo.version
+    const version = t('about.versionprefix') + appConfig.expo.version
     return (
         <View style={styles.container}>
             <HeaderTitle title={t('common.about')} />

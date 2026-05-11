@@ -94,8 +94,8 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                         }}>
                         {t('character.list.sortby')}
                     </Text>
-                    <SortButton type="modified" label="Recent" />
-                    <SortButton type="name" label="Name" />
+                    <SortButton type="modified" label={t('character.list.recent')} />
+                    <SortButton type="name" label={t('character.list.name')} />
                 </View>
                 <View
                     style={{
@@ -125,7 +125,13 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                         delayLongPress={5000}
                         onLongPress={() => {
                             setUseTagHider(!useTagHider)
-                            Logger.infoToast('Hider ' + (!useTagHider ? 'Enabled' : 'Disabled'))
+                            Logger.infoToast(
+                                t(
+                                    !useTagHider
+                                        ? 'character.list.hiderenabled'
+                                        : 'character.list.hiderdisabled'
+                                )
+                            )
                         }}
                     />
                 </View>
@@ -143,7 +149,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                                 suggestions={data
                                     .sort((a, b) => b.tagCount - a.tagCount)
                                     .map((item) => item.tag)}
-                                label="Search By Tags"
+                                label={t('character.list.searchbytags')}
                                 value={tagFilter}
                                 setValue={setTagFilter}
                                 placeholder="Filter Tags..."
@@ -152,7 +158,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                             />
                         )}
                         <ThemedTextInput
-                            label="Search By Name"
+                            label={t('character.list.searchbyname')}
                             containerStyle={{ flex: 0 }}
                             value={textFilter}
                             onChangeText={setTextFilter}

@@ -256,6 +256,8 @@ const entities = {
 }
 
 const entityFilter = new RegExp(`^(${Object.values(entities).join('|')})+$`)
+const colorRegex =
+    /^#([A-Fa-f0-9]{3,4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$|^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(0|1|0?\.\d+)\s*)?\)$/
 
 module.exports = {
     framework: 'react',
@@ -286,6 +288,7 @@ module.exports = {
             entityFilter,
             /^\p{Emoji}+$/u,
             /https?:\/\/\S+/,
+            colorRegex,
             'Github',
             'en',
             'en-US',
@@ -320,7 +323,14 @@ module.exports = {
     },
     'object-properties': {
         include: ['label', 'title', 'description'],
-        exclude: ['[A-Z_-]+', 'type'],
+        exclude: [
+            '[A-Z_-]+',
+            'type',
+            'backgroundColor',
+            'flexDirection',
+            'textAlign',
+            'borderColor',
+        ],
     },
     'class-properties': {
         include: [],

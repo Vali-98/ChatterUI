@@ -6,6 +6,7 @@ import * as DocumentPicker from 'expo-document-picker'
 import { ImageBackground } from 'expo-image'
 import { Redirect, useNavigation } from 'expo-router'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -29,6 +30,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { characterTags, tags } from 'db/schema'
 
 const ChracterEditorScreen = () => {
+    const { t } = useTranslation()
     const styles = useStyles()
     const { color, spacing } = Theme.useTheme()
     const navigation = useNavigation()
@@ -72,19 +74,19 @@ const ChracterEditorScreen = () => {
     usePreventRemove(edited, ({ data }) => {
         if (!charId) return
         Alert.alert({
-            title: `Unsaved Changes`,
-            description: `You have unsaved changes, leaving now will discard your progress.`,
+            title: t('character.editor.unsavedchanges.title'),
+            description: t('character.editor.unsavedchanges.description'),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.cancel') },
                 {
-                    label: 'Save',
+                    label: t('common.save'),
                     onPress: async () => {
                         await handleSaveCard()
                         navigation.dispatch(data.action)
                     },
                 },
                 {
-                    label: 'Discard Changes',
+                    label: t('character.editor.unsavedchanges.discard'),
                     onPress: () => {
                         navigation.dispatch(data.action)
                     },
@@ -99,14 +101,14 @@ const ChracterEditorScreen = () => {
             if (!charId) return
             Characters.exportCharacter(charId)
                 .catch((e) => {
-                    Logger.errorToast('Failed to export')
+                    Logger.errorToast(t('character.editor.exportfailed'))
                     Logger.error(JSON.stringify(e))
                 })
                 .then(() => {
-                    Logger.infoToast('Card Exported!')
+                    Logger.infoToast(t('character.editor.exported'))
                 })
         } catch (e) {
-            Logger.errorToast('Could not export: ' + JSON.stringify(e))
+            Logger.errorToast(t('character.editor.exporterror', { error: JSON.stringify(e) }))
         }
     }
 
@@ -115,24 +117,24 @@ const ChracterEditorScreen = () => {
             return Characters.db.mutate.updateCard(characterCard, charId).then(() => {
                 setCurrentCard(charId)
                 setEdited(() => false)
-                Logger.infoToast('Card Saved!')
+                Logger.infoToast(t('character.editor.saved'))
             })
     }
 
     const handleDeleteCard = () => {
         Alert.alert({
-            title: `Delete Character`,
-            description: `Are you sure you want to delete '${charName}'? This cannot be undone.`,
+            title: t('character.editor.deletecharacter.title'),
+            description: t('character.editor.deletecharacter.description', { name: charName }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.cancel') },
                 {
-                    label: 'Delete Character',
+                    label: t('character.editor.deletecharacter.confirm'),
                     onPress: () => {
                         Characters.db.mutate.deleteCard(charId ?? -1)
                         unloadCharacter()
                         resetId()
                         setEdited(false)
-                        Logger.info(`Deleted character: ${charName}`)
+                        Logger.info(t('character.editor.deleted', { name: charName }))
                     },
                     type: 'warning',
                 },
@@ -148,12 +150,12 @@ const ChracterEditorScreen = () => {
 
     const handleDeleteImage = () => {
         Alert.alert({
-            title: `Delete Image`,
-            description: `Are you sure you want to delete this image? This cannot be undone.`,
+            title: t('character.editor.deleteimage.title'),
+            description: t('character.editor.deleteimage.description'),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.cancel') },
                 {
-                    label: 'Delete Image',
+                    label: t('character.editor.deleteimage.confirm'),
                     onPress: () => {
                         if (characterCard) Characters.deleteImage(characterCard.image_id)
                     },
@@ -193,7 +195,7 @@ const ChracterEditorScreen = () => {
     const deleteAltMessageRoutine = async () => {
         const id = characterCard?.alternate_greetings[altSwipeIndex].id
         if (!id || !charId) {
-            Logger.errorToast('Error deleting swipe')
+            Logger.errorToast(t('character.editor.deleteerror'))
             return
         }
         await Characters.db.mutate.deleteAltGreeting(id)
@@ -207,12 +209,12 @@ const ChracterEditorScreen = () => {
 
     const handleDeleteAltMessage = async () => {
         Alert.alert({
-            title: `Delete Alternate Message`,
-            description: `Are you sure you want to delete this alternate message? This cannot be undone.`,
+            title: t('character.editor.deletealtmessage.title'),
+            description: t('character.editor.deletealtmessage.description'),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.cancel') },
                 {
-                    label: 'Delete',
+                    label: t('character.editor.deletealtmessage.confirm'),
                     onPress: async () => {
                         await deleteAltMessageRoutine()
                     },
@@ -231,7 +233,7 @@ const ChracterEditorScreen = () => {
                 source={{
                     uri: backgroundImage ? Characters.getImageDir(backgroundImage) : '',
                 }}>
-                <HeaderTitle title="Edit Character" />
+                <HeaderTitle title={t('character.editor.title')} />
                 <AvatarViewer editorButton={false} />
 
                 {characterCard && (
@@ -245,7 +247,7 @@ const ChracterEditorScreen = () => {
                                 placement="right"
                                 buttons={[
                                     {
-                                        label: 'Change Image',
+                                        label: t('character.editor.changeimage'),
                                         icon: 'picture',
                                         onPress: (close) => {
                                             close()
@@ -253,7 +255,7 @@ const ChracterEditorScreen = () => {
                                         },
                                     },
                                     {
-                                        label: 'Change Background',
+                                        label: t('character.editor.changebackground'),
                                         icon: 'picture',
                                         onPress: async (close) => {
                                             close()
@@ -265,7 +267,7 @@ const ChracterEditorScreen = () => {
                                     },
 
                                     {
-                                        label: 'View Image',
+                                        label: t('character.editor.viewimage'),
                                         icon: 'search',
                                         onPress: (close) => {
                                             close()
@@ -273,7 +275,7 @@ const ChracterEditorScreen = () => {
                                         },
                                     },
                                     {
-                                        label: 'Delete Image',
+                                        label: t('character.editor.deleteimage.confirm'),
                                         icon: 'delete',
                                         onPress: (close) => {
                                             close()
@@ -282,7 +284,7 @@ const ChracterEditorScreen = () => {
                                         variant: 'warning',
                                     },
                                     {
-                                        label: 'Remove Background',
+                                        label: t('character.editor.removebackground'),
                                         icon: 'delete',
                                         onPress: (close) => {
                                             close()
@@ -312,14 +314,14 @@ const ChracterEditorScreen = () => {
                                         iconName="delete"
                                         iconSize={20}
                                         variant="critical"
-                                        label="Delete"
+                                        label={t('common.delete')}
                                         onPress={handleDeleteCard}
                                     />
                                     {!edited && (
                                         <ThemedButton
                                             iconName="upload"
                                             iconSize={20}
-                                            label="Export"
+                                            label={t('character.editor.export')}
                                             onPress={handleExportCard}
                                             variant="secondary"
                                         />
@@ -328,7 +330,7 @@ const ChracterEditorScreen = () => {
                                         <ThemedButton
                                             iconName="save"
                                             iconSize={20}
-                                            label="Save"
+                                            label={t('common.save')}
                                             onPress={handleSaveCard}
                                             variant="secondary"
                                         />
@@ -348,7 +350,9 @@ const ChracterEditorScreen = () => {
 
                         <ThemedTextInput
                             scrollEnabled
-                            label={`Description Tokens: ${descriptionTokens}`}
+                            label={t('character.editor.descriptiontokens', {
+                                count: descriptionTokens,
+                            })}
                             multiline
                             containerStyle={styles.input}
                             numberOfLines={16}
@@ -362,7 +366,7 @@ const ChracterEditorScreen = () => {
                         />
 
                         <ThemedTextInput
-                            label="First Message"
+                            label={t('character.editor.firstmessage')}
                             multiline
                             containerStyle={styles.input}
                             onChangeText={(mes) => {
@@ -382,7 +386,8 @@ const ChracterEditorScreen = () => {
                                     paddingBottom: 12,
                                 }}>
                                 <Text style={{ color: color.text._100 }}>
-                                    Alternate Greeting{'   '}
+                                    {t('character.editor.alternategreeting')}
+                                    {'   '}
                                     {characterCard.alternate_greetings.length !== 0 && (
                                         <Text
                                             style={{
@@ -477,13 +482,13 @@ const ChracterEditorScreen = () => {
                                         color: color.text._500,
                                         fontStyle: 'italic',
                                     }}>
-                                    No Alternate Greetings
+                                    {t('character.editor.noalternategreetings')}
                                 </Text>
                             )}
                         </View>
 
                         <ThemedTextInput
-                            label="Personality"
+                            label={t('character.editor.personality')}
                             multiline
                             containerStyle={styles.input}
                             numberOfLines={4}
@@ -497,7 +502,7 @@ const ChracterEditorScreen = () => {
                         />
 
                         <ThemedTextInput
-                            label="Scenario"
+                            label={t('character.editor.scenario')}
                             multiline
                             containerStyle={styles.input}
                             onChangeText={(mes) => {
@@ -511,7 +516,7 @@ const ChracterEditorScreen = () => {
                         />
 
                         <ThemedTextInput
-                            label="Example Messages"
+                            label={t('character.editor.examplemessages')}
                             multiline
                             containerStyle={styles.input}
                             onChangeText={(mes) => {
@@ -525,7 +530,7 @@ const ChracterEditorScreen = () => {
                         />
 
                         <StringArrayEditor
-                            label="Tags"
+                            label={t('character.editor.tags')}
                             containerStyle={styles.input}
                             suggestions={data.data
                                 .map((item) => item.tag)

@@ -1,9 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons'
+import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
 import { Theme } from '@lib/theme/ThemeManager'
 
 const CharactersEmpty = () => {
+    const { t } = useTranslation()
     const { color, spacing, fontSize } = Theme.useTheme()
     return (
         <View
@@ -22,7 +24,7 @@ const CharactersEmpty = () => {
                     fontStyle: 'italic',
                     fontSize: fontSize.l,
                 }}>
-                No Characters Found. Try Importing Some!
+                {t('character.list.nocharactersfound')}
             </Text>
         </View>
     )

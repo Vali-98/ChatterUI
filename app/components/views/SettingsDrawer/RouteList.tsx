@@ -1,5 +1,6 @@
 import { AntDesign } from '@expo/vector-icons'
 import { Href, useRouter } from 'expo-router'
+import { useTranslation } from 'react-i18next'
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
@@ -42,13 +43,14 @@ const DrawerButton = ({ item, index }: DrawerButtonProps) => {
 }
 
 const RouteList = () => {
+    const { t } = useTranslation()
     const [devMode] = useMMKVBoolean(AppSettings.DevMode)
     const { appMode } = useAppMode()
-    const paths = getPaths(appMode === 'remote')
+    const paths = getPaths(appMode === 'remote', t)
     return (
         <FlatList
             showsVerticalScrollIndicator={false}
-            data={__DEV__ || devMode ? [...paths, ...paths_dev] : paths}
+            data={__DEV__ || devMode ? [...paths, ...paths_dev(t)] : paths}
             renderItem={({ item, index }) => <DrawerButton item={item} index={index} />}
             keyExtractor={(item) => item.path.toString()}
         />
@@ -75,65 +77,65 @@ const useStyles = () => {
     })
 }
 
-const getPaths = (remote: boolean): ButtonData[] => [
+const getPaths = (remote: boolean, t: (input: string) => string): ButtonData[] => [
     {
-        name: 'Sampler',
+        name: t('navigation.sampler'),
         path: '/screens/SamplerManagerScreen',
         icon: 'control',
     },
     {
-        name: 'Formatting',
+        name: t('navigation.formatting'),
         path: '/screens/FormattingManagerScreen',
         icon: 'profile',
     },
     remote
         ? {
-              name: 'API',
+              name: t('navigation.api'),
               path: '/screens/ConnectionsManagerScreen',
               icon: 'link',
           }
         : {
-              name: 'Models',
+              name: t('navigation.models'),
               path: '/screens/ModelManagerScreen',
               icon: 'branches',
           },
     {
-        name: 'TTS',
+        name: t('navigation.tts'),
         path: '/screens/TTSManagerScreen',
         icon: 'sound',
     },
     {
-        name: 'Logs',
+        name: t('navigation.logs'),
         path: '/screens/LogsScreen',
         icon: 'code',
     },
     {
-        name: 'About',
+        name: t('navigation.about'),
         path: '/screens/AboutScreen',
         icon: 'info-circle',
     },
     {
-        name: 'Settings',
+        name: t('navigation.settings'),
         path: '/screens/AppSettingsScreen',
         icon: 'setting',
     },
 ]
 
-const paths_dev: ButtonData[] = [
+const paths_dev = (t: any): ButtonData[] => [
     /*{
         name: '[DEV] HF',
         path: '/HFTest',
     },*/
     {
-        name: '[DEV] Components',
+        name: t('navigation.dev_components'),
         path: '/screens/ComponentTestScreen',
     },
     {
-        name: '[DEV] ColorTest',
+        name: t('navigation.dev_colortest'),
         path: '/screens/ColorTestScreen',
     },
     {
-        name: '[DEV] Markdown',
+        name: t('navigation.dev_markdown'),
         path: '/screens/MarkdownTestScreen',
     },
 ]
