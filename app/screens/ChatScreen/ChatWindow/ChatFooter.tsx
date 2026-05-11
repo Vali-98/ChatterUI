@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
 import { Theme } from '@lib/theme/ThemeManager'
 
 const ChatFooter = ({ chatLength }: { chatLength: number }) => {
+    const { t } = useTranslation()
     const { color, fontSize } = Theme.useTheme()
 
     return (
@@ -28,8 +30,8 @@ const ChatFooter = ({ chatLength }: { chatLength: number }) => {
                         fontSize: fontSize.s,
                     }}>
                     {chatLength !== undefined && chatLength <= 1
-                        ? 'Send a message to begin!'
-                        : 'Start of chat'}
+                        ? t('chat.footer.sendMessageToBegin')
+                        : t('chat.footer.startOfChat')}
                 </Text>
             </View>
         </View>

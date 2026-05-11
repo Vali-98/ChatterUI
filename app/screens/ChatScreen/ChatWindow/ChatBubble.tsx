@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Pressable, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
@@ -29,6 +30,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
     isLastMessage,
     isGreeting,
 }) => {
+    const { t } = useTranslation()
     const { appMode } = useAppMode()
     const [showTPS] = useMMKVBoolean(AppSettings.ShowTokenPerSecond)
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
@@ -95,8 +97,13 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                                 textAlign: 'right',
                                 fontSize: fontSize.s,
                             }}>
-                            {`Prompt: ${getFiniteValue(timings.prompt_per_second)} t/s`}
-                            {`   Text Gen: ${getFiniteValue(timings.predicted_per_second)} t/s`}
+                            {t('chat.bubble.prompt', {
+                                tokens: getFiniteValue(timings.prompt_per_second),
+                            })}
+
+                            {t('chat.bubble.textgen', {
+                                tokens: getFiniteValue(timings.predicted_per_second),
+                            })}
                         </Text>
                     )}
 

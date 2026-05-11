@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { FlatList, Linking, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
@@ -16,8 +17,6 @@ import { pickJSONDocument } from '@lib/utils/File'
 import TemplateItem from './TemplateItem'
 
 const TemplateManager = () => {
-    // eslint-disable-next-line react-compiler/react-compiler
-    'use no memo'
     const { templates, addTemplate } = APIManager.useConnectionsStore(
         useShallow((state) => ({
             templates: state.customTemplates,
@@ -25,6 +24,7 @@ const TemplateManager = () => {
         }))
     )
     const [showPaste, setShowPaste] = useState(false)
+    const { t } = useTranslation()
     const { color, spacing } = Theme.useTheme()
 
     return (
@@ -36,7 +36,7 @@ const TemplateManager = () => {
                 paddingBottom: spacing.xl2,
                 flex: 1,
             }}>
-            <HeaderTitle title="Template Manager" />
+            <HeaderTitle title={t('connections.templates.title')} />
             <HeaderButton
                 headerRight={() => (
                     <ContextMenu
@@ -44,7 +44,7 @@ const TemplateManager = () => {
                         placement="bottom"
                         buttons={[
                             {
-                                label: 'Import Template',
+                                label: t('connections.templates.import'),
                                 icon: 'download',
                                 onPress: async (close) => {
                                     close()
@@ -56,7 +56,7 @@ const TemplateManager = () => {
                                 },
                             },
                             {
-                                label: 'Paste Template',
+                                label: t('connections.templates.paste'),
                                 icon: 'file',
                                 onPress: (close) => {
                                     close()
@@ -64,7 +64,7 @@ const TemplateManager = () => {
                                 },
                             },
                             {
-                                label: 'Get Templates',
+                                label: t('connections.templates.get'),
                                 icon: 'github',
                                 onPress: (close) => {
                                     close()
@@ -74,7 +74,7 @@ const TemplateManager = () => {
                                 },
                             },
                             {
-                                label: 'Learn About Templates',
+                                label: t('connections.templates.learn'),
                                 icon: 'info',
                                 onPress: (close) => {
                                     close()
@@ -95,11 +95,15 @@ const TemplateManager = () => {
                         const data = JSON.parse(e)
                         addTemplate(data)
                     } catch (e) {
-                        Logger.errorToast('Failed to import: ' + e)
+                        Logger.errorToast(
+                            t('connections.templates.importError', {
+                                error: String(e),
+                            })
+                        )
                     }
                 }}
                 multiline
-                title="Paste Template Here"
+                title={t('connections.templates.pasteSheetTitle')}
             />
             {templates.length > 0 && (
                 <FlatList
@@ -128,7 +132,7 @@ const TemplateManager = () => {
                             fontStyle: 'italic',
                             marginTop: spacing.l,
                         }}>
-                        No Custom Templates Added
+                        {t('connections.templates.empty')}
                     </Text>
                 </View>
             )}

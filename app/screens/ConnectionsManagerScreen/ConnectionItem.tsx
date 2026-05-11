@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -16,6 +17,7 @@ type ConnectionItemProps = {
 }
 
 const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
+    const { t } = useTranslation()
     const { spacing } = Theme.useTheme()
     const styles = useStyles()
     const [showEditor, setShowEditor] = useState(false)
@@ -28,12 +30,12 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
 
     const handleDelete = () => {
         Alert.alert({
-            title: 'Delete API Entry',
-            description: `Are you sure you want to delete "${item.friendlyName}"?`,
+            title: t('connections.item.delete.title'),
+            description: t('connections.item.delete.description', { name: item.friendlyName }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.cancel') },
                 {
-                    label: 'Delete API',
+                    label: t('connections.item.delete.button'),
                     onPress: () => {
                         removeValue(index)
                     },
@@ -66,7 +68,7 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
                         {item.friendlyName}
                     </Text>
                     <Text style={item.active ? styles.config : styles.configInactive}>
-                        Config: {item.configName}
+                        {t('connections.item.configLabel', { configName: item.configName })}
                     </Text>
                 </View>
             </View>

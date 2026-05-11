@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
@@ -23,6 +24,7 @@ import ChatWindow from '@screens/ChatScreen/ChatWindow'
 import ChatEditor from './ChatWindow/ChatEditor'
 
 const ChatScreen = () => {
+    const { t } = useTranslation()
     const insets = useSafeAreaInsets()
     const { unloadCharacter, charId } = Characters.useCharacterStore(
         useShallow((state) => ({
@@ -65,15 +67,14 @@ const ChatScreen = () => {
 
     const handleImportChat = async () => {
         if (!charId || !userId) {
-            Logger.errorToast('You are somehow importing a chat without a character or user')
+            Logger.errorToast(t('chat.importErrors.noChatCharacter'))
             return
         }
         const file = await pickStringDocument({ type: 'application/json' })
         if (!file.success) return
         const result = ChatImportSchema.safeParse(JSON.parse(file.data))
         if (!result.success) {
-            Logger.errorToast('Failed to Import')
-            Logger.error('Incorrect format')
+            Logger.errorToast(t('chat.importErrors.failedToImport'))
             return
         }
         const chat = result.data

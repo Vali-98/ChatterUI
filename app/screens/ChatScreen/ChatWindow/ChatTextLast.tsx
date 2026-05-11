@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Animated, Easing, useAnimatedValue, View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 
@@ -15,6 +16,7 @@ type ChatTextProps = {
 }
 
 const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
+    const { t } = useTranslation()
     const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
 
     const { buffer } = Chats.useBuffer()
@@ -76,7 +78,11 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
                         <ThemedButton
                             onPress={() => setShowHidden(!showHidden)}
                             variant="secondary"
-                            label={showHidden ? 'Hide Filtered' : 'Show Filtered'}
+                            label={
+                                showHidden
+                                    ? t('chat.text.hideFiltered')
+                                    : t('chat.text.showFiltered')
+                            }
                             labelStyle={{ flex: 0, fontSize: 12 }}
                             buttonStyle={{
                                 paddingVertical: 0,

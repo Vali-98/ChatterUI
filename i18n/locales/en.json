@@ -26,7 +26,10 @@
         "disable": "Disable",
         "internal": "Internal",
         "external": "External",
-        "none": "None"
+        "none": "None",
+        "rename": "Rename",
+        "export": "Export",
+        "more": "More"
     },
     "tts": {
         "language": "Language",
@@ -78,6 +81,7 @@
             "namecannotbeempty": "Name cannot be empty",
             "importfromfile": "Import From File",
             "createcharacter": "Create Character",
+            "nocharactersmatch": "No Characters Match Search Result",
             "nocharactersfound": "No Characters Found. Try Importing Some!"
         },
         "editor": {
@@ -125,6 +129,90 @@
             "scenario": "Scenario",
             "examplemessages": "Example Messages",
             "tags": "Tags"
+        }
+    },
+    "chat": {
+        "drawer": {
+            "delete": {
+                "title": "Delete Chat",
+                "description": "Are you sure you want to delete '{{name}}'? This cannot be undone.",
+                "confirm": "Delete Chat"
+            },
+            "clone": {
+                "title": "Clone Chat",
+                "description": "Are you sure you want to clone '{{name}}'?",
+                "confirm": "Clone Chat"
+            },
+            "exported": "File: {{name}} saved to downloads!",
+            "exportfailed": "Failed to export chat",
+            "undefined": "Chat is undefined",
+            "defaultchatfailed": "Something went wrong with creating a default chat",
+            "useralreadyset": "This User Is Already Set",
+            "nouser": "No Current User",
+            "linkeduser": "Linked to User: {{name}}",
+            "rename": {
+                "title": "Rename Chat",
+                "action": "Rename Chat",
+                "namecannotbeempty": "Name cannot be empty"
+            },
+            "linkuser": {
+                "action": "Link User"
+            },
+            "searchTitle": "Search",
+            "chatsTitle": "Chats",
+            "searchPlaceholder": "Search for message...",
+            "startNewChat": "Start New Chat",
+            "noResults": "No Results",
+            "resultsFound": "Results: {{count}}",
+            "searchQueryFailed": "Failed to run chat search: {{error}}",
+            "unknown": "unknown"
+        },
+        "quickActions": {
+            "forkTitle": "Fork Chat",
+            "forkDescription": "This will create a clone of this chat from this message",
+            "forkButton": "Fork Chat",
+            "cloneFailed": "Failed to clone chat",
+            "copied": "Copied",
+            "copyFailed": "Failed to copy to clipboard"
+        },
+        "frame": {
+            "entryNumber": "#{{index}}",
+            "seconds": "{{seconds}}s"
+        },
+        "inputOptions": {
+            "mainMenu": "Main Menu",
+            "editCharacter": "Edit Character",
+            "chatHistory": "Chat History",
+            "takePicture": "Take Picture",
+            "addImage": "Add Image"
+        },
+        "editor": {
+            "delete": "Delete",
+            "reset": "Reset",
+            "confirm": "Confirm"
+        },
+        "footer": {
+            "sendMessageToBegin": "Send a message to begin!",
+            "startOfChat": "Start of chat"
+        },
+        "modelName": {
+            "noModelLoaded": "No Model Loaded"
+        },
+        "text": {
+            "hideFiltered": "Hide Filtered",
+            "showFiltered": "Show Filtered"
+        },
+        "importErrors": {
+            "noChatCharacter": "You are somehow importing a chat without a character or user",
+            "failedToImport": "Failed to Import"
+        },
+        "bubble": {
+            "prompt": "Prompt: {{tokens}} t/s",
+            "textgen": "    Text Gen: {{tokens}} t/s"
+        },
+        "inputErrors": {
+            "failedToSend": "Failed to send message",
+            "abortGeneration": "Aborting Generation"
         }
     },
     "about": {
@@ -339,9 +427,65 @@
             "empty": "No Connections Added",
             "add": "Add Connection"
         },
+        "add": {
+            "title": "Add Connection",
+            "selectConnectionType": "Select Connection Type",
+            "friendlyName": "Friendly Name",
+            "completionUrl": "Completion URL",
+            "fullUrlHint": "Note: Use full URL path",
+            "modelUrl": "Model URL",
+            "selectModel": "Select Model",
+            "apiKey": "API Key",
+            "defaultFriendlyName": "New API",
+            "model": "Model",
+            "firstMessage": "First Message",
+            "firstMessageHint": "Default first message sent to Claude",
+            "prefill": "Prefill",
+            "prefillHint": "Prefill before model response",
+            "createButton": "Create API",
+            "error": {
+                "200": "Could not retrieve models: {{error}}",
+                "modelparse": "Could not parse models",
+                "modelundef": "Models resulted in an undefined value",
+                "nonarray": "'Models resulted in an non-array value. `modelListParser` of template is likely incorrect'"
+            }
+        },
+        "editor": {
+            "title": "Edit Connection",
+            "invalidTemplate": "Could not get valid template!",
+            "friendlyName": "Friendly Name",
+            "completionUrl": "Completion URL",
+            "fullUrlHint": "Note: Use full URL path",
+            "modelUrl": "Model URL",
+            "apiKey": "API Key",
+            "model": "Model",
+            "selectModel": "Select Model",
+            "firstMessage": "First Message",
+            "firstMessageHint": "Default first message sent to Claude",
+            "prefill": "Prefill",
+            "prefillHint": "Prefill before model response",
+            "saveButton": "Save Changes"
+        },
+        "templates": {
+            "title": "Template Manager",
+            "import": "Import Template",
+            "paste": "Paste Template",
+            "get": "Get Templates",
+            "learn": "Learn About Templates",
+            "pasteSheetTitle": "Paste Template Here",
+            "importError": "Failed to import: {{error}}",
+            "empty": "No Custom Templates Added"
+        },
         "notConnected": "Not Connected",
         "failedToConnect": "Failed To Connect",
-        "connected": "Connected"
+        "connected": "Connected",
+        "item": {
+            "delete": {
+                "title": "Delete Connection",
+                "description": "Are you sure you want to delete '{{name}}'? This cannot be undone!",
+                "button": "Delete Connection"
+            }
+        }
     },
     "settings": {
         "title": "Settings",

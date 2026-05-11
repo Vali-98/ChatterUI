@@ -195,7 +195,6 @@ const ChracterEditorScreen = () => {
     const deleteAltMessageRoutine = async () => {
         const id = characterCard?.alternate_greetings[altSwipeIndex].id
         if (!id || !charId) {
-            Logger.errorToast(t('character.editor.deleteerror'))
             return
         }
         await Characters.db.mutate.deleteAltGreeting(id)

@@ -1,5 +1,6 @@
 import { setStringAsync } from 'expo-clipboard'
 import React, { useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { StretchInY, StretchOutY, ZoomIn, ZoomOut } from 'react-native-reanimated'
@@ -56,6 +57,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
     )
 
     const showEditor = useChatEditorStore((state) => state.show)
+    const { t } = useTranslation()
     const { color } = Theme.useTheme()
     const [quickDelete] = useMMKVBoolean(AppSettings.QuickDelete)
     const { chatId, setId } = Chats.useChat()
@@ -71,16 +73,16 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
     const handleFork = () => {
         if (!chatId) return
         Alert.alert({
-            title: 'Fork Chat',
-            description: 'This will create a clone of this chat from this message',
+            title: t('chat.quickActions.forkTitle'),
+            description: t('chat.quickActions.forkDescription'),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.cancel') },
                 {
-                    label: 'Fork Chat',
+                    label: t('chat.quickActions.forkButton'),
                     onPress: async () => {
                         const newChatId = await Chats.db.mutate.cloneChatFromId(chatId, index + 1)
                         if (!newChatId) {
-                            Logger.errorToast('Failed to clone chat')
+                            Logger.errorToast(t('chat.quickActions.cloneFailed'))
                             return
                         }
                         setShowOptions(undefined)
@@ -195,10 +197,10 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
                                     if (showOptions) setShowOptions(undefined)
                                     setStringAsync(swipe.swipe)
                                         .then(() => {
-                                            Logger.infoToast('Copied')
+                                            Logger.infoToast(t('chat.quickActions.copied'))
                                         })
                                         .catch(() => {
-                                            Logger.errorToast('Failed to copy to clipboard')
+                                            Logger.errorToast(t('chat.quickActions.copyFailed'))
                                         })
                                 }}
                             />

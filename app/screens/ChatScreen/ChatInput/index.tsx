@@ -3,6 +3,7 @@ import { randomUUID } from 'expo-crypto'
 import { getDocumentAsync } from 'expo-document-picker'
 import { Image } from 'expo-image'
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { TextInput, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, {
@@ -49,6 +50,7 @@ export const useInputHeightStore = create<ChatInputHeightStoreProps>()((set) => 
 }))
 
 const ChatInput = () => {
+    const { t } = useTranslation()
     const inputRef = useUnfocusTextInput()
 
     const { color, borderRadius, spacing } = Theme.useTheme()
@@ -85,7 +87,7 @@ const ChatInput = () => {
     )
 
     const abortResponse = async () => {
-        Logger.info(`Aborting Generation`)
+        Logger.info(t('chat.inputErrors.abortGeneration'))
         if (abortFunction) await abortFunction()
     }
 
@@ -107,7 +109,7 @@ const ChatInput = () => {
             const swipeId = result?.swipes?.[0]?.id
             if (swipeId) generateResponse(swipeId)
         } catch (e) {
-            Logger.errorToast('Failed to send message')
+            Logger.errorToast(t('chat.inputErrors.failedToSend'))
             Logger.error(JSON.stringify(e))
         } finally {
             setDisableSend(false)
@@ -245,7 +247,7 @@ const ChatInput = () => {
                                 triggerIconSize={20}
                                 buttons={[
                                     {
-                                        label: 'Take Picture',
+                                        label: t('chat.inputOptions.takePicture'),
                                         icon: 'camera',
                                         onPress: (close) => {
                                             setShowCamera(true)
@@ -253,7 +255,7 @@ const ChatInput = () => {
                                         },
                                     },
                                     {
-                                        label: 'Add Image',
+                                        label: t('chat.inputOptions.addImage'),
                                         icon: 'picture',
                                         onPress: async (close) => {
                                             close()

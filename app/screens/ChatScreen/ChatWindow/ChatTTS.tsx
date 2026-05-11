@@ -23,6 +23,7 @@ const ChatTTS: React.FC<TTSProps> = ({ swipe }) => {
     }
 
     const handleStopSpeaking = async () => {
+        // eslint-disable-next-line i18next/no-literal-string
         Logger.info('TTS stopped')
         await stopTTS()
     }

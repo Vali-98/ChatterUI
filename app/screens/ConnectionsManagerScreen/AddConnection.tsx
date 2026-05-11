@@ -1,5 +1,6 @@
 import { Stack, useRouter } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
@@ -17,6 +18,7 @@ import { getNestedValue } from '@lib/utils/Parsing'
 
 const AddConnection = () => {
     const styles = useStyles()
+    const { t } = useTranslation()
     const router = useRouter()
     const { addValue, getTemplates } = APIManager.useConnectionsStore(
         useShallow((state) => ({
@@ -29,7 +31,7 @@ const AddConnection = () => {
     const [values, setValues] = useState<APIManagerValue>({
         ...template.defaultValues,
         configName: template.name,
-        friendlyName: 'New API',
+        friendlyName: t('connections.add.defaultFriendlyName'),
         active: true,
     })
     const [modelList, setModelList] = useState<any[]>([])
@@ -47,23 +49,22 @@ const AddConnection = () => {
         const result = await fetch(values.modelEndpoint, { headers: { ...auth } })
         const data = await result.json()
         if (result.status !== 200) {
-            Logger.error(`Could not retrieve models: ${data?.error?.message}`)
+            Logger.error(t('connections.add.error.200', { error: `${data?.error?.message}` }))
             return
         }
         const models = getNestedValue(data, template.model.modelListParser)
         const isArray = Array.isArray(models)
         if (!models || !isArray) {
-            Logger.warn('Could not parse models!')
+            Logger.warn(t('connections.add.error.modelparse'))
             if (!models) {
-                Logger.error('Models resulted in an undefined value')
-            } else if (!isArray)
-                Logger.error(
-                    'Models resulted in an non-array value. `modelListParser` of template is likely incorrect'
-                )
+                Logger.error(t('connections.add.error.modelundef'))
+            } else if (!isArray) {
+                Logger.error(t('connections.add.error.nonarray'))
+            }
             return
         }
         setModelList(models)
-    }, [template, values])
+    }, [template, values, t])
 
     useEffect(() => {
         handleGetModelList()
@@ -71,7 +72,7 @@ const AddConnection = () => {
 
     return (
         <SafeAreaView edges={['bottom']} style={styles.mainContainer}>
-            <Stack.Screen options={{ title: 'Add Connection' }} />
+            <Stack.Screen options={{ title: t('connections.add.title') }} />
             <ScrollView
                 style={{ flex: 1 }}
                 showsVerticalScrollIndicator={false}
@@ -92,12 +93,12 @@ const AddConnection = () => {
                             model: undefined,
                         })
                     }}
-                    modalTitle="Select Connection Type"
+                    modalTitle={t('connections.add.selectConnectionType')}
                     search
                 />
 
                 <ThemedTextInput
-                    label="Friendly Name"
+                    label={t('connections.add.friendlyName')}
                     value={values.friendlyName}
                     onChangeText={(value) => {
                         setValues({ ...values, friendlyName: value })
@@ -107,20 +108,20 @@ const AddConnection = () => {
                 {template.ui.editableCompletionPath && (
                     <View>
                         <ThemedTextInput
-                            label="Completion URL"
+                            label={t('connections.add.completionUrl')}
                             value={values.endpoint}
                             onChangeText={(value) => {
                                 setValues({ ...values, endpoint: value })
                             }}
                         />
-                        <Text style={styles.hintText}>Note: Use full URL path</Text>
+                        <Text style={styles.hintText}>{t('connections.add.fullUrlHint')}</Text>
                     </View>
                 )}
 
                 {template.ui.editableModelPath && (
                     <View>
                         <ThemedTextInput
-                            label="Model URL"
+                            label={t('connections.add.modelUrl')}
                             value={values.modelEndpoint}
                             onChangeText={(value) => {
                                 setValues({ ...values, modelEndpoint: value })
@@ -144,7 +145,7 @@ const AddConnection = () => {
 
                 {template.features.useKey && (
                     <ThemedTextInput
-                        label="API Key"
+                        label={t('connections.add.apiKey')}
                         secureTextEntry
                         value={values.key}
                         onChangeText={(value) => {
@@ -155,7 +156,7 @@ const AddConnection = () => {
 
                 {template.features.useModel && (
                     <View>
-                        <Text style={styles.title}>Model</Text>
+                        <Text style={styles.title}>{t('connections.add.model')}</Text>
                         <View
                             style={{
                                 flexDirection: 'row',
@@ -175,7 +176,7 @@ const AddConnection = () => {
                                         setValues({ ...values, model: item })
                                     }}
                                     search={modelList.length > 10}
-                                    modalTitle="Select Model"
+                                    modalTitle={t('connections.add.selectModel')}
                                 />
                             )}
                             {template.features.multipleModels && (
@@ -190,7 +191,7 @@ const AddConnection = () => {
                                         setValues({ ...values, model: item })
                                     }}
                                     search={modelList.length > 10}
-                                    modalTitle="Select Model"
+                                    modalTitle={t('connections.add.selectModel')}
                                 />
                             )}
                             <ThemedButton
@@ -208,30 +209,30 @@ const AddConnection = () => {
                 {template.features.useFirstMessage && (
                     <View>
                         <ThemedTextInput
-                            label="First Message"
+                            label={t('connections.add.firstMessage')}
                             value={values.firstMessage}
                             onChangeText={(value) => {
                                 setValues({ ...values, firstMessage: value })
                             }}
                         />
-                        <Text style={styles.hintText}>Default first message sent to Claude</Text>
+                        <Text style={styles.hintText}>{t('connections.add.firstMessageHint')}</Text>
                     </View>
                 )}
                 {template.features.usePrefill && (
                     <View>
                         <ThemedTextInput
-                            label="Prefill"
+                            label={t('connections.add.prefill')}
                             value={values.prefill}
                             onChangeText={(value) => {
                                 setValues({ ...values, prefill: value })
                             }}
                         />
-                        <Text style={styles.hintText}>Prefill before model response</Text>
+                        <Text style={styles.hintText}>{t('connections.add.prefillHint')}</Text>
                     </View>
                 )}
             </ScrollView>
             <ThemedButton
-                label="Create API"
+                label={t('connections.add.createButton')}
                 onPress={() => {
                     addValue(values)
                     router.back()

@@ -1,12 +1,14 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { View, Text, TouchableOpacity } from 'react-native'
 
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const ChatModelName = () => {
+    const { t } = useTranslation()
     const model = Llama.useLlamaModelStore((state) => state.model)
     const { color, spacing, borderRadius } = Theme.useTheme()
 
@@ -30,7 +32,7 @@ const ChatModelName = () => {
                     flex: 1,
                     color: model ? color.primary._700 : color.text._400,
                 }}>
-                {model ? model.name : 'No Model Loaded'}
+                {model ? model.name : t('chat.modelName.noModelLoaded')}
             </Text>
             <TouchableOpacity
                 onPress={() => router.push('/screens/ModelManagerScreen')}

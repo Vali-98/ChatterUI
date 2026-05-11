@@ -1,5 +1,6 @@
 import { FlashList } from '@shopify/flash-list'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
@@ -20,6 +21,7 @@ import ChatDrawerSearchItem from './ChatDrawerSearchItem'
 
 const ChatsDrawer = () => {
     const styles = useStyles()
+    const { t } = useTranslation()
     const { charId } = Characters.useCharacterStore(useShallow((state) => ({ charId: state.id })))
     const { data } = useLiveQueryJoined(Chats.db.query.chatListQuery(charId ?? 0), [charId])
     const setShow = Drawer.useDrawerStore((state) => state.setShow)
@@ -45,7 +47,7 @@ const ChatsDrawer = () => {
     const search = useDebounce(async (query: string, charId?: number) => {
         if (!charId || !query) return
         const results = await Chats.db.query.searchChat(query, charId).catch((e) => {
-            Logger.error('Failed to run query: ' + e)
+            Logger.error(t('chat.drawer.searchQueryFailed', { error: String(e) }))
             return []
         })
         setSearchResults(results.sort((a, b) => b.sendDate.getTime() - a.sendDate.getTime()))
@@ -68,7 +70,9 @@ const ChatsDrawer = () => {
         <Drawer.Body drawerID={Drawer.ID.CHATLIST} drawerStyle={styles.drawer} direction="right">
             <View
                 style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                <Text style={styles.drawerTitle}>{showSearchBar ? 'Search' : 'Chats'}</Text>
+                <Text style={styles.drawerTitle}>
+                    {showSearchBar ? t('chat.drawer.searchTitle') : t('chat.drawer.chatsTitle')}
+                </Text>
                 <ThemedButton
                     variant="tertiary"
                     iconName={showSearchBar ? 'backward' : 'search'}
@@ -81,7 +85,7 @@ const ChatsDrawer = () => {
             <Animated.View key={showSearchBar + ''} entering={FadeIn} exiting={FadeOut}>
                 {showSearchBar && (
                     <ThemedTextInput
-                        placeholder="Search for message..."
+                        placeholder={t('chat.drawer.searchPlaceholder')}
                         containerStyle={{ flex: 0, marginTop: 12, marginBottom: 12 }}
                         value={searchQuery}
                         autoCorrect={false}
@@ -108,14 +112,19 @@ const ChatsDrawer = () => {
                         />
                     </Animated.View>
                     <Animated.View entering={FadeIn} exiting={FadeOut}>
-                        <ThemedButton label="Start New Chat" onPress={handleCreateChat} />
+                        <ThemedButton
+                            label={t('chat.drawer.startNewChat')}
+                            onPress={handleCreateChat}
+                        />
                     </Animated.View>
                 </>
             )}
             {showSearchResults && (
                 <Animated.View entering={FadeIn.duration(200)} style={styles.listContainer}>
                     {searchResults.length > 0 && (
-                        <Text style={styles.resultCount}>Results: {searchResults.length}</Text>
+                        <Text style={styles.resultCount}>
+                            {t('chat.drawer.resultsFound', { count: searchResults.length })}
+                        </Text>
                     )}
                     <FlashList
                         data={searchResults}
@@ -131,7 +140,7 @@ const ChatsDrawer = () => {
                         removeClippedSubviews={false}
                         ListEmptyComponent={() => (
                             <View style={styles.emptyContainer}>
-                                <Text style={styles.emptyText}>No Results</Text>
+                                <Text style={styles.emptyText}>{t('chat.drawer.noResults')}</Text>
                             </View>
                         )}
                     />

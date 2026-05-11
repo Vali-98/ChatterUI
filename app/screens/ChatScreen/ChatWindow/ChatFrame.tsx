@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
@@ -18,6 +19,7 @@ type ChatFrameProps = {
 }
 
 const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, isLast, entry }) => {
+    const { t } = useTranslation()
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
     const [wide] = useMMKVBoolean(AppSettings.WideChatMode)
     const [alternate] = useMMKVBoolean(AppSettings.AlternatingChatMode)
@@ -41,6 +43,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
 
     const rowDir = entry.is_user && alternate ? 'row-reverse' : 'row'
     const align = entry.is_user && alternate ? 'flex-end' : 'flex-start'
+
     if (wide)
         return (
             <View
@@ -84,11 +87,11 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                                 {swipe.gen_finished.toLocaleTimeString()}
                             </Text>
                             <Text style={{ color: color.text._700, fontSize: fontSize.s }}>
-                                #{index}
+                                {t('chat.frame.entryNumber', { index })}
                             </Text>
                             {deltaTime !== undefined && !entry.is_user && index !== 0 && (
                                 <Text style={{ color: color.text._700, fontSize: fontSize.s }}>
-                                    {deltaTime}s
+                                    {t('chat.frame.seconds', { seconds: deltaTime })}
                                 </Text>
                             )}
                         </View>
@@ -120,9 +123,13 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                         />
                     </TouchableOpacity>
 
-                    <Text style={{ color: color.text._400 }}>#{index}</Text>
+                    <Text style={{ color: color.text._400 }}>
+                        {t('chat.frame.entryNumber', { index })}
+                    </Text>
                     {deltaTime !== undefined && !entry.is_user && index !== 0 && (
-                        <Text style={{ color: color.text._400 }}>{deltaTime}s</Text>
+                        <Text style={{ color: color.text._400 }}>
+                            {t('chat.frame.seconds', { seconds: deltaTime })}
+                        </Text>
                     )}
                 </View>
             </View>

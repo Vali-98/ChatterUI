@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { create } from 'zustand'
 
@@ -29,6 +30,7 @@ export const useChatEditorStore = create<ChatEditorStateProps>()((set) => ({
 }))
 
 const ChatEditor = () => {
+    const { t } = useTranslation()
     const { entryId, editMode, hide } = useChatEditorStore()
     const styles = useStyles()
     const { data: entry } = useLiveQuery(Chats.db.live.entry(entryId), [entryId])
@@ -86,7 +88,7 @@ const ChatEditor = () => {
                     justifyContent: 'space-between',
                 }}>
                 <ThemedButton
-                    label="Delete"
+                    label={t('chat.editor.delete')}
                     iconName="delete"
                     onPress={handleDeleteMessage}
                     variant="critical"
@@ -94,11 +96,11 @@ const ChatEditor = () => {
                 <ThemedButton
                     iconName="reload"
                     variant="tertiary"
-                    label="Reset"
+                    label={t('chat.editor.reset')}
                     onPress={() => swipeText && setPlaceholderText(swipeText)}
                 />
                 <ThemedButton
-                    label="Confirm"
+                    label={t('chat.editor.confirm')}
                     iconName="check"
                     onPress={handleEditMessage}
                     variant="secondary"

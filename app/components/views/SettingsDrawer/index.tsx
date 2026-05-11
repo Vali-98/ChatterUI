@@ -35,10 +35,7 @@ const SettingsDrawer = () => {
                     marginBottom: spacing.xl2,
                 }}>
                 {(__DEV__ || devMode) && t('common.devmode') + '\t'}
-                {
-                    // eslint-disable-next-line i18next/no-literal-string
-                    'v' + appConfig.expo.version
-                }
+                {t('about.versionprefix') + appConfig.expo.version}
             </Text>
             <View style={{ marginHorizontal: spacing.xl2 }}>
                 <SupportButton />

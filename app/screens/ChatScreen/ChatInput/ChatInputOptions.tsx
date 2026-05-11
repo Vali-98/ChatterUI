@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 
 import ContextMenu from '@components/views/ContextMenu'
@@ -7,6 +8,7 @@ import Drawer from '@components/views/Drawer'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const ChatOptions = () => {
+    const { t } = useTranslation()
     const router = useRouter()
     const styles = useStyles()
 
@@ -24,7 +26,7 @@ const ChatOptions = () => {
                         close()
                         router.back()
                     },
-                    label: 'Main Menu',
+                    label: t('chat.inputOptions.mainMenu'),
                     icon: 'backward',
                 },
                 {
@@ -32,7 +34,7 @@ const ChatOptions = () => {
                         close()
                         router.push('/screens/CharacterEditorScreen')
                     },
-                    label: 'Edit Character',
+                    label: t('chat.inputOptions.editCharacter'),
                     icon: 'edit',
                 },
                 {
@@ -40,7 +42,7 @@ const ChatOptions = () => {
                         setShowChat(true)
                         close()
                     },
-                    label: 'Chat History',
+                    label: t('chat.inputOptions.chatHistory'),
                     icon: 'paper-clip',
                 },
             ]}

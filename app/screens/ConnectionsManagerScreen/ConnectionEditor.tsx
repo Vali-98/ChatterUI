@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -30,6 +31,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
 }) => {
     const { color, fontSize } = Theme.useTheme()
     const styles = useStyles()
+    const { t } = useTranslation()
 
     const { editValue, getTemplates } = APIManager.useConnectionsStore(
         useShallow((state) => ({
@@ -46,13 +48,13 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
     useEffect(() => {
         const newTemplate = getTemplates().find((item) => item.name === values.configName)
         if (!newTemplate) {
-            Logger.errorToast('Could not get valid template!')
+            Logger.errorToast(t('connections.editor.invalidTemplate'))
             close()
             return
         }
 
         setTemplate(newTemplate)
-    }, [close, values, getTemplates])
+    }, [close, values, getTemplates, t])
 
     const handleGetModelList = useCallback(async () => {
         if (!template.features.useModel || !show) return
@@ -66,12 +68,12 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
         const result = await fetch(values.modelEndpoint, { headers: { ...auth } })
         const data = await result.json()
         if (result.status !== 200) {
-            Logger.error(`Could not retrieve models: ${data?.error?.message}`)
+            Logger.error(t('connections.add.error.200', `${data?.error?.message}`))
             return
         }
         const models = getNestedValue(data, template.model.modelListParser)
         setModelList(models)
-    }, [show, template, values])
+    }, [show, template, values, t])
     // TODO: Replace with react query
     useEffect(() => {
         setValues(originalValues)
@@ -95,7 +97,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                         fontWeight: '500',
                         paddingBottom: 16,
                     }}>
-                    Edit Connection
+                    {t('connections.editor.title')}
                 </Text>
 
                 <ScrollView
@@ -103,7 +105,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ rowGap: 12, paddingBottom: 32 }}>
                     <ThemedTextInput
-                        label="Friendly Name"
+                        label={t('connections.editor.friendlyName')}
                         value={values.friendlyName}
                         onChangeText={(value) => {
                             setValues({ ...values, friendlyName: value })
@@ -113,20 +115,22 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                     {template.ui.editableCompletionPath && (
                         <View>
                             <ThemedTextInput
-                                label="Completion URL"
+                                label={t('connections.editor.completionUrl')}
                                 value={values.endpoint}
                                 onChangeText={(value) => {
                                     setValues({ ...values, endpoint: value })
                                 }}
                             />
-                            <Text style={styles.hintText}>Note: Use full URL path</Text>
+                            <Text style={styles.hintText}>
+                                {t('connections.editor.fullUrlHint')}
+                            </Text>
                         </View>
                     )}
 
                     {template.ui.editableModelPath && (
                         <View>
                             <ThemedTextInput
-                                label="Model URL"
+                                label={t('connections.editor.modelUrl')}
                                 value={values.modelEndpoint}
                                 onChangeText={(value) => {
                                     setValues({ ...values, modelEndpoint: value })
@@ -151,7 +155,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                     {template.features.useKey && (
                         <ThemedTextInput
                             secureTextEntry
-                            label="API Key"
+                            label={t('connections.editor.apiKey')}
                             value={values.key}
                             onChangeText={(value) => {
                                 setValues({ ...values, key: value })
@@ -161,7 +165,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
 
                     {template.features.useModel && (
                         <View style={{ rowGap: 4 }}>
-                            <Text style={styles.title}>Model</Text>
+                            <Text style={styles.title}>{t('connections.editor.model')}</Text>
                             <View
                                 style={{
                                     flexDirection: 'row',
@@ -180,7 +184,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                                             setValues({ ...values, model: item })
                                         }}
                                         search={modelList.length > 10}
-                                        modalTitle="Select Model"
+                                        modalTitle={t('connections.editor.selectModel')}
                                     />
                                 )}
                                 {template.features.multipleModels && (
@@ -195,7 +199,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                                             setValues({ ...values, model: item })
                                         }}
                                         search={modelList.length > 10}
-                                        modalTitle="Select Model"
+                                        modalTitle={t('connections.editor.selectModel')}
                                     />
                                 )}
                                 <ThemedButton
@@ -213,32 +217,34 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                     {template.features.useFirstMessage && (
                         <View>
                             <ThemedTextInput
-                                label="First Message"
+                                label={t('connections.editor.firstMessage')}
                                 value={values.firstMessage}
                                 onChangeText={(value) => {
                                     setValues({ ...values, firstMessage: value })
                                 }}
                             />
                             <Text style={styles.hintText}>
-                                Default first message sent to Claude
+                                {t('connections.editor.firstMessageHint')}
                             </Text>
                         </View>
                     )}
                     {template.features.usePrefill && (
                         <View>
                             <ThemedTextInput
-                                label="Prefill"
+                                label={t('connections.editor.prefill')}
                                 value={values.prefill}
                                 onChangeText={(value) => {
                                     setValues({ ...values, prefill: value })
                                 }}
                             />
-                            <Text style={styles.hintText}>Prefill before model response</Text>
+                            <Text style={styles.hintText}>
+                                {t('connections.editor.prefillHint')}
+                            </Text>
                         </View>
                     )}
                 </ScrollView>
                 <ThemedButton
-                    label="Save Changes"
+                    label={t('connections.editor.saveButton')}
                     onPress={() => {
                         editValue(values, index)
                         close()

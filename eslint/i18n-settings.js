@@ -300,6 +300,10 @@ module.exports = {
             'red',
             'gray',
             'file://',
+            'row',
+            'row-reverse',
+            'flex-end',
+            'flex-start',
         ],
     },
     callees: {
