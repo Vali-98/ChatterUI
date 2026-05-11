@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
@@ -7,6 +8,7 @@ import SectionTitle from '@components/text/SectionTitle'
 import { AppSettings } from '@lib/constants/GlobalValues'
 
 const ChatWindowSettings = () => {
+    const { t } = useTranslation()
     const [autoScroll, setAutoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
     const [sendOnEnter, setSendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
     const [quickDelete, setQuickDelete] = useMMKVBoolean(AppSettings.QuickDelete)
@@ -20,55 +22,55 @@ const ChatWindowSettings = () => {
 
     return (
         <View style={{ rowGap: 8 }}>
-            <SectionTitle>Chat Window</SectionTitle>
+            <SectionTitle>{t('settings.chatwindow.title')}</SectionTitle>
 
             <ThemedSwitch
-                label="Auto Scroll"
+                label={t('settings.chatwindow.autoScroll')}
                 value={autoScroll}
                 onChangeValue={setAutoScroll}
-                description="Autoscrolls text during generations"
+                description={t('settings.chatwindow.autoScrollDescription')}
             />
 
             <ThemedSwitch
-                label="Send on Enter"
+                label={t('settings.chatwindow.sendOnEnter')}
                 value={sendOnEnter}
                 onChangeValue={setSendOnEnter}
-                description="Submits messages when Enter is pressed"
+                description={t('settings.chatwindow.sendOnEnterDescription')}
             />
 
             <ThemedSwitch
-                label="Show Tokens Per Second"
+                label={t('settings.chatwindow.showTokensPerSecond')}
                 value={showTokensPerSecond}
                 onChangeValue={setShowTokensPerSecond}
-                description="Show tokens per second when using local models"
+                description={t('settings.chatwindow.showTokensPerSecondDescription')}
             />
 
             <ThemedSwitch
-                label="Quick Delete"
+                label={t('settings.chatwindow.quickDelete')}
                 value={quickDelete}
                 onChangeValue={setQuickDelete}
-                description="Toggle delete button in chat options bar"
+                description={t('settings.chatwindow.quickDeleteDescription')}
             />
 
             <ThemedSwitch
-                label="Save Scroll Position"
+                label={t('settings.chatwindow.saveScrollPosition')}
                 value={saveScroll}
                 onChangeValue={setSaveScroll}
-                description="Automatically move to last scrolled position in chat"
+                description={t('settings.chatwindow.saveScrollPositionDescription')}
             />
 
             <ThemedSwitch
-                label="Wide Chat"
+                label={t('settings.chatwindow.wideChat')}
                 value={wide}
                 onChangeValue={setWide}
-                description="Removes whitespace for wider chat"
+                description={t('settings.chatwindow.wideChatDescription')}
             />
 
             <ThemedSwitch
-                label="Alternate User and Character Positions"
+                label={t('settings.chatwindow.alternatePositions')}
                 value={alternate}
                 onChangeValue={setAlternate}
-                description="Left align character chats and right aligns user chats"
+                description={t('settings.chatwindow.alternatePositionsDescription')}
             />
         </View>
     )

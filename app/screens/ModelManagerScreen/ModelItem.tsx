@@ -91,11 +91,11 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const loadToggle = isLoaded ? modelLoading || modelImporting : disable
 
     const tags = [
-        item.params === 'N/A' ? 'No Param Size' : item.params,
+        item.params === 'N/A' ? t('model.item.noparamsize') : item.params,
         quant,
         readableFileSize(item.file_size),
         item.architecture,
-        item.file_path.startsWith('content') ? 'External' : 'Internal',
+        item.file_path.startsWith('content') ? t('common.external') : t('common.internal'),
     ]
 
     return (
@@ -106,7 +106,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 onConfirm={async (name) => {
                     await Model.updateName(name, item.id)
                 }}
-                title="Rename Model"
+                title={t('model.item.rename')}
                 defaultValue={item.name}
             />
 
@@ -209,7 +209,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
 
                             setModelLoading(true)
                             await loadModel(item).catch((e) => {
-                                Logger.error(`Failed to load model: ${e}`)
+                                Logger.errorToast(t('model.toast.failedtoload'), `${e}`)
                             })
                             if (item.mmprojLink) {
                                 const [mmprojModel] = mmprojList.filter(
@@ -231,7 +231,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
             </View>
             {((showMMPROJSelector && mmprojList.length > 0) || (item.mmprojLink && !isMMPROJ)) && (
                 <DropdownSheet
-                    modalTitle="Select MMPROJ Model"
+                    modalTitle={t('model.selectmmproj')}
                     containerStyle={{ marginTop: 12, marginBottom: 4 }}
                     data={mmprojList}
                     selected={
@@ -244,7 +244,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                             if (item.mmprojLink) await Model.removeMMPROJLink(item)
                             await Model.createMMPROJLink(item, value)
                         } catch (e) {
-                            Logger.errorToast('Failed to link model: ' + e)
+                            Logger.errorToast(t('model.toast.failedtolink'), JSON.stringify(e))
                         }
                     }}
                 />

@@ -291,6 +291,12 @@ module.exports = {
             'en-US',
             'Hexagon',
             'OpenCL',
+            '.gguf',
+            'white',
+            'yellow',
+            'red',
+            'gray',
+            'file://',
         ],
     },
     callees: {

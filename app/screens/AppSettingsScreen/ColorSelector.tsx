@@ -1,6 +1,7 @@
 import { Octicons } from '@expo/vector-icons'
 import { setBackgroundColorAsync } from 'expo-system-ui'
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { FlatList, Linking, Text, TouchableOpacity, useColorScheme, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
@@ -24,6 +25,7 @@ type ColorThemeItemProps = {
 }
 
 const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete = false }) => {
+    const { t } = useTranslation()
     const {
         systemDark,
         removeColorScheme,
@@ -31,8 +33,8 @@ const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete
         darkColor,
         lightColor,
         setColor,
-        setDarkColor,
         setLightColor,
+        setDarkColor,
     } = Theme.useColorState(
         useShallow((state) => ({
             systemDark: state.useSystemDarkMode,
@@ -50,12 +52,14 @@ const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete
 
     const handleRemoveColorScheme = (index: number) => {
         Alert.alert({
-            title: 'Delete Theme',
-            description: `Are you sure you want to delete "${item.name}"? This cannot be undone!`,
+            title: t('settings.colors.alert.deleteTheme.title'),
+            description: t('settings.colors.alert.deleteTheme.description', {
+                name: item.name,
+            }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('common.cancel') },
                 {
-                    label: 'Delete Theme',
+                    label: t('settings.colors.alert.deleteTheme.confirm'),
                     type: 'warning',
                     onPress: () => {
                         removeColorScheme(index)
@@ -119,7 +123,7 @@ const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete
                                 paddingHorizontal: 8,
                                 borderRadius: 8,
                             }}>
-                            Active
+                            {t('settings.colors.active')}
                         </Text>
                     )}
                 </View>
@@ -135,7 +139,7 @@ const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete
                     />
                 ) : (
                     <Text style={{ color: item.text._500 }}>
-                        {showDelete ? 'Custom' : 'Built-in'}
+                        {showDelete ? t('settings.colors.custom') : t('settings.colors.builtIn')}
                     </Text>
                 )}
             </TouchableOpacity>
@@ -197,6 +201,7 @@ const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete
 }
 
 const ColorSelector = () => {
+    const { t } = useTranslation()
     const { systemDark, setSystemDark, customColors, addCustomColor } = Theme.useColorState(
         useShallow((state) => ({
             // system
@@ -212,11 +217,11 @@ const ColorSelector = () => {
 
     return (
         <SafeAreaView edges={['bottom']} style={{ paddingHorizontal: 16, rowGap: 16, flex: 1 }}>
-            <HeaderTitle title="Themes" />
+            <HeaderTitle title={t('settings.colors.title')} />
             <ThemedSwitch
                 value={systemDark}
                 onChangeValue={setSystemDark}
-                label="Use System Dark Mode"
+                label={t('settings.colors.useSystemDarkMode')}
             />
             <HeaderButton
                 headerRight={() => (
@@ -225,7 +230,7 @@ const ColorSelector = () => {
                         placement="bottom"
                         buttons={[
                             {
-                                label: 'Import Theme',
+                                label: t('settings.colors.contextMenu.importTheme'),
                                 icon: 'download',
                                 onPress: (close) => {
                                     pickJSONDocument().then((result) => {
@@ -236,7 +241,7 @@ const ColorSelector = () => {
                                 },
                             },
                             {
-                                label: 'Paste Theme',
+                                label: t('settings.colors.contextMenu.pasteTheme'),
                                 icon: 'file',
                                 onPress: (close) => {
                                     close()
@@ -244,7 +249,7 @@ const ColorSelector = () => {
                                 },
                             },
                             {
-                                label: 'Get Themes',
+                                label: t('settings.colors.contextMenu.getThemes'),
                                 icon: 'github',
                                 onPress: (close) => {
                                     close()
@@ -265,11 +270,15 @@ const ColorSelector = () => {
                         const data = JSON.parse(e)
                         addCustomColor(data)
                     } catch (e) {
-                        Logger.errorToast('Failed to import: ' + e)
+                        Logger.errorToast(
+                            t('settings.colors.error.failedToImport', {
+                                error: `${e}`,
+                            })
+                        )
                     }
                 }}
                 multiline
-                title="Paste Theme Here"
+                title={t('settings.colors.pasteThemeTitle')}
             />
 
             <FlatList

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
@@ -8,6 +9,7 @@ import { AppSettings } from '@lib/constants/GlobalValues'
 import { TagHider } from '@lib/state/TagHider'
 
 const TagHiderSettings = () => {
+    const { t } = useTranslation()
     const [tagHider, setUseTagHider] = useMMKVBoolean(AppSettings.UseTagHider)
     const { tags, setTags } = TagHider.useTagHiderStore(
         useShallow((store) => ({
@@ -19,8 +21,8 @@ const TagHiderSettings = () => {
     return (
         <View>
             <ThemedSwitch
-                label="Hidden Tags"
-                description="Hide characters with the following tags from the character list."
+                label={t('settings.tagHider.label')}
+                description={t('settings.tagHider.description')}
                 value={tagHider}
                 onChangeValue={(b) => setUseTagHider(b)}
             />

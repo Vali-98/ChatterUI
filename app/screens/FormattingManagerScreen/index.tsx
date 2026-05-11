@@ -29,16 +29,27 @@ import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 
-const autoformatterData = [
-    { label: 'Disabled', example: '*<No Formatting>*' },
-    { label: 'Plain Action, Quote Speech', example: 'Some action, "Some speech"' },
-    { label: 'Asterisk Action, Plain Speech', example: '*Some action* Some speech' },
-    { label: 'Asterisk Action, Quote Speech', example: '*Some action* "Some speech"' },
-]
-
 const FormattingManager = () => {
     const { t } = useTranslation()
     const markdownStyle = MarkdownStyle.useMarkdownStyle()
+    const autoformatterData = [
+        {
+            label: t('formatting.autoformatter.disabled'),
+            example: t('formatting.autoformatter.disabledExample'),
+        },
+        {
+            label: t('formatting.autoformatter.plainActionQuoteSpeech'),
+            example: t('formatting.autoformatter.plainActionQuoteSpeechExample'),
+        },
+        {
+            label: t('formatting.autoformatter.asteriskActionPlainSpeech'),
+            example: t('formatting.autoformatter.asteriskActionPlainSpeechExample'),
+        },
+        {
+            label: t('formatting.autoformatter.asteriskActionQuoteSpeech'),
+            example: t('formatting.autoformatter.asteriskActionQuoteSpeechExample'),
+        },
+    ]
     const [useTemplate, setUseTemplate] = useMMKVBoolean(AppSettings.UseModelTemplate)
     const { currentInstruct, loadInstruct, setCurrentInstruct } = Instructs.useInstruct(
         useShallow((state) => ({
@@ -69,12 +80,12 @@ const FormattingManager = () => {
 
     const handleRegenerateDefaults = () => {
         Alert.alert({
-            title: `Regenerate Default Instructs`,
-            description: `Are you sure you want to regenerate default Instructs'?`,
+            title: t('formatting.alert.regenerateDefaults.title'),
+            description: t('formatting.alert.regenerateDefaults.description'),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('formatting.alert.regenerateDefaults.cancel') },
                 {
-                    label: 'Regenerate Default Presets',
+                    label: t('formatting.alert.regenerateDefaults.confirm'),
                     onPress: async () => {
                         await Instructs.generateInitialDefaults()
                     },
@@ -85,29 +96,32 @@ const FormattingManager = () => {
 
     const handleExportPreset = async () => {
         if (!instructID) return
-        const name = (currentInstruct?.name ?? 'Default') + '.json'
+        const name =
+            (currentInstruct?.name ?? t('formatting.defaultName')) + t('formatting.jsonExtension')
         await saveStringToDownload(JSON.stringify(currentInstruct), name, 'utf8')
-        Logger.infoToast(`Saved "${name}" to Downloads`)
+        Logger.infoToast(t('formatting.toast.savedToDownloads', { name }))
     }
 
     const handleDeletePreset = () => {
         if (instructList.length === 1) {
-            Logger.warnToast(`Cannot delete last Instruct preset.`)
+            Logger.warnToast(t('formatting.toast.cannotDeleteLastPreset'))
             return
         }
 
         Alert.alert({
-            title: `Delete Config`,
-            description: `Are you sure you want to delete '${currentInstruct?.name}'?`,
+            title: t('formatting.alert.deleteConfig.title'),
+            description: t('formatting.alert.deleteConfig.description', {
+                name: currentInstruct?.name ?? t('formatting.defaultName'),
+            }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('formatting.alert.deleteConfig.cancel') },
                 {
-                    label: 'Delete Instruct',
+                    label: t('formatting.alert.deleteConfig.confirm'),
                     onPress: async () => {
                         if (!instructID) return
                         const leftover = data.filter((item) => item.id !== instructID)
                         if (leftover.length === 0) {
-                            Logger.warnToast('Cannot delete last instruct')
+                            Logger.warnToast(t('formatting.toast.cannotDeleteLastPreset'))
                             return
                         }
                         Instructs.db.mutate.deleteInstruct(instructID)
@@ -126,7 +140,7 @@ const FormattingManager = () => {
             placement="bottom"
             buttons={[
                 {
-                    label: 'Create Config',
+                    label: t('formatting.createConfig'),
                     icon: 'file-add',
                     onPress: (close) => {
                         setShowNewInstruct(true)
@@ -135,7 +149,7 @@ const FormattingManager = () => {
                     },
                 },
                 {
-                    label: 'Export Config',
+                    label: t('formatting.exportConfig'),
                     icon: 'download',
                     onPress: (close) => {
                         handleExportPreset()
@@ -143,7 +157,7 @@ const FormattingManager = () => {
                     },
                 },
                 {
-                    label: 'Delete Config',
+                    label: t('formatting.deleteConfig'),
                     icon: 'delete',
                     onPress: (close) => {
                         handleDeletePreset()
@@ -152,7 +166,7 @@ const FormattingManager = () => {
                     variant: 'warning',
                 },
                 {
-                    label: 'Regenerate Default',
+                    label: t('formatting.regenerateDefaults'),
                     icon: 'reload',
                     onPress: (close) => {
                         handleRegenerateDefaults()
@@ -174,21 +188,21 @@ const FormattingManager = () => {
                     marginVertical: spacing.xl,
                     flex: 1,
                 }}>
-                <HeaderTitle title="Formatting" />
+                <HeaderTitle title={t('formatting.title')} />
                 <HeaderButton headerRight={headerRight} />
                 <View>
                     <InputSheet
-                        title="New Instruct Preset"
+                        title={t('formatting.newPreset')}
                         visible={showNewInstruct}
                         setVisible={setShowNewInstruct}
                         verifyText={(text) =>
                             instructList.some((item) => item.name === text)
-                                ? 'Config already exists'
+                                ? t('formatting.configExists')
                                 : ''
                         }
                         onConfirm={(text) => {
                             if (instructList.some((item) => item.name === text)) {
-                                Logger.warnToast(`Config name already exists.`)
+                                Logger.warnToast(t('formatting.toast.configNameExists'))
                                 return
                             }
                             if (!currentInstruct) return
@@ -196,7 +210,7 @@ const FormattingManager = () => {
                             Instructs.db.mutate
                                 .createInstruct({ ...currentInstruct, name: text })
                                 .then(async (newid) => {
-                                    Logger.infoToast(`Config created.`)
+                                    Logger.infoToast(t('formatting.toast.configCreated'))
                                     await loadInstruct(newid)
                                 })
                         }}
@@ -221,7 +235,7 @@ const FormattingManager = () => {
                             if (item.id === instructID) return
                             loadInstruct(item.id)
                         }}
-                        modalTitle="Select Config"
+                        modalTitle={t('formatting.selectConfig')}
                         search
                     />
                     <ThemedButton iconName="save" iconSize={28} variant="tertiary" />
@@ -239,7 +253,7 @@ const FormattingManager = () => {
                     }}>
                     <SectionTitle>{t('instruct.formatting')}</SectionTitle>
                     <ThemedTextInput
-                        label="System Prompt"
+                        label={t('formatting.sections.systemPrompt')}
                         value={currentInstruct.system_prompt}
                         onChangeText={(text) => {
                             setCurrentInstruct({
@@ -252,7 +266,7 @@ const FormattingManager = () => {
                     />
 
                     <ThemedTextInput
-                        label="System Prompt Format"
+                        label={t('formatting.sections.systemPromptFormat')}
                         value={currentInstruct.system_prompt_format}
                         onChangeText={(text) => {
                             setCurrentInstruct({
@@ -265,7 +279,7 @@ const FormattingManager = () => {
                     />
                     <View style={{ flexDirection: 'row', columnGap: spacing.m }}>
                         <ThemedTextInput
-                            label="System Prefix"
+                            label={t('formatting.sections.systemPrefix')}
                             value={currentInstruct.system_prefix}
                             onChangeText={(text) => {
                                 setCurrentInstruct({
@@ -277,7 +291,7 @@ const FormattingManager = () => {
                             multiline
                         />
                         <ThemedTextInput
-                            label="System Suffix"
+                            label={t('formatting.sections.systemSuffix')}
                             value={currentInstruct.system_suffix}
                             onChangeText={(text) => {
                                 setCurrentInstruct({
@@ -291,7 +305,7 @@ const FormattingManager = () => {
                     </View>
                     <View style={{ flexDirection: 'row', columnGap: spacing.m }}>
                         <ThemedTextInput
-                            label="Input Prefix"
+                            label={t('formatting.sections.inputPrefix')}
                             value={currentInstruct.input_prefix}
                             onChangeText={(text) => {
                                 setCurrentInstruct({
@@ -303,7 +317,7 @@ const FormattingManager = () => {
                             multiline
                         />
                         <ThemedTextInput
-                            label="Input Suffix"
+                            label={t('formatting.sections.inputSuffix')}
                             value={currentInstruct.input_suffix}
                             onChangeText={(text) => {
                                 setCurrentInstruct({
@@ -317,7 +331,7 @@ const FormattingManager = () => {
                     </View>
                     <View style={{ flexDirection: 'row', columnGap: spacing.m }}>
                         <ThemedTextInput
-                            label="Output Prefix"
+                            label={t('formatting.sections.outputPrefix')}
                             value={currentInstruct.output_prefix}
                             onChangeText={(text) => {
                                 setCurrentInstruct({
@@ -329,7 +343,7 @@ const FormattingManager = () => {
                             multiline
                         />
                         <ThemedTextInput
-                            label="Output Suffix"
+                            label={t('formatting.sections.outputSuffix')}
                             value={currentInstruct.output_suffix}
                             onChangeText={(text) => {
                                 setCurrentInstruct({
@@ -344,7 +358,7 @@ const FormattingManager = () => {
 
                     <View style={{ flexDirection: 'row' }}>
                         <ThemedTextInput
-                            label="Last Output Prefix"
+                            label={t('formatting.sections.lastOutputPrefix')}
                             value={currentInstruct.last_output_prefix}
                             onChangeText={(text) => {
                                 setCurrentInstruct({
@@ -359,7 +373,7 @@ const FormattingManager = () => {
 
                     <StringArrayEditor
                         containerStyle={{}}
-                        label="Stop Sequence"
+                        label={t('formatting.sections.stopSequence')}
                         value={
                             currentInstruct.stop_sequence
                                 ? currentInstruct.stop_sequence.split(',')
@@ -371,11 +385,11 @@ const FormattingManager = () => {
                                 stop_sequence: data.join(','),
                             })
                         }}
-                        replaceNewLine="\n"
+                        replaceNewLine={String.fromCharCode(10)}
                     />
 
                     <ThemedCheckbox
-                        label="Use Common Stop Sequences"
+                        label={t('formatting.sections.useCommonStopSequences')}
                         value={currentInstruct.use_common_stop}
                         onChangeValue={(b) => {
                             setCurrentInstruct({
@@ -394,7 +408,7 @@ const FormattingManager = () => {
                         }}>
                         <View style={{ flex: 1 }}>
                             <ThemedCheckbox
-                                label="Wrap In Newline"
+                                label={t('formatting.sections.wrapInNewline')}
                                 value={currentInstruct.wrap}
                                 onChangeValue={(b) => {
                                     setCurrentInstruct({
@@ -404,7 +418,7 @@ const FormattingManager = () => {
                                 }}
                             />
                             <ThemedCheckbox
-                                label="Include Names"
+                                label={t('formatting.sections.includeNames')}
                                 value={currentInstruct.names}
                                 onChangeValue={(b) => {
                                     setCurrentInstruct({
@@ -414,7 +428,7 @@ const FormattingManager = () => {
                                 }}
                             />
                             <ThemedCheckbox
-                                label="Add Timestamp"
+                                label={t('formatting.sections.addTimestamp')}
                                 value={currentInstruct.timestamp}
                                 onChangeValue={(b) => {
                                     setCurrentInstruct({
@@ -424,7 +438,7 @@ const FormattingManager = () => {
                                 }}
                             />
                             <ThemedCheckbox
-                                label="Remove Think Tags"
+                                label={t('formatting.sections.removeThinkTags')}
                                 value={currentInstruct.hide_think_tags}
                                 onChangeValue={(b) => {
                                     setCurrentInstruct({
@@ -436,7 +450,7 @@ const FormattingManager = () => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <ThemedCheckbox
-                                label="Use Examples"
+                                label={t('formatting.sections.useExamples')}
                                 value={currentInstruct.examples}
                                 onChangeValue={(b) => {
                                     setCurrentInstruct({
@@ -446,7 +460,7 @@ const FormattingManager = () => {
                                 }}
                             />
                             <ThemedCheckbox
-                                label="Use Scenario"
+                                label={t('formatting.sections.useScenario')}
                                 value={currentInstruct.scenario}
                                 onChangeValue={(b) => {
                                     setCurrentInstruct({
@@ -457,7 +471,7 @@ const FormattingManager = () => {
                             />
 
                             <ThemedCheckbox
-                                label="Use Personality"
+                                label={t('formatting.sections.usePersonality')}
                                 value={currentInstruct.personality}
                                 onChangeValue={(b) => {
                                     setCurrentInstruct({
@@ -479,7 +493,7 @@ const FormattingManager = () => {
                         }}>
                         <View style={{ flex: 1 }}>
                             <ThemedCheckbox
-                                label="Send Images"
+                                label={t('formatting.sections.sendImages')}
                                 value={currentInstruct.send_images}
                                 onChangeValue={(b) => {
                                     setCurrentInstruct({
@@ -489,7 +503,7 @@ const FormattingManager = () => {
                                 }}
                             />
                             <ThemedCheckbox
-                                label="Send Documents"
+                                label={t('formatting.sections.sendDocuments')}
                                 value={currentInstruct.send_documents}
                                 onChangeValue={(b) => {
                                     setCurrentInstruct({
@@ -501,7 +515,7 @@ const FormattingManager = () => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <ThemedCheckbox
-                                label="Send Audio"
+                                label={t('formatting.sections.sendAudio')}
                                 value={currentInstruct.send_audio}
                                 onChangeValue={(b) => {
                                     setCurrentInstruct({
@@ -511,7 +525,7 @@ const FormattingManager = () => {
                                 }}
                             />
                             <ThemedCheckbox
-                                label="Use Last Image Only"
+                                label={t('formatting.sections.useLastImageOnly')}
                                 value={currentInstruct.last_image_only}
                                 onChangeValue={(b) => {
                                     setCurrentInstruct({

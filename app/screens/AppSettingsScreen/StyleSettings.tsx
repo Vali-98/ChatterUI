@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -9,6 +10,7 @@ import Alert from '@components/views/Alert'
 import { useBackgroundStore } from '@lib/state/BackgroundImage'
 
 const StyleSettings = () => {
+    const { t } = useTranslation()
     const router = useRouter()
 
     const { chatBackground, importBackground, deleteBackground } = useBackgroundStore(
@@ -21,31 +23,34 @@ const StyleSettings = () => {
 
     return (
         <View style={{ rowGap: 8 }}>
-            <SectionTitle>Style</SectionTitle>
+            <SectionTitle>{t('settings.style.title')}</SectionTitle>
 
             <ThemedButton
-                label="Change Theme"
+                label={t('settings.style.changeTheme')}
                 variant="secondary"
                 onPress={() => router.push('/screens/AppSettingsScreen/ColorSelector')}
             />
             <ThemedButton
-                label={chatBackground ? 'Replace Chat Background' : 'Import Chat Background'}
+                label={
+                    chatBackground
+                        ? t('settings.style.replaceBackground')
+                        : t('settings.style.importBackground')
+                }
                 variant="secondary"
                 onPress={importBackground}
             />
             {chatBackground && (
                 <ThemedButton
-                    label="Delete Chat Background"
+                    label={t('settings.style.deleteBackground')}
                     variant="critical"
                     onPress={() =>
                         Alert.alert({
-                            title: 'Delete Background',
-                            description:
-                                'Are you sure you want to delete this background? This cannot be undone!',
+                            title: t('settings.style.alert.deleteBackground.title'),
+                            description: t('settings.style.alert.deleteBackground.description'),
                             buttons: [
-                                { label: 'Cancel' },
+                                { label: t('common.cancel') },
                                 {
-                                    label: 'Delete Background',
+                                    label: t('settings.style.alert.deleteBackground.confirm'),
                                     type: 'warning',
                                     onPress: deleteBackground,
                                 },

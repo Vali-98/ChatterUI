@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -31,6 +32,7 @@ A ~~strikethrough~~ text example.
 `
 
 const ChatStyling = () => {
+    const { t } = useTranslation()
     const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
     const { weight, size, setWeight, setSize } = ChatStyle.useChatStyle(
         useShallow((state) => ({
@@ -43,7 +45,7 @@ const ChatStyling = () => {
     const { color } = Theme.useTheme()
     return (
         <SafeAreaView style={{ flex: 1, rowGap: 4, padding: 16, paddingBottom: 32 }}>
-            <HeaderTitle title="Chat Styling" />
+            <HeaderTitle title={t('settings.chatstyle.title')} />
             <View
                 style={{
                     borderRadius: 12,
@@ -64,7 +66,7 @@ const ChatStyling = () => {
                     value: item,
                     label: item.toUpperCase(),
                 }))}
-                label={'Font Size'}
+                label={t('settings.chatstyle.fontSize')}
                 selected={size}
                 onPress={(item) => setSize(item)}
                 style={{ flex: 0 }}
@@ -74,7 +76,7 @@ const ChatStyling = () => {
                     value: item,
                     label: item,
                 }))}
-                label={'Font Weight'}
+                label={t('settings.chatstyle.fontWeight')}
                 selected={weight}
                 onPress={(item) => setWeight(item)}
                 style={{ flex: 0 }}

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 
@@ -16,6 +17,7 @@ import SecuritySettings from './SecuritySettings'
 import StyleSettings from './StyleSettings'
 
 const AppSettingsMenu = () => {
+    const { t } = useTranslation()
     const { spacing } = Theme.useTheme()
 
     return (
@@ -26,7 +28,7 @@ const AppSettingsMenu = () => {
                 paddingBottom: spacing.xl3,
             }}
             contentContainerStyle={{ rowGap: spacing.sm }}>
-            <HeaderTitle title="Settings" />
+            <HeaderTitle title={t('settings.title')} />
 
             <StyleSettings />
             <ChatSettings />

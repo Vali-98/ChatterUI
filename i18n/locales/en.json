@@ -25,7 +25,8 @@
         "enable": "Enable",
         "disable": "Disable",
         "internal": "Internal",
-        "external": "External"
+        "external": "External",
+        "none": "None"
     },
     "tts": {
         "language": "Language",
@@ -122,7 +123,9 @@
         "item": {
             "invalid": "Model is Invalid",
             "contextlength": "Context Length",
-            "file": "File"
+            "file": "File",
+            "noparamsize": "No Param Size",
+            "rename": "Rename Model"
         },
         "info": {
             "loaded": "Model Loaded",
@@ -141,8 +144,11 @@
             }
         },
         "toast": {
-            "deletekv": "KV Cache deleted!"
+            "deletekv": "KV Cache deleted!",
+            "failedtoload": "Failed to load model",
+            "failedtolink": "Failed to link model"
         },
+        "selectmmproj": "Select MMPROJ Model",
         "title": "Models",
         "mtmd": "Multimodal Adapters",
         "maxcontext": "Max Context",
@@ -181,6 +187,76 @@
             "description": "Sends the filtered text for inference"
         }
     },
+    "formatting": {
+        "title": "Formatting",
+        "newPreset": "New Instruct Preset",
+        "selectConfig": "Select Config",
+        "configExists": "Config already exists",
+        "defaultName": "Default",
+        "regenerateDefaults": "Regenerate Default Instructs",
+        "regenerateDefaultsDescription": "Are you sure you want to regenerate default Instructs?",
+        "regenerateDefaultPresets": "Regenerate Default Presets",
+        "deleteConfig": "Delete Config",
+        "deleteConfigDescription": "Are you sure you want to delete '{{name}}'?",
+        "deleteInstruct": "Delete Instruct",
+        "createConfig": "Create Config",
+        "exportConfig": "Export Config",
+        "jsonExtension": ".json",
+        "toast": {
+            "configCreated": "Config created.",
+            "configNameExists": "Config name already exists.",
+            "savedToDownloads": "Saved \"{{name}}\" to Downloads",
+            "cannotDeleteLastPreset": "Cannot delete last Instruct preset."
+        },
+        "alert": {
+            "regenerateDefaults": {
+                "title": "Regenerate Default Instructs",
+                "description": "Are you sure you want to regenerate default Instructs?",
+                "cancel": "Cancel",
+                "confirm": "Regenerate Default Presets"
+            },
+            "deleteConfig": {
+                "title": "Delete Config",
+                "description": "Are you sure you want to delete '{{name}}'?",
+                "cancel": "Cancel",
+                "confirm": "Delete Instruct"
+            }
+        },
+        "autoformatter": {
+            "disabled": "Disabled",
+            "disabledExample": "*<No Formatting>*",
+            "plainActionQuoteSpeech": "Plain Action, Quote Speech",
+            "plainActionQuoteSpeechExample": "Some action, \"Some speech\"",
+            "asteriskActionPlainSpeech": "Asterisk Action, Plain Speech",
+            "asteriskActionPlainSpeechExample": "*Some action* Some speech",
+            "asteriskActionQuoteSpeech": "Asterisk Action, Quote Speech",
+            "asteriskActionQuoteSpeechExample": "*Some action* \"Some speech\""
+        },
+        "sections": {
+            "systemPrompt": "System Prompt",
+            "systemPromptFormat": "System Prompt Format",
+            "systemPrefix": "System Prefix",
+            "systemSuffix": "System Suffix",
+            "inputPrefix": "Input Prefix",
+            "inputSuffix": "Input Suffix",
+            "outputPrefix": "Output Prefix",
+            "outputSuffix": "Output Suffix",
+            "lastOutputPrefix": "Last Output Prefix",
+            "stopSequence": "Stop Sequence",
+            "useCommonStopSequences": "Use Common Stop Sequences",
+            "wrapInNewline": "Wrap In Newline",
+            "includeNames": "Include Names",
+            "addTimestamp": "Add Timestamp",
+            "removeThinkTags": "Remove Think Tags",
+            "useExamples": "Use Examples",
+            "useScenario": "Use Scenario",
+            "usePersonality": "Use Personality",
+            "sendImages": "Send Images",
+            "sendDocuments": "Send Documents",
+            "sendAudio": "Send Audio",
+            "useLastImageOnly": "Use Last Image Only"
+        }
+    },
     "connections": {
         "manager": {
             "header": "Connections",
@@ -190,6 +266,158 @@
         "notConnected": "Not Connected",
         "failedToConnect": "Failed To Connect",
         "connected": "Connected"
+    },
+    "settings": {
+        "title": "Settings",
+        "chat": {
+            "title": "Chat",
+            "useFirstMessage": "Create first message",
+            "useFirstMessageDescription": "Add an initial message when creating a new chat.",
+            "loadChatOnStartup": "Load chat on startup",
+            "loadChatOnStartupDescription": "Automatically reopen the last chat when the app launches.",
+            "autoLoadUser": "Auto-load selected user",
+            "autoLoadUserDescription": "Automatically load the current user profile into new chats.",
+            "autoGenerateTitles": "Auto-generate chat titles",
+            "autoGenerateTitlesDescription": "Create titles for new chats automatically.",
+            "askInChatterUI": "Ask in ChatterUI",
+            "askInChatterUIDescription": "Use ChatterUI prompts for text intent instead of the default keyboard behavior.",
+            "styleButton": "Chat Style"
+        },
+        "chatwindow": {
+            "title": "Chat Window",
+            "autoScroll": "Auto-scroll",
+            "autoScrollDescription": "Scroll to the latest message automatically.",
+            "sendOnEnter": "Send on Enter",
+            "sendOnEnterDescription": "Send your message when pressing Enter.",
+            "showTokensPerSecond": "Show tokens per second",
+            "showTokensPerSecondDescription": "Display token throughput during generation.",
+            "quickDelete": "Quick delete",
+            "quickDeleteDescription": "Allow deleting text with a quick swipe gesture.",
+            "saveScrollPosition": "Save scroll position",
+            "saveScrollPositionDescription": "Restore the last chat position when reopening the conversation.",
+            "wideChat": "Wide chat mode",
+            "wideChatDescription": "Use a wider layout for the chat window.",
+            "alternatePositions": "Alternate chat positions",
+            "alternatePositionsDescription": "Alternate incoming and outgoing message alignment."
+        },
+        "chatstyle": {
+            "title": "Chat Style",
+            "fontSize": "Font Size",
+            "fontWeight": "Font Weight"
+        },
+        "style": {
+            "title": "Style",
+            "changeTheme": "Change Theme",
+            "importBackground": "Import Chat Background",
+            "replaceBackground": "Replace Chat Background",
+            "deleteBackground": "Delete Chat Background",
+            "alert": {
+                "deleteBackground": {
+                    "title": "Delete Background",
+                    "description": "Are you sure you want to delete this background? This cannot be undone!",
+                    "confirm": "Delete Background"
+                }
+            }
+        },
+        "colors": {
+            "title": "Themes",
+            "useSystemDarkMode": "Use System Dark Mode",
+            "pasteThemeTitle": "Paste Theme Here",
+            "custom": "Custom",
+            "builtIn": "Built-in",
+            "active": "Active",
+            "contextMenu": {
+                "importTheme": "Import Theme",
+                "pasteTheme": "Paste Theme",
+                "getThemes": "Get Themes"
+            },
+            "alert": {
+                "deleteTheme": {
+                    "title": "Delete Theme",
+                    "description": "Are you sure you want to delete '{{name}}'? This cannot be undone!",
+                    "confirm": "Delete Theme"
+                }
+            },
+            "error": {
+                "failedToImport": "Failed to import: {{error}}"
+            }
+        },
+        "generating": {
+            "title": "Generation",
+            "printContext": "Print Context",
+            "printContextDescription": "Prints the generation context to logs for debugging",
+            "bypassContextLength": "Bypass Context Length",
+            "bypassContextLengthDescription": "Ignores context length limits when building prompts"
+        },
+        "notification": {
+            "title": "Notifications",
+            "enableNotifications": "Enable Notifications",
+            "enableNotificationsDescription": "Sends notifications when the app is in the background",
+            "playSound": "Notification Sound",
+            "vibrate": "Notification Vibration",
+            "showText": "Show Text In Notification",
+            "showTextDescription": "Shows generated messages in notifications"
+        },
+        "database": {
+            "title": "Database Management",
+            "warningText": "WARNING: ensure imported database is from the same app version!",
+            "exportButton": "Export Database",
+            "importButton": "Import Database",
+            "rerunMigrationsButton": "Rerun Migrations",
+            "toast": {
+                "downloadOk": "Download Successful!",
+                "downloadFailed": "Failed to copy database: {{error}}"
+            },
+            "alert": {
+                "export": {
+                    "title": "Export Database",
+                    "description": "Are you sure you want to export the database file?\n\nIt will automatically be downloaded to Downloads",
+                    "confirm": "Export Database"
+                },
+                "import": {
+                    "title": "Import Database",
+                    "description": "Are you sure you want to import this database? This may destroy the current database!\n\nA backup will automatically be downloaded.\n\nApp will restart automatically",
+                    "confirm": "Import"
+                },
+                "versionMismatch": {
+                    "title": "Different Version",
+                    "description": "The imported database file has a different app version ({{importedVersion}}) than the installed version ({{currentVersion}}). Importing this database may break or corrupt the database. It is recommended to use the same app version.",
+                    "confirm": "Import Anyways"
+                },
+                "rerunMigrations": {
+                    "title": "Rerun Migrations",
+                    "description": "Rerunning migrations may destroy your database. Be sure to export a backup.",
+                    "confirm": "Rerun Migrations"
+                }
+            }
+        },
+        "screen": {
+            "title": "Screen",
+            "unlockOrientation": "Unlock Orientation",
+            "unlockOrientationDescription": "Allows landscape on phones (App restart required)",
+            "keepAwake": "Keep Awake",
+            "keepAwakeDescription": "Keeps app awake in foreground"
+        },
+        "security": {
+            "title": "Security",
+            "lockApp": "Lock App",
+            "lockAppDescription": "Requires user authentication to open the app. This will not work if you have no device locks enabled."
+        },
+        "character": {
+            "title": "Character Management",
+            "regenerateDefaultCard": "Regenerate Default Card",
+            "alert": {
+                "regenerateDefaultCard": {
+                    "title": "Regenerate Default Card",
+                    "description": "This will add the default AI Bot card to your character list.",
+                    "confirm": "Create Default Card"
+                }
+            }
+        },
+        "tagHider": {
+            "label": "Hidden Tags",
+            "description": "Hide characters with the following tags from the character list."
+        }
     },
     "dropdown": {
         "selectItem": "Select Item",
@@ -214,5 +442,20 @@
         "title": "App Mode",
         "remote": "Remote",
         "local": "Local"
+    },
+    "logs": {
+        "toast": {
+            "downloadok": "Logs Downloaded!",
+            "downloaderror": "Could Not Export Logs"
+        },
+        "alert": {
+            "delete": {
+                "title": "Delete Logs",
+                "description": "Are you sure you want to delete all logs? This cannot be undone."
+            }
+        },
+        "export": "Export Logs",
+        "flush": "Flush Logs",
+        "title": "Logs"
     }
 }
