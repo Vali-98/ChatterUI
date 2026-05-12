@@ -74,8 +74,8 @@ const ChracterEditorScreen = () => {
     usePreventRemove(edited, ({ data }) => {
         if (!charId) return
         Alert.alert({
-            title: t('character.editor.unsavedchanges.title'),
-            description: t('character.editor.unsavedchanges.description'),
+            title: t('character.editor.unsavedChanges.title'),
+            description: t('character.editor.unsavedChanges.description'),
             buttons: [
                 { label: t('common.cancel') },
                 {
@@ -86,7 +86,7 @@ const ChracterEditorScreen = () => {
                     },
                 },
                 {
-                    label: t('character.editor.unsavedchanges.discard'),
+                    label: t('character.editor.unsavedChanges.discard'),
                     onPress: () => {
                         navigation.dispatch(data.action)
                     },
@@ -101,14 +101,14 @@ const ChracterEditorScreen = () => {
             if (!charId) return
             Characters.exportCharacter(charId)
                 .catch((e) => {
-                    Logger.errorToast(t('character.editor.exportfailed'))
+                    Logger.errorToast(t('character.editor.exportFailed'))
                     Logger.error(JSON.stringify(e))
                 })
                 .then(() => {
                     Logger.infoToast(t('character.editor.exported'))
                 })
         } catch (e) {
-            Logger.errorToast(t('character.editor.exporterror', { error: JSON.stringify(e) }))
+            Logger.errorToast(t('character.editor.exportError', { error: JSON.stringify(e) }))
         }
     }
 
@@ -123,12 +123,12 @@ const ChracterEditorScreen = () => {
 
     const handleDeleteCard = () => {
         Alert.alert({
-            title: t('character.editor.deletecharacter.title'),
-            description: t('character.editor.deletecharacter.description', { name: charName }),
+            title: t('character.editor.deleteCharacter.title'),
+            description: t('character.editor.deleteCharacter.description', { name: charName }),
             buttons: [
                 { label: t('common.cancel') },
                 {
-                    label: t('character.editor.deletecharacter.confirm'),
+                    label: t('character.editor.deleteCharacter.confirm'),
                     onPress: () => {
                         Characters.db.mutate.deleteCard(charId ?? -1)
                         unloadCharacter()
@@ -150,12 +150,12 @@ const ChracterEditorScreen = () => {
 
     const handleDeleteImage = () => {
         Alert.alert({
-            title: t('character.editor.deleteimage.title'),
-            description: t('character.editor.deleteimage.description'),
+            title: t('character.editor.deleteImage.title'),
+            description: t('character.editor.deleteImage.description'),
             buttons: [
                 { label: t('common.cancel') },
                 {
-                    label: t('character.editor.deleteimage.confirm'),
+                    label: t('character.editor.deleteImage.confirm'),
                     onPress: () => {
                         if (characterCard) Characters.deleteImage(characterCard.image_id)
                     },
@@ -208,12 +208,12 @@ const ChracterEditorScreen = () => {
 
     const handleDeleteAltMessage = async () => {
         Alert.alert({
-            title: t('character.editor.deletealtmessage.title'),
-            description: t('character.editor.deletealtmessage.description'),
+            title: t('character.editor.deleteAltMessage.title'),
+            description: t('character.editor.deleteAltMessage.description'),
             buttons: [
                 { label: t('common.cancel') },
                 {
-                    label: t('character.editor.deletealtmessage.confirm'),
+                    label: t('character.editor.deleteAltMessage.confirm'),
                     onPress: async () => {
                         await deleteAltMessageRoutine()
                     },
@@ -246,7 +246,7 @@ const ChracterEditorScreen = () => {
                                 placement="right"
                                 buttons={[
                                     {
-                                        label: t('character.editor.changeimage'),
+                                        label: t('character.editor.changeImage'),
                                         icon: 'picture',
                                         onPress: (close) => {
                                             close()
@@ -254,7 +254,7 @@ const ChracterEditorScreen = () => {
                                         },
                                     },
                                     {
-                                        label: t('character.editor.changebackground'),
+                                        label: t('character.editor.changeBackground'),
                                         icon: 'picture',
                                         onPress: async (close) => {
                                             close()
@@ -266,7 +266,7 @@ const ChracterEditorScreen = () => {
                                     },
 
                                     {
-                                        label: t('character.editor.viewimage'),
+                                        label: t('character.editor.viewImage'),
                                         icon: 'search',
                                         onPress: (close) => {
                                             close()
@@ -274,7 +274,7 @@ const ChracterEditorScreen = () => {
                                         },
                                     },
                                     {
-                                        label: t('character.editor.deleteimage.confirm'),
+                                        label: t('character.editor.deleteImage.confirm'),
                                         icon: 'delete',
                                         onPress: (close) => {
                                             close()
@@ -283,7 +283,7 @@ const ChracterEditorScreen = () => {
                                         variant: 'warning',
                                     },
                                     {
-                                        label: t('character.editor.removebackground'),
+                                        label: t('character.editor.removeBackground'),
                                         icon: 'delete',
                                         onPress: (close) => {
                                             close()
@@ -349,7 +349,7 @@ const ChracterEditorScreen = () => {
 
                         <ThemedTextInput
                             scrollEnabled
-                            label={t('character.editor.descriptiontokens', {
+                            label={t('character.editor.descriptionTokens', {
                                 count: descriptionTokens,
                             })}
                             multiline
@@ -365,7 +365,7 @@ const ChracterEditorScreen = () => {
                         />
 
                         <ThemedTextInput
-                            label={t('character.editor.firstmessage')}
+                            label={t('character.editor.firstMessage')}
                             multiline
                             containerStyle={styles.input}
                             onChangeText={(mes) => {
@@ -385,7 +385,7 @@ const ChracterEditorScreen = () => {
                                     paddingBottom: 12,
                                 }}>
                                 <Text style={{ color: color.text._100 }}>
-                                    {t('character.editor.alternategreeting')}
+                                    {t('character.editor.alternateGreeting')}
                                     {'   '}
                                     {characterCard.alternate_greetings.length !== 0 && (
                                         <Text
@@ -481,7 +481,7 @@ const ChracterEditorScreen = () => {
                                         color: color.text._500,
                                         fontStyle: 'italic',
                                     }}>
-                                    {t('character.editor.noalternategreetings')}
+                                    {t('character.editor.noAlternateGreetings')}
                                 </Text>
                             )}
                         </View>
@@ -515,7 +515,7 @@ const ChracterEditorScreen = () => {
                         />
 
                         <ThemedTextInput
-                            label={t('character.editor.examplemessages')}
+                            label={t('character.editor.exampleMessages')}
                             multiline
                             containerStyle={styles.input}
                             onChangeText={(mes) => {

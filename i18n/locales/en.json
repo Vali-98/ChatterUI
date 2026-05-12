@@ -1,275 +1,272 @@
 {
-    "common": {
-        "back": "Back",
-        "noitems": "No Items",
-        "tryagain": "Try Again",
-        "result": "Result",
-        "results": "Results",
-        "selected": "Selected",
-        "suggestions": "Suggestions",
-        "chatterui": "ChatterUI",
-        "version": "Version",
-        "devmode": "DEV MODE",
-        "settings": "Settings",
-        "cpu": "CPU",
-        "test": "Test",
-        "save": "Save",
-        "edit": "Edit",
-        "close": "Close",
-        "clone": "Clone",
-        "name": "Name",
-        "description": "Description",
-        "about": "About",
-        "cancel": "Cancel",
-        "delete": "Delete",
-        "enable": "Enable",
-        "disable": "Disable",
-        "internal": "Internal",
-        "external": "External",
-        "none": "None",
-        "rename": "Rename",
-        "export": "Export",
-        "more": "More"
+    "about": {
+        "body1": "ChatterUI is a free and open-source application developed by Vali-98",
+        "body2": "This app is a passion project I develop in my free time. If you're enjoying the app, consider supporting its development!",
+        "devmodeenabled": "You have enabled dev mode.",
+        "disabledev": "Disable Dev Mode",
+        "disabledevmes": "Dev mode disabled.",
+        "donate": "Donate to ChatterUI here:",
+        "donateButton": "Support ChatterUI",
+        "logs": "Don't forget to add your Logs!",
+        "report": "Got an issue? Report it here:",
+        "versionprefix": "v"
     },
-    "tts": {
-        "language": "Language",
-        "voices": "Voices",
-        "test": "This is a test audio",
-        "autoafter": "Automatically TTS After Inference",
-        "live": "Automatically TTS During Inference",
-        "speed": "Speed",
-        "selectlang": "Select Language",
-        "selectvoice": "Select Voice",
-        "nospeaker": "No Speaker Chosen"
+    "appmode": {
+        "local": "Local",
+        "remote": "Remote",
+        "title": "App Mode"
     },
     "auth": {
         "needed": "Authorization Required"
     },
-    "db": {
-        "migrationerror": {
-            "title": "Database Migration Failed!",
-            "description": "If you are seeing this, something has gone terribly wrong. Report this error below, include a screenshot of the log above."
-        }
-    },
-    "navigation": {
-        "sampler": "Sampler",
-        "formatting": "Formatting",
-        "api": "API",
-        "models": "Models",
-        "tts": "TTS",
-        "logs": "Logs",
-        "about": "About",
-        "settings": "Settings",
-        "dev_components": "[DEV] Components",
-        "dev_colortest": "[DEV] ColorTest",
-        "dev_markdown": "[DEV] Markdown"
-    },
     "character": {
-        "list": {
-            "sortby": "Sort By",
-            "chatcreationfailed": "Chat creation backup has failed! Please report.",
-            "loaderror": "Couldn't load character: {{error}}",
-            "recent": "Recent",
-            "name": "Name",
-            "hiderenabled": "Hider Enabled",
-            "hiderdisabled": "Hider Disabled",
-            "searchbytags": "Search By Tags",
-            "searchbyname": "Search By Name",
-            "nomessages": "No Messages",
-            "nameempty": "Name Cannot Be Empty!",
-            "createnewcharacter": "Create New Character",
-            "namecannotbeempty": "Name cannot be empty",
-            "importfromfile": "Import From File",
-            "createcharacter": "Create Character",
-            "nocharactersmatch": "No Characters Match Search Result",
-            "nocharactersfound": "No Characters Found. Try Importing Some!"
-        },
         "editor": {
-            "unsavedchanges": {
-                "title": "Unsaved Changes",
-                "description": "You have unsaved changes, leaving now will discard your progress.",
-                "discard": "Discard Changes"
-            },
-            "deletecharacter": {
-                "title": "Delete Character",
-                "description": "Are you sure you want to delete '{{name}}'? This cannot be undone.",
-                "confirm": "Delete Character"
-            },
-            "clonecharacter": {
-                "title": "Clone Character",
+            "alternateGreeting": "Alternate Greeting",
+            "changeBackground": "Change Background",
+            "changeImage": "Change Image",
+            "cloneCharacter": {
+                "confirm": "Clone Character",
                 "description": "Are you sure you want to clone '{{name}}'?",
-                "confirm": "Clone Character"
+                "title": "Clone Character"
             },
-            "deleteimage": {
-                "title": "Delete Image",
-                "description": "Are you sure you want to delete this image? This cannot be undone.",
-                "confirm": "Delete Image"
-            },
-            "exportfailed": "Failed to export",
-            "exported": "Card Exported!",
-            "exporterror": "Could not export: {{error}}",
-            "saved": "Card Saved!",
-            "deleted": "Deleted character: {{name}}",
-            "deletealtmessage": {
-                "title": "Delete Alternate Message",
+            "deleteAltMessage": {
+                "confirm": "Delete",
                 "description": "Are you sure you want to delete this alternate message? This cannot be undone.",
-                "confirm": "Delete"
+                "title": "Delete Alternate Message"
             },
-            "title": "Edit Character",
-            "changeimage": "Change Image",
-            "changebackground": "Change Background",
-            "viewimage": "View Image",
-            "removebackground": "Remove Background",
+            "deleteCharacter": {
+                "confirm": "Delete Character",
+                "description": "Are you sure you want to delete '{{name}}'? This cannot be undone.",
+                "title": "Delete Character"
+            },
+            "deleted": "Deleted character: {{name}}",
+            "deleteImage": {
+                "confirm": "Delete Image",
+                "description": "Are you sure you want to delete this image? This cannot be undone.",
+                "title": "Delete Image"
+            },
+            "descriptionTokens": "Description Tokens: {{count}}",
+            "exampleMessages": "Example Messages",
             "export": "Export",
-            "descriptiontokens": "Description Tokens: {{count}}",
-            "firstmessage": "First Message",
-            "alternategreeting": "Alternate Greeting",
-            "noalternategreetings": "No Alternate Greetings",
+            "exported": "Card Exported!",
+            "exportError": "Could not export: {{error}}",
+            "exportFailed": "Failed to export",
+            "firstMessage": "First Message",
+            "noAlternateGreetings": "No Alternate Greetings",
             "personality": "Personality",
+            "removeBackground": "Remove Background",
+            "saved": "Card Saved!",
             "scenario": "Scenario",
-            "examplemessages": "Example Messages",
-            "tags": "Tags"
+            "tags": "Tags",
+            "title": "Edit Character",
+            "unsavedChanges": {
+                "description": "You have unsaved changes, leaving now will discard your progress.",
+                "discard": "Discard Changes",
+                "title": "Unsaved Changes"
+            },
+            "viewImage": "View Image"
+        },
+        "list": {
+            "chatcreationfailed": "Chat creation backup has failed! Please report.",
+            "createcharacter": "Create Character",
+            "createnewcharacter": "Create New Character",
+            "hiderdisabled": "Hider Disabled",
+            "hiderenabled": "Hider Enabled",
+            "importfromfile": "Import From File",
+            "loaderror": "Couldn't load character: {{error}}",
+            "name": "Name",
+            "namecannotbeempty": "Name cannot be empty",
+            "nameempty": "Name Cannot Be Empty!",
+            "nocharactersfound": "No Characters Found. Try Importing Some!",
+            "nocharactersmatch": "No Characters Match Search Result",
+            "nomessages": "No Messages",
+            "recent": "Recent",
+            "searchbyname": "Search By Name",
+            "searchbytags": "Search By Tags",
+            "sortby": "Sort By"
         }
     },
     "chat": {
+        "bubble": {
+            "prompt": "Prompt: {{tokens}} t/s",
+            "textgen": "    Text Gen: {{tokens}} t/s"
+        },
         "drawer": {
-            "delete": {
-                "title": "Delete Chat",
-                "description": "Are you sure you want to delete '{{name}}'? This cannot be undone.",
-                "confirm": "Delete Chat"
-            },
+            "chatsTitle": "Chats",
             "clone": {
-                "title": "Clone Chat",
+                "confirm": "Clone Chat",
                 "description": "Are you sure you want to clone '{{name}}'?",
-                "confirm": "Clone Chat"
+                "title": "Clone Chat"
+            },
+            "defaultchatfailed": "Something went wrong with creating a default chat",
+            "delete": {
+                "confirm": "Delete Chat",
+                "description": "Are you sure you want to delete '{{name}}'? This cannot be undone.",
+                "title": "Delete Chat"
             },
             "exported": "File: {{name}} saved to downloads!",
             "exportfailed": "Failed to export chat",
-            "undefined": "Chat is undefined",
-            "defaultchatfailed": "Something went wrong with creating a default chat",
-            "useralreadyset": "This User Is Already Set",
-            "nouser": "No Current User",
             "linkeduser": "Linked to User: {{name}}",
-            "rename": {
-                "title": "Rename Chat",
-                "action": "Rename Chat",
-                "namecannotbeempty": "Name cannot be empty"
-            },
             "linkuser": {
                 "action": "Link User"
             },
-            "searchTitle": "Search",
-            "chatsTitle": "Chats",
-            "searchPlaceholder": "Search for message...",
-            "startNewChat": "Start New Chat",
             "noResults": "No Results",
+            "nouser": "No Current User",
+            "rename": {
+                "action": "Rename Chat",
+                "namecannotbeempty": "Name cannot be empty",
+                "title": "Rename Chat"
+            },
             "resultsFound": "Results: {{count}}",
+            "searchPlaceholder": "Search for message...",
             "searchQueryFailed": "Failed to run chat search: {{error}}",
-            "unknown": "unknown"
-        },
-        "quickActions": {
-            "forkTitle": "Fork Chat",
-            "forkDescription": "This will create a clone of this chat from this message",
-            "forkButton": "Fork Chat",
-            "cloneFailed": "Failed to clone chat",
-            "copied": "Copied",
-            "copyFailed": "Failed to copy to clipboard"
-        },
-        "frame": {
-            "entryNumber": "#{{index}}",
-            "seconds": "{{seconds}}s"
-        },
-        "inputOptions": {
-            "mainMenu": "Main Menu",
-            "editCharacter": "Edit Character",
-            "chatHistory": "Chat History",
-            "takePicture": "Take Picture",
-            "addImage": "Add Image"
+            "searchTitle": "Search",
+            "startNewChat": "Start New Chat",
+            "undefined": "Chat is undefined",
+            "unknown": "unknown",
+            "useralreadyset": "This User Is Already Set"
         },
         "editor": {
+            "confirm": "Confirm",
             "delete": "Delete",
-            "reset": "Reset",
-            "confirm": "Confirm"
+            "reset": "Reset"
         },
         "footer": {
             "sendMessageToBegin": "Send a message to begin!",
             "startOfChat": "Start of chat"
         },
+        "frame": {
+            "entryNumber": "#{{index}}",
+            "seconds": "{{seconds}}s"
+        },
+        "importErrors": {
+            "failedToImport": "Failed to Import",
+            "noChatCharacter": "You are somehow importing a chat without a character or user"
+        },
+        "inputErrors": {
+            "abortGeneration": "Aborting Generation",
+            "failedToSend": "Failed to send message"
+        },
+        "inputOptions": {
+            "addImage": "Add Image",
+            "chatHistory": "Chat History",
+            "editCharacter": "Edit Character",
+            "mainMenu": "Main Menu",
+            "takePicture": "Take Picture"
+        },
         "modelName": {
             "noModelLoaded": "No Model Loaded"
+        },
+        "quickActions": {
+            "cloneFailed": "Failed to clone chat",
+            "copied": "Copied",
+            "copyFailed": "Failed to copy to clipboard",
+            "forkButton": "Fork Chat",
+            "forkDescription": "This will create a clone of this chat from this message",
+            "forkTitle": "Fork Chat"
         },
         "text": {
             "hideFiltered": "Hide Filtered",
             "showFiltered": "Show Filtered"
-        },
-        "importErrors": {
-            "noChatCharacter": "You are somehow importing a chat without a character or user",
-            "failedToImport": "Failed to Import"
-        },
-        "bubble": {
-            "prompt": "Prompt: {{tokens}} t/s",
-            "textgen": "    Text Gen: {{tokens}} t/s"
-        },
-        "inputErrors": {
-            "failedToSend": "Failed to send message",
-            "abortGeneration": "Aborting Generation"
         }
     },
-    "about": {
-        "body1": "ChatterUI is a free and open-source application developed by Vali-98",
-        "body2": "This app is a passion project I develop in my free time. If you're enjoying the app, consider supporting its development!",
-        "donate": "Donate to ChatterUI here:",
-        "report": "Got an issue? Report it here:",
-        "logs": "Don't forget to add your Logs!",
-        "donateButton": "Support ChatterUI",
-        "disabledev": "Disable Dev Mode",
-        "disabledevmes": "Dev mode disabled.",
-        "devmodeenabled": "You have enabled dev mode.",
-        "versionprefix": "v"
+    "common": {
+        "about": "About",
+        "back": "Back",
+        "cancel": "Cancel",
+        "chatterui": "ChatterUI",
+        "clone": "Clone",
+        "close": "Close",
+        "cpu": "CPU",
+        "delete": "Delete",
+        "description": "Description",
+        "devmode": "DEV MODE",
+        "disable": "Disable",
+        "edit": "Edit",
+        "enable": "Enable",
+        "export": "Export",
+        "external": "External",
+        "internal": "Internal",
+        "more": "More",
+        "name": "Name",
+        "noitems": "No Items",
+        "none": "None",
+        "rename": "Rename",
+        "result": "Result",
+        "results": "Results",
+        "save": "Save",
+        "selected": "Selected",
+        "settings": "Settings",
+        "suggestions": "Suggestions",
+        "test": "Test",
+        "tryagain": "Try Again",
+        "version": "Version"
     },
-    "users": {
-        "edit": {
-            "title": "Edit User",
-            "image": {
-                "change": "Change Image",
-                "view": "View Image",
-                "delete": "Delete Image",
-                "deletedesc": "Are you sure you want to delete this image?\nThis cannot be undone."
+    "connections": {
+        "add": {
+            "apiKey": "API Key",
+            "completionUrl": "Completion URL",
+            "createButton": "Create API",
+            "defaultFriendlyName": "New API",
+            "error": {
+                "200": "Could not retrieve models: {{error}}",
+                "modelparse": "Could not parse models",
+                "modelundef": "Models resulted in an undefined value",
+                "nonarray": "'Models resulted in an non-array value. `modelListParser` of template is likely incorrect'"
             },
-            "card": {
-                "delete": "Delete User",
-                "deletedesc": "Are you sure you want to delete '{{name}}'?\nThis cannot be undone.",
-                "clone": "Clone User",
-                "clonedesc": "Are you sure you want to clone '{{name}}'?"
-            }
+            "firstMessage": "First Message",
+            "firstMessageHint": "Default first message sent to Claude",
+            "friendlyName": "Friendly Name",
+            "fullUrlHint": "Note: Use full URL path",
+            "model": "Model",
+            "modelUrl": "Model URL",
+            "prefill": "Prefill",
+            "prefillHint": "Prefill before model response",
+            "selectConnectionType": "Select Connection Type",
+            "selectModel": "Select Model",
+            "title": "Add Connection"
         },
-        "nameplaceholder": "Empty names are discouraged",
-        "profilecount": "User Profiles",
-        "hint": "Hint: Swipe Left or press <icon/> to open the Users drawer",
-        "create": "Create New User"
-    },
-    "sampler": {
-        "title": "Samplers",
-        "notsuported": "Sampler ID [{{id}}] Not Supported",
-        "invalid": "Invalid Sampler Field!",
-        "empty": "No Samplers to Configure",
-        "toast": {
-            "exportok": "Exported Sampler Configuration!",
-            "lastconfig": "Cannot Delete Last Configuration",
-            "emptyname": "Sampler name cannot be empty",
-            "exists": "Sampler name already exists."
+        "connected": "Connected",
+        "editor": {
+            "apiKey": "API Key",
+            "completionUrl": "Completion URL",
+            "firstMessage": "First Message",
+            "firstMessageHint": "Default first message sent to Claude",
+            "friendlyName": "Friendly Name",
+            "fullUrlHint": "Note: Use full URL path",
+            "invalidTemplate": "Could not get valid template!",
+            "model": "Model",
+            "modelUrl": "Model URL",
+            "prefill": "Prefill",
+            "prefillHint": "Prefill before model response",
+            "saveButton": "Save Changes",
+            "selectModel": "Select Model",
+            "title": "Edit Connection"
         },
-        "alert": {
+        "failedToConnect": "Failed To Connect",
+        "item": {
             "delete": {
-                "title": "Delete Sampler",
-                "description": "Are you sure you want to delete '{{name}}'?"
+                "button": "Delete Connection",
+                "description": "Are you sure you want to delete '{{name}}'? This cannot be undone!",
+                "title": "Delete Connection"
             }
         },
-        "create": "Create Sampler",
-        "export": "Export Sampler",
-        "delete": "Delete Sampler",
-        "new": "New Sampler Preset",
-        "nosamplers": "You probably haven't added an API connection yet"
+        "manager": {
+            "add": "Add Connection",
+            "empty": "No Connections Added",
+            "header": "Connections"
+        },
+        "notConnected": "Not Connected",
+        "templates": {
+            "empty": "No Custom Templates Added",
+            "get": "Get Templates",
+            "import": "Import Template",
+            "importError": "Failed to import: {{error}}",
+            "learn": "Learn About Templates",
+            "paste": "Paste Template",
+            "pasteSheetTitle": "Paste Template Here",
+            "title": "Template Manager"
+        }
     },
     "contextlimit": {
         "allocation": "Context Allocation",
@@ -277,405 +274,408 @@
         "generated": "Generated",
         "warning": "Low Chat Context will forget messages faster"
     },
-    "model": {
-        "empty": "No Models Found. Try Importing Some!",
-        "settings": {
-            "title": "Model Settings",
-            "advanced": "Advanced Settings",
-            "cpu": "CPU Settings"
-        },
-        "item": {
-            "invalid": "Model is Invalid",
-            "contextlength": "Context Length",
-            "file": "File",
-            "noparamsize": "No Param Size",
-            "rename": "Rename Model"
-        },
-        "info": {
-            "loaded": "Model Loaded",
-            "hint": "Hint: Press <icon /> and import a GGUF model!"
-        },
-        "alert": {
-            "deletekv": {
-                "title": "Delete KV Cache",
-                "description": "Are you sure you want to delete the KV Cache? This cannot be undone. \n\n This will clear up {{size}} of space."
-            },
-            "deletemodel": {
-                "title": "Delete Model",
-                "description": "Are you sure you want to delete '{{name}}'?\n\nThis cannot be undone!",
-                "internal": "\n\nThis operation will clear up {{size}}",
-                "external": "\n\n(This will not delete external model files, just this entry)"
-            }
-        },
-        "toast": {
-            "deletekv": "KV Cache deleted!",
-            "failedtoload": "Failed to load model",
-            "failedtolink": "Failed to link model"
-        },
-        "selectmmproj": "Select MMPROJ Model",
-        "title": "Models",
-        "mtmd": "Multimodal Adapters",
-        "maxcontext": "Max Context",
-        "threads": "Threads",
-        "batch": "Batch",
-        "gpulayers": "GPU Layers",
-        "contextshift": "Context Shift",
-        "backenddev": "Backend Device",
-        "modelnamechat": "Show Model Name In Chat",
-        "autoload": "Automatically Load Model On Chat",
-        "savekv": "Save Local KV",
-        "savekvdesc": "Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV cache file may be very big and negatively impact battery life!",
-        "purgekv": "Purge KV Cache ({{size}})",
-        "copymodel": "Copy Model Into ChatterUI",
-        "externalmodel": "Use External Model"
-    },
-    "instruct": {
-        "formatting": "Instruct Formatting",
-        "macros": "Macros & Character Card",
-        "attachments": "Attachments",
-        "textformatter": {
-            "title": "Text Formatter",
-            "description": "Automatically formats first message to the style below"
-        },
-        "hiddentext": {
-            "title": "Hidden Text",
-            "description": "Hides text that matches regex patterns defined below. (case insensitive)"
-        },
-        "localtemplate": {
-            "title": "Local Template",
-            "label": "Use Built-In Local Model Template",
-            "description": "When in Local Mode, ChatterUI automatically uses the instruct template provided by the loaded model. Disable this if you want messages to be formatted using Instruct instead. System Prompt however is always used."
-        },
-        "filteredtext": {
-            "label": "Send Filtered Text",
-            "description": "Sends the filtered text for inference"
-        }
-    },
-    "formatting": {
-        "title": "Formatting",
-        "newPreset": "New Instruct Preset",
-        "selectConfig": "Select Config",
-        "configExists": "Config already exists",
-        "defaultName": "Default",
-        "regenerateDefaults": "Regenerate Default Instructs",
-        "regenerateDefaultsDescription": "Are you sure you want to regenerate default Instructs?",
-        "regenerateDefaultPresets": "Regenerate Default Presets",
-        "deleteConfig": "Delete Config",
-        "deleteConfigDescription": "Are you sure you want to delete '{{name}}'?",
-        "deleteInstruct": "Delete Instruct",
-        "createConfig": "Create Config",
-        "exportConfig": "Export Config",
-        "jsonExtension": ".json",
-        "toast": {
-            "configCreated": "Config created.",
-            "configNameExists": "Config name already exists.",
-            "savedToDownloads": "Saved \"{{name}}\" to Downloads",
-            "cannotDeleteLastPreset": "Cannot delete last Instruct preset."
-        },
-        "alert": {
-            "regenerateDefaults": {
-                "title": "Regenerate Default Instructs",
-                "description": "Are you sure you want to regenerate default Instructs?",
-                "cancel": "Cancel",
-                "confirm": "Regenerate Default Presets"
-            },
-            "deleteConfig": {
-                "title": "Delete Config",
-                "description": "Are you sure you want to delete '{{name}}'?",
-                "cancel": "Cancel",
-                "confirm": "Delete Instruct"
-            }
-        },
-        "autoformatter": {
-            "disabled": "Disabled",
-            "disabledExample": "*<No Formatting>*",
-            "plainActionQuoteSpeech": "Plain Action, Quote Speech",
-            "plainActionQuoteSpeechExample": "Some action, \"Some speech\"",
-            "asteriskActionPlainSpeech": "Asterisk Action, Plain Speech",
-            "asteriskActionPlainSpeechExample": "*Some action* Some speech",
-            "asteriskActionQuoteSpeech": "Asterisk Action, Quote Speech",
-            "asteriskActionQuoteSpeechExample": "*Some action* \"Some speech\""
-        },
-        "sections": {
-            "systemPrompt": "System Prompt",
-            "systemPromptFormat": "System Prompt Format",
-            "systemPrefix": "System Prefix",
-            "systemSuffix": "System Suffix",
-            "inputPrefix": "Input Prefix",
-            "inputSuffix": "Input Suffix",
-            "outputPrefix": "Output Prefix",
-            "outputSuffix": "Output Suffix",
-            "lastOutputPrefix": "Last Output Prefix",
-            "stopSequence": "Stop Sequence",
-            "useCommonStopSequences": "Use Common Stop Sequences",
-            "wrapInNewline": "Wrap In Newline",
-            "includeNames": "Include Names",
-            "addTimestamp": "Add Timestamp",
-            "removeThinkTags": "Remove Think Tags",
-            "useExamples": "Use Examples",
-            "useScenario": "Use Scenario",
-            "usePersonality": "Use Personality",
-            "sendImages": "Send Images",
-            "sendDocuments": "Send Documents",
-            "sendAudio": "Send Audio",
-            "useLastImageOnly": "Use Last Image Only"
-        }
-    },
-    "connections": {
-        "manager": {
-            "header": "Connections",
-            "empty": "No Connections Added",
-            "add": "Add Connection"
-        },
-        "add": {
-            "title": "Add Connection",
-            "selectConnectionType": "Select Connection Type",
-            "friendlyName": "Friendly Name",
-            "completionUrl": "Completion URL",
-            "fullUrlHint": "Note: Use full URL path",
-            "modelUrl": "Model URL",
-            "selectModel": "Select Model",
-            "apiKey": "API Key",
-            "defaultFriendlyName": "New API",
-            "model": "Model",
-            "firstMessage": "First Message",
-            "firstMessageHint": "Default first message sent to Claude",
-            "prefill": "Prefill",
-            "prefillHint": "Prefill before model response",
-            "createButton": "Create API",
-            "error": {
-                "200": "Could not retrieve models: {{error}}",
-                "modelparse": "Could not parse models",
-                "modelundef": "Models resulted in an undefined value",
-                "nonarray": "'Models resulted in an non-array value. `modelListParser` of template is likely incorrect'"
-            }
-        },
-        "editor": {
-            "title": "Edit Connection",
-            "invalidTemplate": "Could not get valid template!",
-            "friendlyName": "Friendly Name",
-            "completionUrl": "Completion URL",
-            "fullUrlHint": "Note: Use full URL path",
-            "modelUrl": "Model URL",
-            "apiKey": "API Key",
-            "model": "Model",
-            "selectModel": "Select Model",
-            "firstMessage": "First Message",
-            "firstMessageHint": "Default first message sent to Claude",
-            "prefill": "Prefill",
-            "prefillHint": "Prefill before model response",
-            "saveButton": "Save Changes"
-        },
-        "templates": {
-            "title": "Template Manager",
-            "import": "Import Template",
-            "paste": "Paste Template",
-            "get": "Get Templates",
-            "learn": "Learn About Templates",
-            "pasteSheetTitle": "Paste Template Here",
-            "importError": "Failed to import: {{error}}",
-            "empty": "No Custom Templates Added"
-        },
-        "notConnected": "Not Connected",
-        "failedToConnect": "Failed To Connect",
-        "connected": "Connected",
-        "item": {
-            "delete": {
-                "title": "Delete Connection",
-                "description": "Are you sure you want to delete '{{name}}'? This cannot be undone!",
-                "button": "Delete Connection"
-            }
-        }
-    },
-    "settings": {
-        "title": "Settings",
-        "chat": {
-            "title": "Chat",
-            "useFirstMessage": "Create first message",
-            "useFirstMessageDescription": "Add an initial message when creating a new chat.",
-            "loadChatOnStartup": "Load chat on startup",
-            "loadChatOnStartupDescription": "Automatically reopen the last chat when the app launches.",
-            "autoLoadUser": "Auto-load selected user",
-            "autoLoadUserDescription": "Automatically load the current user profile into new chats.",
-            "autoGenerateTitles": "Auto-generate chat titles",
-            "autoGenerateTitlesDescription": "Create titles for new chats automatically.",
-            "askInChatterUI": "Ask in ChatterUI",
-            "askInChatterUIDescription": "Use ChatterUI prompts for text intent instead of the default keyboard behavior.",
-            "styleButton": "Chat Style"
-        },
-        "chatwindow": {
-            "title": "Chat Window",
-            "autoScroll": "Auto-scroll",
-            "autoScrollDescription": "Scroll to the latest message automatically.",
-            "sendOnEnter": "Send on Enter",
-            "sendOnEnterDescription": "Send your message when pressing Enter.",
-            "showTokensPerSecond": "Show tokens per second",
-            "showTokensPerSecondDescription": "Display token throughput during generation.",
-            "quickDelete": "Quick delete",
-            "quickDeleteDescription": "Allow deleting text with a quick swipe gesture.",
-            "saveScrollPosition": "Save scroll position",
-            "saveScrollPositionDescription": "Restore the last chat position when reopening the conversation.",
-            "wideChat": "Wide chat mode",
-            "wideChatDescription": "Use a wider layout for the chat window.",
-            "alternatePositions": "Alternate chat positions",
-            "alternatePositionsDescription": "Alternate incoming and outgoing message alignment."
-        },
-        "chatstyle": {
-            "title": "Chat Style",
-            "fontSize": "Font Size",
-            "fontWeight": "Font Weight"
-        },
-        "style": {
-            "title": "Style",
-            "changeTheme": "Change Theme",
-            "importBackground": "Import Chat Background",
-            "replaceBackground": "Replace Chat Background",
-            "deleteBackground": "Delete Chat Background",
-            "alert": {
-                "deleteBackground": {
-                    "title": "Delete Background",
-                    "description": "Are you sure you want to delete this background? This cannot be undone!",
-                    "confirm": "Delete Background"
-                }
-            }
-        },
-        "colors": {
-            "title": "Themes",
-            "useSystemDarkMode": "Use System Dark Mode",
-            "pasteThemeTitle": "Paste Theme Here",
-            "custom": "Custom",
-            "builtIn": "Built-in",
-            "active": "Active",
-            "contextMenu": {
-                "importTheme": "Import Theme",
-                "pasteTheme": "Paste Theme",
-                "getThemes": "Get Themes"
-            },
-            "alert": {
-                "deleteTheme": {
-                    "title": "Delete Theme",
-                    "description": "Are you sure you want to delete '{{name}}'? This cannot be undone!",
-                    "confirm": "Delete Theme"
-                }
-            },
-            "error": {
-                "failedToImport": "Failed to import: {{error}}"
-            }
-        },
-        "generating": {
-            "title": "Generation",
-            "printContext": "Print Context",
-            "printContextDescription": "Prints the generation context to logs for debugging",
-            "bypassContextLength": "Bypass Context Length",
-            "bypassContextLengthDescription": "Ignores context length limits when building prompts"
-        },
-        "notification": {
-            "title": "Notifications",
-            "enableNotifications": "Enable Notifications",
-            "enableNotificationsDescription": "Sends notifications when the app is in the background",
-            "playSound": "Notification Sound",
-            "vibrate": "Notification Vibration",
-            "showText": "Show Text In Notification",
-            "showTextDescription": "Shows generated messages in notifications"
-        },
-        "database": {
-            "title": "Database Management",
-            "warningText": "WARNING: ensure imported database is from the same app version!",
-            "exportButton": "Export Database",
-            "importButton": "Import Database",
-            "rerunMigrationsButton": "Rerun Migrations",
-            "toast": {
-                "downloadOk": "Download Successful!",
-                "downloadFailed": "Failed to copy database: {{error}}"
-            },
-            "alert": {
-                "export": {
-                    "title": "Export Database",
-                    "description": "Are you sure you want to export the database file?\n\nIt will automatically be downloaded to Downloads",
-                    "confirm": "Export Database"
-                },
-                "import": {
-                    "title": "Import Database",
-                    "description": "Are you sure you want to import this database? This may destroy the current database!\n\nA backup will automatically be downloaded.\n\nApp will restart automatically",
-                    "confirm": "Import"
-                },
-                "versionMismatch": {
-                    "title": "Different Version",
-                    "description": "The imported database file has a different app version ({{importedVersion}}) than the installed version ({{currentVersion}}). Importing this database may break or corrupt the database. It is recommended to use the same app version.",
-                    "confirm": "Import Anyways"
-                },
-                "rerunMigrations": {
-                    "title": "Rerun Migrations",
-                    "description": "Rerunning migrations may destroy your database. Be sure to export a backup.",
-                    "confirm": "Rerun Migrations"
-                }
-            }
-        },
-        "screen": {
-            "title": "Screen",
-            "unlockOrientation": "Unlock Orientation",
-            "unlockOrientationDescription": "Allows landscape on phones (App restart required)",
-            "keepAwake": "Keep Awake",
-            "keepAwakeDescription": "Keeps app awake in foreground"
-        },
-        "security": {
-            "title": "Security",
-            "lockApp": "Lock App",
-            "lockAppDescription": "Requires user authentication to open the app. This will not work if you have no device locks enabled."
-        },
-        "character": {
-            "title": "Character Management",
-            "regenerateDefaultCard": "Regenerate Default Card",
-            "alert": {
-                "regenerateDefaultCard": {
-                    "title": "Regenerate Default Card",
-                    "description": "This will add the default AI Bot card to your character list.",
-                    "confirm": "Create Default Card"
-                }
-            }
-        },
-        "tagHider": {
-            "label": "Hidden Tags",
-            "description": "Hide characters with the following tags from the character list."
+    "db": {
+        "migrationerror": {
+            "description": "If you are seeing this, something has gone terribly wrong. Report this error below, include a screenshot of the log above.",
+            "title": "Database Migration Failed!"
         }
     },
     "dropdown": {
-        "selectItem": "Select Item",
-        "filter": "Filter..."
+        "filter": "Filter...",
+        "selectItem": "Select Item"
+    },
+    "formatting": {
+        "alert": {
+            "deleteConfig": {
+                "cancel": "Cancel",
+                "confirm": "Delete Instruct",
+                "description": "Are you sure you want to delete '{{name}}'?",
+                "title": "Delete Config"
+            },
+            "regenerateDefaults": {
+                "cancel": "Cancel",
+                "confirm": "Regenerate Default Presets",
+                "description": "Are you sure you want to regenerate default Instructs?",
+                "title": "Regenerate Default Instructs"
+            }
+        },
+        "autoformatter": {
+            "asteriskActionPlainSpeech": "Asterisk Action, Plain Speech",
+            "asteriskActionPlainSpeechExample": "*Some action* Some speech",
+            "asteriskActionQuoteSpeech": "Asterisk Action, Quote Speech",
+            "asteriskActionQuoteSpeechExample": "*Some action* \"Some speech\"",
+            "disabled": "Disabled",
+            "disabledExample": "*<No Formatting>*",
+            "plainActionQuoteSpeech": "Plain Action, Quote Speech",
+            "plainActionQuoteSpeechExample": "Some action, \"Some speech\""
+        },
+        "configExists": "Config already exists",
+        "createConfig": "Create Config",
+        "defaultName": "Default",
+        "deleteConfig": "Delete Config",
+        "deleteConfigDescription": "Are you sure you want to delete '{{name}}'?",
+        "deleteInstruct": "Delete Instruct",
+        "exportConfig": "Export Config",
+        "jsonExtension": ".json",
+        "newPreset": "New Instruct Preset",
+        "regenerateDefaultPresets": "Regenerate Default Presets",
+        "regenerateDefaults": "Regenerate Default Instructs",
+        "regenerateDefaultsDescription": "Are you sure you want to regenerate default Instructs?",
+        "sections": {
+            "addTimestamp": "Add Timestamp",
+            "includeNames": "Include Names",
+            "inputPrefix": "Input Prefix",
+            "inputSuffix": "Input Suffix",
+            "lastOutputPrefix": "Last Output Prefix",
+            "outputPrefix": "Output Prefix",
+            "outputSuffix": "Output Suffix",
+            "removeThinkTags": "Remove Think Tags",
+            "sendAudio": "Send Audio",
+            "sendDocuments": "Send Documents",
+            "sendImages": "Send Images",
+            "stopSequence": "Stop Sequence",
+            "systemPrefix": "System Prefix",
+            "systemPrompt": "System Prompt",
+            "systemPromptFormat": "System Prompt Format",
+            "systemSuffix": "System Suffix",
+            "useCommonStopSequences": "Use Common Stop Sequences",
+            "useExamples": "Use Examples",
+            "useLastImageOnly": "Use Last Image Only",
+            "usePersonality": "Use Personality",
+            "useScenario": "Use Scenario",
+            "wrapInNewline": "Wrap In Newline"
+        },
+        "selectConfig": "Select Config",
+        "title": "Formatting",
+        "toast": {
+            "cannotDeleteLastPreset": "Cannot delete last Instruct preset.",
+            "configCreated": "Config created.",
+            "configNameExists": "Config name already exists.",
+            "savedToDownloads": "Saved \"{{name}}\" to Downloads"
+        }
     },
     "horizontalSelector": {
-        "label": "Selector Label",
-        "description": "Optional helpful description for the selector."
+        "description": "Optional helpful description for the selector.",
+        "label": "Selector Label"
+    },
+    "instruct": {
+        "attachments": "Attachments",
+        "filteredtext": {
+            "description": "Sends the filtered text for inference",
+            "label": "Send Filtered Text"
+        },
+        "formatting": "Instruct Formatting",
+        "hiddentext": {
+            "description": "Hides text that matches regex patterns defined below. (case insensitive)",
+            "title": "Hidden Text"
+        },
+        "localtemplate": {
+            "description": "When in Local Mode, ChatterUI automatically uses the instruct template provided by the loaded model. Disable this if you want messages to be formatted using Instruct instead. System Prompt however is always used.",
+            "label": "Use Built-In Local Model Template",
+            "title": "Local Template"
+        },
+        "macros": "Macros & Character Card",
+        "textformatter": {
+            "description": "Automatically formats first message to the style below",
+            "title": "Text Formatter"
+        }
+    },
+    "logs": {
+        "alert": {
+            "delete": {
+                "description": "Are you sure you want to delete all logs? This cannot be undone.",
+                "title": "Delete Logs"
+            }
+        },
+        "export": "Export Logs",
+        "flush": "Flush Logs",
+        "title": "Logs",
+        "toast": {
+            "downloaderror": "Could Not Export Logs",
+            "downloadok": "Logs Downloaded!"
+        }
+    },
+    "model": {
+        "alert": {
+            "deletekv": {
+                "description": "Are you sure you want to delete the KV Cache? This cannot be undone. \n\n This will clear up {{size}} of space.",
+                "title": "Delete KV Cache"
+            },
+            "deletemodel": {
+                "description": "Are you sure you want to delete '{{name}}'?\n\nThis cannot be undone!",
+                "external": "\n\n(This will not delete external model files, just this entry)",
+                "internal": "\n\nThis operation will clear up {{size}}",
+                "title": "Delete Model"
+            }
+        },
+        "autoload": "Automatically Load Model On Chat",
+        "backenddev": "Backend Device",
+        "batch": "Batch",
+        "contextshift": "Context Shift",
+        "copymodel": "Copy Model Into ChatterUI",
+        "empty": "No Models Found. Try Importing Some!",
+        "externalmodel": "Use External Model",
+        "gpulayers": "GPU Layers",
+        "info": {
+            "hint": "Hint: Press <icon /> and import a GGUF model!",
+            "loaded": "Model Loaded"
+        },
+        "item": {
+            "contextlength": "Context Length",
+            "file": "File",
+            "invalid": "Model is Invalid",
+            "noparamsize": "No Param Size",
+            "rename": "Rename Model"
+        },
+        "maxcontext": "Max Context",
+        "modelnamechat": "Show Model Name In Chat",
+        "mtmd": "Multimodal Adapters",
+        "purgekv": "Purge KV Cache ({{size}})",
+        "savekv": "Save Local KV",
+        "savekvdesc": "Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV cache file may be very big and negatively impact battery life!",
+        "selectmmproj": "Select MMPROJ Model",
+        "settings": {
+            "advanced": "Advanced Settings",
+            "cpu": "CPU Settings",
+            "title": "Model Settings"
+        },
+        "threads": "Threads",
+        "title": "Models",
+        "toast": {
+            "deletekv": "KV Cache deleted!",
+            "failedtolink": "Failed to link model",
+            "failedtoload": "Failed to load model"
+        }
     },
     "multiDropdown": {
         "counter_one": "Selected {{count}} item",
         "counter_other": "Selected {{count}} items",
         "noItemsSelected": "No items selected"
     },
-    "stringArrayEditor": {
-        "placeholder": "Enter value...",
-        "emptyValueError": "Value cannot be empty",
-        "duplicateValueError": "Value already exists",
-        "add": "Add"
+    "navigation": {
+        "about": "About",
+        "api": "API",
+        "dev_colortest": "[DEV] ColorTest",
+        "dev_components": "[DEV] Components",
+        "dev_markdown": "[DEV] Markdown",
+        "formatting": "Formatting",
+        "logs": "Logs",
+        "models": "Models",
+        "sampler": "Sampler",
+        "settings": "Settings",
+        "tts": "TTS"
     },
-    "appmode": {
-        "title": "App Mode",
-        "remote": "Remote",
-        "local": "Local"
-    },
-    "logs": {
-        "toast": {
-            "downloadok": "Logs Downloaded!",
-            "downloaderror": "Could Not Export Logs"
-        },
+    "sampler": {
         "alert": {
             "delete": {
-                "title": "Delete Logs",
-                "description": "Are you sure you want to delete all logs? This cannot be undone."
+                "description": "Are you sure you want to delete '{{name}}'?",
+                "title": "Delete Sampler"
             }
         },
-        "export": "Export Logs",
-        "flush": "Flush Logs",
-        "title": "Logs"
+        "create": "Create Sampler",
+        "delete": "Delete Sampler",
+        "empty": "No Samplers to Configure",
+        "export": "Export Sampler",
+        "invalid": "Invalid Sampler Field!",
+        "new": "New Sampler Preset",
+        "nosamplers": "You probably haven't added an API connection yet",
+        "notsuported": "Sampler ID [{{id}}] Not Supported",
+        "title": "Samplers",
+        "toast": {
+            "emptyname": "Sampler name cannot be empty",
+            "exists": "Sampler name already exists.",
+            "exportok": "Exported Sampler Configuration!",
+            "lastconfig": "Cannot Delete Last Configuration"
+        }
+    },
+    "settings": {
+        "character": {
+            "alert": {
+                "regenerateDefaultCard": {
+                    "confirm": "Create Default Card",
+                    "description": "This will add the default AI Bot card to your character list.",
+                    "title": "Regenerate Default Card"
+                }
+            },
+            "regenerateDefaultCard": "Regenerate Default Card",
+            "title": "Character Management"
+        },
+        "chat": {
+            "askInChatterUI": "Ask in ChatterUI",
+            "askInChatterUIDescription": "Use ChatterUI prompts for text intent instead of the default keyboard behavior.",
+            "autoGenerateTitles": "Auto-generate chat titles",
+            "autoGenerateTitlesDescription": "Create titles for new chats automatically.",
+            "autoLoadUser": "Auto-load selected user",
+            "autoLoadUserDescription": "Automatically load the current user profile into new chats.",
+            "loadChatOnStartup": "Load chat on startup",
+            "loadChatOnStartupDescription": "Automatically reopen the last chat when the app launches.",
+            "styleButton": "Chat Style",
+            "title": "Chat",
+            "useFirstMessage": "Create first message",
+            "useFirstMessageDescription": "Add an initial message when creating a new chat."
+        },
+        "chatstyle": {
+            "fontSize": "Font Size",
+            "fontWeight": "Font Weight",
+            "title": "Chat Style"
+        },
+        "chatwindow": {
+            "alternatePositions": "Alternate chat positions",
+            "alternatePositionsDescription": "Alternate incoming and outgoing message alignment.",
+            "autoScroll": "Auto-scroll",
+            "autoScrollDescription": "Scroll to the latest message automatically.",
+            "quickDelete": "Quick delete",
+            "quickDeleteDescription": "Allow deleting text with a quick swipe gesture.",
+            "saveScrollPosition": "Save scroll position",
+            "saveScrollPositionDescription": "Restore the last chat position when reopening the conversation.",
+            "sendOnEnter": "Send on Enter",
+            "sendOnEnterDescription": "Send your message when pressing Enter.",
+            "showTokensPerSecond": "Show tokens per second",
+            "showTokensPerSecondDescription": "Display token throughput during generation.",
+            "title": "Chat Window",
+            "wideChat": "Wide chat mode",
+            "wideChatDescription": "Use a wider layout for the chat window."
+        },
+        "colors": {
+            "active": "Active",
+            "alert": {
+                "deleteTheme": {
+                    "confirm": "Delete Theme",
+                    "description": "Are you sure you want to delete '{{name}}'? This cannot be undone!",
+                    "title": "Delete Theme"
+                }
+            },
+            "builtIn": "Built-in",
+            "contextMenu": {
+                "getThemes": "Get Themes",
+                "importTheme": "Import Theme",
+                "pasteTheme": "Paste Theme"
+            },
+            "custom": "Custom",
+            "error": {
+                "failedToImport": "Failed to import: {{error}}"
+            },
+            "pasteThemeTitle": "Paste Theme Here",
+            "title": "Themes",
+            "useSystemDarkMode": "Use System Dark Mode"
+        },
+        "database": {
+            "alert": {
+                "export": {
+                    "confirm": "Export Database",
+                    "description": "Are you sure you want to export the database file?\n\nIt will automatically be downloaded to Downloads",
+                    "title": "Export Database"
+                },
+                "import": {
+                    "confirm": "Import",
+                    "description": "Are you sure you want to import this database? This may destroy the current database!\n\nA backup will automatically be downloaded.\n\nApp will restart automatically",
+                    "title": "Import Database"
+                },
+                "rerunMigrations": {
+                    "confirm": "Rerun Migrations",
+                    "description": "Rerunning migrations may destroy your database. Be sure to export a backup.",
+                    "title": "Rerun Migrations"
+                },
+                "versionMismatch": {
+                    "confirm": "Import Anyways",
+                    "description": "The imported database file has a different app version ({{importedVersion}}) than the installed version ({{currentVersion}}). Importing this database may break or corrupt the database. It is recommended to use the same app version.",
+                    "title": "Different Version"
+                }
+            },
+            "exportButton": "Export Database",
+            "importButton": "Import Database",
+            "rerunMigrationsButton": "Rerun Migrations",
+            "title": "Database Management",
+            "toast": {
+                "downloadFailed": "Failed to copy database: {{error}}",
+                "downloadOk": "Download Successful!"
+            },
+            "warningText": "WARNING: ensure imported database is from the same app version!"
+        },
+        "generating": {
+            "bypassContextLength": "Bypass Context Length",
+            "bypassContextLengthDescription": "Ignores context length limits when building prompts",
+            "printContext": "Print Context",
+            "printContextDescription": "Prints the generation context to logs for debugging",
+            "title": "Generation"
+        },
+        "notification": {
+            "enableNotifications": "Enable Notifications",
+            "enableNotificationsDescription": "Sends notifications when the app is in the background",
+            "playSound": "Notification Sound",
+            "showText": "Show Text In Notification",
+            "showTextDescription": "Shows generated messages in notifications",
+            "title": "Notifications",
+            "vibrate": "Notification Vibration"
+        },
+        "screen": {
+            "keepAwake": "Keep Awake",
+            "keepAwakeDescription": "Keeps app awake in foreground",
+            "title": "Screen",
+            "unlockOrientation": "Unlock Orientation",
+            "unlockOrientationDescription": "Allows landscape on phones (App restart required)"
+        },
+        "security": {
+            "lockApp": "Lock App",
+            "lockAppDescription": "Requires user authentication to open the app. This will not work if you have no device locks enabled.",
+            "title": "Security"
+        },
+        "style": {
+            "alert": {
+                "deleteBackground": {
+                    "confirm": "Delete Background",
+                    "description": "Are you sure you want to delete this background? This cannot be undone!",
+                    "title": "Delete Background"
+                }
+            },
+            "changeTheme": "Change Theme",
+            "deleteBackground": "Delete Chat Background",
+            "importBackground": "Import Chat Background",
+            "replaceBackground": "Replace Chat Background",
+            "title": "Style"
+        },
+        "tagHider": {
+            "description": "Hide characters with the following tags from the character list.",
+            "label": "Hidden Tags"
+        },
+        "title": "Settings"
+    },
+    "stringArrayEditor": {
+        "add": "Add",
+        "duplicateValueError": "Value already exists",
+        "emptyValueError": "Value cannot be empty",
+        "placeholder": "Enter value..."
+    },
+    "tts": {
+        "autoafter": "Automatically TTS After Inference",
+        "language": "Language",
+        "live": "Automatically TTS During Inference",
+        "nospeaker": "No Speaker Chosen",
+        "selectlang": "Select Language",
+        "selectvoice": "Select Voice",
+        "speed": "Speed",
+        "test": "This is a test audio",
+        "voices": "Voices"
+    },
+    "users": {
+        "create": "Create New User",
+        "edit": {
+            "card": {
+                "clone": "Clone User",
+                "clonedesc": "Are you sure you want to clone '{{name}}'?",
+                "delete": "Delete User",
+                "deletedesc": "Are you sure you want to delete '{{name}}'?\nThis cannot be undone."
+            },
+            "image": {
+                "change": "Change Image",
+                "delete": "Delete Image",
+                "deletedesc": "Are you sure you want to delete this image?\nThis cannot be undone.",
+                "view": "View Image"
+            },
+            "title": "Edit User"
+        },
+        "hint": "Hint: Swipe Left or press <icon/> to open the Users drawer",
+        "nameplaceholder": "Empty names are discouraged",
+        "profilecount": "User Profiles"
     }
 }
