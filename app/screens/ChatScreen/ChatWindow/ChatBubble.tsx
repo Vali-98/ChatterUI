@@ -97,11 +97,11 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                                 textAlign: 'right',
                                 fontSize: fontSize.s,
                             }}>
-                            {t('chat.bubble.prompt', {
+                            {t('chat.bubble.promptSpeed', {
                                 tokens: getFiniteValue(timings.prompt_per_second),
                             })}
 
-                            {t('chat.bubble.textgen', {
+                            {t('chat.bubble.textGenerationSpeed', {
                                 tokens: getFiniteValue(timings.predicted_per_second),
                             })}
                         </Text>

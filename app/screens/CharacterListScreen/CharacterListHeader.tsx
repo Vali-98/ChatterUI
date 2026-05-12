@@ -92,10 +92,10 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                             color: color.text._400,
                             fontSize: 16,
                         }}>
-                        {t('character.list.sortby')}
+                        {t('character.list.sort.label')}
                     </Text>
-                    <SortButton type="modified" label={t('character.list.recent')} />
-                    <SortButton type="name" label={t('character.list.name')} />
+                    <SortButton type="modified" label={t('character.list.sort.recent')} />
+                    <SortButton type="name" label={t('character.list.columns.name')} />
                 </View>
                 <View
                     style={{
@@ -128,8 +128,8 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                             Logger.infoToast(
                                 t(
                                     !useTagHider
-                                        ? 'character.list.hiderenabled'
-                                        : 'character.list.hiderdisabled'
+                                        ? 'character.list.messages.hiderEnabled'
+                                        : 'character.list.messages.hiderDisabled'
                                 )
                             )
                         }}
@@ -149,7 +149,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                                 suggestions={data
                                     .sort((a, b) => b.tagCount - a.tagCount)
                                     .map((item) => item.tag)}
-                                label={t('character.list.searchbytags')}
+                                label={t('character.list.search.byTags')}
                                 value={tagFilter}
                                 setValue={setTagFilter}
                                 placeholder="Filter Tags..."
@@ -158,7 +158,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                             />
                         )}
                         <ThemedTextInput
-                            label={t('character.list.searchbyname')}
+                            label={t('character.list.search.byName')}
                             containerStyle={{ flex: 0 }}
                             value={textFilter}
                             onChangeText={setTextFilter}
@@ -173,7 +173,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                                     marginTop: 8,
                                     color: color.text._400,
                                 }}>
-                                {t('common.results')}: {resultLength}
+                                {t('common.labels.results')}: {resultLength}
                             </Text>
                         )}
                     </Animated.View>

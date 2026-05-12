@@ -87,7 +87,7 @@ const ChatInput = () => {
     )
 
     const abortResponse = async () => {
-        Logger.info(t('chat.inputErrors.abortGeneration'))
+        Logger.info(t('chat.input.errors.abortGeneration'))
         if (abortFunction) await abortFunction()
     }
 
@@ -109,7 +109,7 @@ const ChatInput = () => {
             const swipeId = result?.swipes?.[0]?.id
             if (swipeId) generateResponse(swipeId)
         } catch (e) {
-            Logger.errorToast(t('chat.inputErrors.failedToSend'))
+            Logger.errorToast(t('chat.input.errors.failedToSend'))
             Logger.error(JSON.stringify(e))
         } finally {
             setDisableSend(false)
@@ -247,7 +247,7 @@ const ChatInput = () => {
                                 triggerIconSize={20}
                                 buttons={[
                                     {
-                                        label: t('chat.inputOptions.takePicture'),
+                                        label: t('chat.input.actions.takePicture'),
                                         icon: 'camera',
                                         onPress: (close) => {
                                             setShowCamera(true)
@@ -255,7 +255,7 @@ const ChatInput = () => {
                                         },
                                     },
                                     {
-                                        label: t('chat.inputOptions.addImage'),
+                                        label: t('chat.input.actions.addImage'),
                                         icon: 'picture',
                                         onPress: async (close) => {
                                             close()

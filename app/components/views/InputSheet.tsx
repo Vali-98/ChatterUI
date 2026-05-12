@@ -90,7 +90,7 @@ const InputSheet: React.FC<InputSheetProps> = ({
                         justifyContent: 'space-between',
                     }}>
                     <ThemedButton
-                        label={t('common.close')}
+                        label={t('common.actions.close')}
                         variant="secondary"
                         onPress={handleClose}
                     />
@@ -117,7 +117,7 @@ const InputSheet: React.FC<InputSheetProps> = ({
                         />
                     </View>
                     <ThemedButton
-                        label={t('common.save')}
+                        label={t('common.actions.save')}
                         onPress={() => {
                             const result = verifyText(text)
                             if (result) setErrorMessage(result)

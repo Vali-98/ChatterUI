@@ -122,7 +122,7 @@ const MultiDropdownSheet = <T,>({
                         )}
                     />
                 ) : (
-                    <Text style={styles.emptyText}>{t('common.noitems')}</Text>
+                    <Text style={styles.emptyText}>{t('common.emptyStates.noItems')}</Text>
                 )}
                 {search && (
                     <TextInput
@@ -137,7 +137,7 @@ const MultiDropdownSheet = <T,>({
             <Pressable style={[style, styles.button]} onPress={() => setShowList(true)}>
                 {selected && selected.length > 0 && (
                     <Text style={styles.buttonText}>
-                        {selected.length} {t('common.selected')}
+                        {selected.length} {t('common.labels.selected')}
                     </Text>
                 )}
                 {(!selected || selected.length === 0) && (

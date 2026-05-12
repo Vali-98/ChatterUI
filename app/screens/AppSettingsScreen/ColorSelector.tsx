@@ -57,7 +57,7 @@ const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete
                 name: item.name,
             }),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
                     label: t('settings.colors.alert.deleteTheme.confirm'),
                     type: 'warning',

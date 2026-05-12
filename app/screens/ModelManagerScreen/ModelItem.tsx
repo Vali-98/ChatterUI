@@ -63,7 +63,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         : t('model.alert.deletemodel.external')
                     : ''),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
                     label: t('model.alert.deletemodel.title'),
                     onPress: async () => {
@@ -95,7 +95,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
         quant,
         readableFileSize(item.file_size),
         item.architecture,
-        item.file_path.startsWith('content') ? t('common.external') : t('common.internal'),
+        item.file_path.startsWith('content')
+            ? t('common.labels.external')
+            : t('common.labels.internal'),
     ]
 
     return (

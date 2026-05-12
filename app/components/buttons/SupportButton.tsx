@@ -17,7 +17,7 @@ const SupportButton = () => {
                 Linking.openURL('https://ko-fi.com/vali98')
             }}
             variant="secondary"
-            label={t('about.donateButton')}
+            label={t('about.support.button')}
             icon={<FontAwesome name="coffee" size={16} color={theme.color.primary._700} />}
         />
     )

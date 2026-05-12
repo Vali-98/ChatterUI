@@ -92,7 +92,11 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
 
     return (
         <View style={{ flexDirection: 'row', marginTop: 8 }}>
-            <ThemedButton label={t('common.test')} onPress={handleCheck} variant="secondary" />
+            <ThemedButton
+                label={t('common.actions.test')}
+                onPress={handleCheck}
+                variant="secondary"
+            />
             <View
                 style={{
                     marginLeft: 4,

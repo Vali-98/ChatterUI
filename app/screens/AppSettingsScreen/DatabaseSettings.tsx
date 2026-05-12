@@ -54,7 +54,7 @@ const DatabaseSettings = () => {
                     currentVersion: appVersion,
                 }),
                 buttons: [
-                    { label: t('common.cancel') },
+                    { label: t('common.actions.cancel') },
                     {
                         label: t('settings.database.alert.versionMismatch.confirm'),
                         onPress: copyDB,
@@ -70,7 +70,7 @@ const DatabaseSettings = () => {
             title: t('settings.database.alert.rerunMigrations.title'),
             description: t('settings.database.alert.rerunMigrations.description'),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
                     label: t('settings.database.alert.rerunMigrations.confirm'),
                     onPress: () => migrateData({ bypass: true }),
@@ -100,7 +100,7 @@ const DatabaseSettings = () => {
                         title: t('settings.database.alert.export.title'),
                         description: t('settings.database.alert.export.description'),
                         buttons: [
-                            { label: t('common.cancel') },
+                            { label: t('common.actions.cancel') },
                             {
                                 label: t('settings.database.alert.export.confirm'),
                                 onPress: exportDB,
@@ -120,7 +120,7 @@ const DatabaseSettings = () => {
                             title: t('settings.database.alert.import.title'),
                             description: t('settings.database.alert.import.description'),
                             buttons: [
-                                { label: t('common.cancel') },
+                                { label: t('common.actions.cancel') },
                                 {
                                     label: t('settings.database.alert.import.confirm'),
                                     onPress: () =>

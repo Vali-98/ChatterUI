@@ -80,7 +80,7 @@ const DropdownSheet = <T,>({
                         )}
                     />
                 ) : (
-                    <Text style={styles.emptyText}>{t('common.noitems')}</Text>
+                    <Text style={styles.emptyText}>{t('common.emptyStates.noItems')}</Text>
                 )}
                 {search && (
                     <TextInput

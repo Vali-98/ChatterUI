@@ -38,14 +38,14 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                 chatId = await Chats.db.mutate.createChat(character.id)
             }
             if (!chatId) {
-                Logger.errorToast(t('character.list.chatcreationfailed'))
+                Logger.errorToast(t('character.list.errors.chatCreationFailed'))
                 return
             }
             await setId(chatId)
             setNowLoading(false)
             router.push('/screens/ChatScreen')
         } catch (error) {
-            Logger.errorToast(t('character.list.loaderror', { error }))
+            Logger.errorToast(t('character.list.errors.load', { error }))
             setNowLoading(false)
         }
     }
@@ -55,16 +55,16 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
     const deleteCard = (close: () => void) => {
         close()
         Alert.alert({
-            title: t('character.editor.deleteCharacter.title'),
-            description: t('character.editor.deleteCharacter.description', {
+            title: t('character.editor.dialogs.deleteCharacter.title'),
+            description: t('character.editor.dialogs.deleteCharacter.description', {
                 name: character.name,
             }),
             buttons: [
                 {
-                    label: t('common.cancel'),
+                    label: t('common.actions.cancel'),
                 },
                 {
-                    label: t('character.editor.deleteCharacter.confirm'),
+                    label: t('character.editor.dialogs.deleteCharacter.confirm'),
                     onPress: async () => {
                         Characters.db.mutate.deleteCard(character.id ?? -1)
                     },
@@ -77,14 +77,14 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
     const cloneCard = (close: () => void) => {
         close()
         Alert.alert({
-            title: t('character.editor.cloneCharacter.title'),
-            description: t('character.editor.cloneCharacter.description', { name: character.name }),
+            title: t('character.editor.dialogs.clone.title'),
+            description: t('character.editor.dialogs.clone.description', { name: character.name }),
             buttons: [
                 {
-                    label: t('common.cancel'),
+                    label: t('common.actions.cancel'),
                 },
                 {
-                    label: t('character.editor.cloneCharacter.confirm'),
+                    label: t('character.editor.dialogs.clone.confirm'),
                     onPress: async () => {
                         setNowLoading(true)
                         await Characters.db.mutate.duplicateCard(character.id)
@@ -112,10 +112,10 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
             longPress
             delayLongPress={300}
             buttons={[
-                { label: t('common.edit'), icon: 'edit', onPress: editCharacter },
-                { label: t('common.clone'), icon: 'copy', onPress: cloneCard },
+                { label: t('common.actions.edit'), icon: 'edit', onPress: editCharacter },
+                { label: t('common.actions.clone'), icon: 'copy', onPress: cloneCard },
                 {
-                    label: t('common.delete'),
+                    label: t('common.actions.delete'),
                     icon: 'delete',
                     onPress: deleteCard,
                     variant: 'warning',

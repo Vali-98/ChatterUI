@@ -30,8 +30,8 @@ const ChatFooter = ({ chatLength }: { chatLength: number }) => {
                         fontSize: fontSize.s,
                     }}>
                     {chatLength !== undefined && chatLength <= 1
-                        ? t('chat.footer.sendMessageToBegin')
-                        : t('chat.footer.startOfChat')}
+                        ? t('chat.footer.emptyState.sendMessageToBegin')
+                        : t('chat.footer.emptyState.startOfChat')}
                 </Text>
             </View>
         </View>

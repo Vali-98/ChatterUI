@@ -37,7 +37,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
 
     const getPreviewText = () => {
         if (character.latestSwipe === undefined || !character.latestName)
-            return t('character.list.nomessages')
+            return t('character.list.emptyStates.noMessages')
         return character.latestName + ':  ' + character.latestSwipe.trim()
     }
 

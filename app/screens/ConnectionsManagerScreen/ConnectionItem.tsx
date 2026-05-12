@@ -33,7 +33,7 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
             title: t('connections.item.delete.title'),
             description: t('connections.item.delete.description', { name: item.friendlyName }),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
                     label: t('connections.item.delete.button'),
                     onPress: () => {
@@ -68,7 +68,7 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
                         {item.friendlyName}
                     </Text>
                     <Text style={item.active ? styles.config : styles.configInactive}>
-                        {t('connections.item.configLabel', { configName: item.configName })}
+                        {item.configName}
                     </Text>
                 </View>
             </View>

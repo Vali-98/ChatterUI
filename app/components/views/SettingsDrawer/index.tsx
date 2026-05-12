@@ -34,8 +34,8 @@ const SettingsDrawer = () => {
                     marginTop: spacing.l,
                     marginBottom: spacing.xl2,
                 }}>
-                {(__DEV__ || devMode) && t('common.devmode') + '\t'}
-                {t('about.versionprefix') + appConfig.expo.version}
+                {(__DEV__ || devMode) && t('common.labels.devMode') + '\t'}
+                {t('about.versionPrefix') + appConfig.expo.version}
             </Text>
             <View style={{ marginHorizontal: spacing.xl2 }}>
                 <SupportButton />

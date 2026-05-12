@@ -24,7 +24,7 @@ const CharacterSettings = () => {
                             'settings.character.alert.regenerateDefaultCard.description'
                         ),
                         buttons: [
-                            { label: t('common.cancel') },
+                            { label: t('common.actions.cancel') },
                             {
                                 label: t('settings.character.alert.regenerateDefaultCard.confirm'),
                                 onPress: async () => await Characters.createDefaultCard(),

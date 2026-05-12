@@ -38,7 +38,7 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
                 <Text style={styles.subtitle}>
                     {t('model.info.loaded')}:{' '}
                     <Text style={styles.modelTitle} ellipsizeMode="tail" numberOfLines={1}>
-                        {modelName ?? t('common.none')}
+                        {modelName ?? t('common.labels.none')}
                     </Text>
                 </Text>
             )}

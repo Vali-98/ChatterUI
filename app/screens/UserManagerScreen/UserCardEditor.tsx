@@ -60,7 +60,7 @@ const UserCardEditor = () => {
             title: t('users.edit.image.delete'),
             description: t('users.edit.image.deletedesc'),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
                     label: t('users.edit.image.delete'),
                     onPress: () => {
@@ -114,7 +114,7 @@ const UserCardEditor = () => {
                 <ThemedTextInput
                     multiline
                     numberOfLines={10}
-                    label={t('common.name')}
+                    label={t('common.labels.name')}
                     value={currentCard?.name ?? ''}
                     onChangeText={(text) => {
                         if (currentCard)
@@ -129,7 +129,7 @@ const UserCardEditor = () => {
             <ThemedTextInput
                 multiline
                 numberOfLines={10}
-                label={t('common.description')}
+                label={t('common.labels.description')}
                 value={currentCard?.description ?? ''}
                 onChangeText={(text) => {
                     if (currentCard)
@@ -154,7 +154,7 @@ const UserCardEditor = () => {
                     }}
                 />
             </Text>
-            <ThemedButton label={t('common.save')} onPress={saveCard} iconName="save" />
+            <ThemedButton label={t('common.actions.save')} onPress={saveCard} iconName="save" />
         </View>
     )
 }

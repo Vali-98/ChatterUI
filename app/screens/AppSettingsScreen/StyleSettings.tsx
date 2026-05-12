@@ -48,7 +48,7 @@ const StyleSettings = () => {
                             title: t('settings.style.alert.deleteBackground.title'),
                             description: t('settings.style.alert.deleteBackground.description'),
                             buttons: [
-                                { label: t('common.cancel') },
+                                { label: t('common.actions.cancel') },
                                 {
                                     label: t('settings.style.alert.deleteBackground.confirm'),
                                     type: 'warning',

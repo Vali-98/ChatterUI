@@ -137,7 +137,7 @@ const ModelManagerScreen = () => {
                 />
             )}
             <ThemedButton
-                label={showSettings ? t('common.back') : t('common.settings')}
+                label={showSettings ? t('common.actions.back') : t('common.navigation.settings')}
                 onPress={() => setShowSettings(!showSettings)}
             />
         </SafeAreaView>

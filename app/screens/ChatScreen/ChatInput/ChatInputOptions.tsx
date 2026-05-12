@@ -26,7 +26,7 @@ const ChatOptions = () => {
                         close()
                         router.back()
                     },
-                    label: t('chat.inputOptions.mainMenu'),
+                    label: t('chat.input.actions.mainMenu'),
                     icon: 'backward',
                 },
                 {
@@ -34,7 +34,7 @@ const ChatOptions = () => {
                         close()
                         router.push('/screens/CharacterEditorScreen')
                     },
-                    label: t('chat.inputOptions.editCharacter'),
+                    label: t('chat.input.actions.editCharacter'),
                     icon: 'edit',
                 },
                 {
@@ -42,7 +42,7 @@ const ChatOptions = () => {
                         setShowChat(true)
                         close()
                     },
-                    label: t('chat.inputOptions.chatHistory'),
+                    label: t('chat.input.actions.chatHistory'),
                     icon: 'paper-clip',
                 },
             ]}

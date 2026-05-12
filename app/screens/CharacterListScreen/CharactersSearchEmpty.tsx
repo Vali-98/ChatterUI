@@ -24,7 +24,7 @@ const CharSearchEmpty = () => {
                     fontStyle: 'italic',
                     fontSize: fontSize.l,
                 }}>
-                {t('character.list.nocharactersmatch')}
+                {t('character.list.emptyStates.noCharactersMatch')}
             </Text>
         </View>
     )

@@ -80,8 +80,8 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
                             variant="secondary"
                             label={
                                 showHidden
-                                    ? t('chat.text.hideFiltered')
-                                    : t('chat.text.showFiltered')
+                                    ? t('chat.filteredText.hide')
+                                    : t('chat.filteredText.show')
                             }
                             labelStyle={{ flex: 0, fontSize: 12 }}
                             buttonStyle={{

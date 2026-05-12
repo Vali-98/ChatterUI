@@ -23,7 +23,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
     const { charName, charId } = Characters.useCharacterStore(
         useShallow((state) => ({
             charId: state.id,
-            charName: state.card?.name ?? t('chat.drawer.unknown'),
+            charName: state.card?.name ?? t('chat.drawer.labels.unknown'),
         }))
     )
 
@@ -38,12 +38,12 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
 
     const handleDeleteChat = (close: () => void) => {
         Alert.alert({
-            title: t('chat.drawer.delete.title'),
-            description: t('chat.drawer.delete.description', { name: item.name }),
+            title: t('chat.drawer.dialogs.delete.title'),
+            description: t('chat.drawer.dialogs.delete.description', { name: item.name }),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
-                    label: t('chat.drawer.delete.confirm'),
+                    label: t('chat.drawer.dialogs.delete.confirm'),
                     onPress: async () => {
                         await Chats.db.mutate.deleteChat(item.id)
                         if (charId && chatId === item.id) {
@@ -53,7 +53,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                                 : await Chats.db.mutate.createChat(charId)
                             chatId && (await setId(chatId))
                         } else if (item.id === chatId) {
-                            Logger.errorToast(t('chat.drawer.defaultchatfailed'))
+                            Logger.errorToast(t('chat.drawer.errors.defaultChatFailed'))
                             resetId()
                         }
                         close()
@@ -66,12 +66,12 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
 
     const handleCloneChat = (close: () => void) => {
         Alert.alert({
-            title: t('chat.drawer.clone.title'),
-            description: t('chat.drawer.clone.description', { name: item.name }),
+            title: t('chat.drawer.dialogs.clone.title'),
+            description: t('chat.drawer.dialogs.clone.description', { name: item.name }),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
-                    label: t('chat.drawer.clone.confirm'),
+                    label: t('chat.drawer.dialogs.clone.confirm'),
                     onPress: async () => {
                         await Chats.db.mutate.cloneChatFromId(item.id)
                         close()
@@ -88,44 +88,44 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
         if (chat) {
             try {
                 await saveStringToDownload(JSON.stringify(chat), name, 'utf8')
-                Logger.infoToast(t('chat.drawer.exported', { name }))
+                Logger.infoToast(t('chat.drawer.messages.exported', { name }))
             } catch (e) {
-                Logger.errorToast(t('chat.drawer.exportfailed'))
+                Logger.errorToast(t('chat.drawer.errors.exportFailed'))
                 Logger.error(`${e}`)
             }
         } else {
-            Logger.errorToast(t('chat.drawer.undefined'))
+            Logger.errorToast(t('chat.drawer.errors.undefinedChat'))
         }
         close()
     }
 
     const handleLinkUser = async (close: () => void) => {
         if (userId === item.user_id) {
-            Logger.warnToast(t('chat.drawer.useralreadyset'))
+            Logger.warnToast(t('chat.drawer.user.alreadySet'))
             close()
             return
         }
         if (!userId) {
-            Logger.errorToast(t('chat.drawer.nouser'))
+            Logger.errorToast(t('chat.drawer.user.noneSelected'))
             close()
             return
         }
         await Chats.db.mutate.updateUser(item.id, userId)
-        Logger.infoToast(t('chat.drawer.linkeduser', { name: userName }))
+        Logger.infoToast(t('chat.drawer.user.linked', { name: userName }))
         close()
     }
 
     return (
         <>
             <InputSheet
-                title={t('chat.drawer.rename.title')}
+                title={t('common.actions.rename')}
                 visible={showRename}
                 setVisible={setShowRename}
                 onConfirm={async (text) => {
                     await Chats.db.mutate.renameChat(item.id, text)
                 }}
                 verifyText={(text) =>
-                    text.length === 0 ? t('chat.drawer.rename.namecannotbeempty') : ''
+                    text.length === 0 ? t('chat.drawer.rename.errors.nameCannotBeEmpty') : ''
                 }
                 defaultValue={item.name}
             />
@@ -135,7 +135,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                 onPress={onPress}
                 buttons={[
                     {
-                        label: t('chat.drawer.rename.action'),
+                        label: t('common.actions.rename'),
                         icon: 'edit',
                         onPress: (close) => {
                             setShowRename(true)
@@ -143,26 +143,26 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                         },
                     },
                     {
-                        label: t('common.delete'),
+                        label: t('common.actions.delete'),
                         icon: 'delete',
                         variant: 'warning',
                         onPress: handleDeleteChat,
                     },
                     {
-                        label: t('common.more'),
+                        label: t('common.actions.more'),
                         submenu: [
                             {
-                                label: t('common.export'),
+                                label: t('common.actions.export'),
                                 icon: 'download',
                                 onPress: handleExportChat,
                             },
                             {
-                                label: t('common.clone'),
+                                label: t('common.actions.clone'),
                                 icon: 'copy',
                                 onPress: handleCloneChat,
                             },
                             {
-                                label: t('chat.drawer.linkuser.action'),
+                                label: t('chat.drawer.user.linkAction'),
                                 icon: 'user',
                                 onPress: handleLinkUser,
                             },

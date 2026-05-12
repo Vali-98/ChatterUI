@@ -27,7 +27,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
 
     const handleCreateCharacter = async (text: string) => {
         if (!text) {
-            Logger.errorToast(t('character.list.nameempty'))
+            Logger.errorToast(t('character.list.errors.nameEmpty'))
             return
         }
         Characters.db.mutate.createCard(text).then(async (id) => {
@@ -44,10 +44,10 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
             <InputSheet
                 visible={showNewChar}
                 setVisible={setShowNewChar}
-                title={t('character.list.createnewcharacter')}
+                title={t('character.list.actions.createNewCharacter')}
                 onConfirm={handleCreateCharacter}
                 verifyText={(text) =>
-                    text.length === 0 ? t('character.list.namecannotbeempty') : ''
+                    text.length === 0 ? t('character.list.errors.nameCannotBeEmpty') : ''
                 }
                 placeholder="Name..."
                 autoFocus
@@ -57,7 +57,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                 triggerIcon="user-add"
                 buttons={[
                     {
-                        label: t('character.list.importfromfile'),
+                        label: t('character.list.actions.importFromFile'),
                         onPress: (close) => {
                             Characters.importCharacter()
                             close()
@@ -65,7 +65,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                         icon: 'upload',
                     },
                     {
-                        label: t('character.list.createcharacter'),
+                        label: t('character.list.actions.createCharacter'),
                         onPress: (close) => {
                             setShowNewChar(true)
                             close()

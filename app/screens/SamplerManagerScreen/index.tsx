@@ -84,7 +84,7 @@ const SamplerManagerScreen = () => {
             title: t('sampler.alert.delete.title'),
             description: t('sampler.alert.delete.description', { name: currentConfig.name }),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
                     label: t('sampler.alert.delete.title'),
                     onPress: async () => {
@@ -292,7 +292,7 @@ const SamplerManagerScreen = () => {
                     }}>
                     <Text style={styles.noSamplersText}>{t('sampler.empty')}</Text>
                     {appMode === 'remote' && (
-                        <Text style={styles.noSamplersText}>{t('sampler.nosamplers')}</Text>
+                        <Text style={styles.noSamplersText}>{t('sampler.noSamplers')}</Text>
                     )}
                 </View>
             )}

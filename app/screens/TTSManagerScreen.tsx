@@ -63,10 +63,10 @@ const TTSManagerScreen = () => {
             }}
             contentContainerStyle={{ rowGap: 8 }}>
             <HeaderTitle title="TTS" />
-            <SectionTitle>{t('common.settings')}</SectionTitle>
+            <SectionTitle>{t('common.navigation.settings')}</SectionTitle>
 
             <ThemedSwitch
-                label={t('common.enable')}
+                label={t('common.actions.enable')}
                 value={enabled}
                 onChangeValue={(value) => {
                     if (value) {
@@ -156,7 +156,7 @@ const TTSManagerScreen = () => {
                     style={{ color: color.text._400, fontStyle: 'italic' }}
                 />
                 <ThemedButton
-                    label={t('common.test')}
+                    label={t('common.actions.test')}
                     variant="secondary"
                     onPress={() => {
                         if (voice === undefined) {

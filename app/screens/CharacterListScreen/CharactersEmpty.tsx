@@ -24,7 +24,7 @@ const CharactersEmpty = () => {
                     fontStyle: 'italic',
                     fontSize: fontSize.l,
                 }}>
-                {t('character.list.nocharactersfound')}
+                {t('character.list.emptyStates.noCharactersFound')}
             </Text>
         </View>
     )

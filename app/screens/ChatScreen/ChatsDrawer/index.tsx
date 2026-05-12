@@ -47,7 +47,7 @@ const ChatsDrawer = () => {
     const search = useDebounce(async (query: string, charId?: number) => {
         if (!charId || !query) return
         const results = await Chats.db.query.searchChat(query, charId).catch((e) => {
-            Logger.error(t('chat.drawer.searchQueryFailed', { error: String(e) }))
+            Logger.error(t('chat.drawer.search.errors.queryFailed', { error: String(e) }))
             return []
         })
         setSearchResults(results.sort((a, b) => b.sendDate.getTime() - a.sendDate.getTime()))
@@ -71,7 +71,7 @@ const ChatsDrawer = () => {
             <View
                 style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
                 <Text style={styles.drawerTitle}>
-                    {showSearchBar ? t('chat.drawer.searchTitle') : t('chat.drawer.chatsTitle')}
+                    {showSearchBar ? t('chat.drawer.search.title') : t('chat.drawer.title')}
                 </Text>
                 <ThemedButton
                     variant="tertiary"
@@ -85,7 +85,7 @@ const ChatsDrawer = () => {
             <Animated.View key={showSearchBar + ''} entering={FadeIn} exiting={FadeOut}>
                 {showSearchBar && (
                     <ThemedTextInput
-                        placeholder={t('chat.drawer.searchPlaceholder')}
+                        placeholder={t('chat.drawer.search.placeholder')}
                         containerStyle={{ flex: 0, marginTop: 12, marginBottom: 12 }}
                         value={searchQuery}
                         autoCorrect={false}
@@ -113,7 +113,7 @@ const ChatsDrawer = () => {
                     </Animated.View>
                     <Animated.View entering={FadeIn} exiting={FadeOut}>
                         <ThemedButton
-                            label={t('chat.drawer.startNewChat')}
+                            label={t('chat.drawer.actions.startNewChat')}
                             onPress={handleCreateChat}
                         />
                     </Animated.View>
@@ -123,7 +123,7 @@ const ChatsDrawer = () => {
                 <Animated.View entering={FadeIn.duration(200)} style={styles.listContainer}>
                     {searchResults.length > 0 && (
                         <Text style={styles.resultCount}>
-                            {t('chat.drawer.resultsFound', { count: searchResults.length })}
+                            {t('chat.drawer.search.resultsFound', { count: searchResults.length })}
                         </Text>
                     )}
                     <FlashList
@@ -140,7 +140,7 @@ const ChatsDrawer = () => {
                         removeClippedSubviews={false}
                         ListEmptyComponent={() => (
                             <View style={styles.emptyContainer}>
-                                <Text style={styles.emptyText}>{t('chat.drawer.noResults')}</Text>
+                                <Text style={styles.emptyText}>{t('chat.drawer.search.noResults')}</Text>
                             </View>
                         )}
                     />

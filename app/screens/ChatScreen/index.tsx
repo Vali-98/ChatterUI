@@ -67,14 +67,14 @@ const ChatScreen = () => {
 
     const handleImportChat = async () => {
         if (!charId || !userId) {
-            Logger.errorToast(t('chat.importErrors.noChatCharacter'))
+            Logger.errorToast(t('chat.import.errors.noChatCharacter'))
             return
         }
         const file = await pickStringDocument({ type: 'application/json' })
         if (!file.success) return
         const result = ChatImportSchema.safeParse(JSON.parse(file.data))
         if (!result.success) {
-            Logger.errorToast(t('chat.importErrors.failedToImport'))
+            Logger.errorToast(t('chat.import.errors.failedToImport'))
             return
         }
         const chat = result.data

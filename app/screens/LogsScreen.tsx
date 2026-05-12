@@ -41,7 +41,7 @@ const LogsScreen = () => {
             title: t('logs.alert.delete.title'),
             description: t('logs.alert.delete.description'),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
                     label: t('logs.alert.delete.title'),
                     onPress: async () => {

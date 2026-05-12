@@ -21,27 +21,28 @@ const AboutScreen = () => {
     const updateCounter = () => {
         if (devMode) return
         if (counter === 6) {
-            Logger.infoToast(t('about.devmodeenabled'))
+            Logger.infoToast(t('about.devMode.enabledMessage'))
             setDevMode(true)
         }
         setCounter(counter + 1)
     }
 
-    const version = t('about.versionprefix') + appConfig.expo.version
+    const version = t('about.versionPrefix') + appConfig.expo.version
     return (
         <View style={styles.container}>
-            <HeaderTitle title={t('common.about')} />
+            <HeaderTitle title={t('common.navigation.about')} />
             <TouchableOpacity activeOpacity={0.8} onPress={updateCounter}>
                 <Image source={require('../../assets/images/icon.png')} style={styles.icon} />
             </TouchableOpacity>
 
-            <Text style={styles.titleText}>{t('common.chatterui')}</Text>
+            <Text style={styles.titleText}>{t('common.brand.name')}</Text>
             <Text style={styles.subtitleText}>
-                {t('common.version')} {version} {devMode && `[${t('common.devmode')}]`}
+                {t('common.labels.version')} {version}{' '}
+                {devMode && `[${t('common.labels.devMode')}]`}
             </Text>
             {devMode && (
                 <ThemedButton
-                    label={t('about.disabledev')}
+                    label={t('about.devMode.disableAction')}
                     variant="critical"
                     buttonStyle={{
                         marginTop: spacing.xl,
@@ -49,19 +50,23 @@ const AboutScreen = () => {
                     onPress={() => {
                         setCounter(0)
                         setDevMode(false)
-                        Logger.info(t('about.disabledevmes'))
+                        Logger.info(t('about.devMode.disabledMessage'))
                     }}
                 />
             )}
 
-            <Text style={styles.body}>{t('about.body1')}</Text>
-            <Text style={{ marginBottom: spacing.xl3, ...styles.body }}>{t('about.body2')}</Text>
-            <Text style={{ ...styles.body, marginBottom: spacing.m }}>{t('about.donate')}</Text>
+            <Text style={styles.body}>{t('about.description.primary')}</Text>
+            <Text style={{ marginBottom: spacing.xl3, ...styles.body }}>
+                {t('about.description.support')}
+            </Text>
+            <Text style={{ ...styles.body, marginBottom: spacing.m }}>
+                {t('about.support.label')}
+            </Text>
 
             <SupportButton />
 
-            <Text style={styles.body}>{t('about.report')}</Text>
-            <Text style={styles.subtitleText}>{t('about.logs')}</Text>
+            <Text style={styles.body}>{t('about.reportIssue')}</Text>
+            <Text style={styles.subtitleText}>{t('about.logsReminder')}</Text>
 
             <ThemedButton
                 buttonStyle={{ marginTop: spacing.m }}

@@ -73,16 +73,16 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
     const handleFork = () => {
         if (!chatId) return
         Alert.alert({
-            title: t('chat.quickActions.forkTitle'),
-            description: t('chat.quickActions.forkDescription'),
+            title: t('chat.quickActions.fork.title'),
+            description: t('chat.quickActions.fork.description'),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
-                    label: t('chat.quickActions.forkButton'),
+                    label: t('chat.quickActions.fork.button'),
                     onPress: async () => {
                         const newChatId = await Chats.db.mutate.cloneChatFromId(chatId, index + 1)
                         if (!newChatId) {
-                            Logger.errorToast(t('chat.quickActions.cloneFailed'))
+                            Logger.errorToast(t('chat.quickActions.errors.cloneFailed'))
                             return
                         }
                         setShowOptions(undefined)
@@ -197,10 +197,10 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
                                     if (showOptions) setShowOptions(undefined)
                                     setStringAsync(swipe.swipe)
                                         .then(() => {
-                                            Logger.infoToast(t('chat.quickActions.copied'))
+                                            Logger.infoToast(t('chat.quickActions.messages.copied'))
                                         })
                                         .catch(() => {
-                                            Logger.errorToast(t('chat.quickActions.copyFailed'))
+                                            Logger.errorToast(t('chat.quickActions.errors.copyFailed'))
                                         })
                                 }}
                             />

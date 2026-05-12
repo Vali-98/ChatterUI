@@ -38,7 +38,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
             title: t('users.edit.card.delete'),
             description: t('users.edit.card.deletedesc', { name: user.name }),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
                     label: t('users.edit.card.delete'),
                     onPress: async () => {
@@ -69,7 +69,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
             title: t('users.edit.card.clone'),
             description: t('users.edit.card.clonedesc', { name: user.name }),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
                     label: t('users.edit.card.clone'),
                     onPress: async () => {
@@ -91,12 +91,12 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
             placement="center"
             buttons={[
                 {
-                    label: t('common.clone'),
+                    label: t('common.actions.clone'),
                     icon: 'copy',
                     onPress: handleCloneCard,
                 },
                 {
-                    label: t('common.delete'),
+                    label: t('common.actions.delete'),
                     icon: 'delete',
                     variant: 'warning',
                     onPress: handleDeleteCard,

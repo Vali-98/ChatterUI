@@ -96,7 +96,7 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
                         }}>
                         {!filterOnly && (
                             <Text style={{ color: color.text._400, marginBottom: 4 }}>
-                                {t('common.suggestions')}
+                                {t('common.labels.suggestions')}
                             </Text>
                         )}
                         <ScrollView

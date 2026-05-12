@@ -32,7 +32,7 @@ const ChatModelName = () => {
                     flex: 1,
                     color: model ? color.primary._700 : color.text._400,
                 }}>
-                {model ? model.name : t('chat.modelName.noModelLoaded')}
+                {model ? model.name : t('chat.model.noModelLoaded')}
             </Text>
             <TouchableOpacity
                 onPress={() => router.push('/screens/ModelManagerScreen')}

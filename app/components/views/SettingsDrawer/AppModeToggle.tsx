@@ -11,14 +11,14 @@ const AppModeToggle = () => {
     return (
         <HorizontalSelector
             style={{ flex: 0, paddingBottom: 4, paddingHorizontal: 8 }}
-            label={t('appmode.title')}
+            label={t('appMode.title')}
             values={[
                 {
                     value: 'local',
-                    label: t('appmode.local'),
+                    label: t('appMode.options.local'),
                     icon: Platform.OS === 'android' ? 'phone-android' : 'phone-iphone',
                 },
-                { value: 'remote', label: t('appmode.remote') },
+                { value: 'remote', label: t('appMode.options.remote') },
             ]}
             selected={appMode}
             onPress={setAppMode}

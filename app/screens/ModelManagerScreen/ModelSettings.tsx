@@ -69,7 +69,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             title: t('model.alert.deletekv.title'),
             description: t('model.alert.deletekv.description', { size: readableFileSize(kvSize) }),
             buttons: [
-                { label: t('common.delete') },
+                { label: t('common.actions.delete') },
                 {
                     label: t('model.alert.deletekv.title'),
                     onPress: async () => {

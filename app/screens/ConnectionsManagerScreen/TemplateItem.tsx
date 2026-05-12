@@ -22,12 +22,12 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
 
     const handleDelete = () => {
         Alert.alert({
-            title: t('connections.templates.deleteTitle'),
-            description: t('connections.templates.deleteDescription', { name: item.name }),
+            title: t('connections.templates.delete.title'),
+            description: t('connections.templates.delete.description', { name: item.name }),
             buttons: [
-                { label: t('common.cancel') },
+                { label: t('common.actions.cancel') },
                 {
-                    label: t('connections.templates.deleteButton'),
+                    label: t('connections.templates.delete.confirm'),
                     onPress: () => {
                         removeTemplate(index)
                     },

@@ -82,9 +82,9 @@ const Home = () => {
                     style={{ marginBottom: 12 }}
                     color={color.text._500}
                 />
-                <Text style={styles.title}>{t('auth.needed')}</Text>
+                <Text style={styles.title}>{t('auth.authorizationRequired')}</Text>
                 <TouchableOpacity onPress={retry} style={styles.button}>
-                    <Text style={styles.buttonText}>{t('common.tryagain')}</Text>
+                    <Text style={styles.buttonText}>{t('common.actions.tryAgain')}</Text>
                 </TouchableOpacity>
             </View>
         )
