@@ -557,6 +557,13 @@ export namespace Chats {
                     .where(eq(chatSwipes.id, swipeId))
             }
 
+            export const updateSwipeTokenLength = async (swipeId: number, length: number) => {
+                await database
+                    .update(chatSwipes)
+                    .set({ token_length: length })
+                    .where(eq(chatSwipes.id, swipeId))
+            }
+
             export const deleteChat = async (chatId: number) => {
                 await updateChatModified(chatId)
                 await database.delete(chats).where(eq(chats.id, chatId))
@@ -668,6 +675,15 @@ export namespace Chats {
                         id: true,
                     },
                     orderBy: desc(chatEntries.id),
+                    with: {
+                        swipes: {
+                            columns: {
+                                token_length: true,
+                            },
+                            limit: 1,
+                            orderBy: desc(chatSwipes.id),
+                        },
+                    },
                 })
             }
 

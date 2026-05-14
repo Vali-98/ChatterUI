@@ -456,7 +456,17 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
                 if (entry.id === -1) return 0
                 const [activeSwipe] = entry.swipes.filter((item) => item.active)
                 if (!activeSwipe) return 0
-                return activeSwipe.token_count ?? 0
+                const tokenCount = activeSwipe.token_count ?? 0
+                if (tokenCount === 0 && activeSwipe.swipe.length > 0) {
+                    // assume that token length hasnt been calculated
+                    const tokenCount = await Llama.useLlamaModelStore.getState().tokenLength(
+                        activeSwipe.swipe,
+                        entry.attachments.map((item) => item.uri)
+                    )
+                    Chats.db.mutate.updateSwipeTokenLength(activeSwipe.id, tokenCount)
+                }
+
+                return tokenCount
             },
             tokenizer: Llama.useLlamaModelStore.getState().tokenLength,
             maxLength: length,

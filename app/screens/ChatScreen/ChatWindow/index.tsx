@@ -27,6 +27,7 @@ type ListItem = {
     entryId: number
     isLastMessage: boolean
     isGreeting: boolean
+    tokenLength: number
 }
 
 type ChatWindowProps = {
@@ -84,6 +85,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                 entryId={item.entryId}
                 isLastMessage={item.isLastMessage}
                 isGreeting={item.isGreeting}
+                tokenLength={item.tokenLength}
             />
         )
     }
@@ -127,6 +129,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                     entryId: item.id,
                     isGreeting: index === entryIdList.length - 1,
                     isLastMessage: index === 0,
+                    tokenLength: item.swipes?.[0]?.token_length ?? 0,
                 }))}
                 keyExtractor={(item) => item.entryId.toString()}
                 renderItem={renderItems}

@@ -252,6 +252,7 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
             stopSequence = stopSequence.slice(0, stopSequenceLimit)
             Logger.warn('Stop sequence length exceeds defined stopSequenceLimit')
         }
+        const tokenizer = Tokenizer.getTokenizer()
         return {
             apiConfig: Object.assign({}, apiConfig),
             apiValues: Object.assign({}, apiValues),
@@ -269,9 +270,20 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
                 if (entry.id === -1) return 0
                 const [activeSwipe] = entry.swipes.filter((item) => item.active)
                 if (!activeSwipe) return 0
+                const tokenCount = activeSwipe.token_count ?? 0
+                console.log(tokenCount, activeSwipe.swipe.length)
+                if (tokenCount === 0 && activeSwipe.swipe.length > 0) {
+                    console.log('recalc')
+                    // assume that token length hasnt been calculated
+                    const tokenCount = await tokenizer(
+                        activeSwipe.swipe,
+                        entry.attachments.map((item) => item.uri)
+                    )
+                    await Chats.db.mutate.updateSwipeTokenLength(activeSwipe.id, tokenCount)
+                }
                 return activeSwipe.token_count ?? 0
             },
-            tokenizer: Tokenizer.getTokenizer(),
+            tokenizer: tokenizer,
             maxLength: length,
             cache: {
                 userCache: await characterState.getCache(characterCard.name),
