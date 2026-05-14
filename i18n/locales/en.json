@@ -280,7 +280,7 @@
         "promptConstructionFailed": "Prompt construction failed",
         "payloadConstructionFailed": "Payload construction failed",
         "completionFailed": "Completion failed.",
-        "errorLogged": "Error Logged",
+        "sseError": "Error During SSE event",
         "generationFailed": "Generation Failed",
         "noMessagesAddedCheckLogs": "No messages added. Check Logs.",
         "entryWithoutValidSwipeFound": "Entry without valid swipe found",

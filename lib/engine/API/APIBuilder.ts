@@ -261,7 +261,7 @@ const readableStreamResponse = async (senderParams: SenderParams) => {
         try {
             const a = JSON.parse(data)
             if (a?.error) {
-                Logger.errorToast(t('toast.errorLogged'))
+                Logger.errorToast(t('toast.sseError'))
                 Logger.error(data)
             }
         } catch {}
