@@ -140,7 +140,9 @@ const ChatsDrawer = () => {
                         removeClippedSubviews={false}
                         ListEmptyComponent={() => (
                             <View style={styles.emptyContainer}>
-                                <Text style={styles.emptyText}>{t('chat.drawer.search.noResults')}</Text>
+                                <Text style={styles.emptyText}>
+                                    {t('chat.drawer.search.noResults')}
+                                </Text>
                             </View>
                         )}
                     />

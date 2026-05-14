@@ -32,7 +32,7 @@ export const useBackgroundStore = create<BackgroundImageStateProps>()(
                     copyFile({ from: uri, to: AppDirectory.Assets + name })
 
                     set({ image: name })
-                    Logger.infoToast(t('toast.successfullyImported'))
+                    Logger.infoToast(t('common.messages.successfullyImported'))
                 } catch (e) {
                     Logger.error('Something went wrong with importing: ' + e)
                 }
@@ -41,7 +41,7 @@ export const useBackgroundStore = create<BackgroundImageStateProps>()(
                 const imageName = get().image
                 if (imageName) deleteFile(AppDirectory.Assets + imageName)
                 set({ image: undefined })
-                Logger.warnToast(t('toast.backgroundDeleted'))
+                Logger.warnToast(t('settings.style.messages.backgroundDeleted'))
             },
         }),
         {

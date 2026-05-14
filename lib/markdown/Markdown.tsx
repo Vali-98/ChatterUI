@@ -44,10 +44,14 @@ export namespace MarkdownStyle {
                                 onPress={() => {
                                     setStringAsync(content)
                                         .then(() => {
-                                            Logger.infoToast(t('toast.copiedCode'))
+                                            Logger.infoToast(
+                                                t('chat.quickActions.toast.copiedCode')
+                                            )
                                         })
                                         .catch(() => {
-                                            Logger.errorToast(t('toast.failedToCopyToClipboard'))
+                                            Logger.errorToast(
+                                                t('chat.quickActions.toast.copyFailed')
+                                            )
                                         })
                                 }}
                             />

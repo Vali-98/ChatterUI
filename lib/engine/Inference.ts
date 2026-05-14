@@ -61,7 +61,7 @@ const completionTaskOptions = {
 
 export async function generateResponse(swipeId: number) {
     if (useInference.getState().nowGenerating) {
-        Logger.infoToast(t('toast.generationAlreadyInProgress'))
+        Logger.infoToast(t('generation.errors.generationAlreadyInProgress'))
         return
     }
     useInference.getState().startGenerating(swipeId)
@@ -84,7 +84,7 @@ const useGenerateResponse = () => {
     const generateResponse = useCallback(
         async (swipeId: number) => {
             if (nowGenerating) {
-                Logger.infoToast(t('toast.generationAlreadyInProgress'))
+                Logger.infoToast(t('generation.errors.generationAlreadyInProgress'))
                 return
             }
             startGenerating(swipeId)
@@ -201,31 +201,31 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
 
         const userCard = userState.card
         if (!userCard) {
-            Logger.errorToast(t('toast.noLoadedUser'))
+            Logger.errorToast(t('generation.errors.noUser'))
             return
         }
 
         const characterCard = characterState.card
         if (!characterCard) {
-            Logger.errorToast(t('toast.noLoadedCharacter'))
+            Logger.errorToast(t('generation.errors.noCharacter'))
             return
         }
 
         const chatId = await Chats.useChatState.getState().id
         if (!chatId) {
-            Logger.errorToast(t('toast.noActiveChat'))
+            Logger.errorToast(t('generation.errors.noActiveChat'))
             return
         }
 
         const messages = (await Chats.db.query.chat(chatId))?.messages
         if (!messages) {
-            Logger.errorToast(t('toast.noChatFound'))
+            Logger.errorToast(t('generation.errors.noChatFound'))
             return
         }
 
         const apiValues = apiState.values.find((item, index) => index === apiState.activeIndex)
         if (!apiValues) {
-            Logger.warnToast(t('toast.noActiveAPI'))
+            Logger.warnToast(t('generation.errors.noActiveAPI'))
             return
         }
 
@@ -233,7 +233,9 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
 
         const apiConfig = configs[0]
         if (!apiConfig) {
-            Logger.errorToast(t('toast.configurationNotFound', { name: apiValues?.configName }))
+            Logger.errorToast(
+                t('generation.errors.configurationNotFound', { name: apiValues?.configName })
+            )
             return
         }
         const samplers = SamplersManager.getCurrentSampler()
@@ -279,6 +281,6 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
         }
     } catch (e) {
         Logger.stackTrace(e)
-        Logger.errorToast(t('toast.failedToOrchestrateRequestBuild'), JSON.stringify(e))
+        Logger.errorToast(t('generation.errors.failedToOrchestrateRequestBuild'), JSON.stringify(e))
     }
 }

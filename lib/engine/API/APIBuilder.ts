@@ -56,7 +56,7 @@ export const buildAndSendRequest = async ({
             bypassContextLength,
         })
         if (prompt === undefined) {
-            Logger.errorToast(t('toast.promptConstructionFailed'))
+            Logger.errorToast(t('generation.errors.promptConstructionFailed'))
             stopGenerating()
             return
         }
@@ -71,7 +71,7 @@ export const buildAndSendRequest = async ({
         })
 
         if (!payload) {
-            Logger.errorToast(t('toast.payloadConstructionFailed'))
+            Logger.errorToast(t('generation.errors.payloadConstructionFailed'))
             stopGenerating()
             return
         }
@@ -144,7 +144,7 @@ export const buildAndSendRequest = async ({
             stopGenerating: stopGenerating,
         })
     } catch (e) {
-        Logger.errorToast(t('toast.completionFailed'), JSON.stringify(e))
+        Logger.errorToast(t('generation.errors.completionFailed'), JSON.stringify(e))
         stopGenerating()
     }
 }
@@ -261,7 +261,7 @@ const readableStreamResponse = async (senderParams: SenderParams) => {
         try {
             const a = JSON.parse(data)
             if (a?.error) {
-                Logger.errorToast(t('toast.sseError'))
+                Logger.errorToast(t('generation.errors.sseFailed'))
                 Logger.error(data)
             }
         } catch {}
@@ -269,7 +269,7 @@ const readableStreamResponse = async (senderParams: SenderParams) => {
     })
 
     sse.setOnError(() => {
-        Logger.errorToast(t('toast.generationFailed'))
+        Logger.errorToast(t('generation.errors.generationFailed'))
         closeStream()
     })
 

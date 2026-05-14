@@ -62,7 +62,7 @@ export namespace Model {
             const file = result.assets[0]
             const name = file.name
             const newdir = `${AppDirectory.ModelPath}${name}`
-            Logger.infoToast(t('toast.importingFile'))
+            Logger.infoToast(t('common.messages.importingFile'))
             let success = false
 
             if (file.uri.startsWith('content://') && Platform.OS === 'android') {
@@ -71,7 +71,7 @@ export namespace Model {
                         success = true
                     })
                     .catch((e) => {
-                        Logger.warnToast(t('toast.failedToCopy'))
+                        Logger.warnToast(t('common.errors.failedToCopy'))
                         Logger.warn(JSON.stringify(e))
                         success = false
                     })
@@ -86,7 +86,7 @@ export namespace Model {
 
             // database routine here
             if (await createModelData(name, true))
-                Logger.infoToast(t('toast.modelImportedSuccessfully'))
+                Logger.infoToast(t('model.toast.modelImportedSuccessfully'))
         })
     }
 
@@ -96,15 +96,15 @@ export namespace Model {
         }).then(async (result) => {
             if (result.canceled) return
             const file = result.assets[0]
-            Logger.infoToast(t('toast.importingFile'))
+            Logger.infoToast(t('common.messages.importingFile'))
             if (!file) {
-                Logger.errorToast(t('toast.fileInvalid'))
+                Logger.errorToast(t('common.errors.fileInvalid'))
                 return
             }
 
             if (await createModelDataExternal(file.uri, file.name)) {
                 persistContentPermission(file.uri)
-                Logger.infoToast(t('toast.modelImportedSuccessfully'))
+                Logger.infoToast(t('model.toast.modelImportedSuccessfully'))
             }
         })
     }
@@ -122,7 +122,7 @@ export namespace Model {
             // cull not required on iOS
             modelList.forEach(async (item) => {
                 if (item.name === '' || !getModelExists(item.file_path)) {
-                    Logger.warnToast(t('toast.modelMissingEntryDeleted', { name: item.name }))
+                    Logger.warnToast(t('model.toast.modelMissingEntryDeleted', { name: item.name }))
                     await db.delete(model_data).where(eq(model_data.id, item.id))
                 }
             })
@@ -152,7 +152,7 @@ export namespace Model {
         deleteOnFailure: boolean = false
     ) => {
         if (!filename) {
-            Logger.errorToast(t('toast.filenameInvalidImportFailed'))
+            Logger.errorToast(t('common.errors.filenameInvalidImportFailed'))
             return
         }
         return setModelDataInternal(filename, newdir, deleteOnFailure)
@@ -269,7 +269,7 @@ export namespace Model {
             await db.update(model_data).set(modelDataEntry).where(eq(model_data.id, id))
             return true
         } catch (e) {
-            Logger.errorToast(t('toast.failedToCreateData'), JSON.stringify(e))
+            Logger.errorToast(t('common.errors.failedToCreateData'), JSON.stringify(e))
             if (deleteOnFailure) deleteFile(file_path)
             return false
         }

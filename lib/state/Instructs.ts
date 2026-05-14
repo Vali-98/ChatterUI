@@ -276,7 +276,7 @@ export namespace Instructs {
                     const baseInstruct = get().data
 
                     if (!baseInstruct) {
-                        Logger.errorToast(t('toast.instructDataError'))
+                        Logger.errorToast(t('formatting.errors.instructDataError'))
                         return Instructs.defaultInstruct
                     }
 

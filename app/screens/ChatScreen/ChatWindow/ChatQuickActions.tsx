@@ -200,7 +200,9 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
                                             Logger.infoToast(t('chat.quickActions.messages.copied'))
                                         })
                                         .catch(() => {
-                                            Logger.errorToast(t('chat.quickActions.errors.copyFailed'))
+                                            Logger.errorToast(
+                                                t('chat.quickActions.errors.copyFailed')
+                                            )
                                         })
                                 }}
                             />

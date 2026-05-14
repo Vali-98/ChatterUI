@@ -132,7 +132,7 @@ const setMismatchedUser = async (userId: number) => {
     Logger.info('Autoloading User with ID: ' + userId)
     const name = await Characters.useUserStore.getState().setCard(userId)
 
-    if (name) Logger.infoToast(t('toast.loadingUser', { name }))
+    if (name) Logger.infoToast(t('users.messages.loadingUser', { name }))
     else
         Logger.warn(
             `Failed to load User with ID ${userId}, it was likely deleted. Consider relinking this chat.`

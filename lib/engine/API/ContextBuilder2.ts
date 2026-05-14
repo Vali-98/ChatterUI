@@ -125,7 +125,7 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
     ): Promise<boolean> => {
         const swipe = message.swipes[0]
         if (!swipe) {
-            Logger.errorToast(t('toast.entryWithoutValidSwipeFound'))
+            Logger.errorToast(t('generation.warn.entryWithoutValidSwipeFound'))
             return false
         }
         const swipeLen = await chatTokenizer(message, index)
@@ -465,7 +465,7 @@ export const getSystemPrompt = ({
 }
 
 const warnNoMessages = () => {
-    Logger.warnToast(t('toast.noMessagesAddedCheckLogs'))
+    Logger.warnToast(t('generation.warn.noMessagesAddedCheckLogs'))
     Logger.warn(
         'No messages were added to the context. This can be caused by:\n- Generated Length is too high, lower it in Formatting\n- Your context length is too low\n- Your first message is too long'
     )

@@ -39,9 +39,7 @@ export namespace SamplersManager {
                 addSamplerConfig: (config) => {
                     const configs = get().configList
                     if (configs.some((item) => item.name === config.name)) {
-                        Logger.errorToast(
-                            t('toast.samplerConfigAlreadyExists', { name: config.name })
-                        )
+                        Logger.errorToast(t('sampler.toast.exists', { name: config.name }))
                         return
                     }
                     config.data = fixSamplerConfig(config.data)
@@ -146,7 +144,7 @@ export namespace SamplersManager {
                 (!result.assets[0].name.endsWith('json') &&
                     !result.assets[0].name.endsWith('settings'))
             ) {
-                Logger.errorToast(t('toast.invalidFileType'))
+                Logger.errorToast(t('common.errors.invalidFileType'))
                 return
             }
             const {
@@ -157,7 +155,7 @@ export namespace SamplersManager {
 
             return { data: JSON.parse(data), name: name }
         } catch (e) {
-            Logger.errorToast(t('toast.failedToImportSampler'), JSON.stringify(e))
+            Logger.errorToast(t('sampler.toast.failedToImport'), JSON.stringify(e))
         }
     }
 }

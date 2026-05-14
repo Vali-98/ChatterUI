@@ -69,7 +69,15 @@
             },
             "errors": {
                 "export": "Could not export: {{error}}",
-                "exportFailed": "Failed to export"
+                "exportFailed": "Failed to export",
+                "copyCardNotExist": "Failed to copy card: Card does not exist",
+                "failedToCopyCard": "Failed to copy card",
+                "deleteBackground": "Failed to delete background",
+                "createFromImage": "Failed to create card - Image could not be retrieved",
+                "cardNoCharacter": "No character was found.",
+                "createFailed": "Failed to create character",
+                "invalidCharacterCard": "Invalid Character Card",
+                "v2ParsingFailedFallingBack": "V2 Parsing failed, falling back to V1"
             },
             "fields": {
                 "alternateGreeting": "Alternate Greeting",
@@ -227,6 +235,10 @@
             },
             "messages": {
                 "copied": "Copied"
+            },
+            "toast": {
+                "copiedCode": "Copied Code",
+                "copyFailed": "Failed to copy to clipboard"
             }
         },
         "frame": {
@@ -274,70 +286,21 @@
         "navigation": {
             "about": "About",
             "settings": "Settings"
+        },
+        "messages": {
+            "importingFile": "Importing file...",
+            "successfullyImported": "Successfully Imported!"
+        },
+        "errors": {
+            "failedToCopy": "Failed to copy",
+            "fileInvalid": "File Invalid",
+            "filenameInvalidImportFailed": "Filename invalid, Import Failed",
+            "failedToCreateData": "Failed to create data",
+            "couldNotGetData": "Could not get data, something very wrong has happened!",
+            "rollingBackDueToError": "Rolling back due to error",
+            "invalidFileType": "Invalid File Type!",
+            "schemaValidationFailed": "Schema validation failed!"
         }
-    },
-    "toast": {
-        "promptConstructionFailed": "Prompt construction failed",
-        "payloadConstructionFailed": "Payload construction failed",
-        "completionFailed": "Completion failed.",
-        "sseError": "Error During SSE event",
-        "generationFailed": "Generation Failed",
-        "noMessagesAddedCheckLogs": "No messages added. Check Logs.",
-        "entryWithoutValidSwipeFound": "Entry without valid swipe found",
-        "generationAlreadyInProgress": "Generation already in progress",
-        "noLoadedUser": "No loaded user",
-        "noLoadedCharacter": "No loaded character",
-        "noActiveChat": "No active chat",
-        "noChatFound": "No chat found",
-        "noActiveAPI": "No Active API",
-        "configurationNotFound": "Configuration \"{{name}}\" not found",
-        "failedToOrchestrateRequestBuild": "Failed to orchestrate request build",
-        "modelAlreadyLoaded": "Model Already Loaded!",
-        "quantizationNoLongerSupported": "Quantization No Longer Supported!",
-        "modelDoesNotExist": "Model Does Not Exist!",
-        "couldNotLoadModel": "Could Not Load Model",
-        "failedToLoadMMPROJ": "Failed to load MMPROJ",
-        "failedToUnloadMMPROJ": "Failed to unload MMPROJ",
-        "noModelLoaded": "No Model Loaded",
-        "mediaAddedWithoutMMPROJModel": "Media was added without MMPROJ model",
-        "importingFile": "Importing file...",
-        "failedToCopy": "Failed to copy",
-        "modelImportedSuccessfully": "Model Imported Successfully!",
-        "fileInvalid": "File Invalid",
-        "filenameInvalidImportFailed": "Filename invalid, Import Failed",
-        "failedToCreateData": "Failed to create data",
-        "mediaAddedWithoutMultimodalSupport": "Media was added without multimodal support.",
-        "failedToBuildPrompt": "Failed to build prompt",
-        "noAutoLoadModelSet": "No Auto-Load Model Set",
-        "autoLoadingModel": "Auto-loading Model: {{name}}",
-        "autoLoadingMMPROJ": "Auto-loading MMPROJ: {{name}}",
-        "failedToBuildPayload": "Failed to build payload",
-        "failedToRunLocalInference": "Failed to run local inference",
-        "failedToGenerateLocally": "Failed to generate locally",
-        "copiedCode": "Copied Code",
-        "failedToCopyToClipboard": "Failed to copy to clipboard",
-        "successfullyImported": "Successfully Imported!",
-        "backgroundDeleted": "Background Deleted!",
-        "couldNotGetData": "Could not get data, something very wrong has happened!",
-        "rollingBackDueToError": "Rolling back due to error",
-        "failedToCopyCardDoesNotExist": "Failed to copy card: Card does not exist",
-        "failedToCopyCard": "Failed to copy card",
-        "failedToDeleteBackground": "Failed to delete background",
-        "failedToCreateCardImageCouldNotBeRetrieved": "Failed to create card - Image could not be retrieved",
-        "noCharacterFound": "No character was found.",
-        "failedToCreateCharacter": "Failed to create character",
-        "invalidCharacterCard": "Invalid Character Card",
-        "v2ParsingFailedFallingBack": "V2 Parsing failed, falling back to V1",
-        "failedToCreateDefaultCharacter": "Failed to create default character",
-        "loadingUser": "Loading User: {{name}}",
-        "instructDataError": "Something wrong happened with Instruct data",
-        "samplerConfigAlreadyExists": "Sampler Config \"{{name}}\" already exists!",
-        "invalidFileType": "Invalid File Type!",
-        "failedToImportSampler": "Failed to import",
-        "noSpeakerChosen": "No Speaker Chosen",
-        "schemaValidationFailed": "Schema validation failed!",
-        "colorNameAlreadyUsed": "Color Name Already Used",
-        "modelMissingEntryDeleted": "Model missing, its entry will be deleted: {{name}}"
     },
     "connections": {
         "add": {
@@ -495,6 +458,9 @@
             "configCreated": "Config created.",
             "configNameExists": "Config name already exists.",
             "savedToDownloads": "Saved \"{{name}}\" to Downloads"
+        },
+        "errors": {
+            "instructDataError": "Something wrong happened with Instruct data"
         }
     },
     "horizontalSelector": {
@@ -587,7 +553,23 @@
         "toast": {
             "deletekv": "KV Cache deleted!",
             "failedtolink": "Failed to link model",
-            "failedtoload": "Failed to load model"
+            "failedtoload": "Failed to load model",
+            "modelAlreadyLoaded": "Model Already Loaded!",
+            "quantizationNoLongerSupported": "Quantization No Longer Supported!",
+            "modelDoesNotExist": "Model Does Not Exist!",
+            "couldNotLoadModel": "Could Not Load Model",
+            "failedToLoadMMPROJ": "Failed to load MMPROJ",
+            "failedToUnloadMMPROJ": "Failed to unload MMPROJ",
+            "noModelLoaded": "No Model Loaded",
+            "mediaAddedWithoutMMPROJModel": "Media was added without MMPROJ model",
+            "modelImportedSuccessfully": "Model Imported Successfully!",
+            "mediaAddedWithoutMultimodalSupport": "Media was added without multimodal support.",
+            "noAutoLoadModelSet": "No Auto-Load Model Set",
+            "autoLoadingModel": "Auto-loading Model: {{name}}",
+            "autoLoadingMMPROJ": "Auto-loading MMPROJ: {{name}}",
+            "failedToRunLocalInference": "Failed to run local inference",
+            "failedToGenerateLocally": "Failed to generate locally",
+            "modelMissingEntryDeleted": "Model missing, its entry will be deleted: {{name}}"
         }
     },
     "multiDropdown": {
@@ -626,9 +608,10 @@
         "title": "Samplers",
         "toast": {
             "emptyname": "Sampler name cannot be empty",
-            "exists": "Sampler name already exists.",
+            "exists": "Sampler Config \"{{name}}\" already exists!",
             "exportok": "Exported Sampler Configuration!",
-            "lastconfig": "Cannot Delete Last Configuration"
+            "lastconfig": "Cannot Delete Last Configuration",
+            "failedToImport": "Failed to import"
         }
     },
     "settings": {
@@ -641,7 +624,10 @@
                 }
             },
             "regenerateDefaultCard": "Regenerate Default Card",
-            "title": "Character Management"
+            "title": "Character Management",
+            "errors": {
+                "failedToCreateDefaultCharacter": "Failed to create default character"
+            }
         },
         "chat": {
             "askInChatterUI": "Ask in ChatterUI",
@@ -696,7 +682,8 @@
             },
             "custom": "Custom",
             "error": {
-                "failedToImport": "Failed to import: {{error}}"
+                "failedToImport": "Failed to import: {{error}}",
+                "colorNameAlreadyUsed": "Color Name Already Used"
             },
             "pasteThemeTitle": "Paste Theme Here",
             "title": "Themes",
@@ -775,7 +762,10 @@
             "deleteBackground": "Delete Chat Background",
             "importBackground": "Import Chat Background",
             "replaceBackground": "Replace Chat Background",
-            "title": "Style"
+            "title": "Style",
+            "messages": {
+                "backgroundDeleted": "Background Deleted!"
+            }
         },
         "tagHider": {
             "description": "Hide characters with the following tags from the character list.",
@@ -819,6 +809,32 @@
         },
         "hint": "Hint: Swipe Left or press <icon/> to open the Users drawer",
         "nameplaceholder": "Empty names are discouraged",
-        "profilecount": "User Profiles"
+        "profilecount": "User Profiles",
+        "messages": {
+            "loadingUser": "Loading User: {{name}}"
+        }
+    },
+    "generation": {
+        "errors": {
+            "promptConstructionFailed": "Prompt construction failed",
+            "payloadConstructionFailed": "Payload construction failed",
+            "completionFailed": "Completion failed.",
+            "sseFailed": "Error During SSE event",
+            "generationFailed": "Generation Failed",
+            "generationAlreadyInProgress": "Generation already in progress",
+            "noUser": "No loaded user",
+            "noCharacter": "No loaded character",
+            "noActiveChat": "No active chat",
+            "noChatFound": "No chat found",
+            "noActiveAPI": "No Active API",
+            "configurationNotFound": "Configuration \"{{name}}\" not found",
+            "failedToOrchestrateRequestBuild": "Failed to orchestrate request build",
+            "failedToBuildPrompt": "Failed to build prompt",
+            "failedToBuildPayload": "Failed to build payload"
+        },
+        "warn": {
+            "noMessagesAddedCheckLogs": "No messages added. Check Logs.",
+            "entryWithoutValidSwipeFound": "Entry without valid swipe found"
+        }
     }
 }

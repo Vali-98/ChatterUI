@@ -76,7 +76,7 @@ export const useTTSStore = create<TTSState>()(
 
                 Logger.info('Starting TTS')
                 if (currentSpeaker === undefined) {
-                    Logger.errorToast(t('toast.noSpeakerChosen'))
+                    Logger.errorToast(t('tts.nospeaker'))
                     clearIndex()
                     return
                 }
