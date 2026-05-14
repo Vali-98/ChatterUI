@@ -1,0 +1,843 @@
+{
+    "about": {
+        "description": {
+            "primary": "ChatterUI 是由 Vali-98 开发的免费开源应用",
+            "support": "这个应用是我业余时间的一个热情项目。如果你喜欢这个应用，请考虑支持它的开发！"
+        },
+        "devMode": {
+            "disableAction": "禁用开发模式",
+            "disabledMessage": "开发模式已禁用。",
+            "enabledMessage": "你已启用开发模式。"
+        },
+        "reportIssue": "遇到问题？在这里报告：",
+        "logsReminder": "记得附上日志",
+        "support": {
+            "button": "支持 ChatterUI",
+            "label": "在这里捐助 ChatterUI："
+        },
+        "versionPrefix": "v"
+    },
+    "appMode": {
+        "options": {
+            "local": "本地",
+            "remote": "远程"
+        },
+        "title": "应用模式"
+    },
+    "auth": {
+        "authorizationRequired": "需要授权"
+    },
+    "character": {
+        "editor": {
+            "title": "角色编辑器",
+            "actions": {
+                "changeBackground": "更改背景",
+                "changeImage": "更改图片",
+                "export": "导出",
+                "removeBackground": "移除背景",
+                "viewImage": "查看图片"
+            },
+            "dialogs": {
+                "clone": {
+                    "confirm": "克隆角色",
+                    "description": "确定要克隆 '{{name}}' 吗？",
+                    "title": "克隆角色"
+                },
+                "deleteAlternateMessage": {
+                    "confirm": "删除",
+                    "description": "确定要删除此替代消息吗？此操作不可撤销。",
+                    "title": "删除替代消息"
+                },
+                "deleteCharacter": {
+                    "confirm": "删除角色",
+                    "description": "确定要删除 '{{name}}' 吗？此操作不可撤销。",
+                    "title": "删除角色"
+                },
+                "deleteImage": {
+                    "confirm": "删除图片",
+                    "description": "确定要删除此图片吗？此操作不可撤销。",
+                    "title": "删除图片"
+                },
+                "unsavedChanges": {
+                    "description": "你有未保存的更改，离开将丢失你的进度。",
+                    "discard": "丢弃更改",
+                    "title": "未保存更改"
+                }
+            },
+            "emptyStates": {
+                "noAlternateGreetings": "没有备用问候语"
+            },
+            "errors": {
+                "export": "无法导出：{{error}}",
+                "exportFailed": "导出失败",
+                "copyCardNotExist": "复制卡片失败：卡片不存在",
+                "failedToCopyCard": "复制卡片失败",
+                "deleteBackground": "删除背景失败",
+                "createFromImage": "卡片创建失败 - 无法获取图片",
+                "cardNoCharacter": "未找到角色。",
+                "createFailed": "创建角色失败",
+                "invalidCharacterCard": "无效的角色卡片",
+                "v2ParsingFailedFallingBack": "V2 解析失败，正在回退到 V1"
+            },
+            "fields": {
+                "alternateGreeting": "备用问候语",
+                "exampleMessages": "示例消息",
+                "firstMessage": "首条消息",
+                "personality": "个性",
+                "scenario": "场景",
+                "tags": "标签"
+            },
+            "messages": {
+                "deleted": "已删除角色：{{name}}",
+                "exported": "卡片已导出！",
+                "saved": "卡片已保存！"
+            },
+            "metrics": {
+                "descriptionTokens": "描述令牌：{{count}}"
+            }
+        },
+        "list": {
+            "actions": {
+                "createCharacter": "创建角色",
+                "createNewCharacter": "创建新角色",
+                "importFromFile": "从文件导入"
+            },
+            "columns": {
+                "name": "名称"
+            },
+            "emptyStates": {
+                "noCharactersFound": "未找到角色。试着导入一些！",
+                "noCharactersMatch": "没有找到匹配搜索结果的角色",
+                "noMessages": "没有消息"
+            },
+            "errors": {
+                "chatCreationFailed": "聊天创建备份失败！请汇报。",
+                "load": "无法加载角色：{{error}}",
+                "nameCannotBeEmpty": "名称不能为空",
+                "nameEmpty": "名称不能为空！"
+            },
+            "messages": {
+                "hiderDisabled": "隐藏器已禁用",
+                "hiderEnabled": "隐藏器已启用"
+            },
+            "search": {
+                "byName": "按名称搜索",
+                "byTags": "按标签搜索"
+            },
+            "sort": {
+                "label": "排序方式",
+                "recent": "最近"
+            }
+        }
+    },
+    "chat": {
+        "bubble": {
+            "promptSpeed": "提示：{{tokens}} t/s",
+            "textGenerationSpeed": "文本生成：{{tokens}} t/s"
+        },
+        "drawer": {
+            "actions": {
+                "startNewChat": "开始新聊天"
+            },
+            "dialogs": {
+                "clone": {
+                    "confirm": "克隆聊天",
+                    "description": "确定要克隆 '{{name}}' 吗？",
+                    "title": "克隆聊天"
+                },
+                "delete": {
+                    "confirm": "删除聊天",
+                    "description": "确定要删除 '{{name}}' 吗？此操作不可撤销。",
+                    "title": "删除聊天"
+                }
+            },
+            "errors": {
+                "defaultChatFailed": "创建默认聊天时出错",
+                "exportFailed": "导出聊天失败",
+                "undefinedChat": "聊天未定义"
+            },
+            "labels": {
+                "unknown": "未知"
+            },
+            "messages": {
+                "exported": "文件：{{name}} 已保存到下载"
+            },
+            "rename": {
+                "errors": {
+                    "nameCannotBeEmpty": "名称不能为空"
+                }
+            },
+            "search": {
+                "errors": {
+                    "queryFailed": "聊天搜索失败：{{error}}"
+                },
+                "noResults": "无结果",
+                "placeholder": "搜索消息...",
+                "resultsFound": "结果：{{count}}",
+                "title": "搜索"
+            },
+            "title": "聊天",
+            "user": {
+                "alreadySet": "该用户已设置",
+                "linkAction": "链接用户",
+                "linked": "已链接到用户：{{name}}",
+                "noneSelected": "当前未选择用户"
+            }
+        },
+        "editor": {
+            "actions": {
+                "confirm": "确认",
+                "delete": "删除",
+                "reset": "重置"
+            }
+        },
+        "filteredText": {
+            "hide": "隐藏过滤",
+            "show": "显示过滤"
+        },
+        "footer": {
+            "emptyState": {
+                "sendMessageToBegin": "发送一条消息即可开始",
+                "startOfChat": "聊天开始"
+            }
+        },
+        "import": {
+            "errors": {
+                "failedToImport": "导入失败",
+                "noChatCharacter": "你正在导入的聊天中没有角色或用户"
+            }
+        },
+        "input": {
+            "actions": {
+                "addImage": "添加图片",
+                "chatHistory": "聊天记录",
+                "editCharacter": "编辑角色",
+                "mainMenu": "主菜单",
+                "takePicture": "拍照"
+            },
+            "errors": {
+                "abortGeneration": "正在中止生成",
+                "failedToSend": "发送失败"
+            }
+        },
+        "model": {
+            "noModelLoaded": "未加载模型"
+        },
+        "quickActions": {
+            "errors": {
+                "cloneFailed": "克隆聊天失败",
+                "copyFailed": "复制到剪贴板失败"
+            },
+            "fork": {
+                "button": "分叉聊天",
+                "description": "这将从此消息创建一个聊天克隆",
+                "title": "分叉聊天"
+            },
+            "messages": {
+                "copied": "已复制"
+            },
+            "toast": {
+                "copiedCode": "已复制代码",
+                "copyFailed": "复制到剪贴板失败"
+            }
+        },
+        "frame": {
+            "seconds": "{{seconds}}秒",
+            "entryNumber": "第{{index}}条"
+        }
+    },
+    "common": {
+        "actions": {
+            "back": "返回",
+            "cancel": "取消",
+            "clone": "克隆",
+            "close": "关闭",
+            "delete": "删除",
+            "disable": "禁用",
+            "edit": "编辑",
+            "enable": "启用",
+            "export": "导出",
+            "more": "更多",
+            "rename": "重命名",
+            "save": "保存",
+            "test": "测试",
+            "tryAgain": "再试一次"
+        },
+        "brand": {
+            "name": "ChatterUI"
+        },
+        "emptyStates": {
+            "noItems": "没有条目"
+        },
+        "labels": {
+            "cpu": "CPU",
+            "description": "描述",
+            "devMode": "开发模式",
+            "external": "外部",
+            "internal": "内部",
+            "name": "名称",
+            "none": "无",
+            "result": "结果",
+            "results": "结果",
+            "selected": "已选",
+            "suggestions": "建议",
+            "version": "版本"
+        },
+        "navigation": {
+            "about": "关于",
+            "settings": "设置"
+        },
+        "messages": {
+            "importingFile": "正在导入文件...",
+            "successfullyImported": "导入成功！"
+        },
+        "errors": {
+            "failedToCopy": "复制失败",
+            "fileInvalid": "文件无效",
+            "filenameInvalidImportFailed": "文件名无效，导入失败",
+            "failedToCreateData": "创建数据失败",
+            "couldNotGetData": "无法获取数据，发生了严重错误！",
+            "rollingBackDueToError": "由于错误正在回滚",
+            "invalidFileType": "文件类型无效！",
+            "schemaValidationFailed": "模式验证失败！"
+        }
+    },
+    "connections": {
+        "add": {
+            "apiKey": "API 密钥",
+            "completionUrl": "完成 URL",
+            "createButton": "创建 API",
+            "defaultFriendlyName": "新 API",
+            "error": {
+                "200": "无法检索模型：{{error}}",
+                "modelparse": "无法解析模型",
+                "modelundef": "模型返回了未定义值",
+                "nonarray": "模型返回了非数组值。`modelListParser` 可能不正确"
+            },
+            "firstMessage": "首条消息",
+            "firstMessageHint": "发送给 Claude 的默认首条消息",
+            "friendlyName": "友好名称",
+            "fullUrlHint": "注意：使用完整 URL 路径",
+            "model": "模型",
+            "modelUrl": "模型 URL",
+            "prefill": "预填充",
+            "prefillHint": "在模型响应前预填充",
+            "selectConnectionType": "选择连接类型",
+            "selectModel": "选择模型",
+            "title": "添加连接"
+        },
+        "connected": "已连接",
+        "editor": {
+            "apiKey": "API 密钥",
+            "completionUrl": "完成 URL",
+            "firstMessage": "首条消息",
+            "firstMessageHint": "发送给 Claude 的默认首条消息",
+            "friendlyName": "友好名称",
+            "fullUrlHint": "注意：使用完整 URL 路径",
+            "invalidTemplate": "无法获取有效模板！",
+            "model": "模型",
+            "modelUrl": "模型 URL",
+            "prefill": "预填充",
+            "prefillHint": "在模型响应前预填充",
+            "saveButton": "保存更改",
+            "selectModel": "选择模型",
+            "title": "编辑连接"
+        },
+        "failedToConnect": "连接失败",
+        "item": {
+            "delete": {
+                "button": "删除连接",
+                "description": "确定要删除 '{{name}}' 吗？此操作不可撤销！",
+                "title": "删除连接"
+            }
+        },
+        "manager": {
+            "add": "添加连接",
+            "empty": "尚未添加连接",
+            "header": "连接"
+        },
+        "notConnected": "未连接",
+        "templates": {
+            "empty": "未添加自定义模板",
+            "get": "获取模板",
+            "import": "导入模板",
+            "importError": "导入失败：{{error}}",
+            "learn": "了解模板",
+            "paste": "粘贴模板",
+            "pasteSheetTitle": "在此处粘贴模板",
+            "title": "模板管理",
+            "delete": {
+                "title": "删除模板",
+                "description": "确定要删除 '{{name}}' 吗？",
+                "confirm": "删除模板"
+            },
+            "exported": "模板导出成功"
+        }
+    },
+    "contextlimit": {
+        "allocation": "上下文分配",
+        "chat": "聊天上下文",
+        "generated": "已生成",
+        "warning": "聊天上下文不足将更快忘记消息"
+    },
+    "db": {
+        "migrationerror": {
+            "description": "如果你看到此消息，那么发生了非常严重的问题。请在下面报告此错误，并附上日志截图。",
+            "title": "数据库迁移失败！"
+        }
+    },
+    "dropdown": {
+        "filter": "筛选...",
+        "selectItem": "选择项目"
+    },
+    "formatting": {
+        "alert": {
+            "deleteConfig": {
+                "cancel": "取消",
+                "confirm": "删除 Instruct",
+                "description": "确定要删除 '{{name}}' 吗？",
+                "title": "删除配置"
+            },
+            "regenerateDefaults": {
+                "cancel": "取消",
+                "confirm": "重新生成默认预设",
+                "description": "确定要重新生成默认 Instruct 吗？",
+                "title": "重新生成默认 Instruct"
+            }
+        },
+        "autoformatter": {
+            "asteriskActionPlainSpeech": "星号动作，普通语言",
+            "asteriskActionPlainSpeechExample": "*某些动作* 某些语言",
+            "asteriskActionQuoteSpeech": "星号动作，引号语言",
+            "asteriskActionQuoteSpeechExample": "*某些动作* \"某些语言\"",
+            "disabled": "已禁用",
+            "disabledExample": "*<无格式>*",
+            "plainActionQuoteSpeech": "普通动作，引号语言",
+            "plainActionQuoteSpeechExample": "某些动作，\"某些语言\""
+        },
+        "configExists": "配置已存在",
+        "createConfig": "创建配置",
+        "defaultName": "默认",
+        "deleteConfig": "删除配置",
+        "deleteConfigDescription": "确定要删除 '{{name}}' 吗？",
+        "deleteInstruct": "删除 Instruct",
+        "exportConfig": "导出配置",
+        "jsonExtension": ".json",
+        "newPreset": "新 Instruct 预设",
+        "regenerateDefaultPresets": "重新生成默认预设",
+        "regenerateDefaults": "重新生成默认 Instruct",
+        "regenerateDefaultsDescription": "确定要重新生成默认 Instruct 吗？",
+        "sections": {
+            "addTimestamp": "添加时间戳",
+            "includeNames": "包含名称",
+            "inputPrefix": "输入前缀",
+            "inputSuffix": "输入后缀",
+            "lastOutputPrefix": "最后输出前缀",
+            "outputPrefix": "输出前缀",
+            "outputSuffix": "输出后缀",
+            "removeThinkTags": "移除思考标签",
+            "sendAudio": "发送音频",
+            "sendDocuments": "发送文档",
+            "sendImages": "发送图片",
+            "stopSequence": "停止序列",
+            "systemPrefix": "系统前缀",
+            "systemPrompt": "系统提示",
+            "systemPromptFormat": "系统提示格式",
+            "systemSuffix": "系统后缀",
+            "useCommonStopSequences": "使用公共停止序列",
+            "useExamples": "使用示例",
+            "useLastImageOnly": "仅使用最后一张图片",
+            "usePersonality": "使用个性",
+            "useScenario": "使用场景",
+            "wrapInNewline": "换行"
+        },
+        "selectConfig": "选择配置",
+        "title": "格式化",
+        "toast": {
+            "cannotDeleteLastPreset": "无法删除最后一个 Instruct 预设。",
+            "configCreated": "配置已创建。",
+            "configNameExists": "配置名称已存在。",
+            "savedToDownloads": "已将 \"{{name}}\" 保存到下载"
+        },
+        "errors": {
+            "instructDataError": "Instruct 数据出现错误"
+        }
+    },
+    "horizontalSelector": {
+        "description": "可选的有用描述字段。",
+        "label": "选择器标签"
+    },
+    "instruct": {
+        "attachments": "附件",
+        "filteredtext": {
+            "description": "将过滤后的文本发送给推理",
+            "label": "发送过滤文本"
+        },
+        "formatting": "Instruct 格式",
+        "hiddentext": {
+            "description": "隐藏与下面定义的正则模式匹配的文本。（不区分大小写）",
+            "title": "隐藏文本"
+        },
+        "localtemplate": {
+            "description": "在本地模式下，ChatterUI 会自动使用加载模型提供的 instruct 模板。禁用后，如果你希望消息改为使用 Instruct 格式，请关闭此选项。但系统提示仍然始终使用。",
+            "label": "使用内置本地模型模板",
+            "title": "本地模板"
+        },
+        "macros": "宏与角色卡片",
+        "textformatter": {
+            "description": "自动将首条消息格式化为以下样式",
+            "title": "文本格式化器"
+        }
+    },
+    "logs": {
+        "alert": {
+            "delete": {
+                "description": "确定要删除所有日志吗？此操作不可撤销。",
+                "title": "删除日志"
+            }
+        },
+        "export": "导出日志",
+        "flush": "清除日志",
+        "title": "日志",
+        "toast": {
+            "downloaderror": "无法导出日志",
+            "downloadok": "日志已下载！"
+        }
+    },
+    "model": {
+        "alert": {
+            "deletekv": {
+                "description": "确定要删除 KV 缓存吗？此操作不可撤销。\n\n这将释放 {{size}} 的空间。",
+                "title": "删除 KV 缓存"
+            },
+            "deletemodel": {
+                "description": "确定要删除 '{{name}}' 吗？\n\n此操作不可撤销！",
+                "external": "\n\n（这不会删除外部模型文件，仅删除此条目）",
+                "internal": "\n\n此操作将释放 {{size}}",
+                "title": "删除模型"
+            }
+        },
+        "autoload": "自动在聊天中加载模型",
+        "backenddev": "后端设备",
+        "batch": "批处理",
+        "contextshift": "上下文切换",
+        "copymodel": "将模型复制到 ChatterUI",
+        "empty": "未找到模型。试着导入一些！",
+        "externalmodel": "使用外部模型",
+        "gpulayers": "GPU 层",
+        "info": {
+            "hint": "提示：按 <icon /> 并导入 GGUF 模型！",
+            "loaded": "模型已加载"
+        },
+        "item": {
+            "contextlength": "上下文长度",
+            "file": "文件",
+            "invalid": "模型无效",
+            "noparamsize": "无参数大小",
+            "rename": "重命名模型"
+        },
+        "maxcontext": "最大上下文",
+        "modelnamechat": "在聊天中显示模型名称",
+        "mtmd": "多模态适配器",
+        "purgekv": "清除 KV 缓存 ({{size}})",
+        "savekv": "保存本地 KV",
+        "savekvdesc": "生成时保存 KV 缓存，允许你在关闭应用后继续会话。必须使用相同模型才能正常工作。保存 KV 缓存文件可能非常大，并可能对电池寿命产生负面影响！",
+        "selectmmproj": "选择 MMPROJ 模型",
+        "settings": {
+            "advanced": "高级设置",
+            "cpu": "CPU 设置",
+            "title": "模型设置"
+        },
+        "threads": "线程",
+        "title": "模型",
+        "toast": {
+            "deletekv": "KV 缓存已删除！",
+            "failedtolink": "链接模型失败",
+            "failedtoload": "加载模型失败",
+            "modelAlreadyLoaded": "模型已加载！",
+            "quantizationNoLongerSupported": "量化不再受支持！",
+            "modelDoesNotExist": "模型不存在！",
+            "couldNotLoadModel": "无法加载模型",
+            "failedToLoadMMPROJ": "加载 MMPROJ 失败",
+            "failedToUnloadMMPROJ": "卸载 MMPROJ 失败",
+            "noModelLoaded": "未加载模型",
+            "mediaAddedWithoutMMPROJModel": "已添加媒体，但没有 MMPROJ 模型",
+            "modelImportedSuccessfully": "模型导入成功！",
+            "mediaAddedWithoutMultimodalSupport": "已添加媒体，但不支持多模态。",
+            "noAutoLoadModelSet": "未设置自动加载模型",
+            "autoLoadingModel": "自动加载模型：{{name}}",
+            "autoLoadingMMPROJ": "自动加载 MMPROJ：{{name}}",
+            "failedToRunLocalInference": "本地推理运行失败",
+            "failedToGenerateLocally": "本地生成失败",
+            "modelMissingEntryDeleted": "模型缺失，其条目将被删除：{{name}}"
+        }
+    },
+    "multiDropdown": {
+        "counter_one": "已选择 {{count}} 项",
+        "counter_other": "已选择 {{count}} 项",
+        "noItemsSelected": "未选择任何项目"
+    },
+    "navigation": {
+        "about": "关于",
+        "api": "API",
+        "dev_colortest": "[DEV] 颜色测试",
+        "dev_components": "[DEV] 组件",
+        "dev_markdown": "[DEV] Markdown",
+        "formatting": "格式",
+        "logs": "日志",
+        "models": "模型",
+        "sampler": "采样器",
+        "settings": "设置",
+        "tts": "TTS"
+    },
+    "sampler": {
+        "alert": {
+            "delete": {
+                "description": "确定要删除 '{{name}}' 吗？",
+                "title": "删除采样器"
+            }
+        },
+        "create": "创建采样器",
+        "delete": "删除采样器",
+        "empty": "没有可配置的采样器",
+        "export": "导出采样器",
+        "invalid": "采样器字段无效！",
+        "new": "新采样预设",
+        "noSamplers": "你可能还没有添加 API 连接",
+        "notSupported": "采样器 ID [{{id}}] 不受支持",
+        "title": "采样器",
+        "toast": {
+            "emptyname": "采样器名称不能为空",
+            "exists": "采样器配置 '{{name}}' 已存在！",
+            "exportok": "导出采样器配置成功！",
+            "lastconfig": "无法删除最后一个配置",
+            "failedToImport": "导入失败"
+        }
+    },
+    "settings": {
+        "character": {
+            "alert": {
+                "regenerateDefaultCard": {
+                    "confirm": "创建默认卡片",
+                    "description": "这将把默认 AI 机器人卡片添加到你的角色列表。",
+                    "title": "重新生成默认卡片"
+                }
+            },
+            "regenerateDefaultCard": "重新生成默认卡片",
+            "title": "角色管理",
+            "errors": {
+                "failedToCreateDefaultCharacter": "创建默认角色失败"
+            }
+        },
+        "chat": {
+            "askInChatterUI": "在 ChatterUI 中询问",
+            "askInChatterUIDescription": "使用 ChatterUI 提示进行文本意图，而不是默认键盘行为。",
+            "autoGenerateTitles": "自动生成聊天标题",
+            "autoGenerateTitlesDescription": "自动为新聊天创建标题。",
+            "autoLoadUser": "自动加载所选用户",
+            "autoLoadUserDescription": "自动将当前用户配置加载到新聊天。",
+            "loadChatOnStartup": "启动时加载聊天",
+            "loadChatOnStartupDescription": "应用启动时自动重新打开上次聊天。",
+            "styleButton": "聊天样式",
+            "title": "聊天",
+            "useFirstMessage": "创建首条消息",
+            "useFirstMessageDescription": "创建新聊天时添加初始消息。"
+        },
+        "chatstyle": {
+            "fontSize": "字体大小",
+            "fontWeight": "字体粗细",
+            "title": "聊天样式"
+        },
+        "chatwindow": {
+            "alternatePositions": "交替聊天位置",
+            "alternatePositionsDescription": "交替显示进出消息对齐方式。",
+            "autoScroll": "自动滚动",
+            "autoScrollDescription": "自动滚动到最新消息。",
+            "quickDelete": "快速删除",
+            "quickDeleteDescription": "允许通过快速滑动手势删除文本。",
+            "saveScrollPosition": "保存滚动位置",
+            "saveScrollPositionDescription": "重新打开会话时恢复上次聊天位置。",
+            "sendOnEnter": "按 Enter 发送",
+            "sendOnEnterDescription": "按 Enter 键时发送消息。",
+            "showTokensPerSecond": "显示每秒令牌数",
+            "showTokensPerSecondDescription": "显示生成过程中的令牌吞吐量。",
+            "title": "聊天窗口",
+            "wideChat": "宽屏聊天模式",
+            "wideChatDescription": "在聊天窗口使用更宽的布局。"
+        },
+        "colors": {
+            "active": "活动",
+            "alert": {
+                "deleteTheme": {
+                    "confirm": "删除主题",
+                    "description": "确定要删除 '{{name}}' 吗？此操作不可撤销！",
+                    "title": "删除主题"
+                }
+            },
+            "builtIn": "内置",
+            "contextMenu": {
+                "getThemes": "获取主题",
+                "importTheme": "导入主题",
+                "pasteTheme": "粘贴主题"
+            },
+            "custom": "自定义",
+            "error": {
+                "failedToImport": "导入失败：{{error}}",
+                "colorNameAlreadyUsed": "颜色名称已被使用"
+            },
+            "pasteThemeTitle": "在此处粘贴主题",
+            "title": "主题",
+            "useSystemDarkMode": "使用系统深色模式"
+        },
+        "database": {
+            "alert": {
+                "export": {
+                    "confirm": "导出数据库",
+                    "description": "确定要导出数据库文件吗？\n\n它将自动下载到下载目录",
+                    "title": "导出数据库"
+                },
+                "import": {
+                    "confirm": "导入",
+                    "description": "确定要导入此数据库吗？这可能会破坏当前数据库！\n\n将自动下载备份。\n\n应用将自动重启",
+                    "title": "导入数据库"
+                },
+                "rerunMigrations": {
+                    "confirm": "重新运行迁移",
+                    "description": "重新运行迁移可能会破坏你的数据库。请务必导出备份。",
+                    "title": "重新运行迁移"
+                },
+                "versionMismatch": {
+                    "confirm": "仍要导入",
+                    "description": "导入的数据库文件的应用版本 ({{importedVersion}}) 与已安装版本 ({{currentVersion}}) 不同。导入此数据库可能会损坏数据库，建议使用相同的应用版本。",
+                    "title": "版本不同"
+                }
+            },
+            "exportButton": "导出数据库",
+            "importButton": "导入数据库",
+            "rerunMigrationsButton": "重新运行迁移",
+            "title": "数据库管理",
+            "toast": {
+                "downloadFailed": "复制数据库失败：{{error}}",
+                "downloadOk": "下载成功！"
+            },
+            "warningText": "警告：确保导入的数据库来自相同的应用版本！"
+        },
+        "generating": {
+            "bypassContextLength": "绕过上下文长度",
+            "bypassContextLengthDescription": "构建提示时忽略上下文长度限制",
+            "printContext": "打印上下文",
+            "printContextDescription": "将生成上下文打印到日志以便调试",
+            "title": "生成"
+        },
+        "notification": {
+            "enableNotifications": "启用通知",
+            "enableNotificationsDescription": "在应用在后台时发送通知",
+            "playSound": "通知声音",
+            "showText": "显示通知文本",
+            "showTextDescription": "在通知中显示生成的消息",
+            "title": "通知",
+            "vibrate": "通知振动"
+        },
+        "screen": {
+            "keepAwake": "保持唤醒",
+            "keepAwakeDescription": "在前台时保持应用唤醒",
+            "title": "屏幕",
+            "unlockOrientation": "解锁方向",
+            "unlockOrientationDescription": "允许手机横屏（需要重启应用）"
+        },
+        "security": {
+            "lockApp": "锁定应用",
+            "lockAppDescription": "需要设备身份验证才能打开应用。如果你没有设备锁，这将无法正常工作。",
+            "title": "安全"
+        },
+        "style": {
+            "alert": {
+                "deleteBackground": {
+                    "confirm": "删除背景",
+                    "description": "确定要删除此背景吗？此操作不可撤销！",
+                    "title": "删除背景"
+                }
+            },
+            "changeTheme": "更改主题",
+            "deleteBackground": "删除聊天背景",
+            "importBackground": "导入聊天背景",
+            "replaceBackground": "替换聊天背景",
+            "title": "样式",
+            "messages": {
+                "backgroundDeleted": "背景已删除！"
+            }
+        },
+        "tagHider": {
+            "description": "从角色列表中隐藏具有以下标签的角色。",
+            "label": "隐藏标签"
+        },
+        "title": "设置",
+        "language": {
+            "title": "设置语言"
+        }
+    },
+    "stringArrayEditor": {
+        "add": "添加",
+        "duplicateValueError": "值已存在",
+        "emptyValueError": "值不能为空",
+        "placeholder": "输入值..."
+    },
+    "tts": {
+        "autoafter": "推理后自动语音",
+        "language": "语言",
+        "live": "推理期间自动语音",
+        "nospeaker": "未选择扬声器",
+        "selectlang": "选择语言",
+        "selectvoice": "选择语音",
+        "speed": "速度",
+        "test": "这是测试音频",
+        "voices": "语音"
+    },
+    "users": {
+        "create": "创建新用户",
+        "edit": {
+            "card": {
+                "clone": "克隆用户",
+                "clonedesc": "确定要克隆 '{{name}}' 吗？",
+                "delete": "删除用户",
+                "deletedesc": "确定要删除 '{{name}}' 吗？\n此操作不可撤销。"
+            },
+            "image": {
+                "change": "更改图片",
+                "delete": "删除图片",
+                "deletedesc": "确定要删除此图片吗？\n此操作不可撤销。",
+                "view": "查看图片"
+            },
+            "title": "编辑用户"
+        },
+        "hint": "提示：向左滑动或按 <icon/> 打开用户抽屉",
+        "nameplaceholder": "不建议留空名称",
+        "profilecount": "用户配置",
+        "messages": {
+            "loadingUser": "正在加载用户：{{name}}"
+        }
+    },
+    "generation": {
+        "errors": {
+            "promptConstructionFailed": "提示构建失败",
+            "payloadConstructionFailed": "载荷构建失败",
+            "completionFailed": "完成失败。",
+            "sseFailed": "SSE 事件期间出错",
+            "generationFailed": "生成失败",
+            "generationAlreadyInProgress": "生成已在进行中",
+            "noUser": "未加载用户",
+            "noCharacter": "未加载角色",
+            "noActiveChat": "没有激活聊天",
+            "noChatFound": "未找到聊天",
+            "noActiveAPI": "没有可用 API",
+            "configurationNotFound": "未找到配置 '{{name}}'",
+            "failedToOrchestrateRequestBuild": "组织请求构建失败",
+            "failedToBuildPrompt": "构建提示失败",
+            "failedToBuildPayload": "构建载荷失败"
+        },
+        "warn": {
+            "noMessagesAddedCheckLogs": "未添加消息。请检查日志。",
+            "entryWithoutValidSwipeFound": "发现没有有效滑动的条目"
+        }
+    }
+}

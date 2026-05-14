@@ -771,7 +771,10 @@
             "description": "Hide characters with the following tags from the character list.",
             "label": "Hidden Tags"
         },
-        "title": "Settings"
+        "title": "Settings",
+        "language": {
+            "title": "Set Language"
+        }
     },
     "stringArrayEditor": {
         "add": "Add",
