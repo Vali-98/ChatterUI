@@ -1,3 +1,5 @@
+import { t } from 'i18next'
+
 import Alert from '@components/views/Alert'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
@@ -110,7 +112,7 @@ const buildLocalPayload = async () => {
                     prompt = result.prompt
                     mediaPaths = result.media_paths ?? []
                     if (mediaPaths.length > 0 && !hasImage && !hasAudio) {
-                        Logger.warnToast('Media was added without multimodal support.')
+                        Logger.warnToast(t('toast.mediaAddedWithoutMultimodalSupport'))
                     }
                 }
             }
@@ -141,7 +143,7 @@ const buildLocalPayload = async () => {
     }
 
     if (!prompt) {
-        Logger.errorToast('Failed to build prompt')
+        Logger.errorToast(t('toast.failedToBuildPrompt'))
         return
     }
 
@@ -186,25 +188,25 @@ const verifyModelLoaded = async (): Promise<boolean> => {
         const autoLoad = mmkv.getBoolean(AppSettings.AutoLoadLocal)
         // If  autoload is disabled, just return
         if (!autoLoad) {
-            Logger.warnToast('No Model Loaded')
+            Logger.warnToast(t('toast.noModelLoaded'))
             return false
         }
 
         // by default, autoload will attempt to load the last model used
         if (!lastModel) {
-            Logger.warnToast('No Auto-Load Model Set')
+            Logger.warnToast(t('toast.noAutoLoadModelSet'))
             return false
         }
 
         // attempt to load model
         if (lastModel) {
-            Logger.infoToast(`Auto-loading Model: ${lastModel.name}`)
+            Logger.infoToast(t('toast.autoLoadingModel', { name: lastModel.name }))
             await Llama.useLlamaModelStore.getState().load(lastModel)
         }
 
         const lastMmproj = Llama.useLlamaPreferencesStore.getState().lastMmproj
         if (lastMmproj) {
-            Logger.infoToast(`Auto-loading MMPROJ: ${lastMmproj.name}`)
+            Logger.infoToast(t('toast.autoLoadingMMPROJ', { name: lastMmproj.name }))
             await Llama.useLlamaModelStore.getState().loadMmproj(lastMmproj)
         }
     }
@@ -222,7 +224,7 @@ export const localInference = async () => {
         const context = Llama.useLlamaModelStore.getState().context
 
         if (!context) {
-            Logger.warnToast('No Model Loaded')
+            Logger.warnToast(t('toast.noModelLoaded'))
             stopGenerating()
             return
         }
@@ -230,7 +232,7 @@ export const localInference = async () => {
         const payload = await buildLocalPayload()
 
         if (!payload) {
-            Logger.warnToast('Failed to build payload')
+            Logger.warnToast(t('toast.failedToBuildPayload'))
             stopGenerating()
             return
         }
@@ -271,7 +273,7 @@ export const localInference = async () => {
         }
         await runLocalCompletion(payload)
     } catch (e) {
-        Logger.errorToast('Failed to run local inference: ' + e)
+        Logger.errorToast(t('toast.failedToRunLocalInference', { error: e }))
         stopGenerating()
     }
 }
@@ -315,7 +317,7 @@ const runLocalCompletion = async (
         .getState()
         .completion({ ...payload, n_threads: engineData.threads }, outputStream, outputCompleted)
         .catch((error) => {
-            Logger.errorToast(`Failed to generate locally: ${error}`)
+            Logger.errorToast(t('toast.failedToGenerateLocally', { error }))
             stopGenerating()
         })
 }
@@ -400,36 +402,36 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
 
         const userCard = userState.card
         if (!userCard) {
-            Logger.errorToast('No loaded user')
+            Logger.errorToast(t('toast.noLoadedUser'))
             return
         }
 
         const characterCard = characterState.card
         if (!characterCard) {
-            Logger.errorToast('No loaded character')
+            Logger.errorToast(t('toast.noLoadedCharacter'))
             return
         }
         const chatId = await Chats.useChatState.getState().id
         if (!chatId) {
-            Logger.errorToast('No active chat')
+            Logger.errorToast(t('toast.noActiveChat'))
             return
         }
 
         const messages = (await Chats.db.query.chat(chatId))?.messages
         if (!messages) {
-            Logger.errorToast('No chat found')
+            Logger.errorToast(t('toast.noChatFound'))
             return
         }
 
         const apiValues = localAPIValues
         if (!apiValues) {
-            Logger.warnToast(`No Active API`)
+            Logger.warnToast(t('toast.noActiveAPI'))
             return
         }
 
         const apiConfig = localAPIConfig
         if (!apiConfig) {
-            Logger.errorToast(`Configuration "${apiValues?.configName}" not found`)
+            Logger.errorToast(t('toast.configurationNotFound', { name: apiValues?.configName }))
             return
         }
 
@@ -463,6 +465,6 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
             },
         }
     } catch (e) {
-        Logger.errorToast('Failed to orchestrate request build: ' + e)
+        Logger.errorToast(t('toast.failedToOrchestrateRequestBuild', { error: e }))
     }
 }

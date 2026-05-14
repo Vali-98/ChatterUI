@@ -1,3 +1,5 @@
+import { t } from 'i18next'
+
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { buildThinkRules } from '@lib/markdown/ThinkTags'
 import { CharacterCardData, CharacterTokenCache } from '@lib/state/Characters'
@@ -468,7 +470,7 @@ export const getSystemPrompt = ({
 }
 
 const warnNoMessages = () => {
-    Logger.warnToast('No messages added. Check Logs.')
+    Logger.warnToast(t('toast.noMessagesAddedCheckLogs'))
     Logger.warn(
         'No messages were added to the context. This can be caused by:\n- Generated Length is too high, lower it in Formatting\n- Your context length is too low\n- Your first message is too long'
     )

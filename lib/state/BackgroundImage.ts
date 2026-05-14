@@ -1,4 +1,5 @@
 import { getDocumentAsync } from 'expo-document-picker'
+import { t } from 'i18next'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -31,7 +32,7 @@ export const useBackgroundStore = create<BackgroundImageStateProps>()(
                     copyFile({ from: uri, to: AppDirectory.Assets + name })
 
                     set({ image: name })
-                    Logger.infoToast('Successfully Imported!')
+                    Logger.infoToast(t('toast.successfullyImported'))
                 } catch (e) {
                     Logger.error('Something went wrong with importing: ' + e)
                 }
@@ -40,7 +41,7 @@ export const useBackgroundStore = create<BackgroundImageStateProps>()(
                 const imageName = get().image
                 if (imageName) deleteFile(AppDirectory.Assets + imageName)
                 set({ image: undefined })
-                Logger.warnToast('Background Deleted!')
+                Logger.warnToast(t('toast.backgroundDeleted'))
             },
         }),
         {

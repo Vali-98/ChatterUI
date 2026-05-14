@@ -1,3 +1,4 @@
+import { t } from 'i18next'
 import BackgroundService from 'react-native-background-actions'
 
 import { AppSettings } from '@lib/constants/GlobalValues'
@@ -60,7 +61,7 @@ const completionTaskOptions = {
 
 export async function generateResponse(swipeId: number) {
     if (useInference.getState().nowGenerating) {
-        Logger.infoToast('Generation already in progress')
+        Logger.infoToast(t('toast.generationAlreadyInProgress'))
         return
     }
     useInference.getState().startGenerating(swipeId)
@@ -83,7 +84,7 @@ const useGenerateResponse = () => {
     const generateResponse = useCallback(
         async (swipeId: number) => {
             if (nowGenerating) {
-                Logger.infoToast('Generation already in progress')
+                Logger.infoToast(t('toast.generationAlreadyInProgress'))
                 return
             }
             startGenerating(swipeId)
@@ -200,31 +201,31 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
 
         const userCard = userState.card
         if (!userCard) {
-            Logger.errorToast('No loaded user')
+            Logger.errorToast(t('toast.noLoadedUser'))
             return
         }
 
         const characterCard = characterState.card
         if (!characterCard) {
-            Logger.errorToast('No loaded character')
+            Logger.errorToast(t('toast.noLoadedCharacter'))
             return
         }
 
         const chatId = await Chats.useChatState.getState().id
         if (!chatId) {
-            Logger.errorToast('No active chat')
+            Logger.errorToast(t('toast.noActiveChat'))
             return
         }
 
         const messages = (await Chats.db.query.chat(chatId))?.messages
         if (!messages) {
-            Logger.errorToast('No chat found')
+            Logger.errorToast(t('toast.noChatFound'))
             return
         }
 
         const apiValues = apiState.values.find((item, index) => index === apiState.activeIndex)
         if (!apiValues) {
-            Logger.warnToast(`No Active API`)
+            Logger.warnToast(t('toast.noActiveAPI'))
             return
         }
 
@@ -232,7 +233,7 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
 
         const apiConfig = configs[0]
         if (!apiConfig) {
-            Logger.errorToast(`Configuration "${apiValues?.configName}" not found`)
+            Logger.errorToast(t('toast.configurationNotFound', { name: apiValues?.configName }))
             return
         }
         const samplers = SamplersManager.getCurrentSampler()
@@ -278,6 +279,6 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
         }
     } catch (e) {
         Logger.stackTrace(e)
-        Logger.errorToast('Failed to orchestrate request build: ' + e)
+        Logger.errorToast(t('toast.failedToOrchestrateRequestBuild', { error: e }))
     }
 }

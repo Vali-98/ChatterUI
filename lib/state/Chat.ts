@@ -1,6 +1,7 @@
 import { and, count, desc, eq, getTableColumns, like, not, sql } from 'drizzle-orm'
 import { randomUUID } from 'expo-crypto'
 import * as Notifications from 'expo-notifications'
+import { t } from 'i18next'
 import mime from 'mime/lite'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
@@ -131,7 +132,7 @@ const setMismatchedUser = async (userId: number) => {
     Logger.info('Autoloading User with ID: ' + userId)
     const name = await Characters.useUserStore.getState().setCard(userId)
 
-    if (name) Logger.infoToast('Loading User : ' + name)
+    if (name) Logger.infoToast(t('toast.loadingUser', { name }))
     else
         Logger.warn(
             `Failed to load User with ID ${userId}, it was likely deleted. Consider relinking this chat.`
@@ -174,7 +175,7 @@ export namespace Chats {
             let autoScroll: { cause: 'search' | 'saveScroll'; index: number } | undefined =
                 undefined
             if (!data) {
-                Logger.errorToast('Failed to load chat')
+                Logger.errorToast(t('toast.failedToLoadChat'))
                 Logger.error(`Chat data for id ${chatId} was invalid: ${JSON.stringify(data)}`)
                 return
             }

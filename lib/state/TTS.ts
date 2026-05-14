@@ -1,4 +1,5 @@
 import * as Speech from 'expo-speech'
+import { t } from 'i18next'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -75,7 +76,7 @@ export const useTTSStore = create<TTSState>()(
 
                 Logger.info('Starting TTS')
                 if (currentSpeaker === undefined) {
-                    Logger.errorToast(`No Speaker Chosen`)
+                    Logger.errorToast(t('toast.noSpeakerChosen'))
                     clearIndex()
                     return
                 }

@@ -1,4 +1,5 @@
 import { setStringAsync } from 'expo-clipboard'
+import { t } from 'i18next'
 import { useCallback, useMemo } from 'react'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { MarkdownIt } from 'react-native-markdown-display'
@@ -43,10 +44,10 @@ export namespace MarkdownStyle {
                                 onPress={() => {
                                     setStringAsync(content)
                                         .then(() => {
-                                            Logger.infoToast('Copied Code')
+                                            Logger.infoToast(t('toast.copiedCode'))
                                         })
                                         .catch(() => {
-                                            Logger.errorToast('Failed to copy to clipboard')
+                                            Logger.errorToast(t('toast.failedToCopyToClipboard'))
                                         })
                                 }}
                             />

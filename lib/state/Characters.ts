@@ -4,6 +4,7 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Asset } from 'expo-asset'
 import * as DocumentPicker from 'expo-document-picker'
 import { Paths } from 'expo-file-system'
+import { t } from 'i18next'
 import { useEffect } from 'react'
 import { z } from 'zod'
 import { create } from 'zustand'
@@ -97,7 +98,7 @@ export namespace Characters {
                     const oldImageID = get().card?.image_id
                     const card = get().card
                     if (!id || !oldImageID || !card) {
-                        Logger.errorToast('Could not get data, something very wrong has happened!')
+                        Logger.errorToast(t('toast.couldNotGetData'))
                         return
                     }
                     const imageID = Date.now()
@@ -183,7 +184,7 @@ export namespace Characters {
             const oldImageID = get().card?.image_id
             const card = get().card
             if (!id || !oldImageID || !card) {
-                Logger.errorToast('Could not get data, something very wrong has happned!')
+                Logger.errorToast(t('toast.couldNotGetData'))
                 return
             }
             const imageID = Date.now()
@@ -682,7 +683,7 @@ export namespace Characters {
                         }
                         return image_id
                     } catch (error) {
-                        Logger.errorToast(`Rolling back due to error: ` + error)
+                        Logger.errorToast(t('toast.rollingBackDueToError', { error }))
                         tx.rollback()
                         return undefined
                     }
@@ -694,7 +695,7 @@ export namespace Characters {
                 const card = await db.query.card(charId)
 
                 if (!card) {
-                    Logger.errorToast('Failed to copy card: Card does not exit')
+                    Logger.errorToast(t('toast.failedToCopyCardDoesNotExist'))
                     return
                 }
                 const imageDir = getImageDir(card.image_id)
@@ -722,7 +723,7 @@ export namespace Characters {
                 }
                 const cv2 = convertDBDataToCV2(card)
                 if (!cv2) {
-                    Logger.errorToast('Failed to copy card')
+                    Logger.errorToast(t('toast.failedToCopyCard'))
                     return
                 }
                 await createCharacter(cv2, cacheLoc)
@@ -773,7 +774,7 @@ export namespace Characters {
             await deleteImage(imageId)
             Logger.info(`Deleted image with id: ` + imageId)
         } catch (e) {
-            Logger.errorToast(`Failed to delete background`)
+            Logger.errorToast(t('toast.failedToDeleteBackground'))
             Logger.error(`Error: ` + e)
         }
     }
@@ -806,18 +807,18 @@ export namespace Characters {
         try {
             const file = await readBase64Async(uri)
             if (!file) {
-                Logger.errorToast(`Failed to create card - Image could not be retrieved`)
+                Logger.errorToast(t('toast.failedToCreateCardImageCouldNotBeRetrieved'))
                 return
             }
             const card = JSON.parse(extractPngTextChunk(file))
             if (card === undefined) {
-                Logger.errorToast('No character was found.')
+                Logger.errorToast(t('toast.noCharacterFound'))
                 return
             }
 
             await createCharacterFromV2JSON(card, uri)
         } catch (e) {
-            Logger.errorToast('Failed to create character')
+            Logger.errorToast(t('toast.failedToCreateCharacter'))
             Logger.error(`${e}`)
         }
     }
@@ -825,7 +826,7 @@ export namespace Characters {
     const createCharacterFromV1JSON = async (data: any, uri: string | undefined = undefined) => {
         const result = characterCardV1Schema.safeParse(data)
         if (result.error) {
-            Logger.errorToast('Invalid Character Card')
+            Logger.errorToast(t('toast.invalidCharacterCard'))
             return
         }
         const converted = createBlankV2Card(result.data.name, result.data)
@@ -838,7 +839,7 @@ export namespace Characters {
         // check JSON def
         const result = characterCardV2Schema.safeParse(data)
         if (result.error) {
-            Logger.warnToast('V2 Parsing failed, falling back to V1')
+            Logger.warnToast(t('toast.v2ParsingFailedFallingBack'))
             return await createCharacterFromV1JSON(data, uri)
         }
 
@@ -907,7 +908,7 @@ export namespace Characters {
             }
             await createCharacterFromImage(cardDefaultDir)
         } catch (e) {
-            Logger.errorToast('Failed to create default character')
+            Logger.errorToast(t('toast.failedToCreateDefaultCharacter'))
             Logger.error('Error: ' + e)
         }
     }

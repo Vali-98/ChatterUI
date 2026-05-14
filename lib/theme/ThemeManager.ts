@@ -1,3 +1,4 @@
+import { t } from 'i18next'
 import { useMemo } from 'react'
 import { useColorScheme } from 'react-native'
 import { create } from 'zustand'
@@ -55,7 +56,7 @@ export namespace Theme {
                     const validation = themeColorSchemaV1.safeParse(colorScheme)
 
                     if (!validation.success) {
-                        Logger.errorToast(`Schema validation failed!`)
+                        Logger.errorToast(t('toast.schemaValidationFailed'))
                         Logger.error(
                             'The format of the imported JSON does not match the required color scheme:\n' +
                                 validation.error.issues
@@ -69,7 +70,7 @@ export namespace Theme {
                         get().customColors.some((item) => item.name === colorScheme.name) ||
                         DefaultColorSchemes.schemes.some((item) => item.name === colorScheme.name)
                     ) {
-                        Logger.errorToast('Color Name Already Used')
+                        Logger.errorToast(t('toast.colorNameAlreadyUsed'))
                         return
                     }
                     set({ customColors: [...get().customColors, colorScheme] })

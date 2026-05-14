@@ -1,7 +1,6 @@
 import { fetch } from 'expo/fetch'
 
 import { Logger } from '@lib/state/Logger'
-
 type SSEValues = {
     endpoint: string
     method: 'POST' | 'GET'

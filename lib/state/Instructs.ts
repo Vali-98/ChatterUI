@@ -1,4 +1,5 @@
 import { eq } from 'drizzle-orm'
+import { t } from 'i18next'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -275,7 +276,7 @@ export namespace Instructs {
                     const baseInstruct = get().data
 
                     if (!baseInstruct) {
-                        Logger.errorToast('Something wrong happened with Instruct data')
+                        Logger.errorToast(t('toast.instructDataError'))
                         return Instructs.defaultInstruct
                     }
 

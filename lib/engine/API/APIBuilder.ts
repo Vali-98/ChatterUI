@@ -1,4 +1,5 @@
 import { nativeApplicationVersion } from 'expo-application'
+import { t } from 'i18next'
 
 import { AppSettings, CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { SSEFetch } from '@lib/engine/SSEFetch'
@@ -55,7 +56,7 @@ export const buildAndSendRequest = async ({
             bypassContextLength,
         })
         if (prompt === undefined) {
-            Logger.errorToast(`Prompt construction failed`)
+            Logger.errorToast(t('toast.promptConstructionFailed'))
             stopGenerating()
             return
         }
@@ -70,7 +71,7 @@ export const buildAndSendRequest = async ({
         })
 
         if (!payload) {
-            Logger.errorToast(`Payload construction failed`)
+            Logger.errorToast(t('toast.payloadConstructionFailed'))
             stopGenerating()
             return
         }
@@ -143,7 +144,7 @@ export const buildAndSendRequest = async ({
             stopGenerating: stopGenerating,
         })
     } catch (e) {
-        Logger.errorToast('Completion failed: ' + e)
+        Logger.errorToast(t('toast.completionFailed', { error: e }))
         stopGenerating()
     }
 }
@@ -260,7 +261,7 @@ const readableStreamResponse = async (senderParams: SenderParams) => {
         try {
             const a = JSON.parse(data)
             if (a?.error) {
-                Logger.errorToast('Error Logged')
+                Logger.errorToast(t('toast.errorLogged'))
                 Logger.error(data)
             }
         } catch {}
@@ -268,7 +269,7 @@ const readableStreamResponse = async (senderParams: SenderParams) => {
     })
 
     sse.setOnError(() => {
-        Logger.errorToast('Generation Failed')
+        Logger.errorToast(t('toast.generationFailed'))
         closeStream()
     })
 
