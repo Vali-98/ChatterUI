@@ -59,7 +59,6 @@ export const buildContext = async (params: ContextBuilderParams) => {
             ? buildChatCompletionContext
             : buildTextCompletionContext
     const output = await buildFn(params)
-    printContext((typeof output === 'object' ? JSON.stringify(output) : output) ?? 'No Output')
     return output
 }
 
@@ -299,7 +298,15 @@ export const buildChatCompletionContext = async (params: ContextBuilderParams) =
             })
         }
     }
-
+    printContext(
+        JSON.stringify(
+            payload.map((item) => {
+                const content = item[feats.contentName]
+                if (typeof content === 'string') return content
+                else return content.filter((item) => item.type === 'text')
+            })
+        )
+    )
     return payload
 }
 
@@ -336,8 +343,9 @@ export const buildTextCompletionContext = async (params: ContextBuilderParams) =
     }
 
     if (!endedAtAssistant) output += instruct.last_output_prefix
-
-    return replaceMacrosInternal(output, instruct)
+    const result = replaceMacrosInternal(output, instruct)
+    printContext(result)
+    return result
 }
 
 const thinkRule = buildThinkRules()
