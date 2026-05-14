@@ -45,7 +45,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
         Characters.db.query.backgroundImageQuery(charId ?? -1)
     )
 
-    const { data: entryIdList } = useLiveQuery(Chats.db.live.entryIdList(chatId), [chatId])
+    const { data: entryIdList, updatedAt } = useLiveQuery(Chats.db.live.entryIdList(chatId), [
+        chatId,
+    ])
 
     const { cause: scrollCause, index: scrollIndex } = scrollData ?? {}
     const flatlistRef = useRef<FlatList | null>(null)
@@ -115,7 +117,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                             .damping(20)
                             .stiffness(300)}
                         exiting={FadeOut.duration(150)}
-                        entering={FadeIn.duration(150).delay(100)}
+                        entering={FadeIn.duration(250)}
                     />
                 )}
                 ref={flatlistRef}
@@ -162,7 +164,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                     paddingBottom: 32,
                     rowGap: 8,
                 }}
-                ListFooterComponent={() => <ChatFooter chatLength={entryIdList.length} />}
+                ListFooterComponent={
+                    updatedAt && (() => <ChatFooter chatLength={entryIdList.length} />)
+                }
                 ListHeaderComponent={() => <ChatHeader />}
             />
 
