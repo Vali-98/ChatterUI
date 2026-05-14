@@ -279,6 +279,6 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
         }
     } catch (e) {
         Logger.stackTrace(e)
-        Logger.errorToast(t('toast.failedToOrchestrateRequestBuild', { error: e }))
+        Logger.errorToast(t('toast.failedToOrchestrateRequestBuild'), JSON.stringify(e))
     }
 }

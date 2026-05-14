@@ -269,7 +269,7 @@ export namespace Model {
             await db.update(model_data).set(modelDataEntry).where(eq(model_data.id, id))
             return true
         } catch (e) {
-            Logger.errorToast(t('toast.failedToCreateData', { error: e }))
+            Logger.errorToast(t('toast.failedToCreateData'), JSON.stringify(e))
             if (deleteOnFailure) deleteFile(file_path)
             return false
         }

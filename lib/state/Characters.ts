@@ -683,7 +683,7 @@ export namespace Characters {
                         }
                         return image_id
                     } catch (error) {
-                        Logger.errorToast(t('toast.rollingBackDueToError', { error }))
+                        Logger.errorToast(t('toast.rollingBackDueToError'), JSON.stringify(error))
                         tx.rollback()
                         return undefined
                     }

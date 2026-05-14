@@ -144,7 +144,7 @@ export const buildAndSendRequest = async ({
             stopGenerating: stopGenerating,
         })
     } catch (e) {
-        Logger.errorToast(t('toast.completionFailed', { error: e }))
+        Logger.errorToast(t('toast.completionFailed'), JSON.stringify(e))
         stopGenerating()
     }
 }

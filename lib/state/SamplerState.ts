@@ -157,7 +157,7 @@ export namespace SamplersManager {
 
             return { data: JSON.parse(data), name: name }
         } catch (e) {
-            Logger.errorToast(t('toast.failedToImportSampler', { error: e }))
+            Logger.errorToast(t('toast.failedToImportSampler'), JSON.stringify(e))
         }
     }
 }

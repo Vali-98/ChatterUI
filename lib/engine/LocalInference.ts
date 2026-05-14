@@ -273,7 +273,7 @@ export const localInference = async () => {
         }
         await runLocalCompletion(payload)
     } catch (e) {
-        Logger.errorToast(t('toast.failedToRunLocalInference', { error: e }))
+        Logger.errorToast(t('toast.failedToRunLocalInference'), JSON.stringify(e))
         stopGenerating()
     }
 }
@@ -317,7 +317,7 @@ const runLocalCompletion = async (
         .getState()
         .completion({ ...payload, n_threads: engineData.threads }, outputStream, outputCompleted)
         .catch((error) => {
-            Logger.errorToast(t('toast.failedToGenerateLocally', { error }))
+            Logger.errorToast(t('toast.failedToGenerateLocally'), JSON.stringify(error))
             stopGenerating()
         })
 }
@@ -465,6 +465,6 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
             },
         }
     } catch (e) {
-        Logger.errorToast(t('toast.failedToOrchestrateRequestBuild', { error: e }))
+        Logger.errorToast(t('toast.failedToOrchestrateRequestBuild'), JSON.stringify(e))
     }
 }
