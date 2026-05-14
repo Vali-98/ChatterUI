@@ -18,7 +18,7 @@ const AppModeToggle = () => {
                     label: t('appMode.options.local'),
                     icon: Platform.OS === 'android' ? 'phone-android' : 'phone-iphone',
                 },
-                { value: 'remote', label: t('appMode.options.remote') },
+                { value: 'remote', label: t('appMode.options.remote'), icon: 'cloud' },
             ]}
             selected={appMode}
             onPress={setAppMode}
