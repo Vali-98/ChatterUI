@@ -43,6 +43,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                 </ChatFrame>
             ) : (
                 <ChatFrameSkeleton
+                    isLastMessage={isLastMessage}
                     index={index}
                     estimatedHeight={Math.max(48, (tokenLength / 10) * 16 + 32)}
                 />

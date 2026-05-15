@@ -9,12 +9,14 @@ type ChatFrameSkeletonProps = {
     index: number
     isUser?: boolean
     estimatedHeight?: number
+    isLastMessage: boolean
 }
 
 const ChatFrameSkeleton: React.FC<ChatFrameSkeletonProps> = ({
     index,
     isUser = false,
     estimatedHeight = 48,
+    isLastMessage,
 }) => {
     const { color, spacing, borderRadius } = Theme.useTheme()
 
@@ -24,7 +26,7 @@ const ChatFrameSkeleton: React.FC<ChatFrameSkeletonProps> = ({
     const rowDir = isUser && alternate ? 'row-reverse' : 'row'
     const align = isUser && alternate ? 'flex-end' : 'flex-start'
 
-    const skeletonColor = color.neutral._300 + '66'
+    const skeletonColor = color.neutral._300 + '33'
 
     if (wide) {
         return (
@@ -58,7 +60,7 @@ const ChatFrameSkeleton: React.FC<ChatFrameSkeletonProps> = ({
                         <View
                             style={{
                                 width: 120,
-                                height: 16,
+                                height: 24,
                                 borderRadius: 8,
                                 backgroundColor: skeletonColor,
                             }}
@@ -66,8 +68,8 @@ const ChatFrameSkeleton: React.FC<ChatFrameSkeletonProps> = ({
 
                         <View
                             style={{
-                                width: 180,
-                                height: 12,
+                                width: 100,
+                                height: 16,
                                 borderRadius: 8,
                                 backgroundColor: skeletonColor,
                             }}
@@ -83,6 +85,17 @@ const ChatFrameSkeleton: React.FC<ChatFrameSkeletonProps> = ({
                         backgroundColor: skeletonColor,
                     }}
                 />
+                {isLastMessage && (
+                    <View
+                        style={{
+                            marginTop: 8,
+                            height: 30,
+                            borderRadius: 8,
+                            backgroundColor: skeletonColor,
+                            marginHorizontal: 32,
+                        }}
+                    />
+                )}
             </View>
         )
     }
@@ -165,6 +178,16 @@ const ChatFrameSkeleton: React.FC<ChatFrameSkeletonProps> = ({
                         backgroundColor: skeletonColor,
                     }}
                 />
+                {isLastMessage && (
+                    <View
+                        style={{
+                            marginTop: 8,
+                            height: 30,
+                            borderRadius: 8,
+                            backgroundColor: skeletonColor,
+                        }}
+                    />
+                )}
             </View>
         </View>
     )
