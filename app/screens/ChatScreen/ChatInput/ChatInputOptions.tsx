@@ -7,6 +7,8 @@ import ContextMenu from '@components/views/ContextMenu'
 import Drawer from '@components/views/Drawer'
 import { Theme } from '@lib/theme/ThemeManager'
 
+import ChatTokenCount from './ChatTokenCount'
+
 const ChatOptions = () => {
     const { t } = useTranslation()
     const router = useRouter()
@@ -21,6 +23,10 @@ const ChatOptions = () => {
     return (
         <ContextMenu
             buttons={[
+                {
+                    component: () => <ChatTokenCount />,
+                    border: true,
+                },
                 {
                     onPress: (close) => {
                         close()

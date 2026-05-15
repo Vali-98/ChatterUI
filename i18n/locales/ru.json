@@ -9,8 +9,8 @@
             "disabledMessage": "Режим разработки отключен.",
             "enabledMessage": "Режим разработки включен."
         },
-        "reportIssue": "Нашли проблему? Сообщите о ней здесь:",
         "logsReminder": "Не забудьте включить логи",
+        "reportIssue": "Нашли проблему? Сообщите о ней здесь:",
         "support": {
             "button": "Поддержать ChatterUI",
             "label": "Пожертвовать ChatterUI:"
@@ -29,7 +29,6 @@
     },
     "character": {
         "editor": {
-            "title": "Редактор персонажа",
             "actions": {
                 "changeBackground": "Изменить фон",
                 "changeImage": "Изменить изображение",
@@ -68,14 +67,14 @@
                 "noAlternateGreetings": "Нет альтернативных приветствий"
             },
             "errors": {
+                "cardNoCharacter": "Персонаж не найден.",
+                "copyCardNotExist": "Не удалось скопировать карточку: карточка не существует",
+                "createFailed": "Не удалось создать персонажа",
+                "createFromImage": "Не удалось создать карточку - невозможно получить изображение",
+                "deleteBackground": "Не удалось удалить фон",
                 "export": "Не удалось экспортировать: {{error}}",
                 "exportFailed": "Ошибка экспорта",
-                "copyCardNotExist": "Не удалось скопировать карточку: карточка не существует",
                 "failedToCopyCard": "Не удалось скопировать карточку",
-                "deleteBackground": "Не удалось удалить фон",
-                "createFromImage": "Не удалось создать карточку - невозможно получить изображение",
-                "cardNoCharacter": "Персонаж не найден.",
-                "createFailed": "Не удалось создать персонажа",
                 "invalidCharacterCard": "Неправильная карточка персонажа",
                 "v2ParsingFailedFallingBack": "Разбор V2 не удался, откат на V1"
             },
@@ -94,7 +93,8 @@
             },
             "metrics": {
                 "descriptionTokens": "Токены описания: {{count}}"
-            }
+            },
+            "title": "Редактор персонажа"
         },
         "list": {
             "actions": {
@@ -201,6 +201,10 @@
                 "startOfChat": "Начало чата"
             }
         },
+        "frame": {
+            "entryNumber": "#{{index}}",
+            "seconds": "{{seconds}}с"
+        },
         "import": {
             "errors": {
                 "failedToImport": "Ошибка импорта",
@@ -241,9 +245,12 @@
                 "copyFailed": "Не удалось скопировать в буфер обмена"
             }
         },
-        "frame": {
-            "seconds": "{{seconds}}с",
-            "entryNumber": "#{{index}}"
+        "state": {
+            "failedToLoad": "Не удалось загрузить чат {{id}}"
+        },
+        "tokencount": {
+            "title": "Лимит контекста",
+            "used": "Использовано {{used}}, максимум {{max}}"
         }
     },
     "common": {
@@ -269,6 +276,16 @@
         "emptyStates": {
             "noItems": "Нет элементов"
         },
+        "errors": {
+            "couldNotGetData": "Не удалось получить данные, что-то очень плохое случилось!",
+            "failedToCopy": "Не удалось скопировать",
+            "failedToCreateData": "Не удалось создать данные",
+            "fileInvalid": "Неправильный файл",
+            "filenameInvalidImportFailed": "Неправильное имя файла, импорт не удался",
+            "invalidFileType": "Неправильный тип файла!",
+            "rollingBackDueToError": "Откат из-за ошибки",
+            "schemaValidationFailed": "Ошибка проверки схемы!"
+        },
         "labels": {
             "cpu": "ЦП",
             "description": "Описание",
@@ -283,23 +300,13 @@
             "suggestions": "Предложения",
             "version": "Версия"
         },
-        "navigation": {
-            "about": "О приложении",
-            "settings": "Настройки"
-        },
         "messages": {
             "importingFile": "Импорт файла...",
             "successfullyImported": "Успешно импортировано!"
         },
-        "errors": {
-            "failedToCopy": "Не удалось скопировать",
-            "fileInvalid": "Неправильный файл",
-            "filenameInvalidImportFailed": "Неправильное имя файла, импорт не удался",
-            "failedToCreateData": "Не удалось создать данные",
-            "couldNotGetData": "Не удалось получить данные, что-то очень плохое случилось!",
-            "rollingBackDueToError": "Откат из-за ошибки",
-            "invalidFileType": "Неправильный тип файла!",
-            "schemaValidationFailed": "Ошибка проверки схемы!"
+        "navigation": {
+            "about": "О приложении",
+            "settings": "Настройки"
         }
     },
     "connections": {
@@ -358,20 +365,20 @@
         },
         "notConnected": "Не подключено",
         "templates": {
+            "delete": {
+                "confirm": "Удалить шаблон",
+                "description": "Вы уверены, что хотите удалить '{{name}}'?",
+                "title": "Удалить шаблон"
+            },
             "empty": "Пользовательские шаблоны не добавлены",
+            "exported": "Шаблон успешно экспортирован",
             "get": "Получить шаблоны",
             "import": "Импортировать шаблон",
             "importError": "Ошибка импорта: {{error}}",
             "learn": "Узнайте о шаблонах",
             "paste": "Вставить шаблон",
             "pasteSheetTitle": "Вставить шаблон здесь",
-            "title": "Менеджер шаблонов",
-            "delete": {
-                "title": "Удалить шаблон",
-                "description": "Вы уверены, что хотите удалить '{{name}}'?",
-                "confirm": "Удалить шаблон"
-            },
-            "exported": "Шаблон успешно экспортирован"
+            "title": "Менеджер шаблонов"
         }
     },
     "contextlimit": {
@@ -421,6 +428,9 @@
         "deleteConfig": "Удалить конфигурацию",
         "deleteConfigDescription": "Вы уверены, что хотите удалить '{{name}}'?",
         "deleteInstruct": "Удалить инструкцию",
+        "errors": {
+            "instructDataError": "Что-то пошло не так с данными инструкций"
+        },
         "exportConfig": "Экспортировать конфигурацию",
         "jsonExtension": ".json",
         "newPreset": "Новая предустановка инструкций",
@@ -458,9 +468,29 @@
             "configCreated": "Конфигурация создана.",
             "configNameExists": "Имя конфигурации уже существует.",
             "savedToDownloads": "\"{{name}}\" сохранен в загрузки"
-        },
+        }
+    },
+    "generation": {
         "errors": {
-            "instructDataError": "Что-то пошло не так с данными инструкций"
+            "completionFailed": "Завершение не удалось.",
+            "configurationNotFound": "Конфигурация \"{{name}}\" не найдена",
+            "failedToBuildPayload": "Не удалось построить полезную нагрузку",
+            "failedToBuildPrompt": "Не удалось построить подсказку",
+            "failedToOrchestrateRequestBuild": "Не удалось организовать построение запроса",
+            "generationAlreadyInProgress": "Генерация уже выполняется",
+            "generationFailed": "Генерация не удалась",
+            "noActiveAPI": "Нет активного API",
+            "noActiveChat": "Нет активного чата",
+            "noCharacter": "Персонаж не загружен",
+            "noChatFound": "Чат не найден",
+            "noUser": "Пользователь не загружен",
+            "payloadConstructionFailed": "Ошибка построения полезной нагрузки",
+            "promptConstructionFailed": "Ошибка построения подсказки",
+            "sseFailed": "Ошибка во время события SSE"
+        },
+        "warn": {
+            "entryWithoutValidSwipeFound": "Найдена запись без действительного смахивания",
+            "noMessagesAddedCheckLogs": "Сообщения не добавлены. Проверьте логи."
         }
     },
     "horizontalSelector": {
@@ -551,25 +581,25 @@
         "threads": "Потоки",
         "title": "Модели",
         "toast": {
+            "autoLoadingMMPROJ": "Автозагрузка MMPROJ: {{name}}",
+            "autoLoadingModel": "Автозагрузка модели: {{name}}",
+            "couldNotLoadModel": "Не удалось загрузить модель",
             "deletekv": "Кэш KV удален!",
+            "failedToGenerateLocally": "Не удалось сгенерировать локально",
+            "failedToLoadMMPROJ": "Не удалось загрузить MMPROJ",
+            "failedToRunLocalInference": "Не удалось запустить локальный вывод",
+            "failedToUnloadMMPROJ": "Не удалось выгрузить MMPROJ",
             "failedtolink": "Не удалось привязать модель",
             "failedtoload": "Не удалось загрузить модель",
-            "modelAlreadyLoaded": "Модель уже загружена!",
-            "quantizationNoLongerSupported": "Квантизация больше не поддерживается!",
-            "modelDoesNotExist": "Модель не существует!",
-            "couldNotLoadModel": "Не удалось загрузить модель",
-            "failedToLoadMMPROJ": "Не удалось загрузить MMPROJ",
-            "failedToUnloadMMPROJ": "Не удалось выгрузить MMPROJ",
-            "noModelLoaded": "Модель не загружена",
             "mediaAddedWithoutMMPROJModel": "Медиа было добавлено без модели MMPROJ",
-            "modelImportedSuccessfully": "Модель успешно импортирована!",
             "mediaAddedWithoutMultimodalSupport": "Медиа было добавлено без поддержки мультимодальности.",
+            "modelAlreadyLoaded": "Модель уже загружена!",
+            "modelDoesNotExist": "Модель не существует!",
+            "modelImportedSuccessfully": "Модель успешно импортирована!",
+            "modelMissingEntryDeleted": "Модель отсутствует, ее запись будет удалена: {{name}}",
             "noAutoLoadModelSet": "Автозагрузка модели не установлена",
-            "autoLoadingModel": "Автозагрузка модели: {{name}}",
-            "autoLoadingMMPROJ": "Автозагрузка MMPROJ: {{name}}",
-            "failedToRunLocalInference": "Не удалось запустить локальный вывод",
-            "failedToGenerateLocally": "Не удалось сгенерировать локально",
-            "modelMissingEntryDeleted": "Модель отсутствует, ее запись будет удалена: {{name}}"
+            "noModelLoaded": "Модель не загружена",
+            "quantizationNoLongerSupported": "Квантизация больше не поддерживается!"
         }
     },
     "multiDropdown": {
@@ -610,8 +640,8 @@
             "emptyname": "Имя семплера не может быть пустым",
             "exists": "Конфигурация семплера \"{{name}}\" уже существует!",
             "exportok": "Конфигурация семплера экспортирована!",
-            "lastconfig": "Невозможно удалить последнюю конфигурацию",
-            "failedToImport": "Ошибка импорта"
+            "failedToImport": "Ошибка импорта",
+            "lastconfig": "Невозможно удалить последнюю конфигурацию"
         }
     },
     "settings": {
@@ -623,11 +653,11 @@
                     "title": "Восстановить карточку по умолчанию"
                 }
             },
-            "regenerateDefaultCard": "Восстановить карточку по умолчанию",
-            "title": "Управление персонажами",
             "errors": {
                 "failedToCreateDefaultCharacter": "Не удалось создать персонажа по умолчанию"
-            }
+            },
+            "regenerateDefaultCard": "Восстановить карточку по умолчанию",
+            "title": "Управление персонажами"
         },
         "chat": {
             "askInChatterUI": "Спросить в ChatterUI",
@@ -682,8 +712,8 @@
             },
             "custom": "Пользовательские",
             "error": {
-                "failedToImport": "Ошибка импорта: {{error}}",
-                "colorNameAlreadyUsed": "Имя цвета уже используется"
+                "colorNameAlreadyUsed": "Имя цвета уже используется",
+                "failedToImport": "Ошибка импорта: {{error}}"
             },
             "pasteThemeTitle": "Вставить тему здесь",
             "title": "Темы",
@@ -729,6 +759,9 @@
             "printContextDescription": "Выводит контекст генерации в логи для отладки",
             "title": "Генерация"
         },
+        "language": {
+            "title": "Установить язык"
+        },
         "notification": {
             "enableNotifications": "Включить уведомления",
             "enableNotificationsDescription": "Отправляет уведомления, когда приложение находится в фоне",
@@ -761,20 +794,17 @@
             "changeTheme": "Изменить тему",
             "deleteBackground": "Удалить фон чата",
             "importBackground": "Импортировать фон чата",
-            "replaceBackground": "Заменить фон чата",
-            "title": "Стиль",
             "messages": {
                 "backgroundDeleted": "Фон удален!"
-            }
+            },
+            "replaceBackground": "Заменить фон чата",
+            "title": "Стиль"
         },
         "tagHider": {
             "description": "Скройте персонажей с следующими тегами из списка персонажей.",
             "label": "Скрытые теги"
         },
-        "title": "Настройки",
-        "language": {
-            "title": "Установить язык"
-        }
+        "title": "Настройки"
     },
     "stringArrayEditor": {
         "add": "Добавить",
@@ -811,33 +841,10 @@
             "title": "Редактировать пользователя"
         },
         "hint": "Подсказка: проведите пальцем влево или нажмите <icon/> для открытия ящика пользователей",
-        "nameplaceholder": "Пустые имена не рекомендуются",
-        "profilecount": "Профили пользователей",
         "messages": {
             "loadingUser": "Загрузка пользователя: {{name}}"
-        }
-    },
-    "generation": {
-        "errors": {
-            "promptConstructionFailed": "Ошибка построения подсказки",
-            "payloadConstructionFailed": "Ошибка построения полезной нагрузки",
-            "completionFailed": "Завершение не удалось.",
-            "sseFailed": "Ошибка во время события SSE",
-            "generationFailed": "Генерация не удалась",
-            "generationAlreadyInProgress": "Генерация уже выполняется",
-            "noUser": "Пользователь не загружен",
-            "noCharacter": "Персонаж не загружен",
-            "noActiveChat": "Нет активного чата",
-            "noChatFound": "Чат не найден",
-            "noActiveAPI": "Нет активного API",
-            "configurationNotFound": "Конфигурация \"{{name}}\" не найдена",
-            "failedToOrchestrateRequestBuild": "Не удалось организовать построение запроса",
-            "failedToBuildPrompt": "Не удалось построить подсказку",
-            "failedToBuildPayload": "Не удалось построить полезную нагрузку"
         },
-        "warn": {
-            "noMessagesAddedCheckLogs": "Сообщения не добавлены. Проверьте логи.",
-            "entryWithoutValidSwipeFound": "Найдена запись без действительного смахивания"
-        }
+        "nameplaceholder": "Пустые имена не рекомендуются",
+        "profilecount": "Профили пользователей"
     }
 }

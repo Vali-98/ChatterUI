@@ -1,4 +1,4 @@
-import { and, count, desc, eq, getTableColumns, like, not, sql } from 'drizzle-orm'
+import { and, count, desc, eq, getTableColumns, like, not, sql, sum } from 'drizzle-orm'
 import { randomUUID } from 'expo-crypto'
 import * as Notifications from 'expo-notifications'
 import { t } from 'i18next'
@@ -175,8 +175,10 @@ export namespace Chats {
             let autoScroll: { cause: 'search' | 'saveScroll'; index: number } | undefined =
                 undefined
             if (!data) {
-                Logger.errorToast(t('toast.failedToLoadChat'))
-                Logger.error(`Chat data for id ${chatId} was invalid: ${JSON.stringify(data)}`)
+                Logger.errorToast(
+                    t('chat.state.failedToLoad', { id: chatId }),
+                    JSON.stringify(data)
+                )
                 return
             }
             if (data.user_id) await setMismatchedUser(data.user_id)
@@ -714,6 +716,16 @@ export namespace Chats {
                     },
                     orderBy: chatSwipes.id,
                 })
+            }
+
+            export const tokenCount = (chatId: number) => {
+                return database
+                    .select({
+                        totalTokens: sum(chatSwipes.token_length),
+                    })
+                    .from(chatSwipes)
+                    .innerJoin(chatEntries, eq(chatSwipes.entry_id, chatEntries.id))
+                    .where(and(eq(chatEntries.chat_id, chatId), eq(chatSwipes.active, true)))
             }
 
             export type LiveEntry = NonNullable<Awaited<ReturnType<typeof entry>>>

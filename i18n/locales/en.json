@@ -244,6 +244,13 @@
         "frame": {
             "seconds": "{{seconds}}s",
             "entryNumber": "#{{index}}"
+        },
+        "state": {
+            "failedToLoad": "Failed to load chat {{id}}"
+        },
+        "tokencount": {
+            "used": "Used {{used}}, Max {{max}}",
+            "title": "Context Limit"
         }
     },
     "common": {

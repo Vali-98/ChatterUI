@@ -1,7 +1,7 @@
 import { AntDesign } from '@expo/vector-icons'
 import { randomUUID } from 'expo-crypto'
 import { useFocusEffect } from 'expo-router'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import {
     BackHandler,
     Dimensions,
@@ -40,7 +40,7 @@ export type Placement = 'top' | 'bottom' | 'left' | 'right' | 'auto' | 'center'
 
 export type ContextMenuButtonProps = {
     key?: string
-    label: string
+    label?: string
     onPress?: (close: () => void) => void
     submenu?: ContextMenuButtonProps[]
     icon?: keyof typeof AntDesign.glyphMap
@@ -48,6 +48,8 @@ export type ContextMenuButtonProps = {
     textColor?: string
     variant?: 'normal' | 'warning'
     disabled?: boolean
+    component?: () => ReactNode
+    border?: boolean
 }
 
 export interface ContextMenuProps extends ViewProps {
@@ -325,44 +327,50 @@ const MenuList = ({
 
                     return (
                         <Animated.View key={key} layout={LinearTransition}>
-                            <Pressable
-                                style={styles.menuItem}
-                                onPress={() => {
-                                    if (hasSubmenu) {
-                                        setOpenKey(openKey === key ? null : key)
-                                    } else {
-                                        item.onPress?.(onClose)
-                                    }
-                                }}>
-                                {item.icon && (
-                                    <AntDesign
-                                        name={item.icon}
-                                        size={item.iconSize ?? 18}
+                            {item.component ? (
+                                item.component()
+                            ) : (
+                                <Pressable
+                                    style={styles.menuItem}
+                                    onPress={() => {
+                                        if (hasSubmenu) {
+                                            setOpenKey(openKey === key ? null : key)
+                                        } else {
+                                            item.onPress?.(onClose)
+                                        }
+                                    }}>
+                                    {item.icon && (
+                                        <AntDesign
+                                            name={item.icon}
+                                            size={item.iconSize ?? 18}
+                                            style={
+                                                item.variant === 'warning'
+                                                    ? styles.menuTextError
+                                                    : styles.menuText
+                                            }
+                                        />
+                                    )}
+
+                                    {!item.icon && hasSubmenu && (
+                                        <AntDesign
+                                            name={openKey === key ? 'caret-up' : 'caret-down'}
+                                            size={12}
+                                            style={styles.menuText}
+                                        />
+                                    )}
+
+                                    <Text
                                         style={
                                             item.variant === 'warning'
                                                 ? styles.menuTextError
                                                 : styles.menuText
-                                        }
-                                    />
-                                )}
+                                        }>
+                                        {item.label}
+                                    </Text>
+                                </Pressable>
+                            )}
 
-                                {!item.icon && hasSubmenu && (
-                                    <AntDesign
-                                        name={openKey === key ? 'caret-up' : 'caret-down'}
-                                        size={12}
-                                        style={styles.menuText}
-                                    />
-                                )}
-
-                                <Text
-                                    style={
-                                        item.variant === 'warning'
-                                            ? styles.menuTextError
-                                            : styles.menuText
-                                    }>
-                                    {item.label}
-                                </Text>
-                            </Pressable>
+                            {item.border && <View style={styles.border} />}
 
                             {hasSubmenu && openKey === key && (
                                 <MenuList buttons={item.submenu!} onClose={onClose} />
@@ -404,6 +412,7 @@ const useStyles = () => {
         menuTextError: {
             color: color.error._300,
         },
+        border: { borderTopWidth: 4, borderColor: color.neutral._300, marginVertical: 4 },
     })
 }
 

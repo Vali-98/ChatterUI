@@ -9,8 +9,8 @@
             "disabledMessage": "开发模式已禁用。",
             "enabledMessage": "你已启用开发模式。"
         },
-        "reportIssue": "遇到问题？在这里报告：",
         "logsReminder": "记得附上日志",
+        "reportIssue": "遇到问题？在这里报告：",
         "support": {
             "button": "支持 ChatterUI",
             "label": "在这里捐助 ChatterUI："
@@ -29,7 +29,6 @@
     },
     "character": {
         "editor": {
-            "title": "角色编辑器",
             "actions": {
                 "changeBackground": "更改背景",
                 "changeImage": "更改图片",
@@ -68,14 +67,14 @@
                 "noAlternateGreetings": "没有备用问候语"
             },
             "errors": {
+                "cardNoCharacter": "未找到角色。",
+                "copyCardNotExist": "复制卡片失败：卡片不存在",
+                "createFailed": "创建角色失败",
+                "createFromImage": "卡片创建失败 - 无法获取图片",
+                "deleteBackground": "删除背景失败",
                 "export": "无法导出：{{error}}",
                 "exportFailed": "导出失败",
-                "copyCardNotExist": "复制卡片失败：卡片不存在",
                 "failedToCopyCard": "复制卡片失败",
-                "deleteBackground": "删除背景失败",
-                "createFromImage": "卡片创建失败 - 无法获取图片",
-                "cardNoCharacter": "未找到角色。",
-                "createFailed": "创建角色失败",
                 "invalidCharacterCard": "无效的角色卡片",
                 "v2ParsingFailedFallingBack": "V2 解析失败，正在回退到 V1"
             },
@@ -94,7 +93,8 @@
             },
             "metrics": {
                 "descriptionTokens": "描述令牌：{{count}}"
-            }
+            },
+            "title": "角色编辑器"
         },
         "list": {
             "actions": {
@@ -201,6 +201,10 @@
                 "startOfChat": "聊天开始"
             }
         },
+        "frame": {
+            "entryNumber": "第{{index}}条",
+            "seconds": "{{seconds}}秒"
+        },
         "import": {
             "errors": {
                 "failedToImport": "导入失败",
@@ -241,9 +245,12 @@
                 "copyFailed": "复制到剪贴板失败"
             }
         },
-        "frame": {
-            "seconds": "{{seconds}}秒",
-            "entryNumber": "第{{index}}条"
+        "state": {
+            "failedToLoad": "无法加载聊天 {{id}}"
+        },
+        "tokencount": {
+            "title": "上下文限制",
+            "used": "已使用 {{used}}，最大 {{max}}"
         }
     },
     "common": {
@@ -269,6 +276,16 @@
         "emptyStates": {
             "noItems": "没有条目"
         },
+        "errors": {
+            "couldNotGetData": "无法获取数据，发生了严重错误！",
+            "failedToCopy": "复制失败",
+            "failedToCreateData": "创建数据失败",
+            "fileInvalid": "文件无效",
+            "filenameInvalidImportFailed": "文件名无效，导入失败",
+            "invalidFileType": "文件类型无效！",
+            "rollingBackDueToError": "由于错误正在回滚",
+            "schemaValidationFailed": "模式验证失败！"
+        },
         "labels": {
             "cpu": "CPU",
             "description": "描述",
@@ -283,23 +300,13 @@
             "suggestions": "建议",
             "version": "版本"
         },
-        "navigation": {
-            "about": "关于",
-            "settings": "设置"
-        },
         "messages": {
             "importingFile": "正在导入文件...",
             "successfullyImported": "导入成功！"
         },
-        "errors": {
-            "failedToCopy": "复制失败",
-            "fileInvalid": "文件无效",
-            "filenameInvalidImportFailed": "文件名无效，导入失败",
-            "failedToCreateData": "创建数据失败",
-            "couldNotGetData": "无法获取数据，发生了严重错误！",
-            "rollingBackDueToError": "由于错误正在回滚",
-            "invalidFileType": "文件类型无效！",
-            "schemaValidationFailed": "模式验证失败！"
+        "navigation": {
+            "about": "关于",
+            "settings": "设置"
         }
     },
     "connections": {
@@ -358,20 +365,20 @@
         },
         "notConnected": "未连接",
         "templates": {
+            "delete": {
+                "confirm": "删除模板",
+                "description": "确定要删除 '{{name}}' 吗？",
+                "title": "删除模板"
+            },
             "empty": "未添加自定义模板",
+            "exported": "模板导出成功",
             "get": "获取模板",
             "import": "导入模板",
             "importError": "导入失败：{{error}}",
             "learn": "了解模板",
             "paste": "粘贴模板",
             "pasteSheetTitle": "在此处粘贴模板",
-            "title": "模板管理",
-            "delete": {
-                "title": "删除模板",
-                "description": "确定要删除 '{{name}}' 吗？",
-                "confirm": "删除模板"
-            },
-            "exported": "模板导出成功"
+            "title": "模板管理"
         }
     },
     "contextlimit": {
@@ -421,6 +428,9 @@
         "deleteConfig": "删除配置",
         "deleteConfigDescription": "确定要删除 '{{name}}' 吗？",
         "deleteInstruct": "删除 Instruct",
+        "errors": {
+            "instructDataError": "Instruct 数据出现错误"
+        },
         "exportConfig": "导出配置",
         "jsonExtension": ".json",
         "newPreset": "新 Instruct 预设",
@@ -458,9 +468,29 @@
             "configCreated": "配置已创建。",
             "configNameExists": "配置名称已存在。",
             "savedToDownloads": "已将 \"{{name}}\" 保存到下载"
-        },
+        }
+    },
+    "generation": {
         "errors": {
-            "instructDataError": "Instruct 数据出现错误"
+            "completionFailed": "完成失败。",
+            "configurationNotFound": "未找到配置 '{{name}}'",
+            "failedToBuildPayload": "构建载荷失败",
+            "failedToBuildPrompt": "构建提示失败",
+            "failedToOrchestrateRequestBuild": "组织请求构建失败",
+            "generationAlreadyInProgress": "生成已在进行中",
+            "generationFailed": "生成失败",
+            "noActiveAPI": "没有可用 API",
+            "noActiveChat": "没有激活聊天",
+            "noCharacter": "未加载角色",
+            "noChatFound": "未找到聊天",
+            "noUser": "未加载用户",
+            "payloadConstructionFailed": "载荷构建失败",
+            "promptConstructionFailed": "提示构建失败",
+            "sseFailed": "SSE 事件期间出错"
+        },
+        "warn": {
+            "entryWithoutValidSwipeFound": "发现没有有效滑动的条目",
+            "noMessagesAddedCheckLogs": "未添加消息。请检查日志。"
         }
     },
     "horizontalSelector": {
@@ -551,25 +581,25 @@
         "threads": "线程",
         "title": "模型",
         "toast": {
+            "autoLoadingMMPROJ": "自动加载 MMPROJ：{{name}}",
+            "autoLoadingModel": "自动加载模型：{{name}}",
+            "couldNotLoadModel": "无法加载模型",
             "deletekv": "KV 缓存已删除！",
+            "failedToGenerateLocally": "本地生成失败",
+            "failedToLoadMMPROJ": "加载 MMPROJ 失败",
+            "failedToRunLocalInference": "本地推理运行失败",
+            "failedToUnloadMMPROJ": "卸载 MMPROJ 失败",
             "failedtolink": "链接模型失败",
             "failedtoload": "加载模型失败",
-            "modelAlreadyLoaded": "模型已加载！",
-            "quantizationNoLongerSupported": "量化不再受支持！",
-            "modelDoesNotExist": "模型不存在！",
-            "couldNotLoadModel": "无法加载模型",
-            "failedToLoadMMPROJ": "加载 MMPROJ 失败",
-            "failedToUnloadMMPROJ": "卸载 MMPROJ 失败",
-            "noModelLoaded": "未加载模型",
             "mediaAddedWithoutMMPROJModel": "已添加媒体，但没有 MMPROJ 模型",
-            "modelImportedSuccessfully": "模型导入成功！",
             "mediaAddedWithoutMultimodalSupport": "已添加媒体，但不支持多模态。",
+            "modelAlreadyLoaded": "模型已加载！",
+            "modelDoesNotExist": "模型不存在！",
+            "modelImportedSuccessfully": "模型导入成功！",
+            "modelMissingEntryDeleted": "模型缺失，其条目将被删除：{{name}}",
             "noAutoLoadModelSet": "未设置自动加载模型",
-            "autoLoadingModel": "自动加载模型：{{name}}",
-            "autoLoadingMMPROJ": "自动加载 MMPROJ：{{name}}",
-            "failedToRunLocalInference": "本地推理运行失败",
-            "failedToGenerateLocally": "本地生成失败",
-            "modelMissingEntryDeleted": "模型缺失，其条目将被删除：{{name}}"
+            "noModelLoaded": "未加载模型",
+            "quantizationNoLongerSupported": "量化不再受支持！"
         }
     },
     "multiDropdown": {
@@ -610,8 +640,8 @@
             "emptyname": "采样器名称不能为空",
             "exists": "采样器配置 '{{name}}' 已存在！",
             "exportok": "导出采样器配置成功！",
-            "lastconfig": "无法删除最后一个配置",
-            "failedToImport": "导入失败"
+            "failedToImport": "导入失败",
+            "lastconfig": "无法删除最后一个配置"
         }
     },
     "settings": {
@@ -623,11 +653,11 @@
                     "title": "重新生成默认卡片"
                 }
             },
-            "regenerateDefaultCard": "重新生成默认卡片",
-            "title": "角色管理",
             "errors": {
                 "failedToCreateDefaultCharacter": "创建默认角色失败"
-            }
+            },
+            "regenerateDefaultCard": "重新生成默认卡片",
+            "title": "角色管理"
         },
         "chat": {
             "askInChatterUI": "在 ChatterUI 中询问",
@@ -682,8 +712,8 @@
             },
             "custom": "自定义",
             "error": {
-                "failedToImport": "导入失败：{{error}}",
-                "colorNameAlreadyUsed": "颜色名称已被使用"
+                "colorNameAlreadyUsed": "颜色名称已被使用",
+                "failedToImport": "导入失败：{{error}}"
             },
             "pasteThemeTitle": "在此处粘贴主题",
             "title": "主题",
@@ -729,6 +759,9 @@
             "printContextDescription": "将生成上下文打印到日志以便调试",
             "title": "生成"
         },
+        "language": {
+            "title": "设置语言"
+        },
         "notification": {
             "enableNotifications": "启用通知",
             "enableNotificationsDescription": "在应用在后台时发送通知",
@@ -761,20 +794,17 @@
             "changeTheme": "更改主题",
             "deleteBackground": "删除聊天背景",
             "importBackground": "导入聊天背景",
-            "replaceBackground": "替换聊天背景",
-            "title": "样式",
             "messages": {
                 "backgroundDeleted": "背景已删除！"
-            }
+            },
+            "replaceBackground": "替换聊天背景",
+            "title": "样式"
         },
         "tagHider": {
             "description": "从角色列表中隐藏具有以下标签的角色。",
             "label": "隐藏标签"
         },
-        "title": "设置",
-        "language": {
-            "title": "设置语言"
-        }
+        "title": "设置"
     },
     "stringArrayEditor": {
         "add": "添加",
@@ -811,33 +841,10 @@
             "title": "编辑用户"
         },
         "hint": "提示：向左滑动或按 <icon/> 打开用户抽屉",
-        "nameplaceholder": "不建议留空名称",
-        "profilecount": "用户配置",
         "messages": {
             "loadingUser": "正在加载用户：{{name}}"
-        }
-    },
-    "generation": {
-        "errors": {
-            "promptConstructionFailed": "提示构建失败",
-            "payloadConstructionFailed": "载荷构建失败",
-            "completionFailed": "完成失败。",
-            "sseFailed": "SSE 事件期间出错",
-            "generationFailed": "生成失败",
-            "generationAlreadyInProgress": "生成已在进行中",
-            "noUser": "未加载用户",
-            "noCharacter": "未加载角色",
-            "noActiveChat": "没有激活聊天",
-            "noChatFound": "未找到聊天",
-            "noActiveAPI": "没有可用 API",
-            "configurationNotFound": "未找到配置 '{{name}}'",
-            "failedToOrchestrateRequestBuild": "组织请求构建失败",
-            "failedToBuildPrompt": "构建提示失败",
-            "failedToBuildPayload": "构建载荷失败"
         },
-        "warn": {
-            "noMessagesAddedCheckLogs": "未添加消息。请检查日志。",
-            "entryWithoutValidSwipeFound": "发现没有有效滑动的条目"
-        }
+        "nameplaceholder": "不建议留空名称",
+        "profilecount": "用户配置"
     }
 }
