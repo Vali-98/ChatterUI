@@ -51,7 +51,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
 
     const showSwipe = !entry.is_user && isLastMessage
     const timings = swipe.timings
-
+    const bubbleColor = entry.is_user ? color.neutral._200 : color.neutral._200
     return (
         <View>
             <Pressable
@@ -59,7 +59,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                     setShowOptions(nowGenerating ? undefined : entry.id)
                 }}
                 style={{
-                    backgroundColor: color.neutral._200,
+                    backgroundColor: bubbleColor,
                     borderColor: color.neutral._200,
                     borderWidth: 1,
                     marginBottom: showSwipe ? 0 : 4,

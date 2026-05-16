@@ -3,7 +3,6 @@ import { ImageBackground } from 'expo-image'
 import { useEffect, useRef } from 'react'
 import { FlatList } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import Drawer from '@components/views/Drawer'
@@ -21,14 +20,6 @@ import ChatHeader from './ChatHeader'
 import ChatHeaderGradient from './ChatHeaderGradient'
 import ChatItem from './ChatItem'
 import ChatModelName from './ChatModelName'
-
-type ListItem = {
-    index: number
-    entryId: number
-    isLastMessage: boolean
-    isGreeting: boolean
-    tokenLength: number
-}
 
 type ChatWindowProps = {
     chatId: number
@@ -80,18 +71,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
             })
     }, [scrollCause, scrollIndex, saveScroll])
 
-    const renderItems = ({ item }: { item: ListItem }) => {
-        return (
-            <ChatItem
-                index={item.index}
-                entryId={item.entryId}
-                isLastMessage={item.isLastMessage}
-                isGreeting={item.isGreeting}
-                tokenLength={item.tokenLength}
-            />
-        )
-    }
-
     return (
         <ImageBackground
             cachePolicy="none"
@@ -108,16 +87,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
             )}
 
             <FlatList
-                CellRendererComponent={(props: any) => (
-                    <Animated.View
-                        {...props}
-                        layout={LinearTransition.duration(250)
-                            .springify()
-                            .mass(0.3)
-                            .damping(20)
-                            .stiffness(300)}
-                        exiting={FadeOut.duration(150)}
-                        entering={FadeIn.duration(250)}
+                CellRendererComponent={({ item, index, ...rest }) => (
+                    <ChatItem
+                        index={item.index}
+                        entryId={item.entryId}
+                        isLastMessage={item.isLastMessage}
+                        isGreeting={item.isGreeting}
+                        tokenLength={item.tokenLength}
+                        {...rest}
                     />
                 )}
                 ref={flatlistRef}
@@ -134,7 +111,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                     tokenLength: item.swipes?.[0]?.token_length ?? 0,
                 }))}
                 keyExtractor={(item) => item.entryId.toString()}
-                renderItem={renderItems}
+                renderItem={() => <></>}
                 scrollEventThrottle={16}
                 onViewableItemsChanged={(item) => {
                     const index = item.viewableItems?.at(0)?.index

@@ -43,7 +43,6 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
 
     const rowDir = entry.is_user && alternate ? 'row-reverse' : 'row'
     const align = entry.is_user && alternate ? 'flex-end' : 'flex-start'
-
     if (wide)
         return (
             <View
@@ -102,7 +101,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
         )
 
     return (
-        <View style={{ flexDirection: rowDir }}>
+        <View style={{ flexDirection: rowDir, marginHorizontal: spacing.m }}>
             <View
                 style={{
                     alignItems: 'center',
@@ -114,8 +113,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                                 width: 48,
                                 height: 48,
                                 borderRadius: borderRadius.xl,
-                                marginLeft: spacing.sm,
-                                marginRight: spacing.m,
+                                marginHorizontal: 4,
                             }}
                             targetImage={Characters.getImageDir(
                                 entry.is_user ? userImageId : charImageId
