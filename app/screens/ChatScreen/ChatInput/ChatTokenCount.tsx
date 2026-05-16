@@ -21,8 +21,8 @@ const ChatTokenCount: React.FC = () => {
     const warning = leftover < Math.min(2048, 0.25 * maxLength)
     const genLengthColor = warning ? color.error._300 : color.primary._500
     return (
-        <View style={{ paddingHorizontal: 8, paddingVertical: 8 }}>
-            <Text style={{ color: color.text._100, paddingBottom: 8, marginLeft: 4 }}>
+        <View style={{ paddingHorizontal: 8, paddingTop: 4, paddingBottom: 8 }}>
+            <Text style={{ color: color.text._300, paddingBottom: 2, marginLeft: 4 }}>
                 {t('chat.tokencount.title')}
             </Text>
             <Bar
@@ -35,7 +35,7 @@ const ChatTokenCount: React.FC = () => {
                 width={null}
             />
             <Text style={{ color: color.text._400, fontSize: fontSize.s, marginLeft: 4 }}>
-                {t('chat.tokencount.used', { max: maxLength, used: tokenCount })}
+                {tokenCount} / {maxLength}
             </Text>
         </View>
     )

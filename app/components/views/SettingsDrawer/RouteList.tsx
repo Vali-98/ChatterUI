@@ -78,16 +78,6 @@ const useStyles = () => {
 }
 
 const getPaths = (remote: boolean, t: (input: string) => string): ButtonData[] => [
-    {
-        name: t('navigation.sampler'),
-        path: '/screens/SamplerManagerScreen',
-        icon: 'control',
-    },
-    {
-        name: t('navigation.formatting'),
-        path: '/screens/FormattingManagerScreen',
-        icon: 'profile',
-    },
     remote
         ? {
               name: t('navigation.api'),
@@ -99,6 +89,17 @@ const getPaths = (remote: boolean, t: (input: string) => string): ButtonData[] =
               path: '/screens/ModelManagerScreen',
               icon: 'branches',
           },
+    {
+        name: t('navigation.sampler'),
+        path: '/screens/SamplerManagerScreen',
+        icon: 'control',
+    },
+    {
+        name: t('navigation.formatting'),
+        path: '/screens/FormattingManagerScreen',
+        icon: 'profile',
+    },
+
     {
         name: t('navigation.tts'),
         path: '/screens/TTSManagerScreen',
