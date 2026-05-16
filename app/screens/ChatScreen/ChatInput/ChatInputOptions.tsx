@@ -9,7 +9,11 @@ import { Theme } from '@lib/theme/ThemeManager'
 
 import ChatTokenCount from './ChatTokenCount'
 
-const ChatOptions = () => {
+type ChatOptionsProps = {
+    disabled: boolean
+}
+
+const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
     const { t } = useTranslation()
     const router = useRouter()
     const styles = useStyles()
@@ -22,6 +26,7 @@ const ChatOptions = () => {
 
     return (
         <ContextMenu
+            disabled={disabled}
             buttons={[
                 {
                     component: () => <ChatTokenCount />,
@@ -53,7 +58,11 @@ const ChatOptions = () => {
                 },
             ]}
             placement="top">
-            <Ionicons name="caret-up" style={styles.optionsButton} size={24} />
+            <Ionicons
+                name="caret-up"
+                style={[styles.optionsButton, { opacity: disabled ? 0.5 : 1 }]}
+                size={24}
+            />
         </ContextMenu>
     )
 }

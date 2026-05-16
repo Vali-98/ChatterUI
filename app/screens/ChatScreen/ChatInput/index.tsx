@@ -2,9 +2,10 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { randomUUID } from 'expo-crypto'
 import { getDocumentAsync } from 'expo-document-picker'
 import { Image } from 'expo-image'
+import { router } from 'expo-router'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TextInput, TouchableOpacity, View } from 'react-native'
+import { Pressable, TextInput, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, {
     BounceIn,
@@ -22,6 +23,7 @@ import ContextMenu from '@components/views/ContextMenu'
 import { XAxisOnlyTransition } from '@lib/animations/transitions'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { generateResponse } from '@lib/engine/Inference'
+import { useActiveProvider } from '@lib/hooks/ActiveProvider'
 import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
 import { Characters } from '@lib/state/Characters'
 import { Chats, useInference } from '@lib/state/Chat'
@@ -52,7 +54,7 @@ export const useInputHeightStore = create<ChatInputHeightStoreProps>()((set) => 
 const ChatInput = () => {
     const { t } = useTranslation()
     const inputRef = useUnfocusTextInput()
-
+    const { available: activeProvider, mode } = useActiveProvider()
     const { color, borderRadius, spacing } = Theme.useTheme()
     const [sendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
     const [disableSend, setDisableSend] = useState(false)
@@ -135,10 +137,17 @@ const ChatInput = () => {
     }
 
     return (
-        <View
+        <Pressable
+            onPress={() => {
+                if (activeProvider) return
+                if (mode === 'local') {
+                    router.push('/screens/ModelManagerScreen')
+                } else router.push('/screens/ConnectionsManagerScreen')
+            }}
             onLayout={(e) => {
                 setHeight(e.nativeEvent.layout.height)
             }}
+            disabled={activeProvider}
             style={{
                 position: 'absolute',
                 width: '98%',
@@ -241,8 +250,9 @@ const ChatInput = () => {
                                 columnGap: 8,
                                 alignItems: 'center',
                             }}>
-                            <ChatOptions />
+                            <ChatOptions disabled={!activeProvider} />
                             <ContextMenu
+                                disabled={!activeProvider}
                                 triggerIcon="paper-clip"
                                 triggerIconSize={20}
                                 buttons={[
@@ -268,6 +278,7 @@ const ChatInput = () => {
                                     padding: 6,
                                     backgroundColor: color.neutral._200,
                                     borderRadius: 16,
+                                    opacity: activeProvider ? 1 : 0.5,
                                 }}
                                 placement="top"
                             />
@@ -300,7 +311,7 @@ const ChatInput = () => {
                         backgroundColor: color.neutral._100,
                         flex: 1,
                         borderWidth: 2,
-                        borderColor: color.primary._300,
+                        borderColor: activeProvider ? color.primary._300 : color.primary._100,
                         borderRadius: borderRadius.l,
                         paddingHorizontal: spacing.m,
                         paddingVertical: spacing.m,
@@ -309,7 +320,14 @@ const ChatInput = () => {
                         setHideOptions(!!newMessage)
                     }}
                     numberOfLines={8}
-                    placeholder="Message..."
+                    placeholder={
+                        activeProvider
+                            ? t('chat.input.message')
+                            : mode === 'local'
+                              ? t('chat.input.noModelLoaded')
+                              : t('chat.input.noConnection')
+                    }
+                    editable={activeProvider}
                     placeholderTextColor={color.text._700}
                     value={newMessage}
                     onChangeText={(text) => {
@@ -322,22 +340,32 @@ const ChatInput = () => {
                 />
                 <Animated.View layout={XAxisOnlyTransition}>
                     <TouchableOpacity
-                        disabled={disableSend}
+                        disabled={disableSend || !chatId || !activeProvider}
                         style={{
                             borderRadius: borderRadius.m,
-                            backgroundColor: nowGenerating ? color.error._500 : color.primary._500,
-                            padding: spacing.m,
+                            backgroundColor: !activeProvider
+                                ? color.neutral._100
+                                : nowGenerating
+                                  ? color.error._500
+                                  : color.primary._500,
+                            padding: spacing.s,
+                            borderWidth: 2,
+                            borderColor: !activeProvider
+                                ? color.primary._100
+                                : nowGenerating
+                                  ? color.error._500
+                                  : color.primary._500,
                         }}
                         onPress={nowGenerating ? abortResponse : handleSend}>
                         <MaterialIcons
                             name={nowGenerating ? 'stop' : 'send'}
-                            color={color.neutral._100}
+                            color={activeProvider ? color.neutral._100 : color.text._700}
                             size={24}
                         />
                     </TouchableOpacity>
                 </Animated.View>
             </View>
-        </View>
+        </Pressable>
     )
 }
 

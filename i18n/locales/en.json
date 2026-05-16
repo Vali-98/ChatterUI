@@ -218,7 +218,10 @@
             "errors": {
                 "abortGeneration": "Aborting Generation",
                 "failedToSend": "Failed to send message"
-            }
+            },
+            "message": "Message...",
+            "noConnection": "No Connection Enabled",
+            "noModelLoaded": "No Model Loaded"
         },
         "model": {
             "noModelLoaded": "No Model Loaded"
@@ -314,7 +317,7 @@
             "apiKey": "API Key",
             "completionUrl": "Completion URL",
             "createButton": "Create API",
-            "defaultFriendlyName": "New API",
+            "defaultFriendlyName": "New Connection",
             "error": {
                 "200": "Could not retrieve models: {{error}}",
                 "modelparse": "Could not parse models",

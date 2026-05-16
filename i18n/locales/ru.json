@@ -1,850 +1,853 @@
 {
-    "about": {
-        "description": {
-            "primary": "ChatterUI - свободное приложение с открытым исходным кодом, разработанное Vali-98",
-            "support": "Это приложение - мой личный проект, развиваемый в свободное время. Если вам нравится приложение, рассмотрите возможность поддержать его разработку!"
-        },
-        "devMode": {
-            "disableAction": "Отключить режим разработки",
-            "disabledMessage": "Режим разработки отключен.",
-            "enabledMessage": "Режим разработки включен."
-        },
-        "logsReminder": "Не забудьте включить логи",
-        "reportIssue": "Нашли проблему? Сообщите о ней здесь:",
-        "support": {
-            "button": "Поддержать ChatterUI",
-            "label": "Пожертвовать ChatterUI:"
-        },
-        "versionPrefix": "v"
+  "about": {
+    "description": {
+      "primary": "ChatterUI - свободное приложение с открытым исходным кодом, разработанное Vali-98",
+      "support": "Это приложение - мой личный проект, развиваемый в свободное время. Если вам нравится приложение, рассмотрите возможность поддержать его разработку!"
     },
-    "appMode": {
-        "options": {
-            "local": "Локальный",
-            "remote": "Удаленный"
-        },
-        "title": "Режим приложения"
+    "devMode": {
+      "disableAction": "Отключить режим разработки",
+      "disabledMessage": "Режим разработки отключен.",
+      "enabledMessage": "Режим разработки включен."
     },
-    "auth": {
-        "authorizationRequired": "Требуется авторизация"
+    "logsReminder": "Не забудьте включить логи",
+    "reportIssue": "Нашли проблему? Сообщите о ней здесь:",
+    "support": {
+      "button": "Поддержать ChatterUI",
+      "label": "Пожертвовать ChatterUI:"
     },
-    "character": {
-        "editor": {
-            "actions": {
-                "changeBackground": "Изменить фон",
-                "changeImage": "Изменить изображение",
-                "export": "Экспортировать",
-                "removeBackground": "Удалить фон",
-                "viewImage": "Просмотреть изображение"
-            },
-            "dialogs": {
-                "clone": {
-                    "confirm": "Клонировать персонажа",
-                    "description": "Вы уверены, что хотите клонировать '{{name}}'?",
-                    "title": "Клонировать персонажа"
-                },
-                "deleteAlternateMessage": {
-                    "confirm": "Удалить",
-                    "description": "Вы уверены, что хотите удалить это альтернативное сообщение? Это действие не может быть отменено.",
-                    "title": "Удалить альтернативное сообщение"
-                },
-                "deleteCharacter": {
-                    "confirm": "Удалить персонажа",
-                    "description": "Вы уверены, что хотите удалить '{{name}}'? Это действие не может быть отменено.",
-                    "title": "Удалить персонажа"
-                },
-                "deleteImage": {
-                    "confirm": "Удалить изображение",
-                    "description": "Вы уверены, что хотите удалить это изображение? Это действие не может быть отменено.",
-                    "title": "Удалить изображение"
-                },
-                "unsavedChanges": {
-                    "description": "У вас есть несохраненные изменения. Если вы уйдете, ваш прогресс будет потерян.",
-                    "discard": "Отменить изменения",
-                    "title": "Несохраненные изменения"
-                }
-            },
-            "emptyStates": {
-                "noAlternateGreetings": "Нет альтернативных приветствий"
-            },
-            "errors": {
-                "cardNoCharacter": "Персонаж не найден.",
-                "copyCardNotExist": "Не удалось скопировать карточку: карточка не существует",
-                "createFailed": "Не удалось создать персонажа",
-                "createFromImage": "Не удалось создать карточку - невозможно получить изображение",
-                "deleteBackground": "Не удалось удалить фон",
-                "export": "Не удалось экспортировать: {{error}}",
-                "exportFailed": "Ошибка экспорта",
-                "failedToCopyCard": "Не удалось скопировать карточку",
-                "invalidCharacterCard": "Неправильная карточка персонажа",
-                "v2ParsingFailedFallingBack": "Разбор V2 не удался, откат на V1"
-            },
-            "fields": {
-                "alternateGreeting": "Альтернативное приветствие",
-                "exampleMessages": "Примеры сообщений",
-                "firstMessage": "Первое сообщение",
-                "personality": "Личность",
-                "scenario": "Сценарий",
-                "tags": "Теги"
-            },
-            "messages": {
-                "deleted": "Удален персонаж: {{name}}",
-                "exported": "Карточка экспортирована!",
-                "saved": "Карточка сохранена!"
-            },
-            "metrics": {
-                "descriptionTokens": "Токены описания: {{count}}"
-            },
-            "title": "Редактор персонажа"
+    "versionPrefix": "v"
+  },
+  "appMode": {
+    "options": {
+      "local": "Локальный",
+      "remote": "Удаленный"
+    },
+    "title": "Режим приложения"
+  },
+  "auth": {
+    "authorizationRequired": "Требуется авторизация"
+  },
+  "character": {
+    "editor": {
+      "actions": {
+        "changeBackground": "Изменить фон",
+        "changeImage": "Изменить изображение",
+        "export": "Экспортировать",
+        "removeBackground": "Удалить фон",
+        "viewImage": "Просмотреть изображение"
+      },
+      "dialogs": {
+        "clone": {
+          "confirm": "Клонировать персонажа",
+          "description": "Вы уверены, что хотите клонировать '{{name}}'?",
+          "title": "Клонировать персонажа"
         },
-        "list": {
-            "actions": {
-                "createCharacter": "Создать персонажа",
-                "createNewCharacter": "Создать нового персонажа",
-                "importFromFile": "Импортировать из файла"
-            },
-            "columns": {
-                "name": "Имя"
-            },
-            "emptyStates": {
-                "noCharactersFound": "Персонажи не найдены. Попробуйте импортировать!",
-                "noCharactersMatch": "Персонажи не соответствуют результату поиска",
-                "noMessages": "Нет сообщений"
-            },
-            "errors": {
-                "chatCreationFailed": "Ошибка резервной копии при создании чата! Пожалуйста, сообщите об этом.",
-                "load": "Не удалось загрузить персонажа: {{error}}",
-                "nameCannotBeEmpty": "Имя не может быть пустым",
-                "nameEmpty": "Имя не может быть пустым!"
-            },
-            "messages": {
-                "hiderDisabled": "Скрыватель отключен",
-                "hiderEnabled": "Скрыватель включен"
-            },
-            "search": {
-                "byName": "Поиск по имени",
-                "byTags": "Поиск по тегам"
-            },
-            "sort": {
-                "label": "Сортировать по",
-                "recent": "Последние"
-            }
+        "deleteAlternateMessage": {
+          "confirm": "Удалить",
+          "description": "Вы уверены, что хотите удалить это альтернативное сообщение? Это действие не может быть отменено.",
+          "title": "Удалить альтернативное сообщение"
+        },
+        "deleteCharacter": {
+          "confirm": "Удалить персонажа",
+          "description": "Вы уверены, что хотите удалить '{{name}}'? Это действие не может быть отменено.",
+          "title": "Удалить персонажа"
+        },
+        "deleteImage": {
+          "confirm": "Удалить изображение",
+          "description": "Вы уверены, что хотите удалить это изображение? Это действие не может быть отменено.",
+          "title": "Удалить изображение"
+        },
+        "unsavedChanges": {
+          "description": "У вас есть несохраненные изменения. Если вы уйдете, ваш прогресс будет потерян.",
+          "discard": "Отменить изменения",
+          "title": "Несохраненные изменения"
         }
+      },
+      "emptyStates": {
+        "noAlternateGreetings": "Нет альтернативных приветствий"
+      },
+      "errors": {
+        "cardNoCharacter": "Персонаж не найден.",
+        "copyCardNotExist": "Не удалось скопировать карточку: карточка не существует",
+        "createFailed": "Не удалось создать персонажа",
+        "createFromImage": "Не удалось создать карточку - невозможно получить изображение",
+        "deleteBackground": "Не удалось удалить фон",
+        "export": "Не удалось экспортировать: {{error}}",
+        "exportFailed": "Ошибка экспорта",
+        "failedToCopyCard": "Не удалось скопировать карточку",
+        "invalidCharacterCard": "Неправильная карточка персонажа",
+        "v2ParsingFailedFallingBack": "Разбор V2 не удался, откат на V1"
+      },
+      "fields": {
+        "alternateGreeting": "Альтернативное приветствие",
+        "exampleMessages": "Примеры сообщений",
+        "firstMessage": "Первое сообщение",
+        "personality": "Личность",
+        "scenario": "Сценарий",
+        "tags": "Теги"
+      },
+      "messages": {
+        "deleted": "Удален персонаж: {{name}}",
+        "exported": "Карточка экспортирована!",
+        "saved": "Карточка сохранена!"
+      },
+      "metrics": {
+        "descriptionTokens": "Токены описания: {{count}}"
+      },
+      "title": "Редактор персонажа"
     },
-    "chat": {
-        "bubble": {
-            "promptSpeed": "Подсказка: {{tokens}} т/с",
-            "textGenerationSpeed": "    Генерация текста: {{tokens}} т/с"
+    "list": {
+      "actions": {
+        "createCharacter": "Создать персонажа",
+        "createNewCharacter": "Создать нового персонажа",
+        "importFromFile": "Импортировать из файла"
+      },
+      "columns": {
+        "name": "Имя"
+      },
+      "emptyStates": {
+        "noCharactersFound": "Персонажи не найдены. Попробуйте импортировать!",
+        "noCharactersMatch": "Персонажи не соответствуют результату поиска",
+        "noMessages": "Нет сообщений"
+      },
+      "errors": {
+        "chatCreationFailed": "Ошибка резервной копии при создании чата! Пожалуйста, сообщите об этом.",
+        "load": "Не удалось загрузить персонажа: {{error}}",
+        "nameCannotBeEmpty": "Имя не может быть пустым",
+        "nameEmpty": "Имя не может быть пустым!"
+      },
+      "messages": {
+        "hiderDisabled": "Скрыватель отключен",
+        "hiderEnabled": "Скрыватель включен"
+      },
+      "search": {
+        "byName": "Поиск по имени",
+        "byTags": "Поиск по тегам"
+      },
+      "sort": {
+        "label": "Сортировать по",
+        "recent": "Последние"
+      }
+    }
+  },
+  "chat": {
+    "bubble": {
+      "promptSpeed": "Подсказка: {{tokens}} т/с",
+      "textGenerationSpeed": "    Генерация текста: {{tokens}} т/с"
+    },
+    "drawer": {
+      "actions": {
+        "startNewChat": "Начать новый чат"
+      },
+      "dialogs": {
+        "clone": {
+          "confirm": "Клонировать чат",
+          "description": "Вы уверены, что хотите клонировать '{{name}}'?",
+          "title": "Клонировать чат"
         },
-        "drawer": {
-            "actions": {
-                "startNewChat": "Начать новый чат"
-            },
-            "dialogs": {
-                "clone": {
-                    "confirm": "Клонировать чат",
-                    "description": "Вы уверены, что хотите клонировать '{{name}}'?",
-                    "title": "Клонировать чат"
-                },
-                "delete": {
-                    "confirm": "Удалить чат",
-                    "description": "Вы уверены, что хотите удалить '{{name}}'? Это действие не может быть отменено.",
-                    "title": "Удалить чат"
-                }
-            },
-            "errors": {
-                "defaultChatFailed": "Что-то пошло не так при создании чата по умолчанию",
-                "exportFailed": "Не удалось экспортировать чат",
-                "undefinedChat": "Чат не определен"
-            },
-            "labels": {
-                "unknown": "неизвестно"
-            },
-            "messages": {
-                "exported": "Файл: {{name}} сохранен в загрузки!"
-            },
-            "rename": {
-                "errors": {
-                    "nameCannotBeEmpty": "Имя не может быть пустым"
-                }
-            },
-            "search": {
-                "errors": {
-                    "queryFailed": "Ошибка поиска в чате: {{error}}"
-                },
-                "noResults": "Результатов не найдено",
-                "placeholder": "Поиск сообщения...",
-                "resultsFound": "Найдено результатов: {{count}}",
-                "title": "Поиск"
-            },
-            "title": "Чаты",
-            "user": {
-                "alreadySet": "Этот пользователь уже установлен",
-                "linkAction": "Привязать пользователя",
-                "linked": "Привязано к пользователю: {{name}}",
-                "noneSelected": "Нет текущего пользователя"
-            }
-        },
-        "editor": {
-            "actions": {
-                "confirm": "Подтвердить",
-                "delete": "Удалить",
-                "reset": "Сбросить"
-            }
-        },
-        "filteredText": {
-            "hide": "Скрыть отфильтрованное",
-            "show": "Показать отфильтрованное"
-        },
-        "footer": {
-            "emptyState": {
-                "sendMessageToBegin": "Отправьте сообщение для начала",
-                "startOfChat": "Начало чата"
-            }
-        },
-        "frame": {
-            "entryNumber": "#{{index}}",
-            "seconds": "{{seconds}}с"
-        },
-        "import": {
-            "errors": {
-                "failedToImport": "Ошибка импорта",
-                "noChatCharacter": "Вы импортируете чат без персонажа или пользователя"
-            }
-        },
-        "input": {
-            "actions": {
-                "addImage": "Добавить изображение",
-                "chatHistory": "История чата",
-                "editCharacter": "Редактировать персонажа",
-                "mainMenu": "Главное меню",
-                "takePicture": "Сделать фото"
-            },
-            "errors": {
-                "abortGeneration": "Отмена генерации",
-                "failedToSend": "Не удалось отправить сообщение"
-            }
-        },
-        "model": {
-            "noModelLoaded": "Модель не загружена"
-        },
-        "quickActions": {
-            "errors": {
-                "cloneFailed": "Не удалось клонировать чат",
-                "copyFailed": "Не удалось скопировать в буфер обмена"
-            },
-            "fork": {
-                "button": "Разветвить чат",
-                "description": "Это создаст копию этого чата с этого сообщения",
-                "title": "Разветвить чат"
-            },
-            "messages": {
-                "copied": "Скопировано"
-            },
-            "toast": {
-                "copiedCode": "Код скопирован",
-                "copyFailed": "Не удалось скопировать в буфер обмена"
-            }
-        },
-        "state": {
-            "failedToLoad": "Не удалось загрузить чат {{id}}"
-        },
-        "tokencount": {
-            "title": "Лимит контекста",
-            "used": "Использовано {{used}}, максимум {{max}}"
+        "delete": {
+          "confirm": "Удалить чат",
+          "description": "Вы уверены, что хотите удалить '{{name}}'? Это действие не может быть отменено.",
+          "title": "Удалить чат"
         }
-    },
-    "common": {
-        "actions": {
-            "back": "Назад",
-            "cancel": "Отмена",
-            "clone": "Клонировать",
-            "close": "Закрыть",
-            "delete": "Удалить",
-            "disable": "Отключить",
-            "edit": "Редактировать",
-            "enable": "Включить",
-            "export": "Экспортировать",
-            "more": "Еще",
-            "rename": "Переименовать",
-            "save": "Сохранить",
-            "test": "Тест",
-            "tryAgain": "Попробовать снова"
-        },
-        "brand": {
-            "name": "ChatterUI"
-        },
-        "emptyStates": {
-            "noItems": "Нет элементов"
-        },
+      },
+      "errors": {
+        "defaultChatFailed": "Что-то пошло не так при создании чата по умолчанию",
+        "exportFailed": "Не удалось экспортировать чат",
+        "undefinedChat": "Чат не определен"
+      },
+      "labels": {
+        "unknown": "неизвестно"
+      },
+      "messages": {
+        "exported": "Файл: {{name}} сохранен в загрузки!"
+      },
+      "rename": {
         "errors": {
-            "couldNotGetData": "Не удалось получить данные, что-то очень плохое случилось!",
-            "failedToCopy": "Не удалось скопировать",
-            "failedToCreateData": "Не удалось создать данные",
-            "fileInvalid": "Неправильный файл",
-            "filenameInvalidImportFailed": "Неправильное имя файла, импорт не удался",
-            "invalidFileType": "Неправильный тип файла!",
-            "rollingBackDueToError": "Откат из-за ошибки",
-            "schemaValidationFailed": "Ошибка проверки схемы!"
-        },
-        "labels": {
-            "cpu": "ЦП",
-            "description": "Описание",
-            "devMode": "РЕЖИМ РАЗРАБОТКИ",
-            "external": "Внешний",
-            "internal": "Внутренний",
-            "name": "Имя",
-            "none": "Нет",
-            "result": "Результат",
-            "results": "Результаты",
-            "selected": "Выбрано",
-            "suggestions": "Предложения",
-            "version": "Версия"
-        },
-        "messages": {
-            "importingFile": "Импорт файла...",
-            "successfullyImported": "Успешно импортировано!"
-        },
-        "navigation": {
-            "about": "О приложении",
-            "settings": "Настройки"
+          "nameCannotBeEmpty": "Имя не может быть пустым"
         }
-    },
-    "connections": {
-        "add": {
-            "apiKey": "Ключ API",
-            "completionUrl": "URL завершения",
-            "createButton": "Создать API",
-            "defaultFriendlyName": "Новый API",
-            "error": {
-                "200": "Не удалось получить модели: {{error}}",
-                "modelparse": "Не удалось разобрать модели",
-                "modelundef": "Модели привели к неопределенному значению",
-                "nonarray": "Модели привели к массиву значений. `modelListParser` шаблона, вероятно, неправильный"
-            },
-            "firstMessage": "Первое сообщение",
-            "firstMessageHint": "Первое сообщение по умолчанию, отправленное Claude",
-            "friendlyName": "Понятное имя",
-            "fullUrlHint": "Примечание: используйте полный путь URL",
-            "model": "Модель",
-            "modelUrl": "URL модели",
-            "prefill": "Предзаполнение",
-            "prefillHint": "Предзаполнение перед ответом модели",
-            "selectConnectionType": "Выберите тип подключения",
-            "selectModel": "Выберите модель",
-            "title": "Добавить подключение"
-        },
-        "connected": "Подключено",
-        "editor": {
-            "apiKey": "Ключ API",
-            "completionUrl": "URL завершения",
-            "firstMessage": "Первое сообщение",
-            "firstMessageHint": "Первое сообщение по умолчанию, отправленное Claude",
-            "friendlyName": "Понятное имя",
-            "fullUrlHint": "Примечание: используйте полный путь URL",
-            "invalidTemplate": "Не удалось получить правильный шаблон!",
-            "model": "Модель",
-            "modelUrl": "URL модели",
-            "prefill": "Предзаполнение",
-            "prefillHint": "Предзаполнение перед ответом модели",
-            "saveButton": "Сохранить изменения",
-            "selectModel": "Выберите модель",
-            "title": "Редактировать подключение"
-        },
-        "failedToConnect": "Не удалось подключиться",
-        "item": {
-            "delete": {
-                "button": "Удалить подключение",
-                "description": "Вы уверены, что хотите удалить '{{name}}'? Это действие не может быть отменено!",
-                "title": "Удалить подключение"
-            }
-        },
-        "manager": {
-            "add": "Добавить подключение",
-            "empty": "Подключения не добавлены",
-            "header": "Подключения"
-        },
-        "notConnected": "Не подключено",
-        "templates": {
-            "delete": {
-                "confirm": "Удалить шаблон",
-                "description": "Вы уверены, что хотите удалить '{{name}}'?",
-                "title": "Удалить шаблон"
-            },
-            "empty": "Пользовательские шаблоны не добавлены",
-            "exported": "Шаблон успешно экспортирован",
-            "get": "Получить шаблоны",
-            "import": "Импортировать шаблон",
-            "importError": "Ошибка импорта: {{error}}",
-            "learn": "Узнайте о шаблонах",
-            "paste": "Вставить шаблон",
-            "pasteSheetTitle": "Вставить шаблон здесь",
-            "title": "Менеджер шаблонов"
-        }
-    },
-    "contextlimit": {
-        "allocation": "Распределение контекста",
-        "chat": "Контекст чата",
-        "generated": "Сгенерировано",
-        "warning": "Низкий контекст чата будет забывать сообщения быстрее"
-    },
-    "db": {
-        "migrationerror": {
-            "description": "Если вы видите это, что-то ужасное пошло не так. Сообщите об этой ошибке ниже, включив снимок экрана журнала выше.",
-            "title": "Ошибка миграции базы данных!"
-        }
-    },
-    "dropdown": {
-        "filter": "Фильтр...",
-        "selectItem": "Выбрать элемент"
-    },
-    "formatting": {
-        "alert": {
-            "deleteConfig": {
-                "cancel": "Отмена",
-                "confirm": "Удалить инструкцию",
-                "description": "Вы уверены, что хотите удалить '{{name}}'?",
-                "title": "Удалить конфигурацию"
-            },
-            "regenerateDefaults": {
-                "cancel": "Отмена",
-                "confirm": "Восстановить предустановки по умолчанию",
-                "description": "Вы уверены, что хотите восстановить инструкции по умолчанию?",
-                "title": "Восстановить инструкции по умолчанию"
-            }
-        },
-        "autoformatter": {
-            "asteriskActionPlainSpeech": "Действие со звездочкой, обычная речь",
-            "asteriskActionPlainSpeechExample": "*Некоторое действие* Некоторая речь",
-            "asteriskActionQuoteSpeech": "Действие со звездочкой, речь в кавычках",
-            "asteriskActionQuoteSpeechExample": "*Некоторое действие* \"Некоторая речь\"",
-            "disabled": "Отключено",
-            "disabledExample": "*<Без форматирования>*",
-            "plainActionQuoteSpeech": "Обычное действие, речь в кавычках",
-            "plainActionQuoteSpeechExample": "Некоторое действие, \"Некоторая речь\""
-        },
-        "configExists": "Конфигурация уже существует",
-        "createConfig": "Создать конфигурацию",
-        "defaultName": "По умолчанию",
-        "deleteConfig": "Удалить конфигурацию",
-        "deleteConfigDescription": "Вы уверены, что хотите удалить '{{name}}'?",
-        "deleteInstruct": "Удалить инструкцию",
+      },
+      "search": {
         "errors": {
-            "instructDataError": "Что-то пошло не так с данными инструкций"
+          "queryFailed": "Ошибка поиска в чате: {{error}}"
         },
-        "exportConfig": "Экспортировать конфигурацию",
-        "jsonExtension": ".json",
-        "newPreset": "Новая предустановка инструкций",
-        "regenerateDefaultPresets": "Восстановить предустановки по умолчанию",
-        "regenerateDefaults": "Восстановить инструкции по умолчанию",
-        "regenerateDefaultsDescription": "Вы уверены, что хотите восстановить инструкции по умолчанию?",
-        "sections": {
-            "addTimestamp": "Добавить временную метку",
-            "includeNames": "Включить имена",
-            "inputPrefix": "Префикс входа",
-            "inputSuffix": "Суффикс входа",
-            "lastOutputPrefix": "Префикс последнего выхода",
-            "outputPrefix": "Префикс выхода",
-            "outputSuffix": "Суффикс выхода",
-            "removeThinkTags": "Удалить теги Think",
-            "sendAudio": "Отправить аудио",
-            "sendDocuments": "Отправить документы",
-            "sendImages": "Отправить изображения",
-            "stopSequence": "Последовательность остановки",
-            "systemPrefix": "Префикс системы",
-            "systemPrompt": "Системная подсказка",
-            "systemPromptFormat": "Формат системной подсказки",
-            "systemSuffix": "Суффикс системы",
-            "useCommonStopSequences": "Использовать обычные последовательности остановки",
-            "useExamples": "Использовать примеры",
-            "useLastImageOnly": "Использовать только последнее изображение",
-            "usePersonality": "Использовать личность",
-            "useScenario": "Использовать сценарий",
-            "wrapInNewline": "Обернуть новой строкой"
-        },
-        "selectConfig": "Выберите конфигурацию",
-        "title": "Форматирование",
-        "toast": {
-            "cannotDeleteLastPreset": "Невозможно удалить последнюю предустановку инструкций.",
-            "configCreated": "Конфигурация создана.",
-            "configNameExists": "Имя конфигурации уже существует.",
-            "savedToDownloads": "\"{{name}}\" сохранен в загрузки"
-        }
+        "noResults": "Результатов не найдено",
+        "placeholder": "Поиск сообщения...",
+        "resultsFound": "Найдено результатов: {{count}}",
+        "title": "Поиск"
+      },
+      "title": "Чаты",
+      "user": {
+        "alreadySet": "Этот пользователь уже установлен",
+        "linkAction": "Привязать пользователя",
+        "linked": "Привязано к пользователю: {{name}}",
+        "noneSelected": "Нет текущего пользователя"
+      }
     },
-    "generation": {
-        "errors": {
-            "completionFailed": "Завершение не удалось.",
-            "configurationNotFound": "Конфигурация \"{{name}}\" не найдена",
-            "failedToBuildPayload": "Не удалось построить полезную нагрузку",
-            "failedToBuildPrompt": "Не удалось построить подсказку",
-            "failedToOrchestrateRequestBuild": "Не удалось организовать построение запроса",
-            "generationAlreadyInProgress": "Генерация уже выполняется",
-            "generationFailed": "Генерация не удалась",
-            "noActiveAPI": "Нет активного API",
-            "noActiveChat": "Нет активного чата",
-            "noCharacter": "Персонаж не загружен",
-            "noChatFound": "Чат не найден",
-            "noUser": "Пользователь не загружен",
-            "payloadConstructionFailed": "Ошибка построения полезной нагрузки",
-            "promptConstructionFailed": "Ошибка построения подсказки",
-            "sseFailed": "Ошибка во время события SSE"
-        },
-        "warn": {
-            "entryWithoutValidSwipeFound": "Найдена запись без действительного смахивания",
-            "noMessagesAddedCheckLogs": "Сообщения не добавлены. Проверьте логи."
-        }
+    "editor": {
+      "actions": {
+        "confirm": "Подтвердить",
+        "delete": "Удалить",
+        "reset": "Сбросить"
+      }
     },
-    "horizontalSelector": {
-        "description": "Необязательное полезное описание для селектора.",
-        "label": "Метка селектора"
+    "filteredText": {
+      "hide": "Скрыть отфильтрованное",
+      "show": "Показать отфильтрованное"
     },
-    "instruct": {
-        "attachments": "Вложения",
-        "filteredtext": {
-            "description": "Отправляет отфильтрованный текст для вывода",
-            "label": "Отправить отфильтрованный текст"
-        },
-        "formatting": "Форматирование инструкций",
-        "hiddentext": {
-            "description": "Скрывает текст, соответствующий определенным ниже шаблонам регулярных выражений. (без учета регистра)",
-            "title": "Скрытый текст"
-        },
-        "localtemplate": {
-            "description": "В локальном режиме ChatterUI автоматически использует шаблон инструкций, предоставленный загруженной моделью. Отключите это, если хотите, чтобы сообщения форматировались с использованием инструкций вместо этого. Системная подсказка всегда используется.",
-            "label": "Использовать встроенный шаблон локальной модели",
-            "title": "Локальный шаблон"
-        },
-        "macros": "Макросы и карточка персонажа",
-        "textformatter": {
-            "description": "Автоматически форматирует первое сообщение в стиле ниже",
-            "title": "Форматер текста"
-        }
+    "footer": {
+      "emptyState": {
+        "sendMessageToBegin": "Отправьте сообщение для начала",
+        "startOfChat": "Начало чата"
+      }
     },
-    "logs": {
-        "alert": {
-            "delete": {
-                "description": "Вы уверены, что хотите удалить все логи? Это действие не может быть отменено.",
-                "title": "Удалить логи"
-            }
-        },
-        "export": "Экспортировать логи",
-        "flush": "Очистить логи",
-        "title": "Логи",
-        "toast": {
-            "downloaderror": "Не удалось экспортировать логи",
-            "downloadok": "Логи загружены!"
-        }
+    "frame": {
+      "entryNumber": "#{{index}}",
+      "seconds": "{{seconds}}с"
+    },
+    "import": {
+      "errors": {
+        "failedToImport": "Ошибка импорта",
+        "noChatCharacter": "Вы импортируете чат без персонажа или пользователя"
+      }
+    },
+    "input": {
+      "actions": {
+        "addImage": "Добавить изображение",
+        "chatHistory": "История чата",
+        "editCharacter": "Редактировать персонажа",
+        "mainMenu": "Главное меню",
+        "takePicture": "Сделать фото"
+      },
+      "errors": {
+        "abortGeneration": "Отмена генерации",
+        "failedToSend": "Не удалось отправить сообщение"
+      },
+      "message": "Сообщение...",
+      "noConnection": "Соединение не включено",
+      "noModelLoaded": "Модель не загружена"
     },
     "model": {
-        "alert": {
-            "deletekv": {
-                "description": "Вы уверены, что хотите удалить кэш KV? Это действие не может быть отменено. \n\n Это освободит {{size}} места.",
-                "title": "Удалить кэш KV"
-            },
-            "deletemodel": {
-                "description": "Вы уверены, что хотите удалить '{{name}}'?\n\nЭто действие не может быть отменено!",
-                "external": "\n\n(Это не удалит внешние файлы модели, только эту запись)",
-                "internal": "\n\nЭтого операция освободит {{size}}",
-                "title": "Удалить модель"
-            }
-        },
-        "autoload": "Автоматически загружать модель при открытии чата",
-        "backenddev": "Устройство бэкенда",
-        "batch": "Пакет",
-        "contextshift": "Сдвиг контекста",
-        "copymodel": "Скопировать модель в ChatterUI",
-        "empty": "Модели не найдены. Попробуйте импортировать!",
-        "externalmodel": "Использовать внешнюю модель",
-        "gpulayers": "Слои GPU",
-        "info": {
-            "hint": "Подсказка: нажмите <icon /> и импортируйте модель GGUF!",
-            "loaded": "Модель загружена"
-        },
-        "item": {
-            "contextlength": "Длина контекста",
-            "file": "Файл",
-            "invalid": "Модель неправильна",
-            "noparamsize": "Нет размера параметров",
-            "rename": "Переименовать модель"
-        },
-        "maxcontext": "Максимальный контекст",
-        "modelnamechat": "Показывать имя модели в чате",
-        "mtmd": "Мультимодальные адаптеры",
-        "purgekv": "Очистить кэш KV ({{size}})",
-        "savekv": "Сохранить локальный KV",
-        "savekvdesc": "Сохраняет кэш KV при генерации, позволяя вам продолжить сеансы после закрытия приложения. Для правильного функционирования должна использоваться одна модель. Сохранение файла кэша KV может быть очень большим и негативно влиять на время работы батареи!",
-        "selectmmproj": "Выберите модель MMPROJ",
-        "settings": {
-            "advanced": "Продвинутые настройки",
-            "cpu": "Настройки ЦП",
-            "title": "Настройки модели"
-        },
-        "threads": "Потоки",
-        "title": "Модели",
-        "toast": {
-            "autoLoadingMMPROJ": "Автозагрузка MMPROJ: {{name}}",
-            "autoLoadingModel": "Автозагрузка модели: {{name}}",
-            "couldNotLoadModel": "Не удалось загрузить модель",
-            "deletekv": "Кэш KV удален!",
-            "failedToGenerateLocally": "Не удалось сгенерировать локально",
-            "failedToLoadMMPROJ": "Не удалось загрузить MMPROJ",
-            "failedToRunLocalInference": "Не удалось запустить локальный вывод",
-            "failedToUnloadMMPROJ": "Не удалось выгрузить MMPROJ",
-            "failedtolink": "Не удалось привязать модель",
-            "failedtoload": "Не удалось загрузить модель",
-            "mediaAddedWithoutMMPROJModel": "Медиа было добавлено без модели MMPROJ",
-            "mediaAddedWithoutMultimodalSupport": "Медиа было добавлено без поддержки мультимодальности.",
-            "modelAlreadyLoaded": "Модель уже загружена!",
-            "modelDoesNotExist": "Модель не существует!",
-            "modelImportedSuccessfully": "Модель успешно импортирована!",
-            "modelMissingEntryDeleted": "Модель отсутствует, ее запись будет удалена: {{name}}",
-            "noAutoLoadModelSet": "Автозагрузка модели не установлена",
-            "noModelLoaded": "Модель не загружена",
-            "quantizationNoLongerSupported": "Квантизация больше не поддерживается!"
-        }
+      "noModelLoaded": "Модель не загружена"
     },
-    "multiDropdown": {
-        "counter_one": "Выбран {{count}} элемент",
-        "counter_other": "Выбрано {{count}} элементов",
-        "noItemsSelected": "Элементы не выбраны"
+    "quickActions": {
+      "errors": {
+        "cloneFailed": "Не удалось клонировать чат",
+        "copyFailed": "Не удалось скопировать в буфер обмена"
+      },
+      "fork": {
+        "button": "Разветвить чат",
+        "description": "Это создаст копию этого чата с этого сообщения",
+        "title": "Разветвить чат"
+      },
+      "messages": {
+        "copied": "Скопировано"
+      },
+      "toast": {
+        "copiedCode": "Код скопирован",
+        "copyFailed": "Не удалось скопировать в буфер обмена"
+      }
+    },
+    "state": {
+      "failedToLoad": "Не удалось загрузить чат {{id}}"
+    },
+    "tokencount": {
+      "title": "Лимит контекста",
+      "used": "Использовано {{used}}, максимум {{max}}"
+    }
+  },
+  "common": {
+    "actions": {
+      "back": "Назад",
+      "cancel": "Отмена",
+      "clone": "Клонировать",
+      "close": "Закрыть",
+      "delete": "Удалить",
+      "disable": "Отключить",
+      "edit": "Редактировать",
+      "enable": "Включить",
+      "export": "Экспортировать",
+      "more": "Еще",
+      "rename": "Переименовать",
+      "save": "Сохранить",
+      "test": "Тест",
+      "tryAgain": "Попробовать снова"
+    },
+    "brand": {
+      "name": "ChatterUI"
+    },
+    "emptyStates": {
+      "noItems": "Нет элементов"
+    },
+    "errors": {
+      "couldNotGetData": "Не удалось получить данные, что-то очень плохое случилось!",
+      "failedToCopy": "Не удалось скопировать",
+      "failedToCreateData": "Не удалось создать данные",
+      "fileInvalid": "Неправильный файл",
+      "filenameInvalidImportFailed": "Неправильное имя файла, импорт не удался",
+      "invalidFileType": "Неправильный тип файла!",
+      "rollingBackDueToError": "Откат из-за ошибки",
+      "schemaValidationFailed": "Ошибка проверки схемы!"
+    },
+    "labels": {
+      "cpu": "ЦП",
+      "description": "Описание",
+      "devMode": "РЕЖИМ РАЗРАБОТКИ",
+      "external": "Внешний",
+      "internal": "Внутренний",
+      "name": "Имя",
+      "none": "Нет",
+      "result": "Результат",
+      "results": "Результаты",
+      "selected": "Выбрано",
+      "suggestions": "Предложения",
+      "version": "Версия"
+    },
+    "messages": {
+      "importingFile": "Импорт файла...",
+      "successfullyImported": "Успешно импортировано!"
     },
     "navigation": {
-        "about": "О приложении",
-        "api": "API",
-        "dev_colortest": "[DEV] Тест цвета",
-        "dev_components": "[DEV] Компоненты",
-        "dev_markdown": "[DEV] Markdown",
-        "formatting": "Форматирование",
-        "logs": "Логи",
-        "models": "Модели",
-        "sampler": "Семплер",
-        "settings": "Настройки",
-        "tts": "TTS"
-    },
-    "sampler": {
-        "alert": {
-            "delete": {
-                "description": "Вы уверены, что хотите удалить '{{name}}'?",
-                "title": "Удалить семплер"
-            }
-        },
-        "create": "Создать семплер",
-        "delete": "Удалить семплер",
-        "empty": "Нет семплеров для конфигурации",
-        "export": "Экспортировать семплер",
-        "invalid": "Неправильное поле семплера!",
-        "new": "Новая предустановка семплера",
-        "noSamplers": "Вероятно, вы еще не добавили подключение API",
-        "notSupported": "Семплер ID [{{id}}] не поддерживается",
-        "title": "Семплеры",
-        "toast": {
-            "emptyname": "Имя семплера не может быть пустым",
-            "exists": "Конфигурация семплера \"{{name}}\" уже существует!",
-            "exportok": "Конфигурация семплера экспортирована!",
-            "failedToImport": "Ошибка импорта",
-            "lastconfig": "Невозможно удалить последнюю конфигурацию"
-        }
-    },
-    "settings": {
-        "character": {
-            "alert": {
-                "regenerateDefaultCard": {
-                    "confirm": "Создать карточку по умолчанию",
-                    "description": "Это добавит карточку AI-бота по умолчанию в ваш список персонажей.",
-                    "title": "Восстановить карточку по умолчанию"
-                }
-            },
-            "errors": {
-                "failedToCreateDefaultCharacter": "Не удалось создать персонажа по умолчанию"
-            },
-            "regenerateDefaultCard": "Восстановить карточку по умолчанию",
-            "title": "Управление персонажами"
-        },
-        "chat": {
-            "askInChatterUI": "Спросить в ChatterUI",
-            "askInChatterUIDescription": "Используйте подсказки ChatterUI для определения намерения текста вместо поведения клавиатуры по умолчанию.",
-            "autoGenerateTitles": "Автоматически создавать названия чатов",
-            "autoGenerateTitlesDescription": "Автоматически создавайте названия для новых чатов.",
-            "autoLoadUser": "Автоматически загружать выбранного пользователя",
-            "autoLoadUserDescription": "Автоматически загружает текущий профиль пользователя в новые чаты.",
-            "loadChatOnStartup": "Загрузить чат при запуске",
-            "loadChatOnStartupDescription": "Автоматически повторно открывает последний чат при запуске приложения.",
-            "styleButton": "Стиль чата",
-            "title": "Чат",
-            "useFirstMessage": "Создать первое сообщение",
-            "useFirstMessageDescription": "Добавьте начальное сообщение при создании нового чата."
-        },
-        "chatstyle": {
-            "fontSize": "Размер шрифта",
-            "fontWeight": "Вес шрифта",
-            "title": "Стиль чата"
-        },
-        "chatwindow": {
-            "alternatePositions": "Чередовать позиции чата",
-            "alternatePositionsDescription": "Чередуйте выравнивание входящих и исходящих сообщений.",
-            "autoScroll": "Автопрокрутка",
-            "autoScrollDescription": "Автоматически прокручивайте к последнему сообщению.",
-            "quickDelete": "Быстрое удаление",
-            "quickDeleteDescription": "Разрешите удалять текст быстрым жестом смахивания.",
-            "saveScrollPosition": "Сохранить позицию прокрутки",
-            "saveScrollPositionDescription": "Восстанавливайте последнюю позицию чата при повторном открытии разговора.",
-            "sendOnEnter": "Отправить при нажатии Enter",
-            "sendOnEnterDescription": "Отправляйте сообщение при нажатии клавиши Enter.",
-            "showTokensPerSecond": "Показывать токены в секунду",
-            "showTokensPerSecondDescription": "Показывайте пропускную способность токенов во время генерации.",
-            "title": "Окно чата",
-            "wideChat": "Режим широкого чата",
-            "wideChatDescription": "Используйте более широкий макет для окна чата."
-        },
-        "colors": {
-            "active": "Активно",
-            "alert": {
-                "deleteTheme": {
-                    "confirm": "Удалить тему",
-                    "description": "Вы уверены, что хотите удалить '{{name}}'? Это действие не может быть отменено!",
-                    "title": "Удалить тему"
-                }
-            },
-            "builtIn": "Встроенные",
-            "contextMenu": {
-                "getThemes": "Получить темы",
-                "importTheme": "Импортировать тему",
-                "pasteTheme": "Вставить тему"
-            },
-            "custom": "Пользовательские",
-            "error": {
-                "colorNameAlreadyUsed": "Имя цвета уже используется",
-                "failedToImport": "Ошибка импорта: {{error}}"
-            },
-            "pasteThemeTitle": "Вставить тему здесь",
-            "title": "Темы",
-            "useSystemDarkMode": "Использовать системный темный режим"
-        },
-        "database": {
-            "alert": {
-                "export": {
-                    "confirm": "Экспортировать базу данных",
-                    "description": "Вы уверены, что хотите экспортировать файл базы данных?\n\nОн будет автоматически загружен в папку загрузок",
-                    "title": "Экспортировать базу данных"
-                },
-                "import": {
-                    "confirm": "Импортировать",
-                    "description": "Вы уверены, что хотите импортировать эту базу данных? Это может повредить текущую базу данных!\n\nРезервная копия будет автоматически загружена.\n\nПриложение будет автоматически перезапущено",
-                    "title": "Импортировать базу данных"
-                },
-                "rerunMigrations": {
-                    "confirm": "Повторить миграции",
-                    "description": "Повторение миграций может повредить вашу базу данных. Обязательно экспортируйте резервную копию.",
-                    "title": "Повторить миграции"
-                },
-                "versionMismatch": {
-                    "confirm": "Импортировать в любом случае",
-                    "description": "Импортированный файл базы данных имеет другую версию приложения ({{importedVersion}}), чем установленная версия ({{currentVersion}}). Импорт этой базы данных может повредить или испортить базу данных. Рекомендуется использовать одну и ту же версию приложения.",
-                    "title": "Другая версия"
-                }
-            },
-            "exportButton": "Экспортировать базу данных",
-            "importButton": "Импортировать базу данных",
-            "rerunMigrationsButton": "Повторить миграции",
-            "title": "Управление базой данных",
-            "toast": {
-                "downloadFailed": "Не удалось скопировать базу данных: {{error}}",
-                "downloadOk": "Загрузка успешна!"
-            },
-            "warningText": "ПРЕДУПРЕЖДЕНИЕ: убедитесь, что импортированная база данных относится к той же версии приложения!"
-        },
-        "generating": {
-            "bypassContextLength": "Обойти ограничение длины контекста",
-            "bypassContextLengthDescription": "Игнорирует ограничения длины контекста при построении подсказок",
-            "printContext": "Печать контекста",
-            "printContextDescription": "Выводит контекст генерации в логи для отладки",
-            "title": "Генерация"
-        },
-        "language": {
-            "title": "Установить язык"
-        },
-        "notification": {
-            "enableNotifications": "Включить уведомления",
-            "enableNotificationsDescription": "Отправляет уведомления, когда приложение находится в фоне",
-            "playSound": "Звук уведомления",
-            "showText": "Показывать текст в уведомлении",
-            "showTextDescription": "Показывает сгенерированные сообщения в уведомлениях",
-            "title": "Уведомления",
-            "vibrate": "Вибрация уведомлений"
-        },
-        "screen": {
-            "keepAwake": "Держать в бодрствовании",
-            "keepAwakeDescription": "Держит приложение в бодрствовании на переднем плане",
-            "title": "Экран",
-            "unlockOrientation": "Разблокировать ориентацию",
-            "unlockOrientationDescription": "Позволяет альбомный режим на телефонах (требуется перезагрузка приложения)"
-        },
-        "security": {
-            "lockApp": "Заблокировать приложение",
-            "lockAppDescription": "Требует аутентификации пользователя для открытия приложения. Это не будет работать, если у вас нет включенных блокировок устройства.",
-            "title": "Безопасность"
-        },
-        "style": {
-            "alert": {
-                "deleteBackground": {
-                    "confirm": "Удалить фон",
-                    "description": "Вы уверены, что хотите удалить этот фон? Это действие не может быть отменено!",
-                    "title": "Удалить фон"
-                }
-            },
-            "changeTheme": "Изменить тему",
-            "deleteBackground": "Удалить фон чата",
-            "importBackground": "Импортировать фон чата",
-            "messages": {
-                "backgroundDeleted": "Фон удален!"
-            },
-            "replaceBackground": "Заменить фон чата",
-            "title": "Стиль"
-        },
-        "tagHider": {
-            "description": "Скройте персонажей с следующими тегами из списка персонажей.",
-            "label": "Скрытые теги"
-        },
-        "title": "Настройки"
-    },
-    "stringArrayEditor": {
-        "add": "Добавить",
-        "duplicateValueError": "Значение уже существует",
-        "emptyValueError": "Значение не может быть пустым",
-        "placeholder": "Введите значение..."
-    },
-    "tts": {
-        "autoafter": "Автоматически произносить после вывода",
-        "language": "Язык",
-        "live": "Автоматически произносить во время вывода",
-        "nospeaker": "Спикер не выбран",
-        "selectlang": "Выберите язык",
-        "selectvoice": "Выберите голос",
-        "speed": "Скорость",
-        "test": "Это тестовое аудио",
-        "voices": "Голоса"
-    },
-    "users": {
-        "create": "Создать нового пользователя",
-        "edit": {
-            "card": {
-                "clone": "Клонировать пользователя",
-                "clonedesc": "Вы уверены, что хотите клонировать '{{name}}'?",
-                "delete": "Удалить пользователя",
-                "deletedesc": "Вы уверены, что хотите удалить '{{name}}'?\nЭто действие не может быть отменено."
-            },
-            "image": {
-                "change": "Изменить изображение",
-                "delete": "Удалить изображение",
-                "deletedesc": "Вы уверены, что хотите удалить это изображение?\nЭто действие не может быть отменено.",
-                "view": "Просмотреть изображение"
-            },
-            "title": "Редактировать пользователя"
-        },
-        "hint": "Подсказка: проведите пальцем влево или нажмите <icon/> для открытия ящика пользователей",
-        "messages": {
-            "loadingUser": "Загрузка пользователя: {{name}}"
-        },
-        "nameplaceholder": "Пустые имена не рекомендуются",
-        "profilecount": "Профили пользователей"
+      "about": "О приложении",
+      "settings": "Настройки"
     }
+  },
+  "connections": {
+    "add": {
+      "apiKey": "Ключ API",
+      "completionUrl": "URL завершения",
+      "createButton": "Создать API",
+      "defaultFriendlyName": "Новый API",
+      "error": {
+        "200": "Не удалось получить модели: {{error}}",
+        "modelparse": "Не удалось разобрать модели",
+        "modelundef": "Модели привели к неопределенному значению",
+        "nonarray": "Модели привели к массиву значений. `modelListParser` шаблона, вероятно, неправильный"
+      },
+      "firstMessage": "Первое сообщение",
+      "firstMessageHint": "Первое сообщение по умолчанию, отправленное Claude",
+      "friendlyName": "Понятное имя",
+      "fullUrlHint": "Примечание: используйте полный путь URL",
+      "model": "Модель",
+      "modelUrl": "URL модели",
+      "prefill": "Предзаполнение",
+      "prefillHint": "Предзаполнение перед ответом модели",
+      "selectConnectionType": "Выберите тип подключения",
+      "selectModel": "Выберите модель",
+      "title": "Добавить подключение"
+    },
+    "connected": "Подключено",
+    "editor": {
+      "apiKey": "Ключ API",
+      "completionUrl": "URL завершения",
+      "firstMessage": "Первое сообщение",
+      "firstMessageHint": "Первое сообщение по умолчанию, отправленное Claude",
+      "friendlyName": "Понятное имя",
+      "fullUrlHint": "Примечание: используйте полный путь URL",
+      "invalidTemplate": "Не удалось получить правильный шаблон!",
+      "model": "Модель",
+      "modelUrl": "URL модели",
+      "prefill": "Предзаполнение",
+      "prefillHint": "Предзаполнение перед ответом модели",
+      "saveButton": "Сохранить изменения",
+      "selectModel": "Выберите модель",
+      "title": "Редактировать подключение"
+    },
+    "failedToConnect": "Не удалось подключиться",
+    "item": {
+      "delete": {
+        "button": "Удалить подключение",
+        "description": "Вы уверены, что хотите удалить '{{name}}'? Это действие не может быть отменено!",
+        "title": "Удалить подключение"
+      }
+    },
+    "manager": {
+      "add": "Добавить подключение",
+      "empty": "Подключения не добавлены",
+      "header": "Подключения"
+    },
+    "notConnected": "Не подключено",
+    "templates": {
+      "delete": {
+        "confirm": "Удалить шаблон",
+        "description": "Вы уверены, что хотите удалить '{{name}}'?",
+        "title": "Удалить шаблон"
+      },
+      "empty": "Пользовательские шаблоны не добавлены",
+      "exported": "Шаблон успешно экспортирован",
+      "get": "Получить шаблоны",
+      "import": "Импортировать шаблон",
+      "importError": "Ошибка импорта: {{error}}",
+      "learn": "Узнайте о шаблонах",
+      "paste": "Вставить шаблон",
+      "pasteSheetTitle": "Вставить шаблон здесь",
+      "title": "Менеджер шаблонов"
+    }
+  },
+  "contextlimit": {
+    "allocation": "Распределение контекста",
+    "chat": "Контекст чата",
+    "generated": "Сгенерировано",
+    "warning": "Низкий контекст чата будет забывать сообщения быстрее"
+  },
+  "db": {
+    "migrationerror": {
+      "description": "Если вы видите это, что-то ужасное пошло не так. Сообщите об этой ошибке ниже, включив снимок экрана журнала выше.",
+      "title": "Ошибка миграции базы данных!"
+    }
+  },
+  "dropdown": {
+    "filter": "Фильтр...",
+    "selectItem": "Выбрать элемент"
+  },
+  "formatting": {
+    "alert": {
+      "deleteConfig": {
+        "cancel": "Отмена",
+        "confirm": "Удалить инструкцию",
+        "description": "Вы уверены, что хотите удалить '{{name}}'?",
+        "title": "Удалить конфигурацию"
+      },
+      "regenerateDefaults": {
+        "cancel": "Отмена",
+        "confirm": "Восстановить предустановки по умолчанию",
+        "description": "Вы уверены, что хотите восстановить инструкции по умолчанию?",
+        "title": "Восстановить инструкции по умолчанию"
+      }
+    },
+    "autoformatter": {
+      "asteriskActionPlainSpeech": "Действие со звездочкой, обычная речь",
+      "asteriskActionPlainSpeechExample": "*Некоторое действие* Некоторая речь",
+      "asteriskActionQuoteSpeech": "Действие со звездочкой, речь в кавычках",
+      "asteriskActionQuoteSpeechExample": "*Некоторое действие* \"Некоторая речь\"",
+      "disabled": "Отключено",
+      "disabledExample": "*<Без форматирования>*",
+      "plainActionQuoteSpeech": "Обычное действие, речь в кавычках",
+      "plainActionQuoteSpeechExample": "Некоторое действие, \"Некоторая речь\""
+    },
+    "configExists": "Конфигурация уже существует",
+    "createConfig": "Создать конфигурацию",
+    "defaultName": "По умолчанию",
+    "deleteConfig": "Удалить конфигурацию",
+    "deleteConfigDescription": "Вы уверены, что хотите удалить '{{name}}'?",
+    "deleteInstruct": "Удалить инструкцию",
+    "errors": {
+      "instructDataError": "Что-то пошло не так с данными инструкций"
+    },
+    "exportConfig": "Экспортировать конфигурацию",
+    "jsonExtension": ".json",
+    "newPreset": "Новая предустановка инструкций",
+    "regenerateDefaultPresets": "Восстановить предустановки по умолчанию",
+    "regenerateDefaults": "Восстановить инструкции по умолчанию",
+    "regenerateDefaultsDescription": "Вы уверены, что хотите восстановить инструкции по умолчанию?",
+    "sections": {
+      "addTimestamp": "Добавить временную метку",
+      "includeNames": "Включить имена",
+      "inputPrefix": "Префикс входа",
+      "inputSuffix": "Суффикс входа",
+      "lastOutputPrefix": "Префикс последнего выхода",
+      "outputPrefix": "Префикс выхода",
+      "outputSuffix": "Суффикс выхода",
+      "removeThinkTags": "Удалить теги Think",
+      "sendAudio": "Отправить аудио",
+      "sendDocuments": "Отправить документы",
+      "sendImages": "Отправить изображения",
+      "stopSequence": "Последовательность остановки",
+      "systemPrefix": "Префикс системы",
+      "systemPrompt": "Системная подсказка",
+      "systemPromptFormat": "Формат системной подсказки",
+      "systemSuffix": "Суффикс системы",
+      "useCommonStopSequences": "Использовать обычные последовательности остановки",
+      "useExamples": "Использовать примеры",
+      "useLastImageOnly": "Использовать только последнее изображение",
+      "usePersonality": "Использовать личность",
+      "useScenario": "Использовать сценарий",
+      "wrapInNewline": "Обернуть новой строкой"
+    },
+    "selectConfig": "Выберите конфигурацию",
+    "title": "Форматирование",
+    "toast": {
+      "cannotDeleteLastPreset": "Невозможно удалить последнюю предустановку инструкций.",
+      "configCreated": "Конфигурация создана.",
+      "configNameExists": "Имя конфигурации уже существует.",
+      "savedToDownloads": "\"{{name}}\" сохранен в загрузки"
+    }
+  },
+  "generation": {
+    "errors": {
+      "completionFailed": "Завершение не удалось.",
+      "configurationNotFound": "Конфигурация \"{{name}}\" не найдена",
+      "failedToBuildPayload": "Не удалось построить полезную нагрузку",
+      "failedToBuildPrompt": "Не удалось построить подсказку",
+      "failedToOrchestrateRequestBuild": "Не удалось организовать построение запроса",
+      "generationAlreadyInProgress": "Генерация уже выполняется",
+      "generationFailed": "Генерация не удалась",
+      "noActiveAPI": "Нет активного API",
+      "noActiveChat": "Нет активного чата",
+      "noCharacter": "Персонаж не загружен",
+      "noChatFound": "Чат не найден",
+      "noUser": "Пользователь не загружен",
+      "payloadConstructionFailed": "Ошибка построения полезной нагрузки",
+      "promptConstructionFailed": "Ошибка построения подсказки",
+      "sseFailed": "Ошибка во время события SSE"
+    },
+    "warn": {
+      "entryWithoutValidSwipeFound": "Найдена запись без действительного смахивания",
+      "noMessagesAddedCheckLogs": "Сообщения не добавлены. Проверьте логи."
+    }
+  },
+  "horizontalSelector": {
+    "description": "Необязательное полезное описание для селектора.",
+    "label": "Метка селектора"
+  },
+  "instruct": {
+    "attachments": "Вложения",
+    "filteredtext": {
+      "description": "Отправляет отфильтрованный текст для вывода",
+      "label": "Отправить отфильтрованный текст"
+    },
+    "formatting": "Форматирование инструкций",
+    "hiddentext": {
+      "description": "Скрывает текст, соответствующий определенным ниже шаблонам регулярных выражений. (без учета регистра)",
+      "title": "Скрытый текст"
+    },
+    "localtemplate": {
+      "description": "В локальном режиме ChatterUI автоматически использует шаблон инструкций, предоставленный загруженной моделью. Отключите это, если хотите, чтобы сообщения форматировались с использованием инструкций вместо этого. Системная подсказка всегда используется.",
+      "label": "Использовать встроенный шаблон локальной модели",
+      "title": "Локальный шаблон"
+    },
+    "macros": "Макросы и карточка персонажа",
+    "textformatter": {
+      "description": "Автоматически форматирует первое сообщение в стиле ниже",
+      "title": "Форматер текста"
+    }
+  },
+  "logs": {
+    "alert": {
+      "delete": {
+        "description": "Вы уверены, что хотите удалить все логи? Это действие не может быть отменено.",
+        "title": "Удалить логи"
+      }
+    },
+    "export": "Экспортировать логи",
+    "flush": "Очистить логи",
+    "title": "Логи",
+    "toast": {
+      "downloaderror": "Не удалось экспортировать логи",
+      "downloadok": "Логи загружены!"
+    }
+  },
+  "model": {
+    "alert": {
+      "deletekv": {
+        "description": "Вы уверены, что хотите удалить кэш KV? Это действие не может быть отменено. \n\n Это освободит {{size}} места.",
+        "title": "Удалить кэш KV"
+      },
+      "deletemodel": {
+        "description": "Вы уверены, что хотите удалить '{{name}}'?\n\nЭто действие не может быть отменено!",
+        "external": "\n\n(Это не удалит внешние файлы модели, только эту запись)",
+        "internal": "\n\nЭтого операция освободит {{size}}",
+        "title": "Удалить модель"
+      }
+    },
+    "autoload": "Автоматически загружать модель при открытии чата",
+    "backenddev": "Устройство бэкенда",
+    "batch": "Пакет",
+    "contextshift": "Сдвиг контекста",
+    "copymodel": "Скопировать модель в ChatterUI",
+    "empty": "Модели не найдены. Попробуйте импортировать!",
+    "externalmodel": "Использовать внешнюю модель",
+    "gpulayers": "Слои GPU",
+    "info": {
+      "hint": "Подсказка: нажмите <icon /> и импортируйте модель GGUF!",
+      "loaded": "Модель загружена"
+    },
+    "item": {
+      "contextlength": "Длина контекста",
+      "file": "Файл",
+      "invalid": "Модель неправильна",
+      "noparamsize": "Нет размера параметров",
+      "rename": "Переименовать модель"
+    },
+    "maxcontext": "Максимальный контекст",
+    "modelnamechat": "Показывать имя модели в чате",
+    "mtmd": "Мультимодальные адаптеры",
+    "purgekv": "Очистить кэш KV ({{size}})",
+    "savekv": "Сохранить локальный KV",
+    "savekvdesc": "Сохраняет кэш KV при генерации, позволяя вам продолжить сеансы после закрытия приложения. Для правильного функционирования должна использоваться одна модель. Сохранение файла кэша KV может быть очень большим и негативно влиять на время работы батареи!",
+    "selectmmproj": "Выберите модель MMPROJ",
+    "settings": {
+      "advanced": "Продвинутые настройки",
+      "cpu": "Настройки ЦП",
+      "title": "Настройки модели"
+    },
+    "threads": "Потоки",
+    "title": "Модели",
+    "toast": {
+      "autoLoadingMMPROJ": "Автозагрузка MMPROJ: {{name}}",
+      "autoLoadingModel": "Автозагрузка модели: {{name}}",
+      "couldNotLoadModel": "Не удалось загрузить модель",
+      "deletekv": "Кэш KV удален!",
+      "failedToGenerateLocally": "Не удалось сгенерировать локально",
+      "failedToLoadMMPROJ": "Не удалось загрузить MMPROJ",
+      "failedToRunLocalInference": "Не удалось запустить локальный вывод",
+      "failedToUnloadMMPROJ": "Не удалось выгрузить MMPROJ",
+      "failedtolink": "Не удалось привязать модель",
+      "failedtoload": "Не удалось загрузить модель",
+      "mediaAddedWithoutMMPROJModel": "Медиа было добавлено без модели MMPROJ",
+      "mediaAddedWithoutMultimodalSupport": "Медиа было добавлено без поддержки мультимодальности.",
+      "modelAlreadyLoaded": "Модель уже загружена!",
+      "modelDoesNotExist": "Модель не существует!",
+      "modelImportedSuccessfully": "Модель успешно импортирована!",
+      "modelMissingEntryDeleted": "Модель отсутствует, ее запись будет удалена: {{name}}",
+      "noAutoLoadModelSet": "Автозагрузка модели не установлена",
+      "noModelLoaded": "Модель не загружена",
+      "quantizationNoLongerSupported": "Квантизация больше не поддерживается!"
+    }
+  },
+  "multiDropdown": {
+    "counter_one": "Выбран {{count}} элемент",
+    "counter_other": "Выбрано {{count}} элементов",
+    "noItemsSelected": "Элементы не выбраны"
+  },
+  "navigation": {
+    "about": "О приложении",
+    "api": "API",
+    "dev_colortest": "[DEV] Тест цвета",
+    "dev_components": "[DEV] Компоненты",
+    "dev_markdown": "[DEV] Markdown",
+    "formatting": "Форматирование",
+    "logs": "Логи",
+    "models": "Модели",
+    "sampler": "Семплер",
+    "settings": "Настройки",
+    "tts": "TTS"
+  },
+  "sampler": {
+    "alert": {
+      "delete": {
+        "description": "Вы уверены, что хотите удалить '{{name}}'?",
+        "title": "Удалить семплер"
+      }
+    },
+    "create": "Создать семплер",
+    "delete": "Удалить семплер",
+    "empty": "Нет семплеров для конфигурации",
+    "export": "Экспортировать семплер",
+    "invalid": "Неправильное поле семплера!",
+    "new": "Новая предустановка семплера",
+    "noSamplers": "Вероятно, вы еще не добавили подключение API",
+    "notSupported": "Семплер ID [{{id}}] не поддерживается",
+    "title": "Семплеры",
+    "toast": {
+      "emptyname": "Имя семплера не может быть пустым",
+      "exists": "Конфигурация семплера \"{{name}}\" уже существует!",
+      "exportok": "Конфигурация семплера экспортирована!",
+      "failedToImport": "Ошибка импорта",
+      "lastconfig": "Невозможно удалить последнюю конфигурацию"
+    }
+  },
+  "settings": {
+    "character": {
+      "alert": {
+        "regenerateDefaultCard": {
+          "confirm": "Создать карточку по умолчанию",
+          "description": "Это добавит карточку AI-бота по умолчанию в ваш список персонажей.",
+          "title": "Восстановить карточку по умолчанию"
+        }
+      },
+      "errors": {
+        "failedToCreateDefaultCharacter": "Не удалось создать персонажа по умолчанию"
+      },
+      "regenerateDefaultCard": "Восстановить карточку по умолчанию",
+      "title": "Управление персонажами"
+    },
+    "chat": {
+      "askInChatterUI": "Спросить в ChatterUI",
+      "askInChatterUIDescription": "Используйте подсказки ChatterUI для определения намерения текста вместо поведения клавиатуры по умолчанию.",
+      "autoGenerateTitles": "Автоматически создавать названия чатов",
+      "autoGenerateTitlesDescription": "Автоматически создавайте названия для новых чатов.",
+      "autoLoadUser": "Автоматически загружать выбранного пользователя",
+      "autoLoadUserDescription": "Автоматически загружает текущий профиль пользователя в новые чаты.",
+      "loadChatOnStartup": "Загрузить чат при запуске",
+      "loadChatOnStartupDescription": "Автоматически повторно открывает последний чат при запуске приложения.",
+      "styleButton": "Стиль чата",
+      "title": "Чат",
+      "useFirstMessage": "Создать первое сообщение",
+      "useFirstMessageDescription": "Добавьте начальное сообщение при создании нового чата."
+    },
+    "chatstyle": {
+      "fontSize": "Размер шрифта",
+      "fontWeight": "Вес шрифта",
+      "title": "Стиль чата"
+    },
+    "chatwindow": {
+      "alternatePositions": "Чередовать позиции чата",
+      "alternatePositionsDescription": "Чередуйте выравнивание входящих и исходящих сообщений.",
+      "autoScroll": "Автопрокрутка",
+      "autoScrollDescription": "Автоматически прокручивайте к последнему сообщению.",
+      "quickDelete": "Быстрое удаление",
+      "quickDeleteDescription": "Разрешите удалять текст быстрым жестом смахивания.",
+      "saveScrollPosition": "Сохранить позицию прокрутки",
+      "saveScrollPositionDescription": "Восстанавливайте последнюю позицию чата при повторном открытии разговора.",
+      "sendOnEnter": "Отправить при нажатии Enter",
+      "sendOnEnterDescription": "Отправляйте сообщение при нажатии клавиши Enter.",
+      "showTokensPerSecond": "Показывать токены в секунду",
+      "showTokensPerSecondDescription": "Показывайте пропускную способность токенов во время генерации.",
+      "title": "Окно чата",
+      "wideChat": "Режим широкого чата",
+      "wideChatDescription": "Используйте более широкий макет для окна чата."
+    },
+    "colors": {
+      "active": "Активно",
+      "alert": {
+        "deleteTheme": {
+          "confirm": "Удалить тему",
+          "description": "Вы уверены, что хотите удалить '{{name}}'? Это действие не может быть отменено!",
+          "title": "Удалить тему"
+        }
+      },
+      "builtIn": "Встроенные",
+      "contextMenu": {
+        "getThemes": "Получить темы",
+        "importTheme": "Импортировать тему",
+        "pasteTheme": "Вставить тему"
+      },
+      "custom": "Пользовательские",
+      "error": {
+        "colorNameAlreadyUsed": "Имя цвета уже используется",
+        "failedToImport": "Ошибка импорта: {{error}}"
+      },
+      "pasteThemeTitle": "Вставить тему здесь",
+      "title": "Темы",
+      "useSystemDarkMode": "Использовать системный темный режим"
+    },
+    "database": {
+      "alert": {
+        "export": {
+          "confirm": "Экспортировать базу данных",
+          "description": "Вы уверены, что хотите экспортировать файл базы данных?\n\nОн будет автоматически загружен в папку загрузок",
+          "title": "Экспортировать базу данных"
+        },
+        "import": {
+          "confirm": "Импортировать",
+          "description": "Вы уверены, что хотите импортировать эту базу данных? Это может повредить текущую базу данных!\n\nРезервная копия будет автоматически загружена.\n\nПриложение будет автоматически перезапущено",
+          "title": "Импортировать базу данных"
+        },
+        "rerunMigrations": {
+          "confirm": "Повторить миграции",
+          "description": "Повторение миграций может повредить вашу базу данных. Обязательно экспортируйте резервную копию.",
+          "title": "Повторить миграции"
+        },
+        "versionMismatch": {
+          "confirm": "Импортировать в любом случае",
+          "description": "Импортированный файл базы данных имеет другую версию приложения ({{importedVersion}}), чем установленная версия ({{currentVersion}}). Импорт этой базы данных может повредить или испортить базу данных. Рекомендуется использовать одну и ту же версию приложения.",
+          "title": "Другая версия"
+        }
+      },
+      "exportButton": "Экспортировать базу данных",
+      "importButton": "Импортировать базу данных",
+      "rerunMigrationsButton": "Повторить миграции",
+      "title": "Управление базой данных",
+      "toast": {
+        "downloadFailed": "Не удалось скопировать базу данных: {{error}}",
+        "downloadOk": "Загрузка успешна!"
+      },
+      "warningText": "ПРЕДУПРЕЖДЕНИЕ: убедитесь, что импортированная база данных относится к той же версии приложения!"
+    },
+    "generating": {
+      "bypassContextLength": "Обойти ограничение длины контекста",
+      "bypassContextLengthDescription": "Игнорирует ограничения длины контекста при построении подсказок",
+      "printContext": "Печать контекста",
+      "printContextDescription": "Выводит контекст генерации в логи для отладки",
+      "title": "Генерация"
+    },
+    "language": {
+      "title": "Установить язык"
+    },
+    "notification": {
+      "enableNotifications": "Включить уведомления",
+      "enableNotificationsDescription": "Отправляет уведомления, когда приложение находится в фоне",
+      "playSound": "Звук уведомления",
+      "showText": "Показывать текст в уведомлении",
+      "showTextDescription": "Показывает сгенерированные сообщения в уведомлениях",
+      "title": "Уведомления",
+      "vibrate": "Вибрация уведомлений"
+    },
+    "screen": {
+      "keepAwake": "Держать в бодрствовании",
+      "keepAwakeDescription": "Держит приложение в бодрствовании на переднем плане",
+      "title": "Экран",
+      "unlockOrientation": "Разблокировать ориентацию",
+      "unlockOrientationDescription": "Позволяет альбомный режим на телефонах (требуется перезагрузка приложения)"
+    },
+    "security": {
+      "lockApp": "Заблокировать приложение",
+      "lockAppDescription": "Требует аутентификации пользователя для открытия приложения. Это не будет работать, если у вас нет включенных блокировок устройства.",
+      "title": "Безопасность"
+    },
+    "style": {
+      "alert": {
+        "deleteBackground": {
+          "confirm": "Удалить фон",
+          "description": "Вы уверены, что хотите удалить этот фон? Это действие не может быть отменено!",
+          "title": "Удалить фон"
+        }
+      },
+      "changeTheme": "Изменить тему",
+      "deleteBackground": "Удалить фон чата",
+      "importBackground": "Импортировать фон чата",
+      "messages": {
+        "backgroundDeleted": "Фон удален!"
+      },
+      "replaceBackground": "Заменить фон чата",
+      "title": "Стиль"
+    },
+    "tagHider": {
+      "description": "Скройте персонажей с следующими тегами из списка персонажей.",
+      "label": "Скрытые теги"
+    },
+    "title": "Настройки"
+  },
+  "stringArrayEditor": {
+    "add": "Добавить",
+    "duplicateValueError": "Значение уже существует",
+    "emptyValueError": "Значение не может быть пустым",
+    "placeholder": "Введите значение..."
+  },
+  "tts": {
+    "autoafter": "Автоматически произносить после вывода",
+    "language": "Язык",
+    "live": "Автоматически произносить во время вывода",
+    "nospeaker": "Спикер не выбран",
+    "selectlang": "Выберите язык",
+    "selectvoice": "Выберите голос",
+    "speed": "Скорость",
+    "test": "Это тестовое аудио",
+    "voices": "Голоса"
+  },
+  "users": {
+    "create": "Создать нового пользователя",
+    "edit": {
+      "card": {
+        "clone": "Клонировать пользователя",
+        "clonedesc": "Вы уверены, что хотите клонировать '{{name}}'?",
+        "delete": "Удалить пользователя",
+        "deletedesc": "Вы уверены, что хотите удалить '{{name}}'?\nЭто действие не может быть отменено."
+      },
+      "image": {
+        "change": "Изменить изображение",
+        "delete": "Удалить изображение",
+        "deletedesc": "Вы уверены, что хотите удалить это изображение?\nЭто действие не может быть отменено.",
+        "view": "Просмотреть изображение"
+      },
+      "title": "Редактировать пользователя"
+    },
+    "hint": "Подсказка: проведите пальцем влево или нажмите <icon/> для открытия ящика пользователей",
+    "messages": {
+      "loadingUser": "Загрузка пользователя: {{name}}"
+    },
+    "nameplaceholder": "Пустые имена не рекомендуются",
+    "profilecount": "Профили пользователей"
+  }
 }
