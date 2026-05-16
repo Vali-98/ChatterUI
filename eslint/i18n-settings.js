@@ -304,6 +304,7 @@ module.exports = {
             'row-reverse',
             'flex-end',
             'flex-start',
+            /\b\d+(?:deg|rad)\b/g,
         ],
     },
     callees: {
