@@ -22,26 +22,30 @@ const ChatItem: React.FC<ChatItemProps> = ({
     isGreeting,
     entryId,
     tokenLength,
+    ...rest
 }) => {
     const nowGenerating = useInference((state) => state.nowGenerating)
     const { data: entry } = useQueuedLiveQuery(Chats.db.live.entry(entryId))
-
-    if (!entry) return
 
     return (
         <>
             {entry ? (
                 <Animated.View
+                    {...rest}
                     layout={LinearTransition.duration(250)
                         .springify()
                         .mass(0.3)
                         .damping(20)
                         .stiffness(300)}
                     exiting={FadeOut.duration(150)}
-                    entering={FadeIn.duration(250)}
+                    entering={FadeIn.duration(250).delay(150)}
                     style={[
                         styles.chatItem,
-                        { zIndex: index, paddingBottom: index === 0 ? 4 : 0 },
+                        {
+                            zIndex: index,
+                            paddingBottom: index === 0 ? 4 : 0,
+                            flexDirection: 'column-reverse',
+                        },
                     ]}>
                     <ChatFrame
                         index={index}
@@ -58,11 +62,13 @@ const ChatItem: React.FC<ChatItemProps> = ({
                     </ChatFrame>
                 </Animated.View>
             ) : (
-                <ChatFrameSkeleton
-                    isLastMessage={isLastMessage}
-                    index={index}
-                    estimatedHeight={Math.max(48, (tokenLength / 10) * 16 + 32)}
-                />
+                <Animated.View {...rest} exiting={FadeOut}>
+                    <ChatFrameSkeleton
+                        isLastMessage={isLastMessage}
+                        index={index}
+                        estimatedHeight={Math.max(48, (tokenLength / 10) * 16 + 32)}
+                    />
+                </Animated.View>
             )}
         </>
     )
@@ -73,6 +79,6 @@ export default ChatItem
 const styles = StyleSheet.create({
     chatItem: {
         paddingHorizontal: 4,
-        transform: [{ rotate: '180deg' }],
+        transform: [{ scale: -1 }],
     },
 })
