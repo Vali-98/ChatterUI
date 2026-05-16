@@ -412,7 +412,7 @@ const useStyles = () => {
         menuTextError: {
             color: color.error._300,
         },
-        border: { borderTopWidth: 4, borderColor: color.neutral._300, marginVertical: 4 },
+        border: { borderTopWidth: 2, borderColor: color.neutral._400, marginVertical: 4 },
     })
 }
 
