@@ -583,7 +583,8 @@
         }
     },
     "multiDropdown": {
-        "counter": "{{count}} item dipilih",
+        "counter_one": "{{count}} item dipilih",
+        "counter_other": "{{count}} item dipilih",
         "noItemsSelected": "Tidak ada item yang dipilih"
     },
     "navigation": {
