@@ -1,0 +1,852 @@
+{
+    "about": {
+        "description": {
+            "primary": "ChatterUI adalah aplikasi gratis dan sumber terbuka yang dikembangkan oleh Vali-98",
+            "support": "Aplikasi ini adalah proyek hobi yang saya kembangkan di waktu luang. Jika Anda menikmati aplikasi ini, pertimbangkan untuk mendukung pengembangannya!"
+        },
+        "devMode": {
+            "disableAction": "Nonaktifkan Mode Dev",
+            "disabledMessage": "Mode dev dinonaktifkan.",
+            "enabledMessage": "Anda telah mengaktifkan mode dev."
+        },
+        "reportIssue": "Punya masalah? Laporkan di sini:",
+        "logsReminder": "Jangan lupa sertakan log",
+        "support": {
+            "button": "Dukung ChatterUI",
+            "label": "Donasi untuk ChatterUI di sini:"
+        },
+        "versionPrefix": "v"
+    },
+    "appMode": {
+        "options": {
+            "local": "Lokal",
+            "remote": "Jarak Jauh"
+        },
+        "title": "Mode Aplikasi"
+    },
+    "auth": {
+        "authorizationRequired": "Otorisasi Diperlukan"
+    },
+    "character": {
+        "editor": {
+            "title": "Editor Karakter",
+            "actions": {
+                "changeBackground": "Ubah Latar Belakang",
+                "changeImage": "Ubah Gambar",
+                "export": "Ekspor",
+                "removeBackground": "Hapus Latar Belakang",
+                "viewImage": "Lihat Gambar"
+            },
+            "dialogs": {
+                "clone": {
+                    "confirm": "Kloning Karakter",
+                    "description": "Apakah Anda yakin ingin mengkloning '{{name}}'?",
+                    "title": "Kloning Karakter"
+                },
+                "deleteAlternateMessage": {
+                    "confirm": "Hapus",
+                    "description": "Apakah Anda yakin ingin menghapus pesan alternatif ini? Tindakan ini tidak dapat dibatalkan.",
+                    "title": "Hapus Pesan Alternatif"
+                },
+                "deleteCharacter": {
+                    "confirm": "Hapus Karakter",
+                    "description": "Apakah Anda yakin ingin menghapus '{{name}}'? Tindakan ini tidak dapat dibatalkan.",
+                    "title": "Hapus Karakter"
+                },
+                "deleteImage": {
+                    "confirm": "Hapus Gambar",
+                    "description": "Apakah Anda yakin ingin menghapus gambar ini? Tindakan ini tidak dapat dibatalkan.",
+                    "title": "Hapus Gambar"
+                },
+                "unsavedChanges": {
+                    "description": "Anda memiliki perubahan yang belum disimpan, meninggalkan sekarang akan menghapus kemajuan Anda.",
+                    "discard": "Buang Perubahan",
+                    "title": "Perubahan Belum Disimpan"
+                }
+            },
+            "emptyStates": {
+                "noAlternateGreetings": "Tidak Ada Salam Alternatif"
+            },
+            "errors": {
+                "export": "Gagal mengekspor: {{error}}",
+                "exportFailed": "Gagal mengekspor",
+                "copyCardNotExist": "Gagal menyalin kartu: Kartu tidak ada",
+                "failedToCopyCard": "Gagal menyalin kartu",
+                "deleteBackground": "Gagal menghapus latar belakang",
+                "createFromImage": "Gagal membuat kartu - Gambar tidak dapat diambil",
+                "cardNoCharacter": "Tidak ada karakter yang ditemukan.",
+                "createFailed": "Gagal membuat karakter",
+                "invalidCharacterCard": "Kartu Karakter Tidak Valid",
+                "v2ParsingFailedFallingBack": "Penguraian V2 gagal, kembali ke V1"
+            },
+            "fields": {
+                "alternateGreeting": "Salam Alternatif",
+                "exampleMessages": "Contoh Pesan",
+                "firstMessage": "Pesan Pertama",
+                "personality": "Kepribadian",
+                "scenario": "Skenario",
+                "tags": "Tag"
+            },
+            "messages": {
+                "deleted": "Karakter dihapus: {{name}}",
+                "exported": "Kartu Berhasil Diekspor!",
+                "saved": "Kartu Berhasil Disimpan!"
+            },
+            "metrics": {
+                "descriptionTokens": "Token Deskripsi: {{count}}"
+            }
+        },
+        "list": {
+            "actions": {
+                "createCharacter": "Buat Karakter",
+                "createNewCharacter": "Buat Karakter Baru",
+                "importFromFile": "Impor Dari File"
+            },
+            "columns": {
+                "name": "Nama"
+            },
+            "emptyStates": {
+                "noCharactersFound": "Tidak Ditemukan Karakter. Coba Impor Beberapa!",
+                "noCharactersMatch": "Tidak Ada Karakter yang Cocok dengan Hasil Pencarian",
+                "noMessages": "Tidak Ada Pesan"
+            },
+            "errors": {
+                "chatCreationFailed": "Pembuatan cadangan chat telah gagal! Harap laporkan.",
+                "load": "Tidak dapat memuat karakter: {{error}}",
+                "nameCannotBeEmpty": "Nama tidak boleh kosong",
+                "nameEmpty": "Nama Tidak Boleh Kosong!"
+            },
+            "messages": {
+                "hiderDisabled": "Penyembunyian Dinonaktifkan",
+                "hiderEnabled": "Penyembunyian Diaktifkan"
+            },
+            "search": {
+                "byName": "Cari Berdasarkan Nama",
+                "byTags": "Cari Berdasarkan Tag"
+            },
+            "sort": {
+                "label": "Urutkan Berdasarkan",
+                "recent": "Terbaru"
+            }
+        }
+    },
+    "chat": {
+        "bubble": {
+            "promptSpeed": "Prompt: {{tokens}} t/d",
+            "textGenerationSpeed": "    Gen Teks: {{tokens}} t/d"
+        },
+        "drawer": {
+            "actions": {
+                "startNewChat": "Mulai Chat Baru"
+            },
+            "dialogs": {
+                "clone": {
+                    "confirm": "Kloning Chat",
+                    "description": "Apakah Anda yakin ingin mengkloning '{{name}}'?",
+                    "title": "Kloning Chat"
+                },
+                "delete": {
+                    "confirm": "Hapus Chat",
+                    "description": "Apakah Anda yakin ingin menghapus '{{name}}'? Tindakan ini tidak dapat dibatalkan.",
+                    "title": "Hapus Chat"
+                }
+            },
+            "errors": {
+                "defaultChatFailed": "Terjadi kesalahan saat membuat chat bawaan",
+                "exportFailed": "Gagal mengekspor chat",
+                "undefinedChat": "Chat tidak terdefinisi"
+            },
+            "labels": {
+                "unknown": "tidak diketahui"
+            },
+            "messages": {
+                "exported": "File: {{name}} disimpan ke unduhan!"
+            },
+            "rename": {
+                "errors": {
+                    "nameCannotBeEmpty": "Nama tidak boleh kosong"
+                }
+            },
+            "search": {
+                "errors": {
+                    "queryFailed": "Gagal menjalankan pencarian chat: {{error}}"
+                },
+                "noResults": "Tidak Ada Hasil",
+                "placeholder": "Cari pesan...",
+                "resultsFound": "Hasil: {{count}}",
+                "title": "Cari"
+            },
+            "title": "Chat",
+            "user": {
+                "alreadySet": "Pengguna Ini Sudah Diatur",
+                "linkAction": "Tautkan Pengguna",
+                "linked": "Ditautkan ke Pengguna: {{name}}",
+                "noneSelected": "Tidak Ada Pengguna Saat Ini"
+            }
+        },
+        "editor": {
+            "actions": {
+                "confirm": "Konfirmasi",
+                "delete": "Hapus",
+                "reset": "Atur Ulang"
+            }
+        },
+        "filteredText": {
+            "hide": "Sembunyikan yang Difilter",
+            "show": "Tampilkan yang Difilter"
+        },
+        "footer": {
+            "emptyState": {
+                "sendMessageToBegin": "Kirim pesan untuk memulai",
+                "startOfChat": "Awal chat"
+            }
+        },
+        "import": {
+            "errors": {
+                "failedToImport": "Gagal Mengimpor",
+                "noChatCharacter": "Anda mengimpor chat tanpa karakter atau pengguna"
+            }
+        },
+        "input": {
+            "actions": {
+                "addImage": "Tambahkan Gambar",
+                "chatHistory": "Riwayat Chat",
+                "editCharacter": "Edit Karakter",
+                "mainMenu": "Menu Utama",
+                "takePicture": "Ambil Foto"
+            },
+            "errors": {
+                "abortGeneration": "Membatalkan Pembuatan",
+                "failedToSend": "Gagal mengirim pesan"
+            },
+            "message": "Pesan...",
+            "noConnection": "Tidak Ada Koneksi yang Diaktifkan",
+            "noModelLoaded": "Tidak Ada Model yang Dimuat"
+        },
+        "model": {
+            "noModelLoaded": "Tidak Ada Model yang Dimuat"
+        },
+        "quickActions": {
+            "errors": {
+                "cloneFailed": "Gagal mengkloning chat",
+                "copyFailed": "Gagal menyalin ke papan klip"
+            },
+            "fork": {
+                "button": "Percabangan Chat",
+                "description": "Ini akan membuat klon dari chat ini mulai dari pesan ini",
+                "title": "Percabangan Chat"
+            },
+            "messages": {
+                "copied": "Disalin"
+            },
+            "toast": {
+                "copiedCode": "Kode Disalin",
+                "copyFailed": "Gagal menyalin ke papan klip"
+            }
+        },
+        "frame": {
+            "seconds": "{{seconds}}d",
+            "entryNumber": "#{{index}}"
+        },
+        "state": {
+            "failedToLoad": "Gagal memuat chat {{id}}"
+        },
+        "tokencount": {
+            "used": "Digunakan {{used}}, Maks {{max}}",
+            "title": "Batas Konteks"
+        }
+    },
+    "common": {
+        "actions": {
+            "back": "Kembali",
+            "cancel": "Batal",
+            "clone": "Kloning",
+            "close": "Tutup",
+            "delete": "Hapus",
+            "disable": "Nonaktifkan",
+            "edit": "Edit",
+            "enable": "Aktifkan",
+            "export": "Ekspor",
+            "more": "Lainnya",
+            "rename": "Ganti Nama",
+            "save": "Simpan",
+            "test": "Uji",
+            "tryAgain": "Coba Lagi"
+        },
+        "brand": {
+            "name": "ChatterUI"
+        },
+        "emptyStates": {
+            "noItems": "Tidak Ada Item"
+        },
+        "labels": {
+            "cpu": "CPU",
+            "description": "Deskripsi",
+            "devMode": "MODE DEV",
+            "external": "Eksternal",
+            "internal": "Internal",
+            "name": "Nama",
+            "none": "Tidak Ada",
+            "result": "Hasil",
+            "results": "Hasil",
+            "selected": "Dipilih",
+            "suggestions": "Saran",
+            "version": "Versi"
+        },
+        "navigation": {
+            "about": "Tentang",
+            "settings": "Pengaturan"
+        },
+        "messages": {
+            "importingFile": "Mengimpor file...",
+            "successfullyImported": "Berhasil Diimpor!"
+        },
+        "errors": {
+            "failedToCopy": "Gagal menyalin",
+            "fileInvalid": "File Tidak Valid",
+            "filenameInvalidImportFailed": "Nama file tidak valid, Impor Gagal",
+            "failedToCreateData": "Gagal membuat data",
+            "couldNotGetData": "Tidak dapat memperoleh data, terjadi kesalahan yang sangat serius!",
+            "rollingBackDueToError": "Mengembalikan karena kesalahan",
+            "invalidFileType": "Jenis File Tidak Valid!",
+            "schemaValidationFailed": "Validasi skema gagal!"
+        }
+    },
+    "connections": {
+        "add": {
+            "apiKey": "Kunci API",
+            "completionUrl": "URL Penyelesaian",
+            "createButton": "Buat API",
+            "defaultFriendlyName": "Koneksi Baru",
+            "error": {
+                "200": "Tidak dapat mengambil model: {{error}}",
+                "modelparse": "Tidak dapat mengurai model",
+                "modelundef": "Model menghasilkan nilai yang tidak terdefinisi",
+                "nonarray": "Model menghasilkan nilai non-array. `modelListParser` dari template kemungkinan salah"
+            },
+            "firstMessage": "Pesan Pertama",
+            "firstMessageHint": "Pesan pertama bawaan yang dikirim ke Claude",
+            "friendlyName": "Nama Ramah",
+            "fullUrlHint": "Catatan: Gunakan path URL lengkap",
+            "model": "Model",
+            "modelUrl": "URL Model",
+            "prefill": "Praisi",
+            "prefillHint": "Praisi sebelum respons model",
+            "selectConnectionType": "Pilih Tipe Koneksi",
+            "selectModel": "Pilih Model",
+            "title": "Tambah Koneksi"
+        },
+        "connected": "Terhubung",
+        "editor": {
+            "apiKey": "Kunci API",
+            "completionUrl": "URL Penyelesaian",
+            "firstMessage": "Pesan Pertama",
+            "firstMessageHint": "Pesan pertama bawaan yang dikirim ke Claude",
+            "friendlyName": "Nama Ramah",
+            "fullUrlHint": "Catatan: Gunakan path URL lengkap",
+            "invalidTemplate": "Tidak dapat mendapatkan template yang valid!",
+            "model": "Model",
+            "modelUrl": "URL Model",
+            "prefill": "Praisi",
+            "prefillHint": "Praisi sebelum respons model",
+            "saveButton": "Simpan Perubahan",
+            "selectModel": "Pilih Model",
+            "title": "Edit Koneksi"
+        },
+        "failedToConnect": "Gagal Terhubung",
+        "item": {
+            "delete": {
+                "button": "Hapus Koneksi",
+                "description": "Apakah Anda yakin ingin menghapus '{{name}}'? Tindakan ini tidak dapat dibatalkan!",
+                "title": "Hapus Koneksi"
+            }
+        },
+        "manager": {
+            "add": "Tambah Koneksi",
+            "empty": "Belum Ada Koneksi",
+            "header": "Koneksi"
+        },
+        "notConnected": "Tidak Terhubung",
+        "templates": {
+            "empty": "Belum Ada Template Kustom",
+            "get": "Dapatkan Template",
+            "import": "Impor Template",
+            "importError": "Gagal mengimpor: {{error}}",
+            "learn": "Pelajari Tentang Template",
+            "paste": "Tempel Template",
+            "pasteSheetTitle": "Tempel Template Di Sini",
+            "title": "Manajer Template",
+            "delete": {
+                "title": "Hapus Template",
+                "description": "Apakah Anda yakin ingin menghapus '{{name}}'?",
+                "confirm": "Hapus Template"
+            },
+            "exported": "Template berhasil diekspor"
+        }
+    },
+    "contextlimit": {
+        "allocation": "Alokasi Konteks",
+        "chat": "Konteks Chat",
+        "generated": "Dihasilkan",
+        "warning": "Konteks Chat Rendah akan membuat pesan lebih cepat terlupakan"
+    },
+    "db": {
+        "migrationerror": {
+            "description": "Jika Anda melihat ini, sesuatu telah berjalan sangat salah. Laporkan kesalahan ini di bawah, sertakan tangkapan layar dari log di atas.",
+            "title": "Migrasi Database Gagal!"
+        }
+    },
+    "dropdown": {
+        "filter": "Filter...",
+        "selectItem": "Pilih Item"
+    },
+    "formatting": {
+        "alert": {
+            "deleteConfig": {
+                "cancel": "Batal",
+                "confirm": "Hapus Instruct",
+                "description": "Apakah Anda yakin ingin menghapus '{{name}}'?",
+                "title": "Hapus Konfig"
+            },
+            "regenerateDefaults": {
+                "cancel": "Batal",
+                "confirm": "Hasilkan Ulang Prasetel Bawaan",
+                "description": "Apakah Anda yakin ingin menghasilkan ulang Instruct bawaan?",
+                "title": "Hasilkan Ulang Instruct Bawaan"
+            }
+        },
+        "autoformatter": {
+            "asteriskActionPlainSpeech": "Tindakan Asterisk, Ucapan Biasa",
+            "asteriskActionPlainSpeechExample": "*Beberapa tindakan* Beberapa ucapan",
+            "asteriskActionQuoteSpeech": "Tindakan Asterisk, Ucapan Kutipan",
+            "asteriskActionQuoteSpeechExample": "*Beberapa tindakan* \"Beberapa ucapan\"",
+            "disabled": "Nonaktif",
+            "disabledExample": "*<Tanpa Pemformatan>*",
+            "plainActionQuoteSpeech": "Tindakan Biasa, Ucapan Kutipan",
+            "plainActionQuoteSpeechExample": "Beberapa tindakan, \"Beberapa ucapan\""
+        },
+        "configExists": "Konfig sudah ada",
+        "createConfig": "Buat Konfig",
+        "defaultName": "Bawaan",
+        "deleteConfig": "Hapus Konfig",
+        "deleteConfigDescription": "Apakah Anda yakin ingin menghapus '{{name}}'?",
+        "deleteInstruct": "Hapus Instruct",
+        "exportConfig": "Ekspor Konfig",
+        "jsonExtension": ".json",
+        "newPreset": "Prasetel Instruct Baru",
+        "regenerateDefaultPresets": "Hasilkan Ulang Prasetel Bawaan",
+        "regenerateDefaults": "Hasilkan Ulang Instruct Bawaan",
+        "regenerateDefaultsDescription": "Apakah Anda yakin ingin menghasilkan ulang Instruct bawaan?",
+        "sections": {
+            "addTimestamp": "Tambahkan Stempel Waktu",
+            "includeNames": "Sertakan Nama",
+            "inputPrefix": "Awal Input",
+            "inputSuffix": "Akhir Input",
+            "lastOutputPrefix": "Awal Output Terakhir",
+            "outputPrefix": "Awal Output",
+            "outputSuffix": "Akhir Output",
+            "removeThinkTags": "Hapus Tag Think",
+            "sendAudio": "Kirim Audio",
+            "sendDocuments": "Kirim Dokumen",
+            "sendImages": "Kirim Gambar",
+            "stopSequence": "Urutan Berhenti",
+            "systemPrefix": "Awal Sistem",
+            "systemPrompt": "Prompt Sistem",
+            "systemPromptFormat": "Format Prompt Sistem",
+            "systemSuffix": "Akhir Sistem",
+            "useCommonStopSequences": "Gunakan Urutan Berhenti Umum",
+            "useExamples": "Gunakan Contoh",
+            "useLastImageOnly": "Gunakan Gambar Terakhir Saja",
+            "usePersonality": "Gunakan Kepribadian",
+            "useScenario": "Gunakan Skenario",
+            "wrapInNewline": "Bungkus dalam Baris Baru"
+        },
+        "selectConfig": "Pilih Konfig",
+        "title": "Pemformatan",
+        "toast": {
+            "cannotDeleteLastPreset": "Tidak dapat menghapus prasetel Instruct terakhir.",
+            "configCreated": "Konfig dibuat.",
+            "configNameExists": "Nama konfig sudah ada.",
+            "savedToDownloads": "Disimpan \"{{name}}\" ke Unduhan"
+        },
+        "errors": {
+            "instructDataError": "Terjadi kesalahan dengan data Instruct"
+        }
+    },
+    "horizontalSelector": {
+        "description": "Deskripsi opsional yang membantu untuk pemilih.",
+        "label": "Label Pemilih"
+    },
+    "instruct": {
+        "attachments": "Lampiran",
+        "filteredtext": {
+            "description": "Mengirim teks yang difilter untuk inferensi",
+            "label": "Kirim Teks yang Difilter"
+        },
+        "formatting": "Pemformatan Instruct",
+        "hiddentext": {
+            "description": "Menyembunyikan teks yang cocok dengan pola regex yang ditentukan di bawah. (tidak peka huruf besar/kecil)",
+            "title": "Teks Tersembunyi"
+        },
+        "localtemplate": {
+            "description": "Saat dalam Mode Lokal, ChatterUI secara otomatis menggunakan template instruct yang disediakan oleh model yang dimuat. Nonaktifkan ini jika Anda ingin pesan diformat menggunakan Instruct. Namun Prompt Sistem selalu digunakan.",
+            "label": "Gunakan Template Model Lokal Bawaan",
+            "title": "Template Lokal"
+        },
+        "macros": "Makro & Kartu Karakter",
+        "textformatter": {
+            "description": "Secara otomatis memformat pesan pertama ke gaya di bawah",
+            "title": "Pemformat Teks"
+        }
+    },
+    "logs": {
+        "alert": {
+            "delete": {
+                "description": "Apakah Anda yakin ingin menghapus semua log? Tindakan ini tidak dapat dibatalkan.",
+                "title": "Hapus Log"
+            }
+        },
+        "export": "Ekspor Log",
+        "flush": "Bersihkan Log",
+        "title": "Log",
+        "toast": {
+            "downloaderror": "Tidak Dapat Mengekspor Log",
+            "downloadok": "Log Berhasil Diunduh!"
+        }
+    },
+    "model": {
+        "alert": {
+            "deletekv": {
+                "description": "Apakah Anda yakin ingin menghapus KV Cache? Tindakan ini tidak dapat dibatalkan. \n\n Ini akan mengosongkan {{size}} ruang.",
+                "title": "Hapus KV Cache"
+            },
+            "deletemodel": {
+                "description": "Apakah Anda yakin ingin menghapus '{{name}}'?\n\nTindakan ini tidak dapat dibatalkan!",
+                "external": "\n\n(Ini tidak akan menghapus file model eksternal, hanya entri ini)",
+                "internal": "\n\nOperasi ini akan mengosongkan {{size}}",
+                "title": "Hapus Model"
+            }
+        },
+        "autoload": "Muat Model Secara Otomatis Saat Chat",
+        "backenddev": "Perangkat Backend",
+        "batch": "Batch",
+        "contextshift": "Pergeseran Konteks",
+        "copymodel": "Salin Model ke ChatterUI",
+        "empty": "Tidak Ditemukan Model. Coba Impor Beberapa!",
+        "externalmodel": "Gunakan Model Eksternal",
+        "gpulayers": "Lapisan GPU",
+        "info": {
+            "hint": "Petunjuk: Tekan <icon /> dan impor model GGUF!",
+            "loaded": "Model Dimuat"
+        },
+        "item": {
+            "contextlength": "Panjang Konteks",
+            "file": "File",
+            "invalid": "Model Tidak Valid",
+            "noparamsize": "Tidak Ada Ukuran Param",
+            "rename": "Ganti Nama Model"
+        },
+        "maxcontext": "Konteks Maks",
+        "modelnamechat": "Tampilkan Nama Model di Chat",
+        "mtmd": "Adaptor Multimodal",
+        "purgekv": "Bersihkan KV Cache ({{size}})",
+        "savekv": "Simpan KV Lokal",
+        "savekvdesc": "Menyimpan cache KV saat generasi, memungkinkan Anda melanjutkan sesi setelah menutup aplikasi. Harus menggunakan model yang sama agar ini berfungsi dengan baik. Menyimpan file cache KV mungkin sangat besar dan berdampak negatif pada masa pakai baterai!",
+        "selectmmproj": "Pilih Model MMPROJ",
+        "settings": {
+            "advanced": "Pengaturan Lanjutan",
+            "cpu": "Pengaturan CPU",
+            "title": "Pengaturan Model"
+        },
+        "threads": "Utas",
+        "title": "Model",
+        "toast": {
+            "deletekv": "KV Cache dihapus!",
+            "failedtolink": "Gagal menautkan model",
+            "failedtoload": "Gagal memuat model",
+            "modelAlreadyLoaded": "Model Sudah Dimuat!",
+            "quantizationNoLongerSupported": "Kuantisasi Tidak Lagi Didukung!",
+            "modelDoesNotExist": "Model Tidak Ada!",
+            "couldNotLoadModel": "Tidak Dapat Memuat Model",
+            "failedToLoadMMPROJ": "Gagal memuat MMPROJ",
+            "failedToUnloadMMPROJ": "Gagal membongkar MMPROJ",
+            "noModelLoaded": "Tidak Ada Model yang Dimuat",
+            "mediaAddedWithoutMMPROJModel": "Media ditambahkan tanpa model MMPROJ",
+            "modelImportedSuccessfully": "Model Berhasil Diimpor!",
+            "mediaAddedWithoutMultimodalSupport": "Media ditambahkan tanpa dukungan multimodal.",
+            "noAutoLoadModelSet": "Tidak Ada Model Muat Otomatis yang Diatur",
+            "autoLoadingModel": "Memuat Model Otomatis: {{name}}",
+            "autoLoadingMMPROJ": "Memuat MMPROJ Otomatis: {{name}}",
+            "failedToRunLocalInference": "Gagal menjalankan inferensi lokal",
+            "failedToGenerateLocally": "Gagal menghasilkan secara lokal",
+            "modelMissingEntryDeleted": "Model hilang, entrinya akan dihapus: {{name}}"
+        }
+    },
+    "multiDropdown": {
+        "counter": "{{count}} item dipilih",
+        "noItemsSelected": "Tidak ada item yang dipilih"
+    },
+    "navigation": {
+        "about": "Tentang",
+        "api": "API",
+        "dev_colortest": "[DEV] TesWarna",
+        "dev_components": "[DEV] Komponen",
+        "dev_markdown": "[DEV] Markdown",
+        "formatting": "Pemformatan",
+        "logs": "Log",
+        "models": "Model",
+        "sampler": "Sampler",
+        "settings": "Pengaturan",
+        "tts": "TTS"
+    },
+    "sampler": {
+        "alert": {
+            "delete": {
+                "description": "Apakah Anda yakin ingin menghapus '{{name}}'?",
+                "title": "Hapus Sampler"
+            }
+        },
+        "create": "Buat Sampler",
+        "delete": "Hapus Sampler",
+        "empty": "Tidak Ada Sampler yang Dikonfigurasi",
+        "export": "Ekspor Sampler",
+        "invalid": "Bidang Sampler Tidak Valid!",
+        "new": "Prasetel Sampler Baru",
+        "noSamplers": "Anda mungkin belum menambahkan koneksi API",
+        "notSupported": "ID Sampler [{{id}}] Tidak Didukung",
+        "title": "Sampler",
+        "toast": {
+            "emptyname": "Nama sampler tidak boleh kosong",
+            "exists": "Konfig Sampler \"{{name}}\" sudah ada!",
+            "exportok": "Konfigurasi Sampler Berhasil Diekspor!",
+            "lastconfig": "Tidak Dapat Menghapus Konfigurasi Terakhir",
+            "failedToImport": "Gagal mengimpor"
+        }
+    },
+    "settings": {
+        "character": {
+            "alert": {
+                "regenerateDefaultCard": {
+                    "confirm": "Buat Kartu Bawaan",
+                    "description": "Ini akan menambahkan kartu Bot AI bawaan ke daftar karakter Anda.",
+                    "title": "Hasilkan Ulang Kartu Bawaan"
+                }
+            },
+            "regenerateDefaultCard": "Hasilkan Ulang Kartu Bawaan",
+            "title": "Manajemen Karakter",
+            "errors": {
+                "failedToCreateDefaultCharacter": "Gagal membuat karakter bawaan"
+            }
+        },
+        "chat": {
+            "askInChatterUI": "Tanya di ChatterUI",
+            "askInChatterUIDescription": "Gunakan prompt ChatterUI untuk maksud teks, bukan perilaku keyboard bawaan.",
+            "autoGenerateTitles": "Hasilkan judul chat otomatis",
+            "autoGenerateTitlesDescription": "Buat judul untuk chat baru secara otomatis.",
+            "autoLoadUser": "Muat pengguna yang dipilih secara otomatis",
+            "autoLoadUserDescription": "Muat profil pengguna saat ini secara otomatis ke chat baru.",
+            "loadChatOnStartup": "Muat chat saat startup",
+            "loadChatOnStartupDescription": "Buka kembali chat terakhir secara otomatis saat aplikasi diluncurkan.",
+            "styleButton": "Gaya Chat",
+            "title": "Chat",
+            "useFirstMessage": "Buat pesan pertama",
+            "useFirstMessageDescription": "Tambahkan pesan awal saat membuat chat baru."
+        },
+        "chatstyle": {
+            "fontSize": "Ukuran Font",
+            "fontWeight": "Ketebalan Font",
+            "title": "Gaya Chat"
+        },
+        "chatwindow": {
+            "alternatePositions": "Posisi chat bergantian",
+            "alternatePositionsDescription": "Selaraskan pesan masuk dan keluar secara bergantian.",
+            "autoScroll": "Gulir otomatis",
+            "autoScrollDescription": "Gulir ke pesan terbaru secara otomatis.",
+            "quickDelete": "Hapus cepat",
+            "quickDeleteDescription": "Izinkan menghapus teks dengan gerakan gesek cepat.",
+            "saveScrollPosition": "Simpan posisi gulir",
+            "saveScrollPositionDescription": "Pulihkan posisi chat terakhir saat membuka kembali percakapan.",
+            "sendOnEnter": "Kirim dengan Enter",
+            "sendOnEnterDescription": "Kirim pesan Anda saat menekan Enter.",
+            "showTokensPerSecond": "Tampilkan token per detik",
+            "showTokensPerSecondDescription": "Tampilkan throughput token selama pembuatan.",
+            "title": "Jendela Chat",
+            "wideChat": "Mode chat lebar",
+            "wideChatDescription": "Gunakan tata letak yang lebih lebar untuk jendela chat."
+        },
+        "colors": {
+            "active": "Aktif",
+            "alert": {
+                "deleteTheme": {
+                    "confirm": "Hapus Tema",
+                    "description": "Apakah Anda yakin ingin menghapus '{{name}}'? Tindakan ini tidak dapat dibatalkan!",
+                    "title": "Hapus Tema"
+                }
+            },
+            "builtIn": "Bawaan",
+            "contextMenu": {
+                "getThemes": "Dapatkan Tema",
+                "importTheme": "Impor Tema",
+                "pasteTheme": "Tempel Tema"
+            },
+            "custom": "Kustom",
+            "error": {
+                "failedToImport": "Gagal mengimpor: {{error}}",
+                "colorNameAlreadyUsed": "Nama Warna Sudah Digunakan"
+            },
+            "pasteThemeTitle": "Tempel Tema Di Sini",
+            "title": "Tema",
+            "useSystemDarkMode": "Gunakan Mode Gelap Sistem"
+        },
+        "database": {
+            "alert": {
+                "export": {
+                    "confirm": "Ekspor Database",
+                    "description": "Apakah Anda yakin ingin mengekspor file database?\n\nIni akan otomatis diunduh ke Unduhan",
+                    "title": "Ekspor Database"
+                },
+                "import": {
+                    "confirm": "Impor",
+                    "description": "Apakah Anda yakin ingin mengimpor database ini? Ini dapat menghancurkan database saat ini!\n\nCadangan akan otomatis diunduh.\n\nAplikasi akan restart secara otomatis",
+                    "title": "Impor Database"
+                },
+                "rerunMigrations": {
+                    "confirm": "Jalankan Ulang Migrasi",
+                    "description": "Menjalankan ulang migrasi dapat menghancurkan database Anda. Pastikan untuk mengekspor cadangan.",
+                    "title": "Jalankan Ulang Migrasi"
+                },
+                "versionMismatch": {
+                    "confirm": "Tetap Impor",
+                    "description": "File database yang diimpor memiliki versi aplikasi yang berbeda ({{importedVersion}}) dari versi yang terinstal ({{currentVersion}}). Mengimpor database ini dapat merusak atau mengkorupsi database. Disarankan untuk menggunakan versi aplikasi yang sama.",
+                    "title": "Versi Berbeda"
+                }
+            },
+            "exportButton": "Ekspor Database",
+            "importButton": "Impor Database",
+            "rerunMigrationsButton": "Jalankan Ulang Migrasi",
+            "title": "Manajemen Database",
+            "toast": {
+                "downloadFailed": "Gagal menyalin database: {{error}}",
+                "downloadOk": "Unduhan Berhasil!"
+            },
+            "warningText": "PERINGATAN: pastikan database yang diimpor dari versi aplikasi yang sama!"
+        },
+        "generating": {
+            "bypassContextLength": "Lewati Panjang Konteks",
+            "bypassContextLengthDescription": "Mengabaikan batas panjang konteks saat membangun prompt",
+            "printContext": "Cetak Konteks",
+            "printContextDescription": "Mencetak konteks pembuatan ke log untuk debugging",
+            "title": "Pembuatan"
+        },
+        "notification": {
+            "enableNotifications": "Aktifkan Notifikasi",
+            "enableNotificationsDescription": "Mengirim notifikasi saat aplikasi di latar belakang",
+            "playSound": "Suara Notifikasi",
+            "showText": "Tampilkan Teks di Notifikasi",
+            "showTextDescription": "Menampilkan pesan yang dihasilkan di notifikasi",
+            "title": "Notifikasi",
+            "vibrate": "Getaran Notifikasi"
+        },
+        "screen": {
+            "keepAwake": "Tetap Aktif",
+            "keepAwakeDescription": "Menjaga aplikasi tetap aktif di latar depan",
+            "title": "Layar",
+            "unlockOrientation": "Buka Kunci Orientasi",
+            "unlockOrientationDescription": "Mengizinkan lanskap di ponsel (Memerlukan restart aplikasi)"
+        },
+        "security": {
+            "lockApp": "Kunci Aplikasi",
+            "lockAppDescription": "Memerlukan autentikasi pengguna untuk membuka aplikasi. Ini tidak akan berfungsi jika Anda tidak memiliki kunci perangkat yang diaktifkan.",
+            "title": "Keamanan"
+        },
+        "style": {
+            "alert": {
+                "deleteBackground": {
+                    "confirm": "Hapus Latar Belakang",
+                    "description": "Apakah Anda yakin ingin menghapus latar belakang ini? Tindakan ini tidak dapat dibatalkan!",
+                    "title": "Hapus Latar Belakang"
+                }
+            },
+            "changeTheme": "Ganti Tema",
+            "deleteBackground": "Hapus Latar Belakang Chat",
+            "importBackground": "Impor Latar Belakang Chat",
+            "replaceBackground": "Ganti Latar Belakang Chat",
+            "title": "Gaya",
+            "messages": {
+                "backgroundDeleted": "Latar Belakang Dihapus!"
+            }
+        },
+        "tagHider": {
+            "description": "Sembunyikan karakter dengan tag berikut dari daftar karakter.",
+            "label": "Tag Tersembunyi"
+        },
+        "title": "Pengaturan",
+        "language": {
+            "title": "Atur Bahasa"
+        }
+    },
+    "stringArrayEditor": {
+        "add": "Tambah",
+        "duplicateValueError": "Nilai sudah ada",
+        "emptyValueError": "Nilai tidak boleh kosong",
+        "placeholder": "Masukkan nilai..."
+    },
+    "tts": {
+        "autoafter": "TTS Otomatis Setelah Inferensi",
+        "language": "Bahasa",
+        "live": "TTS Otomatis Selama Inferensi",
+        "nospeaker": "Tidak Ada Pembicara yang Dipilih",
+        "selectlang": "Pilih Bahasa",
+        "selectvoice": "Pilih Suara",
+        "speed": "Kecepatan",
+        "test": "Ini adalah audio uji",
+        "voices": "Suara"
+    },
+    "users": {
+        "create": "Buat Pengguna Baru",
+        "edit": {
+            "card": {
+                "clone": "Kloning Pengguna",
+                "clonedesc": "Apakah Anda yakin ingin mengkloning '{{name}}'?",
+                "delete": "Hapus Pengguna",
+                "deletedesc": "Apakah Anda yakin ingin menghapus '{{name}}'?\nTindakan ini tidak dapat dibatalkan."
+            },
+            "image": {
+                "change": "Ubah Gambar",
+                "delete": "Hapus Gambar",
+                "deletedesc": "Apakah Anda yakin ingin menghapus gambar ini?\nTindakan ini tidak dapat dibatalkan.",
+                "view": "Lihat Gambar"
+            },
+            "title": "Edit Pengguna"
+        },
+        "hint": "Petunjuk: Gesek ke Kiri atau tekan <icon/> untuk membuka laci Pengguna",
+        "nameplaceholder": "Nama kosong tidak disarankan",
+        "profilecount": "Profil Pengguna",
+        "messages": {
+            "loadingUser": "Memuat Pengguna: {{name}}"
+        }
+    },
+    "generation": {
+        "errors": {
+            "promptConstructionFailed": "Pembangunan prompt gagal",
+            "payloadConstructionFailed": "Pembangunan payload gagal",
+            "completionFailed": "Penyelesaian gagal.",
+            "sseFailed": "Kesalahan Selama event SSE",
+            "generationFailed": "Pembuatan Gagal",
+            "generationAlreadyInProgress": "Pembuatan sudah berlangsung",
+            "noUser": "Tidak ada pengguna yang dimuat",
+            "noCharacter": "Tidak ada karakter yang dimuat",
+            "noActiveChat": "Tidak ada chat aktif",
+            "noChatFound": "Tidak ada chat ditemukan",
+            "noActiveAPI": "Tidak Ada API Aktif",
+            "configurationNotFound": "Konfigurasi \"{{name}}\" tidak ditemukan",
+            "failedToOrchestrateRequestBuild": "Gagal mengorkestrasi pembangunan permintaan",
+            "failedToBuildPrompt": "Gagal membangun prompt",
+            "failedToBuildPayload": "Gagal membangun payload"
+        },
+        "warn": {
+            "noMessagesAddedCheckLogs": "Tidak ada pesan yang ditambahkan. Periksa Log.",
+            "entryWithoutValidSwipeFound": "Entri tanpa gesekan valid ditemukan"
+        }
+    }
+}

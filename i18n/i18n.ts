@@ -10,6 +10,7 @@ import { createMMKVStorage } from '@lib/storage/MMKV'
 import en from './locales/en.json'
 import ru from './locales/ru.json'
 import zh from './locales/zh.json'
+import id from './locales/id.json'
 
 // import { I18nManager } from 'react-native' may be needed by rtl
 
@@ -36,6 +37,11 @@ export const supportedLanguages: Language[] = [
         id: 'ru',
         translation: ru,
         label: 'Русский',
+    },
+    {
+        id: 'id',
+        translation: id,
+        label: 'Bahasa Indonesia',
     },
 ]
 
