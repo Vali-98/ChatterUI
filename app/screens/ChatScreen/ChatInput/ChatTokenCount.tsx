@@ -4,6 +4,7 @@ import { Bar } from 'react-native-progress'
 
 import { SamplerID } from '@lib/constants/SamplerData'
 import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
+import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -11,14 +12,21 @@ import { Theme } from '@lib/theme/ThemeManager'
 const ChatTokenCount: React.FC = () => {
     const { t } = useTranslation()
     const { id: chatId } = Chats.useChatState()
+    const cardTokenCount = Characters.useCharacterStore(
+        (state) => state.tokenCache?.description_length ?? 0
+    )
     const { data } = useLiveQueryJoined(Chats.db.live.tokenCount(chatId ?? -1))
     const { color, fontSize } = Theme.useTheme()
     const sampler = SamplersManager.useCurrentSampler()
-    const tokenCount = parseFloat(data?.[0]?.totalTokens ?? '0')
-    const maxLength = sampler?.data?.[SamplerID.CONTEXT_LENGTH] ?? 1
+
+    const tokenCount = parseFloat(data?.[0]?.totalTokens ?? '0') + cardTokenCount
+
+    const maxLength = sampler?.data?.[SamplerID.CONTEXT_LENGTH] ?? 1024
+
     const progress = Math.min(1, Math.max(0, tokenCount / maxLength))
     const leftover = maxLength - tokenCount
     const warning = leftover < Math.min(2048, 0.25 * maxLength)
+
     const genLengthColor = warning ? color.error._300 : color.primary._500
     return (
         <View style={{ paddingHorizontal: 8, paddingTop: 4, paddingBottom: 8 }}>
