@@ -92,7 +92,7 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
         mode,
         dataSources,
     } = params
-    console.log(dataSources)
+
     const delta = performance.now()
 
     const { characterCache, userCache, instructCache } = cache
@@ -276,7 +276,6 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
                 budget,
                 lastMessageReached
             )
-            console.log(results)
             for (const result of results) {
                 pendingInsertions.push(result)
                 totalLength += result.tokenLength
