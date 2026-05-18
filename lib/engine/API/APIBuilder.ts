@@ -20,41 +20,12 @@ export interface APIBuilderParams
     stopGenerating: () => void
 }
 
-export const buildAndSendRequest = async ({
-    apiConfig,
-    apiValues,
-    onData,
-    onEnd,
-    instruct,
-    samplers,
-    character,
-    user,
-    messages,
-    stopSequence,
-    stopGenerating,
-    chatTokenizer,
-    tokenizer,
-    messageLoader,
-    maxLength,
-    cache,
-}: APIBuilderParams) => {
+export const buildAndSendRequest = async (params: APIBuilderParams) => {
+    const { stopGenerating, apiConfig, apiValues, stopSequence, onData, onEnd } = params
     try {
         let payload: any = undefined
         const bypassContextLength = mmkv.getBoolean(AppSettings.BypassContextLength)
-        const prompt = await buildContext({
-            apiConfig,
-            apiValues,
-            instruct,
-            character,
-            user,
-            messages,
-            chatTokenizer,
-            tokenizer,
-            messageLoader,
-            maxLength,
-            cache,
-            bypassContextLength,
-        })
+        const prompt = await buildContext({ ...params, bypassContextLength })
         if (prompt === undefined) {
             Logger.errorToast(t('generation.errors.promptConstructionFailed'))
             stopGenerating()
@@ -62,12 +33,8 @@ export const buildAndSendRequest = async ({
         }
 
         payload = await buildRequest({
-            apiConfig,
-            apiValues,
-            samplers,
-            instruct,
+            ...params,
             prompt,
-            stopSequence,
         })
 
         if (!payload) {

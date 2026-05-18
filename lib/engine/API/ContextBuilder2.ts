@@ -12,10 +12,11 @@ import { readBase64Async } from '@lib/utils/File'
 import { Macro } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
+import type { DataSource, DataSourceResult } from '../DataSources'
 
 export type MessageLoader = {
     retrieve: (page: number) => Promise<ChatEntry[]> // must retrieve messages in chronological order from oldest to newest
-    pageSize: number // we use this to determine if a last page has been reached, if the
+    pageSize: number // we use this to determine if a last page has been reached, if (await retrieve()).length < pageSize
     initialPage: number // usually 0
 }
 
@@ -43,6 +44,7 @@ export interface ContextBuilderParams {
     cache: TokenCache
     bypassContextLength?: boolean
     messageLoader?: MessageLoader
+    dataSources?: DataSource[]
 }
 
 type TextData = { type: 'input_text' | 'text'; text: string }
@@ -62,7 +64,7 @@ export const buildContext = async (params: ContextBuilderParams) => {
     return output
 }
 
-type ContextMessage = {
+export type ContextMessage = {
     role: 'user' | 'assistant'
     content: string
     attachments?: ContentTypes[]
@@ -88,14 +90,17 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
         bypassContextLength,
         messageLoader,
         mode,
+        dataSources,
     } = params
-
+    console.log(dataSources)
     const delta = performance.now()
 
     const { characterCache, userCache, instructCache } = cache
 
     const usePrefix = mode === 'text'
     const useSuffix = false
+
+    const sortedDataSources = [...(dataSources ?? [])].sort((a, b) => a.priority - b.priority)
 
     let { systemPrompt, systemPromptLength } = getSystemPrompt({
         instruct,
@@ -108,7 +113,10 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
         useSuffix,
     })
 
-    let totalLength = systemPromptLength
+    const reservedBudget = sortedDataSources.reduce((acc, curr) => acc + curr.tokenBudget, 0)
+
+    let totalLength = systemPromptLength + reservedBudget
+
     let hasImage = false
     let completionState: CompletionState = 'initial_completed'
 
@@ -244,18 +252,83 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
         }
     }
 
-    const examples = character?.mes_example
+    const lastMessageReached =
+        completionState === 'loader_completed' || completionState === 'initial_completed'
 
-    const addExamples =
-        completionState === 'loader_completed' ||
-        (completionState === 'initial_completed' &&
-            instruct.examples &&
-            examples &&
-            totalLength + characterCache.examples_length < maxLength)
+    const pendingInsertions: DataSourceResult[] = []
 
-    if (addExamples) {
-        systemPrompt += '\n' + examples
-        totalLength += characterCache.examples_length
+    const runDataSources = async (sources: DataSource[]) => {
+        for (const source of sources) {
+            const remaining = maxLength - totalLength
+            const opportunistic = source.tokenBudget === 0
+            if (remaining <= 0 && opportunistic) {
+                Logger.info(`[DataSource:${source.name}] skipped (no remaining budget)`)
+                continue
+            }
+
+            const budget = opportunistic ? remaining : source.tokenBudget
+
+            const results = await source.retrieve(
+                params,
+                contextMessages,
+                maxLength,
+                totalLength,
+                budget,
+                lastMessageReached
+            )
+            console.log(results)
+            for (const result of results) {
+                pendingInsertions.push(result)
+                totalLength += result.tokenLength
+
+                Logger.info(
+                    `[DataSource:${source.name}] inserted ${result.tokenLength} tokens from ${result.source}`
+                )
+            }
+        }
+    }
+
+    await runDataSources(sortedDataSources)
+
+    const insertMessage = (index: number, message: ContextMessage) => {
+        contextMessages.splice(index, 0, message)
+    }
+
+    for (const insertion of pendingInsertions) {
+        const syntheticMessage: ContextMessage = {
+            role: 'user',
+            content: insertion.content,
+        }
+
+        if (insertion.position.type === 'relative') {
+            switch (insertion.position.location) {
+                case 'afterLast':
+                    contextMessages.push(syntheticMessage)
+                    break
+
+                case 'beforeLast':
+                    contextMessages.splice(
+                        Math.max(contextMessages.length - 1, 0),
+                        0,
+                        syntheticMessage
+                    )
+                    break
+
+                case 'afterSystem':
+                    systemPrompt += '\n' + insertion.content
+                    break
+            }
+
+            continue
+        }
+
+        const index = insertion.position.location
+
+        if (index >= contextMessages.length) {
+            contextMessages.unshift(syntheticMessage)
+        } else {
+            insertMessage(index, syntheticMessage)
+        }
     }
 
     Logger.info(`Approximate Context Size: ${totalLength}`)

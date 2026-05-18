@@ -15,6 +15,7 @@ import { Logger } from '../state/Logger'
 import { APIBuilderParams, buildAndSendRequest } from './API/APIBuilder'
 import { APIConfiguration, APIValues } from './API/APIBuilder.types'
 import { APIManager } from './API/APIManagerState'
+import { getDataSources } from './DataSources'
 import { localInference } from './LocalInference'
 import { Tokenizer } from './Tokenizer'
 
@@ -211,7 +212,7 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
             return
         }
 
-        const chatId = await Chats.useChatState.getState().id
+        const chatId = Chats.useChatState.getState().id
         if (!chatId) {
             Logger.errorToast(t('generation.errors.noActiveChat'))
             return
@@ -253,6 +254,9 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
             Logger.warn('Stop sequence length exceeds defined stopSequenceLimit')
         }
         const tokenizer = Tokenizer.getTokenizer()
+
+        const dataSources = await getDataSources()
+
         return {
             apiConfig: Object.assign({}, apiConfig),
             apiValues: Object.assign({}, apiValues),
@@ -271,9 +275,7 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
                 const [activeSwipe] = entry.swipes.filter((item) => item.active)
                 if (!activeSwipe) return 0
                 const tokenCount = activeSwipe.token_count ?? 0
-                console.log(tokenCount, activeSwipe.swipe.length)
                 if (tokenCount === 0 && activeSwipe.swipe.length > 0) {
-                    console.log('recalc')
                     // assume that token length hasnt been calculated
                     const tokenCount = await tokenizer(
                         activeSwipe.swipe,
@@ -290,6 +292,7 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
                 characterCache: await userState.getCache(userCard.name),
                 instructCache: await instructState.getCache(characterCard.name, userCard.name),
             },
+            dataSources: dataSources,
         }
     } catch (e) {
         Logger.stackTrace(e)
