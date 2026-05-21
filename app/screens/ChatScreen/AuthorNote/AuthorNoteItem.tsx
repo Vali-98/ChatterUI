@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
+import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
@@ -12,6 +13,7 @@ type AuthorNoteItemProps = {
 }
 
 const AuthorNoteItem: React.FC<AuthorNoteItemProps> = ({ id }) => {
+    const { t } = useTranslation()
     const { color, spacing, fontSize, borderRadius } = Theme.useTheme()
     const { data: note } = useLiveQuery(AuthorNotes.db.live.note(id), [id])
 
@@ -55,7 +57,7 @@ const AuthorNoteItem: React.FC<AuthorNoteItemProps> = ({ id }) => {
                         {note.name}
                     </Text>
                     <Text style={{ color: color.text._700 }}>
-                        {note.content.replaceAll('\n', ' ') || 'No Content'}
+                        {note.content.replaceAll('\n', ' ') || t('authorNotes.item.noContent')}
                     </Text>
                 </View>
                 <ThemedButton

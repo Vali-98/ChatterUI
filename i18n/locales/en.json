@@ -863,6 +863,9 @@
         "errors": {
             "create": "Failed to create note"
         },
-        "empty": "No Notes"
+        "empty": "No Notes",
+        "item": {
+            "noContent": "No Content"
+        }
     }
 }
