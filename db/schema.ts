@@ -1,5 +1,5 @@
-import { relations } from 'drizzle-orm'
-import { index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { relations, sql } from 'drizzle-orm'
+import { check, index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 // TAVERN V2 SPEC
 
@@ -354,7 +354,50 @@ export const modelDataRelations = relations(model_data, ({ one }) => ({
     }),
 }))
 
-// Types
+export const authorNotes = sqliteTable(
+    'author_notes',
+    {
+        id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+        name: text('name').notNull().default('New Note'),
+        content: text('content').notNull().default(''),
+        note: text('note').notNull().default(''),
+        priority: integer('priority', { mode: 'number' }).default(0),
+        depth: integer('depth', { mode: 'number' }).default(0),
+        active: integer('active', { mode: 'boolean' }).notNull().default(true),
+        token_length: integer('token_length', { mode: 'number' }),
+        // linking features
+        chat_id: integer('chat_id', { mode: 'number' }).references(() => chats.id, {
+            onDelete: 'cascade',
+        }),
+        character_id: integer('character_id', { mode: 'number' }).references(() => characters.id, {
+            onDelete: 'cascade',
+        }),
+    },
+    (table) => [
+        check(
+            'notes_ownership_check',
+            sql`${table.chat_id} IS NULL OR ${table.character_id} IS NULL`
+        ),
+        /**Index Justification
+         *  Users will likely have very few `active` notes allowing indexes on `active` to be efficient
+         *  However to avoid coupling logic between notes and chat/character, we want to rely on a foreign key
+         *  to trigger the delete on this note. Because of this, we do this funky indexing.
+         */
+        // for chat and characters, leftside index optimizations can be used for both UI and inference query
+        index('author_notes_chat_active_idx').on(table.chat_id, table.active),
+        index('author_notes_character_active_idx').on(table.character_id, table.active),
+        // we split global into two indexes, one retains dual null tables without active for UI query
+        index('author_notes_global_idx')
+            .on(table.id)
+            .where(sql`${table.chat_id} IS NULL AND ${table.character_id} IS NULL`),
+        // while we keep on active + dual null for actual inference
+        index('author_notes_global_active_idx')
+            .on(table.active)
+            .where(
+                sql`${table.chat_id} IS NULL AND ${table.character_id} IS NULL AND ${table.active} = 1`
+            ),
+    ]
+)
 
 export type ModelDataType = typeof model_data.$inferSelect
 export type ChatSwipe = typeof chatSwipes.$inferSelect

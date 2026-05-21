@@ -22,9 +22,18 @@ import ChatDrawerSearchItem from './ChatDrawerSearchItem'
 const ChatsDrawer = () => {
     const styles = useStyles()
     const { t } = useTranslation()
-    const { charId } = Characters.useCharacterStore(useShallow((state) => ({ charId: state.id })))
-    const { data } = useLiveQueryJoined(Chats.db.query.chatListQuery(charId ?? 0), [charId])
-    const setShow = Drawer.useDrawerStore((state) => state.setShow)
+    const { show, setShow } = Drawer.useDrawerStore(
+        useShallow((state) => ({
+            show: state.values[Drawer.ID.CHATLIST],
+            setShow: state.setShow,
+        }))
+    )
+    const { charId } = Characters.useCharacterStore(
+        useShallow((state) => ({ charId: state.id ?? -1 }))
+    )
+    const targetChar = show ? charId : -1
+    const { data } = useLiveQueryJoined(Chats.db.query.chatListQuery(targetChar), [targetChar])
+
     const setShowDrawer = (b: boolean) => {
         setShow(Drawer.ID.CHATLIST, b)
     }

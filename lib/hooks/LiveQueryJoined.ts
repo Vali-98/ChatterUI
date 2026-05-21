@@ -8,7 +8,9 @@ import {
 } from 'drizzle-orm/sqlite-core'
 import { SQLiteRelationalQuery } from 'drizzle-orm/sqlite-core/query-builders/query'
 import { addDatabaseChangeListener } from 'expo-sqlite'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+
+import { TableNames } from '@db'
 
 const getJoinedTableNames = (query: any) => {
     if (query.config.with) {
@@ -22,13 +24,33 @@ const getJoinedTableNames = (query: any) => {
     }
 }
 
+const isDeepEqual = (a: any, b: any): boolean => {
+    if (a === b) return true
+    if (typeof a !== 'object' || Object.is(a, null) || typeof b !== 'object' || Object.is(b, null))
+        return false
+
+    const keysA = Object.keys(a)
+    const keysB = Object.keys(b)
+    if (keysA.length !== keysB.length) return false
+
+    for (const key of keysA) {
+        if (!keysB.includes(key) || !isDeepEqual(a[key], b[key])) return false
+    }
+    return true
+}
+
 export const useLiveQueryJoined = <
     T extends Pick<AnySQLiteSelect, '_' | 'then'> | SQLiteRelationalQuery<'sync', unknown>,
 >(
     query: T,
-    deps: unknown[] = []
+    deps: unknown[] = [],
+    options: {
+        targets?: { tableName: TableNames; rowId: number }[]
+        ignore?: TableNames[]
+        deepCheck?: boolean
+    } = {}
 ) => {
-    const [data, setData] = useState<Awaited<T>>(
+    const data = useRef<Awaited<T>>(
         //@ts-expect-error
         (is(query, SQLiteRelationalQuery) && query.mode === 'first' ? undefined : []) as Awaited<T>
     )
@@ -51,19 +73,33 @@ export const useLiveQueryJoined = <
 
         let listener: ReturnType<typeof addDatabaseChangeListener> | undefined
 
-        const handleData = (data: any) => {
-            setData(data)
+        const handleData = (newData: any) => {
+            if (options?.deepCheck && isDeepEqual(data.current, newData)) {
+                return
+            }
+            data.current = newData
             setUpdatedAt(new Date())
         }
-
         query.then(handleData).catch(setError)
 
         if (is(entity, SQLiteTable) || is(entity, SQLiteView)) {
             const config = is(entity, SQLiteTable) ? getTableConfig(entity) : getViewConfig(entity)
             const relationTableNames = getJoinedTableNames(query)
             const listeningTables = [config.name, ...relationTableNames]
-            listener = addDatabaseChangeListener(({ tableName }) => {
-                if (listeningTables.includes(tableName)) {
+            const targets = options?.targets
+            const ignore = options?.ignore
+            listener = addDatabaseChangeListener(({ tableName, rowId }) => {
+                const isListening = listeningTables.includes(tableName)
+                const isTargetMatch =
+                    targets &&
+                    targets.some(
+                        (target) => tableName === target.tableName && target.rowId === rowId
+                    )
+
+                if (
+                    !ignore?.includes(tableName as TableNames) &&
+                    (isTargetMatch || (!targets && isListening))
+                ) {
                     query.then(handleData).catch(setError)
                 }
             })
@@ -77,8 +113,8 @@ export const useLiveQueryJoined = <
     }, deps)
 
     return {
-        data,
-        error,
-        updatedAt,
+        data: data.current,
+        error: error,
+        updatedAt: updatedAt,
     } as const
 }

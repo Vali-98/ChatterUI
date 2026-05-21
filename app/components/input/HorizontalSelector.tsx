@@ -83,7 +83,6 @@ const HorizontalSelector = <T,>({
                     backgroundColor: color.neutral._100,
                     borderWidth: 2,
                     borderRadius: 8,
-                    marginTop: 8,
                 }}>
                 <Animated.View
                     style={[

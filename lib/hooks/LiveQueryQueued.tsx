@@ -8,7 +8,9 @@ import {
 } from 'drizzle-orm/sqlite-core'
 import { SQLiteRelationalQuery } from 'drizzle-orm/sqlite-core/query-builders/query'
 import { addDatabaseChangeListener } from 'expo-sqlite'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+
+import { TableNames } from '@db'
 
 type Task<T> = () => Promise<T>
 
@@ -52,6 +54,21 @@ const getJoinedTableNames = (query: any) => {
     }
 }
 
+const isDeepEqual = (a: any, b: any): boolean => {
+    if (a === b) return true
+    if (typeof a !== 'object' || Object.is(a, null) || typeof b !== 'object' || Object.is(b, null))
+        return false
+
+    const keysA = Object.keys(a)
+    const keysB = Object.keys(b)
+    if (keysA.length !== keysB.length) return false
+
+    for (const key of keysA) {
+        if (!keysB.includes(key) || !isDeepEqual(a[key], b[key])) return false
+    }
+    return true
+}
+
 export const useQueuedLiveQuery = <
     T extends Pick<AnySQLiteSelect, '_' | 'then'> | SQLiteRelationalQuery<'sync', any>,
 >(
@@ -59,9 +76,11 @@ export const useQueuedLiveQuery = <
     deps: unknown[] = [],
     options?: {
         enabled?: boolean
+        targets?: { tableName: TableNames; rowId: number | number[] }[]
+        deepCheck?: boolean
     }
 ) => {
-    const [data, setData] = useState<Awaited<T>>(
+    const data = useRef<Awaited<T>>(
         //@ts-expect-error
         (is(query, SQLiteRelationalQuery) && query.mode === 'first' ? undefined : []) as Awaited<T>
     )
@@ -93,8 +112,10 @@ export const useQueuedLiveQuery = <
                 const result = (await dbQueryQueue.add(() => query as any)) as any
 
                 if (cancelled) return
-
-                setData(result)
+                if (options?.deepCheck && isDeepEqual(data.current, result)) {
+                    return
+                }
+                data.current = result
                 setUpdatedAt(new Date())
             } catch (err) {
                 if (!cancelled) {
@@ -111,9 +132,18 @@ export const useQueuedLiveQuery = <
             const relationTableNames = getJoinedTableNames(query)
 
             const listeningTables = [config.name, ...relationTableNames]
+            const targets = options?.targets
+            listener = addDatabaseChangeListener(({ tableName, rowId }) => {
+                const isListening = listeningTables.includes(tableName)
+                const isTargetMatch =
+                    targets &&
+                    targets.some(
+                        (t) =>
+                            t.tableName === tableName &&
+                            (Array.isArray(t.rowId) ? t.rowId.includes(rowId) : t.rowId === rowId)
+                    )
 
-            listener = addDatabaseChangeListener(({ tableName }) => {
-                if (listeningTables.includes(tableName)) {
+                if (isTargetMatch || (!targets && isListening)) {
                     runQuery()
                 }
             })
@@ -123,11 +153,12 @@ export const useQueuedLiveQuery = <
             cancelled = true
             listener?.remove()
         }
-    }, [options?.enabled, query, deps])
+    }, [options?.enabled, query, deps, options])
 
     return {
-        data,
-        error,
-        updatedAt,
+        // eslint-disable-next-line react-compiler/react-compiler
+        data: data.current,
+        error: error,
+        updatedAt: updatedAt,
     } as const
 }

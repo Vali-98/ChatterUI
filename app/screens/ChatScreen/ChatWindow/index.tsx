@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { ImageBackground } from 'expo-image'
 import { useEffect, useRef, useState } from 'react'
 import { FlatList, Pressable } from 'react-native'
@@ -11,6 +10,7 @@ import Drawer from '@components/views/Drawer'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useDebounce } from '@lib/hooks/Debounce'
+import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
 import { useAppMode } from '@lib/state/AppMode'
 import { useBackgroundStore } from '@lib/state/BackgroundImage'
 import { Characters } from '@lib/state/Characters'
@@ -39,11 +39,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
     const [showJump, setShowJump] = useState(false)
     const chatInputHeight = useInputHeightStore(useShallow((state) => state.height))
     const [autoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
-    const { data: { background_image: backgroundImage } = {} } = useLiveQuery(
-        Characters.db.query.backgroundImageQuery(charId ?? -1)
+    const { data: { background_image: backgroundImage } = {} } = useLiveQueryJoined(
+        Characters.db.query.backgroundImageQuery(charId ?? -1),
+        [charId],
+        { deepCheck: true }
     )
 
-    const { data: entryIdList, updatedAt } = useLiveQuery(Chats.db.live.entryIdList(chatId), [
+    const { data: entryIdList, updatedAt } = useLiveQueryJoined(Chats.db.live.entryIdList(chatId), [
         chatId,
     ])
 
@@ -100,7 +102,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                         entryId={item.entryId}
                         isLastMessage={item.isLastMessage}
                         isGreeting={item.isGreeting}
-                        tokenLength={item.tokenLength}
                         {...rest}
                     />
                 )}
@@ -115,7 +116,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                     entryId: item.id,
                     isGreeting: index === entryIdList.length - 1,
                     isLastMessage: index === 0,
-                    tokenLength: item.swipes?.[0]?.token_length ?? 0,
                 }))}
                 keyExtractor={(item) => item.entryId.toString()}
                 renderItem={() => <></>}

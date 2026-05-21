@@ -8,6 +8,7 @@ import Drawer from '@components/views/Drawer'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ChatTokenCount from './ChatTokenCount'
+import { useAuthorNoteState } from '../AuthorNote'
 
 type ChatOptionsProps = {
     disabled: boolean
@@ -17,7 +18,7 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
     const { t } = useTranslation()
     const router = useRouter()
     const styles = useStyles()
-
+    const { setVisible } = useAuthorNoteState()
     const setShow = Drawer.useDrawerStore((state) => state.setShow)
 
     const setShowChat = (b: boolean) => {
@@ -39,6 +40,14 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
                     },
                     label: t('chat.input.actions.mainMenu'),
                     icon: 'backward',
+                },
+                {
+                    onPress: (close) => {
+                        setVisible(true)
+                        close()
+                    },
+                    label: t('chat.input.actions.authorNotes'),
+                    icon: 'paper-clip',
                 },
                 {
                     onPress: (close) => {

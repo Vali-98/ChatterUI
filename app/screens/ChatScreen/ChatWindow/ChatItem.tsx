@@ -1,6 +1,8 @@
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
+import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
 import { useQueuedLiveQuery } from '@lib/hooks/LiveQueryQueued'
 import { Chats, useInference } from '@lib/state/Chat'
 
@@ -13,23 +15,48 @@ type ChatItemProps = {
     entryId: number
     isLastMessage: boolean
     isGreeting: boolean
-    tokenLength: number
 }
 
-const ChatItem: React.FC<ChatItemProps> = ({
+type ChatItemBodyProps = ChatItemProps & { entrySwipeIds: number[] }
+
+const ChatItem: React.FC<ChatItemProps> = ({ entryId, ...rest }) => {
+    const { data: swipeidList } = useLiveQueryJoined(
+        Chats.db.live.swipeIdList(entryId),
+        [entryId],
+        { deepCheck: true }
+    )
+
+    return (
+        <ChatItemBody
+            {...rest}
+            entryId={entryId}
+            entrySwipeIds={swipeidList.map((item) => item.id)}
+        />
+    )
+}
+
+const ChatItemBody: React.FC<ChatItemBodyProps> = ({
     index,
     isLastMessage,
     isGreeting,
     entryId,
-    tokenLength,
+    entrySwipeIds,
     ...rest
 }) => {
     const nowGenerating = useInference((state) => state.nowGenerating)
-    const { data: entry } = useQueuedLiveQuery(Chats.db.live.entry(entryId))
+    const { data: entry } = useQueuedLiveQuery(Chats.db.live.entry(entryId), [entryId], {
+        targets: [
+            { tableName: 'chat_entries', rowId: entryId },
+            {
+                tableName: 'chat_swipes',
+                rowId: entrySwipeIds,
+            },
+        ],
+    })
 
     return (
         <>
-            {entry ? (
+            {entry && entrySwipeIds.length > 0 ? (
                 <Animated.View
                     {...rest}
                     layout={LinearTransition.duration(250)
@@ -63,11 +90,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                 </Animated.View>
             ) : (
                 <Animated.View {...rest} exiting={FadeOut}>
-                    <ChatFrameSkeleton
-                        isLastMessage={isLastMessage}
-                        index={index}
-                        estimatedHeight={Math.max(48, (tokenLength / 10) * 16 + 32)}
-                    />
+                    <ChatFrameSkeleton isLastMessage={isLastMessage} index={index} />
                 </Animated.View>
             )}
         </>

@@ -213,6 +213,7 @@
                 "chatHistory": "Chat History",
                 "editCharacter": "Edit Character",
                 "mainMenu": "Main Menu",
+                "authorNotes": "Author Notes",
                 "takePicture": "Take Picture"
             },
             "errors": {
@@ -271,6 +272,8 @@
             "rename": "Rename",
             "save": "Save",
             "test": "Test",
+            "add": "Add",
+            "create": "Create",
             "tryAgain": "Try Again"
         },
         "brand": {
@@ -849,5 +852,17 @@
             "noMessagesAddedCheckLogs": "No messages added. Check Logs.",
             "entryWithoutValidSwipeFound": "Entry without valid swipe found"
         }
+    },
+
+    "authorNotes": {
+        "selector": {
+            "chat": "Chat",
+            "character": "Character",
+            "global": "Global"
+        },
+        "errors": {
+            "create": "Failed to create note"
+        },
+        "empty": "No Notes"
     }
 }

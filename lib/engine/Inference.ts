@@ -109,10 +109,6 @@ async function chatInferenceStream() {
     }
     fields.stopGenerating = stop
     fields.onData = (text) => {
-        if (text === '<think>' || text === '</think>') {
-            const currentBuffer = Chats.useChatState.getState().buffer.data
-            if (currentBuffer.includes(text)) return
-        }
         Chats.useChatState.getState().insertToBuffer(text)
         useTTSStore.getState().insertBuffer(text)
     }

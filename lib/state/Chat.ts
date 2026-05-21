@@ -677,15 +677,6 @@ export namespace Chats {
                         id: true,
                     },
                     orderBy: desc(chatEntries.id),
-                    with: {
-                        swipes: {
-                            columns: {
-                                token_length: true,
-                            },
-                            limit: 1,
-                            orderBy: desc(chatSwipes.id),
-                        },
-                    },
                 })
             }
 
