@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
+import { useDebounce } from '@lib/hooks/Debounce'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ThemedButton from './ThemedButton'
@@ -73,9 +74,7 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
         }
     }, [api, apiFormat, callback, headers])
 
-    useEffect(() => {
-        handleCheck()
-    }, [handleCheck])
+    useDebounce(handleCheck, 300)
 
     const getButtonColor = () => {
         switch (status) {
