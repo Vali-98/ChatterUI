@@ -9,8 +9,8 @@
             "disabledMessage": "Mode dev dinonaktifkan.",
             "enabledMessage": "Anda telah mengaktifkan mode dev."
         },
-        "reportIssue": "Punya masalah? Laporkan di sini:",
         "logsReminder": "Jangan lupa sertakan log",
+        "reportIssue": "Punya masalah? Laporkan di sini:",
         "support": {
             "button": "Dukung ChatterUI",
             "label": "Donasi untuk ChatterUI di sini:"
@@ -27,9 +27,22 @@
     "auth": {
         "authorizationRequired": "Otorisasi Diperlukan"
     },
+    "authorNotes": {
+        "empty": "Tidak Ada Catatan",
+        "errors": {
+            "create": "Gagal membuat catatan"
+        },
+        "item": {
+            "noContent": "Tidak Ada Konten"
+        },
+        "selector": {
+            "character": "Karakter",
+            "chat": "Mengobrol",
+            "global": "Global"
+        }
+    },
     "character": {
         "editor": {
-            "title": "Editor Karakter",
             "actions": {
                 "changeBackground": "Ubah Latar Belakang",
                 "changeImage": "Ubah Gambar",
@@ -68,14 +81,14 @@
                 "noAlternateGreetings": "Tidak Ada Salam Alternatif"
             },
             "errors": {
+                "cardNoCharacter": "Tidak ada karakter yang ditemukan.",
+                "copyCardNotExist": "Gagal menyalin kartu: Kartu tidak ada",
+                "createFailed": "Gagal membuat karakter",
+                "createFromImage": "Gagal membuat kartu - Gambar tidak dapat diambil",
+                "deleteBackground": "Gagal menghapus latar belakang",
                 "export": "Gagal mengekspor: {{error}}",
                 "exportFailed": "Gagal mengekspor",
-                "copyCardNotExist": "Gagal menyalin kartu: Kartu tidak ada",
                 "failedToCopyCard": "Gagal menyalin kartu",
-                "deleteBackground": "Gagal menghapus latar belakang",
-                "createFromImage": "Gagal membuat kartu - Gambar tidak dapat diambil",
-                "cardNoCharacter": "Tidak ada karakter yang ditemukan.",
-                "createFailed": "Gagal membuat karakter",
                 "invalidCharacterCard": "Kartu Karakter Tidak Valid",
                 "v2ParsingFailedFallingBack": "Penguraian V2 gagal, kembali ke V1"
             },
@@ -94,7 +107,8 @@
             },
             "metrics": {
                 "descriptionTokens": "Token Deskripsi: {{count}}"
-            }
+            },
+            "title": "Editor Karakter"
         },
         "list": {
             "actions": {
@@ -201,6 +215,10 @@
                 "startOfChat": "Awal chat"
             }
         },
+        "frame": {
+            "entryNumber": "#{{index}}",
+            "seconds": "{{seconds}}d"
+        },
         "import": {
             "errors": {
                 "failedToImport": "Gagal Mengimpor",
@@ -210,6 +228,7 @@
         "input": {
             "actions": {
                 "addImage": "Tambahkan Gambar",
+                "authorNotes": "Catatan Penulis",
                 "chatHistory": "Riwayat Chat",
                 "editCharacter": "Edit Karakter",
                 "mainMenu": "Menu Utama",
@@ -244,24 +263,22 @@
                 "copyFailed": "Gagal menyalin ke papan klip"
             }
         },
-        "frame": {
-            "seconds": "{{seconds}}d",
-            "entryNumber": "#{{index}}"
-        },
         "state": {
             "failedToLoad": "Gagal memuat chat {{id}}"
         },
         "tokencount": {
-            "used": "Digunakan {{used}}, Maks {{max}}",
-            "title": "Batas Konteks"
+            "title": "Batas Konteks",
+            "used": "Digunakan {{used}}, Maks {{max}}"
         }
     },
     "common": {
         "actions": {
+            "add": "Menambahkan",
             "back": "Kembali",
             "cancel": "Batal",
             "clone": "Kloning",
             "close": "Tutup",
+            "create": "Membuat",
             "delete": "Hapus",
             "disable": "Nonaktifkan",
             "edit": "Edit",
@@ -279,6 +296,16 @@
         "emptyStates": {
             "noItems": "Tidak Ada Item"
         },
+        "errors": {
+            "couldNotGetData": "Tidak dapat memperoleh data, terjadi kesalahan yang sangat serius!",
+            "failedToCopy": "Gagal menyalin",
+            "failedToCreateData": "Gagal membuat data",
+            "fileInvalid": "File Tidak Valid",
+            "filenameInvalidImportFailed": "Nama file tidak valid, Impor Gagal",
+            "invalidFileType": "Jenis File Tidak Valid!",
+            "rollingBackDueToError": "Mengembalikan karena kesalahan",
+            "schemaValidationFailed": "Validasi skema gagal!"
+        },
         "labels": {
             "cpu": "CPU",
             "description": "Deskripsi",
@@ -293,23 +320,13 @@
             "suggestions": "Saran",
             "version": "Versi"
         },
-        "navigation": {
-            "about": "Tentang",
-            "settings": "Pengaturan"
-        },
         "messages": {
             "importingFile": "Mengimpor file...",
             "successfullyImported": "Berhasil Diimpor!"
         },
-        "errors": {
-            "failedToCopy": "Gagal menyalin",
-            "fileInvalid": "File Tidak Valid",
-            "filenameInvalidImportFailed": "Nama file tidak valid, Impor Gagal",
-            "failedToCreateData": "Gagal membuat data",
-            "couldNotGetData": "Tidak dapat memperoleh data, terjadi kesalahan yang sangat serius!",
-            "rollingBackDueToError": "Mengembalikan karena kesalahan",
-            "invalidFileType": "Jenis File Tidak Valid!",
-            "schemaValidationFailed": "Validasi skema gagal!"
+        "navigation": {
+            "about": "Tentang",
+            "settings": "Pengaturan"
         }
     },
     "connections": {
@@ -368,20 +385,20 @@
         },
         "notConnected": "Tidak Terhubung",
         "templates": {
+            "delete": {
+                "confirm": "Hapus Template",
+                "description": "Apakah Anda yakin ingin menghapus '{{name}}'?",
+                "title": "Hapus Template"
+            },
             "empty": "Belum Ada Template Kustom",
+            "exported": "Template berhasil diekspor",
             "get": "Dapatkan Template",
             "import": "Impor Template",
             "importError": "Gagal mengimpor: {{error}}",
             "learn": "Pelajari Tentang Template",
             "paste": "Tempel Template",
             "pasteSheetTitle": "Tempel Template Di Sini",
-            "title": "Manajer Template",
-            "delete": {
-                "title": "Hapus Template",
-                "description": "Apakah Anda yakin ingin menghapus '{{name}}'?",
-                "confirm": "Hapus Template"
-            },
-            "exported": "Template berhasil diekspor"
+            "title": "Manajer Template"
         }
     },
     "contextlimit": {
@@ -431,6 +448,9 @@
         "deleteConfig": "Hapus Konfig",
         "deleteConfigDescription": "Apakah Anda yakin ingin menghapus '{{name}}'?",
         "deleteInstruct": "Hapus Instruct",
+        "errors": {
+            "instructDataError": "Terjadi kesalahan dengan data Instruct"
+        },
         "exportConfig": "Ekspor Konfig",
         "jsonExtension": ".json",
         "newPreset": "Prasetel Instruct Baru",
@@ -468,9 +488,29 @@
             "configCreated": "Konfig dibuat.",
             "configNameExists": "Nama konfig sudah ada.",
             "savedToDownloads": "Disimpan \"{{name}}\" ke Unduhan"
-        },
+        }
+    },
+    "generation": {
         "errors": {
-            "instructDataError": "Terjadi kesalahan dengan data Instruct"
+            "completionFailed": "Penyelesaian gagal.",
+            "configurationNotFound": "Konfigurasi \"{{name}}\" tidak ditemukan",
+            "failedToBuildPayload": "Gagal membangun payload",
+            "failedToBuildPrompt": "Gagal membangun prompt",
+            "failedToOrchestrateRequestBuild": "Gagal mengorkestrasi pembangunan permintaan",
+            "generationAlreadyInProgress": "Pembuatan sudah berlangsung",
+            "generationFailed": "Pembuatan Gagal",
+            "noActiveAPI": "Tidak Ada API Aktif",
+            "noActiveChat": "Tidak ada chat aktif",
+            "noCharacter": "Tidak ada karakter yang dimuat",
+            "noChatFound": "Tidak ada chat ditemukan",
+            "noUser": "Tidak ada pengguna yang dimuat",
+            "payloadConstructionFailed": "Pembangunan payload gagal",
+            "promptConstructionFailed": "Pembangunan prompt gagal",
+            "sseFailed": "Kesalahan Selama event SSE"
+        },
+        "warn": {
+            "entryWithoutValidSwipeFound": "Entri tanpa gesekan valid ditemukan",
+            "noMessagesAddedCheckLogs": "Tidak ada pesan yang ditambahkan. Periksa Log."
         }
     },
     "horizontalSelector": {
@@ -561,25 +601,25 @@
         "threads": "Utas",
         "title": "Model",
         "toast": {
+            "autoLoadingMMPROJ": "Memuat MMPROJ Otomatis: {{name}}",
+            "autoLoadingModel": "Memuat Model Otomatis: {{name}}",
+            "couldNotLoadModel": "Tidak Dapat Memuat Model",
             "deletekv": "KV Cache dihapus!",
+            "failedToGenerateLocally": "Gagal menghasilkan secara lokal",
+            "failedToLoadMMPROJ": "Gagal memuat MMPROJ",
+            "failedToRunLocalInference": "Gagal menjalankan inferensi lokal",
+            "failedToUnloadMMPROJ": "Gagal membongkar MMPROJ",
             "failedtolink": "Gagal menautkan model",
             "failedtoload": "Gagal memuat model",
-            "modelAlreadyLoaded": "Model Sudah Dimuat!",
-            "quantizationNoLongerSupported": "Kuantisasi Tidak Lagi Didukung!",
-            "modelDoesNotExist": "Model Tidak Ada!",
-            "couldNotLoadModel": "Tidak Dapat Memuat Model",
-            "failedToLoadMMPROJ": "Gagal memuat MMPROJ",
-            "failedToUnloadMMPROJ": "Gagal membongkar MMPROJ",
-            "noModelLoaded": "Tidak Ada Model yang Dimuat",
             "mediaAddedWithoutMMPROJModel": "Media ditambahkan tanpa model MMPROJ",
-            "modelImportedSuccessfully": "Model Berhasil Diimpor!",
             "mediaAddedWithoutMultimodalSupport": "Media ditambahkan tanpa dukungan multimodal.",
+            "modelAlreadyLoaded": "Model Sudah Dimuat!",
+            "modelDoesNotExist": "Model Tidak Ada!",
+            "modelImportedSuccessfully": "Model Berhasil Diimpor!",
+            "modelMissingEntryDeleted": "Model hilang, entrinya akan dihapus: {{name}}",
             "noAutoLoadModelSet": "Tidak Ada Model Muat Otomatis yang Diatur",
-            "autoLoadingModel": "Memuat Model Otomatis: {{name}}",
-            "autoLoadingMMPROJ": "Memuat MMPROJ Otomatis: {{name}}",
-            "failedToRunLocalInference": "Gagal menjalankan inferensi lokal",
-            "failedToGenerateLocally": "Gagal menghasilkan secara lokal",
-            "modelMissingEntryDeleted": "Model hilang, entrinya akan dihapus: {{name}}"
+            "noModelLoaded": "Tidak Ada Model yang Dimuat",
+            "quantizationNoLongerSupported": "Kuantisasi Tidak Lagi Didukung!"
         }
     },
     "multiDropdown": {
@@ -620,8 +660,8 @@
             "emptyname": "Nama sampler tidak boleh kosong",
             "exists": "Konfig Sampler \"{{name}}\" sudah ada!",
             "exportok": "Konfigurasi Sampler Berhasil Diekspor!",
-            "lastconfig": "Tidak Dapat Menghapus Konfigurasi Terakhir",
-            "failedToImport": "Gagal mengimpor"
+            "failedToImport": "Gagal mengimpor",
+            "lastconfig": "Tidak Dapat Menghapus Konfigurasi Terakhir"
         }
     },
     "settings": {
@@ -633,11 +673,11 @@
                     "title": "Hasilkan Ulang Kartu Bawaan"
                 }
             },
-            "regenerateDefaultCard": "Hasilkan Ulang Kartu Bawaan",
-            "title": "Manajemen Karakter",
             "errors": {
                 "failedToCreateDefaultCharacter": "Gagal membuat karakter bawaan"
-            }
+            },
+            "regenerateDefaultCard": "Hasilkan Ulang Kartu Bawaan",
+            "title": "Manajemen Karakter"
         },
         "chat": {
             "askInChatterUI": "Tanya di ChatterUI",
@@ -692,8 +732,8 @@
             },
             "custom": "Kustom",
             "error": {
-                "failedToImport": "Gagal mengimpor: {{error}}",
-                "colorNameAlreadyUsed": "Nama Warna Sudah Digunakan"
+                "colorNameAlreadyUsed": "Nama Warna Sudah Digunakan",
+                "failedToImport": "Gagal mengimpor: {{error}}"
             },
             "pasteThemeTitle": "Tempel Tema Di Sini",
             "title": "Tema",
@@ -739,6 +779,9 @@
             "printContextDescription": "Mencetak konteks pembuatan ke log untuk debugging",
             "title": "Pembuatan"
         },
+        "language": {
+            "title": "Atur Bahasa"
+        },
         "notification": {
             "enableNotifications": "Aktifkan Notifikasi",
             "enableNotificationsDescription": "Mengirim notifikasi saat aplikasi di latar belakang",
@@ -771,20 +814,17 @@
             "changeTheme": "Ganti Tema",
             "deleteBackground": "Hapus Latar Belakang Chat",
             "importBackground": "Impor Latar Belakang Chat",
-            "replaceBackground": "Ganti Latar Belakang Chat",
-            "title": "Gaya",
             "messages": {
                 "backgroundDeleted": "Latar Belakang Dihapus!"
-            }
+            },
+            "replaceBackground": "Ganti Latar Belakang Chat",
+            "title": "Gaya"
         },
         "tagHider": {
             "description": "Sembunyikan karakter dengan tag berikut dari daftar karakter.",
             "label": "Tag Tersembunyi"
         },
-        "title": "Pengaturan",
-        "language": {
-            "title": "Atur Bahasa"
-        }
+        "title": "Pengaturan"
     },
     "stringArrayEditor": {
         "add": "Tambah",
@@ -821,33 +861,10 @@
             "title": "Edit Pengguna"
         },
         "hint": "Petunjuk: Gesek ke Kiri atau tekan <icon/> untuk membuka laci Pengguna",
-        "nameplaceholder": "Nama kosong tidak disarankan",
-        "profilecount": "Profil Pengguna",
         "messages": {
             "loadingUser": "Memuat Pengguna: {{name}}"
-        }
-    },
-    "generation": {
-        "errors": {
-            "promptConstructionFailed": "Pembangunan prompt gagal",
-            "payloadConstructionFailed": "Pembangunan payload gagal",
-            "completionFailed": "Penyelesaian gagal.",
-            "sseFailed": "Kesalahan Selama event SSE",
-            "generationFailed": "Pembuatan Gagal",
-            "generationAlreadyInProgress": "Pembuatan sudah berlangsung",
-            "noUser": "Tidak ada pengguna yang dimuat",
-            "noCharacter": "Tidak ada karakter yang dimuat",
-            "noActiveChat": "Tidak ada chat aktif",
-            "noChatFound": "Tidak ada chat ditemukan",
-            "noActiveAPI": "Tidak Ada API Aktif",
-            "configurationNotFound": "Konfigurasi \"{{name}}\" tidak ditemukan",
-            "failedToOrchestrateRequestBuild": "Gagal mengorkestrasi pembangunan permintaan",
-            "failedToBuildPrompt": "Gagal membangun prompt",
-            "failedToBuildPayload": "Gagal membangun payload"
         },
-        "warn": {
-            "noMessagesAddedCheckLogs": "Tidak ada pesan yang ditambahkan. Periksa Log.",
-            "entryWithoutValidSwipeFound": "Entri tanpa gesekan valid ditemukan"
-        }
+        "nameplaceholder": "Nama kosong tidak disarankan",
+        "profilecount": "Profil Pengguna"
     }
 }
