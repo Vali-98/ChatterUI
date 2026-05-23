@@ -1,12 +1,15 @@
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
+import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
 import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { Theme } from '@lib/theme/ThemeManager'
+
+import { authorNoteEditorState } from './AuthorNoteEditor'
 
 type AuthorNoteItemProps = {
     id: number
@@ -15,8 +18,12 @@ type AuthorNoteItemProps = {
 const AuthorNoteItem: React.FC<AuthorNoteItemProps> = ({ id }) => {
     const { t } = useTranslation()
     const { color, spacing, fontSize, borderRadius } = Theme.useTheme()
-    const { data: note } = useLiveQuery(AuthorNotes.db.live.note(id), [id])
-
+    const setVisible = authorNoteEditorState(useShallow((state) => state.setVisible))
+    const {
+        data: [note],
+    } = useLiveQueryJoined(AuthorNotes.db.live.note(id), [id], {
+        targets: [{ tableName: 'author_notes', rowId: id }],
+    })
     if (!note)
         return (
             <Animated.View
@@ -66,7 +73,7 @@ const AuthorNoteItem: React.FC<AuthorNoteItemProps> = ({ id }) => {
                     iconSize={24}
                     iconStyle={{ color: color.text._400 }}
                     onPress={() => {
-                        /**TODO: Editor */
+                        setVisible(true, id)
                     }}
                 />
             </View>

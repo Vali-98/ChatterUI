@@ -4,7 +4,8 @@ import { unionAll } from 'drizzle-orm/sqlite-core'
 import { db as database } from '@db'
 import { authorNotes } from 'db/schema'
 
-export type NoteParams = Partial<Omit<typeof authorNotes.$inferInsert, 'id'>>
+export type AuthorNote = typeof authorNotes.$inferSelect
+export type AuthorNoteParams = Partial<Omit<AuthorNote, 'id'>>
 export enum NoteType {
     GLOBAL,
     CHARACTER,
@@ -39,7 +40,7 @@ export namespace AuthorNotes {
             }
         }
         export namespace mutate {
-            export const createNote = async (params: NoteParams = {}) => {
+            export const createNote = async (params: AuthorNoteParams = {}) => {
                 const [{ id }] = await database
                     .insert(authorNotes)
                     .values(params)
@@ -51,7 +52,7 @@ export namespace AuthorNotes {
                 await database.delete(authorNotes).where(eq(authorNotes.id, noteId))
             }
 
-            export const updateNote = async (noteId: number, params: NoteParams = {}) => {
+            export const updateNote = async (noteId: number, params: AuthorNoteParams = {}) => {
                 await database.update(authorNotes).set(params).where(eq(authorNotes.id, noteId))
             }
         }
@@ -78,7 +79,11 @@ export namespace AuthorNotes {
             }
 
             export const note = (noteId: number) => {
-                return database.query.authorNotes.findFirst({ where: eq(authorNotes.id, noteId) })
+                return database
+                    .select()
+                    .from(authorNotes)
+                    .where(eq(authorNotes.id, noteId))
+                    .limit(1)
             }
 
             export const chatNoteIds = (chatId: number) => {

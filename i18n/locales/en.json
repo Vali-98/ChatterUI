@@ -865,7 +865,17 @@
         },
         "empty": "No Notes",
         "item": {
-            "noContent": "No Content"
+            "noContent": "No Content",
+            "content": "Note Content",
+            "comments": "Comments",
+            "priority": "Priority"
+        },
+        "alert": {
+            "delete": {
+                "title": "Delete Note",
+                "description": "Are you sure you want to delete {{name}}? This cannot be undone.",
+                "button": "Delete Note"
+            }
         }
     }
 }

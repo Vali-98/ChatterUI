@@ -23,7 +23,7 @@ const AuthorNoteList: React.FC<AuthorNoteListProps> = ({ noteType }) => {
 
     return (
         <FlatList
-            contentContainerStyle={{ rowGap: 8 }}
+            contentContainerStyle={{ rowGap: 8, paddingRight: 8 }}
             data={noteIdList}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => <AuthorNoteItem id={item.id} />}

@@ -55,7 +55,8 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                         {
                             paddingTop: spacing.xl2,
                             paddingBottom: insets.bottom + spacing.xl2,
-                            paddingHorizontal: spacing.xl2,
+                            paddingLeft: spacing.xl2,
+                            paddingRight: spacing.xl,
                             maxHeight: '70%',
                             width: '100%',
                             borderTopLeftRadius: spacing.xl2,

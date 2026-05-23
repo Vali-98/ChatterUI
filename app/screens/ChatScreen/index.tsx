@@ -22,6 +22,7 @@ import ChatsDrawer from '@screens/ChatScreen/ChatsDrawer'
 import ChatWindow from '@screens/ChatScreen/ChatWindow'
 
 import AuthorNoteSheet from './AuthorNote'
+import AuthorNoteEditor from './AuthorNote/AuthorNoteEditor'
 import ChatEditor from './ChatWindow/ChatEditor'
 
 const ChatScreen = () => {
@@ -167,6 +168,7 @@ const ChatScreen = () => {
                         <AvatarViewer />
                         <ChatEditor />
                         <AuthorNoteSheet />
+                        <AuthorNoteEditor />
                     </View>
                 </Animated.View>
 
