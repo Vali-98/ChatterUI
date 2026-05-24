@@ -274,7 +274,8 @@
             "test": "Test",
             "add": "Add",
             "create": "Create",
-            "tryAgain": "Try Again"
+            "tryAgain": "Try Again",
+            "reset": "Reset"
         },
         "brand": {
             "name": "ChatterUI"
@@ -294,7 +295,8 @@
             "results": "Results",
             "selected": "Selected",
             "suggestions": "Suggestions",
-            "version": "Version"
+            "version": "Version",
+            "tokens": "Tokens"
         },
         "navigation": {
             "about": "About",

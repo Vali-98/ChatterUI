@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, View } from 'react-native'
+import { ScrollView, View, Text } from 'react-native'
 import { create } from 'zustand'
 
 import ThemedButton from '@components/buttons/ThemedButton'
@@ -8,7 +8,9 @@ import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import BottomSheet from '@components/views/BottomSheet'
+import { Tokenizer } from '@lib/engine/Tokenizer'
 import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
+import { useDebounceTokenizer } from '@lib/hooks/Tokenizer'
 import { AuthorNote, AuthorNotes } from '@lib/state/AuthorNotes'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -25,7 +27,8 @@ export const authorNoteEditorState = create<AuthorNoteEditorStateProps>()((set) 
 
 const AuthorNoteEditor = () => {
     const { t } = useTranslation()
-    const { spacing } = Theme.useTheme()
+    const tokenizer = Tokenizer.useTokenizer()
+    const { color, spacing, fontSize } = Theme.useTheme()
     const { visible, setVisible, noteId } = authorNoteEditorState((state) => state)
     const [placeHolderNote, setPlaceHolderNote] = useState<AuthorNote | undefined>(undefined)
     const {
@@ -38,6 +41,8 @@ const AuthorNoteEditor = () => {
             },
         ],
     })
+    const contentTokens = useDebounceTokenizer(placeHolderNote?.content ?? '', 300)
+
     useEffect(() => {
         visible && note && setPlaceHolderNote(note)
     }, [note, visible])
@@ -59,7 +64,7 @@ const AuthorNoteEditor = () => {
                     }}
                 />
                 <ThemedTextInput
-                    label={t('authorNotes.item.content')}
+                    label={t('authorNotes.item.content', { tokenLength: contentTokens })}
                     containerStyle={{ flex: 0 }}
                     numberOfLines={10}
                     value={placeHolderNote.content}
@@ -67,6 +72,9 @@ const AuthorNoteEditor = () => {
                         setPlaceHolderNote({ ...placeHolderNote, content: t })
                     }}
                 />
+                <Text style={{ color: color.text._700, fontSize: fontSize.s }}>
+                    {t('common.labels.tokens')}: {contentTokens}
+                </Text>
 
                 <ThemedTextInput
                     label={t('authorNotes.item.comments')}
@@ -93,10 +101,12 @@ const AuthorNoteEditor = () => {
                     flexDirection: 'row',
                     columnGap: spacing.l,
                     justifyContent: 'space-between',
+                    paddingTop: 12,
                 }}>
                 <ThemedButton
                     label={t('common.actions.delete')}
                     variant="critical"
+                    iconName="delete"
                     onPress={() => {
                         Alert.alert({
                             title: t('authorNotes.alert.delete.title'),
@@ -115,16 +125,25 @@ const AuthorNoteEditor = () => {
                         })
                     }}
                 />
-
+                <ThemedButton
+                    label={t('common.actions.reset')}
+                    variant="tertiary"
+                    iconName="reload"
+                    onPress={async () => {
+                        setPlaceHolderNote(note)
+                    }}
+                />
                 <ThemedButton
                     label={t('common.actions.save')}
                     variant="secondary"
-                    onPress={() => {
-                        AuthorNotes.db.mutate.updateNote(note.id, {
+                    iconName="save"
+                    onPress={async () => {
+                        await AuthorNotes.db.mutate.updateNote(note.id, {
                             name: placeHolderNote.name,
                             content: placeHolderNote.content,
                             note: placeHolderNote.note,
                             priority: placeHolderNote.priority,
+                            token_length: await tokenizer(placeHolderNote.content),
                         })
                     }}
                 />
