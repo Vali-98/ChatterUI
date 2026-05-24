@@ -234,6 +234,13 @@ export namespace Chats {
                 if (chat) return { ...chat }
             }
 
+            export const chatShallow = async (chatId: number) => {
+                const chat = await database.query.chats.findFirst({
+                    where: eq(chats.id, chatId),
+                })
+                return chat
+            }
+
             export const chatNew = async (chatId: number) => {
                 const [result] = await database
                     .select({

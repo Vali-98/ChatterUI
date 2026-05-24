@@ -1,3 +1,6 @@
+import { AuthorNotes } from '@lib/state/AuthorNotes'
+import { Chats } from '@lib/state/Chat'
+
 import type { ContextBuilderParams, ContextMessage } from './API/ContextBuilder2'
 
 export type DataSourceResult = {
@@ -71,7 +74,41 @@ export const createExampleDataSource = (): DataSource => ({
     },
 })
 
-export const getDataSources = async () => {
-    const characterExampleSource = createExampleDataSource()
-    return [characterExampleSource]
+const AUTHOR_NOTE_NAME = 'author_notes'
+const createAuthorNotesDataSource = async (): Promise<DataSource | undefined> => {
+    const { id: chatId } = Chats.useChatState.getState()
+    if (!chatId) return
+    const chatData = await Chats.db.query.chatShallow(chatId)
+    if (!chatData) return
+    const characterId = chatData.character_id
+
+    const activeNotes = await AuthorNotes.db.query.getActiveNotes(characterId, chatId)
+    if (!activeNotes || activeNotes.length === 0) return
+
+    const tokenTotal = activeNotes.reduce((a, b) => a + (b.token_length ?? 0), 0)
+    const dataSourceResults: DataSourceResult[] = activeNotes.map((item) => ({
+        content: item.content,
+        source: AUTHOR_NOTE_NAME,
+        tokenLength: item.token_length ?? 0,
+        position: {
+            type: 'index',
+            location: item.depth ?? 0,
+        },
+    }))
+
+    return {
+        name: AUTHOR_NOTE_NAME,
+        priority: 1,
+        tokenBudget: tokenTotal,
+        retrieve: async (params) => {
+            return dataSourceResults
+        },
+    }
+}
+
+export const getDataSources = async (): Promise<DataSource[]> => {
+    let dataSources = [createExampleDataSource()]
+    const authorNotesSource = await createAuthorNotesDataSource()
+    if (authorNotesSource) dataSources.push(authorNotesSource)
+    return dataSources
 }
