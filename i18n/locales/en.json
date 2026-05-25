@@ -9,8 +9,8 @@
             "disabledMessage": "Dev mode disabled.",
             "enabledMessage": "You have enabled dev mode."
         },
-        "reportIssue": "Got an issue? Report it here:",
         "logsReminder": "Remember to include logs",
+        "reportIssue": "Got an issue? Report it here:",
         "support": {
             "button": "Support ChatterUI",
             "label": "Donate to ChatterUI here:"
@@ -27,9 +27,38 @@
     "auth": {
         "authorizationRequired": "Authorization Required"
     },
+    "authorNotes": {
+        "alert": {
+            "delete": {
+                "button": "Delete Note",
+                "description": "Are you sure you want to delete {{name}}? This cannot be undone.",
+                "title": "Delete Note"
+            }
+        },
+        "empty": "No Notes",
+        "errors": {
+            "create": "Failed to create note"
+        },
+        "item": {
+            "comments": "Comments",
+            "content": "Note Content",
+            "noContent": "No Content",
+            "priority": "Priority"
+        },
+        "selector": {
+            "character": "Character",
+            "chat": "Chat",
+            "global": "Global"
+        },
+        "type": "Note Type",
+        "unsavedChanges": {
+            "description": "You have unsaved changes, exiting will undo all changes.",
+            "discard": "Discard Changes",
+            "title": "Unsaved Changes"
+        }
+    },
     "character": {
         "editor": {
-            "title": "Character Editor",
             "actions": {
                 "changeBackground": "Change Background",
                 "changeImage": "Change Image",
@@ -68,14 +97,14 @@
                 "noAlternateGreetings": "No Alternate Greetings"
             },
             "errors": {
+                "cardNoCharacter": "No character was found.",
+                "copyCardNotExist": "Failed to copy card: Card does not exist",
+                "createFailed": "Failed to create character",
+                "createFromImage": "Failed to create card - Image could not be retrieved",
+                "deleteBackground": "Failed to delete background",
                 "export": "Could not export: {{error}}",
                 "exportFailed": "Failed to export",
-                "copyCardNotExist": "Failed to copy card: Card does not exist",
                 "failedToCopyCard": "Failed to copy card",
-                "deleteBackground": "Failed to delete background",
-                "createFromImage": "Failed to create card - Image could not be retrieved",
-                "cardNoCharacter": "No character was found.",
-                "createFailed": "Failed to create character",
                 "invalidCharacterCard": "Invalid Character Card",
                 "v2ParsingFailedFallingBack": "V2 Parsing failed, falling back to V1"
             },
@@ -94,7 +123,8 @@
             },
             "metrics": {
                 "descriptionTokens": "Description Tokens: {{count}}"
-            }
+            },
+            "title": "Character Editor"
         },
         "list": {
             "actions": {
@@ -201,6 +231,10 @@
                 "startOfChat": "Start of chat"
             }
         },
+        "frame": {
+            "entryNumber": "#{{index}}",
+            "seconds": "{{seconds}}s"
+        },
         "import": {
             "errors": {
                 "failedToImport": "Failed to Import",
@@ -210,10 +244,10 @@
         "input": {
             "actions": {
                 "addImage": "Add Image",
+                "authorNotes": "Author Notes",
                 "chatHistory": "Chat History",
                 "editCharacter": "Edit Character",
                 "mainMenu": "Main Menu",
-                "authorNotes": "Author Notes",
                 "takePicture": "Take Picture"
             },
             "errors": {
@@ -228,9 +262,15 @@
             "noModelLoaded": "No Model Loaded"
         },
         "quickActions": {
+            "createNote": {
+                "button": "Create Note",
+                "description": "Create an Author Note from this message?",
+                "title": "Create Note"
+            },
             "errors": {
                 "cloneFailed": "Failed to clone chat",
-                "copyFailed": "Failed to copy to clipboard"
+                "copyFailed": "Failed to copy to clipboard",
+                "noteCreateFailed": "Failed to create note"
             },
             "fork": {
                 "button": "Fork Chat",
@@ -245,24 +285,22 @@
                 "copyFailed": "Failed to copy to clipboard"
             }
         },
-        "frame": {
-            "seconds": "{{seconds}}s",
-            "entryNumber": "#{{index}}"
-        },
         "state": {
             "failedToLoad": "Failed to load chat {{id}}"
         },
         "tokencount": {
-            "used": "Used {{used}}, Max {{max}}",
-            "title": "Context Limit"
+            "title": "Context Limit",
+            "used": "Used {{used}}, Max {{max}}"
         }
     },
     "common": {
         "actions": {
+            "add": "Add",
             "back": "Back",
             "cancel": "Cancel",
             "clone": "Clone",
             "close": "Close",
+            "create": "Create",
             "delete": "Delete",
             "disable": "Disable",
             "edit": "Edit",
@@ -270,18 +308,26 @@
             "export": "Export",
             "more": "More",
             "rename": "Rename",
+            "reset": "Reset",
             "save": "Save",
             "test": "Test",
-            "add": "Add",
-            "create": "Create",
-            "tryAgain": "Try Again",
-            "reset": "Reset"
+            "tryAgain": "Try Again"
         },
         "brand": {
             "name": "ChatterUI"
         },
         "emptyStates": {
             "noItems": "No Items"
+        },
+        "errors": {
+            "couldNotGetData": "Could not get data, something very wrong has happened!",
+            "failedToCopy": "Failed to copy",
+            "failedToCreateData": "Failed to create data",
+            "fileInvalid": "File Invalid",
+            "filenameInvalidImportFailed": "Filename invalid, Import Failed",
+            "invalidFileType": "Invalid File Type!",
+            "rollingBackDueToError": "Rolling back due to error",
+            "schemaValidationFailed": "Schema validation failed!"
         },
         "labels": {
             "cpu": "CPU",
@@ -295,26 +341,16 @@
             "results": "Results",
             "selected": "Selected",
             "suggestions": "Suggestions",
-            "version": "Version",
-            "tokens": "Tokens"
-        },
-        "navigation": {
-            "about": "About",
-            "settings": "Settings"
+            "tokens": "Tokens",
+            "version": "Version"
         },
         "messages": {
             "importingFile": "Importing file...",
             "successfullyImported": "Successfully Imported!"
         },
-        "errors": {
-            "failedToCopy": "Failed to copy",
-            "fileInvalid": "File Invalid",
-            "filenameInvalidImportFailed": "Filename invalid, Import Failed",
-            "failedToCreateData": "Failed to create data",
-            "couldNotGetData": "Could not get data, something very wrong has happened!",
-            "rollingBackDueToError": "Rolling back due to error",
-            "invalidFileType": "Invalid File Type!",
-            "schemaValidationFailed": "Schema validation failed!"
+        "navigation": {
+            "about": "About",
+            "settings": "Settings"
         }
     },
     "connections": {
@@ -373,20 +409,20 @@
         },
         "notConnected": "Not Connected",
         "templates": {
+            "delete": {
+                "confirm": "Delete Template",
+                "description": "Are you sure you want to delete '{{name}}'?",
+                "title": "Delete Template"
+            },
             "empty": "No Custom Templates Added",
+            "exported": "Template sucessfully exported",
             "get": "Get Templates",
             "import": "Import Template",
             "importError": "Failed to import: {{error}}",
             "learn": "Learn About Templates",
             "paste": "Paste Template",
             "pasteSheetTitle": "Paste Template Here",
-            "title": "Template Manager",
-            "delete": {
-                "title": "Delete Template",
-                "description": "Are you sure you want to delete '{{name}}'?",
-                "confirm": "Delete Template"
-            },
-            "exported": "Template sucessfully exported"
+            "title": "Template Manager"
         }
     },
     "contextlimit": {
@@ -436,6 +472,9 @@
         "deleteConfig": "Delete Config",
         "deleteConfigDescription": "Are you sure you want to delete '{{name}}'?",
         "deleteInstruct": "Delete Instruct",
+        "errors": {
+            "instructDataError": "Something wrong happened with Instruct data"
+        },
         "exportConfig": "Export Config",
         "jsonExtension": ".json",
         "newPreset": "New Instruct Preset",
@@ -473,9 +512,29 @@
             "configCreated": "Config created.",
             "configNameExists": "Config name already exists.",
             "savedToDownloads": "Saved \"{{name}}\" to Downloads"
-        },
+        }
+    },
+    "generation": {
         "errors": {
-            "instructDataError": "Something wrong happened with Instruct data"
+            "completionFailed": "Completion failed.",
+            "configurationNotFound": "Configuration \"{{name}}\" not found",
+            "failedToBuildPayload": "Failed to build payload",
+            "failedToBuildPrompt": "Failed to build prompt",
+            "failedToOrchestrateRequestBuild": "Failed to orchestrate request build",
+            "generationAlreadyInProgress": "Generation already in progress",
+            "generationFailed": "Generation Failed",
+            "noActiveAPI": "No Active API",
+            "noActiveChat": "No active chat",
+            "noCharacter": "No loaded character",
+            "noChatFound": "No chat found",
+            "noUser": "No loaded user",
+            "payloadConstructionFailed": "Payload construction failed",
+            "promptConstructionFailed": "Prompt construction failed",
+            "sseFailed": "Error During SSE event"
+        },
+        "warn": {
+            "entryWithoutValidSwipeFound": "Entry without valid swipe found",
+            "noMessagesAddedCheckLogs": "No messages added. Check Logs."
         }
     },
     "horizontalSelector": {
@@ -566,25 +625,25 @@
         "threads": "Threads",
         "title": "Models",
         "toast": {
+            "autoLoadingMMPROJ": "Auto-loading MMPROJ: {{name}}",
+            "autoLoadingModel": "Auto-loading Model: {{name}}",
+            "couldNotLoadModel": "Could Not Load Model",
             "deletekv": "KV Cache deleted!",
+            "failedToGenerateLocally": "Failed to generate locally",
+            "failedToLoadMMPROJ": "Failed to load MMPROJ",
+            "failedToRunLocalInference": "Failed to run local inference",
+            "failedToUnloadMMPROJ": "Failed to unload MMPROJ",
             "failedtolink": "Failed to link model",
             "failedtoload": "Failed to load model",
-            "modelAlreadyLoaded": "Model Already Loaded!",
-            "quantizationNoLongerSupported": "Quantization No Longer Supported!",
-            "modelDoesNotExist": "Model Does Not Exist!",
-            "couldNotLoadModel": "Could Not Load Model",
-            "failedToLoadMMPROJ": "Failed to load MMPROJ",
-            "failedToUnloadMMPROJ": "Failed to unload MMPROJ",
-            "noModelLoaded": "No Model Loaded",
             "mediaAddedWithoutMMPROJModel": "Media was added without MMPROJ model",
-            "modelImportedSuccessfully": "Model Imported Successfully!",
             "mediaAddedWithoutMultimodalSupport": "Media was added without multimodal support.",
+            "modelAlreadyLoaded": "Model Already Loaded!",
+            "modelDoesNotExist": "Model Does Not Exist!",
+            "modelImportedSuccessfully": "Model Imported Successfully!",
+            "modelMissingEntryDeleted": "Model missing, its entry will be deleted: {{name}}",
             "noAutoLoadModelSet": "No Auto-Load Model Set",
-            "autoLoadingModel": "Auto-loading Model: {{name}}",
-            "autoLoadingMMPROJ": "Auto-loading MMPROJ: {{name}}",
-            "failedToRunLocalInference": "Failed to run local inference",
-            "failedToGenerateLocally": "Failed to generate locally",
-            "modelMissingEntryDeleted": "Model missing, its entry will be deleted: {{name}}"
+            "noModelLoaded": "No Model Loaded",
+            "quantizationNoLongerSupported": "Quantization No Longer Supported!"
         }
     },
     "multiDropdown": {
@@ -625,8 +684,8 @@
             "emptyname": "Sampler name cannot be empty",
             "exists": "Sampler Config \"{{name}}\" already exists!",
             "exportok": "Exported Sampler Configuration!",
-            "lastconfig": "Cannot Delete Last Configuration",
-            "failedToImport": "Failed to import"
+            "failedToImport": "Failed to import",
+            "lastconfig": "Cannot Delete Last Configuration"
         }
     },
     "settings": {
@@ -638,11 +697,11 @@
                     "title": "Regenerate Default Card"
                 }
             },
-            "regenerateDefaultCard": "Regenerate Default Card",
-            "title": "Character Management",
             "errors": {
                 "failedToCreateDefaultCharacter": "Failed to create default character"
-            }
+            },
+            "regenerateDefaultCard": "Regenerate Default Card",
+            "title": "Character Management"
         },
         "chat": {
             "askInChatterUI": "Ask in ChatterUI",
@@ -697,8 +756,8 @@
             },
             "custom": "Custom",
             "error": {
-                "failedToImport": "Failed to import: {{error}}",
-                "colorNameAlreadyUsed": "Color Name Already Used"
+                "colorNameAlreadyUsed": "Color Name Already Used",
+                "failedToImport": "Failed to import: {{error}}"
             },
             "pasteThemeTitle": "Paste Theme Here",
             "title": "Themes",
@@ -744,6 +803,9 @@
             "printContextDescription": "Prints the generation context to logs for debugging",
             "title": "Generation"
         },
+        "language": {
+            "title": "Set Language"
+        },
         "notification": {
             "enableNotifications": "Enable Notifications",
             "enableNotificationsDescription": "Sends notifications when the app is in the background",
@@ -776,20 +838,17 @@
             "changeTheme": "Change Theme",
             "deleteBackground": "Delete Chat Background",
             "importBackground": "Import Chat Background",
-            "replaceBackground": "Replace Chat Background",
-            "title": "Style",
             "messages": {
                 "backgroundDeleted": "Background Deleted!"
-            }
+            },
+            "replaceBackground": "Replace Chat Background",
+            "title": "Style"
         },
         "tagHider": {
             "description": "Hide characters with the following tags from the character list.",
             "label": "Hidden Tags"
         },
-        "title": "Settings",
-        "language": {
-            "title": "Set Language"
-        }
+        "title": "Settings"
     },
     "stringArrayEditor": {
         "add": "Add",
@@ -826,58 +885,10 @@
             "title": "Edit User"
         },
         "hint": "Hint: Swipe Left or press <icon/> to open the Users drawer",
-        "nameplaceholder": "Empty names are discouraged",
-        "profilecount": "User Profiles",
         "messages": {
             "loadingUser": "Loading User: {{name}}"
-        }
-    },
-    "generation": {
-        "errors": {
-            "promptConstructionFailed": "Prompt construction failed",
-            "payloadConstructionFailed": "Payload construction failed",
-            "completionFailed": "Completion failed.",
-            "sseFailed": "Error During SSE event",
-            "generationFailed": "Generation Failed",
-            "generationAlreadyInProgress": "Generation already in progress",
-            "noUser": "No loaded user",
-            "noCharacter": "No loaded character",
-            "noActiveChat": "No active chat",
-            "noChatFound": "No chat found",
-            "noActiveAPI": "No Active API",
-            "configurationNotFound": "Configuration \"{{name}}\" not found",
-            "failedToOrchestrateRequestBuild": "Failed to orchestrate request build",
-            "failedToBuildPrompt": "Failed to build prompt",
-            "failedToBuildPayload": "Failed to build payload"
         },
-        "warn": {
-            "noMessagesAddedCheckLogs": "No messages added. Check Logs.",
-            "entryWithoutValidSwipeFound": "Entry without valid swipe found"
-        }
-    },
-
-    "authorNotes": {
-        "selector": {
-            "chat": "Chat",
-            "character": "Character",
-            "global": "Global"
-        },
-        "errors": {
-            "create": "Failed to create note"
-        },
-        "empty": "No Notes",
-        "item": {
-            "noContent": "No Content",
-            "content": "Note Content",
-            "comments": "Comments",
-            "priority": "Priority"
-        },
-        "alert": {
-            "delete": {
-                "title": "Delete Note",
-                "description": "Are you sure you want to delete {{name}}? This cannot be undone.",
-                "button": "Delete Note"
-            }
-        }
+        "nameplaceholder": "Empty names are discouraged",
+        "profilecount": "User Profiles"
     }
 }

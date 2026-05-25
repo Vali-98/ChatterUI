@@ -11,12 +11,15 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import Alert from '@components/views/Alert'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useBackAction } from '@lib/hooks/BackAction'
+import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { Chats, useInference } from '@lib/state/Chat'
+import { authorNoteEditorState } from '@lib/state/components/AuthorNotes'
 import { Logger } from '@lib/state/Logger'
 import { useTTSStore } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
 import { ChatSwipe } from 'db/schema'
 
+import { useAuthorNoteState } from '../AuthorNote'
 import { useChatEditorStore } from './ChatEditor'
 import ChatTTS from './ChatTTS'
 
@@ -57,6 +60,8 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
     )
 
     const showEditor = useChatEditorStore((state) => state.show)
+    const showNoteEditor = authorNoteEditorState(useShallow((state) => state.setVisible))
+    const showAuthorNotes = useAuthorNoteState(useShallow((state) => state.setVisible))
     const { t } = useTranslation()
     const { color } = Theme.useTheme()
     const [quickDelete] = useMMKVBoolean(AppSettings.QuickDelete)
@@ -87,6 +92,32 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
                         }
                         setShowOptions(undefined)
                         setId(newChatId)
+                    },
+                },
+            ],
+        })
+    }
+
+    const handleCreateAuthorNote = () => {
+        if (!chatId) return
+        Alert.alert({
+            title: t('chat.quickActions.createNote.title'),
+            description: t('chat.quickActions.createNote.description'),
+            buttons: [
+                { label: t('common.actions.cancel') },
+                {
+                    label: t('chat.quickActions.createNote.button'),
+                    onPress: async () => {
+                        const newNoteId = await AuthorNotes.db.mutate.createNote({
+                            chat_id: chatId,
+                            content: swipe.swipe,
+                        })
+                        if (!newNoteId) {
+                            Logger.errorToast(t('chat.quickActions.errors.noteCreateFailed'))
+                            return
+                        }
+                        showAuthorNotes(true)
+                        showNoteEditor(true, newNoteId)
                     },
                 },
             ],
@@ -168,7 +199,19 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
                                 />
                             </Animated.View>
                         )}
-
+                        <Animated.View
+                            entering={ZoomIn.duration(200)}
+                            exiting={ZoomOut.duration(200)}>
+                            <ThemedButton
+                                variant="tertiary"
+                                iconName="font-colors"
+                                iconSize={22}
+                                iconStyle={{
+                                    color: color.text._500,
+                                }}
+                                onPress={handleCreateAuthorNote}
+                            />
+                        </Animated.View>
                         <Animated.View
                             entering={ZoomIn.duration(200)}
                             exiting={ZoomOut.duration(200)}>

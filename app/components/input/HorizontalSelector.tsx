@@ -69,6 +69,7 @@ const HorizontalSelector = <T,>({
                     style={{
                         flex: style?.flex ?? 1,
                         color: color.text._100,
+                        paddingBottom: spacing.s,
                     }}>
                     {label}
                 </Text>

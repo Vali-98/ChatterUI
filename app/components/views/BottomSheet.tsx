@@ -14,6 +14,7 @@ export interface BottomSheetProps {
     children: ReactNode
     sheetStyle?: ViewStyle
     onClose?: () => void
+    onRequestClose?: (close: () => void) => void
 }
 
 const BottomSheet: React.FC<BottomSheetProps> = ({
@@ -22,6 +23,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     children,
     onClose,
     sheetStyle,
+    onRequestClose,
 }) => {
     const { color, spacing } = Theme.useTheme()
     const insets = useSafeAreaInsets()
@@ -39,6 +41,10 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
             statusBarTranslucent
             navigationBarTranslucent
             onRequestClose={() => {
+                if (onRequestClose) {
+                    onRequestClose(() => setVisible(false))
+                    return
+                }
                 setVisible(false)
                 onClose?.()
             }}

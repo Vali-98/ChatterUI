@@ -24,7 +24,6 @@ const AuthorNoteSheet = () => {
     return (
         <BottomSheet sheetStyle={{ flex: 1 }} visible={visible} setVisible={setVisible}>
             <AuthorNoteBody />
-            {/**Editor here */}
         </BottomSheet>
     )
 }

@@ -1,19 +1,22 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
+import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import { AuthorNotes, NoteType } from '@lib/state/AuthorNotes'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
+import { authorNoteBodyState } from '@lib/state/components/AuthorNotes'
 import { Logger } from '@lib/state/Logger'
 
 import AuthorNoteList from './AuthorNoteList'
 
 const AuthorNoteBody = () => {
     const { t } = useTranslation()
-    const [currentNoteType, setCurrentNoteType] = useState(NoteType.CHAT)
+    const { currentNoteType, setCurrentNoteType } = authorNoteBodyState(
+        useShallow((state) => state)
+    )
     const { id: chatId } = Chats.useChatState()
     const { id: characterId } = Characters.useCharacterStore()
 

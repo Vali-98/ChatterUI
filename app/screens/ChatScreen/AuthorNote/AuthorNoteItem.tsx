@@ -7,9 +7,8 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
 import { AuthorNotes } from '@lib/state/AuthorNotes'
+import { authorNoteEditorState } from '@lib/state/components/AuthorNotes'
 import { Theme } from '@lib/theme/ThemeManager'
-
-import { authorNoteEditorState } from './AuthorNoteEditor'
 
 type AuthorNoteItemProps = {
     id: number
@@ -63,7 +62,7 @@ const AuthorNoteItem: React.FC<AuthorNoteItemProps> = ({ id }) => {
                     <Text style={{ color: color.text._400, fontSize: fontSize.l }}>
                         {note.name}
                     </Text>
-                    <Text style={{ color: color.text._700 }}>
+                    <Text style={{ color: color.text._700 }} numberOfLines={3} ellipsizeMode="tail">
                         {note.content.replaceAll('\n', ' ') || t('authorNotes.item.noContent')}
                     </Text>
                 </View>
