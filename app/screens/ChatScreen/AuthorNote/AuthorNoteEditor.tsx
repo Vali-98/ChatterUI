@@ -18,10 +18,45 @@ import { Chats } from '@lib/state/Chat'
 import { authorNoteBodyState, authorNoteEditorState } from '@lib/state/components/AuthorNotes'
 import { Theme } from '@lib/theme/ThemeManager'
 
-const authorNoteTypeFromIds = (charId: number | null, chatId: number | null) => {
-    if (chatId) return NoteType.CHAT
-    if (charId) return NoteType.CHARACTER
+const getNoteTypeFromIds = (note: AuthorNote) => {
+    if (note.chat_id) return NoteType.CHAT
+    if (note.character_id) return NoteType.CHARACTER
     return NoteType.GLOBAL
+}
+
+const getUpdateValue = (
+    noteType: NoteType,
+    charId: number | undefined,
+    chatId: number | undefined
+) => {
+    let updates: Partial<AuthorNote> | null = null
+    switch (noteType) {
+        case NoteType.CHARACTER:
+            if (charId) {
+                updates = {
+                    character_id: charId,
+                    chat_id: null,
+                }
+            }
+            break
+
+        case NoteType.CHAT:
+            if (chatId) {
+                updates = {
+                    character_id: null,
+                    chat_id: chatId,
+                }
+            }
+            break
+
+        case NoteType.GLOBAL:
+            updates = {
+                character_id: null,
+                chat_id: null,
+            }
+            break
+    }
+    return updates
 }
 
 const AuthorNoteEditor = () => {
@@ -31,12 +66,12 @@ const AuthorNoteEditor = () => {
     const setCurrentNoteType = authorNoteBodyState(useShallow((state) => state.setCurrentNoteType))
     const charId = Characters.useCharacterStore(useShallow((state) => state.id))
     const chatId = Chats.useChatState(useShallow((state) => state.id))
-    const { visible, setVisible, noteId } = authorNoteEditorState((state) => state)
+    const { visible, setVisible, noteId } = authorNoteEditorState(useShallow((state) => state))
     const [placeHolderNote, setPlaceHolderNote] = useState<AuthorNote | undefined>(undefined)
     const [edited, setEdited] = useState(false)
     const {
         data: [note],
-    } = useLiveQueryJoined(AuthorNotes.db.live.note(noteId ?? -1), [noteId], {
+    } = useLiveQueryJoined(AuthorNotes.db.live.note(noteId ?? -1), [noteId ?? -1], {
         targets: [
             {
                 tableName: 'author_notes',
@@ -88,43 +123,18 @@ const AuthorNoteEditor = () => {
 
     if (note === undefined || placeHolderNote === undefined || !noteId || !visible) return
 
-    const handleUpdateNoteType = async (noteType: NoteType) => {
-        let updates: Partial<AuthorNote> | null = null
-
-        switch (noteType) {
-            case NoteType.CHARACTER:
-                if (charId) {
-                    updates = {
-                        character_id: charId,
-                        chat_id: null,
-                    }
-                }
-                break
-
-            case NoteType.CHAT:
-                if (chatId) {
-                    updates = {
-                        character_id: null,
-                        chat_id: chatId,
-                    }
-                }
-                break
-
-            case NoteType.GLOBAL:
-                updates = {
-                    character_id: null,
-                    chat_id: null,
-                }
-                break
-        }
-
+    const handleUpdateNoteType = async (
+        noteType: NoteType,
+        charId: number | undefined,
+        chatId: number | undefined
+    ) => {
+        const updates = getUpdateValue(noteType, charId, chatId)
         if (!updates) return
-
         const updated = await AuthorNotes.db.mutate.updateNote(note.id, updates).then(() => true)
-
         if (updated) setCurrentNoteType(noteType)
     }
 
+    const selectedNoteType = getNoteTypeFromIds(placeHolderNote)
     return (
         <BottomSheet
             onRequestClose={backAction}
@@ -185,8 +195,11 @@ const AuthorNoteEditor = () => {
                         },
                         { label: t('authorNotes.selector.global'), value: NoteType.GLOBAL },
                     ]}
-                    selected={authorNoteTypeFromIds(note.character_id, note.chat_id)}
-                    onPress={handleUpdateNoteType}
+                    selected={selectedNoteType}
+                    onPress={(type) => {
+                        if (type === selectedNoteType) return
+                        handleUpdateNoteType(type, charId, chatId)
+                    }}
                 />
             </ScrollView>
 
