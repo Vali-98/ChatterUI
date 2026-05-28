@@ -10,8 +10,9 @@ import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import BottomSheet from '@components/views/BottomSheet'
 import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
-import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
+import { APIConfiguration, APIValues } from '@lib/engine/API/APIBuilder.types'
 import { APIManager, APIManagerValue } from '@lib/engine/API/APIManagerState'
+import { useDebounce } from '@lib/hooks/Debounce'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getNestedValue } from '@lib/utils/Parsing'
@@ -52,33 +53,43 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
             close()
             return
         }
+        if (newTemplate.name !== template.name) setTemplate(newTemplate)
+    }, [close, values, getTemplates, t, template])
 
-        setTemplate(newTemplate)
-    }, [close, values, getTemplates, t])
-
-    const handleGetModelList = useCallback(async () => {
-        if (!template.features.useModel || !show) return
-        const auth: any = {}
-        if (template.features.useKey) {
-            auth[template.request.authHeader] = template.request.authPrefix + values.key
-            if (template.name === 'Claude') {
-                auth['anthropic-version'] = CLAUDE_VERSION
+    const handleGetModelList = useCallback(
+        async (values: APIValues) => {
+            if (!template.features.useModel || !show) return
+            const auth: any = {}
+            if (template.features.useKey) {
+                auth[template.request.authHeader] = template.request.authPrefix + values.key
+                if (template.name === 'Claude') {
+                    auth['anthropic-version'] = CLAUDE_VERSION
+                }
             }
-        }
-        const result = await fetch(values.modelEndpoint, { headers: { ...auth } })
-        const data = await result.json()
-        if (result.status !== 200) {
-            Logger.error(t('connections.add.error.200', `${data?.error?.message}`))
-            return
-        }
-        const models = getNestedValue(data, template.model.modelListParser)
-        setModelList(models)
-    }, [show, template, values, t])
+            const result = await fetch(values.modelEndpoint, { headers: { ...auth } })
+            if (result.status !== 200) {
+                Logger.error(t('connections.add.error.200', { error: `${result.status}` }))
+                return
+            }
+
+            const data = await result.json().catch(() => null)
+            if (!data) return
+
+            const models = getNestedValue(data, template.model.modelListParser)
+            setModelList(models)
+        },
+        [show, template, t]
+    )
+
+    const debouncedModelList = useDebounce(handleGetModelList, 300)
     // TODO: Replace with react query
     useEffect(() => {
         setValues(originalValues)
-        handleGetModelList()
-    }, [originalValues, handleGetModelList])
+    }, [originalValues])
+
+    useEffect(() => {
+        debouncedModelList(values)
+    }, [debouncedModelList, values])
 
     return (
         <BottomSheet
@@ -127,6 +138,17 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                         </View>
                     )}
 
+                    {template.features.useKey && (
+                        <ThemedTextInput
+                            secureTextEntry
+                            label={t('connections.editor.apiKey')}
+                            value={values.key}
+                            onChangeText={(value) => {
+                                setValues({ ...values, key: value })
+                            }}
+                        />
+                    )}
+
                     {template.ui.editableModelPath && (
                         <View>
                             <ThemedTextInput
@@ -147,20 +169,9 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                                           }
                                         : {}
                                 }
-                                callback={handleGetModelList}
+                                callback={() => handleGetModelList(values)}
                             />
                         </View>
-                    )}
-
-                    {template.features.useKey && (
-                        <ThemedTextInput
-                            secureTextEntry
-                            label={t('connections.editor.apiKey')}
-                            value={values.key}
-                            onChangeText={(value) => {
-                                setValues({ ...values, key: value })
-                            }}
-                        />
                     )}
 
                     {template.features.useModel && (
@@ -202,14 +213,6 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                                         modalTitle={t('connections.editor.selectModel')}
                                     />
                                 )}
-                                <ThemedButton
-                                    onPress={() => {
-                                        handleGetModelList()
-                                    }}
-                                    iconName="reload"
-                                    iconSize={18}
-                                    variant="secondary"
-                                />
                             </View>
                         </View>
                     )}
@@ -243,13 +246,30 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                         </View>
                     )}
                 </ScrollView>
-                <ThemedButton
-                    label={t('connections.editor.saveButton')}
-                    onPress={() => {
-                        editValue(values, index)
-                        close()
-                    }}
-                />
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        paddingTop: 8,
+                        justifyContent: 'space-between',
+                    }}>
+                    <ThemedButton
+                        variant="tertiary"
+                        iconName="reload"
+                        label={t('common.actions.reset')}
+                        onPress={() => {
+                            setValues(originalValues)
+                        }}
+                    />
+                    <ThemedButton
+                        variant="secondary"
+                        label={t('common.actions.save')}
+                        iconName="save"
+                        onPress={() => {
+                            editValue(values, index)
+                            close()
+                        }}
+                    />
+                </View>
             </View>
         </BottomSheet>
     )

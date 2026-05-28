@@ -1,11 +1,9 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
 import { useDebounce } from '@lib/hooks/Debounce'
 import { Theme } from '@lib/theme/ThemeManager'
-
-import ThemedButton from './ThemedButton'
 
 const enum ResponseStatus {
     DEFAULT,
@@ -54,27 +52,35 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
         }
     }, [status, messageNeutral, propMessageError, propMessageOK, t])
 
-    const handleCheck = useCallback(async () => {
-        const endpoint = apiFormat(api)
-        try {
-            const controller = new AbortController()
-            const timeout = setTimeout(() => {
-                controller.abort()
-            }, 1000)
-            const response = await fetch(endpoint, {
-                method: 'GET',
-                signal: controller.signal,
-                headers: headers ?? {},
-            }).catch(() => ({ status: 400 }))
-            clearTimeout(timeout)
-            callback()
-            setStatus(response.status === 200 ? ResponseStatus.OK : ResponseStatus.ERROR)
-        } catch {
-            setStatus(ResponseStatus.ERROR)
-        }
-    }, [api, apiFormat, callback, headers])
+    const handleCheck = useCallback(
+        async (api: string) => {
+            const endpoint = apiFormat(api)
+            try {
+                const controller = new AbortController()
+                const timeout = setTimeout(() => {
+                    controller.abort()
+                }, 1000)
+                const response = await fetch(endpoint, {
+                    method: 'GET',
+                    signal: controller.signal,
+                    headers: headers ?? {},
+                }).catch(() => ({ status: 400 }))
+                clearTimeout(timeout)
+                if (callback) callback()
 
-    useDebounce(handleCheck, 300)
+                setStatus(response.status === 200 ? ResponseStatus.OK : ResponseStatus.ERROR)
+            } catch {
+                setStatus(ResponseStatus.ERROR)
+            }
+        },
+        [apiFormat, callback, headers]
+    )
+
+    const debouncedCheck = useDebounce(handleCheck, 300)
+
+    useEffect(() => {
+        if (api) debouncedCheck(api)
+    }, [api, debouncedCheck])
 
     const getButtonColor = () => {
         switch (status) {
@@ -91,11 +97,6 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
 
     return (
         <View style={{ flexDirection: 'row', marginTop: 8 }}>
-            <ThemedButton
-                label={t('common.actions.test')}
-                onPress={handleCheck}
-                variant="secondary"
-            />
             <View
                 style={{
                     marginLeft: 4,
