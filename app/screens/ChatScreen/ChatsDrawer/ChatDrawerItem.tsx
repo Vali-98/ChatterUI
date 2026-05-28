@@ -32,7 +32,7 @@ const ChatDrawerItem: React.FC<ChatDrawerItemProps> = ({ item, onLoad }) => {
                             justifyContent: 'space-between',
                         }}>
                         <View style={{ flexDirection: 'row' }}>
-                            <Ionicons name="chatbox" size={20} color={color.text._400} />
+                            <Ionicons name="chatbox" size={20} color={color.text._700} />
                             <Text style={styles.smallTextChat}>{item.entryCount}</Text>
                         </View>
                         <View style={{ flexDirection: 'row' }}>
@@ -78,8 +78,8 @@ const useStyles = () => {
             borderWidth: borderWidth.m,
             borderColor: color.primary._500,
         },
-        smallText: { color: color.text._400, marginLeft: spacing.l },
-        smallTextChat: { color: color.text._400, marginLeft: spacing.sm },
+        smallText: { color: color.text._700, marginLeft: spacing.l },
+        smallTextChat: { color: color.text._600, marginLeft: spacing.sm },
 
         editButton: {
             paddingHorizontal: spacing.m,
