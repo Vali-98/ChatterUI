@@ -6,7 +6,7 @@ import Animated, { Easing, SlideInLeft, SlideOutLeft } from 'react-native-reanim
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import HorizontalSelector from '@components/input/HorizontalSelector'
 import SectionTitle from '@components/text/SectionTitle'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
@@ -130,9 +130,14 @@ const ModelManagerScreen = () => {
                     exit={() => setShowSettings(false)}
                 />
             )}
-            <ThemedButton
-                label={showSettings ? t('common.actions.back') : t('common.navigation.settings')}
-                onPress={() => setShowSettings(!showSettings)}
+            <HorizontalSelector
+                style={{ flex: 0 }}
+                values={[
+                    { label: t('model.title'), value: false },
+                    { label: t('common.navigation.settings'), value: true },
+                ]}
+                selected={showSettings}
+                onPress={setShowSettings}
             />
         </SafeAreaView>
     )
