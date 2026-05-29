@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons'
+import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Linking } from 'react-native'

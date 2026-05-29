@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons'
+import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'

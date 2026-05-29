@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons'
+import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 

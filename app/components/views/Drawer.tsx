@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesignIconName } from '@react-native-vector-icons/ant-design/static'
 import { useFocusEffect } from 'expo-router'
 import React, { ComponentProps, ReactNode, useCallback } from 'react'
 import { BackHandler, StyleSheet, View, ViewStyle } from 'react-native'
@@ -48,8 +48,8 @@ type DrawerBodyProps = {
 
 interface DrawerButtonProps extends ThemedButtonProps {
     drawerID: Drawer.ID
-    openIcon?: keyof typeof AntDesign.glyphMap
-    closeIcon?: keyof typeof AntDesign.glyphMap
+    openIcon?: AntDesignIconName
+    closeIcon?: AntDesignIconName
 }
 
 type DrawerGestureConfig = {

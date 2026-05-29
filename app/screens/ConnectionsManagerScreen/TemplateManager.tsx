@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons'
+import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, Linking, Text, View } from 'react-native'

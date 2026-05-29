@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons'
+import AntDesign, { AntDesignIconName } from '@react-native-vector-icons/ant-design/static'
 import { Href, useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native'
@@ -12,7 +12,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 type ButtonData = {
     name: string
     path: Href
-    icon?: keyof typeof AntDesign.glyphMap
+    icon?: AntDesignIconName
 }
 
 type DrawerButtonProps = {

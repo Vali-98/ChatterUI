@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons'
+import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { SplashScreen } from 'expo-router'
 import { useEffect, useState } from 'react'

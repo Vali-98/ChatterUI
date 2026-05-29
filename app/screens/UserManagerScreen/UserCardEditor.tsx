@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons'
+import AntDesign from '@react-native-vector-icons/ant-design/static'
 import * as DocumentPicker from 'expo-document-picker'
 import React, { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'

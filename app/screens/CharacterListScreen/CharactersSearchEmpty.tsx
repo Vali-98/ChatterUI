@@ -1,4 +1,4 @@
-import { Octicons } from '@expo/vector-icons'
+import Octicons from '@react-native-vector-icons/octicons/static'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 

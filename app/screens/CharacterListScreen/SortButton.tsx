@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons'
+import AntDesign from '@react-native-vector-icons/ant-design/static'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'

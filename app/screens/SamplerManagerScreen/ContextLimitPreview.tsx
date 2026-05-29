@@ -1,4 +1,5 @@
-import { AntDesign, MaterialIcons } from '@expo/vector-icons'
+import AntDesign from '@react-native-vector-icons/ant-design/static'
+import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'

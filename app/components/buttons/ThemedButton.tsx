@@ -1,4 +1,5 @@
-import { AntDesign, MaterialIcons } from '@expo/vector-icons'
+import AntDesign, { AntDesignIconName } from '@react-native-vector-icons/ant-design/static'
+import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import { ReactNode } from 'react'
 import {
     PressableProps,
@@ -21,7 +22,7 @@ export interface ThemedButtonProps extends Omit<PressableProps, 'style'> {
     buttonStyle?: ViewStyle
     opacity?: number
     variant?: ButtonVariant
-    iconName?: keyof typeof AntDesign.glyphMap
+    iconName?: AntDesignIconName
     iconSize?: number
     iconStyle?: TextStyle
     icon?: ReactNode

@@ -1,4 +1,4 @@
-import { Octicons } from '@expo/vector-icons'
+import Octicons from '@react-native-vector-icons/octicons/static'
 import React, { useMemo } from 'react'
 import { View } from 'react-native'
 import Animated, {

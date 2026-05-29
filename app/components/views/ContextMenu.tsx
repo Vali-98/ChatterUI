@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons'
+import AntDesign, { AntDesignIconName } from '@react-native-vector-icons/ant-design/static'
 import { randomUUID } from 'expo-crypto'
 import { useFocusEffect } from 'expo-router'
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
@@ -43,7 +43,7 @@ export type ContextMenuButtonProps = {
     label?: string
     onPress?: (close: () => void) => void
     submenu?: ContextMenuButtonProps[]
-    icon?: keyof typeof AntDesign.glyphMap
+    icon?: AntDesignIconName
     iconSize?: number
     textColor?: string
     variant?: 'normal' | 'warning'
@@ -53,7 +53,7 @@ export type ContextMenuButtonProps = {
 }
 
 export interface ContextMenuProps extends ViewProps {
-    triggerIcon?: keyof typeof AntDesign.glyphMap
+    triggerIcon?: AntDesignIconName
     triggerIconSize?: number
     triggerStyle?: TextStyle
     buttons: ContextMenuButtonProps[]

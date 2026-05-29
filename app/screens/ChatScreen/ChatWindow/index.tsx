@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons'
+import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { ImageBackground } from 'expo-image'
 import { useEffect, useRef, useState } from 'react'
 import { FlatList, Pressable } from 'react-native'

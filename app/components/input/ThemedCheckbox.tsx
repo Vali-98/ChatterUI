@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons'
+import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useEffect } from 'react'
 import { Pressable, Text, ViewStyle } from 'react-native'
 import Animated, {

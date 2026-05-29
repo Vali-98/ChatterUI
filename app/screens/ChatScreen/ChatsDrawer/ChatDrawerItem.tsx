@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons'
+import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import { StyleSheet, Text, View } from 'react-native'
 
 import { Chats } from '@lib/state/Chat'

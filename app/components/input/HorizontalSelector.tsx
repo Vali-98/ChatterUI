@@ -1,4 +1,6 @@
-import { MaterialIcons } from '@expo/vector-icons'
+import MaterialIcons, {
+    MaterialIconsIconName,
+} from '@react-native-vector-icons/material-icons/static'
 import { useEffect, useRef } from 'react'
 import { Pressable, Text, View, ViewStyle } from 'react-native'
 import Animated, {
@@ -14,7 +16,7 @@ type HorizontalSelectorProps<T> = {
     values: {
         label: string
         value: T
-        icon?: keyof typeof MaterialIcons.glyphMap
+        icon?: MaterialIconsIconName
         iconSize?: number
     }[]
     selected: T

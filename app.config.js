@@ -98,6 +98,13 @@ module.exports = {
             './expo-build-plugins/usercert.plugin.js',
             './expo-build-plugins/rnllama.plugin.js',
             './expo-build-plugins/copyhtp.plugin.js',
+            /**
+             * Future icon usage will need to be added here
+             * https://github.com/oblador/react-native-vector-icons/blob/master/docs/SETUP-EXPO.md
+             */
+            '@react-native-vector-icons/ant-design',
+            '@react-native-vector-icons/octicons',
+            '@react-native-vector-icons/material-icons',
         ],
         experiments: {
             typedRoutes: true,
