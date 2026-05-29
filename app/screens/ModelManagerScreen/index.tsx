@@ -42,19 +42,16 @@ const ModelManagerScreen = () => {
         }))
     )
 
-    const data =
-        modelList.length !== 0 && mmprojList.length !== 0
-            ? [
-                  {
-                      title: t('model.title'),
-                      data: modelList,
-                  },
-                  {
-                      title: t('model.mtmd'),
-                      data: mmprojList,
-                  },
-              ]
-            : []
+    const data = [
+        {
+            title: t('model.title'),
+            data: modelList ?? [],
+        },
+        {
+            title: t('model.mtmd'),
+            data: mmprojList ?? [],
+        },
+    ]
 
     return (
         <SafeAreaView
@@ -92,9 +89,6 @@ const ModelManagerScreen = () => {
                     <SectionList
                         style={{
                             marginTop: 16,
-                            flex: 1,
-                        }}
-                        contentContainerStyle={{
                             flex: 1,
                         }}
                         sections={data}
