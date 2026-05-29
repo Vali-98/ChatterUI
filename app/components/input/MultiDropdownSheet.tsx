@@ -1,4 +1,4 @@
-import { Entypo } from '@expo/vector-icons'
+import { Octicons } from '@expo/vector-icons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
@@ -143,7 +143,7 @@ const MultiDropdownSheet = <T,>({
                 {(!selected || selected.length === 0) && (
                     <Text style={styles.placeholderText}>{finalPlaceholder}</Text>
                 )}
-                <Entypo name="chevron-down" color={color.primary._800} size={18} />
+                <Octicons name="chevron-down" color={color.primary._800} size={18} />
             </Pressable>
         </View>
     )

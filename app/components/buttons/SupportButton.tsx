@@ -1,4 +1,4 @@
-import { FontAwesome } from '@expo/vector-icons'
+import { MaterialIcons } from '@expo/vector-icons'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Linking } from 'react-native'
@@ -18,7 +18,7 @@ const SupportButton = () => {
             }}
             variant="secondary"
             label={t('about.support.button')}
-            icon={<FontAwesome name="coffee" size={16} color={theme.color.primary._700} />}
+            icon={<MaterialIcons name="coffee" size={16} color={theme.color.primary._700} />}
         />
     )
 }

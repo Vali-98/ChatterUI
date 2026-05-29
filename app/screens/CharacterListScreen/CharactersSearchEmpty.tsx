@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons'
+import { Octicons } from '@expo/vector-icons'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
@@ -16,7 +16,7 @@ const CharSearchEmpty = () => {
                 alignItems: 'center',
                 marginTop: spacing.xl3,
             }}>
-            <Ionicons name="search" color={color.text._400} size={60} />
+            <Octicons name="search" color={color.text._400} size={60} />
             <Text
                 style={{
                     color: color.text._400,

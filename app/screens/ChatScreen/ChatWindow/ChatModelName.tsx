@@ -1,8 +1,8 @@
-import { Ionicons } from '@expo/vector-icons'
+import { AntDesign } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { View, Text, TouchableOpacity } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -37,7 +37,7 @@ const ChatModelName = () => {
             <TouchableOpacity
                 onPress={() => router.push('/screens/ModelManagerScreen')}
                 style={{ paddingLeft: spacing.xl2, paddingVertical: spacing.m }}>
-                <Ionicons name="caret-forward" color={color.primary._500} size={18} />
+                <AntDesign name="caret-right" color={color.primary._500} size={18} />
             </TouchableOpacity>
         </View>
     )

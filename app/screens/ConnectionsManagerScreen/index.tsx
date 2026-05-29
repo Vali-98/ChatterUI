@@ -1,4 +1,4 @@
-import { AntDesign, Ionicons } from '@expo/vector-icons'
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { FlatList, Pressable, Text, View } from 'react-native'
@@ -58,7 +58,7 @@ const ConnectionsManagerScreen = () => {
 
             {apiValues.length === 0 && (
                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                    <Ionicons name="cloud-offline-outline" size={64} color={color.text._700} />
+                    <MaterialIcons name="cloud-off" size={64} color={color.text._700} />
                     <Text
                         style={{
                             color: color.text._400,

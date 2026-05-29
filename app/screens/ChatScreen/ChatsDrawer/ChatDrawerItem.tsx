@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons'
+import { MaterialIcons } from '@expo/vector-icons'
 import { StyleSheet, Text, View } from 'react-native'
 
 import { Chats } from '@lib/state/Chat'
@@ -32,7 +32,11 @@ const ChatDrawerItem: React.FC<ChatDrawerItemProps> = ({ item, onLoad }) => {
                             justifyContent: 'space-between',
                         }}>
                         <View style={{ flexDirection: 'row' }}>
-                            <Ionicons name="chatbox" size={20} color={color.text._700} />
+                            <MaterialIcons
+                                name="chat-bubble-outline"
+                                size={20}
+                                color={color.text._700}
+                            />
                             <Text style={styles.smallTextChat}>{item.entryCount}</Text>
                         </View>
                         <View style={{ flexDirection: 'row' }}>

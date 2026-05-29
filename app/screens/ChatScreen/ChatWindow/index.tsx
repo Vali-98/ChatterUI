@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons'
+import { AntDesign } from '@expo/vector-icons'
 import { ImageBackground } from 'expo-image'
 import { useEffect, useRef, useState } from 'react'
 import { FlatList, Pressable } from 'react-native'
@@ -168,7 +168,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                                 viewPosition: 1,
                             })
                         }}>
-                        <Ionicons
+                        <AntDesign
                             name="caret-down"
                             size={16}
                             style={{

@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons'
+import { AntDesign } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
@@ -7,8 +7,8 @@ import ContextMenu from '@components/views/ContextMenu'
 import Drawer from '@components/views/Drawer'
 import { Theme } from '@lib/theme/ThemeManager'
 
-import ChatTokenCount from './ChatTokenCount'
 import { useAuthorNoteState } from '../AuthorNote'
+import ChatTokenCount from './ChatTokenCount'
 
 type ChatOptionsProps = {
     disabled: boolean
@@ -67,7 +67,7 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
                 },
             ]}
             placement="top">
-            <Ionicons
+            <AntDesign
                 name="caret-up"
                 style={[styles.optionsButton, { opacity: disabled ? 0.5 : 1 }]}
                 size={24}

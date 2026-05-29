@@ -1,4 +1,4 @@
-import { Entypo } from '@expo/vector-icons'
+import { Octicons } from '@expo/vector-icons'
 import React, { useState } from 'react'
 import { Pressable, Text, TextStyle, View, ViewProps, ViewStyle } from 'react-native'
 
@@ -40,7 +40,7 @@ const Accordion: React.FC<AccordionProps> = ({
                     ...accordionStyle,
                 }}>
                 <Text style={{ color: color.text._100, ...labelStyle }}>{label}</Text>
-                <Entypo
+                <Octicons
                     name={show ? 'chevron-up' : 'chevron-down'}
                     color={color.primary._800}
                     size={18}

@@ -1,4 +1,4 @@
-import { FontAwesome } from '@expo/vector-icons'
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
@@ -43,23 +43,36 @@ const ContextLimitPreview: React.FC<ContextLimitPreviewProps> = ({ generatedLeng
                 borderRadius={12}
                 width={null}
             />
-            <View style={{ flexDirection: 'row', columnGap: 24 }}>
-                <Text style={{ color: color.text._400 }}>
-                    <FontAwesome
-                        name={warning ? 'exclamation-circle' : 'circle'}
+            <View style={{ flexDirection: 'row', columnGap: 4, alignItems: 'center' }}>
+                {warning ? (
+                    <AntDesign
+                        name={'exclamation-circle'}
+                        size={16}
                         style={{
-                            color: warning ? color.error._300 : color.primary._400,
+                            color: color.error._400,
                         }}
-                    />{' '}
+                    />
+                ) : (
+                    <MaterialIcons
+                        name="circle"
+                        size={16}
+                        style={{
+                            color: color.primary._400,
+                        }}
+                    />
+                )}
+                <Text style={{ color: color.text._400, textAlign: 'center' }}>
                     {t('contextlimit.chat')}: {leftover}
                 </Text>
-                <Text style={{ color: color.text._400 }}>
-                    <FontAwesome
-                        name="circle"
-                        style={{
-                            color: genLengthColor,
-                        }}
-                    />{' '}
+                <MaterialIcons
+                    name="circle"
+                    size={16}
+                    style={{
+                        color: genLengthColor,
+                        marginLeft: 12,
+                    }}
+                />
+                <Text style={{ color: color.text._400, textAlign: 'center' }}>
                     {t('contextlimit.generated')}: {generatedLength}
                 </Text>
             </View>
