@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { AntDesign } from '@expo/vector-icons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, Linking, Text, View } from 'react-native'
@@ -121,11 +121,7 @@ const TemplateManager = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                     }}>
-                    <MaterialCommunityIcons
-                        name="file-question-outline"
-                        size={64}
-                        color={color.text._700}
-                    />
+                    <AntDesign name="file-unknown" size={64} color={color.text._700} />
                     <Text
                         style={{
                             color: color.text._400,
