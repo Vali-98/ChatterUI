@@ -1,12 +1,16 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import Animated, {
+    interpolateColor,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+} from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
-import Alert from '@components/views/Alert'
-import { APIManagerValue, APIManager } from '@lib/engine/API/APIManagerState'
+import { APIManager, APIManagerValue } from '@lib/engine/API/APIManagerState'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ConnectionEditor from './ConnectionEditor'
@@ -17,36 +21,33 @@ type ConnectionItemProps = {
 }
 
 const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
-    const { t } = useTranslation()
-    const { spacing } = Theme.useTheme()
+    const { spacing, color } = Theme.useTheme()
     const styles = useStyles()
     const [showEditor, setShowEditor] = useState(false)
-    const { removeValue, editValue } = APIManager.useConnectionsStore(
+    const { editValue } = APIManager.useConnectionsStore(
         useShallow((state) => ({
-            removeValue: state.removeValue,
             editValue: state.editValue,
         }))
     )
 
-    const handleDelete = () => {
-        Alert.alert({
-            title: t('connections.item.delete.title'),
-            description: t('connections.item.delete.description', { name: item.friendlyName }),
-            buttons: [
-                { label: t('common.actions.cancel') },
-                {
-                    label: t('connections.item.delete.button'),
-                    onPress: () => {
-                        removeValue(index)
-                    },
-                    type: 'warning',
-                },
-            ],
+    const activeProgress = useSharedValue(item.active ? 1 : 0)
+
+    useEffect(() => {
+        activeProgress.value = withTiming(item.active ? 1 : 0, {
+            duration: 200,
         })
-    }
+    }, [activeProgress, item.active])
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        borderColor: interpolateColor(
+            activeProgress.value,
+            [0, 1],
+            [color.neutral._200, color.primary._500]
+        ),
+    }))
 
     return (
-        <View style={item.active ? styles.longContainer : styles.longContainerInactive}>
+        <Animated.View style={[styles.longContainer, animatedStyle]}>
             <ConnectionEditor
                 index={index}
                 originalValues={item}
@@ -72,23 +73,14 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
                     </Text>
                 </View>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <ThemedButton
-                    onPress={handleDelete}
-                    variant="critical"
-                    iconName="delete"
-                    iconSize={24}
-                    buttonStyle={{ borderWidth: 0 }}
-                />
-                <ThemedButton
-                    onPress={() => setShowEditor(true)}
-                    variant="tertiary"
-                    iconName="edit"
-                    iconSize={24}
-                    buttonStyle={{ borderWidth: 0 }}
-                />
-            </View>
-        </View>
+            <ThemedButton
+                onPress={() => setShowEditor(true)}
+                variant="tertiary"
+                iconName="edit"
+                iconSize={24}
+                buttonStyle={{ borderWidth: 0 }}
+            />
+        </Animated.View>
     )
 }
 
@@ -98,20 +90,6 @@ const useStyles = () => {
     const { color, spacing, borderWidth, fontSize } = Theme.useTheme()
     return StyleSheet.create({
         longContainer: {
-            borderColor: color.primary._500,
-            borderWidth: borderWidth.m,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderRadius: spacing.xl,
-            flex: 1,
-            paddingLeft: spacing.xl,
-            paddingRight: spacing.xl,
-            paddingVertical: spacing.xl,
-        },
-
-        longContainerInactive: {
-            borderColor: color.neutral._200,
             borderWidth: borderWidth.m,
             flexDirection: 'row',
             justifyContent: 'space-between',
