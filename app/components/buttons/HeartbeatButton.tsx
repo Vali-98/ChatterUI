@@ -104,7 +104,7 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
                     borderColor:
                         status === ResponseStatus.DEFAULT ? color.neutral._100 : buttonColor,
                     padding: 8,
-                    minWidth: 160,
+                    minWidth: 150,
                     alignItems: 'center',
                     paddingHorizontal: 16,
                     borderWidth: 1,

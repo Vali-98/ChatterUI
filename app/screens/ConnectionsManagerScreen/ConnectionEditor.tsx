@@ -135,7 +135,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                 <ScrollView
                     style={{ flex: 1 }}
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ rowGap: 12, paddingBottom: 32 }}>
+                    contentContainerStyle={{ rowGap: 16, paddingBottom: 32 }}>
                     <ThemedTextInput
                         label={t('connections.editor.friendlyName')}
                         value={values.friendlyName}
@@ -171,7 +171,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                     )}
 
                     {template.ui.editableModelPath && (
-                        <View>
+                        <View style={{ flexDirection: 'row' }}>
                             <ThemedTextInput
                                 label={t('connections.editor.modelUrl')}
                                 value={values.modelEndpoint}
@@ -179,19 +179,21 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                                     setValues({ ...values, modelEndpoint: value })
                                 }}
                             />
-                            <HeartbeatButton
-                                api={values.modelEndpoint ?? ''}
-                                apiFormat={(s) => s}
-                                headers={
-                                    template.features.useKey
-                                        ? {
-                                              [template.request.authHeader]:
-                                                  template.request.authPrefix + values.key,
-                                          }
-                                        : {}
-                                }
-                                callback={() => handleGetModelList(values)}
-                            />
+                            <View style={{ marginTop: 20 }}>
+                                <HeartbeatButton
+                                    api={values.modelEndpoint ?? ''}
+                                    apiFormat={(s) => s}
+                                    headers={
+                                        template.features.useKey
+                                            ? {
+                                                  [template.request.authHeader]:
+                                                      template.request.authPrefix + values.key,
+                                              }
+                                            : {}
+                                    }
+                                    callback={() => handleGetModelList(values)}
+                                />
+                            </View>
                         </View>
                     )}
 
