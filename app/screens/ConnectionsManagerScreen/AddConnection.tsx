@@ -67,6 +67,7 @@ const AddConnection = () => {
     }, [template, values, t])
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         handleGetModelList()
     }, [template, handleGetModelList])
 

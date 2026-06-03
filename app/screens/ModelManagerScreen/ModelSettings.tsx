@@ -51,7 +51,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
     }
 
     useEffect(() => {
-        getKVSize()
+        KV.getKVSize().then(setKVSize)
     }, [])
 
     const backAction = () => {

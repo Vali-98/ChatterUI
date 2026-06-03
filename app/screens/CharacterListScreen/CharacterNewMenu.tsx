@@ -1,8 +1,8 @@
 import { useRouter } from 'expo-router'
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useShallow } from 'zustand/react/shallow'
 
+import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import InputSheet from '@components/views/InputSheet'
 import { Characters } from '@lib/state/Characters'
@@ -23,7 +23,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
     )
 
     const router = useRouter()
-    const [showNewChar, setShowNewChar] = useState<boolean>(false)
+    const inputRef = useBottomSheetRef()
 
     const handleCreateCharacter = async (text: string) => {
         if (!text) {
@@ -42,8 +42,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
     return (
         <>
             <InputSheet
-                visible={showNewChar}
-                setVisible={setShowNewChar}
+                ref={inputRef}
                 title={t('character.list.actions.createNewCharacter')}
                 onConfirm={handleCreateCharacter}
                 verifyText={(text) =>
@@ -51,6 +50,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                 }
                 placeholder="Name..."
                 autoFocus
+                confirmLabel={t('common.actions.create')}
             />
 
             <ContextMenu
@@ -67,7 +67,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                     {
                         label: t('character.list.actions.createCharacter'),
                         onPress: (close) => {
-                            setShowNewChar(true)
+                            inputRef.current?.open()
                             close()
                         },
                         icon: 'edit',

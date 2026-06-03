@@ -34,6 +34,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
         Math.round(
             Math.max(
                 0,
+                // eslint-disable-next-line react-hooks/purity
                 ((nowGenerating && isLast ? Date.now() : swipe.gen_finished.getTime()) -
                     swipe.gen_started.getTime()) /
                     1000

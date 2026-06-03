@@ -15,6 +15,7 @@ import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Accordion from '@components/views/Accordion'
+import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import InputSheet from '@components/views/InputSheet'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -43,7 +44,7 @@ const ComponentTestScreen = () => {
     const [checkbox, setCheckbox] = useState(true)
     const [sw, setSw] = useState(true)
     const { color } = Theme.useTheme()
-    const [showInputSheet, setShowInputSheet] = useState(false)
+    const inputRef = useBottomSheetRef()
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -71,13 +72,12 @@ const ComponentTestScreen = () => {
                     }}
                 />
 
-                <ThemedButton onPress={() => setShowInputSheet(true)} label="Show Sheet" />
+                <ThemedButton onPress={() => inputRef.current?.open()} label="Show Sheet" />
 
                 <InputSheet
                     title="Test Input"
                     description="Example description"
-                    visible={showInputSheet}
-                    setVisible={setShowInputSheet}
+                    ref={inputRef}
                     onConfirm={(text) => {
                         console.log(text)
                     }}

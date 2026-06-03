@@ -18,7 +18,7 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
     const { t } = useTranslation()
     const router = useRouter()
     const styles = useStyles()
-    const { setVisible } = useAuthorNoteState()
+    const { ref } = useAuthorNoteState()
     const setShow = Drawer.useDrawerStore((state) => state.setShow)
 
     const setShowChat = (b: boolean) => {
@@ -43,7 +43,7 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
                 },
                 {
                     onPress: (close) => {
-                        setVisible(true)
+                        ref?.current?.open()
                         close()
                     },
                     label: t('chat.input.actions.authorNotes'),

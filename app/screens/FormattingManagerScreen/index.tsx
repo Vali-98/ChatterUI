@@ -1,5 +1,4 @@
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
@@ -16,6 +15,7 @@ import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
+import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
@@ -63,7 +63,7 @@ const FormattingManager = () => {
     const { data } = useLiveQuery(Instructs.db.query.instructListQuery())
     const instructList = data
     const selectedItem = data.filter((item) => item.id === instructID)?.[0]
-    const [showNewInstruct, setShowNewInstruct] = useState<boolean>(false)
+    const newInstructInputRef = useBottomSheetRef()
     const { textFilter, setTextFilter, sendFilteredText, setSendFilteredText } = useTextFilterStore(
         useShallow((state) => ({
             sendFilteredText: state.sendFilteredText,
@@ -143,8 +143,7 @@ const FormattingManager = () => {
                     label: t('formatting.createConfig'),
                     icon: 'file-add',
                     onPress: (close) => {
-                        setShowNewInstruct(true)
-
+                        newInstructInputRef.current?.open()
                         close()
                     },
                 },
@@ -193,8 +192,7 @@ const FormattingManager = () => {
                 <View>
                     <InputSheet
                         title={t('formatting.newPreset')}
-                        visible={showNewInstruct}
-                        setVisible={setShowNewInstruct}
+                        ref={newInstructInputRef}
                         verifyText={(text) =>
                             instructList.some((item) => item.name === text)
                                 ? t('formatting.configExists')

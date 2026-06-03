@@ -3,7 +3,7 @@ import { randomUUID } from 'expo-crypto'
 import { getDocumentAsync } from 'expo-document-picker'
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Pressable, TextInput, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -18,6 +18,7 @@ import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
+import { useBottomSheetRef } from '@components/views/BottomSheet'
 import CameraSheet from '@components/views/CameraSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import { XAxisOnlyTransition } from '@lib/animations/transitions'
@@ -60,7 +61,7 @@ const ChatInput = () => {
     const [disableSend, setDisableSend] = useState(false)
     const [attachments, setAttachments] = useState<Attachment[]>([])
     const [hideOptions, setHideOptions] = useState(false)
-    const [showCamera, setShowCamera] = useState(false)
+    const cameraSheetRef = useBottomSheetRef()
     const { nowGenerating, abortFunction } = useInference(
         useShallow((state) => ({
             nowGenerating: state.nowGenerating,
@@ -231,8 +232,7 @@ const ChatInput = () => {
                         },
                     ])
                 }}
-                visible={showCamera}
-                setVisible={setShowCamera}
+                ref={cameraSheetRef}
             />
             <View
                 style={{
@@ -260,7 +260,7 @@ const ChatInput = () => {
                                         label: t('chat.input.actions.takePicture'),
                                         icon: 'camera',
                                         onPress: (close) => {
-                                            setShowCamera(true)
+                                            cameraSheetRef.current?.open()
                                             close()
                                         },
                                     },

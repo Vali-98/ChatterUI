@@ -6,48 +6,50 @@ import { create } from 'zustand'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
-import BottomSheet from '@components/views/BottomSheet'
+import BottomSheet, { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type ChatEditorStateProps = {
     entryId: number
-    editMode: boolean
+    ref: BottomSheetRef
     hide: () => void
     show: (index: number) => void
 }
 
 //TODO: This is somewhat unsafe, as it always expects index to be valid at 0
-export const useChatEditorStore = create<ChatEditorStateProps>()((set) => ({
+export const useChatEditorStore = create<ChatEditorStateProps>()((set, get) => ({
     entryId: 0,
+    ref: createBottomSheetRef(),
     editMode: false,
     hide: () => {
-        set({ editMode: false })
+        get().ref.current?.close()
     },
-    show: (index) => {
-        set({ editMode: true, entryId: index })
+    show: (entryId) => {
+        set({ entryId })
+        get().ref.current?.open()
     },
 }))
 
 const ChatEditor = () => {
     const { t } = useTranslation()
-    const { entryId, editMode, hide } = useChatEditorStore()
+    const { entryId, hide, ref } = useChatEditorStore()
     const styles = useStyles()
     const { data: entry } = useLiveQuery(Chats.db.live.entry(entryId), [entryId])
     const { data: swipe } = useLiveQuery(Chats.db.live.activeSwipeByEntry(entryId), [entryId])
     const [placeholderText, setPlaceholderText] = useState('')
 
-    const swipeText = swipe?.swipe
     useEffect(() => {
-        editMode && setPlaceholderText(swipeText ?? '')
-    }, [swipeText, editMode])
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setPlaceholderText(swipe?.swipe ?? '')
+    }, [swipe])
 
     // TODO: This should safely return if invalid values were given
     if (swipe === undefined) return
 
     const handleEditMessage = () => {
         hide()
-        if (placeholderText !== swipeText)
+        if (placeholderText !== swipe.swipe)
             Chats.db.mutate.updateChatSwipe(swipe.id, placeholderText)
     }
 
@@ -56,18 +58,8 @@ const ChatEditor = () => {
         Chats.db.mutate.deleteChatEntry(entryId)
     }
 
-    const handleClose = () => {
-        hide()
-    }
-
     return (
-        <BottomSheet
-            sheetStyle={{ rowGap: 12 }}
-            visible={editMode}
-            setVisible={(visible) => {
-                if (!visible) handleClose()
-            }}
-            onClose={handleClose}>
+        <BottomSheet sheetStyle={{ rowGap: 12 }} ref={ref}>
             <View style={styles.topText}>
                 <Text numberOfLines={1} style={styles.nameText} ellipsizeMode="tail">
                     {entry?.name}
@@ -97,7 +89,7 @@ const ChatEditor = () => {
                     iconName="reload"
                     variant="tertiary"
                     label={t('chat.editor.actions.reset')}
-                    onPress={() => swipeText && setPlaceholderText(swipeText)}
+                    onPress={() => setPlaceholderText(swipe.swipe ?? '')}
                 />
                 <ThemedButton
                     label={t('chat.editor.actions.confirm')}

@@ -1,10 +1,10 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
-import { usePreventRemove } from '@react-navigation/core'
 import { count, eq } from 'drizzle-orm'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import * as DocumentPicker from 'expo-document-picker'
 import { ImageBackground } from 'expo-image'
 import { Redirect, useNavigation } from 'expo-router'
+import { usePreventRemove } from 'expo-router/build/react-navigation'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -71,6 +71,15 @@ const ChracterEditorScreen = () => {
         setCharacterCard(card)
     }
 
+    const handleSaveCard = async () => {
+        if (characterCard && charId)
+            return Characters.db.mutate.updateCard(characterCard, charId).then(() => {
+                setCurrentCard(charId)
+                setEdited(() => false)
+                Logger.infoToast(t('character.editor.messages.saved'))
+            })
+    }
+
     usePreventRemove(edited, ({ data }) => {
         if (!charId) return
         Alert.alert({
@@ -110,15 +119,6 @@ const ChracterEditorScreen = () => {
         } catch (e) {
             Logger.errorToast(t('character.editor.errors.export', { error: JSON.stringify(e) }))
         }
-    }
-
-    const handleSaveCard = async () => {
-        if (characterCard && charId)
-            return Characters.db.mutate.updateCard(characterCard, charId).then(() => {
-                setCurrentCard(charId)
-                setEdited(() => false)
-                Logger.infoToast(t('character.editor.messages.saved'))
-            })
     }
 
     const handleDeleteCard = () => {

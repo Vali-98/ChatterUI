@@ -46,13 +46,12 @@ const TTSManagerScreen = () => {
             return name
         })
 
-    useEffect(() => {
-        getVoices()
-    }, [])
-
     const getVoices = (value = false) => {
         Speech.getAvailableVoicesAsync().then((list) => setModelList(list))
     }
+    useEffect(() => {
+        getVoices()
+    }, [])
 
     return (
         <KeyboardAwareScrollView

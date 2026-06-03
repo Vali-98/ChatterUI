@@ -17,7 +17,7 @@ type AuthorNoteItemProps = {
 const AuthorNoteItem: React.FC<AuthorNoteItemProps> = ({ id }) => {
     const { t } = useTranslation()
     const { color, spacing, fontSize, borderRadius } = Theme.useTheme()
-    const setVisible = authorNoteEditorState(useShallow((state) => state.setVisible))
+    const open = authorNoteEditorState(useShallow((state) => state.open))
     const {
         data: [note],
     } = useLiveQueryJoined(AuthorNotes.db.live.note(id), [id], {
@@ -72,7 +72,7 @@ const AuthorNoteItem: React.FC<AuthorNoteItemProps> = ({ id }) => {
                     iconSize={24}
                     iconStyle={{ color: color.text._400 }}
                     onPress={() => {
-                        setVisible(true, id)
+                        open(id)
                     }}
                 />
             </View>

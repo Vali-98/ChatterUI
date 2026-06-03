@@ -1,6 +1,6 @@
 import Octicons from '@react-native-vector-icons/octicons/static'
 import { setBackgroundColorAsync } from 'expo-system-ui'
-import React, { useState } from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, Linking, Text, TouchableOpacity, useColorScheme, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -9,6 +9,7 @@ import { useShallow } from 'zustand/react/shallow'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import Alert from '@components/views/Alert'
+import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
@@ -165,7 +166,6 @@ const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete
                                     : activeColor.text._700
                             }
                             name="sun"
-                            icon
                             size={17}
                         />
                     </TouchableOpacity>
@@ -190,7 +190,6 @@ const ColorThemeItem: React.FC<ColorThemeItemProps> = ({ item, index, showDelete
                                     : activeColor.text._700
                             }
                             name="moon"
-                            icon
                             size={18}
                         />
                     </TouchableOpacity>
@@ -213,7 +212,7 @@ const ColorSelector = () => {
         }))
     )
 
-    const [showPaste, setShowPaste] = useState(false)
+    const inputRef = useBottomSheetRef()
 
     return (
         <SafeAreaView edges={['bottom']} style={{ paddingHorizontal: 16, rowGap: 16, flex: 1 }}>
@@ -245,7 +244,7 @@ const ColorSelector = () => {
                                 icon: 'file',
                                 onPress: (close) => {
                                     close()
-                                    setShowPaste(true)
+                                    inputRef.current?.open()
                                 },
                             },
                             {
@@ -263,8 +262,7 @@ const ColorSelector = () => {
                 )}
             />
             <InputSheet
-                visible={showPaste}
-                setVisible={setShowPaste}
+                ref={inputRef}
                 onConfirm={(e) => {
                     try {
                         const data = JSON.parse(e)

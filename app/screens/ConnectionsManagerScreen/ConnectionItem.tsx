@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Animated, {
     interpolateColor,
@@ -10,6 +10,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
+import { useBottomSheetRef } from '@components/views/BottomSheet'
 import { APIManager, APIManagerValue } from '@lib/engine/API/APIManagerState'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -23,7 +24,7 @@ type ConnectionItemProps = {
 const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
     const { spacing, color } = Theme.useTheme()
     const styles = useStyles()
-    const [showEditor, setShowEditor] = useState(false)
+    const editorRef = useBottomSheetRef()
     const { editValue } = APIManager.useConnectionsStore(
         useShallow((state) => ({
             editValue: state.editValue,
@@ -48,14 +49,7 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
 
     return (
         <Animated.View style={[styles.longContainer, animatedStyle]}>
-            <ConnectionEditor
-                index={index}
-                originalValues={item}
-                show={showEditor}
-                close={() => {
-                    setShowEditor(false)
-                }}
-            />
+            <ConnectionEditor index={index} originalValues={item} ref={editorRef} />
             <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                 <ThemedSwitch
                     value={item.active}
@@ -74,7 +68,7 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
                 </View>
             </View>
             <ThemedButton
-                onPress={() => setShowEditor(true)}
+                onPress={() => editorRef.current?.open()}
                 variant="tertiary"
                 iconName="edit"
                 iconSize={24}

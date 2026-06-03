@@ -7,11 +7,10 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import { Theme } from '@lib/theme/ThemeManager'
 
-import BottomSheet from './BottomSheet'
+import BottomSheet, { BottomSheetRef } from './BottomSheet'
 
 export type InputSheetProps = {
-    visible: boolean
-    setVisible: (visible: boolean) => void
+    ref: BottomSheetRef
     onConfirm: (text: string) => void
     onClose?: () => void
     title?: string
@@ -22,11 +21,13 @@ export type InputSheetProps = {
     autoFocus?: boolean
     defaultValue?: string
     multiline?: boolean
+    confirmLabel?: string
 }
 
+export type InputSheetRef = BottomSheetRef
+
 const InputSheet: React.FC<InputSheetProps> = ({
-    visible,
-    setVisible,
+    ref,
     onConfirm = (text) => {},
     onClose = () => {},
     title = '',
@@ -36,6 +37,7 @@ const InputSheet: React.FC<InputSheetProps> = ({
     autoFocus = false,
     defaultValue = '',
     multiline = false,
+    confirmLabel,
 }) => {
     const { t } = useTranslation()
     const [text, setText] = useState(defaultValue)
@@ -43,13 +45,13 @@ const InputSheet: React.FC<InputSheetProps> = ({
     const { color, fontSize, spacing } = Theme.useTheme()
 
     const handleClose = () => {
-        setVisible(false)
+        ref.current?.close()
         onClose()
         setErrorMessage('')
     }
 
     return (
-        <BottomSheet visible={visible} setVisible={setVisible} onClose={handleClose}>
+        <BottomSheet ref={ref} onClose={handleClose}>
             <View style={{ rowGap: spacing.xl }}>
                 {title && (
                     <Text
@@ -117,7 +119,7 @@ const InputSheet: React.FC<InputSheetProps> = ({
                         />
                     </View>
                     <ThemedButton
-                        label={t('common.actions.save')}
+                        label={confirmLabel ?? t('common.actions.save')}
                         onPress={() => {
                             const result = verifyText(text)
                             if (result) setErrorMessage(result)

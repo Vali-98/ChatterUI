@@ -1,28 +1,32 @@
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 
-import BottomSheet from '@components/views/BottomSheet'
+import BottomSheet, { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
 
 import AuthorNoteBody from './AuthorNoteBody'
 
 type AuthorNoteState = {
-    visible: boolean
-    setVisible: (b: boolean) => void
+    ref: BottomSheetRef
+    open: () => void
+    close: () => void
 }
 
 export const useAuthorNoteState = create<AuthorNoteState>()((set, get) => ({
-    visible: false,
-    setVisible: (b) => {
-        set({ visible: b })
+    ref: createBottomSheetRef(),
+    open: () => {
+        console.log(get().ref.current)
+        get().ref?.current?.open()
+    },
+    close: () => {
+        get().ref?.current?.close()
     },
 }))
 
 const AuthorNoteSheet = () => {
-    const { visible, setVisible } = useAuthorNoteState()
-
-    if (!visible) return
+    const ref = useAuthorNoteState(useShallow((state) => state.ref))
 
     return (
-        <BottomSheet sheetStyle={{ flex: 1 }} visible={visible} setVisible={setVisible}>
+        <BottomSheet sheetStyle={{ flex: 1 }} ref={ref}>
             <AuthorNoteBody />
         </BottomSheet>
     )

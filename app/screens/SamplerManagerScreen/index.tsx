@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
@@ -11,6 +10,7 @@ import ThemedCheckbox from '@components/input/ThemedCheckbox'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
+import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
@@ -32,7 +32,7 @@ const SamplerManagerScreen = () => {
     const styles = useStyles()
     const { spacing } = Theme.useTheme()
     const { appMode } = useAppMode()
-    const [showNewSampler, setShowNewSampler] = useState<boolean>(false)
+    const newSamplerInputRef = useBottomSheetRef()
 
     const {
         addSamplerConfig,
@@ -109,7 +109,7 @@ const SamplerManagerScreen = () => {
                     label: t('sampler.create'),
                     icon: 'file-add',
                     onPress: (close) => {
-                        setShowNewSampler(true)
+                        newSamplerInputRef.current?.open()
                         close()
                     },
                 },
@@ -145,8 +145,7 @@ const SamplerManagerScreen = () => {
         <SafeAreaView edges={['bottom']} style={{ flex: 1 }} key={currentConfig.name}>
             <InputSheet
                 title={t('sampler.new')}
-                visible={showNewSampler}
-                setVisible={setShowNewSampler}
+                ref={newSamplerInputRef}
                 onConfirm={(text: string) => {
                     if (text === '') {
                         Logger.errorToast(t('sampler.toast.emptyname'))

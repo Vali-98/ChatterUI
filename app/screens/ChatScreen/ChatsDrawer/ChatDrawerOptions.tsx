@@ -1,8 +1,9 @@
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useShallow } from 'zustand/react/shallow'
 
 import Alert from '@components/views/Alert'
+import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import InputSheet from '@components/views/InputSheet'
 import { Characters } from '@lib/state/Characters'
@@ -18,7 +19,7 @@ type ChatEditPopupProps = {
 
 const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }) => {
     const { t } = useTranslation()
-    const [showRename, setShowRename] = useState<boolean>(false)
+    const renameInputRef = useBottomSheetRef()
 
     const { charName, charId } = Characters.useCharacterStore(
         useShallow((state) => ({
@@ -119,8 +120,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
         <>
             <InputSheet
                 title={t('common.actions.rename')}
-                visible={showRename}
-                setVisible={setShowRename}
+                ref={renameInputRef}
                 onConfirm={async (text) => {
                     await Chats.db.mutate.renameChat(item.id, text)
                 }}
@@ -138,7 +138,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                         label: t('common.actions.rename'),
                         icon: 'edit',
                         onPress: (close) => {
-                            setShowRename(true)
+                            renameInputRef.current?.open()
                             close()
                         },
                     },

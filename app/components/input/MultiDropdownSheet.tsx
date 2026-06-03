@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
 
-import BottomSheet from '@components/views/BottomSheet'
+import BottomSheet, { useBottomSheetRef } from '@components/views/BottomSheet'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type DropdownItemProps = {
@@ -55,7 +55,7 @@ const MultiDropdownSheet = <T,>({
     const { t } = useTranslation()
     const styles = useDropdownStyles()
     const { color, spacing } = Theme.useTheme()
-    const [showList, setShowList] = useState(false)
+    const sheetRef = useBottomSheetRef()
     const [searchFilter, setSearchFilter] = useState('')
 
     const finalPlaceholder = placeholder ?? t('dropdown.selectItem')
@@ -69,8 +69,7 @@ const MultiDropdownSheet = <T,>({
     return (
         <View style={containerStyle}>
             <BottomSheet
-                visible={showList}
-                setVisible={setShowList}
+                ref={sheetRef}
                 onClose={() => {
                     setSearchFilter('')
                 }}>
@@ -134,7 +133,7 @@ const MultiDropdownSheet = <T,>({
                     />
                 )}
             </BottomSheet>
-            <Pressable style={[style, styles.button]} onPress={() => setShowList(true)}>
+            <Pressable style={[style, styles.button]} onPress={() => sheetRef.current?.open()}>
                 {selected && selected.length > 0 && (
                     <Text style={styles.buttonText}>
                         {selected.length} {t('common.labels.selected')}

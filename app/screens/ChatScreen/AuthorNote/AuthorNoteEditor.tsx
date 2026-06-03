@@ -66,7 +66,7 @@ const AuthorNoteEditor = () => {
     const setCurrentNoteType = authorNoteBodyState(useShallow((state) => state.setCurrentNoteType))
     const charId = Characters.useCharacterStore(useShallow((state) => state.id))
     const chatId = Chats.useChatState(useShallow((state) => state.id))
-    const { visible, setVisible, noteId } = authorNoteEditorState(useShallow((state) => state))
+    const { close, noteId, ref } = authorNoteEditorState(useShallow((state) => state))
     const [placeHolderNote, setPlaceHolderNote] = useState<AuthorNote | undefined>(undefined)
     const [edited, setEdited] = useState(false)
     const {
@@ -90,9 +90,10 @@ const AuthorNoteEditor = () => {
     )
 
     useEffect(() => {
-        if (!visible || !note) return
+        if (!note) return
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         handleSetPlaceholder(note, false)
-    }, [note, visible, handleSetPlaceholder])
+    }, [note, handleSetPlaceholder])
 
     const backAction = useCallback(
         (close: () => void) => {
@@ -121,7 +122,7 @@ const AuthorNoteEditor = () => {
         [note, placeHolderNote, edited, t]
     )
 
-    if (note === undefined || placeHolderNote === undefined || !noteId || !visible) return
+    if (note === undefined || placeHolderNote === undefined || !noteId) return
 
     const handleUpdateNoteType = async (
         noteType: NoteType,
@@ -136,11 +137,7 @@ const AuthorNoteEditor = () => {
 
     const selectedNoteType = getNoteTypeFromIds(placeHolderNote)
     return (
-        <BottomSheet
-            onRequestClose={backAction}
-            sheetStyle={{ flex: 1 }}
-            visible={visible}
-            setVisible={setVisible}>
+        <BottomSheet onRequestClose={backAction} sheetStyle={{ flex: 1 }} ref={ref}>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ rowGap: spacing.xl, paddingBottom: spacing.xl2 }}>
@@ -226,7 +223,7 @@ const AuthorNoteEditor = () => {
                                     label: t('authorNotes.alert.delete.button'),
                                     onPress: () => {
                                         AuthorNotes.db.mutate.deleteNote(note.id)
-                                        setVisible(false)
+                                        close()
                                     },
                                 },
                             ],
@@ -253,7 +250,7 @@ const AuthorNoteEditor = () => {
                             priority: placeHolderNote.priority,
                             token_length: await tokenizer(placeHolderNote.content),
                         })
-                        setVisible(false)
+                        close()
                     }}
                 />
             </View>

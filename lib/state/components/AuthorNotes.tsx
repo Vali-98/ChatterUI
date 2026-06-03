@@ -1,16 +1,25 @@
 import { create } from 'zustand'
 
+import { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
+
 import { NoteType } from '../AuthorNotes'
 
 type AuthorNoteEditorStateProps = {
-    visible: boolean
-    setVisible: (show: boolean, noteId?: number) => void
+    ref: BottomSheetRef | null
+    open: (noteId: number) => void
+    close: () => void
     noteId?: number
 }
 
-export const authorNoteEditorState = create<AuthorNoteEditorStateProps>()((set) => ({
-    visible: false,
-    setVisible: (visible, noteId) => set({ visible, noteId }),
+export const authorNoteEditorState = create<AuthorNoteEditorStateProps>()((set, get) => ({
+    ref: createBottomSheetRef(),
+    open: (noteId) => {
+        get().ref?.current?.open()
+        set({ noteId })
+    },
+    close: () => {
+        get().ref?.current?.close()
+    },
 }))
 
 type AuthorNoteBodyStateProps = {

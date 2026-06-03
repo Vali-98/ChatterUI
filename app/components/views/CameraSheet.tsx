@@ -3,15 +3,14 @@ import { useRef } from 'react'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 
-import BottomSheet from './BottomSheet'
+import BottomSheet, { BottomSheetRef } from './BottomSheet'
 
 interface CameraSheetProps {
-    visible: boolean
-    setVisible: (visible: boolean) => void
+    ref: BottomSheetRef
     onTakePicture: (picture: CameraCapturedPicture) => void
 }
 
-const CameraSheet: React.FC<CameraSheetProps> = ({ visible, setVisible, onTakePicture }) => {
+const CameraSheet: React.FC<CameraSheetProps> = ({ ref, onTakePicture }) => {
     const cameraRef = useRef<CameraView>(null)
 
     const handleTakePicture = async () => {
@@ -20,13 +19,12 @@ const CameraSheet: React.FC<CameraSheetProps> = ({ visible, setVisible, onTakePi
         const picture = await camera.takePictureAsync()
         if (!picture) return
         onTakePicture(picture)
-        setVisible(false)
+        ref.current?.close()
     }
 
     return (
         <BottomSheet
-            visible={visible}
-            setVisible={setVisible}
+            ref={ref}
             sheetStyle={{ flex: 1, maxHeight: '70%', justifyContent: 'space-between' }}>
             <CameraView
                 ref={cameraRef}

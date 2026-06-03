@@ -1,10 +1,10 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, Linking, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
+import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
@@ -23,7 +23,7 @@ const TemplateManager = () => {
             addTemplate: state.addTemplate,
         }))
     )
-    const [showPaste, setShowPaste] = useState(false)
+    const pasteInputRef = useBottomSheetRef()
     const { t } = useTranslation()
     const { color, spacing } = Theme.useTheme()
 
@@ -60,7 +60,7 @@ const TemplateManager = () => {
                                 icon: 'file',
                                 onPress: (close) => {
                                     close()
-                                    setShowPaste(true)
+                                    pasteInputRef.current?.open()
                                 },
                             },
                             {
@@ -88,8 +88,7 @@ const TemplateManager = () => {
                 )}
             />
             <InputSheet
-                visible={showPaste}
-                setVisible={setShowPaste}
+                ref={pasteInputRef}
                 onConfirm={(e) => {
                     try {
                         const data = JSON.parse(e)

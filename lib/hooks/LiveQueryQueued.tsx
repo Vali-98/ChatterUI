@@ -98,6 +98,7 @@ export const useQueuedLiveQuery = <
               (query as AnySQLiteSelect).config.table
 
         if (is(entity, Subquery) || is(entity, SQL)) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setError(
                 new Error('Selecting from subqueries and SQL are not supported in useLiveQuery')
             )
@@ -156,7 +157,7 @@ export const useQueuedLiveQuery = <
     }, [options?.enabled, query, deps, options])
 
     return {
-        // eslint-disable-next-line react-compiler/react-compiler
+        // eslint-disable-next-line react-hooks/refs, react-compiler/react-compiler
         data: data.current,
         error: error,
         updatedAt: updatedAt,

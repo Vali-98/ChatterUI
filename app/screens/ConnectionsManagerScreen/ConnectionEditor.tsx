@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
@@ -9,9 +9,9 @@ import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
-import BottomSheet from '@components/views/BottomSheet'
+import BottomSheet, { BottomSheetRef } from '@components/views/BottomSheet'
 import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
-import { APIConfiguration, APIValues } from '@lib/engine/API/APIBuilder.types'
+import { APIValues } from '@lib/engine/API/APIBuilder.types'
 import { APIManager, APIManagerValue } from '@lib/engine/API/APIManagerState'
 import { useDebounce } from '@lib/hooks/Debounce'
 import { Logger } from '@lib/state/Logger'
@@ -20,17 +20,11 @@ import { getNestedValue } from '@lib/utils/Parsing'
 
 type ConnectionEditorProps = {
     index: number
-    show: boolean
-    close: () => void
+    ref: BottomSheetRef
     originalValues: APIManagerValue
 }
 
-const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
-    index,
-    show,
-    close,
-    originalValues,
-}) => {
+const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ index, ref, originalValues }) => {
     const { color, fontSize } = Theme.useTheme()
     const styles = useStyles()
     const { t } = useTranslation()
@@ -43,24 +37,16 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
         }))
     )
 
-    const [template, setTemplate] = useState<APIConfiguration>(getTemplates()[0])
-
     const [values, setValues] = useState<APIManagerValue>(originalValues)
     const [modelList, setModelList] = useState<any[]>([])
 
-    useEffect(() => {
-        const newTemplate = getTemplates().find((item) => item.name === values.configName)
-        if (!newTemplate) {
-            Logger.errorToast(t('connections.editor.invalidTemplate'))
-            close()
-            return
-        }
-        if (newTemplate.name !== template.name) setTemplate(newTemplate)
-    }, [close, values, getTemplates, t, template])
+    const template = useMemo(() => {
+        return getTemplates().find((item) => item.name === values.configName) ?? getTemplates()[0]
+    }, [values.configName, getTemplates])
 
     const handleGetModelList = useCallback(
         async (values: APIValues) => {
-            if (!template.features.useModel || !show) return
+            if (!template.features.useModel) return
             const auth: any = {}
             if (template.features.useKey) {
                 auth[template.request.authHeader] = template.request.authPrefix + values.key
@@ -80,12 +66,13 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
             const models = getNestedValue(data, template.model.modelListParser)
             setModelList(models)
         },
-        [show, template, t]
+        [template, t]
     )
 
     const debouncedModelList = useDebounce(handleGetModelList, 300)
-    // TODO: Replace with react query
+
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setValues(originalValues)
     }, [originalValues])
 
@@ -112,15 +99,15 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
         })
     }
 
+    if (values.configName !== template.name) {
+        Logger.errorToast(
+            t('connections.editor.invalidTemplate'),
+            `${template.name} - ${values.configName}`
+        )
+    }
+
     return (
-        <BottomSheet
-            sheetStyle={{ flex: 2, maxHeight: '80%' }}
-            visible={show}
-            onClose={close}
-            setVisible={(v) => {
-                if (v) return
-                close()
-            }}>
+        <BottomSheet sheetStyle={{ flex: 2, maxHeight: '80%' }} ref={ref}>
             <View style={styles.mainContainer}>
                 <Text
                     style={{
@@ -295,7 +282,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                         iconName="save"
                         onPress={() => {
                             editValue(values, index)
-                            close()
+                            ref.current?.close()
                         }}
                     />
                 </View>

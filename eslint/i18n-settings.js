@@ -324,6 +324,7 @@ module.exports = {
             'startsWith',
             'groupBy',
             'saveStringToDownload',
+            'router',
         ],
     },
     'object-properties': {

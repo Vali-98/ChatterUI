@@ -1,7 +1,7 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { SplashScreen } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
@@ -19,8 +19,6 @@ const useStartupRoutine = () => {
     const { success, error } = useMigrations(db, migrations)
     const { authorized, retry } = useLocalAuth()
 
-    const [firstRender, setFirstRender] = useState<boolean>(true)
-
     useTextIntentFocus()
 
     useEffect(() => {
@@ -37,20 +35,19 @@ const useStartupRoutine = () => {
          */
         if (success) {
             startupApp()
-            setFirstRender(false)
             SplashScreen.hideAsync()
         }
         if (error) SplashScreen.hideAsync()
     }, [success, error])
 
-    return { firstRender, authorized, retry }
+    return { authorized, retry }
 }
 
 const Home = () => {
     const { color } = Theme.useTheme()
     const styles = useStyles()
     const { success, error } = useMigrations(db, migrations)
-    const { authorized, retry, firstRender } = useStartupRoutine()
+    const { authorized, retry } = useStartupRoutine()
     const { t } = useTranslation()
     if (error)
         return (
@@ -88,7 +85,7 @@ const Home = () => {
                 </TouchableOpacity>
             </View>
         )
-    if (!firstRender && success) return <CharacterList />
+    if (success) return <CharacterList />
     return <HeaderTitle />
 }
 

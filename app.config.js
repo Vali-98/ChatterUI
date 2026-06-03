@@ -28,7 +28,6 @@ module.exports = {
                 monochromeImage: './assets/images/adaptive-icon-foreground.png',
                 backgroundColor: '#000',
             },
-            edgeToEdgeEnabled: true,
             package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
             userInterfaceStyle: 'dark',
             permissions: [

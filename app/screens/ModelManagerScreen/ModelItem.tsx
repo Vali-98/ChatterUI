@@ -6,6 +6,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import DropdownSheet from '@components/input/DropdownSheet'
 import Alert from '@components/views/Alert'
+import { useBottomSheetRef } from '@components/views/BottomSheet'
 import InputSheet from '@components/views/InputSheet'
 import { GGMLNameMap } from '@lib/engine/Local'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
@@ -48,7 +49,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
         useShallow((state) => state.maybeClearLastLoaded)
     )
 
-    const [showEdit, setShowEdit] = useState(false)
+    const editInputRef = useBottomSheetRef()
     //@ts-ignore
     const quant: string = item.quantization && GGMLNameMap[item.quantization]
     const isInvalid = Model.isInitialEntry(item)
@@ -103,8 +104,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
     return (
         <View style={styles.modelContainer}>
             <InputSheet
-                visible={showEdit}
-                setVisible={setShowEdit}
+                ref={editInputRef}
                 onConfirm={async (name) => {
                     await Model.updateName(name, item.id)
                 }}
@@ -178,7 +178,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                     disabled={disableEdit}
                     style={styles.button}
                     onPress={() => {
-                        setShowEdit(true)
+                        editInputRef.current?.open()
                     }}>
                     <AntDesign
                         name="edit"

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, Pressable, Text, TextInput, View, ViewStyle } from 'react-native'
 
-import BottomSheet from '@components/views/BottomSheet'
+import BottomSheet, { useBottomSheetRef } from '@components/views/BottomSheet'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import { useDropdownStyles } from './MultiDropdownSheet'
@@ -36,7 +36,7 @@ const DropdownSheet = <T,>({
     closeOnSelect = true,
 }: DropdownSheetProps<T>) => {
     const styles = useDropdownStyles()
-    const [showList, setShowList] = useState(false)
+    const sheetRef = useBottomSheetRef()
     const [searchFilter, setSearchFilter] = useState('')
     const theme = Theme.useTheme()
     const { t } = useTranslation()
@@ -52,8 +52,7 @@ const DropdownSheet = <T,>({
     return (
         <View style={containerStyle}>
             <BottomSheet
-                visible={showList}
-                setVisible={setShowList}
+                ref={sheetRef}
                 onClose={() => {
                     setSearchFilter('')
                 }}>
@@ -73,7 +72,7 @@ const DropdownSheet = <T,>({
                                 }
                                 onPress={() => {
                                     onChangeValue(item)
-                                    setShowList(!closeOnSelect)
+                                    if (closeOnSelect) sheetRef.current?.close()
                                 }}>
                                 <Text style={styles.listItemText}>{labelExtractor(item)}</Text>
                             </Pressable>
@@ -92,7 +91,7 @@ const DropdownSheet = <T,>({
                     />
                 )}
             </BottomSheet>
-            <Pressable style={[style, styles.button]} onPress={() => setShowList(true)}>
+            <Pressable style={[style, styles.button]} onPress={() => sheetRef.current?.open()}>
                 {selected && <Text style={styles.buttonText}>{labelExtractor(selected)}</Text>}
                 {!selected && <Text style={styles.placeholderText}>{placeholder}</Text>}
                 <Octicons name="chevron-down" color={theme.color.primary._800} size={18} />

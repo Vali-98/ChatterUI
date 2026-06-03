@@ -60,8 +60,8 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
     )
 
     const showEditor = useChatEditorStore((state) => state.show)
-    const showNoteEditor = authorNoteEditorState(useShallow((state) => state.setVisible))
-    const showAuthorNotes = useAuthorNoteState(useShallow((state) => state.setVisible))
+    const showNoteEditor = authorNoteEditorState(useShallow((state) => state.open))
+    const ref = useAuthorNoteState(useShallow((state) => state.ref))
     const { t } = useTranslation()
     const { color } = Theme.useTheme()
     const [quickDelete] = useMMKVBoolean(AppSettings.QuickDelete)
@@ -116,8 +116,8 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
                             Logger.errorToast(t('chat.quickActions.errors.noteCreateFailed'))
                             return
                         }
-                        showAuthorNotes(true)
-                        showNoteEditor(true, newNoteId)
+                        ref?.current?.open()
+                        showNoteEditor(newNoteId)
                     },
                 },
             ],

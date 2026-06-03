@@ -387,7 +387,7 @@ export namespace Chats {
                 const userId = Characters.useUserStore.getState().id
                 const charName = card.name
                 return await database.transaction(async (tx) => {
-                    if (!card || !charName) return
+                    if (!card || charName === undefined) return
                     const [{ chatId }] = await tx
                         .insert(chats)
                         .values({
