@@ -11,7 +11,8 @@ import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
-import { APIManagerValue, APIManager } from '@lib/engine/API/APIManagerState'
+import { APIManager, APIManagerValue } from '@lib/engine/API/APIManagerState'
+import { useDebounce } from '@lib/hooks/Debounce'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getNestedValue } from '@lib/utils/Parsing'
@@ -66,10 +67,11 @@ const AddConnection = () => {
         setModelList(models)
     }, [template, values, t])
 
+    const debouncedModelList = useDebounce(handleGetModelList, 300)
+
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        handleGetModelList()
-    }, [template, handleGetModelList])
+        debouncedModelList()
+    }, [debouncedModelList])
 
     return (
         <SafeAreaView edges={['bottom']} style={styles.mainContainer}>

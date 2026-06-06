@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { create } from 'zustand'
@@ -7,6 +7,7 @@ import { create } from 'zustand'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import BottomSheet, { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
+import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -35,14 +36,18 @@ const ChatEditor = () => {
     const { t } = useTranslation()
     const { entryId, hide, ref } = useChatEditorStore()
     const styles = useStyles()
-    const { data: entry } = useLiveQuery(Chats.db.live.entry(entryId), [entryId])
-    const { data: swipe } = useLiveQuery(Chats.db.live.activeSwipeByEntry(entryId), [entryId])
     const [placeholderText, setPlaceholderText] = useState('')
-
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setPlaceholderText(swipe?.swipe ?? '')
-    }, [swipe])
+    const { data: entry } = useLiveQuery(Chats.db.live.entry(entryId), [entryId])
+    const { data: swipe } = useLiveQueryJoined(
+        Chats.db.live.activeSwipeByEntry(entryId),
+        [entryId],
+        {
+            onUpdated: (result) => {
+                const swipe = result?.swipe
+                setPlaceholderText(swipe ?? '')
+            },
+        }
+    )
 
     // TODO: This should safely return if invalid values were given
     if (swipe === undefined) return

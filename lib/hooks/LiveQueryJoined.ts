@@ -48,6 +48,7 @@ export const useLiveQueryJoined = <
         targets?: { tableName: TableNames; rowId: number }[]
         ignore?: TableNames[]
         deepCheck?: boolean
+        onUpdated?: (result: Awaited<T>) => void
     } = {}
 ) => {
     const data = useRef<Awaited<T>>(
@@ -79,6 +80,7 @@ export const useLiveQueryJoined = <
                 return
             }
             data.current = newData
+            options.onUpdated?.(newData)
             setUpdatedAt(new Date())
         }
         query.then(handleData).catch(setError)

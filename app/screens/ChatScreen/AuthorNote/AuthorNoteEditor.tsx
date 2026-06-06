@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
@@ -69,6 +69,14 @@ const AuthorNoteEditor = () => {
     const { close, noteId, ref } = authorNoteEditorState(useShallow((state) => state))
     const [placeHolderNote, setPlaceHolderNote] = useState<AuthorNote | undefined>(undefined)
     const [edited, setEdited] = useState(false)
+
+    const handleSetPlaceholder = useCallback(
+        (newNote: AuthorNote, edited = true) => {
+            setPlaceHolderNote(newNote)
+            setEdited(edited)
+        },
+        [setPlaceHolderNote, setEdited]
+    )
     const {
         data: [note],
     } = useLiveQueryJoined(AuthorNotes.db.live.note(noteId ?? -1), [noteId ?? -1], {
@@ -78,22 +86,12 @@ const AuthorNoteEditor = () => {
                 rowId: noteId ?? -1,
             },
         ],
+        onUpdated: (result) => {
+            const [item] = result
+            if (item) handleSetPlaceholder(item)
+        },
     })
     const contentTokens = useDebounceTokenizer(placeHolderNote?.content ?? '', 300)
-
-    const handleSetPlaceholder = useCallback(
-        (newNote: AuthorNote, edited = true) => {
-            setPlaceHolderNote(newNote)
-            setEdited(edited)
-        },
-        [setPlaceHolderNote, setEdited]
-    )
-
-    useEffect(() => {
-        if (!note) return
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        handleSetPlaceholder(note, false)
-    }, [note, handleSetPlaceholder])
 
     const backAction = useCallback(
         (close: () => void) => {
