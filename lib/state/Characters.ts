@@ -813,7 +813,15 @@ export namespace Characters {
                 Logger.errorToast(t('character.editor.errors.createFromImage'))
                 return
             }
-            const card = JSON.parse(extractPngTextChunk(file))
+            const [result] = extractPngTextChunk(file, {
+                keywords: ['Comment', 'character_card', 'chara', 'ccv3'],
+            })
+            if (result) {
+                Logger.errorToast(t('character.editor.errors.createFromImage'))
+                return
+            }
+
+            const card = JSON.parse(result)
             if (card === undefined) {
                 Logger.errorToast(t('character.editor.errors.cardNoCharacter'))
                 return
@@ -887,7 +895,9 @@ export namespace Characters {
         if (fileExists(imagePath)) {
             const fileData = await readBase64Async(imagePath)
             if (!fileData) return
-            const exportData = replacePngTextChunk(fileData, cardString)
+            const exportData = replacePngTextChunk(fileData, [
+                { data: cardString, keyword: 'chara', b64encode: true },
+            ])
             await saveStringToDownload(exportData, exportedFileName + '.png', 'base64')
         } else {
             await saveStringToDownload(cardString, exportedFileName + '.json', 'utf8')
