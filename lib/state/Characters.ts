@@ -68,6 +68,8 @@ type CharacterCardState = {
 
 export type CharacterCardData = Awaited<ReturnType<typeof Characters.db.query.cardQuery>>
 
+const CHARACTER_CARD_TEXT_CHUNK_KEYWORDS = ['Comment', 'character_card', 'chara', 'ccv3']
+
 export namespace Characters {
     export const useUserStore = create<CharacterCardState>()(
         persist(
@@ -814,7 +816,7 @@ export namespace Characters {
                 return
             }
             const [result] = extractPngTextChunk(file, {
-                keywords: ['Comment', 'character_card', 'chara', 'ccv3'],
+                keywords: CHARACTER_CARD_TEXT_CHUNK_KEYWORDS,
             })
             if (result) {
                 Logger.errorToast(t('character.editor.errors.createFromImage'))
@@ -895,9 +897,11 @@ export namespace Characters {
         if (fileExists(imagePath)) {
             const fileData = await readBase64Async(imagePath)
             if (!fileData) return
-            const exportData = replacePngTextChunk(fileData, [
-                { data: cardString, keyword: 'chara', b64encode: true },
-            ])
+            const exportData = replacePngTextChunk(
+                fileData,
+                [{ data: cardString, keyword: 'chara', b64encode: true }],
+                { removeKeywords: CHARACTER_CARD_TEXT_CHUNK_KEYWORDS }
+            )
             await saveStringToDownload(exportData, exportedFileName + '.png', 'base64')
         } else {
             await saveStringToDownload(cardString, exportedFileName + '.json', 'utf8')
