@@ -231,7 +231,7 @@
                 "authorNotes": "作者笔记",
                 "chatHistory": "聊天记录",
                 "editCharacter": "编辑角色",
-                "mainMenu": "主菜单",
+                "mainMenu": "角色列表",
                 "takePicture": "拍照"
             },
             "errors": {
