@@ -68,7 +68,13 @@ type CharacterCardState = {
 
 export type CharacterCardData = Awaited<ReturnType<typeof Characters.db.query.cardQuery>>
 
-const CHARACTER_CARD_TEXT_CHUNK_KEYWORDS = ['Comment', 'character_card', 'chara', 'ccv3']
+const CHARACTER_CARD_TEXT_CHUNK_KEYWORDS = [
+    'Description', // AI bot base description
+    'Comment', // incorrect migration, needs to be retained
+    'character_card',
+    'chara',
+    'ccv3',
+]
 
 export namespace Characters {
     export const useUserStore = create<CharacterCardState>()(
@@ -818,12 +824,13 @@ export namespace Characters {
             const [result] = extractPngTextChunk(file, {
                 keywords: CHARACTER_CARD_TEXT_CHUNK_KEYWORDS,
             })
-            if (result) {
+
+            if (!result) {
                 Logger.errorToast(t('character.editor.errors.createFromImage'))
                 return
             }
 
-            const card = JSON.parse(result)
+            const card = JSON.parse(result.data)
             if (card === undefined) {
                 Logger.errorToast(t('character.editor.errors.cardNoCharacter'))
                 return
