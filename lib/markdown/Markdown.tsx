@@ -1,6 +1,6 @@
 import { setStringAsync } from 'expo-clipboard'
 import { t } from 'i18next'
-import { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { MarkdownIt } from 'react-native-markdown-display'
 import MathJax from 'react-native-mathjax-svg'
@@ -14,6 +14,36 @@ import { Theme } from '@lib/theme/ThemeManager'
 import latexPlugin from './MarkdownLatexPlugin'
 import doubleQuotePlugin from './MarkdownQuotePlugin'
 import thinkPlugin from './MarkdownThinkPlugin'
+
+const getDeepASTDirection = (astNode: any): 'ltr' | 'rtl' | 'neutral' => {
+    if (!astNode) return 'neutral'
+
+    // Explicitly flag softbreaks or hardbreaks as neutral
+    if (
+        astNode.type === 'softbreak' ||
+        astNode.type === 'hardbreak' ||
+        astNode.type === 'double_quote'
+    ) {
+        return 'neutral'
+    }
+
+    if (astNode.type === 'text' && typeof astNode.content === 'string') {
+        // If it's pure whitespace/newlines, it's neutral
+        if (!astNode.content.trim()) return 'neutral'
+
+        const rtlRegex = /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/
+        return rtlRegex.test(astNode.content) ? 'rtl' : 'ltr'
+    }
+
+    if (Array.isArray(astNode.children)) {
+        for (const childNode of astNode.children) {
+            const dir = getDeepASTDirection(childNode)
+            if (dir !== 'neutral') return dir // Return the first concrete direction found
+        }
+    }
+
+    return 'neutral'
+}
 
 export namespace MarkdownStyle {
     export const Rules = MarkdownIt({ typographer: true })
@@ -104,6 +134,81 @@ export namespace MarkdownStyle {
                 </MathJax>
             )
         },
+
+        textgroup: (node: any, children: any, parent: any, styles: any) => {
+            const astChildrenArray = node.children || []
+            const renderedChildrenArray = React.Children.toArray(children)
+
+            const componentRuns: any[] = []
+            let currentRunAst: any[] = []
+            let currentRunRendered: any[] = []
+
+            // Start with a fallback default, but it will update on the first non-neutral node
+            let currentDir: 'ltr' | 'rtl' = 'ltr'
+            let isFirstNode = true
+            astChildrenArray.forEach((astChild: any, index: number) => {
+                const renderedChild = renderedChildrenArray[index]
+                if (!renderedChild) return
+
+                let childDir = getDeepASTDirection(astChild)
+
+                // If the node is neutral (like a softbreak), force it to adopt the current running direction
+                if (childDir === 'neutral') {
+                    childDir = currentDir
+                }
+
+                if (isFirstNode) {
+                    currentDir = childDir
+                    isFirstNode = false
+                    currentRunAst.push(astChild)
+                    currentRunRendered.push(renderedChild)
+                } else if (childDir === currentDir) {
+                    currentRunAst.push(astChild)
+                    currentRunRendered.push(renderedChild)
+                } else {
+                    // A genuine direction switch happened (LTR <-> RTL)
+                    componentRuns.push({
+                        direction: currentDir,
+                        renderedChildren: currentRunRendered,
+                    })
+                    currentDir = childDir
+                    currentRunAst = [astChild]
+                    currentRunRendered = [renderedChild]
+                }
+            })
+
+            if (currentRunRendered.length > 0) {
+                componentRuns.push({
+                    direction: currentDir,
+                    renderedChildren: currentRunRendered,
+                })
+            }
+
+            return (
+                <View key={node.key} style={{ width: '100%' }}>
+                    {componentRuns.map((run, index) => {
+                        const isRtl = run.direction === 'rtl'
+
+                        return (
+                            <Text
+                                key={`run-${index}`}
+                                style={[
+                                    styles.textgroup,
+                                    {
+                                        width: '100%',
+                                        writingDirection: run.direction,
+                                        textAlign: isRtl ? 'right' : 'left',
+                                    },
+                                ]}>
+                                {isRtl ? '\u2067' : '\u2066'}
+                                {run.renderedChildren}
+                                {'\u2069'}
+                            </Text>
+                        )
+                    })}
+                </View>
+            )
+        },
     }
 
     export const useCustomFormatting = () => {
@@ -146,7 +251,9 @@ export namespace MarkdownStyle {
                 StyleSheet.create({
                     double_quote: { color: color.quote },
                     // The main container
-                    body: {},
+                    body: {
+                        textAlign: 'auto',
+                    },
 
                     // Headings
                     heading1: {
@@ -365,6 +472,7 @@ export namespace MarkdownStyle {
                     textgroup: {
                         fontWeight: getModifiedFontWeight(400),
                         color: color.text._100,
+                        width: '100%',
                     },
                     latex_inline: {
                         color: color.text._300,
@@ -376,10 +484,7 @@ export namespace MarkdownStyle {
                     },
                     paragraph: {
                         flexWrap: 'wrap',
-                        flexDirection: 'row',
-                        alignItems: 'flex-start',
-                        justifyContent: 'flex-start',
-                        width: '100%',
+                        textAlign: 'auto',
                         color: color.text._100,
                         marginVertical: spacing.sm,
                         fontSize: getModifiedFontSize(14),
