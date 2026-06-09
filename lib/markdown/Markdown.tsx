@@ -185,7 +185,7 @@ export namespace MarkdownStyle {
             }
 
             return (
-                <View key={node.key} style={{ width: '100%' }}>
+                <View key={node.key} style={{ width: '100%', flexWrap: 'wrap' }}>
                     {componentRuns.map((run, index) => {
                         const isRtl = run.direction === 'rtl'
 
@@ -195,6 +195,7 @@ export namespace MarkdownStyle {
                                 style={[
                                     styles.textgroup,
                                     {
+                                        flexWrap: 'wrap',
                                         width: '100%',
                                         writingDirection: run.direction,
                                         textAlign: isRtl ? 'right' : 'left',
@@ -207,6 +208,13 @@ export namespace MarkdownStyle {
                         )
                     })}
                 </View>
+            )
+        },
+        inline: (node: any, children: any, parent: any, styles: any) => {
+            return (
+                <Text key={node.key} style={[styles.inline, { flexWrap: 'wrap', width: '100%' }]}>
+                    {children}
+                </Text>
             )
         },
     }
