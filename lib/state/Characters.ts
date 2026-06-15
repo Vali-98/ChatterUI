@@ -756,6 +756,8 @@ export namespace Characters {
                     .where(eq(characters.id, charId))
             }
         }
+
+        export namespace live {}
     }
 
     export const importBackground = async (charId: number, oldBackground?: number | null) => {
