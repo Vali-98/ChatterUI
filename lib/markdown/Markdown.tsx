@@ -92,9 +92,24 @@ export namespace MarkdownStyle {
             )
         },
         double_quote: (node: any, children: any, parent: any, styles: any) => {
+            const quotes = {
+                english: ['“', '”'],
+                low9: ['„', '”'],
+                reversed9: ['‟', '”'],
+                ascii: ['"', '"'],
+                guillemet: ['«', '»'],
+            }
+
+            const quoteType = (node.sourceMeta?.quoteType ??
+                node.meta?.quoteType ??
+                'english') as keyof typeof quotes
+            let [open, close] = quotes[quoteType] || quotes.english
+
             return (
                 <Text key={node.key} style={styles.double_quote}>
-                    “{children}”
+                    {open}
+                    {children}
+                    {close}
                 </Text>
             )
         },

@@ -1,24 +1,53 @@
-module.exports = function doubleQuotePlugin(md) {
-    const getQuoteType = (ch) => {
-        if (ch === '“') return 'open'
-        if (ch === '”') return 'close'
-        if (ch === '"') return 'ascii'
-        return null
-    }
+const OPEN_QUOTES = {
+    '“': 'english',
+    '„': 'low9',
+    '‟': 'reversed9',
+}
 
+const CLOSE_QUOTES = new Set(['”'])
+
+const GUILLEMETS = new Set(['«', '»'])
+
+module.exports = function doubleQuotePlugin(md) {
     md.core.ruler.after('inline', 'double_quote', function (state) {
         for (const blockToken of state.tokens) {
-            if (blockToken.type !== 'inline' || !blockToken.children) continue
+            if (blockToken.type !== 'inline' || !blockToken.children) {
+                continue
+            }
 
-            const children = blockToken.children
             const newChildren = []
 
-            let asciiOpen = false
-            let lastOpenIdx = -1
+            let quoteOpen = false
 
-            for (let i = 0; i < children.length; i++) {
-                const token = children[i]
+            const emitText = (content) => {
+                const token = new state.Token('text', '', 0)
+                token.content = content
+                newChildren.push(token)
+            }
 
+            const emitOpen = (quoteType, quoteChar) => {
+                const token = new state.Token('double_quote_open', 'span', 1)
+
+                token.meta = {
+                    quoteType,
+                }
+
+                newChildren.push(token)
+
+                quoteOpen = true
+                return token
+            }
+
+            const emitClose = () => {
+                const token = new state.Token('double_quote_close', 'span', -1)
+
+                newChildren.push(token)
+
+                quoteOpen = false
+            }
+            let openToken = null
+
+            for (const token of blockToken.children) {
                 if (token.type !== 'text') {
                     newChildren.push(token)
                     continue
@@ -27,50 +56,82 @@ module.exports = function doubleQuotePlugin(md) {
                 const content = token.content
                 let lastPos = 0
 
-                for (let j = 0; j < content.length; j++) {
-                    const type = getQuoteType(content[j])
+                for (let i = 0; i < content.length; i++) {
+                    const ch = content[i]
+
+                    let type = null
+                    let quoteType = null
+
+                    if (OPEN_QUOTES[ch]) {
+                        type = 'open'
+                        quoteType = OPEN_QUOTES[ch]
+                    } else if (CLOSE_QUOTES.has(ch)) {
+                        type = 'close'
+                    } else if (ch === '"') {
+                        type = 'ascii'
+                        quoteType = 'ascii'
+                    } else if (GUILLEMETS.has(ch)) {
+                        type = 'guillemet'
+                        quoteType = 'guillemet'
+                    }
+
                     if (!type) continue
 
-                    // flush text
-                    if (j > lastPos) {
-                        const t = new state.Token('text', '', 0)
-                        t.content = content.slice(lastPos, j)
-                        newChildren.push(t)
+                    if (i > lastPos) {
+                        emitText(content.slice(lastPos, i))
                     }
 
-                    // Open only curly or ascii when closed
-                    if (type === 'open' || (type === 'ascii' && !asciiOpen)) {
-                        const open = new state.Token('double_quote_open', 'span', 1)
-                        newChildren.push(open)
-                        lastOpenIdx = newChildren.length - 1
+                    switch (type) {
+                        case 'open':
+                            if (!quoteOpen) {
+                                openToken = emitOpen(quoteType, ch)
+                            } else {
+                                emitText(ch)
+                            }
+                            break
 
-                        if (type === 'ascii') asciiOpen = true
+                        case 'close':
+                            if (quoteOpen) {
+                                emitClose()
+                            } else {
+                                emitText(ch)
+                            }
+                            break
+
+                        case 'ascii':
+                            if (quoteOpen) {
+                                emitClose()
+                            } else {
+                                openToken = emitOpen('ascii', ch)
+                            }
+                            break
+
+                        case 'guillemet':
+                            if (quoteOpen) {
+                                emitClose()
+                            } else {
+                                openToken = emitOpen('guillemet', ch)
+                            }
+                            break
                     }
 
-                    // Close only curly or ascii when open
-                    else if (type === 'close' || (type === 'ascii' && asciiOpen)) {
-                        const close = new state.Token('double_quote_close', 'span', -1)
-                        newChildren.push(close)
-                        lastOpenIdx = -1
-
-                        if (type === 'ascii') asciiOpen = false
-                    }
-
-                    lastPos = j + 1
+                    lastPos = i + 1
                 }
 
                 if (lastPos < content.length) {
-                    const t = new state.Token('text', '', 0)
-                    t.content = content.slice(lastPos)
-                    newChildren.push(t)
+                    emitText(content.slice(lastPos))
                 }
             }
 
-            // safety: revert if last quote never closed
-            if (lastOpenIdx !== -1) {
-                newChildren[lastOpenIdx] = Object.assign(new state.Token('text', '', 0), {
-                    content: '"',
-                })
+            if (quoteOpen) {
+                const close = new state.Token('double_quote_close', 'span', -1)
+
+                close.meta = {
+                    synthetic: true,
+                }
+                if (openToken?.meta) openToken.meta.dangling = true
+
+                newChildren.push(close)
             }
 
             blockToken.children = newChildren
