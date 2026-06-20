@@ -5,7 +5,7 @@ import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Pressable, TextInput, TouchableOpacity, View } from 'react-native'
+import { Keyboard, Pressable, TextInput, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, {
     BounceIn,
@@ -95,6 +95,7 @@ const ChatInput = () => {
     }
 
     const handleSend = async () => {
+        Keyboard.dismiss()
         if (!chatId) return
         setDisableSend(true)
         if (newMessage.trim() !== '' || attachments.length > 0)
