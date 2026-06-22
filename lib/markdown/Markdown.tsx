@@ -104,7 +104,7 @@ export namespace MarkdownStyle {
                 node.meta?.quoteType ??
                 'english') as keyof typeof quotes
             let [open, close] = quotes[quoteType] || quotes.english
-
+            if (node.sourceMeta?.dangling) close = ''
             return (
                 <Text key={node.key} style={styles.double_quote}>
                     {open}
