@@ -12,17 +12,24 @@ import { readBase64Async } from '@lib/utils/File'
 import { Macro } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
+import type { DataSource, DataSourceResult } from '../DataSources'
 
 export type MessageLoader = {
-    retrieve: (limit: number, offset: number) => Promise<ChatEntry[]>
-    initialLimit: number
-    initialOffset: number
+    retrieve: (page: number) => Promise<ChatEntry[]> // must retrieve messages in chronological order from oldest to newest
+    pageSize: number // we use this to determine if a last page has been reached, if (await retrieve()).length < pageSize
+    initialPage: number // usually 0
 }
 
 export type TokenCache = {
     userCache: CharacterTokenCache
     characterCache: CharacterTokenCache
     instructCache: InstructTokenCache
+}
+
+const printContext = (context: string) => {
+    if (!mmkv.getBoolean(AppSettings.PrintContext)) return
+    Logger.info('Input Context')
+    Logger.info(JSON.stringify(context))
 }
 
 export interface ContextBuilderParams {
@@ -38,50 +45,65 @@ export interface ContextBuilderParams {
     cache: TokenCache
     bypassContextLength?: boolean
     messageLoader?: MessageLoader
+    dataSources?: DataSource[]
 }
 
-type ContentTypes =
-    | { type: 'input_text' | 'text'; text: string }
-    | { type: 'image_url'; image_url: { url: string } }
-    | { type: 'input_audio'; input_audio: { data: string; format: string } }
+type TextData = { type: 'input_text' | 'text'; text: string }
+type ImageData = { type: 'image_url'; image_url: { url: string } }
+type AudioData = { type: 'input_audio'; input_audio: { data: string; format: string } }
+
+type ContentTypes = TextData | ImageData | AudioData
 
 export type Message = { role: string; [x: string]: ContentTypes[] | string }
 
 export const buildContext = async (params: ContextBuilderParams) => {
-    if (params.apiConfig.request.completionType.type === 'chatCompletions') {
-        return await buildChatCompletionContext(params)
-    } else {
-        return await buildTextCompletionContext(params)
-    }
+    const buildFn =
+        params.apiConfig.request.completionType.type === 'chatCompletions'
+            ? buildChatCompletionContext
+            : buildTextCompletionContext
+    const output = await buildFn(params)
+    return output
 }
 
-/**
- * TODO:
- * Context Builder is not a pure function:
- * - Macros rely on macro state
- */
+export type ContextMessage = {
+    role: 'user' | 'assistant'
+    content: string
+    attachments?: ContentTypes[]
+}
 
-export const buildChatCompletionContext = async ({
-    apiConfig,
-    apiValues,
-    messages,
-    character,
-    user,
-    cache,
-    instruct,
-    tokenizer,
-    chatTokenizer,
-    maxLength,
-    bypassContextLength,
-    messageLoader,
-}: ContextBuilderParams) => {
+export type CompletionState =
+    | 'initial_truncated'
+    | 'initial_completed'
+    | 'loader_completed'
+    | 'loader_truncated'
+
+export const collectContext = async (params: ContextBuilderParams & { mode: 'chat' | 'text' }) => {
+    const {
+        apiConfig,
+        messages,
+        character,
+        user,
+        cache,
+        instruct,
+        tokenizer,
+        chatTokenizer,
+        maxLength,
+        bypassContextLength,
+        messageLoader,
+        mode,
+        dataSources,
+    } = params
+
     const delta = performance.now()
 
-    if (apiConfig.request.completionType.type !== 'chatCompletions') return
-    const completionFeats = apiConfig.request.completionType
     const { characterCache, userCache, instructCache } = cache
-    const usePrefix = false
-    const { systemPrompt, systemPromptLength } = getSystemPrompt({
+
+    const usePrefix = mode === 'text'
+    const useSuffix = false
+
+    const sortedDataSources = [...(dataSources ?? [])].sort((a, b) => a.priority - b.priority)
+
+    let { systemPrompt, systemPromptLength } = getSystemPrompt({
         instruct,
         user,
         character,
@@ -89,259 +111,314 @@ export const buildChatCompletionContext = async ({
         characterCache,
         instructCache,
         usePrefix,
-    })
-
-    const initial = systemPrompt
-    let total_length = systemPromptLength
-    let first_message_reached = false
-
-    const payload: Message[] = [
-        {
-            role: completionFeats.systemRole,
-            [completionFeats.contentName]: replaceMacrosInternal(initial, instruct),
-        },
-    ]
-    let hasImage = false
-    const messageBuffer: Message[] = []
-    let index = messages.length - 1
-    for (const message of messages.reverse()) {
-        const swipe_data = message.swipes[message.swipe_id]
-        // special case for claude, prefill may be useful!
-        const timestamp_string = `[${swipe_data.send_date.toString().split(' ')[0]} ${swipe_data.send_date.toLocaleTimeString()}]\n`
-        const timestamp_length = instruct.timestamp ? await tokenizer(timestamp_string) : 0
-
-        const name_string = `${message.name} :`
-        const name_length = instruct.names ? await tokenizer(name_string) : 0
-        const { attachments, hasImageNew } = getValidAttachments(
-            message,
-            completionFeats,
-            instruct,
-            hasImage
-        )
-
-        const swipe_len = message.id !== -1 ? await chatTokenizer(message, index) : 0
-        const len = swipe_len + name_length + timestamp_length
-
-        if (total_length + len > maxLength && !bypassContextLength) break
-        hasImage = hasImageNew
-
-        const prefill = index === messages.length - 1 ? apiValues.prefill : ''
-
-        if (!swipe_data.swipe && !prefill && index === messages.length - 1) {
-            index--
-            continue
-        }
-        const role = message.is_user ? completionFeats.userRole : completionFeats.assistantRole
-
-        if (message.attachments.length > 0) {
-            const images: ContentTypes[] = await Promise.all(
-                attachments.map(async (item) => {
-                    const base64data = await readBase64Async(item.uri)
-                    if (item.type === 'image')
-                        return {
-                            type: 'image_url',
-                            image_url: {
-                                url: 'data:' + item.mime_type + ';base64,' + base64data,
-                            },
-                        }
-                    return {
-                        type: 'input_audio',
-                        input_audio: {
-                            data: base64data,
-                            format: item.mime_type.split('/')[1],
-                        },
-                    }
-                })
-            )
-
-            messageBuffer.push({
-                role: role,
-                [completionFeats.contentName]: [
-                    {
-                        type: 'text',
-                        text: replaceMacrosInternal(prefill + swipe_data.swipe, instruct),
-                    },
-                    ...images,
-                ],
-            })
-        } else {
-            messageBuffer.push({
-                role: role,
-                [completionFeats.contentName]: replaceMacrosInternal(
-                    prefill + swipe_data.swipe,
-                    instruct
-                ),
-            })
-        }
-        first_message_reached = index === 0
-        total_length += len
-        index--
-    }
-
-    if (index >= messages.length - 1 && messages.length !== 0) {
-        warnNoMessages()
-    }
-
-    const examples = character?.mes_example
-    if (
-        first_message_reached &&
-        instruct.examples &&
-        examples &&
-        total_length + characterCache.examples_length < maxLength
-    ) {
-        payload[0][completionFeats.contentName] += replaceMacrosInternal(examples, instruct)
-        total_length += characterCache.examples_length
-    }
-
-    if (apiConfig.features.useFirstMessage && apiValues.firstMessage)
-        messageBuffer.push({
-            role: completionFeats.userRole,
-            [completionFeats.contentName]: apiValues.firstMessage,
-        })
-
-    const output = [...payload, ...messageBuffer.reverse()]
-    Logger.info(`Approximate Context Size: ${total_length} tokens`)
-    Logger.info(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
-    if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(JSON.stringify(output))
-
-    return output
-}
-
-export const buildTextCompletionContext = async ({
-    apiConfig,
-    apiValues,
-    messages,
-    character,
-    user,
-    cache,
-    instruct,
-    tokenizer,
-    chatTokenizer,
-    maxLength,
-    bypassContextLength,
-    messageLoader,
-}: ContextBuilderParams) => {
-    const delta = performance.now()
-    const useSuffix = false
-    const { characterCache, userCache, instructCache } = cache
-
-    const { systemPrompt, systemPromptLength } = getSystemPrompt({
-        instruct,
-        user,
-        character,
-        userCache,
-        characterCache,
-        instructCache,
         useSuffix,
     })
 
-    let payload = systemPrompt
-    const payloadLength = systemPromptLength
+    const reservedBudget = sortedDataSources.reduce((acc, curr) => acc + curr.tokenBudget, 0)
 
-    // suffix must be delayed for example messages
-    let message_acc = ``
-    let message_acc_length = 0
-    let is_last = true
+    let totalLength = systemPromptLength + reservedBudget
+
+    let hasImage = false
+    let completionState: CompletionState = 'initial_completed'
+
+    const contextMessages: ContextMessage[] = []
+
+    /**
+     * Shared processor
+     */
+    const processMessage = async (
+        message: ChatEntry,
+        index: number,
+        isLast: boolean
+    ): Promise<boolean> => {
+        const swipe = message.swipes[0]
+        if (!swipe) {
+            Logger.errorToast(t('generation.warn.entryWithoutValidSwipeFound'))
+            return false
+        }
+        const swipeLen = await chatTokenizer(message, index)
+
+        const timestamp = instruct.timestamp
+            ? `[${swipe.send_date.toDateString()} ${swipe.send_date.toLocaleTimeString()}]\n`
+            : ''
+
+        const name = instruct.names ? `${message.name}: ` : ''
+
+        const timestampLen = instruct.timestamp ? await tokenizer(timestamp) : 0
+        const nameLen = instruct.names ? await tokenizer(name) : 0
+
+        let instructLen = 0
+        if (mode === 'text') {
+            instructLen += message.is_user
+                ? instructCache.input_prefix_length
+                : instructCache.output_prefix_length
+        }
+
+        const shardLen = swipeLen + timestampLen + nameLen + instructLen
+
+        // HARD LIMIT (always enforced)
+        if (totalLength + shardLen > maxLength && !bypassContextLength) {
+            return false
+        }
+
+        if (!swipe.swipe && isLast) {
+            return true
+        }
+
+        const role: 'user' | 'assistant' = message.is_user ? 'user' : 'assistant'
+
+        const content = replaceMacrosInternal(`${timestamp}${name}${swipe.swipe}`, instruct)
+
+        let attachments: ContentTypes[] | undefined
+
+        if (mode === 'chat' && apiConfig.request.completionType.type === 'chatCompletions') {
+            const result = getValidAttachments(
+                message,
+                apiConfig.request.completionType,
+                instruct,
+                hasImage
+            )
+
+            hasImage = result.hasImageNew
+
+            if (result.attachments.length > 0) {
+                attachments = await Promise.all(
+                    result.attachments.map(async (item) => {
+                        const base64 = await readBase64Async(item.uri)
+
+                        if (item.type === 'image') {
+                            return {
+                                type: 'image_url',
+                                image_url: {
+                                    url: `data:${item.mime_type};base64,${base64}`,
+                                },
+                            }
+                        }
+
+                        return {
+                            type: 'input_audio',
+                            input_audio: {
+                                data: base64,
+                                format: item.mime_type.split('/')[1],
+                            },
+                        }
+                    })
+                )
+            }
+        }
+
+        contextMessages.push({ role, content, attachments })
+
+        totalLength += shardLen
+
+        return true
+    }
+
+    // initial message collector
     let index = messages.length - 1
 
-    const wrap_string = `\n`
-    const wrap_length = instruct.wrap ? await tokenizer(wrap_string) : 0
+    for (let i = messages.length - 1; i >= 0; i--) {
+        const success = await processMessage(messages[i], index, i === messages.length - 1)
 
-    // we use this to check if the first message is reached
-    // this is needed to check if examples should be added
-    let first_message_reached = false
-
-    // we require lengths for names if use_names is enabled
-    for (const message of messages.reverse()) {
-        const swipe_len = await chatTokenizer(message, index)
-        const swipe_data = message.swipes[message.swipe_id]
-
-        /** Accumulate total string length
-         *  The context builder MUST retain context length below the
-         *  context limit, especially for local gens to prevent truncation
-         * **/
-
-        let instruct_len = message.is_user
-            ? instructCache.input_prefix_length
-            : is_last
-              ? instructCache.last_output_prefix_length
-              : instructCache.output_suffix_length
-
-        // for last message, we want to skip the end token to allow the LLM to generate
-
-        if (!is_last)
-            instruct_len += message.is_user
-                ? instructCache.input_suffix_length
-                : instructCache.output_suffix_length
-
-        const timestamp_string = `[${swipe_data.send_date.toString().split(' ')[0]} ${swipe_data.send_date.toLocaleTimeString()}]\n`
-        const timestamp_length = instruct.timestamp ? await tokenizer(timestamp_string) : 0
-
-        const name_string = `${message.name}: `
-        const name_length = instruct.names ? await tokenizer(name_string) : 0
-
-        const shard_length = swipe_len + instruct_len + name_length + timestamp_length + wrap_length
-
-        // check if within context window
-        if (message_acc_length + payloadLength + shard_length > maxLength && !bypassContextLength) {
+        if (!success) {
+            completionState = 'initial_truncated'
             break
         }
-
-        // apply strings
-
-        let message_shard = message.is_user
-            ? instruct.input_prefix
-            : is_last
-              ? instruct.last_output_prefix
-              : instruct.output_prefix
-
-        if (instruct.timestamp) message_shard += timestamp_string
-
-        if (instruct.names) message_shard += name_string
-
-        message_shard += swipe_data.swipe
-
-        if (!is_last) {
-            message_shard += `${message.is_user ? instruct.input_suffix : instruct.output_suffix}`
-        }
-
-        if (instruct.wrap) {
-            message_shard += wrap_string
-        }
-
-        first_message_reached = index === 0
-
-        // ensure no more is_last checks after this
-        is_last = false
-        message_acc_length += shard_length
-        message_acc = message_shard + message_acc
         index--
     }
 
-    if (index >= messages.length - 1 && messages.length !== 0) {
-        warnNoMessages()
+    if (messageLoader && completionState === 'initial_completed') {
+        let page = messageLoader.initialPage
+        while (true) {
+            let batch: ChatEntry[] | null = null
+
+            batch = await messageLoader.retrieve(page)
+
+            for (let i = batch.length - 1; i >= 0; i--) {
+                const success = await processMessage(batch[i], -1, false)
+                if (!success) {
+                    completionState = 'loader_truncated'
+                    break
+                }
+            }
+
+            if (completionState === 'loader_truncated') break
+
+            if (batch.length < messageLoader.pageSize || batch.length === 0) {
+                completionState = 'loader_completed'
+                break
+            }
+
+            page++
+        }
     }
 
-    const examples = character?.mes_example
-    if (
-        first_message_reached &&
-        instruct.examples &&
-        examples &&
-        message_acc_length + payloadLength + characterCache.examples_length < maxLength
-    ) {
-        payload += examples
-        message_acc_length += characterCache.examples_length
+    const lastMessageReached =
+        completionState === 'loader_completed' || completionState === 'initial_completed'
+
+    const pendingInsertions: DataSourceResult[] = []
+
+    const runDataSources = async (sources: DataSource[]) => {
+        for (const source of sources) {
+            const remaining = maxLength - totalLength
+            const opportunistic = source.tokenBudget === 0
+            if (remaining <= 0 && opportunistic) {
+                Logger.info(`[DataSource:${source.name}] skipped (no remaining budget)`)
+                continue
+            }
+
+            const budget = opportunistic ? remaining : source.tokenBudget
+
+            const results = await source.retrieve(
+                params,
+                contextMessages,
+                maxLength,
+                totalLength,
+                budget,
+                lastMessageReached
+            )
+            for (const result of results) {
+                pendingInsertions.push(result)
+                totalLength += result.tokenLength
+
+                Logger.info(
+                    `[DataSource:${source.name}] inserted ${result.tokenLength} tokens from ${result.source}`
+                )
+            }
+        }
     }
 
-    payload += instruct.system_suffix
-    payload = replaceMacrosInternal(payload + message_acc, instruct)
+    await runDataSources(sortedDataSources)
 
-    Logger.info(`Approximate Context Size: ${message_acc_length + payloadLength} tokens`)
-    Logger.info(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
+    const insertMessage = (index: number, message: ContextMessage) => {
+        contextMessages.splice(index, 0, message)
+    }
 
-    if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(payload)
+    for (const insertion of pendingInsertions) {
+        const syntheticMessage: ContextMessage = {
+            role: 'user',
+            content: insertion.content,
+        }
 
+        if (insertion.position.type === 'relative') {
+            switch (insertion.position.location) {
+                case 'afterLast':
+                    contextMessages.push(syntheticMessage)
+                    break
+
+                case 'beforeLast':
+                    contextMessages.splice(
+                        Math.max(contextMessages.length - 1, 0),
+                        0,
+                        syntheticMessage
+                    )
+                    break
+
+                case 'afterSystem':
+                    systemPrompt += '\n' + insertion.content
+                    break
+            }
+
+            continue
+        }
+
+        const index = insertion.position.location
+
+        if (index >= contextMessages.length) {
+            contextMessages.unshift(syntheticMessage)
+        } else {
+            insertMessage(index, syntheticMessage)
+        }
+    }
+
+    Logger.info(`Approximate Context Size: ${totalLength}`)
+    Logger.info(`${(performance.now() - delta).toFixed(2)}ms`)
+
+    if (contextMessages.length === 0) warnNoMessages()
+    return {
+        systemPrompt: systemPrompt,
+        messages: contextMessages.reverse(),
+    }
+}
+
+export const buildChatCompletionContext = async (params: ContextBuilderParams) => {
+    if (params.apiConfig.request.completionType.type !== 'chatCompletions') return
+
+    const { systemPrompt, messages } = await collectContext({
+        ...params,
+        mode: 'chat',
+    })
+
+    const feats = params.apiConfig.request.completionType
+
+    const payload: Message[] = [
+        {
+            role: feats.systemRole,
+            [feats.contentName]: replaceMacrosInternal(systemPrompt, params.instruct),
+        },
+    ]
+
+    for (const msg of messages) {
+        if (msg.attachments?.length) {
+            payload.push({
+                role: msg.role,
+                [feats.contentName]: [{ type: 'text', text: msg.content }, ...msg.attachments],
+            })
+        } else {
+            payload.push({
+                role: msg.role,
+                [feats.contentName]: msg.content,
+            })
+        }
+    }
+    printContext(
+        JSON.stringify(
+            payload.map((item) => {
+                const content = item[feats.contentName]
+                if (typeof content === 'string') return content
+                else return content.filter((item) => item.type === 'text')
+            })
+        )
+    )
     return payload
+}
+
+export const buildTextCompletionContext = async (params: ContextBuilderParams) => {
+    const { systemPrompt, messages } = await collectContext({
+        ...params,
+        mode: 'text',
+    })
+
+    const { instruct } = params
+
+    let output = systemPrompt + instruct.system_suffix
+    let len = 0
+    let endedAtAssistant = false
+    for (const msg of messages) {
+        let outPrefix = instruct.output_prefix
+        let outSuffix = instruct.output_suffix
+        if (len === messages.length - 1 && msg.role === 'assistant') {
+            outPrefix = instruct.last_output_prefix
+            outSuffix = ''
+            endedAtAssistant = true
+        }
+
+        let shard = msg.role === 'user' ? instruct.input_prefix : outPrefix
+
+        shard += msg.content
+
+        shard += msg.role === 'user' ? instruct.input_suffix : outSuffix
+
+        if (instruct.wrap && !endedAtAssistant) shard += '\n'
+
+        output += shard
+        len++
+    }
+
+    if (!endedAtAssistant) output += instruct.last_output_prefix
+    const result = replaceMacrosInternal(output, instruct)
+    printContext(result)
+    return result
 }
 
 const thinkRule = buildThinkRules()
@@ -373,6 +450,7 @@ const getValidAttachments = (
     instruct: InstructType,
     hasImage: boolean
 ) => {
+    // hasImage is used for last_image_only checking
     let hasImageNew = hasImage
     const audioAttachments = entry.attachments.filter(
         (item) => item.type === 'audio' && instruct.send_audio && config.supportsAudio

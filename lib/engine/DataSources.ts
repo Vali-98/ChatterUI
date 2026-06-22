@@ -1,7 +1,7 @@
 import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { Chats } from '@lib/state/Chat'
 
-import type { ContextBuilderParams, ContextMessage } from './API/ContextBuilder2'
+import type { ContextBuilderParams, ContextMessage } from './API/ContextBuilder'
 
 export type DataSourceResult = {
     content: string
