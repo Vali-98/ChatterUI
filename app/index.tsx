@@ -40,14 +40,13 @@ const useStartupRoutine = () => {
         if (error) SplashScreen.hideAsync()
     }, [success, error])
 
-    return { authorized, retry }
+    return { authorized, retry, error, success }
 }
 
 const Home = () => {
     const { color } = Theme.useTheme()
     const styles = useStyles()
-    const { success, error } = useMigrations(db, migrations)
-    const { authorized, retry } = useStartupRoutine()
+    const { authorized, retry, error, success } = useStartupRoutine()
     const { t } = useTranslation()
     if (error)
         return (
