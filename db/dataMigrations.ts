@@ -6,6 +6,8 @@ import { mmkv } from '@lib/storage/MMKV'
 
 import { chatSwipes } from './schema'
 
+const MIGRATION_TAG = '[MIGRATION]'
+
 enum MigrationId {
     MIGRATE_SWIPE_ID = 'migration.deprecate_swipe_id',
 }
@@ -16,16 +18,18 @@ const migrationRoutines: Record<MigrationId, () => Promise<void>> = {
             .select({ swipeCount: count(chatSwipes.id) })
             .from(chatSwipes)
 
-        if (swipeCount === 0) return Logger.info('swipe_id migration skipped, no messages') // assume fresh install
+        if (swipeCount === 0)
+            return Logger.info(MIGRATION_TAG + ' swipe_id migration skipped, no messages') // assume fresh install
 
         const [{ activeCount }] = await db
             .select({ activeCount: count(chatSwipes.id) })
             .from(chatSwipes)
             .where(eq(chatSwipes.active, true))
 
-        if (activeCount > 0) return Logger.info('swipe_id migration skipped, active exists') // assume matched well
+        if (activeCount > 0)
+            return Logger.info(MIGRATION_TAG + ' swipe_id migration skipped, active exists') // assume matched well
 
-        Logger.info('swipe_id migration running')
+        Logger.info(MIGRATION_TAG + ' swipe_id migration checks passed, running')
 
         await db.get(sql`
             UPDATE chat_swipes
@@ -42,6 +46,7 @@ const migrationRoutines: Record<MigrationId, () => Promise<void>> = {
             ) = ce.swipe_id
             );
         `)
+        Logger.info(MIGRATION_TAG + ' swipe_id migration complete')
     },
 }
 
@@ -56,12 +61,12 @@ export const migrateData = async ({ bypass }: MigrateDataParams = {}) => {
     for (const migrationId in migrationRoutines) {
         const migrationCheck = mmkv.getBoolean(migrationId)
         if (migrationCheck && !bypass) continue
-        Logger.info(`Running migration: ${migrationId}`)
+        Logger.info(MIGRATION_TAG + ` Running migration: ${migrationId}`)
         try {
             await migrationRoutines[migrationId as MigrationId]()
             mmkv.set(migrationId, true)
         } catch (e) {
-            Logger.errorToast('Migration Failed')
+            Logger.errorToast(MIGRATION_TAG + ' Migration Failed')
             Logger.error(`${e}`)
         }
     }
