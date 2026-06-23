@@ -2,6 +2,7 @@ import { t } from 'i18next'
 
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { buildThinkRules } from '@lib/markdown/ThinkTags'
+import { useAppModeStore } from '@lib/state/AppMode'
 import { CharacterCardData, CharacterTokenCache } from '@lib/state/Characters'
 import { ChatEntry } from '@lib/state/Chat'
 import { defaultSystemPromptFormat, InstructTokenCache, InstructType } from '@lib/state/Instructs'
@@ -390,7 +391,7 @@ export const buildTextCompletionContext = async (params: ContextBuilderParams) =
     })
 
     const { instruct } = params
-
+    let hasMedia = false
     let output = systemPrompt + instruct.system_suffix
     let len = 0
     let endedAtAssistant = false
@@ -410,9 +411,19 @@ export const buildTextCompletionContext = async (params: ContextBuilderParams) =
         shard += msg.role === 'user' ? instruct.input_suffix : outSuffix
 
         if (instruct.wrap && !endedAtAssistant) shard += '\n'
-
+        if (!hasMedia && msg.attachments?.length) {
+            hasMedia = true
+        }
         output += shard
         len++
+    }
+    if (hasMedia) {
+        Logger.errorToast('Text Completions does not support multimodal')
+        if (useAppModeStore.getState().appMode === 'local') {
+            Logger.warn(
+                "[HINT] You probably have built-in templates disabled. Enable it in 'Formatting > Use Built-In Local Model' template"
+            )
+        }
     }
 
     if (!endedAtAssistant) output += instruct.last_output_prefix
