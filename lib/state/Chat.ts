@@ -74,6 +74,7 @@ export interface ChatState {
     setId: (chatId: number) => Promise<void>
     reset: () => void
     setBuffer: (data: OutputBuffer) => void
+    setBufferTimings: (timings: CompletionTimings) => void
     insertToBuffer: (data: string) => void
     updateFromBuffer: (swipeId: number) => Promise<void>
 }
@@ -199,7 +200,7 @@ export namespace Chats {
         reset: () => set({ id: undefined }),
 
         setBuffer: (newBuffer: OutputBuffer) => set({ buffer: newBuffer }),
-
+        setBufferTimings: (timings) => set({ buffer: { ...get().buffer, timings } }),
         insertToBuffer: (data: string) =>
             set((state: ChatState) => ({
                 buffer: { ...state.buffer, data: state.buffer.data + data },

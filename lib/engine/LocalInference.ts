@@ -302,11 +302,7 @@ const runLocalCompletion = async (
     }
 
     const outputCompleted = (text: string, timings: CompletionTimings) => {
-        // @TODO: Maybe fix this
-        // const regenCache = Chats.useChatState.getState().getRegenCache()
-        // Chats.useChatState
-        //   .getState()
-        //  .setBuffer({ data: (regenCache + text).replaceAll(replace, ''), timings: timings })
+        Chats.useChatState.getState().setBufferTimings(timings)
         if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(`Completion Output:\n${text}`)
         stopGenerating()
     }
