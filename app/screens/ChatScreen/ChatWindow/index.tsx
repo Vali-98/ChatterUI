@@ -107,7 +107,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                 )}
                 ref={flatlistRef}
                 maintainVisibleContentPosition={
-                    autoScroll ? null : { minIndexForVisible: 1, autoscrollToTopThreshold: 50 }
+                    autoScroll ? null : { minIndexForVisible: 0, autoscrollToTopThreshold: 50 }
                 }
                 keyboardShouldPersistTaps="handled"
                 inverted
