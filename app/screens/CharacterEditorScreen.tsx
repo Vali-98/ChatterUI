@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons'
 import { usePreventRemove } from '@react-navigation/core'
 import { count, eq } from 'drizzle-orm'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
@@ -24,6 +24,7 @@ import { useDebounceTokenizer } from '@lib/hooks/Tokenizer'
 import { CharacterCardData, Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
+import { importLive2DModel, deleteLive2DModel } from '@lib/state/Live2D'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { characterTags, tags } from 'db/schema'
@@ -57,9 +58,25 @@ const ChracterEditorScreen = () => {
     const [characterCard, setCharacterCard] = useState<CharacterCardData | undefined>(currentCard)
     const descriptionTokens = useDebounceTokenizer(characterCard?.description ?? '', 300)
     const { chat, unloadChat } = Chats.useChat()
+
+    // ── Background image (existing) ──────────────────────────────────────────
     const { data: { background_image: backgroundImage } = {} } = useLiveQuery(
         Characters.db.query.backgroundImageQuery(charId ?? -1)
     )
+
+    // ── Live2D model path ────────────────────────────────────────────────────
+    const { data: live2dRow } = useLiveQuery(
+        db.query.characters.findFirst({
+            where: eq(db._.$inferSelect.characters.id, charId ?? -1) as any,
+            columns: { live2d_model_path: true },
+        })
+    )
+    const live2dModelPath: string | null = (live2dRow as any)?.live2d_model_path ?? null
+    // Extract a display-friendly model folder name from the path
+    const live2dModelName = live2dModelPath
+        ? live2dModelPath.split('/').slice(-2, -1)[0] ?? 'Custom model'
+        : null
+
     const setShowViewer = useAvatarViewerStore((state) => state.setShow)
     const [edited, setEdited] = useState(false)
     const [altSwipeIndex, setAltSwipeIndex] = useState(0)
@@ -173,13 +190,33 @@ const ChracterEditorScreen = () => {
         })
     }
 
+    // ── Live2D handlers ──────────────────────────────────────────────────────
+
+    const handleImportLive2D = async () => {
+        if (!charId) return
+        await importLive2DModel(charId)
+    }
+
+    const handleDeleteLive2D = () => {
+        if (!charId) return
+        Alert.alert({
+            title: 'Remove Live2D Model',
+            description: `Remove the Live2D model from "${charName}"? The imported files will be deleted.`,
+            buttons: [
+                { label: 'Cancel' },
+                {
+                    label: 'Remove',
+                    onPress: () => deleteLive2DModel(charId),
+                    type: 'warning',
+                },
+            ],
+        })
+    }
+
     const handleAddAltMessage = async () => {
         if (!charId || !characterCard) return
         const id = await Characters.db.mutate.addAltGreeting(charId)
         await setCurrentCard(charId)
-
-        // optimistically update editor state
-
         const greetings = [
             ...(characterCard?.alternate_greetings ?? []),
             { id: id, greeting: '', character_id: charId },
@@ -240,6 +277,8 @@ const ChracterEditorScreen = () => {
                         showsVerticalScrollIndicator={false}
                         keyboardShouldPersistTaps="always"
                         contentContainerStyle={{ rowGap: 8, paddingBottom: 24 }}>
+
+                        {/* ── Existing character header ────────────────────── */}
                         <View style={styles.characterHeader}>
                             <ContextMenu
                                 placement="right"
@@ -263,7 +302,6 @@ const ChracterEditorScreen = () => {
                                             )
                                         },
                                     },
-
                                     {
                                         label: 'View Image',
                                         icon: 'search',
@@ -346,6 +384,66 @@ const ChracterEditorScreen = () => {
                             </View>
                         </View>
 
+                        {/* ── Live2D Model section ─────────────────────────── */}
+                        <View style={styles.live2dSection}>
+                            <View style={styles.live2dHeader}>
+                                <MaterialCommunityIcons
+                                    name="animation-play"
+                                    size={18}
+                                    color={color.primary._500}
+                                />
+                                <Text style={styles.live2dTitle}>Live2D Model</Text>
+                            </View>
+
+                            <View style={styles.live2dRow}>
+                                {/* Current model name, or placeholder */}
+                                <View style={styles.live2dModelInfo}>
+                                    <Text
+                                        style={[
+                                            styles.live2dModelName,
+                                            !live2dModelName && styles.live2dModelNone,
+                                        ]}
+                                        numberOfLines={1}
+                                        ellipsizeMode="middle">
+                                        {live2dModelName ?? 'No model selected'}
+                                    </Text>
+                                    <Text style={styles.live2dHint}>
+                                        Supports .zip, .wks (Live2DViewerEX) or .model3.json
+                                    </Text>
+                                </View>
+
+                                {/* Import button */}
+                                <TouchableOpacity
+                                    style={styles.live2dImportBtn}
+                                    onPress={handleImportLive2D}
+                                    activeOpacity={0.7}>
+                                    <MaterialCommunityIcons
+                                        name="folder-open-outline"
+                                        size={20}
+                                        color={color.primary._500}
+                                    />
+                                    <Text style={styles.live2dBtnLabel}>
+                                        {live2dModelName ? 'Change' : 'Import'}
+                                    </Text>
+                                </TouchableOpacity>
+
+                                {/* Remove button — only shown when a model is set */}
+                                {live2dModelName && (
+                                    <TouchableOpacity
+                                        style={styles.live2dRemoveBtn}
+                                        onPress={handleDeleteLive2D}
+                                        activeOpacity={0.7}>
+                                        <AntDesign
+                                            name="close"
+                                            size={16}
+                                            color={color.error._400}
+                                        />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        </View>
+                        {/* ─────────────────────────────────────────────────── */}
+
                         <ThemedTextInput
                             scrollEnabled
                             label={`Description Tokens: ${descriptionTokens}`}
@@ -384,10 +482,7 @@ const ChracterEditorScreen = () => {
                                 <Text style={{ color: color.text._100 }}>
                                     Alternate Greeting{'   '}
                                     {characterCard.alternate_greetings.length !== 0 && (
-                                        <Text
-                                            style={{
-                                                color: color.text._100,
-                                            }}>
+                                        <Text style={{ color: color.text._100 }}>
                                             {altSwipeIndex + 1} /{' '}
                                             {characterCard.alternate_greetings.length}
                                         </Text>
@@ -620,6 +715,78 @@ const useStyles = () => {
             borderWidth: 1,
             backgroundColor: color.primary._300,
             borderRadius: borderRadius.l,
+        },
+
+        // ── Live2D styles ───────────────────────────────────────────────────
+        live2dSection: {
+            backgroundColor: color.neutral._100,
+            borderRadius: borderRadius.xl,
+            paddingVertical: 12,
+            paddingHorizontal: 12,
+            rowGap: 8,
+        },
+
+        live2dHeader: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            columnGap: 6,
+        },
+
+        live2dTitle: {
+            color: color.text._100,
+            fontWeight: '600',
+            fontSize: 14,
+        },
+
+        live2dRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            columnGap: 8,
+        },
+
+        live2dModelInfo: {
+            flex: 1,
+            rowGap: 2,
+        },
+
+        live2dModelName: {
+            color: color.text._100,
+            fontSize: 13,
+            fontWeight: '500',
+        },
+
+        live2dModelNone: {
+            color: color.text._500,
+            fontStyle: 'italic',
+        },
+
+        live2dHint: {
+            color: color.text._600,
+            fontSize: 11,
+        },
+
+        live2dImportBtn: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            columnGap: 4,
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderRadius: borderRadius.m,
+            borderWidth: 1,
+            borderColor: color.primary._500,
+        },
+
+        live2dBtnLabel: {
+            color: color.primary._500,
+            fontSize: 13,
+            fontWeight: '600',
+        },
+
+        live2dRemoveBtn: {
+            padding: 6,
+            borderRadius: borderRadius.m,
+            borderWidth: 1,
+            borderColor: color.error._400,
         },
     })
 }

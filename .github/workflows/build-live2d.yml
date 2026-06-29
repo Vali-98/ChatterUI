@@ -1,0 +1,214 @@
+name: 🔨 Build ChatterUI + Live2D APK
+
+# ─── Déclencheurs ────────────────────────────────────────────────────────────
+on:
+  # Déclenchement manuel depuis l'onglet Actions de GitHub
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Type de build'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug      # Installable directement, pas besoin de clé de signature
+          - release    # Requiert KEYSTORE_* dans les Secrets GitHub
+
+  # Déclenchement automatique sur chaque push
+  push:
+    branches: [main, master, live2d]
+    paths-ignore:
+      - '**.md'
+      - '.github/ISSUE_TEMPLATE/**'
+
+# ─── Variables globales ──────────────────────────────────────────────────────
+env:
+  BUILD_TYPE: ${{ github.event.inputs.build_type || 'debug' }}
+  NODE_VERSION: '20'
+  JAVA_VERSION: '17'
+  # NDK requis par React Native 0.83.x
+  NDK_VERSION: '27.1.12297006'
+
+jobs:
+  build:
+    name: Build APK (${{ github.event.inputs.build_type || 'debug' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      # ── 1. Récupérer le code ────────────────────────────────────────────────
+      - name: 📦 Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. Java ────────────────────────────────────────────────────────────
+      - name: ☕ Setup JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      # ── 3. Android SDK (pré-installé sur ubuntu-latest) ────────────────────
+      - name: 📱 Install Android SDK components
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "SDK at: $ANDROID_HOME"
+          # Accepter toutes les licences
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || \
+          yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses 2>/dev/null || true
+
+          # Installer les composants requis
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0" \
+            "ndk;$NDK_VERSION" 2>/dev/null || \
+          $ANDROID_HOME/tools/bin/sdkmanager \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0" \
+            "ndk;$NDK_VERSION" 2>/dev/null || true
+
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION" >> $GITHUB_ENV
+
+      # ── 4. Node.js ─────────────────────────────────────────────────────────
+      - name: 🟢 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      # ── 5. Cache Gradle ────────────────────────────────────────────────────
+      - name: 🗄️ Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      # ── 6. Dépendances npm ─────────────────────────────────────────────────
+      - name: 📥 npm install
+        run: npm install --legacy-peer-deps
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+
+      # ── 7. SDK Live2D (hors-ligne) ─────────────────────────────────────────
+      - name: 🎭 Télécharger bibliothèques Live2D
+        run: |
+          if [ -f "assets/live2d/download_sdk.sh" ]; then
+            bash assets/live2d/download_sdk.sh
+          else
+            echo "⚠️ download_sdk.sh absent, le viewer utilisera le CDN"
+          fi
+
+      # ── 8. Expo Prebuild (génère le dossier android/) ──────────────────────
+      - name: 🏗️ Expo Prebuild
+        run: |
+          npx expo prebuild \
+            --platform android \
+            --clean \
+            --no-install
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          EXPO_NO_TELEMETRY: '1'
+
+      # ── 9. Droits Gradle ───────────────────────────────────────────────────
+      - name: 🔐 chmod gradlew
+        run: chmod +x android/gradlew
+
+      # ── 10a. Build DEBUG (pas de clé de signature nécessaire) ─────────────
+      - name: 🔨 Build Debug APK
+        if: env.BUILD_TYPE == 'debug'
+        run: |
+          cd android
+          ./gradlew assembleDebug \
+            --no-daemon \
+            --stacktrace
+        env:
+          GRADLE_OPTS: '-Dorg.gradle.jvmargs=-Xmx4g -Dfile.encoding=UTF-8'
+          NODE_OPTIONS: '--max-old-space-size=4096'
+
+      # ── 10b. Préparer la clé de signature RELEASE ─────────────────────────
+      - name: 🔑 Setup Release Keystore
+        if: env.BUILD_TYPE == 'release'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "⚠️ Secrets KEYSTORE_* non configurés → génération d'une clé de test"
+            cd android/app
+            keytool -genkey -v \
+              -keystore release.keystore \
+              -alias release \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=ChatterUI Live2D, O=Dev, C=FR" \
+              -storepass android -keypass android -noprompt
+            echo "KEYSTORE_FILE=release.keystore"          >> $GITHUB_ENV
+            echo "KEYSTORE_PASS=android"                   >> $GITHUB_ENV
+            echo "KEY_ALIAS_NAME=release"                  >> $GITHUB_ENV
+            echo "KEY_PASS=android"                        >> $GITHUB_ENV
+          else
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
+            echo "KEYSTORE_FILE=release.keystore"          >> $GITHUB_ENV
+            echo "KEYSTORE_PASS=$KEYSTORE_PASSWORD"        >> $GITHUB_ENV
+            echo "KEY_ALIAS_NAME=$KEY_ALIAS"               >> $GITHUB_ENV
+            echo "KEY_PASS=$KEY_PASSWORD"                  >> $GITHUB_ENV
+          fi
+
+      # ── 10c. Build RELEASE ─────────────────────────────────────────────────
+      - name: 🔨 Build Release APK
+        if: env.BUILD_TYPE == 'release'
+        run: |
+          cd android
+          ./gradlew assembleRelease \
+            --no-daemon \
+            --stacktrace \
+            -Pandroid.injected.signing.store.file=app/$KEYSTORE_FILE \
+            -Pandroid.injected.signing.store.password=$KEYSTORE_PASS \
+            -Pandroid.injected.signing.key.alias=$KEY_ALIAS_NAME \
+            -Pandroid.injected.signing.key.password=$KEY_PASS
+        env:
+          GRADLE_OPTS: '-Dorg.gradle.jvmargs=-Xmx4g -Dfile.encoding=UTF-8'
+          NODE_OPTIONS: '--max-old-space-size=4096'
+
+      # ── 11. Afficher le résultat ───────────────────────────────────────────
+      - name: 📋 Info APK
+        if: always()
+        run: |
+          echo "### Fichiers produits :"
+          find android/app/build/outputs/apk -name "*.apk" \
+               -exec ls -lh {} \; 2>/dev/null || echo "Aucun APK trouvé"
+
+      # ── 12. Upload de l'artefact ───────────────────────────────────────────
+      - name: 📤 Upload APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChatterUI-Live2D-${{ env.BUILD_TYPE }}-run${{ github.run_number }}
+          path: android/app/build/outputs/apk/**/*.apk
+          retention-days: 30
+
+      # ── 13. Résumé dans l'interface GitHub ────────────────────────────────
+      - name: 📊 Résumé
+        if: always()
+        run: |
+          echo "## 🎭 ChatterUI + Live2D — Build \`$BUILD_TYPE\` #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if find android/app/build/outputs/apk -name "*.apk" -quit 2>/dev/null; then
+            echo "### ✅ Succès !" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Télécharge l'APK dans **Artifacts** ci-dessus ⬆️" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Fichier | Taille |" >> $GITHUB_STEP_SUMMARY
+            echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
+            find android/app/build/outputs/apk -name "*.apk" | while read f; do
+              size=$(ls -lh "$f" | awk '{print $5}')
+              echo "| $(basename $f) | $size |" >> $GITHUB_STEP_SUMMARY
+            done
+          else
+            echo "### ❌ Échec — voir les logs ci-dessous" >> $GITHUB_STEP_SUMMARY
+          fi

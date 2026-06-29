@@ -14,4 +14,6 @@ export enum Storage {
     TagHider = 'tag-hider-storage',
     CharacterSearch = 'storage-character-search',
     ChatStyle = 'storage-chat-text-styling',
+    // ─── Live2D ──────────────────────────────────────────────────────────
+    Live2D = 'live2d-storage',
 }
