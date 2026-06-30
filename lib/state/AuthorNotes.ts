@@ -1,8 +1,8 @@
 import { and, eq, isNull, SQL } from 'drizzle-orm'
 import { unionAll } from 'drizzle-orm/sqlite-core'
 
-import { db as database } from '@db'
-import { authorNotes } from 'db/schema'
+import { db as database } from '@db/db'
+import { authorNotes } from '@db/schema'
 
 export type AuthorNote = typeof authorNotes.$inferSelect
 export type AuthorNoteParams = Partial<Omit<AuthorNote, 'id'>>

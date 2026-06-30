@@ -1,6 +1,6 @@
 import { count, eq, sql } from 'drizzle-orm'
 
-import { db } from '@db'
+import { db } from '@db/db'
 import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'
 

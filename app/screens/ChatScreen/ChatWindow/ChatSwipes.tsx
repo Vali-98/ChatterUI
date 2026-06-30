@@ -3,10 +3,10 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import React, { useCallback } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
+import { ChatSwipe } from '@db/schema'
 import { continueResponse, generateResponse, regenerateResponse } from '@lib/engine/Inference'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
-import { ChatSwipe } from 'db/schema'
 
 type SwipesProps = {
     nowGenerating: boolean

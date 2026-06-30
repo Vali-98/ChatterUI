@@ -2,11 +2,11 @@ import Octicons from '@react-native-vector-icons/octicons/static'
 import { TouchableOpacity, View } from 'react-native'
 import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated'
 
+import { ChatSwipe } from '@db/schema'
 import { useInference } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
 import { useTTSStore } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
-import { ChatSwipe } from 'db/schema'
 
 type TTSProps = {
     swipe: ChatSwipe

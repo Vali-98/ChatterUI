@@ -6,14 +6,14 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
+import appConfig from '@appconfig'
 import ThemedButton from '@components/buttons/ThemedButton'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
+import { migrateData } from '@db/dataMigrations'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { copyFile, deleteFile } from '@lib/utils/File'
-import appConfig from 'app.config'
-import { migrateData } from 'db/dataMigrations'
 
 const appVersion = appConfig.expo.version
 

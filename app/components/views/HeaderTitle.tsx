@@ -1,9 +1,12 @@
 import { Stack } from 'expo-router'
-import { ReactNode } from 'react'
+import { ColorValue } from 'react-native'
 
 type HeaderTitleProps = {
     title?: string
-    headerTitle?: ((props: { children: string; tintColor?: string }) => ReactNode) | undefined
+    headerTitle?:
+        | string
+        | ((props: { children: string; tintColor?: ColorValue | undefined }) => React.ReactNode)
+        | undefined
 }
 
 const HeaderTitle: React.FC<HeaderTitleProps> = ({ title = '', headerTitle = undefined }) => {

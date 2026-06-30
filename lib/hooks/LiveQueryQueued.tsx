@@ -10,7 +10,7 @@ import { SQLiteRelationalQuery } from 'drizzle-orm/sqlite-core/query-builders/qu
 import { addDatabaseChangeListener } from 'expo-sqlite'
 import { useEffect, useRef, useState } from 'react'
 
-import { TableNames } from '@db'
+import { TableNames } from '@db/db'
 
 type Task<T> = () => Promise<T>
 

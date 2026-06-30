@@ -20,14 +20,14 @@ import Avatar from '@components/views/Avatar'
 import AvatarViewer from '@components/views/AvatarViewer'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { db } from '@db'
+import { db } from '@db/db'
+import { characterTags, tags } from '@db/schema'
 import { useDebounceTokenizer } from '@lib/hooks/Tokenizer'
 import { CharacterCardData, Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
-import { characterTags, tags } from 'db/schema'
 
 const ChracterEditorScreen = () => {
     const { t } = useTranslation()

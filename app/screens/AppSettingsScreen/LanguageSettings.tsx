@@ -1,10 +1,9 @@
-import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
 import DropdownSheet from '@components/input/DropdownSheet'
 import SectionTitle from '@components/text/SectionTitle'
-import { supportedLanguages, useLanguageStore } from 'i18n/i18n'
+import { supportedLanguages, useLanguageStore } from '@i18n/i18n'
 
 const GeneratingSettings = () => {
     const { i18n, t } = useTranslation()

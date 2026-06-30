@@ -7,7 +7,8 @@ import { Platform } from 'react-native'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import { db } from '@db'
+import { db } from '@db/db'
+import { model_data, model_mmproj_links, ModelDataType } from '@db/schema'
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
@@ -20,7 +21,6 @@ import {
     listFiles,
     readableFileSize,
 } from '@lib/utils/File'
-import { model_data, model_mmproj_links, ModelDataType } from 'db/schema'
 
 import { GGMLNameMap, GGMLType } from './GGML'
 

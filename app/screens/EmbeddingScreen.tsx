@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { create } from 'zustand'
 
-import { sqliteDB } from '@db'
+import { sqliteDB } from '@db/db'
 import { LlamaConfig } from '@lib/engine/Local/LlamaLocal'
 import { Theme } from '@lib/theme/ThemeManager'
 

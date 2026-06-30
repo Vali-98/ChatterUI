@@ -6,11 +6,7 @@ import mime from 'mime/lite'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
-import { db as database } from '@db'
-import { Tokenizer } from '@lib/engine/Tokenizer'
-import { replaceMacros } from '@lib/state/Macros'
-import { AppDirectory, copyFile, deleteFile, fileInfo } from '@lib/utils/File'
-import { convertToFormatInstruct } from '@lib/utils/TextFormat'
+import { db as database } from '@db/db'
 import {
     chatAttachments,
     ChatAttachmentType,
@@ -21,7 +17,11 @@ import {
     chatSwipes,
     ChatType,
     CompletionTimings,
-} from 'db/schema'
+} from '@db/schema'
+import { Tokenizer } from '@lib/engine/Tokenizer'
+import { replaceMacros } from '@lib/state/Macros'
+import { AppDirectory, copyFile, deleteFile, fileInfo } from '@lib/utils/File'
+import { convertToFormatInstruct } from '@lib/utils/TextFormat'
 
 import { Characters } from './Characters'
 import { Logger } from './Logger'

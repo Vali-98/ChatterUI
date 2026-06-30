@@ -10,7 +10,16 @@ import { z } from 'zod'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import { db as database } from '@db'
+import { db as database } from '@db/db'
+import {
+    characterGreetings,
+    characterTags,
+    characters,
+    chatEntries,
+    chatSwipes,
+    chats,
+    tags,
+} from '@db/schema'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Storage } from '@lib/enums/Storage'
 import {
@@ -22,15 +31,6 @@ import {
     saveStringToDownload,
 } from '@lib/utils/File'
 import { replaceMacroBase } from '@lib/utils/Macros'
-import {
-    characterGreetings,
-    characterTags,
-    characters,
-    chatEntries,
-    chatSwipes,
-    chats,
-    tags,
-} from 'db/schema'
 
 import { Logger } from './Logger'
 import { createMMKVStorage } from '../storage/MMKV'

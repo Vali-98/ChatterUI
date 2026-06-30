@@ -8,13 +8,13 @@ import DropdownSheet from '@components/input/DropdownSheet'
 import Alert from '@components/views/Alert'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import InputSheet from '@components/views/InputSheet'
+import { ModelDataType } from '@db/schema'
 import { GGMLNameMap } from '@lib/engine/Local'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { Model, ModelListQueryType } from '@lib/engine/Local/Model'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { readableFileSize } from '@lib/utils/File'
-import { ModelDataType } from 'db/schema'
 
 type ModelItemProps = {
     item: ModelListQueryType

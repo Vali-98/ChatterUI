@@ -1,3 +1,4 @@
+import { ModelDataType } from '@db/schema'
 import { closeFd, getContentFd } from '@vali98/react-native-fs'
 import {
     CompletionParams,
@@ -12,7 +13,6 @@ import { persist } from 'zustand/middleware'
 
 import { Storage } from '@lib/enums/Storage'
 import { AppDirectory, fileExists, readableFileSize, writeBase64File } from '@lib/utils/File'
-import { ModelDataType } from 'db/schema'
 
 import { checkGGMLDeprecated } from './GGML'
 import { KV, Model } from './Model'

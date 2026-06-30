@@ -5,10 +5,10 @@ import Markdown from 'react-native-markdown-display'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import AnimatedEllipsis from '@components/text/AnimatedEllipsis'
+import { ChatSwipe } from '@db/schema'
 import { useTextFilter } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { Chats, useInference } from '@lib/state/Chat'
-import { ChatSwipe } from 'db/schema'
 
 type ChatTextProps = {
     nowGenerating: boolean

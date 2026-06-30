@@ -1,6 +1,7 @@
 import { t } from 'i18next'
 import BackgroundService from 'react-native-background-actions'
 
+import { ChatSwipe } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { Chats, useInference } from '@lib/state/Chat'
@@ -8,7 +9,6 @@ import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSStore } from '@lib/state/TTS'
 import { mmkv } from '@lib/storage/MMKV'
-import { ChatSwipe } from 'db/schema'
 
 import { Characters } from '../state/Characters'
 import { Logger } from '../state/Logger'

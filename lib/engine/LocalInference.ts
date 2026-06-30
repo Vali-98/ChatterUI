@@ -1,6 +1,7 @@
 import { t } from 'i18next'
 
 import Alert from '@components/views/Alert'
+import { CompletionTimings } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { Characters } from '@lib/state/Characters'
@@ -10,7 +11,6 @@ import { Logger } from '@lib/state/Logger'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSStore } from '@lib/state/TTS'
 import { mmkv } from '@lib/storage/MMKV'
-import { CompletionTimings } from 'db/schema'
 
 import { APIConfiguration, APISampler, APIValues } from './API/APIBuilder.types'
 import {
