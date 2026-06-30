@@ -612,7 +612,9 @@
             "noparamsize": "Нет размера параметров",
             "rename": "Переименовать модель"
         },
+        "linkmmproj": "Ссылка на MMPROJ",
         "maxcontext": "Максимальный контекст",
+        "mmproj": "ммпродж",
         "modelnamechat": "Показывать имя модели в чате",
         "mtmd": "Мультимодальные адаптеры",
         "purgekv": "Очистить кэш KV ({{size}})",
@@ -646,7 +648,8 @@
             "noAutoLoadModelSet": "Автозагрузка модели не установлена",
             "noModelLoaded": "Модель не загружена",
             "quantizationNoLongerSupported": "Квантизация больше не поддерживается!"
-        }
+        },
+        "unlinkmmproj": "Отсоединить MMPROJ"
     },
     "multiDropdown": {
         "counter_one": "Выбран {{count}} элемент",

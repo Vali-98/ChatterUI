@@ -7,6 +7,7 @@ import { useShallow } from 'zustand/react/shallow'
 import DropdownSheet from '@components/input/DropdownSheet'
 import Alert from '@components/views/Alert'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
+import ContextMenu from '@components/views/ContextMenu'
 import InputSheet from '@components/views/InputSheet'
 import { ModelDataType } from '@db/schema'
 import { GGMLNameMap } from '@lib/engine/Local'
@@ -35,6 +36,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const styles = useStyles()
     const { color } = Theme.useTheme()
     const [showMMPROJSelector, setShowMMPROJSelector] = useState(false)
+    const [showInfo, setShowInfo] = useState(false)
     const { loadModel, unloadModel, loadMmproj, modelId, mmprojId } = Llama.useLlamaModelStore(
         useShallow((state) => ({
             loadMmproj: state.loadMmproj,
@@ -79,6 +81,19 @@ const ModelItem: React.FC<ModelItemProps> = ({
             ],
         })
     }
+
+    const handleUnlinkMMPROJ = async () => {
+        if (item.mmprojLink) {
+            await Model.removeMMPROJLink(item)
+            const mmproj = mmprojList.filter((a) => a.id === item.mmprojLink?.mmproj_id)?.[0]
+            if (mmproj) {
+                maybeClearLastLoaded(mmproj)
+            }
+            return
+        }
+        setShowMMPROJSelector(!showMMPROJSelector)
+    }
+
     const isMMPROJ = Model.isMMPROJ(item.architecture)
     const isLoaded = isMMPROJ ? mmprojId === item.id : modelId === item.id
 
@@ -94,12 +109,14 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const tags = [
         item.params === 'N/A' ? t('model.item.noparamsize') : item.params,
         quant,
-        readableFileSize(item.file_size),
         item.architecture,
-        item.file_path.startsWith('content')
-            ? t('common.labels.external')
-            : t('common.labels.internal'),
     ]
+    const location = item.file_path.startsWith('content')
+        ? t('common.labels.external')
+        : t('common.labels.internal')
+
+    const mmprojName =
+        mmprojList.filter((e) => e.id === item.mmprojLink?.mmproj_id)?.[0]?.name ?? undefined
 
     return (
         <View style={styles.modelContainer}>
@@ -111,104 +128,132 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 title={t('model.item.rename')}
                 defaultValue={item.name}
             />
-
-            <Text style={styles.title}>{item.name}</Text>
-            {!isInvalid && (
-                <View style={styles.tagContainer}>
-                    {tags.map((tag, i) => {
-                        return (
-                            <Text key={i} style={styles.tag} numberOfLines={1}>
-                                {tag}
-                            </Text>
-                        )
-                    })}
-                </View>
-            )}
-            {isInvalid && (
-                <View style={styles.tagContainer}>
-                    <Text style={styles.tag}>{t('model.item.invalid')}</Text>
-                </View>
-            )}
-            {!isInvalid && !isMMPROJ && (
-                <Text style={styles.subtitle}>
-                    {t('model.item.contextlength')}: {item.context_length}
-                </Text>
-            )}
-            <Text style={styles.subtitle}>
-                {t('model.item.file')}: {item.file.replace('.gguf', '')}
-            </Text>
-            <View style={styles.buttonContainer}>
-                {!isMMPROJ && mmprojList.length > 0 && (
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={async () => {
-                            if (item.mmprojLink) {
-                                await Model.removeMMPROJLink(item)
-                                const mmproj = mmprojList.filter(
-                                    (a) => a.id === item.mmprojLink?.mmproj_id
-                                )?.[0]
-                                if (mmproj) {
-                                    maybeClearLastLoaded(mmproj)
-                                }
-                                return
-                            }
-
-                            setShowMMPROJSelector(!showMMPROJSelector)
-                        }}>
-                        <AntDesign
-                            name={showMMPROJSelector && !item.mmprojLink ? 'close' : 'camera'}
-                            size={24}
-                            color={disableEdit ? color.text._600 : color.text._300}
-                        />
-                        {item.mmprojLink && (
-                            <AntDesign
-                                name="close"
-                                style={{
-                                    position: 'absolute',
-                                    bottom: 0,
-                                    transform: [{ translateX: 10 }],
-                                }}
-                                size={18}
-                                color={disableEdit ? color.text._600 : color.text._300}
-                            />
-                        )}
+            <View style={{ flex: 1, alignContent: 'center' }}>
+                <View style={{ flexDirection: 'row', columnGap: 12, alignItems: 'center' }}>
+                    <Text style={styles.title}>{item.name}</Text>
+                    <TouchableOpacity onPress={() => setShowInfo(!showInfo)}>
+                        <AntDesign name="info-circle" color={color.text._300} size={16} />
                     </TouchableOpacity>
+                </View>
+                {showInfo && !isInvalid && (
+                    <>
+                        <View style={styles.tagContainer}>
+                            {tags.map((tag, i) => {
+                                return (
+                                    <Text key={i} style={styles.tag} numberOfLines={1}>
+                                        {tag}
+                                    </Text>
+                                )
+                            })}
+                        </View>
+
+                        {isInvalid && (
+                            <View style={styles.tagContainer}>
+                                <Text style={styles.tag}>{t('model.item.invalid')}</Text>
+                            </View>
+                        )}
+
+                        {!isMMPROJ && (
+                            <Text style={styles.subtitle}>
+                                {t('model.item.contextlength')}: {item.context_length}
+                            </Text>
+                        )}
+                        <Text style={styles.subtitle}>
+                            {t('model.item.file')}: {item.file.replace('.gguf', '')} (
+                            {readableFileSize(item.file_size)}, {location})
+                        </Text>
+                    </>
                 )}
-                <TouchableOpacity
-                    disabled={disableEdit}
-                    style={styles.button}
-                    onPress={() => {
-                        editInputRef.current?.open()
-                    }}>
-                    <AntDesign
-                        name="edit"
-                        size={24}
-                        color={disableEdit ? color.text._600 : color.text._300}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity
-                    disabled={disableDelete}
-                    style={styles.button}
-                    onPress={() => {
-                        handleDeleteModel()
-                    }}>
-                    <AntDesign
-                        name="delete"
-                        size={24}
-                        color={disableDelete ? color.text._600 : color.error._500}
-                    />
-                </TouchableOpacity>
+
+                {mmprojName && (
+                    <Text style={styles.subtitle}>
+                        {t('model.mmproj')}: {mmprojName}
+                    </Text>
+                )}
+            </View>
+
+            <View style={styles.buttonContainer}>
+                <ContextMenu
+                    triggerIcon="edit"
+                    triggerStyle={{ color: color.text._400 }}
+                    triggerIconSize={22}
+                    buttons={[
+                        {
+                            label: t('model.linkmmproj'),
+                            component: () => (
+                                <DropdownSheet
+                                    modalTitle={t('model.selectmmproj')}
+                                    style={{
+                                        backgroundColor: color.neutral._200,
+                                        paddingVertical: 10,
+                                    }}
+                                    containerStyle={{ marginTop: 8 }}
+                                    placeholder={t('model.linkmmproj')}
+                                    data={mmprojList}
+                                    selected={
+                                        mmprojList.filter(
+                                            (e) => e.id === item.mmprojLink?.mmproj_id
+                                        )?.[0] ?? undefined
+                                    }
+                                    labelExtractor={(item) => item.name}
+                                    onChangeValue={async (value) => {
+                                        try {
+                                            if (item.mmprojLink) await Model.removeMMPROJLink(item)
+                                            await Model.createMMPROJLink(item, value)
+                                        } catch (e) {
+                                            Logger.errorToast(
+                                                t('model.toast.failedtolink'),
+                                                JSON.stringify(e)
+                                            )
+                                        }
+                                    }}
+                                    icon={'link'}
+                                    iconPosition="left"
+                                    iconSize={16}
+                                />
+                            ),
+                            disabled: isMMPROJ || !!item.mmprojLink || mmprojList.length === 0,
+                        },
+                        {
+                            label: t('model.unlinkmmproj'),
+                            onPress: (close) => {
+                                handleUnlinkMMPROJ()
+                                close()
+                            },
+                            disabled: isMMPROJ || !item.mmprojLink,
+                            icon: 'disconnect',
+                        },
+                        {
+                            label: t('common.actions.rename'),
+                            onPress: (close) => {
+                                editInputRef.current?.open()
+                                close()
+                            },
+                            disabled: disableEdit,
+                            icon: 'edit',
+                        },
+
+                        {
+                            label: t('common.actions.delete'),
+                            onPress: (close) => {
+                                handleDeleteModel()
+                                close()
+                            },
+                            disabled: disableDelete,
+                            variant: 'warning',
+                            icon: 'delete',
+                        },
+                    ]}
+                />
 
                 {!isMMPROJ && (
                     <TouchableOpacity
                         disabled={loadToggle}
-                        style={styles.button}
                         onPress={async () => {
                             if (isLoaded) {
                                 await unloadModel()
                                 return
                             }
-
                             setModelLoading(true)
                             await loadModel(item).catch((e) => {
                                 Logger.errorToast(t('model.toast.failedtoload'), `${e}`)
@@ -226,30 +271,56 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         <AntDesign
                             name={isLoaded ? 'close-circle' : 'play-circle'}
                             size={24}
-                            color={loadToggle ? color.text._600 : color.text._300}
+                            color={
+                                loadToggle
+                                    ? color.text._600
+                                    : isLoaded
+                                      ? color.error._400
+                                      : color.primary._500
+                            }
                         />
                     </TouchableOpacity>
                 )}
             </View>
-            {((showMMPROJSelector && mmprojList.length > 0) || (item.mmprojLink && !isMMPROJ)) && (
-                <DropdownSheet
-                    modalTitle={t('model.selectmmproj')}
-                    containerStyle={{ marginTop: 12, marginBottom: 4 }}
-                    data={mmprojList}
-                    selected={
-                        mmprojList.filter((e) => e.id === item.mmprojLink?.mmproj_id)?.[0] ??
-                        undefined
-                    }
-                    labelExtractor={(item) => item.name}
-                    onChangeValue={async (value) => {
-                        try {
-                            if (item.mmprojLink) await Model.removeMMPROJLink(item)
-                            await Model.createMMPROJLink(item, value)
-                        } catch (e) {
-                            Logger.errorToast(t('model.toast.failedtolink'), JSON.stringify(e))
-                        }
-                    }}
-                />
+
+            {false && (
+                <View style={styles.buttonContainer}>
+                    {!isMMPROJ && mmprojList.length > 0 && (
+                        <TouchableOpacity
+                            onPress={async () => {
+                                if (item.mmprojLink) {
+                                    await Model.removeMMPROJLink(item)
+                                    const mmproj = mmprojList.filter(
+                                        (a) => a.id === item.mmprojLink?.mmproj_id
+                                    )?.[0]
+                                    if (mmproj) {
+                                        maybeClearLastLoaded(mmproj)
+                                    }
+                                    return
+                                }
+
+                                setShowMMPROJSelector(!showMMPROJSelector)
+                            }}>
+                            <AntDesign
+                                name={showMMPROJSelector && !item.mmprojLink ? 'close' : 'camera'}
+                                size={24}
+                                color={disableEdit ? color.text._600 : color.text._300}
+                            />
+                            {item.mmprojLink && (
+                                <AntDesign
+                                    name="close"
+                                    style={{
+                                        position: 'absolute',
+                                        bottom: 0,
+                                        transform: [{ translateX: 10 }],
+                                    }}
+                                    size={18}
+                                    color={disableEdit ? color.text._600 : color.text._300}
+                                />
+                            )}
+                        </TouchableOpacity>
+                    )}
+                </View>
             )}
         </View>
     )
@@ -267,6 +338,8 @@ const useStyles = () => {
             paddingHorizontal: spacing.xl2,
             backgroundColor: color.neutral._200,
             marginBottom: spacing.l,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
         },
 
         tagContainer: {
@@ -299,15 +372,8 @@ const useStyles = () => {
 
         buttonContainer: {
             flexDirection: 'row',
-            flex: 1,
-            marginTop: spacing.l,
-            borderColor: color.neutral._300,
-        },
-
-        button: {
-            flex: 1,
             alignItems: 'center',
-            paddingVertical: spacing.s,
+            columnGap: spacing.xl2,
         },
     })
 }

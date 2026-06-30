@@ -619,6 +619,9 @@
         "savekv": "Save Local KV",
         "savekvdesc": "Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV cache file may be very big and negatively impact battery life!",
         "selectmmproj": "Select MMPROJ Model",
+        "linkmmproj": "Link MMPROJ",
+        "unlinkmmproj": "Unlink MMPROJ",
+        "mmproj": "mmproj",
         "settings": {
             "advanced": "Advanced Settings",
             "cpu": "CPU Settings",

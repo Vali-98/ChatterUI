@@ -612,7 +612,9 @@
             "noparamsize": "无参数大小",
             "rename": "重命名模型"
         },
+        "linkmmproj": "链接MMPROJ",
         "maxcontext": "最大上下文",
+        "mmproj": "项目计划",
         "modelnamechat": "在聊天中显示模型名称",
         "mtmd": "多模态适配器",
         "purgekv": "清除 KV 缓存 ({{size}})",
@@ -646,7 +648,8 @@
             "noAutoLoadModelSet": "未设置自动加载模型",
             "noModelLoaded": "未加载模型",
             "quantizationNoLongerSupported": "量化不再受支持！"
-        }
+        },
+        "unlinkmmproj": "取消链接 MMPROJ"
     },
     "multiDropdown": {
         "counter_one": "已选择 {{count}} 项",

@@ -612,7 +612,9 @@
             "noparamsize": "Tidak Ada Ukuran Param",
             "rename": "Ganti Nama Model"
         },
+        "linkmmproj": "Tautan MMPROJ",
         "maxcontext": "Konteks Maks",
+        "mmproj": "mmproj",
         "modelnamechat": "Tampilkan Nama Model di Chat",
         "mtmd": "Adaptor Multimodal",
         "purgekv": "Bersihkan KV Cache ({{size}})",
@@ -646,7 +648,8 @@
             "noAutoLoadModelSet": "Tidak Ada Model Muat Otomatis yang Diatur",
             "noModelLoaded": "Tidak Ada Model yang Dimuat",
             "quantizationNoLongerSupported": "Kuantisasi Tidak Lagi Didukung!"
-        }
+        },
+        "unlinkmmproj": "Putuskan tautan MMPROJ"
     },
     "multiDropdown": {
         "counter_one": "{{count}} item dipilih",

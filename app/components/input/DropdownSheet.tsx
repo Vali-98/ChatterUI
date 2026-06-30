@@ -1,4 +1,4 @@
-import Octicons from '@react-native-vector-icons/octicons/static'
+import Octicons, { OcticonsIconName } from '@react-native-vector-icons/octicons/static'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, Pressable, Text, TextInput, View, ViewStyle } from 'react-native'
@@ -19,6 +19,9 @@ type DropdownSheetProps<T> = {
     placeholder?: string
     modalTitle?: string
     closeOnSelect?: boolean
+    icon?: OcticonsIconName | null
+    iconPosition?: 'right' | 'left'
+    iconSize?: number
 }
 
 const DropdownSheet = <T,>({
@@ -34,6 +37,9 @@ const DropdownSheet = <T,>({
     },
     search = false,
     closeOnSelect = true,
+    icon = 'chevron-down',
+    iconPosition = 'right',
+    iconSize = 18,
 }: DropdownSheetProps<T>) => {
     const styles = useDropdownStyles()
     const sheetRef = useBottomSheetRef()
@@ -91,10 +97,19 @@ const DropdownSheet = <T,>({
                     />
                 )}
             </BottomSheet>
-            <Pressable style={[style, styles.button]} onPress={() => sheetRef.current?.open()}>
+            <Pressable
+                style={[
+                    styles.button,
+                    style,
+                    {
+                        flexDirection: iconPosition === 'right' ? 'row' : 'row-reverse',
+                        columnGap: 8,
+                    },
+                ]}
+                onPress={() => sheetRef.current?.open()}>
                 {selected && <Text style={styles.buttonText}>{labelExtractor(selected)}</Text>}
                 {!selected && <Text style={styles.placeholderText}>{placeholder}</Text>}
-                <Octicons name="chevron-down" color={theme.color.primary._800} size={18} />
+                {icon && <Octicons name={icon} color={theme.color.primary._800} size={iconSize} />}
             </Pressable>
         </View>
     )
