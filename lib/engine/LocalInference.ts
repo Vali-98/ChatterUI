@@ -44,6 +44,7 @@ export const localSamplerData: APISampler[] = [
     { externalName: 'dry_allowed_length', samplerID: SamplerID.DRY_ALLOWED_LENGTH },
     { externalName: 'dry_multiplier', samplerID: SamplerID.DRY_MULTIPLIER },
     { externalName: 'dry_sequence_breakers', samplerID: SamplerID.DRY_SEQUENCE_BREAK },
+    { externalName: 'thinking_budget_tokens', samplerID: SamplerID.REASONING_MAX_TOKENS },
 ]
 
 const getSamplerFields = (max_length?: number) => {
