@@ -89,6 +89,20 @@ module.exports = {
                 },
             ],
             ['expo-sqlite', { withSQLiteVecExtension: true }],
+            [
+                'expo-image-picker',
+                {
+                    photosPermission: 'ChatterUI requires image permissions for vision models',
+                    colors: {
+                        cropToolbarColor: '#000000',
+                    },
+                    dark: {
+                        colors: {
+                            cropToolbarColor: '#000000',
+                        },
+                    },
+                },
+            ],
             'expo-localization',
             'expo-router',
             'expo-font',

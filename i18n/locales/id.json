@@ -28,17 +28,33 @@
         "authorizationRequired": "Otorisasi Diperlukan"
     },
     "authorNotes": {
+        "alert": {
+            "delete": {
+                "button": "Hapus Catatan",
+                "description": "Apakah Anda yakin ingin menghapus {{name}}? \nHal ini tidak dapat dibatalkan.",
+                "title": "Hapus Catatan"
+            }
+        },
         "empty": "Tidak Ada Catatan",
         "errors": {
             "create": "Gagal membuat catatan"
         },
         "item": {
-            "noContent": "Tidak Ada Konten"
+            "comments": "Komentar",
+            "content": "Catatan Isi",
+            "noContent": "Tidak Ada Konten",
+            "priority": "Prioritas"
         },
         "selector": {
             "character": "Karakter",
             "chat": "Mengobrol",
             "global": "Global"
+        },
+        "type": "Jenis Catatan",
+        "unsavedChanges": {
+            "description": "Anda memiliki perubahan yang belum disimpan, keluar akan membatalkan semua perubahan.",
+            "discard": "Buang Perubahan",
+            "title": "Perubahan yang Belum Disimpan"
         }
     },
     "character": {
@@ -236,7 +252,8 @@
             },
             "errors": {
                 "abortGeneration": "Membatalkan Pembuatan",
-                "failedToSend": "Gagal mengirim pesan"
+                "failedToSend": "Gagal mengirim pesan",
+                "permissionDescription": "Akses media diperlukan untuk menambahkan lampiran"
             },
             "message": "Pesan...",
             "noConnection": "Tidak Ada Koneksi yang Diaktifkan",
@@ -246,9 +263,15 @@
             "noModelLoaded": "Tidak Ada Model yang Dimuat"
         },
         "quickActions": {
+            "createNote": {
+                "button": "Buat Catatan",
+                "description": "Buat Catatan Penulis dari pesan ini?",
+                "title": "Buat Catatan"
+            },
             "errors": {
                 "cloneFailed": "Gagal mengkloning chat",
-                "copyFailed": "Gagal menyalin ke papan klip"
+                "copyFailed": "Gagal menyalin ke papan klip",
+                "noteCreateFailed": "Gagal membuat catatan"
             },
             "fork": {
                 "button": "Percabangan Chat",
@@ -286,6 +309,7 @@
             "export": "Ekspor",
             "more": "Lainnya",
             "rename": "Ganti Nama",
+            "reset": "Mengatur ulang",
             "save": "Simpan",
             "test": "Uji",
             "tryAgain": "Coba Lagi"
@@ -303,6 +327,7 @@
             "fileInvalid": "File Tidak Valid",
             "filenameInvalidImportFailed": "Nama file tidak valid, Impor Gagal",
             "invalidFileType": "Jenis File Tidak Valid!",
+            "permissionRequired": "Izin Diperlukan",
             "rollingBackDueToError": "Mengembalikan karena kesalahan",
             "schemaValidationFailed": "Validasi skema gagal!"
         },
@@ -318,6 +343,7 @@
             "results": "Hasil",
             "selected": "Dipilih",
             "suggestions": "Saran",
+            "tokens": "Token",
             "version": "Versi"
         },
         "messages": {

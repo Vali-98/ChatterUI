@@ -28,17 +28,33 @@
         "authorizationRequired": "需要授权"
     },
     "authorNotes": {
+        "alert": {
+            "delete": {
+                "button": "删除注释",
+                "description": "您确定要删除 {{name}} 吗？\n此操作无法撤消。",
+                "title": "删除注释"
+            }
+        },
         "empty": "无注释",
         "errors": {
             "create": "创建笔记失败"
         },
         "item": {
-            "noContent": "没有内容"
+            "comments": "评论",
+            "content": "备注内容",
+            "noContent": "没有内容",
+            "priority": "优先事项"
         },
         "selector": {
             "character": "特点",
             "chat": "聊天",
             "global": "全球的"
+        },
+        "type": "注释类型",
+        "unsavedChanges": {
+            "description": "您有未保存的更改，退出将撤消所有更改。",
+            "discard": "放弃更改",
+            "title": "未保存的更改"
         }
     },
     "character": {
@@ -236,7 +252,8 @@
             },
             "errors": {
                 "abortGeneration": "正在中止生成",
-                "failedToSend": "发送失败"
+                "failedToSend": "发送失败",
+                "permissionDescription": "添加附件需要媒体访问权限"
             },
             "message": "信息...",
             "noConnection": "未启用连接",
@@ -246,9 +263,15 @@
             "noModelLoaded": "未加载模型"
         },
         "quickActions": {
+            "createNote": {
+                "button": "创建注释",
+                "description": "根据此消息创建作者注释？",
+                "title": "创建注释"
+            },
             "errors": {
                 "cloneFailed": "克隆聊天失败",
-                "copyFailed": "复制到剪贴板失败"
+                "copyFailed": "复制到剪贴板失败",
+                "noteCreateFailed": "创建笔记失败"
             },
             "fork": {
                 "button": "分叉聊天",
@@ -286,6 +309,7 @@
             "export": "导出",
             "more": "更多",
             "rename": "重命名",
+            "reset": "重置",
             "save": "保存",
             "test": "测试",
             "tryAgain": "再试一次"
@@ -303,6 +327,7 @@
             "fileInvalid": "文件无效",
             "filenameInvalidImportFailed": "文件名无效，导入失败",
             "invalidFileType": "文件类型无效！",
+            "permissionRequired": "需要许可",
             "rollingBackDueToError": "由于错误正在回滚",
             "schemaValidationFailed": "模式验证失败！"
         },
@@ -318,6 +343,7 @@
             "results": "结果",
             "selected": "已选",
             "suggestions": "建议",
+            "tokens": "代币",
             "version": "版本"
         },
         "messages": {

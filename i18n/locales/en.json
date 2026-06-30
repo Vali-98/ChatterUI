@@ -252,7 +252,8 @@
             },
             "errors": {
                 "abortGeneration": "Aborting Generation",
-                "failedToSend": "Failed to send message"
+                "failedToSend": "Failed to send message",
+                "permissionDescription": "Media access required for adding attachments"
             },
             "message": "Message...",
             "noConnection": "No Connection Enabled",
@@ -327,7 +328,8 @@
             "filenameInvalidImportFailed": "Filename invalid, Import Failed",
             "invalidFileType": "Invalid File Type!",
             "rollingBackDueToError": "Rolling back due to error",
-            "schemaValidationFailed": "Schema validation failed!"
+            "schemaValidationFailed": "Schema validation failed!",
+            "permissionRequired": "Permission Required"
         },
         "labels": {
             "cpu": "CPU",

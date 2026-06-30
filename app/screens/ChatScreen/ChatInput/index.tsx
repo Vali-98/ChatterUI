@@ -1,7 +1,7 @@
 import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import { randomUUID } from 'expo-crypto'
-import { getDocumentAsync } from 'expo-document-picker'
 import { Image } from 'expo-image'
+import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from 'expo-image-picker'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -18,6 +18,7 @@ import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
+import Alert from '@components/views/Alert'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import CameraSheet from '@components/views/CameraSheet'
 import ContextMenu from '@components/views/ContextMenu'
@@ -121,21 +122,39 @@ const ChatInput = () => {
     }
 
     const handlePickImage = async () => {
-        const result = await getDocumentAsync({
-            type: 'image/*',
-            multiple: true,
-            copyToCacheDirectory: true,
+        const permissionResult = await requestMediaLibraryPermissionsAsync()
+
+        if (!permissionResult.granted) {
+            Alert.alert({
+                title: t('common.errors.permissionRequired'),
+                description: t('chat.input.errors.permissionDescription'),
+                buttons: [
+                    {
+                        label: t('common.actions.close'),
+                    },
+                ],
+            })
+            return
+        }
+
+        let result = await launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsMultipleSelection: true,
+            aspect: [4, 3],
+            quality: 1,
         })
-        if (result.canceled || result.assets.length < 1) return
+
+        if (result.canceled) return
 
         const newAttachments = result.assets
             .map((item) => ({
                 uri: item.uri,
                 type: 'image',
-                name: item.name,
+                name: item.fileName,
             }))
             .filter((item) => !attachments.some((a) => a.name === item.name)) as Attachment[]
-        setAttachments([...attachments, ...newAttachments])
+
+        return setAttachments([...attachments, ...newAttachments])
     }
 
     return (
