@@ -49,11 +49,18 @@ export const useLiveQueryJoined = <
         ignore?: TableNames[]
         deepCheck?: boolean
         onUpdated?: (result: Awaited<T>) => void
+        sync?: boolean
     } = {}
 ) => {
     const data = useRef<Awaited<T>>(
         //@ts-expect-error
-        (is(query, SQLiteRelationalQuery) && query.mode === 'first' ? undefined : []) as Awaited<T>
+        (options?.sync && query.sync
+            ? //@ts-expect-error sync not found
+              query.sync()
+            : //@ts-expect-error
+              is(query, SQLiteRelationalQuery) && query.mode === 'first'
+              ? undefined
+              : []) as Awaited<T>
     )
     const [error, setError] = useState<Error>()
     const [updatedAt, setUpdatedAt] = useState<Date>()

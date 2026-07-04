@@ -7,7 +7,6 @@ import { Chats, useInference } from '@lib/state/Chat'
 
 import ChatBubble from './ChatBubble'
 import ChatFrame from './ChatFrame'
-import ChatFrameSkeleton from './ChatFrameSkeleton'
 
 type ChatItemProps = {
     index: number
@@ -22,7 +21,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ entryId, ...rest }) => {
     const { data: swipeidList } = useLiveQueryJoined(
         Chats.db.live.swipeIdList(entryId),
         [entryId],
-        { deepCheck: true }
+        { deepCheck: true, sync: true }
     )
 
     return (
@@ -51,48 +50,39 @@ const ChatItemBody: React.FC<ChatItemBodyProps> = ({
                 rowId: entrySwipeIds,
             },
         ],
+        sync: true,
     })
 
+    if (!entry || entrySwipeIds.length === 0) return // this should never be hit
+
     return (
-        <>
-            {entry && entrySwipeIds.length > 0 ? (
-                <Animated.View
-                    {...rest}
-                    layout={LinearTransition.duration(250)
-                        .springify()
-                        .mass(0.3)
-                        .damping(20)
-                        .stiffness(300)}
-                    exiting={FadeOut.duration(150)}
-                    entering={FadeIn.duration(250).delay(150)}
-                    style={[
-                        styles.chatItem,
-                        {
-                            zIndex: index,
-                            paddingBottom: index === 0 ? 4 : 0,
-                            flexDirection: 'column-reverse',
-                        },
-                    ]}>
-                    <ChatFrame
-                        index={index}
-                        nowGenerating={nowGenerating}
-                        isLast={isLastMessage}
-                        entry={entry}>
-                        <ChatBubble
-                            nowGenerating={nowGenerating}
-                            entry={entry}
-                            index={index}
-                            isLastMessage={isLastMessage}
-                            isGreeting={isGreeting}
-                        />
-                    </ChatFrame>
-                </Animated.View>
-            ) : (
-                <Animated.View {...rest} exiting={FadeOut}>
-                    <ChatFrameSkeleton isLastMessage={isLastMessage} index={index} />
-                </Animated.View>
-            )}
-        </>
+        <Animated.View
+            {...rest}
+            layout={LinearTransition.duration(250).springify().mass(0.3).damping(20).stiffness(300)}
+            exiting={FadeOut.duration(150)}
+            entering={FadeIn.duration(250).delay(150)}
+            style={[
+                styles.chatItem,
+                {
+                    zIndex: index,
+                    paddingBottom: index === 0 ? 4 : 0,
+                    flexDirection: 'column-reverse',
+                },
+            ]}>
+            <ChatFrame
+                index={index}
+                nowGenerating={nowGenerating}
+                isLast={isLastMessage}
+                entry={entry}>
+                <ChatBubble
+                    nowGenerating={nowGenerating}
+                    entry={entry}
+                    index={index}
+                    isLastMessage={isLastMessage}
+                    isGreeting={isGreeting}
+                />
+            </ChatFrame>
+        </Animated.View>
     )
 }
 

@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { TableNames } from '@db/db'
 
-type Task<T> = () => Promise<T>
+type Task<T> = (() => Promise<T>) | (() => T)
 
 class QueryQueue {
     private running = 0
@@ -78,11 +78,18 @@ export const useQueuedLiveQuery = <
         enabled?: boolean
         targets?: { tableName: TableNames; rowId: number | number[] }[]
         deepCheck?: boolean
+        sync?: boolean
     }
 ) => {
     const data = useRef<Awaited<T>>(
         //@ts-expect-error
-        (is(query, SQLiteRelationalQuery) && query.mode === 'first' ? undefined : []) as Awaited<T>
+        options?.sync && query.sync
+            ? //@ts-expect-error sync not found
+              query.sync()
+            : //@ts-expect-error
+              ((is(query, SQLiteRelationalQuery) && query.mode === 'first'
+                  ? undefined
+                  : []) as Awaited<T>)
     )
 
     const [error, setError] = useState<Error>()

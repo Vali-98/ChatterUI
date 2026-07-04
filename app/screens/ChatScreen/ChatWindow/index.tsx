@@ -1,9 +1,7 @@
-import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { ImageBackground } from 'expo-image'
 import { useEffect, useRef, useState } from 'react'
-import { FlatList, Pressable } from 'react-native'
+import { FlatList } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
-import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import Drawer from '@components/views/Drawer'
@@ -15,14 +13,13 @@ import { useAppMode } from '@lib/state/AppMode'
 import { useBackgroundStore } from '@lib/state/BackgroundImage'
 import { Characters } from '@lib/state/Characters'
 import { Chats, ScrollData } from '@lib/state/Chat'
-import { Theme } from '@lib/theme/ThemeManager'
 import { AppDirectory } from '@lib/utils/File'
 
-import { useInputHeightStore } from '../ChatInput'
 import ChatFooter from './ChatFooter'
 import ChatHeader from './ChatHeader'
 import ChatHeaderGradient from './ChatHeaderGradient'
 import ChatItem from './ChatItem'
+import ChatJumpButton from './ChatJumpButton'
 import ChatModelName from './ChatModelName'
 
 type ChatWindowProps = {
@@ -32,12 +29,11 @@ type ChatWindowProps = {
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
     const charId = Characters.useCharacterStore((state) => state.card?.id)
-    const { color } = Theme.useTheme()
+
     const { appMode } = useAppMode()
     const [saveScroll] = useMMKVBoolean(AppSettings.SaveScrollPosition)
     const [showModelname] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [showJump, setShowJump] = useState(false)
-    const chatInputHeight = useInputHeightStore(useShallow((state) => state.height))
     const [autoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
     const { data: { background_image: backgroundImage } = {} } = useLiveQueryJoined(
         Characters.db.query.backgroundImageQuery(charId ?? -1),
@@ -47,6 +43,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
 
     const { data: entryIdList, updatedAt } = useLiveQueryJoined(Chats.db.live.entryIdList(chatId), [
         chatId,
+        {
+            sync: true,
+        },
     ])
 
     const { cause: scrollCause, index: scrollIndex } = scrollData ?? {}
@@ -156,34 +155,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                 }
                 ListHeaderComponent={() => <ChatHeader />}
             />
-            {showJump && (
-                <Animated.View entering={FadeInDown}>
-                    <Pressable
-                        style={{ position: 'absolute', bottom: chatInputHeight + 12, right: '50%' }}
-                        onPress={() => {
-                            setShowJump(false)
-                            flatlistRef?.current?.scrollToIndex({
-                                index: 0,
-                                animated: false,
-                                viewPosition: 1,
-                            })
-                        }}>
-                        <AntDesign
-                            name="caret-down"
-                            size={16}
-                            style={{
-                                left: 16,
-                                borderRadius: 32,
-                                color: color.text._300,
-                                backgroundColor: color.neutral._100,
-                                borderWidth: 2,
-                                borderColor: color.primary._300,
-                                padding: 8,
-                            }}
-                        />
-                    </Pressable>
-                </Animated.View>
-            )}
+            <ChatJumpButton
+                jump={() => {
+                    setShowJump(false)
+                    flatlistRef?.current?.scrollToIndex({
+                        index: 0,
+                        animated: false,
+                        viewPosition: 1,
+                    })
+                }}
+                visible={showJump}
+            />
 
             <ChatHeaderGradient />
         </ImageBackground>
