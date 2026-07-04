@@ -14,7 +14,6 @@ type AuthorNoteState = {
 export const useAuthorNoteState = create<AuthorNoteState>()((set, get) => ({
     ref: createBottomSheetRef(),
     open: () => {
-        console.log(get().ref.current)
         get().ref?.current?.open()
     },
     close: () => {
