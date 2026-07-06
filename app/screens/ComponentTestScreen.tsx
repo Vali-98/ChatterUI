@@ -14,6 +14,7 @@ import ThemedCheckbox from '@components/input/ThemedCheckbox'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
+import CollapsableTitle from '@components/text/CollapsableTitle'
 import Accordion from '@components/views/Accordion'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
@@ -52,13 +53,6 @@ const ComponentTestScreen = () => {
                 style={{ flex: 1 }}
                 contentContainerStyle={{ rowGap: 16, padding: 16 }}
                 keyboardShouldPersistTaps="always">
-                <View style={{ rowGap: 8 }}>
-                    {buttonVariants.map((item) => (
-                        //@ts-expect-error
-                        <ThemedButton variant={item} key={item} label={`Button Variant: ${item}`} />
-                    ))}
-                </View>
-
                 <HorizontalSelector
                     label="Selector"
                     description="Example description for Selector"
@@ -71,6 +65,19 @@ const ComponentTestScreen = () => {
                         setHSelected(s)
                     }}
                 />
+
+                <CollapsableTitle title="Collapsable Title">
+                    <View style={{ rowGap: 8 }}>
+                        {buttonVariants.map((item) => (
+                            <ThemedButton
+                                //@ts-expect-error
+                                variant={item}
+                                key={item}
+                                label={`Button Variant: ${item}`}
+                            />
+                        ))}
+                    </View>
+                </CollapsableTitle>
 
                 <ThemedButton onPress={() => inputRef.current?.open()} label="Show Sheet" />
 
