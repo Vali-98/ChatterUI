@@ -19,9 +19,10 @@ import ConnectionEditor from './ConnectionEditor'
 type ConnectionItemProps = {
     item: APIManagerValue
     index: number
+    pendingOpen?: number
 }
 
-const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
+const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index, pendingOpen }) => {
     const { spacing, color } = Theme.useTheme()
     const styles = useStyles()
     const editorRef = useBottomSheetRef()
@@ -32,6 +33,10 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
     )
 
     const activeProgress = useSharedValue(item.active ? 1 : 0)
+
+    useEffect(() => {
+        if (index === pendingOpen) editorRef.current?.open()
+    }, [editorRef, index, pendingOpen])
 
     useEffect(() => {
         activeProgress.value = withTiming(item.active ? 1 : 0, {

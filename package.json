@@ -30,6 +30,7 @@
     "@babel/traverse": "^7.24.1",
     "@react-native-community/slider": "5.2.0",
     "@react-native-vector-icons/ant-design": "^13.1.2",
+    "@react-native-vector-icons/common": "^13.0.1",
     "@react-native-vector-icons/material-icons": "^13.1.2",
     "@react-native-vector-icons/octicons": "^21.1.2",
     "@shopify/flash-list": "^2.3.2",
