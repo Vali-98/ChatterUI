@@ -60,7 +60,7 @@ const ChatItemBody: React.FC<ChatItemBodyProps> = ({
             {...rest}
             layout={LinearTransition.duration(250).springify().mass(0.3).damping(20).stiffness(300)}
             exiting={FadeOut.duration(150)}
-            entering={FadeIn.duration(250).delay(150)}
+            entering={FadeIn.duration(250)}
             style={[
                 styles.chatItem,
                 {
