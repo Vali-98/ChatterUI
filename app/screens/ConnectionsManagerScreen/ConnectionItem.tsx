@@ -1,17 +1,13 @@
 import { useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Animated, {
-    interpolateColor,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
-} from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import { APIManager, APIManagerValue } from '@lib/engine/API/APIManagerState'
+import useAnimatedActiveColorStyle from '@lib/hooks/AnimatedActiveColorStyle'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ConnectionEditor from './ConnectionEditor'
@@ -32,25 +28,15 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index, pendingOpe
         }))
     )
 
-    const activeProgress = useSharedValue(item.active ? 1 : 0)
-
     useEffect(() => {
         if (index === pendingOpen) editorRef.current?.open()
     }, [editorRef, index, pendingOpen])
 
-    useEffect(() => {
-        activeProgress.value = withTiming(item.active ? 1 : 0, {
-            duration: 200,
-        })
-    }, [activeProgress, item.active])
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        borderColor: interpolateColor(
-            activeProgress.value,
-            [0, 1],
-            [color.neutral._200, color.primary._500]
-        ),
-    }))
+    const animatedStyle = useAnimatedActiveColorStyle({
+        deactiveColor: color.neutral._200,
+        activeColor: color.primary._500,
+        active: item.active,
+    })
 
     return (
         <Animated.View style={[styles.longContainer, animatedStyle]}>

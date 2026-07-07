@@ -1,13 +1,8 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, Linking, Pressable, Text, View } from 'react-native'
-import Animated, {
-    interpolateColor,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
-} from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
@@ -15,6 +10,7 @@ import Aicons, { AiconsGlyphName } from '@components/icons/Aicons'
 import BottomSheet, { BottomSheetRef } from '@components/views/BottomSheet'
 import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { APIManager } from '@lib/engine/API/APIManagerState'
+import useAnimatedActiveColorStyle from '@lib/hooks/AnimatedActiveColorStyle'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type TemplatePickerProps = {
@@ -29,21 +25,11 @@ const TemplateItem: React.FC<{
 }> = ({ config, onPress, selected }) => {
     const { color, borderWidth, spacing, fontSize } = Theme.useTheme()
 
-    const activeProgress = useSharedValue(selected ? 1 : 0)
-
-    useEffect(() => {
-        activeProgress.value = withTiming(selected ? 1 : 0, {
-            duration: 200,
-        })
-    }, [activeProgress, selected])
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        borderColor: interpolateColor(
-            activeProgress.value,
-            [0, 1],
-            [color.neutral._200, color.primary._500]
-        ),
-    }))
+    const animatedStyle = useAnimatedActiveColorStyle({
+        deactiveColor: color.neutral._200,
+        activeColor: color.primary._500,
+        active: selected,
+    })
 
     // eslint-disable-next-line i18next/no-literal-string
     const icon = config.ui.display?.icon ?? 'link'
