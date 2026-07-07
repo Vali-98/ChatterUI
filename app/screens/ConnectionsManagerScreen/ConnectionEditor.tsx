@@ -29,11 +29,12 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ index, ref, origina
     const styles = useStyles()
     const { t } = useTranslation()
 
-    const { editValue, getTemplates, removeValue } = APIManager.useConnectionsStore(
+    const { editValue, getTemplates, removeValue, addValue } = APIManager.useConnectionsStore(
         useShallow((state) => ({
             removeValue: state.removeValue,
             getTemplates: state.getTemplates,
             editValue: state.editValue,
+            addValue: state.addValue,
         }))
     )
 
@@ -270,10 +271,13 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ index, ref, origina
                     />
                     <ThemedButton
                         variant="tertiary"
-                        iconName="reload"
-                        label={t('common.actions.reset')}
+                        iconName="copy"
+                        label={t('common.actions.clone')}
                         onPress={() => {
-                            setValues(originalValues)
+                            const newName = values.friendlyName + ` (${t('common.actions.clone')})`
+                            const newValue = { ...values, friendlyName: newName }
+                            addValue(newValue)
+                            ref.current?.close()
                         }}
                     />
                     <ThemedButton
