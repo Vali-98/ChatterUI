@@ -13,6 +13,7 @@
     "lint:fix": "eslint app db lib --ignore-pattern db/migrations --fix",
     "prebuild": "cross-env APP_VARIANT=development expo prebuild --clean",
     "prebuild:android": "cross-env APP_VARIANT=development expo prebuild --clean --platform android",
+    "build" : "npx eas build",
     "dev:android": "cross-env APP_VARIANT=development expo run:android",
     "dev:ios": "cross-env APP_VARIANT=development expo run:ios",
     "migrate": "npx drizzle-kit generate",
