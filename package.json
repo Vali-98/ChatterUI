@@ -109,6 +109,7 @@
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-preset-expo": "~57.0.0",
     "cross-env": "^7.0.3",
+    "eas-cli": "^20.5.1",
     "eslint": "^9.38.0",
     "eslint-config-expo": "~57.0.0",
     "eslint-config-prettier": "^9.1.0",
