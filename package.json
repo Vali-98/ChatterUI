@@ -133,6 +133,7 @@
     "cui-llama.rn@1.11.14": true,
     "esbuild@0.28.1": true,
     "react-native-mmkv@4.0.0-beta.12": true,
+    "react-native-nitro-modules@0.31.0": true,
     "unrs-resolver@1.11.1": true
   }
 }
