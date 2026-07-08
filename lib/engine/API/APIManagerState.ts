@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
 
 import { Storage } from '@lib/enums/Storage'
+import { CharacterLink } from '@lib/state/CharacterLinks'
 import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
@@ -21,6 +22,7 @@ type APIStateProps = {
     addValue: (template: APIManagerValue) => void
     addTemplate: (values: APIConfiguration) => void
     removeValue: (index: number) => void
+    setActiveIndex: (index: number) => void
     removeTemplate: (index: number) => void
     editValue: (value: APIManagerValue, index: number) => void
     getTemplates: () => APIConfiguration[]
@@ -42,7 +44,12 @@ export namespace APIManager {
                         activeIndex: values.length - 1,
                     })
                 },
-
+                setActiveIndex: (activeIndex) => {
+                    const values = get().values.map((item) => ({ ...item, active: false }))
+                    if (activeIndex > values.length) return
+                    values[activeIndex].active = true
+                    set({ activeIndex, values })
+                },
                 addTemplate: (template) => {
                     const templates = get().getTemplates()
                     if (templates.some((item) => item.name === template.name)) {
@@ -65,6 +72,7 @@ export namespace APIManager {
                         activeIndex = -1
                     }
                     values.splice(index, 1)
+                    CharacterLink.db.mutate.deleteByValue('connection_index', index)
                     set({ values: values, activeIndex: activeIndex })
                 },
                 removeTemplate: (index) => {

@@ -10,6 +10,7 @@ import { persist } from 'zustand/middleware'
 import { db } from '@db/db'
 import { model_data, model_mmproj_links, ModelDataType } from '@db/schema'
 import { Storage } from '@lib/enums/Storage'
+import { CharacterLink } from '@lib/state/CharacterLinks'
 import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 import {
@@ -46,8 +47,9 @@ export namespace Model {
         if (!modelInfo) return
         // some models may be external
         if (modelInfo.file_path.startsWith(AppDirectory.ModelPath))
-            await deleteModel(modelInfo.file)
+            await deleteModelFile(modelInfo.file)
         await db.delete(model_data).where(eq(model_data.id, id))
+        await CharacterLink.db.mutate.deleteByValue('model_id', id)
     }
 
     export const isMMPROJ = (arch: string) => {
@@ -285,7 +287,7 @@ export namespace Model {
         return (await getModelList()).includes(modelName)
     }
 
-    const deleteModel = async (name: string) => {
+    const deleteModelFile = async (name: string) => {
         if (!(await modelExists(name))) return
         return deleteFile(`${AppDirectory.ModelPath}${name}`)
     }

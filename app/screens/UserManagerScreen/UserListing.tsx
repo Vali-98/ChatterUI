@@ -6,6 +6,7 @@ import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
 import ContextMenu from '@components/views/ContextMenu'
 import Drawer from '@components/views/Drawer'
+import { CharacterLink } from '@lib/state/CharacterLinks'
 import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getFriendlyTimeStamp } from '@lib/utils/Time'
@@ -57,6 +58,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
                             if (userId && list.some((item) => item.id === userId)) return
                             setCard(list[0].id)
                         })
+                        await CharacterLink.db.mutate.deleteByValue('user_id', user.id)
                     },
                     type: 'warning',
                 },

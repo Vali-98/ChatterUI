@@ -21,6 +21,7 @@ import m0016 from './0016_violet_meteorite.sql';
 import m0017 from './0017_regular_lady_ursula.sql';
 import m0018 from './0018_nice_loki.sql';
 import m0019 from './0019_youthful_captain_cross.sql';
+import m0020 from './0020_amusing_plazm.sql';
 
   export default {
     journal,
@@ -44,7 +45,8 @@ m0015,
 m0016,
 m0017,
 m0018,
-m0019
+m0019,
+m0020
     }
   }
   

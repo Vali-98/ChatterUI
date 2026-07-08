@@ -41,6 +41,12 @@ export type CharInfo = {
     image_id: number
     last_modified: number
     tags: string[]
+    links: {
+        id: number
+        type: 'user_id' | 'instruct_id' | 'connection_index' | 'sampler_index' | 'model_id'
+        character_id: number
+        value: number
+    }[]
     latestSwipe?: string
     latestName?: string
     latestChat?: number
@@ -250,6 +256,7 @@ export namespace Characters {
                             },
                         },
                         alternate_greetings: true,
+                        links: true,
                     },
                 })
             }
@@ -462,6 +469,7 @@ export namespace Characters {
                                 },
                             },
                         },
+                        links: true,
                     },
                     orderBy:
                         orderBy === 'name' ? dir(characters.name) : dir(characters.last_modified),
@@ -757,7 +765,20 @@ export namespace Characters {
             }
         }
 
-        export namespace live {}
+        export namespace live {
+            export const listSimple = (type: 'character' | 'user') => {
+                return database.query.characters.findMany({
+                    columns: {
+                        id: true,
+                        name: true,
+                        image_id: true,
+                        last_modified: true,
+                    },
+                    where: (characters, { eq }) => eq(characters.type, type),
+                    orderBy: characters.id,
+                })
+            }
+        }
     }
 
     export const importBackground = async (charId: number, oldBackground?: number | null) => {

@@ -5,9 +5,12 @@ import { View } from 'react-native'
 
 import Alert from '@components/views/Alert'
 import ContextMenu from '@components/views/ContextMenu'
+import { APIManager } from '@lib/engine/API/APIManagerState'
 import { CharInfo, Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
+import { Instructs } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
+import { SamplersManager } from '@lib/state/SamplerState'
 
 type CharacterEditPopupProps = {
     character: CharInfo
@@ -27,12 +30,38 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
     const router = useRouter()
 
     const { setId } = Chats.useChat()
+    const setUser = Characters.useUserStore((state) => state.setCard)
+    const setInstruct = Instructs.useInstruct((state) => state.load)
+    const setConnectionIndex = APIManager.useConnectionsStore((state) => state.setActiveIndex)
+    const setSampler = SamplersManager.useSamplerStore((state) => state.setConfig)
 
     const setCurrentCharacter = async () => {
         if (nowLoading || path === '/screens/ChatScreen' || !character.id) return
         try {
             setNowLoading(true)
             await setCurrentCard(character.id)
+            character?.links.forEach((item) => {
+                switch (item.type) {
+                    case 'user_id':
+                        Logger.info(t('character.editor.links.loadUser', { value: item.value }))
+                        setUser(item.value)
+                        break
+                    case 'instruct_id':
+                        Logger.info(t('character.editor.links.loadInstruct', { value: item.value }))
+                        setInstruct(item.value)
+                        break
+                    case 'connection_index':
+                        Logger.info(
+                            t('character.editor.links.loadConnection', { value: item.value })
+                        )
+                        setConnectionIndex(item.value)
+                        break
+                    case 'sampler_index':
+                        Logger.info(t('character.editor.links.loadSampler', { value: item.value }))
+                        setSampler(item.value)
+                        break
+                }
+            })
             let chatId = character.latestChat
             if (!chatId) {
                 chatId = await Chats.db.mutate.createChat(character.id)

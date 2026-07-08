@@ -64,7 +64,21 @@
                 "changeImage": "Change Image",
                 "export": "Export",
                 "removeBackground": "Remove Background",
-                "viewImage": "View Image"
+                "viewImage": "View Image",
+                "manageLinks": "Manage Links"
+            },
+            "links": {
+                "missingUser": "No Linked User",
+                "missingInstruct": "No Linked Formatting",
+                "missingModel": "No Linked Model",
+                "missingConnection": "No Linked Connection",
+                "missingSampler": "No Linked Sampler",
+                "description": "Linked configurations will automatically load when this character is loaded",
+                "loadUser": "Loading user with id: {{value}}",
+                "loadInstruct": "Loading instruct with id: {{value}}",
+                "loadModel": "Loading model with id: {{value}}",
+                "loadConnection": "Loading connection with index: {{value}}",
+                "loadSampler": "Loading sampler with index: {{value}}"
             },
             "dialogs": {
                 "clone": {
@@ -312,7 +326,9 @@
             "reset": "Reset",
             "save": "Save",
             "test": "Test",
-            "tryAgain": "Try Again"
+            "tryAgain": "Try Again",
+            "select": "Select",
+            "link": "Link"
         },
         "brand": {
             "name": "ChatterUI"

@@ -66,7 +66,7 @@ const TemplateItem: React.FC<{
                         color={color.text._400}
                     />
                 )}
-                <View style={{ flex: 1, overflow: 'scroll' }}>
+                <View style={{ flex: 1, marginRight: link ? 0 : 16 }}>
                     <Text style={{ color: color.text._100, fontSize: fontSize.l }}>{name}</Text>
                     {description && <Text style={{ color: color.text._400 }}>{description}</Text>}
                 </View>

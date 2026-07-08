@@ -15,6 +15,8 @@ import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 import { readStringAsync } from '@lib/utils/File'
 
+import { CharacterLink } from './CharacterLinks'
+
 export type SamplerConfig = {
     name: string
     data: SamplerConfigData
@@ -49,6 +51,7 @@ export namespace SamplersManager {
                     }))
                 },
                 deleteSamplerConfig: (index) => {
+                    CharacterLink.db.mutate.deleteByValue('sampler_index', index)
                     set((state) => ({
                         configList: state.configList.filter((item, i) => i !== index),
                         currentConfigIndex:

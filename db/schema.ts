@@ -1,5 +1,13 @@
 import { relations, sql } from 'drizzle-orm'
-import { check, index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import {
+    check,
+    index,
+    integer,
+    primaryKey,
+    sqliteTable,
+    text,
+    unique,
+} from 'drizzle-orm/sqlite-core'
 
 // TAVERN V2 SPEC
 
@@ -60,6 +68,7 @@ export const characterRelations = relations(characters, ({ many }) => ({
     tags: many(characterTags),
     lorebooks: many(characterLorebooks),
     chats: many(chats),
+    links: many(characterLinks),
 }))
 
 export const greetingsRelations = relations(characterGreetings, ({ one }) => ({
@@ -82,6 +91,42 @@ export const characterTagsRelations = relations(characterTags, ({ one }) => ({
 
 export const tagsRelations = relations(tags, ({ many }) => ({
     characters: many(characterTags),
+}))
+
+// for now, use strict naming convention for _index based stores
+// this is needed as removals require shifting all db values of [type_index] by -1
+export const linkTypes = [
+    'user_id',
+    'instruct_id',
+    'connection_index',
+    'sampler_index',
+    'model_id',
+] as const
+
+export type LinkType = (typeof linkTypes)[number]
+
+export const characterLinks = sqliteTable(
+    'characterLinks',
+    {
+        id: integer('id', { mode: 'number' }).notNull().primaryKey(),
+        character_id: integer('character_id', { mode: 'number' })
+            .notNull()
+            .references(() => characters.id, { onDelete: 'cascade' }),
+        value: integer('value', { mode: 'number' }).notNull(),
+        type: text('type', {
+            enum: linkTypes,
+        }).notNull(),
+    },
+    (table) => [
+        unique('character_links_character_id_type_unique').on(table.character_id, table.type),
+    ]
+)
+
+export const characterLinkRelations = relations(characterLinks, ({ one }) => ({
+    character: one(characters, {
+        fields: [characterLinks.character_id],
+        references: [characters.id],
+    }),
 }))
 
 // CHATS

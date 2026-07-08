@@ -8,6 +8,7 @@ import { instructs } from '@db/schema'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Storage } from '@lib/enums/Storage'
 
+import { CharacterLink } from './CharacterLinks'
 import { Characters } from './Characters'
 import { Logger } from './Logger'
 import { replaceMacros } from '../state/Macros'
@@ -422,6 +423,7 @@ export namespace Instructs {
 
             export const deleteInstruct = async (id: number) => {
                 await database.delete(instructs).where(eq(instructs.id, id))
+                await CharacterLink.db.mutate.deleteByValue('instruct_id', id)
             }
         }
     }

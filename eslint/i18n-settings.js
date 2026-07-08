@@ -325,6 +325,7 @@ module.exports = {
             'groupBy',
             'saveStringToDownload',
             'router',
+            'push',
         ],
     },
     'object-properties': {

@@ -3,7 +3,7 @@ import { count, eq } from 'drizzle-orm'
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import * as DocumentPicker from 'expo-document-picker'
 import { ImageBackground } from 'expo-image'
-import { Redirect, useNavigation } from 'expo-router'
+import { Redirect, useNavigation, useRouter } from 'expo-router'
 import { usePreventRemove } from 'expo-router/build/react-navigation'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -19,6 +19,7 @@ import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
 import AvatarViewer from '@components/views/AvatarViewer'
 import ContextMenu from '@components/views/ContextMenu'
+import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { db } from '@db/db'
 import { characterTags, tags } from '@db/schema'
@@ -34,6 +35,7 @@ const ChracterEditorScreen = () => {
     const styles = useStyles()
     const { color, spacing } = Theme.useTheme()
     const navigation = useNavigation()
+    const router = useRouter()
     const data = useLiveQuery(
         db
             .select({
@@ -225,9 +227,44 @@ const ChracterEditorScreen = () => {
         })
     }
 
+    const headerRight = () => (
+        <ContextMenu
+            placement="bottom"
+            triggerIcon="setting"
+            buttons={[
+                {
+                    label: t('common.actions.export'),
+                    icon: 'upload',
+                    onPress: (close) => {
+                        handleExportCard()
+                        close()
+                    },
+                },
+                {
+                    label: t('character.editor.actions.manageLinks'),
+                    icon: 'link',
+                    onPress: (close) => {
+                        router.push('/screens/CharacterLinksScreen')
+                        close()
+                    },
+                },
+                {
+                    label: t('common.actions.delete'),
+                    icon: 'delete',
+                    onPress: (close) => {
+                        handleDeleteCard()
+                        close()
+                    },
+                    variant: 'warning',
+                },
+            ]}
+        />
+    )
+
     if (!charId) return <Redirect href=".." />
     return (
         <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+            <HeaderButton headerRight={headerRight} />
             <ImageBackground
                 cachePolicy="none"
                 style={styles.mainContainer}
@@ -312,30 +349,13 @@ const ChracterEditorScreen = () => {
                             <View style={styles.characterHeaderInfo}>
                                 <View style={styles.buttonContainer}>
                                     <ThemedButton
-                                        iconName="delete"
+                                        disabled={!edited}
+                                        iconName="save"
                                         iconSize={20}
-                                        variant="critical"
-                                        label={t('common.actions.delete')}
-                                        onPress={handleDeleteCard}
+                                        label={t('common.actions.save')}
+                                        onPress={handleSaveCard}
+                                        variant={edited ? 'secondary' : 'disabled'}
                                     />
-                                    {!edited && (
-                                        <ThemedButton
-                                            iconName="upload"
-                                            iconSize={20}
-                                            label={t('character.editor.actions.export')}
-                                            onPress={handleExportCard}
-                                            variant="secondary"
-                                        />
-                                    )}
-                                    {edited && (
-                                        <ThemedButton
-                                            iconName="save"
-                                            iconSize={20}
-                                            label={t('common.actions.save')}
-                                            onPress={handleSaveCard}
-                                            variant="secondary"
-                                        />
-                                    )}
                                 </View>
                                 <ThemedTextInput
                                     onChangeText={(mes) => {

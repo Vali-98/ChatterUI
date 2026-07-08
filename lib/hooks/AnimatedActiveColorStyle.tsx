@@ -10,21 +10,25 @@ const useAnimatedActiveColorStyle = ({
     active,
     deactiveColor,
     activeColor,
+    duration = 200,
+    colorProp = 'borderColor',
 }: {
     active: boolean
     deactiveColor: string
     activeColor: string
+    duration?: number
+    colorProp?: 'backgroundColor' | 'borderColor'
 }) => {
     const activeProgress = useSharedValue(active ? 1 : 0)
 
     useEffect(() => {
         activeProgress.value = withTiming(active ? 1 : 0, {
-            duration: 200,
+            duration: duration,
         })
-    }, [activeProgress, active])
+    }, [activeProgress, active, duration])
 
     const animatedStyle = useAnimatedStyle(() => ({
-        borderColor: interpolateColor(activeProgress.value, [0, 1], [deactiveColor, activeColor]),
+        [colorProp]: interpolateColor(activeProgress.value, [0, 1], [deactiveColor, activeColor]),
     }))
 
     return animatedStyle
