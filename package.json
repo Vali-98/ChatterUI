@@ -128,5 +128,11 @@
     "uuid": ">=14.0.0",
     "@react-native/jest-preset": "0.86.0"
   },
-  "private": true
+  "private": true,
+  "allowScripts": {
+    "cui-llama.rn@1.11.14": true,
+    "esbuild@0.28.1": true,
+    "react-native-mmkv@4.0.0-beta.12": true,
+    "unrs-resolver@1.11.1": true
+  }
 }
