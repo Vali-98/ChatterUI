@@ -1,5 +1,6 @@
 import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { Chats } from '@lib/state/Chat'
+import { replaceMacros } from '@lib/state/Macros'
 
 import type { ContextBuilderParams, ContextMessage } from './API/ContextBuilder'
 
@@ -62,7 +63,7 @@ export const createExampleDataSource = (): DataSource => ({
 
         return [
             {
-                content: examples,
+                content: replaceMacros(examples),
                 source: 'character_examples',
                 tokenLength: tokenLength,
                 position: {
@@ -87,7 +88,7 @@ const createAuthorNotesDataSource = async (): Promise<DataSource | undefined> =>
 
     const tokenTotal = activeNotes.reduce((a, b) => a + (b.token_length ?? 0), 0)
     const dataSourceResults: DataSourceResult[] = activeNotes.map((item) => ({
-        content: item.content,
+        content: replaceMacros(item.content),
         source: AUTHOR_NOTE_NAME,
         tokenLength: item.token_length ?? 0,
         position: {
