@@ -43,7 +43,8 @@
             "comments": "Comments",
             "content": "Note Content",
             "noContent": "No Content",
-            "priority": "Priority"
+            "priority": "Priority",
+            "depth": "Depth"
         },
         "selector": {
             "character": "Character",

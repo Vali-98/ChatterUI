@@ -179,6 +179,16 @@ const AuthorNoteEditor = () => {
                         handleSetPlaceholder({ ...placeHolderNote, priority: value })
                     }
                 />
+                <ThemedSlider
+                    label={t('authorNotes.item.depth')}
+                    min={0}
+                    max={10}
+                    step={1}
+                    value={placeHolderNote.depth ?? 0}
+                    onValueChange={(value) =>
+                        handleSetPlaceholder({ ...placeHolderNote, depth: value })
+                    }
+                />
                 <HorizontalSelector
                     label={t('authorNotes.type')}
                     style={{ flex: 1 }}
