@@ -42,6 +42,7 @@
         "item": {
             "comments": "评论",
             "content": "备注内容",
+            "depth": "深度",
             "noContent": "没有内容",
             "priority": "优先事项"
         },
@@ -63,6 +64,7 @@
                 "changeBackground": "更改背景",
                 "changeImage": "更改图片",
                 "export": "导出",
+                "manageLinks": "管理链接",
                 "removeBackground": "移除背景",
                 "viewImage": "查看图片"
             },
@@ -115,6 +117,19 @@
                 "personality": "个性",
                 "scenario": "场景",
                 "tags": "标签"
+            },
+            "links": {
+                "description": "当加载该角色时，链接的配置将自动加载",
+                "loadConnection": "正在加载索引为：{{value}} 的连接",
+                "loadInstruct": "加载 id 指令：{{value}}",
+                "loadModel": "正在加载 id 为：{{value}} 的模型",
+                "loadSampler": "加载索引为 {{value}} 的采样器",
+                "loadUser": "正在加载具有 id 的用户：{{value}}",
+                "missingConnection": "无链接连接",
+                "missingInstruct": "无链接格式",
+                "missingModel": "无链接模型",
+                "missingSampler": "无链接采样器",
+                "missingUser": "无关联用户"
             },
             "messages": {
                 "deleted": "已删除角色：{{name}}",
@@ -307,10 +322,12 @@
             "edit": "编辑",
             "enable": "启用",
             "export": "导出",
+            "link": "关联",
             "more": "更多",
             "rename": "重命名",
             "reset": "重置",
             "save": "保存",
+            "select": "选择",
             "test": "测试",
             "tryAgain": "再试一次"
         },

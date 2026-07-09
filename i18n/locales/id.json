@@ -42,6 +42,7 @@
         "item": {
             "comments": "Komentar",
             "content": "Catatan Isi",
+            "depth": "Kedalaman",
             "noContent": "Tidak Ada Konten",
             "priority": "Prioritas"
         },
@@ -63,6 +64,7 @@
                 "changeBackground": "Ubah Latar Belakang",
                 "changeImage": "Ubah Gambar",
                 "export": "Ekspor",
+                "manageLinks": "Kelola Tautan",
                 "removeBackground": "Hapus Latar Belakang",
                 "viewImage": "Lihat Gambar"
             },
@@ -115,6 +117,19 @@
                 "personality": "Kepribadian",
                 "scenario": "Skenario",
                 "tags": "Tag"
+            },
+            "links": {
+                "description": "Konfigurasi tertaut akan dimuat secara otomatis saat karakter ini dimuat",
+                "loadConnection": "Memuat koneksi dengan indeks: {{value}}",
+                "loadInstruct": "Memuat instruksi dengan id: {{value}}",
+                "loadModel": "Memuat model dengan id: {{value}}",
+                "loadSampler": "Memuat sampler dengan indeks: {{value}}",
+                "loadUser": "Memuat pengguna dengan id: {{value}}",
+                "missingConnection": "Tidak Ada Koneksi Tertaut",
+                "missingInstruct": "Tidak Ada Pemformatan Tertaut",
+                "missingModel": "Tidak Ada Model Tertaut",
+                "missingSampler": "Tidak Ada Sampler Tertaut",
+                "missingUser": "Tidak Ada Pengguna Tertaut"
             },
             "messages": {
                 "deleted": "Karakter dihapus: {{name}}",
@@ -307,10 +322,12 @@
             "edit": "Edit",
             "enable": "Aktifkan",
             "export": "Ekspor",
+            "link": "Link",
             "more": "Lainnya",
             "rename": "Ganti Nama",
             "reset": "Mengatur ulang",
             "save": "Simpan",
+            "select": "Memilih",
             "test": "Uji",
             "tryAgain": "Coba Lagi"
         },
