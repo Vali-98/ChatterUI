@@ -3,6 +3,7 @@ import {
     forwardRef,
     ReactNode,
     RefObject,
+    useCallback,
     useImperativeHandle,
     useRef,
     useState,
@@ -54,16 +55,16 @@ const BottomSheet = forwardRef<BottomSheetRefFunctions, BottomSheetProps>(
         const [visible, setVisible] = useState(false)
         const [contentVisible, setContentVisible] = useState(false)
 
-        const handleClose = () => {
+        const handleClose = useCallback(() => {
             setContentVisible(false)
             setVisible(false)
             onClose?.()
-        }
+        }, [onClose, setVisible, setContentVisible])
 
-        const open = () => {
+        const open = useCallback(() => {
             setVisible(true)
             setContentVisible(true)
-        }
+        }, [setVisible, setContentVisible])
 
         useImperativeHandle(
             ref,
@@ -71,7 +72,7 @@ const BottomSheet = forwardRef<BottomSheetRefFunctions, BottomSheetProps>(
                 open: open,
                 close: handleClose,
             }),
-            []
+            [handleClose, open]
         )
 
         return (
