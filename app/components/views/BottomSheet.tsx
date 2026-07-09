@@ -11,7 +11,6 @@ import { Modal, View, ViewStyle } from 'react-native'
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
 import Animated, { SlideInDown, SlideOutDown, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { scheduleOnRN } from 'react-native-worklets'
 
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -57,9 +56,6 @@ const BottomSheet = forwardRef<BottomSheetRefFunctions, BottomSheetProps>(
 
         const handleClose = () => {
             setContentVisible(false)
-        }
-
-        const handleOnClose = () => {
             setVisible(false)
             onClose?.()
         }
@@ -99,7 +95,7 @@ const BottomSheet = forwardRef<BottomSheetRefFunctions, BottomSheetProps>(
                     <Animated.View
                         style={[animatedStyle]}
                         entering={SlideInDown}
-                        exiting={SlideOutDown.withCallback(() => scheduleOnRN(handleOnClose))}>
+                        exiting={SlideOutDown}>
                         <FadeBackrop handleOverlayClick={handleClose} />
                         <View
                             style={[
