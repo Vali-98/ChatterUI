@@ -376,7 +376,7 @@ export const buildChatCompletionContext = async (params: ContextBuilderParams) =
         JSON.stringify(
             payload.map((item) => {
                 const content = item[feats.contentName]
-                if (typeof content === 'string') return content
+                if (typeof content === 'string') return item
                 else return content.filter((item) => item.type === 'text')
             })
         )
