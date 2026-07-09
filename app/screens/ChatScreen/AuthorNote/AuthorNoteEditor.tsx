@@ -256,6 +256,7 @@ const AuthorNoteEditor = () => {
                             content: placeHolderNote.content,
                             note: placeHolderNote.note,
                             priority: placeHolderNote.priority,
+                            depth: placeHolderNote.depth,
                             token_length: await tokenizer(placeHolderNote.content),
                         })
                         close()
