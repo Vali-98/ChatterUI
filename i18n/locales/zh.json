@@ -177,8 +177,8 @@
     },
     "chat": {
         "bubble": {
-            "promptSpeed": "提示：{{tokens}} t/s",
-            "textGenerationSpeed": "文本生成：{{tokens}} t/s"
+            "promptSpeed": "提示：{{tokens}} t/s | {{seconds}}s",
+            "textGenerationSpeed": "文本生成：{{tokens}} t/s | \n{{seconds}}s"
         },
         "drawer": {
             "actions": {

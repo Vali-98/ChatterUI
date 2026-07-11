@@ -177,8 +177,8 @@
     },
     "chat": {
         "bubble": {
-            "promptSpeed": "Prompt: {{tokens}} t/s",
-            "textGenerationSpeed": "    Text Gen: {{tokens}} t/s"
+            "promptSpeed": "Prompt: {{tokens}} t/s | {{seconds}}s",
+            "textGenerationSpeed": "    Text Gen: {{tokens}} t/s | {{seconds}}s"
         },
         "drawer": {
             "actions": {
