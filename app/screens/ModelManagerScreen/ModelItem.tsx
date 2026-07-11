@@ -337,6 +337,8 @@ const useStyles = () => {
             paddingVertical: spacing.l,
             paddingHorizontal: spacing.xl2,
             backgroundColor: color.neutral._200,
+            minHeight: 64,
+            alignItems: 'center',
             marginBottom: spacing.l,
             flexDirection: 'row',
             justifyContent: 'space-between',
