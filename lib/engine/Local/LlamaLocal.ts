@@ -1,4 +1,3 @@
-import { ModelDataType } from '@db/schema'
 import { closeFd, getContentFd } from '@vali98/react-native-fs'
 import {
     CompletionParams,
@@ -11,6 +10,7 @@ import { t } from 'i18next'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+import { ModelDataType } from '@db/schema'
 import { Storage } from '@lib/enums/Storage'
 import { AppDirectory, fileExists, readableFileSize, writeBase64File } from '@lib/utils/File'
 
