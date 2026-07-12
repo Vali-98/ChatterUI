@@ -72,7 +72,7 @@ const buildLocalPayload = async () => {
     const payloadFields = getSamplerFields()
     const rep_pen = payloadFields?.['penalty_repeat']
     const reasoning = payloadFields?.['enable_thinking'] as boolean
-    let endTag: string | undefined = undefined
+    let thinkTags = {}
     const localPreset: LlamaConfig = Llama.useLlamaPreferencesStore.getState().config
     let prompt: undefined | string = undefined
     let mediaPaths: string[] = []
@@ -115,7 +115,17 @@ const buildLocalPayload = async () => {
                     prompt = result.prompt
                     mediaPaths = result.media_paths ?? []
                     if (reasoning && result.type === 'jinja') {
-                        endTag = (result as JinjaFormattedChatResult).thinking_end_tag
+                        const jinjaResult = result as JinjaFormattedChatResult
+                        const thinking_end_tag = jinjaResult.thinking_end_tag
+                        const thinking_start_tag = jinjaResult.thinking_start_tag
+                        const thinking_forced_open = true
+
+                        if (thinking_end_tag && thinking_start_tag)
+                            thinkTags = {
+                                thinking_end_tag,
+                                thinking_start_tag,
+                                thinking_forced_open,
+                            }
                     }
 
                     if (mediaPaths.length > 0 && !hasImage && !hasAudio) {
@@ -153,11 +163,7 @@ const buildLocalPayload = async () => {
         Logger.errorToast(t('generation.errors.failedToBuildPrompt'))
         return
     }
-    let endTagResult = {}
-    if (endTag) {
-        endTagResult = { thinking_end_tag: endTag }
-    }
-    console.log(endTagResult)
+
     const finalMediaPaths = hasAudio || hasImage ? { media_paths: mediaPaths } : {}
 
     return {
@@ -168,7 +174,7 @@ const buildLocalPayload = async () => {
         stop: constructStopSequence(),
         emit_partial_completion: true,
         ...finalMediaPaths,
-        ...endTagResult,
+        ...thinkTags,
     }
 }
 
