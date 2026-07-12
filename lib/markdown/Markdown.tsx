@@ -1,9 +1,10 @@
 import { setStringAsync } from 'expo-clipboard'
+import { Image } from 'expo-image'
 import { t } from 'i18next'
-import React, { useCallback, useMemo } from 'react'
-import { Platform, StyleSheet, Text, View } from 'react-native'
+import { RaTeXView } from 'ratex-react-native'
+import React, { ReactNode, useCallback, useMemo, useState } from 'react'
+import { Platform, StyleSheet, Text, useWindowDimensions, View } from 'react-native'
 import { MarkdownIt } from 'react-native-markdown-display'
-import MathJax from 'react-native-mathjax-svg'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import Accordion from '@components/views/Accordion'
@@ -45,13 +46,72 @@ const getDeepASTDirection = (astNode: any): 'ltr' | 'rtl' | 'neutral' => {
     return 'neutral'
 }
 
+const ImageAdapter = ({
+    node,
+    children,
+    parent,
+    styles,
+    allowedImageHandlers,
+    defaultImageHandler,
+}: {
+    node: any
+    children: any
+    parent: any
+    styles: any
+    allowedImageHandlers: any
+    defaultImageHandler: any
+}) => {
+    const [imageData, setImageData] = useState({ height: 0, aspectRatio: 1 })
+    const { src, alt } = node.attributes
+
+    const { width } = useWindowDimensions()
+    // we check that the source starts with at least one of the elements in allowedImageHandlers
+    const show =
+        allowedImageHandlers.filter((value: string) => {
+            return src.toLowerCase().startsWith(value.toLowerCase())
+        }).length > 0
+
+    if (show === false && defaultImageHandler === null) {
+        return null
+    }
+
+    const imageProps: any = {
+        indicator: true,
+        style: styles._VIEW_SAFE_image,
+        source: { uri: src },
+    }
+
+    if (alt) {
+        imageProps.accessible = true
+        imageProps.accessibilityLabel = alt
+    }
+
+    return (
+        <View style={{ height: imageData.height }}>
+            <Image
+                key={node.key}
+                {...imageProps}
+                width={imageData.height}
+                aspectRatio={imageData.aspectRatio}
+                onLoad={(data) => {
+                    setImageData({
+                        height: Math.min(width - 100, data.source.width),
+                        aspectRatio: data.source.width / data.source.height,
+                    })
+                }}
+                contentFit="contain"
+            />
+        </View>
+    )
+}
+
 export namespace MarkdownStyle {
     export const Rules = MarkdownIt({ typographer: true })
         .use(thinkPlugin)
         .use(doubleQuotePlugin)
         .use(latexPlugin)
 
-    export const RenderRules = {
+    export const RenderRules: Record<string, (...props: any) => ReactNode> = {
         fence: (node: any, children: any, parent: any, styles: any, inheritedStyles = {}) => {
             let { content, sourceInfo } = node
             if (
@@ -130,23 +190,23 @@ export namespace MarkdownStyle {
         latex_block: (node: any, children: any, parent: any, styles: any) => {
             const { content } = node
             return (
-                <MathJax
+                <RaTeXView
+                    latex={content ?? ''}
                     key={node.key}
                     style={styles.latex_block}
-                    color={styles.latex_block.color ?? 'white'}>
-                    {content}
-                </MathJax>
+                    color={styles.latex_block.color ?? 'white'}
+                />
             )
         },
         latex_inline: (node: any, children: any, parent: any, styles: any) => {
             const { content } = node
             return (
-                <MathJax
+                <RaTeXView
+                    latex={content ?? ''}
                     key={node.key}
-                    style={styles.latex_inline}
-                    color={styles.latex_inline.color ?? 'white'}>
-                    {content}
-                </MathJax>
+                    style={styles.latex_block}
+                    color={styles.latex_block.color ?? 'white'}
+                />
             )
         },
 
@@ -230,6 +290,26 @@ export namespace MarkdownStyle {
                 <Text key={node.key} style={[styles.inline, { flexWrap: 'wrap', width: '100%' }]}>
                     {children}
                 </Text>
+            )
+        },
+        image: (
+            node: any,
+            children: any,
+            parent: any,
+            styles: any,
+            allowedImageHandlers: any,
+            defaultImageHandler: any
+        ) => {
+            return (
+                <ImageAdapter
+                    key={node.key}
+                    node={node}
+                    parent={parent}
+                    styles={styles}
+                    allowedImageHandlers={allowedImageHandlers}
+                    defaultImageHandler={defaultImageHandler}>
+                    {children}
+                </ImageAdapter>
             )
         },
     }
@@ -487,6 +567,8 @@ export namespace MarkdownStyle {
                     // Images
                     image: {
                         flex: 1,
+                        minWidth: 30,
+                        minHeight: 30,
                     },
 
                     // Text Output
@@ -499,9 +581,11 @@ export namespace MarkdownStyle {
                     },
                     latex_inline: {
                         color: color.text._300,
+                        fontSize: getModifiedFontSize(16),
                     },
                     latex_block: {
                         color: color.text._300,
+                        fontSize: getModifiedFontSize(16),
                         marginTop: spacing.l,
                         marginBottom: spacing.sm,
                     },
