@@ -24,12 +24,15 @@ const AuthorNoteBody = () => {
         try {
             switch (currentNoteType) {
                 case NoteType.GLOBAL:
-                    AuthorNotes.db.mutate.createNote({})
+                    AuthorNotes.db.mutate.createNote({ depth: 1 })
                     break
                 case NoteType.CHARACTER:
-                    if (characterId) AuthorNotes.db.mutate.createNote({ character_id: characterId })
+                    if (characterId)
+                        AuthorNotes.db.mutate.createNote({ character_id: characterId, depth: 1 })
+                    break
                 case NoteType.CHAT:
-                    if (chatId) AuthorNotes.db.mutate.createNote({ chat_id: chatId })
+                    if (chatId) AuthorNotes.db.mutate.createNote({ chat_id: chatId, depth: 1 })
+                    break
             }
         } catch (e) {
             Logger.errorToast(t('authorNotes.errors.create'), JSON.stringify(e))

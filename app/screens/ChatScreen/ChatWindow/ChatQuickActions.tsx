@@ -111,6 +111,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
                         const newNoteId = await AuthorNotes.db.mutate.createNote({
                             chat_id: chatId,
                             content: swipe.swipe,
+                            depth: 1,
                         })
                         if (!newNoteId) {
                             Logger.errorToast(t('chat.quickActions.errors.noteCreateFailed'))
