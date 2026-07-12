@@ -48,7 +48,9 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
                         <Trans
                             i18nKey="model.info.hint"
                             components={{
-                                icon: <AntDesign name="file-add" size={16} />,
+                                icon: (
+                                    <AntDesign name="file-add" size={16} color={color.text._400} />
+                                ),
                             }}
                         />
                     </Text>
