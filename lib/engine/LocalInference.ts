@@ -1,3 +1,4 @@
+import { JinjaFormattedChatResult } from 'cui-llama.rn'
 import { t } from 'i18next'
 
 import Alert from '@components/views/Alert'
@@ -71,6 +72,7 @@ const buildLocalPayload = async () => {
     const payloadFields = getSamplerFields()
     const rep_pen = payloadFields?.['penalty_repeat']
     const reasoning = payloadFields?.['enable_thinking'] as boolean
+    let endTag: string | undefined = undefined
     const localPreset: LlamaConfig = Llama.useLlamaPreferencesStore.getState().config
     let prompt: undefined | string = undefined
     let mediaPaths: string[] = []
@@ -112,6 +114,10 @@ const buildLocalPayload = async () => {
                 else if (typeof result === 'object') {
                     prompt = result.prompt
                     mediaPaths = result.media_paths ?? []
+                    if (reasoning && result.type === 'jinja') {
+                        endTag = (result as JinjaFormattedChatResult).thinking_end_tag
+                    }
+
                     if (mediaPaths.length > 0 && !hasImage && !hasAudio) {
                         Logger.warnToast(t('model.toast.mediaAddedWithoutMultimodalSupport'))
                     }
@@ -147,7 +153,11 @@ const buildLocalPayload = async () => {
         Logger.errorToast(t('generation.errors.failedToBuildPrompt'))
         return
     }
-
+    let endTagResult = {}
+    if (endTag) {
+        endTagResult = { thinking_end_tag: endTag }
+    }
+    console.log(endTagResult)
     const finalMediaPaths = hasAudio || hasImage ? { media_paths: mediaPaths } : {}
 
     return {
@@ -158,6 +168,7 @@ const buildLocalPayload = async () => {
         stop: constructStopSequence(),
         emit_partial_completion: true,
         ...finalMediaPaths,
+        ...endTagResult,
     }
 }
 
