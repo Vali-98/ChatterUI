@@ -14,6 +14,12 @@ type TextData = {
     content: string
 }
 
+const ASCII_DOUBLE_QUOTE = '"'
+const DOUBLE_QUOTES_REGEX = /[“”„‟❝❞]/g
+
+const normalizeQuotes = (input: string): string =>
+    input.replace(DOUBLE_QUOTES_REGEX, ASCII_DOUBLE_QUOTE)
+
 const detectFormat = (input: string): Formats => {
     const hasAsterisk = input.includes('*')
     const hasQuote = input.includes('"')
@@ -142,6 +148,7 @@ const constructString = (input: TextData[], format: Formats): string => {
 }
 
 export const convertToFormat = (input: string, targetFormat: Formats) => {
+    input = normalizeQuotes(input)
     if (targetFormat === Formats.None) return input
     const sourceFormat = detectFormat(input)
     if (sourceFormat === targetFormat || sourceFormat === Formats.None) return input
