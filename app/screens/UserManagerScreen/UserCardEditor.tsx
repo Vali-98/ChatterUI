@@ -1,8 +1,10 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
 import * as DocumentPicker from 'expo-document-picker'
-import React, { useEffect, useState } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { useNavigation } from 'expo-router'
+import { usePreventRemove } from 'expo-router/build/react-navigation'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { StyleSheet, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
@@ -19,7 +21,8 @@ const UserCardEditor = () => {
     const { t } = useTranslation()
     const styles = useStyles()
     const { color, spacing } = Theme.useTheme()
-
+    const navigation = useNavigation()
+    const [edited, setEdited] = useState(false)
     const { userCard, imageID, id, setCard, updateImage } = Characters.useUserStore(
         useShallow((state) => ({
             userCard: state.card,
@@ -39,9 +42,15 @@ const UserCardEditor = () => {
         setCurrentCard(userCard)
     }, [userCard])
 
-    const saveCard = async () => {
+    const updateCard = (card: CharacterCardData) => {
+        setEdited(true)
+        setCurrentCard(card)
+    }
+
+    const handleSaveCard = async () => {
         if (currentCard && id) {
             await Characters.db.mutate.updateCard(currentCard, id)
+            setEdited(false)
             setCard(id)
         }
     }
@@ -72,6 +81,31 @@ const UserCardEditor = () => {
             ],
         })
     }
+
+    usePreventRemove(edited, ({ data }) => {
+        if (!userCard) return
+        Alert.alert({
+            title: t('character.editor.dialogs.unsavedChanges.title'),
+            description: t('character.editor.dialogs.unsavedChanges.description'),
+            buttons: [
+                { label: t('common.actions.cancel') },
+                {
+                    label: t('common.actions.save'),
+                    onPress: async () => {
+                        await handleSaveCard()
+                        navigation.dispatch(data.action)
+                    },
+                },
+                {
+                    label: t('character.editor.dialogs.unsavedChanges.discard'),
+                    onPress: () => {
+                        navigation.dispatch(data.action)
+                    },
+                    type: 'warning',
+                },
+            ],
+        })
+    })
 
     return (
         <View style={styles.userContainer}>
@@ -112,50 +146,58 @@ const UserCardEditor = () => {
                     />
                     <AntDesign name="edit" color={color.text._100} style={styles.editHover} />
                 </ContextMenu>
-                <ThemedTextInput
-                    multiline
-                    numberOfLines={10}
-                    label={t('common.labels.name')}
-                    value={currentCard?.name ?? ''}
-                    onChangeText={(text) => {
-                        if (currentCard)
-                            setCurrentCard({
-                                ...currentCard,
-                                name: text,
-                            })
-                    }}
-                    placeholder={t('users.nameplaceholder')}
-                />
+                <View style={{ marginLeft: spacing.xl2, rowGap: 12, flex: 1 }}>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            columnGap: 4,
+                        }}>
+                        <ThemedButton
+                            disabled={!edited}
+                            iconName="save"
+                            iconSize={20}
+                            label={t('common.actions.save')}
+                            onPress={handleSaveCard}
+                            variant={edited ? 'secondary' : 'disabled'}
+                        />
+                    </View>
+
+                    <ThemedTextInput
+                        style={{ height: 36 }}
+                        value={currentCard?.name ?? ''}
+                        onChangeText={(text) => {
+                            if (currentCard)
+                                updateCard({
+                                    ...currentCard,
+                                    name: text,
+                                })
+                        }}
+                    />
+                </View>
             </View>
             <ThemedTextInput
                 multiline
+                containerStyle={{
+                    marginHorizontal: 16,
+                }}
+                style={{
+                    backgroundColor: color.neutral._100,
+                    paddingVertical: 12,
+                    paddingHorizontal: 12,
+                    borderRadius: 8,
+                }}
                 numberOfLines={10}
                 label={t('common.labels.description')}
                 value={currentCard?.description ?? ''}
                 onChangeText={(text) => {
                     if (currentCard)
-                        setCurrentCard({
+                        updateCard({
                             ...currentCard,
                             description: text,
                         })
                 }}
                 placeholder="Describe this user..."
             />
-            <View style={{ flex: 1, paddingBottom: spacing.m }} />
-            <Text
-                style={{
-                    color: color.text._400,
-                    marginTop: spacing.xl2,
-                    alignSelf: 'center',
-                }}>
-                <Trans
-                    i18nKey="users.hint"
-                    components={{
-                        icon: <AntDesign name="menu-unfold" size={16} />,
-                    }}
-                />
-            </Text>
-            <ThemedButton label={t('common.actions.save')} onPress={saveCard} iconName="save" />
         </View>
     )
 }
@@ -168,14 +210,20 @@ const useStyles = () => {
     return StyleSheet.create({
         userContainer: {
             flex: 1,
-            paddingVertical: spacing.xl,
-            paddingHorizontal: spacing.xl,
-            rowGap: 16,
+            paddingHorizontal: spacing.m,
+            paddingTop: spacing.m,
+            paddingBottom: spacing.s,
+            rowGap: 12,
         },
 
         nameBar: {
+            alignContent: 'flex-start',
+            borderRadius: borderRadius.xl,
             flexDirection: 'row',
-            columnGap: 24,
+            alignItems: 'center',
+            backgroundColor: color.neutral._100,
+            paddingVertical: 12,
+            paddingHorizontal: 12,
         },
 
         userImage: {
