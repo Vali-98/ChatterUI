@@ -19,6 +19,9 @@ const SwipeSchema = z.object({
     send_date: z.coerce.date(),
     gen_started: z.coerce.date(),
     gen_finished: z.coerce.date(),
+    active: z.boolean(),
+    token_length: z.number().nullable(),
+    reset_length: z.number().nullable(),
     timings: CompletionTimingsSchema.nullable(),
 })
 

@@ -16,7 +16,7 @@ import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
 import { ChatImportSchema } from '@lib/utils/ChatSchema'
-import { pickStringDocument } from '@lib/utils/File'
+import { FileUtils } from '@lib/utils/File'
 import ChatInput from '@screens/ChatScreen/ChatInput'
 import ChatsDrawer from '@screens/ChatScreen/ChatsDrawer'
 import ChatWindow from '@screens/ChatScreen/ChatWindow'
@@ -72,7 +72,7 @@ const ChatScreen = () => {
             Logger.errorToast(t('chat.import.errors.noChatCharacter'))
             return
         }
-        const file = await pickStringDocument({ type: 'application/json' })
+        const file = await FileUtils.pickText({ type: 'application/json' })
         if (!file.success) return
         const result = ChatImportSchema.safeParse(JSON.parse(file.data))
         if (!result.success) {
@@ -99,9 +99,8 @@ const ChatScreen = () => {
                 chat.user_id = null
             }
         }
-
         chat.last_modified = Date.now()
-        // Chats.db.mutate.cloneChat(chat)
+        Chats.db.mutate.cloneChat(chat)
     }
 
     const renderHeaderButtonRight = () => {
