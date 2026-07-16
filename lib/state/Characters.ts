@@ -1,11 +1,9 @@
 import { extractPngTextChunk, replacePngTextChunk } from '@vali98/react-native-png-utils'
 import { and, asc, desc, eq, gte, inArray, like, notExists, notInArray, sql } from 'drizzle-orm'
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Asset } from 'expo-asset'
 import * as DocumentPicker from 'expo-document-picker'
 import { Paths } from 'expo-file-system'
 import { t } from 'i18next'
-import { useEffect } from 'react'
 import { z } from 'zod'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -958,21 +956,6 @@ export namespace Characters {
             Logger.errorToast(t('settings.character.errors.failedToCreateDefaultCharacter'))
             Logger.error('Error: ' + e)
         }
-    }
-
-    export const useCharacterUpdater = () => {
-        const { id, updateCard } = useCharacterStore((state) => ({
-            id: state.id,
-            updateCard: state.updateCard,
-        }))
-
-        const { data } = useLiveQuery(db.query.cardQuery(id ?? -1))
-
-        useEffect(() => {
-            if (id && id === data?.id) {
-                if (data) updateCard(data)
-            }
-        }, [data, id, updateCard])
     }
 }
 
