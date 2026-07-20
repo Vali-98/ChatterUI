@@ -51,7 +51,7 @@ const InputSheet: React.FC<InputSheetProps> = ({
     }
 
     return (
-        <BottomSheet ref={ref} onClose={handleClose}>
+        <BottomSheet ref={ref} onRequestClose={handleClose}>
             <View style={{ rowGap: spacing.xl }}>
                 {title && (
                     <Text
