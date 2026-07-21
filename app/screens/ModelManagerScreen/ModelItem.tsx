@@ -129,12 +129,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 defaultValue={item.name}
             />
             <View style={{ flex: 1, alignContent: 'center' }}>
-                <View style={{ flexDirection: 'row', columnGap: 12, alignItems: 'center' }}>
+                <TouchableOpacity onPress={() => setShowInfo(!showInfo)}>
                     <Text style={styles.title}>{item.name}</Text>
-                    <TouchableOpacity onPress={() => setShowInfo(!showInfo)}>
-                        <AntDesign name="info-circle" color={color.text._300} size={16} />
-                    </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
                 {showInfo && !isInvalid && (
                     <>
                         <View style={styles.tagContainer}>
@@ -158,6 +155,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                                 {t('model.item.contextlength')}: {item.context_length}
                             </Text>
                         )}
+
                         <Text style={styles.subtitle}>
                             {t('model.item.file')}: {item.file.replace('.gguf', '')} (
                             {readableFileSize(item.file_size)}, {location})
@@ -338,6 +336,7 @@ const useStyles = () => {
             paddingHorizontal: spacing.xl2,
             backgroundColor: color.neutral._200,
             minHeight: 64,
+            columnGap: 12,
             alignItems: 'center',
             marginBottom: spacing.l,
             flexDirection: 'row',
@@ -375,7 +374,7 @@ const useStyles = () => {
         buttonContainer: {
             flexDirection: 'row',
             alignItems: 'center',
-            columnGap: spacing.xl2,
+            columnGap: spacing.xl,
         },
     })
 }
