@@ -49,12 +49,9 @@ const ChatEditor = () => {
         }
     )
 
-    // TODO: This should safely return if invalid values were given
-    if (swipe === undefined) return
-
     const handleEditMessage = () => {
         hide()
-        if (placeholderText !== swipe.swipe)
+        if (swipe && placeholderText !== swipe.swipe)
             Chats.db.mutate.updateChatSwipe(swipe.id, placeholderText)
     }
 
@@ -65,44 +62,48 @@ const ChatEditor = () => {
 
     return (
         <BottomSheet sheetStyle={{ rowGap: 12 }} ref={ref}>
-            <View style={styles.topText}>
-                <Text numberOfLines={1} style={styles.nameText} ellipsizeMode="tail">
-                    {entry?.name}
-                </Text>
-                <Text style={styles.timeText}>{swipe?.send_date.toLocaleTimeString()}</Text>
-            </View>
+            {swipe !== undefined && (
+                <>
+                    <View style={styles.topText}>
+                        <Text numberOfLines={1} style={styles.nameText} ellipsizeMode="tail">
+                            {entry?.name}
+                        </Text>
+                        <Text style={styles.timeText}>{swipe?.send_date.toLocaleTimeString()}</Text>
+                    </View>
 
-            <ThemedTextInput
-                containerStyle={{ flex: 0, flexShrink: 1 }}
-                value={placeholderText}
-                onChangeText={setPlaceholderText}
-                multiline
-            />
+                    <ThemedTextInput
+                        containerStyle={{ flex: 0, flexShrink: 1 }}
+                        value={placeholderText}
+                        onChangeText={setPlaceholderText}
+                        multiline
+                    />
 
-            <View
-                style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                }}>
-                <ThemedButton
-                    label={t('chat.editor.actions.delete')}
-                    iconName="delete"
-                    onPress={handleDeleteMessage}
-                    variant="critical"
-                />
-                <ThemedButton
-                    iconName="reload"
-                    variant="tertiary"
-                    label={t('chat.editor.actions.reset')}
-                    onPress={() => setPlaceholderText(swipe.swipe ?? '')}
-                />
-                <ThemedButton
-                    label={t('chat.editor.actions.confirm')}
-                    iconName="check"
-                    onPress={handleEditMessage}
-                    variant="secondary"
-                />
-            </View>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                        }}>
+                        <ThemedButton
+                            label={t('chat.editor.actions.delete')}
+                            iconName="delete"
+                            onPress={handleDeleteMessage}
+                            variant="critical"
+                        />
+                        <ThemedButton
+                            iconName="reload"
+                            variant="tertiary"
+                            label={t('chat.editor.actions.reset')}
+                            onPress={() => setPlaceholderText(swipe?.swipe ?? '')}
+                        />
+                        <ThemedButton
+                            label={t('chat.editor.actions.confirm')}
+                            iconName="check"
+                            onPress={handleEditMessage}
+                            variant="secondary"
+                        />
+                    </View>
+                </>
+            )}
         </BottomSheet>
     )
 }
