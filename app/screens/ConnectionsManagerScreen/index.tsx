@@ -1,14 +1,14 @@
-import AntDesign from '@react-native-vector-icons/ant-design/static'
 import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FlatList, Pressable, Text, View } from 'react-native'
+import { FlatList, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
+import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { APIManager } from '@lib/engine/API/APIManagerState'
@@ -19,9 +19,11 @@ import TemplatePicker from './TemplatePicker'
 
 const ConnectionsManagerScreen = () => {
     const { t } = useTranslation()
-    const { apiValues } = APIManager.useConnectionsStore(
+    const { apiValues, updatePreferences, isCustomFieldsEnabled } = APIManager.useConnectionsStore(
         useShallow((state) => ({
             apiValues: state.values,
+            isCustomFieldsEnabled: state.preferences?.showCustomFields,
+            updatePreferences: state.updatePreferences,
         }))
     )
     const { color, spacing } = Theme.useTheme()
@@ -40,12 +42,31 @@ const ConnectionsManagerScreen = () => {
             <HeaderTitle title={t('connections.manager.header')} />
             <HeaderButton
                 headerRight={() => (
-                    <Pressable
-                        onPressIn={() => {
-                            router.push('/screens/ConnectionsManagerScreen/TemplateManager')
-                        }}>
-                        <AntDesign name="file" color={color.text._400} size={26} />
-                    </Pressable>
+                    <ContextMenu
+                        placement="bottom"
+                        triggerIcon="setting"
+                        buttons={[
+                            {
+                                icon: 'file',
+
+                                label: t('connections.options.manageTemplates'),
+                                onPress: (close) => {
+                                    router.push('/screens/ConnectionsManagerScreen/TemplateManager')
+
+                                    close()
+                                },
+                            },
+                            {
+                                icon: 'file-text',
+
+                                label: isCustomFieldsEnabled
+                                    ? t('connections.options.disableCustomFields')
+                                    : t('connections.options.enableCustomFields'),
+                                onPress: (close) =>
+                                    updatePreferences({ showCustomFields: !isCustomFieldsEnabled }),
+                            },
+                        ]}
+                    />
                 )}
             />
             {apiValues.length > 0 && (

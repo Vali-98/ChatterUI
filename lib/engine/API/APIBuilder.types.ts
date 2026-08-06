@@ -28,6 +28,7 @@ export interface APIValues {
     firstMessage: string
     key: string
     model: any
+    customFields?: string
     // config name is unique and defines which template to use on generation
     configName: string
 }

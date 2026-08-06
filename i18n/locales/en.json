@@ -411,6 +411,7 @@
             "prefillHint": "Prefill before model response",
             "saveButton": "Save Changes",
             "selectModel": "Select Model",
+            "customFields": "Custom Fields",
             "title": "Edit Connection"
         },
         "failedToConnect": "Failed To Connect",
@@ -442,6 +443,11 @@
             "paste": "Paste Template",
             "pasteSheetTitle": "Paste Template Here",
             "title": "Template Manager"
+        },
+        "options": {
+            "manageTemplates": "Manage Templates",
+            "enableCustomFields": "Enable Custom Fields",
+            "disableCustomFields": "Disable Custom Fields"
         }
     },
     "contextlimit": {

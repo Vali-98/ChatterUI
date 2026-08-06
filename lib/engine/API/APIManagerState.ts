@@ -15,9 +15,15 @@ export interface APIManagerValue extends APIValues {
     friendlyName: string
 }
 
+type APIManagerPreferences = {
+    showCustomFields: boolean
+}
+
 type APIStateProps = {
     activeIndex: number
     values: APIManagerValue[]
+    preferences: APIManagerPreferences
+    updatePreferences: (preferences: Partial<APIManagerPreferences>) => void
     customTemplates: APIConfiguration[]
     addValue: (template: APIManagerValue) => void
     addTemplate: (values: APIConfiguration) => void
@@ -33,8 +39,11 @@ export namespace APIManager {
         persist(
             (set, get) => ({
                 activeIndex: -1,
+                preferences: { showCustomFields: false },
                 values: [],
                 customTemplates: [],
+                updatePreferences: (preferences) =>
+                    set({ preferences: { ...get().preferences, ...preferences } }),
                 addValue: (value) => {
                     const values = [...get().values]
                     values.forEach((item) => (item.active = false))
@@ -103,7 +112,13 @@ export namespace APIManager {
             {
                 name: Storage.API,
                 storage: createMMKVStorage(),
-                version: 1,
+                version: 2,
+                migrate: (persistedState: any, version) => {
+                    if (version === 1) {
+                        persistedState.preferences = { showCustomFields: false }
+                    }
+                    return persistedState
+                },
             }
         )
     )

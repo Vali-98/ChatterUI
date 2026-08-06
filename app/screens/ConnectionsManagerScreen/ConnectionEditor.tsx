@@ -29,14 +29,16 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ index, ref, origina
     const styles = useStyles()
     const { t } = useTranslation()
 
-    const { editValue, getTemplates, removeValue, addValue } = APIManager.useConnectionsStore(
-        useShallow((state) => ({
-            removeValue: state.removeValue,
-            getTemplates: state.getTemplates,
-            editValue: state.editValue,
-            addValue: state.addValue,
-        }))
-    )
+    const { editValue, getTemplates, removeValue, addValue, showCustomFields } =
+        APIManager.useConnectionsStore(
+            useShallow((state) => ({
+                removeValue: state.removeValue,
+                getTemplates: state.getTemplates,
+                editValue: state.editValue,
+                addValue: state.addValue,
+                showCustomFields: state.preferences.showCustomFields,
+            }))
+        )
 
     const [values, setValues] = useState<APIManagerValue>(originalValues)
     const [modelList, setModelList] = useState<any[]>([])
@@ -255,6 +257,17 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ index, ref, origina
                                 {t('connections.editor.prefillHint')}
                             </Text>
                         </View>
+                    )}
+                    {showCustomFields && (
+                        <ThemedTextInput
+                            label={t('connections.editor.customFields')}
+                            value={values.customFields ?? ''}
+                            onChangeText={(value) => {
+                                setValues({ ...values, customFields: value })
+                            }}
+                            multiline
+                            numberOfLines={4}
+                        />
                     )}
                 </ScrollView>
                 <View
