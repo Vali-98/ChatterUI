@@ -5,6 +5,7 @@ import Alert from '@components/views/Alert'
 import { CompletionTimings } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
+import { isCloseThinkTag, isOpenThinkTag } from '@lib/markdown/ThinkTags'
 import { Characters } from '@lib/state/Characters'
 import { Chats, useInference } from '@lib/state/Chat'
 import { commonStopStrings, Instructs, outputPrefixes } from '@lib/state/Instructs'
@@ -314,8 +315,25 @@ const runLocalCompletion = async (
         await Llama.useLlamaModelStore.getState().stopCompletion()
     })
 
+    let reasoningMode = false
     const outputStream = (text: string) => {
+        const cleaned = cleanStopString(text)
         Chats.useChatState.getState().insertToBuffer(cleanStopString(text))
+        /**
+         * @TODO implement think seperation for TTS
+         */
+        if (reasoningMode) {
+            if (isCloseThinkTag(cleaned)) {
+                reasoningMode = false
+            }
+            return
+        }
+
+        if (isOpenThinkTag(cleaned)) {
+            reasoningMode = true
+            return
+        }
+        console.log('tts', text)
         useTTSStore.getState().insertBuffer(cleanStopString(text))
     }
 

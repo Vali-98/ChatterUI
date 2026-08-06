@@ -38,3 +38,17 @@ export function buildThinkRules() {
         }
     })
 }
+
+export const isOpenThinkTag = (buffer: string) => {
+    return thinkTags.some((tag) => {
+        if (tag.open instanceof RegExp) {
+            return tag.open.test(buffer)
+        }
+
+        return buffer.endsWith(tag.open)
+    })
+}
+
+export const isCloseThinkTag = (buffer: string) => {
+    return thinkTags.some((tag) => buffer.endsWith(tag.close))
+}

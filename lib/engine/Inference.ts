@@ -3,6 +3,7 @@ import BackgroundService from 'react-native-background-actions'
 
 import { ChatSwipe } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { isCloseThinkTag, isOpenThinkTag } from '@lib/markdown/ThinkTags'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { Chats, useInference } from '@lib/state/Chat'
 import { Instructs } from '@lib/state/Instructs'
@@ -108,26 +109,41 @@ async function chatInferenceStream() {
         return
     }
     fields.stopGenerating = stop
-
-    let inReasoning = false
+    let reasoningMode: 'structured' | 'raw' | null = null
     fields.onData = (output) => {
-        if (!inReasoning && output.type === 'reasoning') {
+        if (!reasoningMode && output.type === 'reasoning') {
             Chats.useChatState.getState().insertToBuffer('<think>')
-            inReasoning = true
+            reasoningMode = 'raw'
         }
 
-        if (inReasoning && output.type !== 'reasoning') {
+        if (reasoningMode === 'raw' && output.type !== 'reasoning' && reasoningMode === 'raw') {
             Chats.useChatState.getState().insertToBuffer('</think>\n')
-            inReasoning = false
+            reasoningMode = null
+        }
+
+        /**
+         * This is a naive implementation that expects output tags to be full tokens
+         * Most LLMs are trained so that think_start and think_end tokens are not composite
+         */
+        if (!reasoningMode && output.type === 'text' && isOpenThinkTag(output.type)) {
+            reasoningMode = 'structured'
+        }
+
+        if (
+            reasoningMode === 'structured' &&
+            output.type === 'text' &&
+            isCloseThinkTag(output.type)
+        ) {
+            reasoningMode = null
         }
 
         Chats.useChatState.getState().insertToBuffer(output.content)
+
         /**
          * considerations
-         * - dont TTS reasoning
          * - add tool calls
          */
-        useTTSStore.getState().insertBuffer(output.content)
+        if (!reasoningMode) useTTSStore.getState().insertBuffer(output.content)
     }
 
     fields.onEnd = async () => {
