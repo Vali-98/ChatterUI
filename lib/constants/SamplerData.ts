@@ -119,7 +119,7 @@ export const Samplers = {
         values: {
             type: 'integer',
             min: 1024,
-            max: 128000,
+            max: 2 ** 20,
             default: 8192,
             step: 16,
             precision: 0,

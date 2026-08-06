@@ -78,7 +78,13 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
                 {showInput && (
                     <TextInput
                         editable={!disabled}
-                        style={disabled ? styles.textBoxDisabled : styles.textBox}
+                        style={[
+                            styles.textBox,
+                            {
+                                flex: value > 999999 ? 2 : 1.5,
+                                borderColor: disabled ? color.neutral._700 : color.neutral._400,
+                            },
+                        ]}
                         value={textValue}
                         onChangeText={handleTextInputChange}
                         keyboardType="number-pad"
@@ -118,20 +124,9 @@ const useStyles = () => {
         },
 
         textBox: {
-            borderColor: color.neutral._400,
             color: color.text._100,
             borderWidth: 1,
             borderRadius: spacing.l,
-            flex: 1.5,
-            textAlign: `center`,
-        },
-
-        textBoxDisabled: {
-            borderColor: color.neutral._700,
-            color: color.neutral._700,
-            borderWidth: 1,
-            borderRadius: spacing.l,
-            flex: 1.5,
             textAlign: `center`,
         },
     })
