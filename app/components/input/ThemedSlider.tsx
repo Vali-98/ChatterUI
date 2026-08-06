@@ -83,6 +83,8 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
                         onChangeText={handleTextInputChange}
                         keyboardType="number-pad"
                         submitBehavior="blurAndSubmit"
+                        multiline
+                        numberOfLines={1}
                         onEndEditing={handleEndEdit}
                         onSubmitEditing={handleEndEdit}
                         onBlur={handleEndEdit}
