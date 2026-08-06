@@ -61,7 +61,7 @@ const ChatEditor = () => {
     }
 
     return (
-        <BottomSheet sheetStyle={{ rowGap: 12 }} ref={ref}>
+        <BottomSheet sheetStyle={{ rowGap: 12, maxHeight: '95%' }} ref={ref}>
             {swipe !== undefined && (
                 <>
                     <View style={styles.topText}>
