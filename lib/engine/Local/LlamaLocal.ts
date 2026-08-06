@@ -132,6 +132,7 @@ export namespace Llama {
                         persistedState.config.devices = []
                         Logger.info('Migrated to v3 EngineData')
                     }
+                    return persistedState
                 },
             }
         )

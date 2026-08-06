@@ -164,6 +164,7 @@ export namespace Characters {
                         persistedState.id = undefined
                         persistedState.card = undefined
                     }
+                    return persistedState
                 },
             }
         )
