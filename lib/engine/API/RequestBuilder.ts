@@ -95,13 +95,20 @@ const cohereRequest = async (
     const promptData = prompt?.[config.request.promptKey]
     if (!promptData || typeof promptData === 'string') return
 
-    const [preamble, ...history] = promptData
+    if (config.request.completionType.type !== 'chatCompletions') return
+    const { systemRole, contentName } = config.request.completionType
+    const preamble = promptData
+        .filter((item) => item.role === systemRole)
+        .map((item) => getTextContent(item[contentName]))
+        .filter(Boolean)
+        .join('\n\n')
+    const history = promptData.filter((item) => item.role !== systemRole)
     const last = history.pop()
     return {
         ...payloadFields,
         ...stop,
         ...model,
-        preamble: preamble.message,
+        preamble: preamble,
         chat_history: history,
         [config.request.promptKey]: last?.message ?? '',
     }
@@ -112,12 +119,22 @@ const claudeRequest = async (
     instruct: InstructType,
     { payloadFields, model, stop, prompt }: Field
 ) => {
-    const systemPrompt = instruct.system_prompt
     const systemRole =
         config.request.completionType.type === 'chatCompletions'
             ? config.request.completionType.systemRole
             : 'system'
     const promptObject = prompt?.[config.request.promptKey]
+    const contentName =
+        config.request.completionType.type === 'chatCompletions'
+            ? config.request.completionType.contentName
+            : 'content'
+    const systemPrompt = Array.isArray(promptObject)
+        ? promptObject
+              .filter((item) => item.role === systemRole)
+              .map((item) => getTextContent(item[contentName]))
+              .filter(Boolean)
+              .join('\n\n')
+        : instruct.system_prompt
     const finalPrompt = Array.isArray(promptObject)
         ? {
               [config.request.promptKey]: promptObject.filter(
@@ -133,6 +150,17 @@ const claudeRequest = async (
         ...stop,
         ...finalPrompt,
     }
+}
+
+const getTextContent = (content: Message[string] | undefined) => {
+    if (typeof content === 'string') return content
+    if (!Array.isArray(content)) return ''
+    return content
+        .filter(
+            (item): item is Extract<(typeof content)[number], { text: string }> => 'text' in item
+        )
+        .map((item) => item.text)
+        .join('\n')
 }
 
 const hordeRequest = async ({ payloadFields, model, stop, prompt }: Field) => {

@@ -29,13 +29,11 @@ const importDB = async (uri: string, name: string) => {
     const copyDB = async () => {
         await exportDB(false)
         deleteFile(dbPath)
-        if (
-            copyFile({
-                from: uri,
-                to: dbPath,
-            })
-        )
-            reloadAppAsync()
+        const copied = await copyFile({
+            from: uri,
+            to: dbPath,
+        })
+        if (copied) await reloadAppAsync()
     }
 
     const dbAppVersion = name.split('-')?.[0]

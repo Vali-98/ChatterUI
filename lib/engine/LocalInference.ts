@@ -445,8 +445,8 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
             tokenizer: Llama.useLlamaModelStore.getState().tokenLength,
             maxLength: length,
             cache: {
-                userCache: await characterState.getCache(characterCard.name),
-                characterCache: await userState.getCache(userCard.name),
+                userCache: await userState.getCache(characterCard.name),
+                characterCache: await characterState.getCache(userCard.name),
                 instructCache: await instructState.getCache(characterCard.name, userCard.name),
             },
         }

@@ -115,17 +115,21 @@ npx expo run:android
 
 #### Building an APK
 
-Requires Node.js, Java 17/21 SDK and Android SDK. Expo uses EAS to build apps which requires a Linux environment.
+Requires Node.js 20.19.4 or newer, Java 17/21, and the Android SDK. On Windows,
+the build script automatically detects Android Studio's bundled Java and the
+SDK in its standard location. Otherwise, set `JAVA_HOME` and `ANDROID_HOME`.
 
-1. Clone the repo.
-2. Rename the `eas.json.example` to `eas.json`.
-3. Modify `"ANDROID_SDK_ROOT"` to the directory of your Android SDK
-4. Run the following:
+Run the following to create an installable release APK locally:
 
 ```
 npm install
-eas build --platform android --local
+npm run build:android:apk
 ```
+
+The APK is written to `artifacts/ChatterUI-<version>.apk`. This local build does
+not require EAS or an Expo account. Android uses the standard debug signing key,
+so this APK is intended for direct installation and testing rather than Play
+Store publishing.
 
 ### IOS
 

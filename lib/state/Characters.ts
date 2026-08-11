@@ -31,6 +31,7 @@ import {
     tags,
 } from 'db/schema'
 
+import { CharacterCardV2, parseCharacterCardV2 } from './CharacterCardV2'
 import { Logger } from './Logger'
 import { createMMKVStorage } from '../storage/MMKV'
 
@@ -809,13 +810,13 @@ export namespace Characters {
                 Logger.errorToast(`Failed to create card - Image could not be retrieved`)
                 return
             }
-            const card = JSON.parse(extractPngTextChunk(file))
-            if (card === undefined) {
+            const cardData = extractPngTextChunk(file)
+            if (cardData === undefined) {
                 Logger.errorToast('No character was found.')
                 return
             }
 
-            await createCharacterFromV2JSON(card, uri)
+            await createCharacterFromV2JSON(cardData, uri)
         } catch (e) {
             Logger.errorToast('Failed to create character')
             Logger.error(`${e}`)
@@ -836,10 +837,16 @@ export namespace Characters {
 
     const createCharacterFromV2JSON = async (data: any, uri: string | undefined = undefined) => {
         // check JSON def
-        const result = characterCardV2Schema.safeParse(data)
+        const result = parseCharacterCardV2(data)
         if (result.error) {
             Logger.warnToast('V2 Parsing failed, falling back to V1')
-            return await createCharacterFromV1JSON(data, uri)
+            try {
+                const fallbackData = typeof data === 'string' ? JSON.parse(data) : data
+                return await createCharacterFromV1JSON(fallbackData, uri)
+            } catch {
+                Logger.errorToast('Invalid Character Card')
+                return
+            }
         }
 
         Logger.info(`Creating new character: ${result.data.data.name}`)
@@ -859,7 +866,7 @@ export namespace Characters {
             try {
                 if (isJSON) {
                     const data = await readStringAsync(item.uri)
-                    await createCharacterFromV2JSON(JSON.parse(data))
+                    await createCharacterFromV2JSON(data)
                 }
 
                 if (isPNG) await createCharacterFromImage(item.uri)
@@ -937,34 +944,9 @@ const characterCardV1Schema = z.object({
     mes_example: z.string().catch(''),
 })
 
-const characterCardV2DataSchema = z.object({
-    name: z.string(),
-    description: z.string().catch(''),
-    personality: z.string().catch(''),
-    scenario: z.string().catch(''),
-    first_mes: z.string().catch(''),
-    mes_example: z.string().catch(''),
-
-    creator_notes: z.string().catch(''),
-    system_prompt: z.string().catch(''),
-    post_history_instructions: z.string().catch(''),
-    creator: z.string().catch(''),
-    character_version: z.string().catch(''),
-    alternate_greetings: z.string().array().catch([]),
-    tags: z.string().array().catch([]),
-})
-
-const characterCardV2Schema = z.object({
-    spec: z.literal('chara_card_v2'),
-    spec_version: z.literal('2.0'),
-    data: characterCardV2DataSchema,
-})
-
 // placeholder types
 // type CharaterCardV1 = z.infer<typeof characterCardV1Schema>
 // type CharacterCardV2Data = z.infer<typeof characterCardV2DataSchema>
-
-type CharacterCardV2 = z.infer<typeof characterCardV2Schema>
 
 const createBlankV2Card = (
     name: string,

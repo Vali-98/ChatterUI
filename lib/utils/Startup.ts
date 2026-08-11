@@ -212,7 +212,8 @@ const setKeepAwake = async () => {
     else KeepAwake.deactivateKeepAwake()
 }
 
-const setDefaultInstruct = () => {
+const setDefaultInstruct = async () => {
+    await Instructs.migrateLegacyDefaultPrompts()
     Instructs.db.query.instructList().then(async (list) => {
         if (!list) {
             Logger.error('Instruct database Invalid, this should not happen! Please report this!')

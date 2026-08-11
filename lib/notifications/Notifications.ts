@@ -22,6 +22,16 @@ export const setupNotifications = () => {
     })
 }
 
+const isPermissionGranted = (permissions: Notifications.NotificationPermissionsStatus) => {
+    // PermissionResponse is supplied by expo-modules-core at runtime, but its
+    // inherited fields are not always visible when Expo dependencies are nested.
+    const response = permissions as Notifications.NotificationPermissionsStatus & {
+        granted?: boolean
+        status?: string
+    }
+    return response.granted ?? response.status === 'granted'
+}
+
 export async function registerForPushNotificationsAsync() {
     if (Platform.OS === 'android') {
         await Notifications.setNotificationChannelAsync('chatterUI', {
@@ -32,13 +42,13 @@ export async function registerForPushNotificationsAsync() {
         })
     }
 
-    const { status: existingStatus } = await Notifications.getPermissionsAsync()
-    let finalStatus = existingStatus
-    if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync()
-        finalStatus = status
+    const existingPermissions = await Notifications.getPermissionsAsync()
+    let permissionGranted = isPermissionGranted(existingPermissions)
+    if (!permissionGranted) {
+        const requestedPermissions = await Notifications.requestPermissionsAsync()
+        permissionGranted = isPermissionGranted(requestedPermissions)
     }
-    if (finalStatus !== 'granted') {
+    if (!permissionGranted) {
         Alert.alert({
             title: 'Permission Required',
             description: 'ChatterUI requires permissions to send you notifications.',

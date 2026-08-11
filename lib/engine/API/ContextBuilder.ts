@@ -10,6 +10,7 @@ import { readBase64Async } from '@lib/utils/File'
 import { Macro } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
+import { getCharacterPromptLayers } from './CharacterCardPrompt'
 
 export type MessageLoader = {
     retrieve: (limit: number, offset: number) => Promise<ChatEntry[]>
@@ -79,18 +80,29 @@ export const buildChatCompletionContext = async ({
     const completionFeats = apiConfig.request.completionType
     const { characterCache, userCache, instructCache } = cache
     const usePrefix = false
-    const { systemPrompt, systemPromptLength } = getSystemPrompt({
+    const { systemPrompt, systemPromptLength } = await getSystemPrompt({
         instruct,
         user,
         character,
         userCache,
         characterCache,
         instructCache,
+        tokenizer,
         usePrefix,
     })
 
+    const { postHistoryInstruction } = getCharacterPromptLayers(
+        character,
+        instruct.system_prompt ?? '',
+        instruct.user_alignment_message ?? ''
+    )
+    const resolvedPostHistoryInstruction = replaceMacrosInternal(postHistoryInstruction, instruct)
+    const postHistoryLength = resolvedPostHistoryInstruction
+        ? await tokenizer(resolvedPostHistoryInstruction)
+        : 0
+
     const initial = systemPrompt
-    let total_length = systemPromptLength
+    let total_length = systemPromptLength + postHistoryLength
     let first_message_reached = false
 
     const payload: Message[] = [
@@ -199,7 +211,15 @@ export const buildChatCompletionContext = async ({
             [completionFeats.contentName]: apiValues.firstMessage,
         })
 
-    const output = [...payload, ...messageBuffer.reverse()]
+    const postHistoryMessages: Message[] = resolvedPostHistoryInstruction
+        ? [
+              {
+                  role: completionFeats.systemRole,
+                  [completionFeats.contentName]: resolvedPostHistoryInstruction,
+              },
+          ]
+        : []
+    const output = [...payload, ...messageBuffer.reverse(), ...postHistoryMessages]
     Logger.info(`Approximate Context Size: ${total_length} tokens`)
     Logger.info(`${(performance.now() - delta).toFixed(2)}ms taken to build context`)
     if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(JSON.stringify(output))
@@ -225,18 +245,33 @@ export const buildTextCompletionContext = async ({
     const useSuffix = false
     const { characterCache, userCache, instructCache } = cache
 
-    const { systemPrompt, systemPromptLength } = getSystemPrompt({
+    const { systemPrompt, systemPromptLength } = await getSystemPrompt({
         instruct,
         user,
         character,
         userCache,
         characterCache,
         instructCache,
+        tokenizer,
         useSuffix,
     })
 
+    const { postHistoryInstruction } = getCharacterPromptLayers(
+        character,
+        instruct.system_prompt ?? '',
+        instruct.user_alignment_message ?? ''
+    )
+    const resolvedPostHistoryInstruction = replaceMacrosInternal(postHistoryInstruction, instruct)
+    const postHistoryShard = resolvedPostHistoryInstruction
+        ? instruct.system_prefix + resolvedPostHistoryInstruction + instruct.system_suffix
+        : ''
+    const postHistoryLength = postHistoryShard
+        ? await tokenizer(replaceMacrosInternal(postHistoryShard, instruct))
+        : 0
+
     let payload = systemPrompt
-    const payloadLength = systemPromptLength
+    const payloadLength =
+        systemPromptLength + instructCache.system_suffix_length + postHistoryLength
 
     // suffix must be delayed for example messages
     let message_acc = ``
@@ -295,6 +330,8 @@ export const buildTextCompletionContext = async ({
               ? instruct.last_output_prefix
               : instruct.output_prefix
 
+        if (is_last && postHistoryShard) message_shard = postHistoryShard + message_shard
+
         if (instruct.timestamp) message_shard += timestamp_string
 
         if (instruct.names) message_shard += name_string
@@ -321,6 +358,8 @@ export const buildTextCompletionContext = async ({
     if (index >= messages.length - 1 && messages.length !== 0) {
         warnNoMessages()
     }
+
+    if (is_last && postHistoryShard) message_acc = postHistoryShard
 
     const examples = character?.mes_example
     if (
@@ -394,13 +433,14 @@ const getValidAttachments = (
     return { hasImageNew, attachments }
 }
 
-export const getSystemPrompt = ({
+export const getSystemPrompt = async ({
     instruct,
     user,
     character,
     userCache,
     characterCache,
     instructCache,
+    tokenizer,
     usePrefix = true,
     useSuffix = true,
 }: {
@@ -410,6 +450,7 @@ export const getSystemPrompt = ({
     userCache: CharacterTokenCache
     characterCache: CharacterTokenCache
     instructCache: InstructTokenCache
+    tokenizer: ContextBuilderParams['tokenizer']
     usePrefix?: boolean
     useSuffix?: boolean
 }) => {
@@ -422,7 +463,7 @@ export const getSystemPrompt = ({
         Logger.warn('System Prompt Format is blank')
     }
 
-    let systemPromptLength = 0
+    const { systemInstruction } = getCharacterPromptLayers(character, instruct.system_prompt ?? '')
     const macros = [
         {
             macro: '{{system_prefix}}',
@@ -436,8 +477,8 @@ export const getSystemPrompt = ({
         },
         {
             macro: '{{system_prompt}}',
-            value: instruct.system_prompt ?? '',
-            length: instructCache.system_suffix_length,
+            value: systemInstruction,
+            length: 0,
         },
         {
             macro: '{{character_desc}}',
@@ -462,8 +503,8 @@ export const getSystemPrompt = ({
     ]
     macros.forEach((m) => {
         systemPrompt = systemPrompt.replaceAll(m.macro, m.value)
-        systemPromptLength += m.length
     })
+    const systemPromptLength = await tokenizer(replaceMacrosInternal(systemPrompt, instruct))
     return { systemPrompt, systemPromptLength }
 }
 

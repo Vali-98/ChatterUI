@@ -28,7 +28,6 @@ module.exports = {
                 monochromeImage: './assets/images/adaptive-icon-foreground.png',
                 backgroundColor: '#000',
             },
-            edgeToEdgeEnabled: true,
             package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
             userInterfaceStyle: 'dark',
             permissions: [
@@ -98,6 +97,7 @@ module.exports = {
             './expo-build-plugins/usercert.plugin.js',
             './expo-build-plugins/rnllama.plugin.js',
             './expo-build-plugins/copyhtp.plugin.js',
+            './expo-build-plugins/gradlememory.plugin.js',
         ],
         experiments: {
             typedRoutes: true,

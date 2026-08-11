@@ -15,6 +15,23 @@ import { createMMKVStorage } from '../storage/MMKV'
 export const defaultSystemPromptFormat =
     '{{system_prefix}}{{system_prompt}}\n{{character_desc}}\n{{personality}}\n{{scenario}}\n{{user_desc}}{{system_suffix}}'
 
+const legacyDefaultSystemPrompt =
+    "Write {{char}}'s next reply in a chat between {{char}} and {{user}}."
+
+export const defaultRoleplaySystemPrompt = `You are participating in an ongoing fictional roleplay between {{char}} and {{user}}.
+
+Write only {{char}}'s next response and remain in character. Treat the character description, personality, scenario, example dialogue, character-specific instructions, and conversation history as authoritative.
+
+Use ordinary text for spoken dialogue and *asterisks for actions, expressions, gestures, physical reactions, and narrative behavior*.
+
+Do not speak for {{user}}, determine {{user}}'s thoughts, or dictate {{user}}'s actions.
+
+Respond as though the fictional situation is actually occurring. Do not switch into assistant-style explanation, discuss being an AI/model, summarize the roleplay from outside it, or add out-of-character commentary unless the user explicitly requests OOC discussion.
+
+Maintain continuity, characterization, relationships, motivations, and previously established facts.
+
+Be proactive enough to continue the interaction naturally without seizing control of the user's character.`
+
 const defaultGenerics = {
     wrap: false,
     macro: false,
@@ -36,7 +53,7 @@ const defaultGenerics = {
 
 const defaultInstructs: InstructType[] = [
     {
-        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prompt: defaultRoleplaySystemPrompt,
         system_prefix: '<|im_start|>system\n',
         system_suffix: '<|im_end|>\n',
         input_prefix: '<|im_start|>user\n',
@@ -51,7 +68,7 @@ const defaultInstructs: InstructType[] = [
         ...defaultGenerics,
     },
     {
-        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prompt: defaultRoleplaySystemPrompt,
         system_prefix: '### Instruction: ',
         system_suffix: '\n',
         input_prefix: '### Instruction: ',
@@ -66,7 +83,7 @@ const defaultInstructs: InstructType[] = [
         ...defaultGenerics,
     },
     {
-        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prompt: defaultRoleplaySystemPrompt,
         system_prefix: '<|start_header_id|>system<|end_header_id|>\n\n',
         system_suffix: '<|eot_id|>',
         input_prefix: '<|start_header_id|>user<|end_header_id|>\n\n',
@@ -81,7 +98,7 @@ const defaultInstructs: InstructType[] = [
         ...defaultGenerics,
     },
     {
-        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prompt: defaultRoleplaySystemPrompt,
         system_prefix: '<|system|>\n',
         system_suffix: '<|endoftext|>\n',
         input_prefix: '<|user|>\n',
@@ -96,7 +113,7 @@ const defaultInstructs: InstructType[] = [
         ...defaultGenerics,
     },
     {
-        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prompt: defaultRoleplaySystemPrompt,
         system_prefix: '<|system|>\n',
         system_suffix: '<|end|>\n',
         input_prefix: '<|user|>\n',
@@ -111,7 +128,7 @@ const defaultInstructs: InstructType[] = [
         ...defaultGenerics,
     },
     {
-        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prompt: defaultRoleplaySystemPrompt,
         system_prefix: '<start_of_turn>user\n',
         system_suffix: '<end_of_turn>\n',
         input_prefix: '<start_of_turn>user\n',
@@ -126,7 +143,7 @@ const defaultInstructs: InstructType[] = [
         ...defaultGenerics,
     },
     {
-        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prompt: defaultRoleplaySystemPrompt,
         system_prefix: '',
         system_suffix: '',
         input_prefix: '[INST]',
@@ -141,7 +158,7 @@ const defaultInstructs: InstructType[] = [
         ...defaultGenerics,
     },
     {
-        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prompt: defaultRoleplaySystemPrompt,
         system_prefix: '',
         system_suffix: '',
         input_prefix: '<｜User｜>',
@@ -207,7 +224,7 @@ export type InstructTokenCache = {
 
 export namespace Instructs {
     export const defaultInstruct: InstructType = {
-        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prompt: defaultRoleplaySystemPrompt,
         system_prefix: '### Instruction: ',
         system_suffix: '\n',
         input_prefix: '### Instruction: ',
@@ -266,7 +283,9 @@ export namespace Instructs {
                         output_prefix_length: await getTokenCount(instruct.output_prefix),
                         last_output_prefix_length: await getTokenCount(instruct.last_output_prefix),
                         output_suffix_length: await getTokenCount(instruct.output_suffix),
-                        user_alignment_message_length: await getTokenCount(instruct.system_prompt),
+                        user_alignment_message_length: await getTokenCount(
+                            instruct.user_alignment_message
+                        ),
                     }
                     set({ tokenCache: newCache })
                     return newCache
@@ -289,7 +308,7 @@ export namespace Instructs {
                         output_prefix: replaceMacros(baseInstruct.output_prefix),
                         last_output_prefix: replaceMacros(baseInstruct.last_output_prefix),
                         output_suffix: replaceMacros(baseInstruct.output_suffix),
-                        user_alignment_message: replaceMacros(baseInstruct.system_prompt),
+                        user_alignment_message: replaceMacros(baseInstruct.user_alignment_message),
                         stop_sequence: replaceMacros(baseInstruct.stop_sequence),
                     }
 
@@ -322,7 +341,7 @@ export namespace Instructs {
                 name: Storage.Instruct,
                 storage: createMMKVStorage(),
                 partialize: (state) => ({ data: state.data }),
-                version: 7,
+                version: 8,
                 migrate: async (persistedState: any, version) => {
                     if (!version) {
                         persistedState.data.timestamp = false
@@ -369,6 +388,13 @@ export namespace Instructs {
 
                     if (version === 6) {
                         persistedState.data.system_prompt_format = defaultSystemPromptFormat
+                    }
+
+                    if (
+                        version === 7 &&
+                        persistedState.data.system_prompt === legacyDefaultSystemPrompt
+                    ) {
+                        persistedState.data.system_prompt = defaultRoleplaySystemPrompt
                     }
 
                     return persistedState
@@ -425,15 +451,23 @@ export namespace Instructs {
         }
     }
 
+    export const migrateLegacyDefaultPrompts = async () => {
+        await database
+            .update(instructs)
+            .set({ system_prompt: defaultRoleplaySystemPrompt })
+            .where(eq(instructs.system_prompt, legacyDefaultSystemPrompt))
+    }
+
     export const generateInitialDefaults = async () => {
+        await migrateLegacyDefaultPrompts()
         const list = await db.query.instructList()
         let data = -1
-        defaultInstructs.map(async (item) => {
+        for (const item of defaultInstructs) {
             if (!list?.some((e) => e.name === item.name)) {
                 const newid = await db.mutate.createInstruct(item)
                 if (data === -1) data = newid
             }
-        })
+        }
         Logger.info('Default Instructs Successfully Generated')
         return data === -1 ? 1 : data
     }
