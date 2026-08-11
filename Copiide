@@ -1,0 +1,14 @@
+git fetch origin
+git checkout -b feature/brilliant-integration origin/master
+# buat folder app/screens/ModelManagerScreen dan lib/services serta app/config jika belum ada
+# Simpan file-file yang saya berikan sebelumnya ke path:
+# lib/services/ModelDownloader.ts
+# lib/services/Streaming.ts
+# app/config/secure.ts
+# app/screens/ModelManagerScreen/ModelDownloader.tsx
+# .github/workflows/android-build.yml
+# eas.json
+
+git add lib/services/ModelDownloader.ts lib/services/Streaming.ts app/config/secure.ts app/screens/ModelManagerScreen/ModelDownloader.tsx .github/workflows/android-build.yml eas.json
+git commit -m "feat: add model downloader, streaming abstraction, secure store wrapper, UI component, and CI workflow (feature/brilliant-integration)"
+git push -u origin feature/brilliant-integration
