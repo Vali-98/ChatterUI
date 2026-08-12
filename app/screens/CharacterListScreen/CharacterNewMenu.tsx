@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
+import { Alert, Platform } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 import ContextMenu from '@components/views/ContextMenu'
@@ -37,6 +38,24 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
         })
     }
 
+    const handleImportFolder = async () => {
+        if (nowLoading) return
+        setNowLoading(true)
+        try {
+            const counts = await Characters.importCharacterFolder()
+            if (!counts) return
+            Alert.alert(
+                'Folder Import Complete',
+                `Imported: ${counts.imported}\nSkipped: ${counts.skipped}\nFailed: ${counts.failed}`
+            )
+        } catch (error) {
+            Logger.error(`Failed to import character folder: ${error}`)
+            Alert.alert('Folder Import Failed', 'The selected folder could not be read.')
+        } finally {
+            setNowLoading(false)
+        }
+    }
+
     return (
         <>
             <InputSheet
@@ -60,6 +79,18 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                         },
                         icon: 'upload',
                     },
+                    ...(Platform.OS === 'android'
+                        ? [
+                              {
+                                  label: 'Import Folder',
+                                  onPress: (close: () => void) => {
+                                      close()
+                                      void handleImportFolder()
+                                  },
+                                  icon: 'folder-open' as const,
+                              },
+                          ]
+                        : []),
                     {
                         label: 'Create Character',
                         onPress: (close) => {

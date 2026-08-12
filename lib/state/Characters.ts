@@ -4,7 +4,9 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { Asset } from 'expo-asset'
 import * as DocumentPicker from 'expo-document-picker'
 import { Paths } from 'expo-file-system'
+import { StorageAccessFramework } from 'expo-file-system/legacy'
 import { useEffect } from 'react'
+import { Platform } from 'react-native'
 import { z } from 'zod'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -19,6 +21,7 @@ import {
     readBase64Async,
     readStringAsync,
     saveStringToDownload,
+    writeBase64File,
 } from '@lib/utils/File'
 import { replaceMacroBase } from '@lib/utils/Macros'
 import {
@@ -32,6 +35,7 @@ import {
 } from 'db/schema'
 
 import { CharacterCardV2, parseCharacterCardV2 } from './CharacterCardV2'
+import { CharacterFolderImportCounts, importCharacterFolderTree } from './CharacterFolderImport'
 import { Logger } from './Logger'
 import { createMMKVStorage } from '../storage/MMKV'
 
@@ -688,7 +692,9 @@ export namespace Characters {
                         return undefined
                     }
                 })
-                if (image_id && imageuri) await copyImage(imageuri, image_id)
+                if (image_id === undefined) return false
+                if (imageuri) await copyImage(imageuri, image_id)
+                return true
             }
 
             export const duplicateCard = async (charId: number) => {
@@ -803,31 +809,40 @@ export namespace Characters {
         }
     }
 
-    export const createCharacterFromImage = async (uri: string) => {
+    export const createCharacterFromImage = async (
+        uri: string,
+        notify = true
+    ): Promise<boolean> => {
         try {
             const file = await readBase64Async(uri)
             if (!file) {
-                Logger.errorToast(`Failed to create card - Image could not be retrieved`)
-                return
+                if (notify)
+                    Logger.errorToast(`Failed to create card - Image could not be retrieved`)
+                return false
             }
             const cardData = extractPngTextChunk(file)
             if (cardData === undefined) {
-                Logger.errorToast('No character was found.')
-                return
+                if (notify) Logger.errorToast('No character was found.')
+                return false
             }
 
-            await createCharacterFromV2JSON(cardData, uri)
+            return await createCharacterFromV2JSON(cardData, uri, notify)
         } catch (e) {
-            Logger.errorToast('Failed to create character')
+            if (notify) Logger.errorToast('Failed to create character')
             Logger.error(`${e}`)
+            return false
         }
     }
 
-    const createCharacterFromV1JSON = async (data: any, uri: string | undefined = undefined) => {
+    const createCharacterFromV1JSON = async (
+        data: any,
+        uri: string | undefined = undefined,
+        notify = true
+    ): Promise<boolean> => {
         const result = characterCardV1Schema.safeParse(data)
         if (result.error) {
-            Logger.errorToast('Invalid Character Card')
-            return
+            if (notify) Logger.errorToast('Invalid Character Card')
+            return false
         }
         const converted = createBlankV2Card(result.data.name, result.data)
 
@@ -835,22 +850,57 @@ export namespace Characters {
         return db.mutate.createCharacter(converted, uri)
     }
 
-    const createCharacterFromV2JSON = async (data: any, uri: string | undefined = undefined) => {
+    export const createCharacterFromV2JSON = async (
+        data: any,
+        uri: string | undefined = undefined,
+        notify = true
+    ): Promise<boolean> => {
         // check JSON def
         const result = parseCharacterCardV2(data)
         if (result.error) {
-            Logger.warnToast('V2 Parsing failed, falling back to V1')
+            if (notify) Logger.warnToast('V2 Parsing failed, falling back to V1')
             try {
                 const fallbackData = typeof data === 'string' ? JSON.parse(data) : data
-                return await createCharacterFromV1JSON(fallbackData, uri)
+                return await createCharacterFromV1JSON(fallbackData, uri, notify)
             } catch {
-                Logger.errorToast('Invalid Character Card')
-                return
+                if (notify) Logger.errorToast('Invalid Character Card')
+                return false
             }
         }
 
         Logger.info(`Creating new character: ${result.data.data.name}`)
         return await db.mutate.createCharacter(result.data, uri)
+    }
+
+    export const importCharacterFolder = async (): Promise<
+        CharacterFolderImportCounts | undefined
+    > => {
+        if (Platform.OS !== 'android') return
+
+        const permission = await StorageAccessFramework.requestDirectoryPermissionsAsync()
+        if (!permission.granted) return
+
+        return await importCharacterFolderTree(permission.directoryUri, {
+            readDirectory: StorageAccessFramework.readDirectoryAsync,
+            importPNG: async (uri) => {
+                const cacheURI = `${Paths.cache.uri}character-folder-import-${Date.now()}.png`
+                try {
+                    const data = await StorageAccessFramework.readAsStringAsync(uri, {
+                        encoding: 'base64',
+                    })
+                    await writeBase64File(cacheURI, data)
+                    return await createCharacterFromImage(cacheURI, false)
+                } finally {
+                    deleteFile(cacheURI)
+                }
+            },
+            importJSON: async (uri) => {
+                const data = await StorageAccessFramework.readAsStringAsync(uri)
+                return await createCharacterFromV2JSON(data, undefined, false)
+            },
+            onError: (uri, error) =>
+                Logger.error(`Failed to import character folder entry '${uri}': ${error}`),
+        })
     }
 
     export const importCharacter = async () => {
