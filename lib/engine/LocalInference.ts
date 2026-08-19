@@ -333,7 +333,6 @@ const runLocalCompletion = async (
             reasoningMode = true
             return
         }
-        console.log('tts', text)
         useTTSStore.getState().insertBuffer(cleanStopString(text))
     }
 
