@@ -1,6 +1,6 @@
 import { localDownload } from '@vali98/react-native-fs'
 import { getDocumentAsync } from 'expo-document-picker'
-import { Directory, File, Paths } from 'expo-file-system'
+import { Directory, File, FileMode, Paths } from 'expo-file-system'
 
 import { Logger } from '../state/Logger'
 
@@ -205,4 +205,20 @@ export const fileInfo = (path: string) => {
 
 export const makeDirectory = async (path: string) => {
     new Directory(path).create({ idempotent: true })
+}
+
+export const readFileMagic = (path: string) => {
+    const magicBytes = new File(path).open(FileMode.ReadOnly).readBytes(4)
+    const magic = String.fromCharCode(...magicBytes)
+    const hex = Array.from(magic, (b) => `0x${b.toString().padStart(2, '0').toUpperCase()}`).join(
+        ' '
+    )
+
+    return { hex, magic }
+}
+
+export const printFileMagic = (path: string) => {
+    const { hex, magic } = readFileMagic(path)
+    Logger.info(hex)
+    Logger.info(magic)
 }

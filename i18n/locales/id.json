@@ -400,6 +400,7 @@
         "editor": {
             "apiKey": "Kunci API",
             "completionUrl": "URL Penyelesaian",
+            "customFields": "Bidang Kustom",
             "firstMessage": "Pesan Pertama",
             "firstMessageHint": "Pesan pertama bawaan yang dikirim ke Claude",
             "friendlyName": "Nama Ramah",
@@ -427,6 +428,11 @@
             "header": "Koneksi"
         },
         "notConnected": "Tidak Terhubung",
+        "options": {
+            "disableCustomFields": "Nonaktifkan Bidang Kustom",
+            "enableCustomFields": "Aktifkan Bidang Kustom",
+            "manageTemplates": "Kelola Templat"
+        },
         "templates": {
             "delete": {
                 "confirm": "Hapus Template",
@@ -630,6 +636,7 @@
             "rename": "Ganti Nama Model"
         },
         "linkmmproj": "Tautan MMPROJ",
+        "magic": "Header: {{magic}}, Hex: {{hex}}",
         "maxcontext": "Konteks Maks",
         "mmproj": "mmproj",
         "modelnamechat": "Tampilkan Nama Model di Chat",

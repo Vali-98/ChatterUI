@@ -400,6 +400,7 @@
         "editor": {
             "apiKey": "Ключ API",
             "completionUrl": "URL завершения",
+            "customFields": "Пользовательские поля",
             "firstMessage": "Первое сообщение",
             "firstMessageHint": "Первое сообщение по умолчанию, отправленное Claude",
             "friendlyName": "Понятное имя",
@@ -427,6 +428,11 @@
             "header": "Подключения"
         },
         "notConnected": "Не подключено",
+        "options": {
+            "disableCustomFields": "Отключить настраиваемые поля",
+            "enableCustomFields": "Включить настраиваемые поля",
+            "manageTemplates": "Управление шаблонами"
+        },
         "templates": {
             "delete": {
                 "confirm": "Удалить шаблон",
@@ -630,6 +636,7 @@
             "rename": "Переименовать модель"
         },
         "linkmmproj": "Ссылка на MMPROJ",
+        "magic": "Header: {{magic}}, Hex: {{hex}}",
         "maxcontext": "Максимальный контекст",
         "mmproj": "ммпродж",
         "modelnamechat": "Показывать имя модели в чате",

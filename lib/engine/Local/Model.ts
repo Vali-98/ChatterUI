@@ -21,6 +21,7 @@ import {
     fileInfo,
     listFiles,
     readableFileSize,
+    readFileMagic,
 } from '@lib/utils/File'
 
 import { GGMLNameMap, GGMLType } from './GGML'
@@ -247,6 +248,11 @@ export namespace Model {
             // This will load GGUF KV-pairs
             // refer to https://github.com/ggml-org/ggml/blob/master/docs/gguf.md#standardized-key-value-pairs
             let loadable_path = file_path
+
+            const magicInfo = readFileMagic(loadable_path)
+
+            Logger.info(t('model.magic', magicInfo))
+
             if (loadable_path.includes('content://'))
                 loadable_path = (await getContentFd(loadable_path)) ?? loadable_path
 

@@ -400,6 +400,7 @@
         "editor": {
             "apiKey": "API 密钥",
             "completionUrl": "完成 URL",
+            "customFields": "自定义字段",
             "firstMessage": "首条消息",
             "firstMessageHint": "发送给 Claude 的默认首条消息",
             "friendlyName": "友好名称",
@@ -427,6 +428,11 @@
             "header": "连接"
         },
         "notConnected": "未连接",
+        "options": {
+            "disableCustomFields": "禁用自定义字段",
+            "enableCustomFields": "启用自定义字段",
+            "manageTemplates": "管理模板"
+        },
         "templates": {
             "delete": {
                 "confirm": "删除模板",
@@ -630,6 +636,7 @@
             "rename": "重命名模型"
         },
         "linkmmproj": "链接MMPROJ",
+        "magic": "Header：{{magic}}，Hex：{{hex}}",
         "maxcontext": "最大上下文",
         "mmproj": "项目计划",
         "modelnamechat": "在聊天中显示模型名称",
