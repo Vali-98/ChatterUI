@@ -62,7 +62,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 t('model.alert.deletemodel.description', { name: item.name }) +
                 (!isInvalid
                     ? !item.file_path.startsWith('content')
-                        ? t('model.alert.deletemodel.internal', readableFileSize(item.file_size))
+                        ? t('model.alert.deletemodel.internal', {
+                              size: readableFileSize(item.file_size),
+                          })
                         : t('model.alert.deletemodel.external')
                     : ''),
             buttons: [
