@@ -295,7 +295,7 @@ const createLorebookDataSource = async (
             })
 
             return selected.map((matched) => ({
-                content: matched.content,
+                content: `**${matched.entry.name}**: ` + matched.content,
                 source: `${LOREBOOK_NAME}:${lorebookId}:${matched.entry.id}`,
                 tokenLength: matched.tokenLength,
                 position: {
