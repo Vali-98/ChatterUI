@@ -111,10 +111,11 @@ export namespace Logger {
         insertLogs(logItem)
     }
 
-    export const errorToast = (data: string, internal?: string) => {
+    export const errorToast = (data: string, internal?: unknown) => {
         error(data)
         if (internal) {
-            error(internal)
+            if (typeof internal === 'string') error(internal)
+            else if (internal instanceof Error) error(internal.message)
         }
         Toast.show(data, toastTime, { textColor: 'red' })
     }

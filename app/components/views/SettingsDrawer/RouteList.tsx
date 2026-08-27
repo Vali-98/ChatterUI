@@ -99,7 +99,11 @@ const getPaths = (remote: boolean, t: (input: string) => string): ButtonData[] =
         path: '/screens/FormattingManagerScreen',
         icon: 'profile',
     },
-
+    {
+        name: t('navigation.dataSources'),
+        path: '/screens/DataSourcesScreen',
+        icon: 'account-book',
+    },
     {
         name: t('navigation.tts'),
         path: '/screens/TTSManagerScreen',

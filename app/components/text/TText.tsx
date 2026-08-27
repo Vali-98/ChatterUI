@@ -7,6 +7,7 @@ type FontColor = '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' |
 
 interface TTextProps extends TextProps {
     color?: FontColor
+    size?: number
 }
 const styles = StyleSheet.create({
     text: {
@@ -14,13 +15,14 @@ const styles = StyleSheet.create({
     },
 })
 
-const TText: React.FC<TTextProps> = ({ color = '100', children, style, ...props }) => {
+const TText: React.FC<TTextProps> = ({ color = '100', size = 14, children, style, ...props }) => {
     const { color: themeColor } = Theme.useTheme()
     const colorOverride = useMemo(
         () => ({
             color: themeColor.text[`_${color}`],
+            fontSize: size,
         }),
-        [color, themeColor]
+        [color, themeColor, size]
     )
     return (
         <Text style={[colorOverride, styles.text, style]} {...props}>

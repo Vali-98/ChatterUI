@@ -319,6 +319,8 @@
             "create": "Create",
             "delete": "Delete",
             "disable": "Disable",
+            "discard": "Discard",
+            "discardChanges": "Discard Changes",
             "edit": "Edit",
             "enable": "Enable",
             "export": "Export",
@@ -326,6 +328,7 @@
             "rename": "Rename",
             "reset": "Reset",
             "save": "Save",
+            "search": "Search",
             "test": "Test",
             "tryAgain": "Try Again",
             "select": "Select",
@@ -354,6 +357,8 @@
             "devMode": "DEV MODE",
             "external": "External",
             "internal": "Internal",
+            "content": "Content",
+            "comment": "Comment",
             "name": "Name",
             "none": "None",
             "result": "Result",
@@ -370,6 +375,12 @@
         "navigation": {
             "about": "About",
             "settings": "Settings"
+        },
+        "alert": {
+            "unsaved": {
+                "title": "Unsaved Changes",
+                "description": "You have unsaved changes, exiting will discard all changes."
+            }
         }
     },
     "connections": {
@@ -687,6 +698,7 @@
         "dev_components": "[DEV] Components",
         "dev_markdown": "[DEV] Markdown",
         "formatting": "Formatting",
+        "dataSources": "Data Sources",
         "logs": "Logs",
         "models": "Models",
         "sampler": "Sampler",
@@ -919,5 +931,32 @@
         },
         "nameplaceholder": "Empty names are discouraged",
         "profilecount": "User Profiles"
+    },
+    "lorebook": {
+        "delete": {
+            "title": "Delete Lorebook",
+            "description": "Are you sure you want to delete '{{name}}'?\n\nThis cannot be undone."
+        },
+        "deleteEntry": {
+            "title": "Delete Entry",
+            "description": "Are you sure you want to delete the entry '{{name}}'?\n\nThis cannot be undone."
+        },
+        "fields": {
+            "entries": "Entries",
+            "keys": "Keys",
+            "caseSensitive": "Case Sensitive",
+            "selective": "Selective",
+            "constant": "Constant",
+            "priority": "Priority",
+            "secondaryKeys": "Secondary Keys",
+            "insertionOrder": "Insertion Order",
+            "tokenBudget": "Token Budget",
+            "recursiveScanning": "Recursive Scanning",
+            "scanDepth": "Scan Depth"
+        },
+        "labels": {
+            "info": "Lorebook Info",
+            "generationSettings": "Generation Settings"
+        }
     }
 }

@@ -9,6 +9,7 @@ interface AccordionProps extends ViewProps {
     label?: string
     labelStyle?: TextStyle
     accordionStyle?: ViewStyle
+    bodyStyle?: ViewStyle
 }
 
 const Accordion: React.FC<AccordionProps> = ({
@@ -16,6 +17,7 @@ const Accordion: React.FC<AccordionProps> = ({
     label = '',
     labelStyle = {},
     accordionStyle = {},
+    bodyStyle = {},
     children,
     ...rest
 }) => {
@@ -49,16 +51,19 @@ const Accordion: React.FC<AccordionProps> = ({
 
             {show && (
                 <View
-                    style={{
-                        backgroundColor: color.neutral._100,
-                        borderColor: color.neutral._300,
-                        borderWidth: 2,
-                        paddingHorizontal: spacing.l,
-                        paddingTop: spacing.l,
-                        paddingBottom: spacing.m,
-                        borderBottomLeftRadius: borderRadius.m,
-                        borderBottomRightRadius: borderRadius.m,
-                    }}>
+                    style={[
+                        {
+                            backgroundColor: color.neutral._100,
+                            borderColor: color.neutral._300,
+                            borderWidth: 2,
+                            paddingHorizontal: spacing.l,
+                            paddingTop: spacing.l,
+                            paddingBottom: spacing.m,
+                            borderBottomLeftRadius: borderRadius.m,
+                            borderBottomRightRadius: borderRadius.m,
+                        },
+                        bodyStyle,
+                    ]}>
                     {children}
                 </View>
             )}

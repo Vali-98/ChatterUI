@@ -1,8 +1,10 @@
 import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { Chats } from '@lib/state/Chat'
+import { Lorebooks } from '@lib/state/lorebooks'
 import { replaceMacros } from '@lib/state/Macros'
 
-import type { ContextBuilderParams, ContextMessage } from './API/ContextBuilder'
+import createLorebookDataSource from './lorebookSource'
+import type { ContextBuilderParams, ContextMessage } from '../API/ContextBuilder'
 
 export type DataSourceResult = {
     content: string
@@ -111,5 +113,20 @@ export const getDataSources = async (): Promise<DataSource[]> => {
     let dataSources = [createExampleDataSource()]
     const authorNotesSource = await createAuthorNotesDataSource()
     if (authorNotesSource) dataSources.push(authorNotesSource)
+
+    const lorebooks = await Lorebooks.db.query.activeLorebooks()
+
+    for (const lorebook of lorebooks) {
+        if (lorebook) {
+            const lorebookSource = await createLorebookDataSource(lorebook.id, {
+                scan_depth: lorebook.scan_depth ?? 10,
+                token_budget: lorebook.token_budget ?? 0,
+                recursive_scanning: lorebook.recursive_scanning ?? false,
+            })
+            if (lorebookSource) {
+                dataSources.push(lorebookSource)
+            }
+        }
+    }
     return dataSources
 }
