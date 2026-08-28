@@ -74,6 +74,7 @@ const LorebookManagerScreen = () => {
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <LongButton
+                        active={item.active ?? false}
                         style={{ flexDirection: 'row', columnGap: 12, alignItems: 'center' }}
                         onPress={() => {
                             setId(item.id)
@@ -88,7 +89,7 @@ const LorebookManagerScreen = () => {
                             }
                         />
 
-                        <TText style={{ flex: 1 }} size={16}>
+                        <TText color={item.active ? '100' : '400'} style={{ flex: 1 }} size={16}>
                             {item.name}
                         </TText>
 
