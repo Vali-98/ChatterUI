@@ -319,6 +319,8 @@
             "create": "Membuat",
             "delete": "Hapus",
             "disable": "Nonaktifkan",
+            "discard": "Buang",
+            "discardChanges": "Abaikan Perubahan",
             "edit": "Edit",
             "enable": "Aktifkan",
             "export": "Ekspor",
@@ -327,9 +329,16 @@
             "rename": "Ganti Nama",
             "reset": "Mengatur ulang",
             "save": "Simpan",
+            "search": "Cari",
             "select": "Memilih",
             "test": "Uji",
             "tryAgain": "Coba Lagi"
+        },
+        "alert": {
+            "unsaved": {
+                "description": "Anda memiliki perubahan yang belum disimpan, keluar akan mengabaikan semua perubahan.",
+                "title": "Perubahan Yang Belum Disimpan"
+            }
         },
         "brand": {
             "name": "ChatterUI"
@@ -349,6 +358,8 @@
             "schemaValidationFailed": "Validasi skema gagal!"
         },
         "labels": {
+            "comment": "Komentar",
+            "content": "Isi",
             "cpu": "CPU",
             "description": "Deskripsi",
             "devMode": "MODE DEV",
@@ -356,6 +367,7 @@
             "internal": "Internal",
             "name": "Nama",
             "none": "Tidak Ada",
+            "preferences": "Preferensi",
             "result": "Hasil",
             "results": "Hasil",
             "selected": "Dipilih",
@@ -603,6 +615,44 @@
             "downloadok": "Log Berhasil Diunduh!"
         }
     },
+    "lorebook": {
+        "delete": {
+            "description": "Anda yakin ingin menghapus '{{name}}}'?\n\nIni tidak bisa dibatalkan.",
+            "title": "Hapus Lorebook"
+        },
+        "deleteEntry": {
+            "description": "Anda yakin ingin menghapus entri '{{name}}}'?\n\nIni tidak bisa dibatalkan.",
+            "title": "Hapus Entri"
+        },
+        "empty": "Tidak ada Lorebooks Ditambahkan",
+        "fields": {
+            "caseSensitive": "Sensitif Kasus",
+            "constant": "Konstan",
+            "entries": "Entri",
+            "insertionOrder": "Urutan Insersi",
+            "keys": "Kunci",
+            "priority": "Prioritas",
+            "recursiveScanning": "Pemindaian Rekursif",
+            "scanDepth": "Kedalaman Pemindaian",
+            "secondaryKeys": "Kunci Sekunder",
+            "selective": "Selektif",
+            "tokenBudget": "Anggaran Token"
+        },
+        "import": "Impor Buku Pengetahuan",
+        "labels": {
+            "generationSettings": "Pengaturan Generation",
+            "info": "Info Lorebook"
+        },
+        "preferences": {
+            "afterLast": "Setelah Terakhir",
+            "afterSystem": "Setelah Sistem",
+            "beforeLast": "Sebelum Terakhir",
+            "index": "Indeks",
+            "insertionDepth": "Kedalaman Penyisipan",
+            "insertionType": "Strategi Penyisipan"
+        },
+        "title": "Buku pengetahuan"
+    },
     "model": {
         "alert": {
             "deletekv": {
@@ -683,6 +733,7 @@
     "navigation": {
         "about": "Tentang",
         "api": "API",
+        "dataSources": "Sumber Data",
         "dev_colortest": "[DEV] TesWarna",
         "dev_components": "[DEV] Komponen",
         "dev_markdown": "[DEV] Markdown",

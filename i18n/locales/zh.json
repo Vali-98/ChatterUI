@@ -319,6 +319,8 @@
             "create": "创造",
             "delete": "删除",
             "disable": "禁用",
+            "discard": "丢弃",
+            "discardChanges": "丢弃更改",
             "edit": "编辑",
             "enable": "启用",
             "export": "导出",
@@ -327,9 +329,16 @@
             "rename": "重命名",
             "reset": "重置",
             "save": "保存",
+            "search": "搜索",
             "select": "选择",
             "test": "测试",
             "tryAgain": "再试一次"
+        },
+        "alert": {
+            "unsaved": {
+                "description": "您有未保存的更改, 退出会丢弃所有更改 。",
+                "title": "未保存的更改"
+            }
         },
         "brand": {
             "name": "ChatterUI"
@@ -349,6 +358,8 @@
             "schemaValidationFailed": "模式验证失败！"
         },
         "labels": {
+            "comment": "注释",
+            "content": "内容",
             "cpu": "CPU",
             "description": "描述",
             "devMode": "开发模式",
@@ -356,6 +367,7 @@
             "internal": "内部",
             "name": "名称",
             "none": "无",
+            "preferences": "首选项",
             "result": "结果",
             "results": "结果",
             "selected": "已选",
@@ -603,6 +615,44 @@
             "downloadok": "日志已下载！"
         }
     },
+    "lorebook": {
+        "delete": {
+            "description": "您确定要删除“%%%%% ” 吗 ?\n\n这一点是无法消除的。",
+            "title": "删除乐谱"
+        },
+        "deleteEntry": {
+            "description": "您确定要删除“% 1 ” 条目吗 ?\n\n这一点是无法消除的。",
+            "title": "删除条目"
+        },
+        "empty": "无 Lorebook 添加",
+        "fields": {
+            "caseSensitive": "区分大小写",
+            "constant": "常数",
+            "entries": "条目",
+            "insertionOrder": "插入顺序",
+            "keys": "键",
+            "priority": "优先权",
+            "recursiveScanning": "递归扫描",
+            "scanDepth": "扫描深度",
+            "secondaryKeys": "次要密钥",
+            "selective": "选择",
+            "tokenBudget": "调用预算"
+        },
+        "import": "导入 Lorebook",
+        "labels": {
+            "generationSettings": "生成设置",
+            "info": "Lorebook 信息库"
+        },
+        "preferences": {
+            "afterLast": "倒数",
+            "afterSystem": "系统后",
+            "beforeLast": "上一页之前",
+            "index": "指数",
+            "insertionDepth": "插入深度",
+            "insertionType": "插入战略"
+        },
+        "title": "书店"
+    },
     "model": {
         "alert": {
             "deletekv": {
@@ -683,6 +733,7 @@
     "navigation": {
         "about": "关于",
         "api": "API",
+        "dataSources": "数据来源",
         "dev_colortest": "[DEV] 颜色测试",
         "dev_components": "[DEV] 组件",
         "dev_markdown": "[DEV] Markdown",

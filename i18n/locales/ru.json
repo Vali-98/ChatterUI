@@ -319,6 +319,8 @@
             "create": "Создавать",
             "delete": "Удалить",
             "disable": "Отключить",
+            "discard": "выбрасывать",
+            "discardChanges": "Откажитесь от изменений",
             "edit": "Редактировать",
             "enable": "Включить",
             "export": "Экспортировать",
@@ -327,9 +329,16 @@
             "rename": "Переименовать",
             "reset": "Перезагрузить",
             "save": "Сохранить",
+            "search": "Поиск",
             "select": "Выбирать",
             "test": "Тест",
             "tryAgain": "Попробовать снова"
+        },
+        "alert": {
+            "unsaved": {
+                "description": "У вас есть несохраненные изменения, выход будет отбрасывать все изменения.",
+                "title": "Неспасенные перемены"
+            }
         },
         "brand": {
             "name": "ChatterUI"
@@ -349,6 +358,8 @@
             "schemaValidationFailed": "Ошибка проверки схемы!"
         },
         "labels": {
+            "comment": "Комментарий",
+            "content": "Контент",
             "cpu": "ЦП",
             "description": "Описание",
             "devMode": "РЕЖИМ РАЗРАБОТКИ",
@@ -356,6 +367,7 @@
             "internal": "Внутренний",
             "name": "Имя",
             "none": "Нет",
+            "preferences": "Предпочтения",
             "result": "Результат",
             "results": "Результаты",
             "selected": "Выбрано",
@@ -603,6 +615,44 @@
             "downloadok": "Логи загружены!"
         }
     },
+    "lorebook": {
+        "delete": {
+            "description": "Вы уверены, что хотите удалить «{{name}}»?\n\nЭто нельзя отменить.",
+            "title": "Удалить Lorebook"
+        },
+        "deleteEntry": {
+            "description": "Вы уверены, что хотите удалить запись «{{name}}»?\n\nЭто нельзя отменить.",
+            "title": "Удалить вход"
+        },
+        "empty": "Никаких лотерейных книг",
+        "fields": {
+            "caseSensitive": "Случай чувствительный",
+            "constant": "постоянный",
+            "entries": "Входы",
+            "insertionOrder": "Порядок включения",
+            "keys": "Ключи",
+            "priority": "Приоритет",
+            "recursiveScanning": "Рекурсивное сканирование",
+            "scanDepth": "Глубина сканирования",
+            "secondaryKeys": "Вторичные ключи",
+            "selective": "избирательный",
+            "tokenBudget": "Токеновый бюджет"
+        },
+        "import": "Импортная книга",
+        "labels": {
+            "generationSettings": "Настройки поколений",
+            "info": "Lorebook Информация"
+        },
+        "preferences": {
+            "afterLast": "Последний",
+            "afterSystem": "После системы",
+            "beforeLast": "До последнего",
+            "index": "Индекс",
+            "insertionDepth": "Глубина включения",
+            "insertionType": "Стратегия включения"
+        },
+        "title": "учебники"
+    },
     "model": {
         "alert": {
             "deletekv": {
@@ -683,6 +733,7 @@
     "navigation": {
         "about": "О приложении",
         "api": "API",
+        "dataSources": "Источники данных",
         "dev_colortest": "[DEV] Тест цвета",
         "dev_components": "[DEV] Компоненты",
         "dev_markdown": "[DEV] Markdown",

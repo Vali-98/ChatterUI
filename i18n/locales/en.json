@@ -42,9 +42,9 @@
         "item": {
             "comments": "Comments",
             "content": "Note Content",
+            "depth": "Depth",
             "noContent": "No Content",
-            "priority": "Priority",
-            "depth": "Depth"
+            "priority": "Priority"
         },
         "selector": {
             "character": "Character",
@@ -64,22 +64,9 @@
                 "changeBackground": "Change Background",
                 "changeImage": "Change Image",
                 "export": "Export",
+                "manageLinks": "Manage Links",
                 "removeBackground": "Remove Background",
-                "viewImage": "View Image",
-                "manageLinks": "Manage Links"
-            },
-            "links": {
-                "missingUser": "No Linked User",
-                "missingInstruct": "No Linked Formatting",
-                "missingModel": "No Linked Model",
-                "missingConnection": "No Linked Connection",
-                "missingSampler": "No Linked Sampler",
-                "description": "Linked configurations will automatically load when this character is loaded",
-                "loadUser": "Loading user with id: {{value}}",
-                "loadInstruct": "Loading instruct with id: {{value}}",
-                "loadModel": "Loading model with id: {{value}}",
-                "loadConnection": "Loading connection with index: {{value}}",
-                "loadSampler": "Loading sampler with index: {{value}}"
+                "viewImage": "View Image"
             },
             "dialogs": {
                 "clone": {
@@ -130,6 +117,19 @@
                 "personality": "Personality",
                 "scenario": "Scenario",
                 "tags": "Tags"
+            },
+            "links": {
+                "description": "Linked configurations will automatically load when this character is loaded",
+                "loadConnection": "Loading connection with index: {{value}}",
+                "loadInstruct": "Loading instruct with id: {{value}}",
+                "loadModel": "Loading model with id: {{value}}",
+                "loadSampler": "Loading sampler with index: {{value}}",
+                "loadUser": "Loading user with id: {{value}}",
+                "missingConnection": "No Linked Connection",
+                "missingInstruct": "No Linked Formatting",
+                "missingModel": "No Linked Model",
+                "missingSampler": "No Linked Sampler",
+                "missingUser": "No Linked User"
             },
             "messages": {
                 "deleted": "Deleted character: {{name}}",
@@ -324,15 +324,21 @@
             "edit": "Edit",
             "enable": "Enable",
             "export": "Export",
+            "link": "Link",
             "more": "More",
             "rename": "Rename",
             "reset": "Reset",
             "save": "Save",
             "search": "Search",
-            "test": "Test",
-            "tryAgain": "Try Again",
             "select": "Select",
-            "link": "Link"
+            "test": "Test",
+            "tryAgain": "Try Again"
+        },
+        "alert": {
+            "unsaved": {
+                "description": "You have unsaved changes, exiting will discard all changes.",
+                "title": "Unsaved Changes"
+            }
         },
         "brand": {
             "name": "ChatterUI"
@@ -347,21 +353,21 @@
             "fileInvalid": "File Invalid",
             "filenameInvalidImportFailed": "Filename invalid, Import Failed",
             "invalidFileType": "Invalid File Type!",
+            "permissionRequired": "Permission Required",
             "rollingBackDueToError": "Rolling back due to error",
-            "schemaValidationFailed": "Schema validation failed!",
-            "permissionRequired": "Permission Required"
+            "schemaValidationFailed": "Schema validation failed!"
         },
         "labels": {
+            "comment": "Comment",
+            "content": "Content",
             "cpu": "CPU",
             "description": "Description",
             "devMode": "DEV MODE",
             "external": "External",
             "internal": "Internal",
-            "content": "Content",
-            "comment": "Comment",
-            "preferences": "Preferences",
             "name": "Name",
             "none": "None",
+            "preferences": "Preferences",
             "result": "Result",
             "results": "Results",
             "selected": "Selected",
@@ -376,12 +382,6 @@
         "navigation": {
             "about": "About",
             "settings": "Settings"
-        },
-        "alert": {
-            "unsaved": {
-                "title": "Unsaved Changes",
-                "description": "You have unsaved changes, exiting will discard all changes."
-            }
         }
     },
     "connections": {
@@ -412,6 +412,7 @@
         "editor": {
             "apiKey": "API Key",
             "completionUrl": "Completion URL",
+            "customFields": "Custom Fields",
             "firstMessage": "First Message",
             "firstMessageHint": "Default first message sent to Claude",
             "friendlyName": "Friendly Name",
@@ -423,7 +424,6 @@
             "prefillHint": "Prefill before model response",
             "saveButton": "Save Changes",
             "selectModel": "Select Model",
-            "customFields": "Custom Fields",
             "title": "Edit Connection"
         },
         "failedToConnect": "Failed To Connect",
@@ -440,6 +440,11 @@
             "header": "Connections"
         },
         "notConnected": "Not Connected",
+        "options": {
+            "disableCustomFields": "Disable Custom Fields",
+            "enableCustomFields": "Enable Custom Fields",
+            "manageTemplates": "Manage Templates"
+        },
         "templates": {
             "delete": {
                 "confirm": "Delete Template",
@@ -455,11 +460,6 @@
             "paste": "Paste Template",
             "pasteSheetTitle": "Paste Template Here",
             "title": "Template Manager"
-        },
-        "options": {
-            "manageTemplates": "Manage Templates",
-            "enableCustomFields": "Enable Custom Fields",
-            "disableCustomFields": "Disable Custom Fields"
         }
     },
     "contextlimit": {
@@ -615,6 +615,44 @@
             "downloadok": "Logs Downloaded!"
         }
     },
+    "lorebook": {
+        "delete": {
+            "description": "Are you sure you want to delete '{{name}}'?\n\nThis cannot be undone.",
+            "title": "Delete Lorebook"
+        },
+        "deleteEntry": {
+            "description": "Are you sure you want to delete the entry '{{name}}'?\n\nThis cannot be undone.",
+            "title": "Delete Entry"
+        },
+        "empty": "No Lorebooks Added",
+        "fields": {
+            "caseSensitive": "Case Sensitive",
+            "constant": "Constant",
+            "entries": "Entries",
+            "insertionOrder": "Insertion Order",
+            "keys": "Keys",
+            "priority": "Priority",
+            "recursiveScanning": "Recursive Scanning",
+            "scanDepth": "Scan Depth",
+            "secondaryKeys": "Secondary Keys",
+            "selective": "Selective",
+            "tokenBudget": "Token Budget"
+        },
+        "import": "Import Lorebook",
+        "labels": {
+            "generationSettings": "Generation Settings",
+            "info": "Lorebook Info"
+        },
+        "preferences": {
+            "afterLast": "After Last",
+            "afterSystem": "After System",
+            "beforeLast": "Before Last",
+            "index": "Index",
+            "insertionDepth": "Insertion Depth",
+            "insertionType": "Insertion Strategy"
+        },
+        "title": "Lorebooks"
+    },
     "model": {
         "alert": {
             "deletekv": {
@@ -647,16 +685,16 @@
             "noparamsize": "No Param Size",
             "rename": "Rename Model"
         },
+        "linkmmproj": "Link MMPROJ",
+        "magic": "Header: {{magic}}, Hex: {{hex}}",
         "maxcontext": "Max Context",
+        "mmproj": "mmproj",
         "modelnamechat": "Show Model Name In Chat",
         "mtmd": "Multimodal Adapters",
         "purgekv": "Purge KV Cache ({{size}})",
         "savekv": "Save Local KV",
         "savekvdesc": "Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV cache file may be very big and negatively impact battery life!",
         "selectmmproj": "Select MMPROJ Model",
-        "linkmmproj": "Link MMPROJ",
-        "unlinkmmproj": "Unlink MMPROJ",
-        "mmproj": "mmproj",
         "settings": {
             "advanced": "Advanced Settings",
             "cpu": "CPU Settings",
@@ -664,18 +702,17 @@
         },
         "threads": "Threads",
         "title": "Models",
-        "magic": "Header: {{magic}}, Hex: {{hex}}",
         "toast": {
             "autoLoadingMMPROJ": "Auto-loading MMPROJ: {{name}}",
             "autoLoadingModel": "Auto-loading Model: {{name}}",
             "couldNotLoadModel": "Could Not Load Model",
             "deletekv": "KV Cache deleted!",
             "failedToGenerateLocally": "Failed to generate locally",
+            "failedtolink": "Failed to link model",
+            "failedtoload": "Failed to load model",
             "failedToLoadMMPROJ": "Failed to load MMPROJ",
             "failedToRunLocalInference": "Failed to run local inference",
             "failedToUnloadMMPROJ": "Failed to unload MMPROJ",
-            "failedtolink": "Failed to link model",
-            "failedtoload": "Failed to load model",
             "mediaAddedWithoutMMPROJModel": "Media was added without MMPROJ model",
             "mediaAddedWithoutMultimodalSupport": "Media was added without multimodal support.",
             "modelAlreadyLoaded": "Model Already Loaded!",
@@ -685,7 +722,8 @@
             "noAutoLoadModelSet": "No Auto-Load Model Set",
             "noModelLoaded": "No Model Loaded",
             "quantizationNoLongerSupported": "Quantization No Longer Supported!"
-        }
+        },
+        "unlinkmmproj": "Unlink MMPROJ"
     },
     "multiDropdown": {
         "counter_one": "Selected {{count}} item",
@@ -695,11 +733,11 @@
     "navigation": {
         "about": "About",
         "api": "API",
+        "dataSources": "Data Sources",
         "dev_colortest": "[DEV] ColorTest",
         "dev_components": "[DEV] Components",
         "dev_markdown": "[DEV] Markdown",
         "formatting": "Formatting",
-        "dataSources": "Data Sources",
         "logs": "Logs",
         "models": "Models",
         "sampler": "Sampler",
@@ -932,43 +970,5 @@
         },
         "nameplaceholder": "Empty names are discouraged",
         "profilecount": "User Profiles"
-    },
-    "lorebook": {
-        "title": "Lorebooks",
-        "import": "Import Lorebook",
-        "empty": "No Lorebooks Added",
-        "delete": {
-            "title": "Delete Lorebook",
-            "description": "Are you sure you want to delete '{{name}}'?\n\nThis cannot be undone."
-        },
-        "deleteEntry": {
-            "title": "Delete Entry",
-            "description": "Are you sure you want to delete the entry '{{name}}'?\n\nThis cannot be undone."
-        },
-        "fields": {
-            "entries": "Entries",
-            "keys": "Keys",
-            "caseSensitive": "Case Sensitive",
-            "selective": "Selective",
-            "constant": "Constant",
-            "priority": "Priority",
-            "secondaryKeys": "Secondary Keys",
-            "insertionOrder": "Insertion Order",
-            "tokenBudget": "Token Budget",
-            "recursiveScanning": "Recursive Scanning",
-            "scanDepth": "Scan Depth"
-        },
-        "labels": {
-            "info": "Lorebook Info",
-            "generationSettings": "Generation Settings"
-        },
-        "preferences": {
-            "insertionDepth": "Insertion Depth",
-            "insertionType": "Insertion Strategy",
-            "afterLast": "After Last",
-            "beforeLast": "Before Last",
-            "index": "Index",
-            "afterSystem": "After System"
-        }
     }
 }
