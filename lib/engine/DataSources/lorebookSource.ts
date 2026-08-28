@@ -1,46 +1,74 @@
-import { LorebookEntryType } from '@db/schema'
+import { addDatabaseChangeListener } from 'expo-sqlite'
+import { create } from 'zustand'
+
+import { LorebookEntryType, LorebookType } from '@db/schema'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Lorebooks } from '@lib/state/lorebooks'
+import { useLorebookPreferenceStore } from '@lib/state/lorebooks/state'
 import { replaceMacros } from '@lib/state/Macros'
 
-import type { ContextBuilderParams, ContextMessage } from '../API/ContextBuilder'
+import { DataSource, DataSourceResult } from './types'
+import type { ContextMessage } from '../API/ContextBuilder'
 
-export type DataSourceResult = {
-    content: string
-    source: string
-    tokenLength: number
-    position:
-        | {
-              type: 'relative'
-              location: 'afterLast' | 'beforeLast' | 'afterSystem'
-          }
-        | {
-              type: 'index'
-              location: number
-          }
+type LorebookEntryRegexCache = {
+    cache: Record<number, RegExp>
+    get: (entry: LorebookEntryType, type: 'primary' | 'secondary') => RegExp
+    remove: (id: number) => void
 }
 
-export type DataSource = {
-    retrieve: (
-        params: ContextBuilderParams,
-        messages: ContextMessage[],
-        maxLength: number,
-        currentLength: number,
-        tokenBudget: number,
-        lastMessageReached: boolean
-    ) => Promise<DataSourceResult[]>
-    tokenBudget: number
-    priority: number
-    name: string
+const lorebookEntryRegexCache = create<LorebookEntryRegexCache>()((set, get) => ({
+    cache: {},
+    get: (entry, type) => {
+        const cacheId = entry.id * 2 + (type === 'secondary' ? 1 : 0)
+        const cached = get().cache[cacheId]
+
+        if (cached) return cached
+
+        const regex = createKeyRegex(
+            type === 'primary' ? entry.keys : entry.secondary_keys,
+            entry.case_sensitive
+        )
+
+        set((state) => ({
+            cache: {
+                ...state.cache,
+                [cacheId]: regex,
+            },
+        }))
+
+        return regex
+    },
+
+    remove: (id) => {
+        const { [id * 2]: primary, [id * 2 + 1]: secondary, ...rest } = get().cache
+
+        if (primary || secondary) {
+            set({ cache: rest })
+        }
+    },
+}))
+
+const createKeyRegex = (keys: string[], caseSensitive: boolean): RegExp => {
+    const escapedKeys = keys
+        .filter(Boolean)
+        .map((key) => key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+
+    // Never-match regex if there are no valid keys.
+    if (escapedKeys.length === 0) {
+        return /(?!)/
+    }
+
+    const flags = caseSensitive ? 'u' : 'iu'
+
+    return new RegExp(`(?<![\\p{L}\\p{N}_])(?:${escapedKeys.join('|')})(?![\\p{L}\\p{N}_])`, flags)
 }
+
+addDatabaseChangeListener((event) => {
+    if (event.databaseName !== 'db.db' || event.tableName !== 'lorebook_entries') return
+    lorebookEntryRegexCache.getState().remove(event.rowId)
+})
 
 const LOREBOOK_NAME = 'lorebook'
-
-type LorebookConfig = {
-    scan_depth: number
-    token_budget: number
-    recursive_scanning: boolean
-}
 
 type MatchedEntry = {
     entry: NonNullable<LorebookEntryType>
@@ -49,41 +77,18 @@ type MatchedEntry = {
     discoveryOrder: number
 }
 
-/**
- * Lorebook matching is deliberately done in JS rather than SQLite.
- *
- * A typical lorebook is small enough that scanning:
- *
- *     500 entries × 3 keys
- *
- * is trivial compared to the rest of generation.
- */
-const containsKey = (text: string, key: string, caseSensitive: boolean): boolean => {
-    if (!key) return false
-
-    if (caseSensitive) {
-        return text.includes(key)
-    }
-
-    return text.toLocaleLowerCase().includes(key.toLocaleLowerCase())
-}
-
-const matchesAnyKey = (text: string, keys: string[], caseSensitive: boolean): boolean => {
-    return keys.some((key) => containsKey(text, key, caseSensitive))
-}
-
-const matchesEntry = (entry: NonNullable<LorebookEntryType>, text: string): boolean => {
+const matchesEntry = (entry: LorebookEntryType, text: string): boolean => {
     if (entry.constant) return true
 
-    const caseSensitive = entry.case_sensitive
+    const primaryRegex = lorebookEntryRegexCache.getState().get(entry, 'primary')
 
-    const primaryMatch = matchesAnyKey(text, entry.keys, caseSensitive)
-
-    if (!primaryMatch) return false
+    if (!primaryRegex.test(text)) return false
 
     if (!entry.selective) return true
 
-    return matchesAnyKey(text, entry.secondary_keys, caseSensitive)
+    const secondaryRegex = lorebookEntryRegexCache.getState().get(entry, 'secondary')
+
+    return secondaryRegex.test(text)
 }
 
 /**
@@ -93,7 +98,7 @@ const matchesEntry = (entry: NonNullable<LorebookEntryType>, text: string): bool
  * participating in matching.
  */
 const getScanText = (messages: ContextMessage[], scanDepth: number): string => {
-    if (scanDepth <= 0) return ''
+    if (scanDepth <= 0) return messages.map((item) => item.content).join('\n')
 
     return messages
         .slice(-scanDepth)
@@ -124,10 +129,9 @@ const sortEntries = (entries: MatchedEntry[]) => {
 }
 
 const createLorebookDataSource = async (
-    lorebookId: number,
-    config: LorebookConfig
+    lorebook: LorebookType
 ): Promise<DataSource | undefined> => {
-    const entries = await Lorebooks.db.query.lorebookEntryList(lorebookId)
+    const entries = await Lorebooks.db.query.lorebookEntryList(lorebook.id)
 
     const enabledEntries = entries.filter((entry) => entry.enable)
 
@@ -181,7 +185,7 @@ const createLorebookDataSource = async (
         ) => {
             if (!lastMessageReached) return []
 
-            const configuredBudget = config.token_budget
+            const configuredBudget = lorebook.token_budget ?? 0
 
             if (configuredBudget <= 0) return []
 
@@ -192,7 +196,7 @@ const createLorebookDataSource = async (
             /*
              * Initial scan.
              */
-            const initialText = getScanText(messages, config.scan_depth)
+            const initialText = getScanText(messages, lorebook.scan_depth ?? 1)
 
             if (!initialText && !enabledEntries.some((entry) => entry.constant)) {
                 return []
@@ -243,7 +247,7 @@ const createLorebookDataSource = async (
              *
              * are harmless.
              */
-            if (config.recursive_scanning) {
+            if (lorebook.recursive_scanning) {
                 let scanIndex = 0
 
                 while (scanIndex < matchedEntries.length) {
@@ -294,14 +298,23 @@ const createLorebookDataSource = async (
                 return a.discoveryOrder - b.discoveryOrder
             })
 
+            const { insertionLocation, insertionDepth } = useLorebookPreferenceStore.getState()
+            const position: DataSourceResult['position'] =
+                insertionLocation === 'index'
+                    ? {
+                          type: 'index',
+                          location: insertionDepth,
+                      }
+                    : {
+                          type: 'relative',
+                          location: insertionLocation,
+                      }
+
             return selected.map((matched) => ({
                 content: `**${matched.entry.name}**: ` + matched.content,
-                source: `${LOREBOOK_NAME}:${lorebookId}:${matched.entry.id}`,
+                source: `${LOREBOOK_NAME}:${lorebook.id}:${matched.entry.id}`,
                 tokenLength: matched.tokenLength,
-                position: {
-                    type: 'relative',
-                    location: 'afterSystem',
-                },
+                position: position,
             }))
         },
     }

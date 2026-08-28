@@ -15,4 +15,5 @@ export enum Storage {
     CharacterSearch = 'storage-character-search',
     ChatStyle = 'storage-chat-text-styling',
     Language = 'storage-language',
+    LorebookPreferences = 'storage-lorebook-preference',
 }

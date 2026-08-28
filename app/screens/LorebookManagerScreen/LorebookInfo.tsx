@@ -111,15 +111,13 @@ const LorebookInfoScreen = () => {
                         value={placeholderInfo?.recursive_scanning ?? false}
                         onChangeValue={(recursive_scanning) => handleUpdate({ recursive_scanning })}
                     />
-                    {placeholderInfo?.recursive_scanning && (
-                        <ThemedSlider
-                            label={t('lorebook.fields.scanDepth')}
-                            value={placeholderInfo?.scan_depth ?? 0}
-                            min={1}
-                            max={10}
-                            onValueChange={(scan_depth) => handleUpdate({ scan_depth })}
-                        />
-                    )}
+                    <ThemedSlider
+                        label={t('lorebook.fields.scanDepth')}
+                        value={placeholderInfo?.scan_depth ?? 0}
+                        min={0}
+                        max={100}
+                        onValueChange={(scan_depth) => handleUpdate({ scan_depth })}
+                    />
                 </Accordion>
             </View>
             <SectionTitle style={{ marginHorizontal: 12, paddingTop: 16, paddingBottom: 8 }}>

@@ -359,6 +359,7 @@
             "internal": "Internal",
             "content": "Content",
             "comment": "Comment",
+            "preferences": "Preferences",
             "name": "Name",
             "none": "None",
             "result": "Result",
@@ -933,6 +934,9 @@
         "profilecount": "User Profiles"
     },
     "lorebook": {
+        "title": "Lorebooks",
+        "import": "Import Lorebook",
+        "empty": "No Lorebooks Added",
         "delete": {
             "title": "Delete Lorebook",
             "description": "Are you sure you want to delete '{{name}}'?\n\nThis cannot be undone."
@@ -957,6 +961,14 @@
         "labels": {
             "info": "Lorebook Info",
             "generationSettings": "Generation Settings"
+        },
+        "preferences": {
+            "insertionDepth": "Insertion Depth",
+            "insertionType": "Insertion Strategy",
+            "afterLast": "After Last",
+            "beforeLast": "Before Last",
+            "index": "Index",
+            "afterSystem": "After System"
         }
     }
 }
