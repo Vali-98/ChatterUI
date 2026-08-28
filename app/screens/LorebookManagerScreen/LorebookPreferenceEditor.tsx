@@ -12,8 +12,8 @@ const LorebookPreferenceEditor = () => {
 
     const selectorValues: { label: string; value: LorebookPreferenceStore['insertionLocation'] }[] =
         [
-            { label: t('lorebook.preferences.afterLast'), value: 'afterLast' },
             { label: t('lorebook.preferences.beforeLast'), value: 'beforeLast' },
+            { label: t('lorebook.preferences.afterLast'), value: 'afterLast' },
             { label: t('lorebook.preferences.afterSystem'), value: 'afterSystem' },
             { label: t('lorebook.preferences.index'), value: 'index' },
         ]
