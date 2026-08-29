@@ -22,9 +22,38 @@ export namespace db {
                 where: eq(lorebooks.active, true),
             })
         }
+        export const lorebookWithEntries = async (id: number) => {
+            return await database.query.lorebooks.findFirst({
+                where: eq(lorebooks.id, id),
+                with: {
+                    entries: true,
+                },
+            })
+        }
     }
 
     export namespace mutate {
+        export const createLorebook = async (name: string) => {
+            const [{ id }] = await database
+                .insert(lorebooks)
+                .values([{ name: name, description: '' }])
+                .returning({ id: lorebooks.id })
+            return id
+        }
+
+        export const createLorebookEntry = async (name: string, lorebookId: number) => {
+            const [{ id }] = await database
+                .insert(lorebookEntries)
+                .values([
+                    {
+                        name: name,
+                        lorebook_id: lorebookId,
+                    },
+                ])
+                .returning({ id: lorebookEntries.id })
+            return id
+        }
+
         export const importFromJSON = async (lorebook: LorebookImport) => {
             const { entries, ...lorebookRest } = lorebook
             const [{ lorebookId }] = await database

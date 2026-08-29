@@ -22,4 +22,20 @@ export namespace Lorebooks {
             Logger.errorToast('Failed to import Lorebook', e)
         }
     }
+
+    export const exportToJSON = async (id: number) => {
+        try {
+            const lorebook = await db.query.lorebookWithEntries(id)
+            if (!lorebook) return
+
+            await FileUtils.saveStringToDownload(
+                JSON.stringify(lorebook),
+                lorebook.name + '.json',
+                'utf8'
+            )
+            Logger.infoToast('Lorebook Exported')
+        } catch (e) {
+            Logger.errorToast('Failed to export Lorebook', e)
+        }
+    }
 }

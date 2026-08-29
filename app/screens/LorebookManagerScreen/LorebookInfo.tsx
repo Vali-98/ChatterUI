@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { create } from 'zustand'
 
 import LongButton from '@components/buttons/LongButton'
+import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
@@ -49,7 +50,6 @@ const LorebookInfoScreen = () => {
     const handleUpdateDebounce = useDebounce(
         async (lorebookInfo: LorebookType | Partial<LorebookType>) => {
             if (!id) return
-
             await Lorebooks.db.mutate.updateLorebookInfo(id, lorebookInfo)
         },
         300
@@ -123,12 +123,35 @@ const LorebookInfoScreen = () => {
             <SectionTitle style={{ marginHorizontal: 12, paddingTop: 16, paddingBottom: 8 }}>
                 {t('lorebook.fields.entries')}
             </SectionTitle>
-            <ThemedTextInput
-                containerStyle={{ flex: 0, paddingHorizontal: 12 }}
-                placeholder={t('common.actions.search')}
-                value={search}
-                onChangeText={setSearch}
-            />
+            <View
+                style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingHorizontal: 12,
+                    columnGap: 8,
+                }}>
+                <ThemedTextInput
+                    containerStyle={{}}
+                    placeholder={t('common.actions.search')}
+                    value={search}
+                    onChangeText={setSearch}
+                />
+
+                <ThemedButton
+                    variant="secondary"
+                    buttonStyle={{ flex: 0, paddingHorizontal: 8 }}
+                    iconName="plus"
+                    onPress={async () => {
+                        if (!id) return
+                        const entryId = await Lorebooks.db.mutate.createLorebookEntry(
+                            t('lorebook.new.entry'),
+                            id
+                        )
+                        openEditor(entryId)
+                    }}
+                />
+            </View>
+
             <FlatList
                 style={{ paddingHorizontal: 12 }}
                 data={entries}

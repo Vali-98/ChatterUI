@@ -299,8 +299,14 @@ export const lorebookEntries = sqliteTable('lorebook_entries', {
     lorebook_id: integer('lorebook_id', { mode: 'number' })
         .notNull()
         .references(() => lorebooks.id, { onDelete: 'cascade' }),
-    keys: text('keys', { mode: 'json' }).notNull().$type<string[]>().notNull(),
-    content: text('content').notNull(),
+    keys: text('keys', { mode: 'json' })
+        .notNull()
+        .$type<string[]>()
+        .notNull()
+        .$defaultFn(() => []),
+    content: text('content')
+        .notNull()
+        .$defaultFn(() => ''),
     enable: integer('enable', { mode: 'boolean' }).default(true).notNull(),
     insertion_order: integer('insertion_order').default(100).notNull(),
     case_sensitive: integer('case_sensitive', { mode: 'boolean' }).default(true).notNull(),
@@ -310,7 +316,10 @@ export const lorebookEntries = sqliteTable('lorebook_entries', {
     selective: integer('selective', { mode: 'boolean' }).default(false).notNull(),
     constant: integer('constant', { mode: 'boolean' }).default(false).notNull(),
     comment: text('comment').default('').notNull(),
-    secondary_keys: text('secondary_keys', { mode: 'json' }).notNull().$type<string[]>(),
+    secondary_keys: text('secondary_keys', { mode: 'json' })
+        .notNull()
+        .$type<string[]>()
+        .$defaultFn(() => []),
 })
 
 export const characterLorebooks = sqliteTable(

@@ -11,9 +11,11 @@ import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
 import TText from '@components/text/TText'
 import Alert from '@components/views/Alert'
+import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
+import InputSheet from '@components/views/InputSheet'
 import { Lorebooks } from '@lib/state/lorebooks'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -25,6 +27,7 @@ const LorebookManagerScreen = () => {
     const { color } = Theme.useTheme()
     const { setId } = useLorebookInfoState()
     const { t } = useTranslation()
+    const createLorebookInputRef = useBottomSheetRef()
     const router = useRouter()
 
     const handleDeleteLorebook = (id: number, name: string) => {
@@ -62,15 +65,34 @@ const LorebookManagerScreen = () => {
                                     close()
                                 },
                             },
+                            {
+                                label: t('common.actions.create'),
+                                icon: 'edit',
+                                onPress: (close) => {
+                                    createLorebookInputRef.current?.open()
+                                    close()
+                                },
+                            },
                         ]}
                     />
                 )}
             />
             <LorebookPreferenceEditor />
             <SectionTitle>{t('lorebook.title')}</SectionTitle>
+
+            <InputSheet
+                title={t('lorebook.new.title')}
+                placeholder={t('lorebook.new.placeholder')}
+                ref={createLorebookInputRef}
+                onConfirm={(name) => {
+                    if (name === '') name = t('lorebook.new.placeholder')
+                    Lorebooks.db.mutate.createLorebook(name)
+                }}
+            />
             <FlatList
                 style={{ marginTop: 8 }}
                 data={lorebooks}
+                contentContainerStyle={{ rowGap: 12 }}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <LongButton
@@ -102,6 +124,14 @@ const LorebookManagerScreen = () => {
                                     icon: 'delete',
                                     onPress: (close) => {
                                         handleDeleteLorebook(item.id, item.name)
+                                        close()
+                                    },
+                                },
+                                {
+                                    label: t('common.actions.export'),
+                                    icon: 'export',
+                                    onPress: (close) => {
+                                        Lorebooks.exportToJSON(item.id)
                                         close()
                                     },
                                 },

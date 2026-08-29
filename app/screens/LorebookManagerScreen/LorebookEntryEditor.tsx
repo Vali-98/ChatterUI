@@ -122,14 +122,11 @@ const LorebookEntryEditor = () => {
         [entry, placeholderEntry, edited, t]
     )
 
-    if (entry === undefined || placeholderEntry === undefined || !entryId) {
-        return
-    }
-
     const updateEntry = <K extends keyof LorebookEntryType>(
         key: K,
         value: LorebookEntryType[K]
     ) => {
+        if (!placeholderEntry) return
         handleSetPlaceholder({
             ...placeholderEntry,
             [key]: value,
@@ -137,149 +134,155 @@ const LorebookEntryEditor = () => {
     }
 
     const save = async () => {
+        if (!entry || !placeholderEntry) return
         await Lorebooks.db.mutate.updateLorebookEntry(entry.id, placeholderEntry)
-
         close()
     }
 
     return (
         <BottomSheet onRequestClose={backAction} sheetStyle={{ flex: 1 }} ref={ref}>
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{
-                    rowGap: spacing.xl,
-                    paddingBottom: spacing.xl2,
-                }}>
-                <ThemedTextInput
-                    label={t('common.labels.name')}
-                    containerStyle={{ flex: 0 }}
-                    value={placeholderEntry.name}
-                    onChangeText={(value) => updateEntry('name', value)}
-                />
+            {entry && placeholderEntry && entryId && (
+                <>
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{
+                            rowGap: spacing.xl,
+                            paddingBottom: spacing.xl2,
+                        }}>
+                        <ThemedTextInput
+                            label={t('common.labels.name')}
+                            containerStyle={{ flex: 0 }}
+                            value={placeholderEntry.name}
+                            onChangeText={(value) => updateEntry('name', value)}
+                        />
 
-                <StringArrayEditor
-                    label={t('lorebook.fields.keys')}
-                    value={placeholderEntry.keys}
-                    setValue={(value) => updateEntry('keys', value)}
-                />
+                        <StringArrayEditor
+                            label={t('lorebook.fields.keys')}
+                            value={placeholderEntry.keys}
+                            setValue={(value) => updateEntry('keys', value)}
+                        />
 
-                <ThemedTextInput
-                    label={t('common.labels.content')}
-                    containerStyle={{ flex: 0 }}
-                    numberOfLines={10}
-                    value={placeholderEntry.content}
-                    onChangeText={(value) => updateEntry('content', value)}
-                />
+                        <ThemedTextInput
+                            label={t('common.labels.content')}
+                            containerStyle={{ flex: 0 }}
+                            numberOfLines={10}
+                            value={placeholderEntry.content}
+                            onChangeText={(value) => updateEntry('content', value)}
+                        />
 
-                <ThemedTextInput
-                    label={t('common.labels.comment')}
-                    containerStyle={{ flex: 0 }}
-                    numberOfLines={3}
-                    value={placeholderEntry.comment}
-                    onChangeText={(value) => updateEntry('comment', value)}
-                />
+                        <ThemedTextInput
+                            label={t('common.labels.comment')}
+                            containerStyle={{ flex: 0 }}
+                            numberOfLines={3}
+                            value={placeholderEntry.comment}
+                            onChangeText={(value) => updateEntry('comment', value)}
+                        />
 
-                <ThemedSwitch
-                    label={t('common.actions.enable')}
-                    value={placeholderEntry.enable}
-                    onChangeValue={(value) => updateEntry('enable', value)}
-                />
+                        <ThemedSwitch
+                            label={t('common.actions.enable')}
+                            value={placeholderEntry.enable}
+                            onChangeValue={(value) => updateEntry('enable', value)}
+                        />
 
-                <ThemedSwitch
-                    label={t('lorebook.fields.caseSensitive')}
-                    value={placeholderEntry.case_sensitive}
-                    onChangeValue={(value) => updateEntry('case_sensitive', value)}
-                />
+                        <ThemedSwitch
+                            label={t('lorebook.fields.caseSensitive')}
+                            value={placeholderEntry.case_sensitive}
+                            onChangeValue={(value) => updateEntry('case_sensitive', value)}
+                        />
 
-                <ThemedSwitch
-                    label={t('lorebook.fields.selective')}
-                    value={placeholderEntry.selective}
-                    onChangeValue={(value) => updateEntry('selective', value)}
-                />
+                        <ThemedSwitch
+                            label={t('lorebook.fields.selective')}
+                            value={placeholderEntry.selective}
+                            onChangeValue={(value) => updateEntry('selective', value)}
+                        />
 
-                {placeholderEntry.selective && (
-                    <StringArrayEditor
-                        label={t('lorebook.fields.secondaryKeys')}
-                        value={placeholderEntry.secondary_keys}
-                        setValue={(value) => updateEntry('secondary_keys', value)}
-                    />
-                )}
+                        {placeholderEntry.selective && (
+                            <StringArrayEditor
+                                label={t('lorebook.fields.secondaryKeys')}
+                                value={placeholderEntry.secondary_keys}
+                                setValue={(value) => updateEntry('secondary_keys', value)}
+                            />
+                        )}
 
-                <ThemedSwitch
-                    label={t('lorebook.fields.constant')}
-                    value={placeholderEntry.constant}
-                    onChangeValue={(value) => updateEntry('constant', value)}
-                />
+                        <ThemedSwitch
+                            label={t('lorebook.fields.constant')}
+                            value={placeholderEntry.constant}
+                            onChangeValue={(value) => updateEntry('constant', value)}
+                        />
 
-                <ThemedSlider
-                    label={t('lorebook.fields.insertionOrder')}
-                    min={0}
-                    max={1000}
-                    step={1}
-                    value={placeholderEntry.insertion_order}
-                    onValueChange={(value) => updateEntry('insertion_order', value)}
-                />
+                        <ThemedSlider
+                            label={t('lorebook.fields.insertionOrder')}
+                            min={0}
+                            max={1000}
+                            step={1}
+                            value={placeholderEntry.insertion_order}
+                            onValueChange={(value) => updateEntry('insertion_order', value)}
+                        />
 
-                <ThemedSlider
-                    label={t('lorebook.fields.priority')}
-                    min={0}
-                    max={1000}
-                    step={1}
-                    value={placeholderEntry.priority}
-                    onValueChange={(value) => updateEntry('priority', value)}
-                />
-            </ScrollView>
+                        <ThemedSlider
+                            label={t('lorebook.fields.priority')}
+                            min={0}
+                            max={1000}
+                            step={1}
+                            value={placeholderEntry.priority}
+                            onValueChange={(value) => updateEntry('priority', value)}
+                        />
+                    </ScrollView>
 
-            <View
-                style={{
-                    flexDirection: 'row',
-                    columnGap: spacing.l,
-                    justifyContent: 'space-between',
-                    marginTop: 8,
-                }}>
-                <ThemedButton
-                    label={t('common.actions.delete')}
-                    variant="critical"
-                    iconName="delete"
-                    onPress={() => {
-                        Alert.alert({
-                            title: t('lorebook.deleteEntry.title'),
-                            description: t('lorebook.deleteEntry.description', {
-                                name: entry.name,
-                            }),
-                            buttons: [
-                                {
-                                    label: t('common.actions.cancel'),
-                                },
-                                {
-                                    label: t('common.actions.delete'),
-                                    onPress: async () => {
-                                        await Lorebooks.db.mutate.deleteLorebookEntry(entry.id)
-                                        close()
-                                    },
-                                    type: 'warning',
-                                },
-                            ],
-                        })
-                    }}
-                />
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            columnGap: spacing.l,
+                            justifyContent: 'space-between',
+                            marginTop: 8,
+                        }}>
+                        <ThemedButton
+                            label={t('common.actions.delete')}
+                            variant="critical"
+                            iconName="delete"
+                            onPress={() => {
+                                Alert.alert({
+                                    title: t('lorebook.deleteEntry.title'),
+                                    description: t('lorebook.deleteEntry.description', {
+                                        name: entry.name,
+                                    }),
+                                    buttons: [
+                                        {
+                                            label: t('common.actions.cancel'),
+                                        },
+                                        {
+                                            label: t('common.actions.delete'),
+                                            onPress: async () => {
+                                                await Lorebooks.db.mutate.deleteLorebookEntry(
+                                                    entry.id
+                                                )
+                                                close()
+                                            },
+                                            type: 'warning',
+                                        },
+                                    ],
+                                })
+                            }}
+                        />
 
-                <ThemedButton
-                    label={t('common.actions.reset')}
-                    variant="tertiary"
-                    iconName="reload"
-                    onPress={() => {
-                        handleSetPlaceholder(entry, false)
-                    }}
-                />
+                        <ThemedButton
+                            label={t('common.actions.reset')}
+                            variant="tertiary"
+                            iconName="reload"
+                            onPress={() => {
+                                handleSetPlaceholder(entry, false)
+                            }}
+                        />
 
-                <ThemedButton
-                    label={t('common.actions.save')}
-                    variant="secondary"
-                    iconName="save"
-                    onPress={save}
-                />
-            </View>
+                        <ThemedButton
+                            label={t('common.actions.save')}
+                            variant="secondary"
+                            iconName="save"
+                            onPress={save}
+                        />
+                    </View>
+                </>
+            )}
         </BottomSheet>
     )
 }

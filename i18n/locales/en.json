@@ -651,7 +651,12 @@
             "insertionDepth": "Insertion Depth",
             "insertionType": "Insertion Strategy"
         },
-        "title": "Lorebooks"
+        "title": "Lorebooks",
+        "new": {
+            "title": "Enter Name",
+            "placeholder": "New Lorebook",
+            "entry": "New Entry"
+        }
     },
     "model": {
         "alert": {
