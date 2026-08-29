@@ -643,6 +643,11 @@
             "generationSettings": "Настройки поколений",
             "info": "Lorebook Информация"
         },
+        "new": {
+            "entry": "Новый вход",
+            "placeholder": "Новая книга",
+            "title": "Введите имя"
+        },
         "preferences": {
             "afterLast": "Последний",
             "afterSystem": "После системы",

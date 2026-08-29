@@ -643,6 +643,11 @@
             "generationSettings": "Pengaturan Generation",
             "info": "Info Lorebook"
         },
+        "new": {
+            "entry": "Entri Baru",
+            "placeholder": "Lorebook Baru",
+            "title": "Masukkan Nama"
+        },
         "preferences": {
             "afterLast": "Setelah Terakhir",
             "afterSystem": "Setelah Sistem",

@@ -643,6 +643,11 @@
             "generationSettings": "生成设置",
             "info": "Lorebook 信息库"
         },
+        "new": {
+            "entry": "新条目",
+            "placeholder": "新乐谱",
+            "title": "输入名称"
+        },
         "preferences": {
             "afterLast": "倒数",
             "afterSystem": "系统后",
