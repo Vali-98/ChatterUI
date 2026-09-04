@@ -35,7 +35,7 @@ const AuthorNoteBody = () => {
                     break
             }
         } catch (e) {
-            Logger.errorToast(t('authorNotes.errors.create'), JSON.stringify(e))
+            Logger.errorToast(t('authorNotes.errors.create'), e)
         }
     }
 

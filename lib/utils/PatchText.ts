@@ -65,6 +65,7 @@ export const patchAndroidText = () => {
         patchText()
         patchRender()
     } catch (e) {
-        Logger.error('Failed to patch text: ' + JSON.stringify(e))
+        Logger.error('Failed to patch text')
+        Logger.error(e)
     }
 }

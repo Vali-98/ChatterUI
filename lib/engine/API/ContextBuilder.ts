@@ -13,7 +13,7 @@ import { readBase64Async } from '@lib/utils/File'
 import { Macro } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
-import type { DataSource, DataSourceResult } from '../DataSources'
+import type { DataSource, DataSourceResult } from '../DataSources/types'
 
 export type MessageLoader = {
     retrieve: (page: number) => Promise<ChatEntry[]> // must retrieve messages in chronological order from oldest to newest

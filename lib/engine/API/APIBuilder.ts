@@ -79,7 +79,7 @@ export const buildAndSendRequest = async (params: APIBuilderParams) => {
                 if (text) onData({ content: text, type: type })
                 return !!text?.trim()
             } catch (e) {
-                Logger.error(JSON.stringify(e))
+                Logger.error(e)
             }
             return false
         }
@@ -107,7 +107,7 @@ export const buildAndSendRequest = async (params: APIBuilderParams) => {
             stopGenerating: stopGenerating,
         })
     } catch (e) {
-        Logger.errorToast(t('generation.errors.completionFailed'), JSON.stringify(e))
+        Logger.errorToast(t('generation.errors.completionFailed'), e)
         stopGenerating()
     }
 }

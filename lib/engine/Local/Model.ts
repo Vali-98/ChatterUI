@@ -75,7 +75,7 @@ export namespace Model {
                     })
                     .catch((e) => {
                         Logger.warnToast(t('common.errors.failedToCopy'))
-                        Logger.warn(JSON.stringify(e))
+                        Logger.warn(e)
                         success = false
                     })
             } else {
@@ -277,7 +277,7 @@ export namespace Model {
             await db.update(model_data).set(modelDataEntry).where(eq(model_data.id, id))
             return true
         } catch (e) {
-            Logger.errorToast(t('common.errors.failedToCreateData'), JSON.stringify(e))
+            Logger.errorToast(t('common.errors.failedToCreateData'), e)
             if (deleteOnFailure) deleteFile(file_path)
             return false
         }

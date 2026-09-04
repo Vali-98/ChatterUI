@@ -34,7 +34,7 @@ const LogsScreen = () => {
                 Logger.infoToast(t('logs.toast.downloadok'))
             })
             .catch((e) => {
-                Logger.errorToast(t('logs.toast.downloaderror'), JSON.stringify(e))
+                Logger.errorToast(t('logs.toast.downloaderror'), e)
             })
     }
 

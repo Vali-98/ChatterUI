@@ -223,7 +223,7 @@ export namespace Llama {
                     closeFd(model_path)
                 }
 
-                Logger.errorToast(t('model.toast.failedToLoadMMPROJ'), JSON.stringify(e))
+                Logger.errorToast(t('model.toast.failedToLoadMMPROJ'), e)
             })
             if (await context.isMultimodalEnabled()) {
                 const capabilities = await context.getMultimodalSupport()
@@ -259,7 +259,7 @@ export namespace Llama {
             await get()
                 .context?.releaseMultimodal()
                 .catch((e) => {
-                    Logger.errorToast(t('model.toast.failedToUnloadMMPROJ'), JSON.stringify(e))
+                    Logger.errorToast(t('model.toast.failedToUnloadMMPROJ'), e)
                 })
             set({
                 mmproj: undefined,

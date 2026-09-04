@@ -201,10 +201,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                                             if (item.mmprojLink) await Model.removeMMPROJLink(item)
                                             await Model.createMMPROJLink(item, value)
                                         } catch (e) {
-                                            Logger.errorToast(
-                                                t('model.toast.failedtolink'),
-                                                JSON.stringify(e)
-                                            )
+                                            Logger.errorToast(t('model.toast.failedtolink'), e)
                                         }
                                     }}
                                     icon={'link'}

@@ -327,6 +327,6 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
         }
     } catch (e) {
         Logger.stackTrace(e)
-        Logger.errorToast(t('generation.errors.failedToOrchestrateRequestBuild'), JSON.stringify(e))
+        Logger.errorToast(t('generation.errors.failedToOrchestrateRequestBuild'), e)
     }
 }

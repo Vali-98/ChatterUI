@@ -1,6 +1,5 @@
 import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { Chats } from '@lib/state/Chat'
-import { Lorebooks } from '@lib/state/lorebooks'
 import { replaceMacros } from '@lib/state/Macros'
 
 import createLorebookDataSource from './lorebookSource'
@@ -85,15 +84,10 @@ export const getDataSources = async (): Promise<DataSource[]> => {
     const authorNotesSource = await createAuthorNotesDataSource()
     if (authorNotesSource) dataSources.push(authorNotesSource)
 
-    const lorebooks = await Lorebooks.db.query.activeLorebooks()
-
-    for (const lorebook of lorebooks) {
-        if (lorebook) {
-            const lorebookSource = await createLorebookDataSource(lorebook)
-            if (lorebookSource) {
-                dataSources.push(lorebookSource)
-            }
-        }
+    const lorebooks = await createLorebookDataSource()
+    if (lorebooks) {
+        dataSources.push(...lorebooks)
     }
+
     return dataSources
 }

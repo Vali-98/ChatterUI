@@ -115,7 +115,7 @@ const ChatInput = () => {
             if (swipeId) generateResponse(swipeId)
         } catch (e) {
             Logger.errorToast(t('chat.input.errors.failedToSend'))
-            Logger.error(JSON.stringify(e))
+            Logger.error(e)
         } finally {
             setDisableSend(false)
         }

@@ -292,7 +292,7 @@ export const localInference = async () => {
         }
         await runLocalCompletion(payload)
     } catch (e) {
-        Logger.errorToast(t('model.toast.failedToRunLocalInference'), JSON.stringify(e))
+        Logger.errorToast(t('model.toast.failedToRunLocalInference'), e)
         stopGenerating()
     }
 }
@@ -508,6 +508,6 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
             },
         }
     } catch (e) {
-        Logger.errorToast(t('generation.errors.failedToOrchestrateRequestBuild'), JSON.stringify(e))
+        Logger.errorToast(t('generation.errors.failedToOrchestrateRequestBuild'), e)
     }
 }

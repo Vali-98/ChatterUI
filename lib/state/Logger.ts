@@ -68,13 +68,22 @@ export namespace Logger {
         useLoggerStore.getState().addLog(data)
     }
 
-    const createLog = (data: string, level: LogLevel): LogEntry => {
+    const createLog = (data: unknown, level: LogLevel): LogEntry => {
         const timestamp = `[${new Date().toTimeString().substring(0, 8)}]`
-        return { timestamp: timestamp, message: data, level: level }
+        const message = parseLog(data)
+        return { timestamp: timestamp, message: message, level: level }
     }
 
     const printLog = (log: LogEntry) => {
         console.log(`${LevelName[log.level]}${log.timestamp}: ${log.message}`)
+    }
+
+    const parseLog = (data: unknown) => {
+        return typeof data === 'string'
+            ? data
+            : data instanceof Error
+              ? data.message
+              : 'INVALID LOG'
     }
 
     export const info = (data: string) => {
@@ -91,7 +100,7 @@ export namespace Logger {
         Toast.show(data, toastTime)
     }
 
-    export const warn = (data: string) => {
+    export const warn = (data: unknown) => {
         const logItem = createLog(data, LogLevel.WARN)
         printLog(logItem)
         insertLogs(logItem)
@@ -105,7 +114,7 @@ export namespace Logger {
         Toast.show(data, toastTime, { textColor: 'yellow' })
     }
 
-    export const error = (data: string) => {
+    export const error = (data: unknown) => {
         const logItem = createLog(data, LogLevel.ERROR)
         printLog(logItem)
         insertLogs(logItem)

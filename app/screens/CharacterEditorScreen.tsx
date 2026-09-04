@@ -113,13 +113,13 @@ const ChracterEditorScreen = () => {
             Characters.exportCharacter(charId)
                 .catch((e) => {
                     Logger.errorToast(t('character.editor.errors.exportFailed'))
-                    Logger.error(JSON.stringify(e))
+                    Logger.error(e)
                 })
                 .then(() => {
                     Logger.infoToast(t('character.editor.messages.exported'))
                 })
         } catch (e) {
-            Logger.errorToast(t('character.editor.errors.export', { error: JSON.stringify(e) }))
+            Logger.errorToast(t('character.editor.errors.export'), e)
         }
     }
 
