@@ -174,8 +174,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
 
             <View style={styles.buttonContainer}>
                 <ContextMenu
+                    disabled={disableEdit}
                     triggerIcon="edit"
-                    triggerStyle={{ color: color.text._400 }}
+                    triggerStyle={{ color: disableEdit ? color.text._700 : color.text._400 }}
                     triggerIconSize={22}
                     buttons={[
                         {
@@ -279,46 +280,6 @@ const ModelItem: React.FC<ModelItemProps> = ({
                     </TouchableOpacity>
                 )}
             </View>
-
-            {false && (
-                <View style={styles.buttonContainer}>
-                    {!isMMPROJ && mmprojList.length > 0 && (
-                        <TouchableOpacity
-                            onPress={async () => {
-                                if (item.mmprojLink) {
-                                    await Model.removeMMPROJLink(item)
-                                    const mmproj = mmprojList.filter(
-                                        (a) => a.id === item.mmprojLink?.mmproj_id
-                                    )?.[0]
-                                    if (mmproj) {
-                                        maybeClearLastLoaded(mmproj)
-                                    }
-                                    return
-                                }
-
-                                setShowMMPROJSelector(!showMMPROJSelector)
-                            }}>
-                            <AntDesign
-                                name={showMMPROJSelector && !item.mmprojLink ? 'close' : 'camera'}
-                                size={24}
-                                color={disableEdit ? color.text._600 : color.text._300}
-                            />
-                            {item.mmprojLink && (
-                                <AntDesign
-                                    name="close"
-                                    style={{
-                                        position: 'absolute',
-                                        bottom: 0,
-                                        transform: [{ translateX: 10 }],
-                                    }}
-                                    size={18}
-                                    color={disableEdit ? color.text._600 : color.text._300}
-                                />
-                            )}
-                        </TouchableOpacity>
-                    )}
-                </View>
-            )}
         </View>
     )
 }
@@ -373,7 +334,7 @@ const useStyles = () => {
         buttonContainer: {
             flexDirection: 'row',
             alignItems: 'center',
-            columnGap: spacing.xl,
+            columnGap: spacing.xl2,
         },
     })
 }
