@@ -6,13 +6,7 @@ type GridProps<T> = {
     rowGap?: number
     columnGap?: number
 }
-export function Grid<T>({
-    items,
-    numColumns,
-    renderItem,
-    columnGap = 0,
-    rowGap = 0,
-}: GridProps<T>) {
+const Grid = <T,>({ items, numColumns, renderItem, columnGap = 0, rowGap = 0 }: GridProps<T>) => {
     if (numColumns < 1) {
         return null
     }
@@ -51,3 +45,5 @@ const styles = StyleSheet.create({
     row: { flexDirection: 'row' },
     item: { flex: 1 },
 })
+
+export default Grid
