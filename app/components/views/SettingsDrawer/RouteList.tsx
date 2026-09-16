@@ -1,7 +1,8 @@
 import AntDesign, { AntDesignIconName } from '@react-native-vector-icons/ant-design/static'
 import { Href, useRouter } from 'expo-router'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
 
@@ -11,7 +12,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 
 type ButtonData = {
     name: string
-    path: Href
+    path: Href | ButtonData[]
     icon?: AntDesignIconName
 }
 
@@ -23,7 +24,9 @@ type DrawerButtonProps = {
 const DrawerButton = ({ item, index }: DrawerButtonProps) => {
     const styles = useStyles()
     const router = useRouter()
+    const [expanded, setExpanded] = useState(false)
     const { color } = Theme.useTheme()
+
     return (
         <Animated.View
             key={index}
@@ -33,11 +36,31 @@ const DrawerButton = ({ item, index }: DrawerButtonProps) => {
             <TouchableOpacity
                 style={styles.largeButton}
                 onPress={() => {
-                    router.push(item.path)
+                    if (typeof item.path === 'string') router.push(item.path)
+                    else {
+                        setExpanded(!expanded)
+                    }
                 }}>
-                <AntDesign size={24} name={item.icon ?? 'question'} color={color.text._400} />
-                <Text style={styles.largeButtonText}>{item.name}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <AntDesign size={24} name={item.icon ?? 'question'} color={color.text._400} />
+                    <Text style={styles.largeButtonText}>{item.name}</Text>
+                </View>
+                {Array.isArray(item.path) && (
+                    <AntDesign
+                        style={{ padding: 16 }}
+                        size={16}
+                        name={expanded ? 'up' : 'down'}
+                        color={color.text._400}
+                    />
+                )}
             </TouchableOpacity>
+            {Array.isArray(item.path) && expanded && (
+                <View style={{ paddingLeft: 20, backgroundColor: color.neutral._200 }}>
+                    {item.path.map((item, index) => (
+                        <DrawerButton item={item} index={index} key={index} />
+                    ))}
+                </View>
+            )}
         </Animated.View>
     )
 }
@@ -73,6 +96,7 @@ const useStyles = () => {
             paddingLeft: spacing.xl,
             flexDirection: 'row',
             alignItems: 'center',
+            justifyContent: 'space-between',
         },
     })
 }
@@ -101,7 +125,13 @@ const getPaths = (remote: boolean, t: (input: string) => string): ButtonData[] =
     },
     {
         name: t('navigation.dataSources'),
-        path: '/screens/DataSourcesScreen',
+        path: [
+            {
+                name: t('navigation.lorebooks'),
+                path: '/screens/LorebookManagerScreen',
+                icon: 'book',
+            },
+        ],
         icon: 'file-search',
     },
     {

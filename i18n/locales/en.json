@@ -747,7 +747,8 @@
         "models": "Models",
         "sampler": "Sampler",
         "settings": "Settings",
-        "tts": "TTS"
+        "tts": "TTS",
+        "lorebooks": "Lorebooks"
     },
     "sampler": {
         "alert": {
