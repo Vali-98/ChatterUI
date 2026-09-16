@@ -576,6 +576,13 @@ export namespace Chats {
 
             export const deleteChat = async (chatId: number) => {
                 await updateChatModified(chatId)
+                // attachment rows cascade with the chat, their files do not
+                const attachments = await database
+                    .select({ uri: chatAttachments.uri })
+                    .from(chatAttachments)
+                    .innerJoin(chatEntries, eq(chatAttachments.chat_entry_id, chatEntries.id))
+                    .where(eq(chatEntries.chat_id, chatId))
+                await Promise.all(attachments.map(async (item) => deleteFile(item.uri)))
                 await database.delete(chats).where(eq(chats.id, chatId))
             }
 
