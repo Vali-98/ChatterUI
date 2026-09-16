@@ -373,7 +373,9 @@
             "selected": "Selected",
             "suggestions": "Suggestions",
             "tokens": "Tokens",
-            "version": "Version"
+            "version": "Version",
+            "model": "Model",
+            "api": "API"
         },
         "messages": {
             "importingFile": "Importing file...",
@@ -519,14 +521,17 @@
         "regenerateDefaults": "Regenerate Default Instructs",
         "regenerateDefaultsDescription": "Are you sure you want to regenerate default Instructs?",
         "sections": {
-            "addTimestamp": "Add Timestamp",
-            "includeNames": "Include Names",
+            "examples": "Use Examples",
+            "hideThinkTags": "Remove Think Tags",
             "inputPrefix": "Input Prefix",
             "inputSuffix": "Input Suffix",
+            "lastImageOnly": "Use Last Image Only",
             "lastOutputPrefix": "Last Output Prefix",
+            "names": "Include Names",
             "outputPrefix": "Output Prefix",
             "outputSuffix": "Output Suffix",
-            "removeThinkTags": "Remove Think Tags",
+            "personality": "Use Personality",
+            "scenario": "Use Scenario",
             "sendAudio": "Send Audio",
             "sendDocuments": "Send Documents",
             "sendImages": "Send Images",
@@ -535,12 +540,9 @@
             "systemPrompt": "System Prompt",
             "systemPromptFormat": "System Prompt Format",
             "systemSuffix": "System Suffix",
+            "timestamp": "Add Timestamp",
             "useCommonStopSequences": "Use Common Stop Sequences",
-            "useExamples": "Use Examples",
-            "useLastImageOnly": "Use Last Image Only",
-            "usePersonality": "Use Personality",
-            "useScenario": "Use Scenario",
-            "wrapInNewline": "Wrap In Newline"
+            "wrap": "Wrap In Newline"
         },
         "selectConfig": "Select Config",
         "title": "Formatting",
@@ -549,7 +551,8 @@
             "configCreated": "Config created.",
             "configNameExists": "Config name already exists.",
             "savedToDownloads": "Saved \"{{name}}\" to Downloads"
-        }
+        },
+        "unused": "Unused by current {{mode}}"
     },
     "generation": {
         "errors": {
@@ -643,6 +646,11 @@
             "generationSettings": "Generation Settings",
             "info": "Lorebook Info"
         },
+        "new": {
+            "entry": "New Entry",
+            "placeholder": "New Lorebook",
+            "title": "Enter Name"
+        },
         "preferences": {
             "afterLast": "After Last",
             "afterSystem": "After System",
@@ -651,12 +659,7 @@
             "insertionDepth": "Insertion Depth",
             "insertionType": "Insertion Strategy"
         },
-        "title": "Lorebooks",
-        "new": {
-            "title": "Enter Name",
-            "placeholder": "New Lorebook",
-            "entry": "New Entry"
-        }
+        "title": "Lorebooks"
     },
     "model": {
         "alert": {
@@ -713,11 +716,11 @@
             "couldNotLoadModel": "Could Not Load Model",
             "deletekv": "KV Cache deleted!",
             "failedToGenerateLocally": "Failed to generate locally",
-            "failedtolink": "Failed to link model",
-            "failedtoload": "Failed to load model",
             "failedToLoadMMPROJ": "Failed to load MMPROJ",
             "failedToRunLocalInference": "Failed to run local inference",
             "failedToUnloadMMPROJ": "Failed to unload MMPROJ",
+            "failedtolink": "Failed to link model",
+            "failedtoload": "Failed to load model",
             "mediaAddedWithoutMMPROJModel": "Media was added without MMPROJ model",
             "mediaAddedWithoutMultimodalSupport": "Media was added without multimodal support.",
             "modelAlreadyLoaded": "Model Already Loaded!",
@@ -744,11 +747,11 @@
         "dev_markdown": "[DEV] Markdown",
         "formatting": "Formatting",
         "logs": "Logs",
+        "lorebooks": "Lorebooks",
         "models": "Models",
         "sampler": "Sampler",
         "settings": "Settings",
-        "tts": "TTS",
-        "lorebooks": "Lorebooks"
+        "tts": "TTS"
     },
     "sampler": {
         "alert": {

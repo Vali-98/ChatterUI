@@ -161,3 +161,6 @@ export const convertToFormatInstruct = (input: string) => {
     if (!formatType || formatType === 0) return input
     return convertToFormat(input, formatType)
 }
+
+export const snakeToCamel = (str: string) =>
+    str.toLowerCase().replace(/([-_][a-z0-9])/g, (group) => group.slice(-1).toUpperCase())

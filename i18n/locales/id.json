@@ -358,6 +358,7 @@
             "schemaValidationFailed": "Validasi skema gagal!"
         },
         "labels": {
+            "api": "API",
             "comment": "Komentar",
             "content": "Isi",
             "cpu": "CPU",
@@ -365,6 +366,7 @@
             "devMode": "MODE DEV",
             "external": "Eksternal",
             "internal": "Internal",
+            "model": "Model",
             "name": "Nama",
             "none": "Tidak Ada",
             "preferences": "Preferensi",
@@ -519,14 +521,17 @@
         "regenerateDefaults": "Hasilkan Ulang Instruct Bawaan",
         "regenerateDefaultsDescription": "Apakah Anda yakin ingin menghasilkan ulang Instruct bawaan?",
         "sections": {
-            "addTimestamp": "Tambahkan Stempel Waktu",
-            "includeNames": "Sertakan Nama",
+            "examples": "Gunakan Contoh",
+            "hideThinkTags": "Hapus Tag Think",
             "inputPrefix": "Awal Input",
             "inputSuffix": "Akhir Input",
+            "lastImageOnly": "Gunakan Gambar Terakhir Saja",
             "lastOutputPrefix": "Awal Output Terakhir",
+            "names": "Sertakan Nama",
             "outputPrefix": "Awal Output",
             "outputSuffix": "Akhir Output",
-            "removeThinkTags": "Hapus Tag Think",
+            "personality": "Gunakan Kepribadian",
+            "scenario": "Gunakan Skenario",
             "sendAudio": "Kirim Audio",
             "sendDocuments": "Kirim Dokumen",
             "sendImages": "Kirim Gambar",
@@ -535,12 +540,9 @@
             "systemPrompt": "Prompt Sistem",
             "systemPromptFormat": "Format Prompt Sistem",
             "systemSuffix": "Akhir Sistem",
+            "timestamp": "Tambahkan Stempel Waktu",
             "useCommonStopSequences": "Gunakan Urutan Berhenti Umum",
-            "useExamples": "Gunakan Contoh",
-            "useLastImageOnly": "Gunakan Gambar Terakhir Saja",
-            "usePersonality": "Gunakan Kepribadian",
-            "useScenario": "Gunakan Skenario",
-            "wrapInNewline": "Bungkus dalam Baris Baru"
+            "wrap": "Bungkus dalam Baris Baru"
         },
         "selectConfig": "Pilih Konfig",
         "title": "Pemformatan",
@@ -549,7 +551,8 @@
             "configCreated": "Konfig dibuat.",
             "configNameExists": "Nama konfig sudah ada.",
             "savedToDownloads": "Disimpan \"{{name}}\" ke Unduhan"
-        }
+        },
+        "unused": "Tidak digunakan oleh {{mode}} sekarang"
     },
     "generation": {
         "errors": {

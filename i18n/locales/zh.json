@@ -358,6 +358,7 @@
             "schemaValidationFailed": "模式验证失败！"
         },
         "labels": {
+            "api": "API 密码",
             "comment": "注释",
             "content": "内容",
             "cpu": "CPU",
@@ -365,6 +366,7 @@
             "devMode": "开发模式",
             "external": "外部",
             "internal": "内部",
+            "model": "型号",
             "name": "名称",
             "none": "无",
             "preferences": "首选项",
@@ -519,14 +521,17 @@
         "regenerateDefaults": "重新生成默认 Instruct",
         "regenerateDefaultsDescription": "确定要重新生成默认 Instruct 吗？",
         "sections": {
-            "addTimestamp": "添加时间戳",
-            "includeNames": "包含名称",
+            "examples": "使用示例",
+            "hideThinkTags": "移除思考标签",
             "inputPrefix": "输入前缀",
             "inputSuffix": "输入后缀",
+            "lastImageOnly": "仅使用最后一张图片",
             "lastOutputPrefix": "最后输出前缀",
+            "names": "包含名称",
             "outputPrefix": "输出前缀",
             "outputSuffix": "输出后缀",
-            "removeThinkTags": "移除思考标签",
+            "personality": "使用个性",
+            "scenario": "使用场景",
             "sendAudio": "发送音频",
             "sendDocuments": "发送文档",
             "sendImages": "发送图片",
@@ -535,12 +540,9 @@
             "systemPrompt": "系统提示",
             "systemPromptFormat": "系统提示格式",
             "systemSuffix": "系统后缀",
+            "timestamp": "添加时间戳",
             "useCommonStopSequences": "使用公共停止序列",
-            "useExamples": "使用示例",
-            "useLastImageOnly": "仅使用最后一张图片",
-            "usePersonality": "使用个性",
-            "useScenario": "使用场景",
-            "wrapInNewline": "换行"
+            "wrap": "换行"
         },
         "selectConfig": "选择配置",
         "title": "格式化",
@@ -549,7 +551,8 @@
             "configCreated": "配置已创建。",
             "configNameExists": "配置名称已存在。",
             "savedToDownloads": "已将 \"{{name}}\" 保存到下载"
-        }
+        },
+        "unused": "未被当前 QQmode 使用"
     },
     "generation": {
         "errors": {

@@ -358,6 +358,7 @@
             "schemaValidationFailed": "Ошибка проверки схемы!"
         },
         "labels": {
+            "api": "API",
             "comment": "Комментарий",
             "content": "Контент",
             "cpu": "ЦП",
@@ -365,6 +366,7 @@
             "devMode": "РЕЖИМ РАЗРАБОТКИ",
             "external": "Внешний",
             "internal": "Внутренний",
+            "model": "Модель",
             "name": "Имя",
             "none": "Нет",
             "preferences": "Предпочтения",
@@ -519,14 +521,17 @@
         "regenerateDefaults": "Восстановить инструкции по умолчанию",
         "regenerateDefaultsDescription": "Вы уверены, что хотите восстановить инструкции по умолчанию?",
         "sections": {
-            "addTimestamp": "Добавить временную метку",
-            "includeNames": "Включить имена",
+            "examples": "Использовать примеры",
+            "hideThinkTags": "Удалить теги Think",
             "inputPrefix": "Префикс входа",
             "inputSuffix": "Суффикс входа",
+            "lastImageOnly": "Использовать только последнее изображение",
             "lastOutputPrefix": "Префикс последнего выхода",
+            "names": "Включить имена",
             "outputPrefix": "Префикс выхода",
             "outputSuffix": "Суффикс выхода",
-            "removeThinkTags": "Удалить теги Think",
+            "personality": "Использовать личность",
+            "scenario": "Использовать сценарий",
             "sendAudio": "Отправить аудио",
             "sendDocuments": "Отправить документы",
             "sendImages": "Отправить изображения",
@@ -535,12 +540,9 @@
             "systemPrompt": "Системная подсказка",
             "systemPromptFormat": "Формат системной подсказки",
             "systemSuffix": "Суффикс системы",
+            "timestamp": "Добавить временную метку",
             "useCommonStopSequences": "Использовать обычные последовательности остановки",
-            "useExamples": "Использовать примеры",
-            "useLastImageOnly": "Использовать только последнее изображение",
-            "usePersonality": "Использовать личность",
-            "useScenario": "Использовать сценарий",
-            "wrapInNewline": "Обернуть новой строкой"
+            "wrap": "Обернуть новой строкой"
         },
         "selectConfig": "Выберите конфигурацию",
         "title": "Форматирование",
@@ -549,7 +551,8 @@
             "configCreated": "Конфигурация создана.",
             "configNameExists": "Имя конфигурации уже существует.",
             "savedToDownloads": "\"{{name}}\" сохранен в загрузки"
-        }
+        },
+        "unused": "Не используется текущим режимом"
     },
     "generation": {
         "errors": {

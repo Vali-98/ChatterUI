@@ -18,5 +18,5 @@ export const useCompletionMode = () => {
     if (completionType) return completionType
 
     // default if all else fails
-    return 'chatCompletions'
+    return 'textCompletions'
 }
