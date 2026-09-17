@@ -437,7 +437,7 @@ const thinkRule = buildThinkRules()
 const getMacroRules = (instruct: InstructType) => {
     const data: Macro[] = []
     if (instruct.hide_think_tags) {
-        data.concat(thinkRule)
+        data.push(...thinkRule)
     }
     // for expansion
     return data

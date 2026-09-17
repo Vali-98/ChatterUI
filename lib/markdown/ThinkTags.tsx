@@ -33,7 +33,8 @@ export function buildThinkRules() {
         const closeSource = escapeRegex(tag.close)
 
         return {
-            macro: new RegExp(`${openSource}[\\s\\S]*?${closeSource}`, 'g'),
+            // a block cut off before its closing tag is removed to the end of the text
+            macro: new RegExp(`${openSource}[\\s\\S]*?(?:${closeSource}|$)`, 'g'),
             value: '',
         }
     })
