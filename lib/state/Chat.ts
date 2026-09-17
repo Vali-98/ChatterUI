@@ -576,7 +576,7 @@ export namespace Chats {
 
             export const deleteChat = async (chatId: number) => {
                 await updateChatModified(chatId)
-                // attachment rows cascade with the chat, their files do not
+                // clean up attachments
                 const attachments = await database
                     .select({ uri: chatAttachments.uri })
                     .from(chatAttachments)

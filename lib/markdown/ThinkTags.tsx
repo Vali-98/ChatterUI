@@ -33,7 +33,9 @@ export function buildThinkRules() {
         const closeSource = escapeRegex(tag.close)
 
         return {
-            // a block cut off before its closing tag is removed to the end of the text
+            /**
+             * @TODO investigate if cut off think tags should be ignored
+             */
             macro: new RegExp(`${openSource}[\\s\\S]*?(?:${closeSource}|$)`, 'g'),
             value: '',
         }
