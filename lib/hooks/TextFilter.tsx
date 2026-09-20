@@ -42,7 +42,7 @@ export const useTextFilter = (inputString: string): RegexResult => {
     try {
         filters.forEach((item) => {
             const regex = new RegExp(item, 'gi')
-            newString = inputString.replace(regex, '')
+            newString = newString.replace(regex, '')
         })
     } catch (e) {
         Logger.warn('Regex parsing failed: ' + e)
