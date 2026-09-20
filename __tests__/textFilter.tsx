@@ -167,4 +167,39 @@ describe('useTextFilter', () => {
         expect(result).toBe('alpha beta')
         expect(found).toBe(false)
     })
+
+    test('an earlier removal destroys a later pattern that matched the raw input', () => {
+        const { result, found } = filterText(['a', 'ab'], 'ab')
+
+        expect(result).toBe('b')
+        expect(found).toBe(true)
+    })
+
+    test('the destructive pair in reverse order removes the whole string', () => {
+        const { result, found } = filterText(['ab', 'a'], 'ab')
+
+        expect(result).toBe('')
+        expect(found).toBe(true)
+    })
+
+    test('an anchored pattern anchors against the already filtered string', () => {
+        const { result, found } = filterText(['foo', '^bar'], 'foobar')
+
+        expect(result).toBe('')
+        expect(found).toBe(true)
+    })
+
+    test('an empty pattern in first position does not discard the filters after it', () => {
+        const { result, found } = filterText(['', 'alpha', 'beta'], 'alpha beta')
+
+        expect(result).toBe(' ')
+        expect(found).toBe(true)
+    })
+
+    test('an invalid pattern mid-list keeps earlier removals and skips the rest', () => {
+        const { result, found } = filterText(['alpha', 'beta', '(', 'gamma'], 'alpha beta gamma')
+
+        expect(result).toBe('  gamma')
+        expect(found).toBe(true)
+    })
 })
