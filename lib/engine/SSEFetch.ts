@@ -17,11 +17,14 @@ export class SSEFetch {
     private closeStream = () => {}
     private cancelled = false
     public abort() {
-        this.abortController.abort()
-
-        this.closeStream()
-        this.closeStream = () => {
-            this.cancelled = true
+        try {
+            this.abortController.abort()
+        } catch {
+        } finally {
+            this.closeStream()
+            this.closeStream = () => {
+                this.cancelled = true
+            }
         }
     }
 
