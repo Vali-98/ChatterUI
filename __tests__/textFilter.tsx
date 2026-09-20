@@ -55,10 +55,11 @@ describe('useTextFilter', () => {
         expect(found).toBe(true)
     })
 
-    test('filters applied in order can match text uncovered by an earlier filter', () => {
-        const { result } = filterText(['<hidden>', 'o+ps'], 'keep<hidden>ooops')
+    test('a later filter matches text only exposed by an earlier removal', () => {
+        const { result, found } = filterText(['X', 'ab'], 'aXb')
 
-        expect(result).toBe('keep')
+        expect(result).toBe('')
+        expect(found).toBe(true)
     })
 
     test('applies all three of three filters', () => {
@@ -76,10 +77,11 @@ describe('useTextFilter', () => {
         expect(reverse.result).toBe('  gamma')
     })
 
-    test('an overlapping pair cascades in the reverse order too', () => {
-        const { result } = filterText(['o+ps', '<hidden>'], 'keep<hidden>ooops')
+    test('(control) filters are not revisited after a later removal exposes them', () => {
+        const { result, found } = filterText(['ab', 'X'], 'aXb')
 
-        expect(result).toBe('keep')
+        expect(result).toBe('ab')
+        expect(found).toBe(true)
     })
 
     test('filters that together cover the whole string leave it empty', () => {
