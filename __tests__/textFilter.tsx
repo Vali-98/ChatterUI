@@ -61,6 +61,55 @@ describe('useTextFilter', () => {
         expect(result).toBe('keep')
     })
 
+    test('applies all three of three filters', () => {
+        const { result, found } = filterText(['alpha', 'beta', 'gamma'], 'alpha beta gamma')
+
+        expect(result).toBe('  ')
+        expect(found).toBe(true)
+    })
+
+    test('two disjoint filters give the same result in either order', () => {
+        const forward = filterText(['alpha', 'beta'], 'alpha beta gamma')
+        const reverse = filterText(['beta', 'alpha'], 'alpha beta gamma')
+
+        expect(forward.result).toBe('  gamma')
+        expect(reverse.result).toBe('  gamma')
+    })
+
+    test('an overlapping pair cascades in the reverse order too', () => {
+        const { result } = filterText(['o+ps', '<hidden>'], 'keep<hidden>ooops')
+
+        expect(result).toBe('keep')
+    })
+
+    test('filters that together cover the whole string leave it empty', () => {
+        const { result, found } = filterText(['a', 'b'], 'ab')
+
+        expect(result).toBe('')
+        expect(found).toBe(true)
+    })
+
+    test('an empty pattern after a matching one keeps the earlier removal', () => {
+        const { result, found } = filterText(['alpha', ''], 'alpha beta')
+
+        expect(result).toBe(' beta')
+        expect(found).toBe(true)
+    })
+
+    test('a pattern matching only empty strings still reports the earlier match as found', () => {
+        const { result, found } = filterText(['secret', 'z*'], 'a secret value')
+
+        expect(result).toBe('a  value')
+        expect(found).toBe(true)
+    })
+
+    test('an invalid pattern keeps the removals made by every earlier filter', () => {
+        const { result, found } = filterText(['alpha', 'beta', '('], 'alpha beta gamma')
+
+        expect(result).toBe('  gamma')
+        expect(found).toBe(true)
+    })
+
     test('(control) keeps the matches made before an invalid pattern aborts the loop', () => {
         const { result, found } = filterText(['secret', '('], 'a secret value')
 
@@ -93,6 +142,27 @@ describe('useTextFilter', () => {
         const { result, found } = filterText(['alpha', 'beta'], '')
 
         expect(result).toBe('')
+        expect(found).toBe(false)
+    })
+
+    test('(control) the last filter still applies when only it matches', () => {
+        const { result, found } = filterText(['nomatch', 'secret'], 'a secret value')
+
+        expect(result).toBe('a  value')
+        expect(found).toBe(true)
+    })
+
+    test('(control) an invalid pattern in first position leaves the input untouched', () => {
+        const { result, found } = filterText(['(', 'secret'], 'a secret value')
+
+        expect(result).toBe('a secret value')
+        expect(found).toBe(false)
+    })
+
+    test('(control) a lone empty pattern removes nothing', () => {
+        const { result, found } = filterText([''], 'alpha beta')
+
+        expect(result).toBe('alpha beta')
         expect(found).toBe(false)
     })
 })
