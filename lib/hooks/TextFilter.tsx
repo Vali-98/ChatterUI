@@ -42,10 +42,11 @@ export const useTextFilter = (inputString: string): RegexResult => {
     try {
         filters.forEach((item) => {
             const regex = new RegExp(item, 'gi')
-            newString = inputString.replace(regex, '')
+            newString = newString.replace(regex, '')
         })
     } catch (e) {
-        Logger.warn('Regex parsing failed: ' + e)
+        Logger.warn('Regex parsing failed')
+        Logger.warn(e)
     } finally {
         return { result: newString, found: newString.length !== inputString.length }
     }
