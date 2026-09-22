@@ -11,6 +11,6 @@ export const useActiveConnection = () => {
 
     return {
         activeConnection: activeConnection,
-        activeTemplate: getTemplates().find((item) => item.name === activeConnection.configName),
+        activeTemplate: getTemplates().find((item) => item.name === activeConnection?.configName),
     }
 }
