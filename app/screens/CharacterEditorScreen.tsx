@@ -161,7 +161,10 @@ const ChracterEditorScreen = () => {
                 {
                     label: t('character.editor.dialogs.deleteImage.confirm'),
                     onPress: () => {
-                        if (characterCard) Characters.deleteImage(characterCard.image_id)
+                        if (currentCard) {
+                            Characters.db.mutate.deleteImage(currentCard.id)
+                            Characters.deleteImage(currentCard.image_id)
+                        }
                     },
                     type: 'warning',
                 },

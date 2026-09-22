@@ -74,7 +74,10 @@ const UserCardEditor = () => {
                 {
                     label: t('users.edit.image.delete'),
                     onPress: () => {
-                        Characters.deleteImage(imageID)
+                        if (currentCard) {
+                            Characters.db.mutate.deleteImage(currentCard.id)
+                            Characters.deleteImage(imageID)
+                        }
                     },
                     type: 'warning',
                 },

@@ -762,6 +762,13 @@ export namespace Characters {
                     .set({ background_image: null })
                     .where(eq(characters.id, charId))
             }
+
+            export const deleteImage = async (charId: number) => {
+                await database
+                    .update(characters)
+                    .set({ image_id: -1 })
+                    .where(eq(characters.id, charId))
+            }
         }
 
         export namespace live {
