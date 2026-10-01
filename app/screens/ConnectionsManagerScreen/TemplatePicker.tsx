@@ -137,7 +137,7 @@ const TemplatePicker: React.FC<TemplatePickerProps> = ({ ref, setPending }) => {
                     disabled={selected === undefined}
                     label={t('common.actions.create')}
                     onPress={() => {
-                        if (!selected) return
+                        if (selected === undefined) return
                         const template = templates.at(selected)
                         if (!template) return
                         addValue({
