@@ -73,7 +73,7 @@ Remote Mode allows you to connect to a few common APIs from both commercial and 
 ### Dedicated API:
 
 -   OpenAI
--   Claude _(with ability to use a proxy)_
+-   Claude
 -   Cohere
 -   Open Router
 -   Mancer
@@ -94,45 +94,9 @@ Read more about it [here!](https://github.com/Vali-98/ChatterUI/discussions/126)
 
 ## Development
 
-### Android
-
-To run a development build, follow these simple steps:
-
--   Install any Java 17/21 SDK of your choosing
--   Install `android-sdk` via `Android Studio`
--   Clone the repo:
-
-```
-git clone https://github.com/Vali-98/ChatterUI.git
-```
-
--   Install dependencies via npm and run via Expo:
-
-```
-npm install
-npx expo run:android
-```
-
-#### Building an APK
-
-Requires Node.js, Java 17/21 SDK and Android SDK. Expo uses EAS to build apps which requires a Linux environment.
-
-1. Clone the repo.
-2. Rename the `eas.json.example` to `eas.json`.
-3. Modify `"ANDROID_SDK_ROOT"` to the directory of your Android SDK
-4. Run the following:
-
-```
-npm install
-eas build --platform android --local
-```
-
-### IOS
-
-Currently in development
+Refer to [CONTRIBUTING.md](https://github.com/Vali-98/ChatterUI/blob/master/docs/CONTRIBUTING.md)
 
 ## Acknowledgement
 
 -   [llama.cpp](https://github.com/ggerganov/llama.cpp) - the underlying engine to run LLMs
 -   [llama.rn](https://github.com/mybigday/llama.rn) - the original react-native llama.cpp adapter
-
