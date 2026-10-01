@@ -2,6 +2,7 @@ import { SplashScreen, Stack } from 'expo-router'
 import { setOptions } from 'expo-splash-screen'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
+import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated'
 
 import { AlertProvider } from '@components/views/Alert'
 import { PortalHost } from '@components/views/Portal'
@@ -20,6 +21,7 @@ const Layout = () => {
     useAppStateNotificationObserver()
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
+            <ReducedMotionConfig mode={ReduceMotion.Never} />
             <KeyboardProvider>
                 <AlertProvider />
                 <Stack
