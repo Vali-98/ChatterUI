@@ -40,6 +40,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
         [charId],
         { deepCheck: true }
     )
+    const scrolledChat = useRef(-1)
 
     const { data: entryIdList, updatedAt } = useLiveQueryJoined(Chats.db.live.entryIdList(chatId), [
         chatId,
@@ -66,7 +67,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
     const image = useBackgroundStore((state) => state.image)
 
     useEffect(() => {
-        if (!scrollCause || !scrollIndex || entryIdList.length === 0) return
+        if (
+            scrolledChat.current === chatId ||
+            !scrollCause ||
+            !scrollIndex ||
+            entryIdList.length === 0
+        )
+            return
         const isSave = scrollCause === 'saveScroll'
         if (!saveScroll && isSave) return
         const offset = Math.max(0, scrollIndex + (isSave ? 1 : 0))
@@ -77,7 +84,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                 animated: scrollCause === 'search',
                 viewOffset: 32,
             })
-    }, [scrollCause, scrollIndex, saveScroll, entryIdList.length])
+        scrolledChat.current = chatId
+    }, [scrollCause, scrollIndex, saveScroll, entryIdList.length, chatId, scrolledChat])
 
     return (
         <ImageBackground
