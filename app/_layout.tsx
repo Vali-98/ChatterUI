@@ -21,6 +21,12 @@ const Layout = () => {
     useAppStateNotificationObserver()
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
+            {/**
+             * `Transition Animation Scale` dev settings causes react-native-reanimated transitions to break
+             * when set to `off`. <ReducedMotionConfig /> allows us to ignore this setting.
+             *
+             * Refer to https://github.com/Vali-98/ChatterUI/issues/650
+             */}
             <ReducedMotionConfig mode={ReduceMotion.Never} />
             <KeyboardProvider>
                 <AlertProvider />
