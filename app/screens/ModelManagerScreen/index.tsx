@@ -86,10 +86,7 @@ const ModelManagerScreen = () => {
                     />
 
                     <SectionList
-                        style={{
-                            marginTop: 16,
-                            flex: 1,
-                        }}
+                        style={{ flex: 1 }}
                         sections={data}
                         renderItem={({ item, index }) => (
                             <ModelItem
@@ -108,7 +105,7 @@ const ModelManagerScreen = () => {
                                 return (
                                     <SectionTitle
                                         visible={data.length > 0}
-                                        style={{ marginBottom: 16 }}>
+                                        style={{ marginVertical: 16 }}>
                                         {title}
                                     </SectionTitle>
                                 )

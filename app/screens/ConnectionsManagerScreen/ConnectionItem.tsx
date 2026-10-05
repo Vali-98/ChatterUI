@@ -32,7 +32,7 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index, pendingOpe
     }, [editorRef, index, pendingOpen])
 
     return (
-        <ListButton style={{ paddingLeft: spacing.l }}>
+        <ListButton style={{ paddingLeft: spacing.l }} active={item.active}>
             <ConnectionEditor index={index} originalValues={item} ref={editorRef} />
             <ListButtonSection style={{ columnGap: spacing.xl, paddingVertical: spacing.xl }}>
                 <ThemedSwitch

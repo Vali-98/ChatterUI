@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
+import ListButton, { ListButtonSection } from '@components/buttons/ListButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import Alert from '@components/views/Alert'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
@@ -125,7 +126,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
         mmprojList.filter((e) => e.id === item.mmprojLink?.mmproj_id)?.[0]?.name ?? undefined
 
     return (
-        <View style={styles.modelContainer}>
+        <ListButton style={{ paddingHorizontal: 24 }} active={isLoaded}>
             <InputSheet
                 ref={editInputRef}
                 onConfirm={async (name) => {
@@ -135,49 +136,52 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 defaultValue={item.name}
             />
 
-            <View style={{ flex: 1, alignContent: 'center' }}>
-                <TouchableOpacity onPress={() => setShowInfo(!showInfo)}>
+            <ListButtonSection style={{ flex: 1 }}>
+                <TouchableOpacity
+                    onPress={() => setShowInfo(!showInfo)}
+                    style={{ paddingVertical: 12 }}>
                     <Text style={styles.title}>{item.name}</Text>
-                </TouchableOpacity>
-                {showInfo && !isInvalid && (
-                    <>
-                        <View style={styles.tagContainer}>
-                            {tags.map((tag, i) => {
-                                return (
-                                    <Text key={i} style={styles.tag} numberOfLines={1}>
-                                        {tag}
-                                    </Text>
-                                )
-                            })}
-                        </View>
 
-                        {isInvalid && (
+                    {showInfo && !isInvalid && (
+                        <>
                             <View style={styles.tagContainer}>
-                                <Text style={styles.tag}>{t('model.item.invalid')}</Text>
+                                {tags.map((tag, i) => {
+                                    return (
+                                        <Text key={i} style={styles.tag} numberOfLines={1}>
+                                            {tag}
+                                        </Text>
+                                    )
+                                })}
                             </View>
-                        )}
 
-                        {!isMMPROJ && (
+                            {isInvalid && (
+                                <View style={styles.tagContainer}>
+                                    <Text style={styles.tag}>{t('model.item.invalid')}</Text>
+                                </View>
+                            )}
+
+                            {!isMMPROJ && (
+                                <Text style={styles.subtitle}>
+                                    {t('model.item.contextlength')}: {item.context_length}
+                                </Text>
+                            )}
+
                             <Text style={styles.subtitle}>
-                                {t('model.item.contextlength')}: {item.context_length}
+                                {t('model.item.file')}: {item.file.replace('.gguf', '')} (
+                                {readableFileSize(item.file_size)}, {location})
                             </Text>
-                        )}
+                        </>
+                    )}
 
+                    {mmprojName && (
                         <Text style={styles.subtitle}>
-                            {t('model.item.file')}: {item.file.replace('.gguf', '')} (
-                            {readableFileSize(item.file_size)}, {location})
+                            {t('model.mmproj')}: {mmprojName}
                         </Text>
-                    </>
-                )}
+                    )}
+                </TouchableOpacity>
+            </ListButtonSection>
 
-                {mmprojName && (
-                    <Text style={styles.subtitle}>
-                        {t('model.mmproj')}: {mmprojName}
-                    </Text>
-                )}
-            </View>
-
-            <View style={styles.buttonContainer}>
+            <ListButtonSection style={styles.buttonContainer}>
                 <ContextMenu
                     disabled={disableEdit}
                     triggerIcon="edit"
@@ -264,8 +268,8 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         />
                     </TouchableOpacity>
                 )}
-            </View>
-        </View>
+            </ListButtonSection>
+        </ListButton>
     )
 }
 

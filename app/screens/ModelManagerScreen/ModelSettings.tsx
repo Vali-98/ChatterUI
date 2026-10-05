@@ -1,8 +1,9 @@
+import { getThreads } from '@vali98/react-native-cpu-info'
 import { useFocusEffect } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BackHandler, Platform, View } from 'react-native'
-import { useMMKVBoolean, useMMKVNumber } from 'react-native-mmkv'
+import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -12,7 +13,7 @@ import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
-import { AppSettings, Global } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/GlobalValues'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { KV } from '@lib/engine/Local/Model'
 import useBackendDevices from '@lib/hooks/BackendDevices'
@@ -41,7 +42,6 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
     const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
     const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)
     const [showModelInChat, setShowModelInChat] = useMMKVBoolean(AppSettings.ShowModelInChat)
-    const [threadCount] = useMMKVNumber(Global.CPUThreads)
 
     const [kvSize, setKVSize] = useState(0)
 
@@ -107,7 +107,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                         value={config.threads}
                         onValueChange={(value) => setConfig({ ...config, threads: value })}
                         min={1}
-                        max={threadCount ?? 8}
+                        max={getThreads()}
                         step={1}
                         disabled={modelImporting || modelLoading}
                     />
