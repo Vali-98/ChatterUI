@@ -1,14 +1,8 @@
 import AntDesign, { AntDesignIconName } from '@react-native-vector-icons/ant-design/static'
 import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import { ReactNode } from 'react'
-import {
-    Animated,
-    PressableProps,
-    StyleSheet,
-    TextStyle,
-    useAnimatedValue,
-    ViewStyle,
-} from 'react-native'
+import { PressableProps, TextStyle, ViewStyle } from 'react-native'
+import { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 
 import TText from '@components/text/TText'
 import { AnimatedPressable } from '@lib/components/AnimatedComponents'
@@ -125,43 +119,38 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
     icon = undefined,
     ...rest
 }) => {
-    const animOpacity = useAnimatedValue(1)
+    const animOpacity = useSharedValue(1)
     const theme = useButtonTheme(variant)
-    const handlePressIn = () => {
-        animOpacity.setValue(0.4)
-    }
-
-    const handlePressOut = () => {
-        Animated.timing(animOpacity, {
-            toValue: 1,
-            duration: 50,
-            useNativeDriver: true,
-        }).start()
-    }
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            opacity: animOpacity.value,
+        }
+    })
 
     return (
         <AnimatedPressable
             disabled={variant === 'disabled'}
             onPressIn={(event) => {
-                handlePressIn()
+                animOpacity.set(withTiming(0.4, { duration: 100 }))
+
                 if (onPressIn) onPressIn(event)
             }}
             onPressOut={(event) => {
-                handlePressOut()
+                animOpacity.set(withTiming(1, { duration: 100 }))
                 if (onPressOut) onPressOut(event)
             }}
             {...rest}
-            style={StyleSheet.flatten([
+            style={[
+                animatedStyle,
                 theme.buttonStyle,
                 {
                     flexDirection: 'row',
                     columnGap: 8,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    opacity: animOpacity,
                 },
                 buttonStyle,
-            ])}>
+            ]}>
             {!icon &&
                 iconName &&
                 (iconName !== 'search' ? (

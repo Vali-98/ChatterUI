@@ -56,7 +56,7 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index, pendingOpe
                     variant="tertiary"
                     iconName="edit"
                     iconSize={24}
-                    buttonStyle={{ height: '100%', paddingHorizontal: spacing.l }}
+                    buttonStyle={{ paddingHorizontal: spacing.l }}
                 />
             </ListButtonSection>
         </ListButton>

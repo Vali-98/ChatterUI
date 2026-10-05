@@ -28,6 +28,15 @@ const LorebookManagerHeaderButtons = () => {
     const createLorebookInputRef = useBottomSheetRef()
     return (
         <>
+            <InputSheet
+                title={t('lorebook.new.title')}
+                placeholder={t('lorebook.new.placeholder')}
+                ref={createLorebookInputRef}
+                onConfirm={(name) => {
+                    if (name === '') name = t('lorebook.new.placeholder')
+                    Lorebooks.db.mutate.createLorebook(name)
+                }}
+            />
             <HeaderButton
                 headerRight={() => (
                     <ContextMenu
@@ -52,15 +61,6 @@ const LorebookManagerHeaderButtons = () => {
                         ]}
                     />
                 )}
-            />
-            <InputSheet
-                title={t('lorebook.new.title')}
-                placeholder={t('lorebook.new.placeholder')}
-                ref={createLorebookInputRef}
-                onConfirm={(name) => {
-                    if (name === '') name = t('lorebook.new.placeholder')
-                    Lorebooks.db.mutate.createLorebook(name)
-                }}
             />
         </>
     )
