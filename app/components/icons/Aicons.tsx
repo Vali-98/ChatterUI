@@ -21,3 +21,11 @@ const Aicons = createIconSet(glyphMap, {
 export type AiconsGlyphName = keyof typeof glyphMap
 
 export default Aicons
+
+/**
+ * Generated at https://icomoon.io
+ *  Flow
+ *  - Add icons
+ *  - Generate ttf
+ *  - Extract codepoints -> glpyh map
+ */
