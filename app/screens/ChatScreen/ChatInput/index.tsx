@@ -17,7 +17,7 @@ import Animated, {
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
-import { AnimatedTextInput } from '@components/AnimatedAdapters'
+import { AnimatedTextInput } from '@components/AnimatedComponents'
 import ThemedButton from '@components/buttons/ThemedButton'
 import Alert from '@components/views/Alert'
 import { useBottomSheetRef } from '@components/views/BottomSheet'

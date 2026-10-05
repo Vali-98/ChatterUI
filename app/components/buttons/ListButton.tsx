@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { View, ViewStyle } from 'react-native'
 
-import { AnimatedPressable } from '@components/AnimatedAdapters'
+import { AnimatedPressable } from '@components/AnimatedComponents'
 import useAnimatedActiveColorStyle from '@lib/hooks/AnimatedActiveColorStyle'
 import { Theme } from '@lib/theme/ThemeManager'
 

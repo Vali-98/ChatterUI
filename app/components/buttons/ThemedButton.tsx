@@ -10,7 +10,7 @@ import {
     ViewStyle,
 } from 'react-native'
 
-import { AnimatedPressable } from '@components/AnimatedAdapters'
+import { AnimatedPressable } from '@components/AnimatedComponents'
 import TText from '@components/text/TText'
 import { Theme } from '@lib/theme/ThemeManager'
 
