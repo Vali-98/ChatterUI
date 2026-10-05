@@ -222,12 +222,6 @@ const verifyModelLoaded = async (): Promise<boolean> => {
             Logger.infoToast(t('model.toast.autoLoadingModel', { name: lastModel.name }))
             await Llama.useLlamaModelStore.getState().load(lastModel)
         }
-
-        const lastMmproj = Llama.useLlamaPreferencesStore.getState().lastMmproj
-        if (lastMmproj) {
-            Logger.infoToast(t('model.toast.autoLoadingMMPROJ', { name: lastMmproj.name }))
-            await Llama.useLlamaModelStore.getState().loadMmproj(lastMmproj)
-        }
     }
     return true
 }

@@ -37,9 +37,8 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const { color } = Theme.useTheme()
     const [showMMPROJSelector, setShowMMPROJSelector] = useState(false)
     const [showInfo, setShowInfo] = useState(false)
-    const { loadModel, unloadModel, loadMmproj, modelId, mmprojId } = Llama.useLlamaModelStore(
+    const { loadModel, unloadModel, modelId, mmprojId } = Llama.useLlamaModelStore(
         useShallow((state) => ({
-            loadMmproj: state.loadMmproj,
             loadModel: state.load,
             unloadModel: state.unload,
             modelId: state.model?.id,
@@ -85,15 +84,20 @@ const ModelItem: React.FC<ModelItemProps> = ({
     }
 
     const handleUnlinkMMPROJ = async () => {
-        if (item.mmprojLink) {
-            await Model.removeMMPROJLink(item)
-            const mmproj = mmprojList.filter((a) => a.id === item.mmprojLink?.mmproj_id)?.[0]
-            if (mmproj) {
-                maybeClearLastLoaded(mmproj)
-            }
+        if (item.mmprojLink) return await Model.removeMMPROJLink(item)
+        setShowMMPROJSelector(!showMMPROJSelector)
+    }
+
+    const handleLoadModel = async () => {
+        if (isLoaded) {
+            await unloadModel()
             return
         }
-        setShowMMPROJSelector(!showMMPROJSelector)
+        setModelLoading(true)
+        await loadModel(item).catch((e) => {
+            Logger.errorToast(t('model.toast.failedtoload'), `${e}`)
+        })
+        setModelLoading(false)
     }
 
     const isMMPROJ = Model.isMMPROJ(item.architecture)
@@ -130,6 +134,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 title={t('model.item.rename')}
                 defaultValue={item.name}
             />
+
             <View style={{ flex: 1, alignContent: 'center' }}>
                 <TouchableOpacity onPress={() => setShowInfo(!showInfo)}>
                     <Text style={styles.title}>{item.name}</Text>
@@ -245,27 +250,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 />
 
                 {!isMMPROJ && (
-                    <TouchableOpacity
-                        disabled={loadToggle}
-                        onPress={async () => {
-                            if (isLoaded) {
-                                await unloadModel()
-                                return
-                            }
-                            setModelLoading(true)
-                            await loadModel(item).catch((e) => {
-                                Logger.errorToast(t('model.toast.failedtoload'), `${e}`)
-                            })
-                            if (item.mmprojLink) {
-                                const [mmprojModel] = mmprojList.filter(
-                                    (a) => a.id === item.mmprojLink?.mmproj_id
-                                )
-                                if (mmprojModel) {
-                                    await loadMmproj(mmprojModel)
-                                }
-                            }
-                            setModelLoading(false)
-                        }}>
+                    <TouchableOpacity disabled={loadToggle} onPress={handleLoadModel}>
                         <AntDesign
                             name={isLoaded ? 'close-circle' : 'play-circle'}
                             size={24}

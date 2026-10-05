@@ -27,15 +27,8 @@ import {
 import { GGMLNameMap, GGMLType } from './GGML'
 
 export type ModelData = Omit<ModelDataType, 'id' | 'create_date' | 'last_modified'>
-export type ModelListQueryType = Omit<
-    Awaited<ReturnType<typeof Model.getModelListQuery2>>[0],
-    'mmprojLink'
-> & {
-    mmprojLink?: {
-        model_id: number
-        mmproj_id: number
-    }
-}
+export type ModelListQueryType = Awaited<ReturnType<typeof Model.getModelListQuery>>[0]
+
 const mmprojArchs = ['clip', 'llava']
 
 export namespace Model {
@@ -112,6 +105,11 @@ export namespace Model {
         })
     }
 
+    export const getModel = async (modelId: number) => {
+        const result = await db.query.model_data.findFirst({ where: eq(model_data.id, modelId) })
+        return result
+    }
+
     export const getModelExists = (path: string) => {
         return fileExists(path)
     }
@@ -162,10 +160,6 @@ export namespace Model {
     }
 
     export const getModelListQuery = () => {
-        return db.query.model_data.findMany()
-    }
-
-    export const getModelListQuery2 = () => {
         return db.query.model_data.findMany({
             where: notInArray(model_data.architecture, mmprojArchs),
             with: {
@@ -189,7 +183,7 @@ export namespace Model {
 
     export const createMMPROJLink = async (
         model: ModelListQueryType,
-        mmproj: ModelListQueryType
+        mmproj: Omit<ModelListQueryType, 'mmprojLink'>
     ) => {
         await db.insert(model_mmproj_links).values({ model_id: model.id, mmproj_id: mmproj.id })
     }

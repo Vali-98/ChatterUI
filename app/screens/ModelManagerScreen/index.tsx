@@ -26,10 +26,9 @@ const ModelManagerScreen = () => {
 
     const { data: mmprojLinks } = useLiveQuery(Model.getMMPROJLinks())
 
-    const { data: modelList, updatedAt: modelUpdatedAt } = useLiveQuery(
-        Model.getModelListQuery2(),
-        [mmprojLinks]
-    )
+    const { data: modelList, updatedAt: modelUpdatedAt } = useLiveQuery(Model.getModelListQuery(), [
+        mmprojLinks,
+    ])
     const { data: mmprojList } = useLiveQuery(Model.getMMPROJListQuery())
 
     const [showSettings, setShowSettings] = useState(false)

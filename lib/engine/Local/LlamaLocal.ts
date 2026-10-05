@@ -15,7 +15,7 @@ import { Storage } from '@lib/enums/Storage'
 import { AppDirectory, fileExists, readableFileSize, writeBase64File } from '@lib/utils/File'
 
 import { checkGGMLDeprecated } from './GGML'
-import { KV, Model } from './Model'
+import { KV, Model, ModelListQueryType } from './Model'
 import { AppSettings } from '../../constants/GlobalValues'
 import { Logger } from '../../state/Logger'
 import { createMMKVStorage, mmkv } from '../../storage/MMKV'
@@ -44,7 +44,7 @@ export type LlamaState = {
     loadProgress: number
     chatCount: number
     promptCache?: string
-    load: (model: ModelDataType) => Promise<void>
+    load: (model: ModelListQueryType) => Promise<void>
     loadMmproj: (model: ModelDataType) => Promise<void>
     setLoadProgress: (progress: number) => void
     unload: () => Promise<void>
@@ -72,11 +72,9 @@ export type LlamaConfig = {
 
 export type EngineDataProps = {
     config: LlamaConfig
-    lastModel?: ModelDataType
-    lastMmproj?: ModelDataType
+    lastModel?: ModelListQueryType
     setConfiguration: (config: LlamaConfig) => void
-    setLastModelLoaded: (model: ModelDataType | undefined) => void
-    setLastMmprojLoaded: (model: ModelDataType | undefined) => void
+    setLastModelLoaded: (model: ModelListQueryType | undefined) => void
     maybeClearLastLoaded: (mode: ModelDataType) => void
 }
 
@@ -99,19 +97,13 @@ export namespace Llama {
                 setConfiguration: (config: LlamaConfig) => {
                     set({ config: config })
                 },
-                setLastModelLoaded: (model: ModelDataType | undefined) => {
+                setLastModelLoaded: (model: ModelListQueryType | undefined) => {
                     if (get().lastModel?.id === model?.id) return
-                    set({ lastModel: model, lastMmproj: undefined })
+                    set({ lastModel: model })
                 },
-                setLastMmprojLoaded: (mmproj: ModelDataType | undefined) => {
-                    set({ lastMmproj: mmproj })
-                },
-                maybeClearLastLoaded: (data) => {
-                    if (data.id === get().lastModel?.id) {
-                        set({ lastModel: undefined, lastMmproj: undefined })
-                    } else if (data.id === get().lastMmproj?.id) {
-                        set({ lastMmproj: undefined })
-                    }
+                maybeClearLastLoaded: (model) => {
+                    if (model.id !== get().lastModel?.id) return
+                    set({ lastModel: undefined })
                 },
             }),
             {
@@ -119,7 +111,6 @@ export namespace Llama {
                 partialize: (state) => ({
                     config: state.config,
                     lastModel: state.lastModel,
-                    lastMmproj: state.lastMmproj,
                 }),
                 storage: createMMKVStorage(),
                 version: 3,
@@ -143,7 +134,7 @@ export namespace Llama {
         loadProgress: 0,
         chatCount: 0,
         promptCache: undefined,
-        load: async (model: ModelDataType) => {
+        load: async (model) => {
             const config = useLlamaPreferencesStore.getState().config
 
             if (get()?.model?.id === model.id) {
@@ -204,6 +195,13 @@ export namespace Llama {
                 chatCount: 1,
             })
 
+            if (model.mmprojLink) {
+                const mmproj = await Model.getModel(model.mmprojLink.mmproj_id)
+                if (mmproj) {
+                    get().loadMmproj(mmproj)
+                }
+            }
+
             // updated EngineData
             useLlamaPreferencesStore.getState().setLastModelLoaded(model)
             KV.useKVStore.getState().setKvCacheLoaded(false)
@@ -235,8 +233,6 @@ export namespace Llama {
             set({
                 mmproj: model,
             })
-
-            useLlamaPreferencesStore.getState().setLastMmprojLoaded(model)
         },
         setLoadProgress: (progress: number) => {
             set({ loadProgress: progress })
