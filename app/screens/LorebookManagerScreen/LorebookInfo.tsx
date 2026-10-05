@@ -6,7 +6,7 @@ import { FlatList } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { create } from 'zustand'
 
-import LongButton from '@components/buttons/LongButton'
+import ListButton from '@components/buttons/ListButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
@@ -158,9 +158,12 @@ const LorebookInfoScreen = () => {
                 contentContainerStyle={{ rowGap: 4, paddingBottom: 64 }}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <LongButton active={false} onPress={() => openEditor(item.id)}>
+                    <ListButton
+                        style={{ padding: 12 }}
+                        active={false}
+                        onPress={() => openEditor(item.id)}>
                         <TText>{item.name}</TText>
-                    </LongButton>
+                    </ListButton>
                 )}
             />
             <LorebookEntryEditor />

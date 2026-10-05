@@ -6,7 +6,7 @@ import { Text, View } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import LongButton from '@components/buttons/LongButton'
+import ListButton, { ListButtonSection } from '@components/buttons/ListButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
 import TText from '@components/text/TText'
@@ -16,42 +16,18 @@ import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import InputSheet from '@components/views/InputSheet'
+import { LorebookType } from '@db/schema'
 import { Lorebooks } from '@lib/state/lorebooks'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import { useLorebookInfoState } from './LorebookInfo'
 import LorebookPreferenceEditor from './LorebookPreferenceEditor'
 
-const LorebookManagerScreen = () => {
-    const { data: lorebooks } = useLiveQuery(Lorebooks.db.live.lorebookList())
-    const { color } = Theme.useTheme()
-    const { setId } = useLorebookInfoState()
+const LorebookManagerHeaderButtons = () => {
     const { t } = useTranslation()
     const createLorebookInputRef = useBottomSheetRef()
-    const router = useRouter()
-
-    const handleDeleteLorebook = (id: number, name: string) => {
-        Alert.alert({
-            title: t('lorebook.delete.title'),
-            description: t('lorebook.delete.description', {
-                name: name,
-            }),
-            buttons: [
-                { label: t('common.actions.cancel') },
-                {
-                    label: t('common.actions.delete'),
-                    onPress: () => {
-                        Lorebooks.db.mutate.deleteLorebook(id)
-                    },
-                    type: 'warning',
-                },
-            ],
-        })
-    }
-
     return (
-        <SafeAreaView style={{ paddingHorizontal: 12, rowGap: 8 }}>
-            <HeaderTitle title={t('lorebook.title')} />
+        <>
             <HeaderButton
                 headerRight={() => (
                     <ContextMenu
@@ -77,9 +53,6 @@ const LorebookManagerScreen = () => {
                     />
                 )}
             />
-            <LorebookPreferenceEditor />
-            <SectionTitle>{t('lorebook.title')}</SectionTitle>
-
             <InputSheet
                 title={t('lorebook.new.title')}
                 placeholder={t('lorebook.new.placeholder')}
@@ -89,72 +62,121 @@ const LorebookManagerScreen = () => {
                     Lorebooks.db.mutate.createLorebook(name)
                 }}
             />
+        </>
+    )
+}
+
+const LorebookListItem: React.FC<{ lorebook: LorebookType }> = ({ lorebook }) => {
+    const { t } = useTranslation()
+    const { setId } = useLorebookInfoState()
+    const router = useRouter()
+    const handleDeleteLorebook = (id: number, name: string) => {
+        Alert.alert({
+            title: t('lorebook.delete.title'),
+            description: t('lorebook.delete.description', {
+                name: name,
+            }),
+            buttons: [
+                { label: t('common.actions.cancel') },
+                {
+                    label: t('common.actions.delete'),
+                    onPress: () => {
+                        Lorebooks.db.mutate.deleteLorebook(id)
+                    },
+                    type: 'warning',
+                },
+            ],
+        })
+    }
+    return (
+        <ListButton
+            style={{ paddingHorizontal: 12 }}
+            active={lorebook.active ?? false}
+            onPress={() => {
+                setId(lorebook.id)
+                router.push('/screens/LorebookManagerScreen/LorebookInfo')
+            }}>
+            <ListButtonSection style={{ columnGap: 12 }}>
+                <ThemedSwitch
+                    value={lorebook?.active || false}
+                    onChangeValue={(active) =>
+                        Lorebooks.db.mutate.updateLorebookInfo(lorebook.id, {
+                            active,
+                        })
+                    }
+                />
+                <TText
+                    color={lorebook.active ? '100' : '400'}
+                    size={16}
+                    style={{ flexShrink: 1, paddingVertical: 12 }}>
+                    {lorebook.name}
+                </TText>
+            </ListButtonSection>
+            <ListButtonSection>
+                <ContextMenu
+                    triggerStyle={{ paddingVertical: 12 }}
+                    triggerIcon="edit"
+                    buttons={[
+                        {
+                            label: t('common.actions.delete'),
+                            variant: 'warning',
+                            icon: 'delete',
+                            onPress: (close) => {
+                                handleDeleteLorebook(lorebook.id, lorebook.name)
+                                close()
+                            },
+                        },
+                        {
+                            label: t('common.actions.export'),
+                            icon: 'export',
+                            onPress: (close) => {
+                                Lorebooks.exportToJSON(lorebook.id)
+                                close()
+                            },
+                        },
+                    ]}
+                />
+            </ListButtonSection>
+        </ListButton>
+    )
+}
+
+const LorebookEmpty = () => {
+    const { t } = useTranslation()
+    const { color } = Theme.useTheme()
+    return (
+        <View
+            style={{
+                flex: 1,
+                padding: 64,
+                alignItems: 'center',
+                rowGap: 12,
+            }}>
+            <AntDesign name="file-search" size={64} style={{ color: color.text._600 }} />
+            <Text style={{ color: color.text._600 }}>{t('lorebook.empty')}</Text>
+        </View>
+    )
+}
+
+const LorebookManagerScreen = () => {
+    const { data: lorebooks } = useLiveQuery(Lorebooks.db.live.lorebookList())
+    const { t } = useTranslation()
+
+    return (
+        <SafeAreaView style={{ paddingHorizontal: 12, rowGap: 8 }}>
+            <HeaderTitle title={t('lorebook.title')} />
+            <LorebookManagerHeaderButtons />
+            <LorebookPreferenceEditor />
+
+            <SectionTitle>{t('lorebook.title')}</SectionTitle>
+
             <FlatList
                 style={{ marginTop: 8 }}
                 data={lorebooks}
                 contentContainerStyle={{ rowGap: 12 }}
                 keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <LongButton
-                        active={item.active ?? false}
-                        style={{ flexDirection: 'row', columnGap: 12, alignItems: 'center' }}
-                        onPress={() => {
-                            setId(item.id)
-                            router.push('/screens/LorebookManagerScreen/LorebookInfo')
-                        }}>
-                        <ThemedSwitch
-                            value={item?.active || false}
-                            onChangeValue={(active) =>
-                                Lorebooks.db.mutate.updateLorebookInfo(item.id, {
-                                    active,
-                                })
-                            }
-                        />
-
-                        <TText color={item.active ? '100' : '400'} style={{ flex: 1 }} size={16}>
-                            {item.name}
-                        </TText>
-
-                        <ContextMenu
-                            triggerIcon="edit"
-                            buttons={[
-                                {
-                                    label: t('common.actions.delete'),
-                                    variant: 'warning',
-                                    icon: 'delete',
-                                    onPress: (close) => {
-                                        handleDeleteLorebook(item.id, item.name)
-                                        close()
-                                    },
-                                },
-                                {
-                                    label: t('common.actions.export'),
-                                    icon: 'export',
-                                    onPress: (close) => {
-                                        Lorebooks.exportToJSON(item.id)
-                                        close()
-                                    },
-                                },
-                            ]}
-                        />
-                    </LongButton>
-                )}
-                ListEmptyComponent={
-                    <View
-                        style={{
-                            flex: 1,
-                            padding: 64,
-                            alignItems: 'center',
-                            rowGap: 12,
-                        }}>
-                        <AntDesign
-                            name="file-search"
-                            size={64}
-                            style={{ color: color.text._600 }}
-                        />
-                        <Text style={{ color: color.text._600 }}>{t('lorebook.empty')}</Text>
-                    </View>
-                }
+                renderItem={({ item: lorebook }) => <LorebookListItem lorebook={lorebook} />}
+                ListEmptyComponent={<LorebookEmpty />}
             />
         </SafeAreaView>
     )

@@ -1,13 +1,31 @@
 import { ReactNode } from 'react'
-import { Pressable, ViewStyle } from 'react-native'
-import Animated from 'react-native-reanimated'
+import { View, ViewStyle } from 'react-native'
 
+import { AnimatedPressable } from '@components/AnimatedAdapters'
 import useAnimatedActiveColorStyle from '@lib/hooks/AnimatedActiveColorStyle'
 import { Theme } from '@lib/theme/ThemeManager'
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
+const ListButtonSection: React.FC<{
+    children?: ReactNode
+    style?: ViewStyle
+}> = ({ children, style }) => {
+    return (
+        <View
+            style={[
+                {
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    alignSelf: 'stretch',
+                    flexShrink: 1,
+                },
+                style,
+            ]}>
+            {children}
+        </View>
+    )
+}
 
-const LongButton: React.FC<{
+const ListButton: React.FC<{
     children?: ReactNode
     onPress?: () => void | Promise<void>
     active?: boolean
@@ -28,12 +46,9 @@ const LongButton: React.FC<{
                 {
                     borderWidth: borderWidth.m,
                     flexDirection: 'row',
+                    alignItems: 'stretch',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
                     borderRadius: spacing.xl,
-                    paddingLeft: spacing.xl,
-                    paddingRight: spacing.xl,
-                    paddingVertical: spacing.xl,
                 },
                 animatedStyle,
                 style,
@@ -43,4 +58,5 @@ const LongButton: React.FC<{
     )
 }
 
-export default LongButton
+export { ListButtonSection }
+export default ListButton

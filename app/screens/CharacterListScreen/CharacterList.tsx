@@ -63,7 +63,7 @@ const CharacterList: React.FC = () => {
     if (path !== '/') return
 
     return (
-        <View style={{ paddingTop: 16, paddingHorizontal: 8, flex: 1 }}>
+        <View style={{ flex: 1 }}>
             <HeaderTitle />
             <HeaderButton
                 headerLeft={() => <Drawer.Button drawerID={Drawer.ID.SETTINGS} />}

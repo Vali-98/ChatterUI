@@ -5,7 +5,7 @@ import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from 'ex
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Keyboard, Pressable, TextInput, TouchableOpacity, View } from 'react-native'
+import { Keyboard, Pressable, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, {
     BounceIn,
@@ -17,6 +17,7 @@ import Animated, {
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
+import { AnimatedTextInput } from '@components/AnimatedAdapters'
 import ThemedButton from '@components/buttons/ThemedButton'
 import Alert from '@components/views/Alert'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
@@ -40,8 +41,6 @@ export type Attachment = {
     type: 'image' | 'audio' | 'document'
     name: string
 }
-
-const AnimatedTextInput = Animated.createAnimatedComponent(TextInput)
 
 type ChatInputHeightStoreProps = {
     height: number

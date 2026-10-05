@@ -12,6 +12,7 @@ interface TTextProps extends TextProps {
 const styles = StyleSheet.create({
     text: {
         fontWeight: 'normal',
+        flexShrink: 1,
     },
 })
 

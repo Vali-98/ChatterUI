@@ -1,13 +1,12 @@
 import { useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Animated from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
+import ListButton, { ListButtonSection } from '@components/buttons/ListButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import { APIManager, APIManagerValue } from '@lib/engine/API/APIManagerState'
-import useAnimatedActiveColorStyle from '@lib/hooks/AnimatedActiveColorStyle'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ConnectionEditor from './ConnectionEditor'
@@ -19,7 +18,7 @@ type ConnectionItemProps = {
 }
 
 const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index, pendingOpen }) => {
-    const { spacing, color } = Theme.useTheme()
+    const { spacing } = Theme.useTheme()
     const styles = useStyles()
     const editorRef = useBottomSheetRef()
     const { editValue } = APIManager.useConnectionsStore(
@@ -32,24 +31,17 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index, pendingOpe
         if (index === pendingOpen) editorRef.current?.open()
     }, [editorRef, index, pendingOpen])
 
-    const animatedStyle = useAnimatedActiveColorStyle({
-        deactiveColor: color.neutral._200,
-        activeColor: color.primary._500,
-        active: item.active,
-    })
-
     return (
-        <Animated.View style={[styles.longContainer, animatedStyle]}>
+        <ListButton style={{ paddingLeft: spacing.l }}>
             <ConnectionEditor index={index} originalValues={item} ref={editorRef} />
-            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+            <ListButtonSection style={{ columnGap: spacing.xl, paddingVertical: spacing.xl }}>
                 <ThemedSwitch
                     value={item.active}
                     onChangeValue={(value) => {
                         editValue({ ...item, active: value }, index)
                     }}
                 />
-
-                <View style={{ marginLeft: spacing.xl, flex: 1 }}>
+                <View>
                     <Text numberOfLines={1} style={item.active ? styles.name : styles.nameInactive}>
                         {item.friendlyName}
                     </Text>
@@ -57,35 +49,25 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index, pendingOpe
                         {item.configName}
                     </Text>
                 </View>
-            </View>
-            <ThemedButton
-                onPress={() => editorRef.current?.open()}
-                variant="tertiary"
-                iconName="edit"
-                iconSize={24}
-                buttonStyle={{ borderWidth: 0 }}
-            />
-        </Animated.View>
+            </ListButtonSection>
+            <ListButtonSection>
+                <ThemedButton
+                    onPress={() => editorRef.current?.open()}
+                    variant="tertiary"
+                    iconName="edit"
+                    iconSize={24}
+                    buttonStyle={{ height: '100%', paddingHorizontal: spacing.l }}
+                />
+            </ListButtonSection>
+        </ListButton>
     )
 }
 
 export default ConnectionItem
 
 const useStyles = () => {
-    const { color, spacing, borderWidth, fontSize } = Theme.useTheme()
+    const { color, fontSize } = Theme.useTheme()
     return StyleSheet.create({
-        longContainer: {
-            borderWidth: borderWidth.m,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderRadius: spacing.xl,
-            flex: 1,
-            paddingLeft: spacing.xl,
-            paddingRight: spacing.xl,
-            paddingVertical: spacing.xl,
-        },
-
         name: {
             fontSize: fontSize.l,
             color: color.text._100,

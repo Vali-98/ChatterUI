@@ -2,15 +2,15 @@ import AntDesign, { AntDesignIconName } from '@react-native-vector-icons/ant-des
 import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import { ReactNode } from 'react'
 import {
-    PressableProps,
-    TextStyle,
-    Pressable,
-    ViewStyle,
-    StyleSheet,
     Animated,
+    PressableProps,
+    StyleSheet,
+    TextStyle,
     useAnimatedValue,
+    ViewStyle,
 } from 'react-native'
 
+import { AnimatedPressable } from '@components/AnimatedAdapters'
 import TText from '@components/text/TText'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -27,8 +27,6 @@ export interface ThemedButtonProps extends Omit<PressableProps, 'style'> {
     iconStyle?: TextStyle
     icon?: ReactNode
 }
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 type ButtonTheme = {
     buttonStyle: ViewStyle
