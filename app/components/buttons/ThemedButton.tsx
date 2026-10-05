@@ -10,8 +10,8 @@ import {
     ViewStyle,
 } from 'react-native'
 
-import { AnimatedPressable } from '@components/AnimatedComponents'
 import TText from '@components/text/TText'
+import { AnimatedPressable } from '@lib/components/AnimatedComponents'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'critical' | 'disabled'

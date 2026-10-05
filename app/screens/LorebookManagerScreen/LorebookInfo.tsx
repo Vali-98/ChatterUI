@@ -88,17 +88,7 @@ const LorebookInfoScreen = () => {
                         value={placeholderInfo?.description ?? ''}
                         onChangeText={(description) => handleUpdate({ description })}
                     />
-                    {/**
-                         
-                    <ThemedSwitch
-                        label="Enable"
-                        value={placeholderInfo?.active ?? false}
-                        onChangeValue={(active) => {
-                            handleUpdate({ active })
-                        }}
-                    />
-                    
-                         */}
+
                     <ThemedSlider
                         label={t('lorebook.fields.tokenBudget')}
                         value={placeholderInfo?.token_budget ?? 0}
