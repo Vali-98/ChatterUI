@@ -9,6 +9,7 @@ import { useBottomSheetRef } from '@components/views/BottomSheet'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { LinkType } from '@db/schema'
 import { APIManager } from '@lib/engine/API/APIManagerState'
+import { Model } from '@lib/engine/Local/Model'
 import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
 import { CharacterLink } from '@lib/state/CharacterLinks'
 import { Characters } from '@lib/state/Characters'
@@ -34,6 +35,7 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
     const instructList = useLiveQueryJoined(Instructs.db.query.instructListQuery(), [], {
         sync: true,
     })
+    const modelList = useLiveQueryJoined(Model.getModelListQuery(), [], { sync: true })
     const samplerList = SamplersManager.useSamplerStore((state) => state.configList)
     const connectionsList = APIManager.useConnectionsStore((state) => state.values)
 
@@ -43,6 +45,9 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
 
     const instructLink = data.find((link) => link.type === 'instruct_id')
     const activeInstruct = instructList.data.find((instruct) => instruct.id === instructLink?.value)
+
+    const modelLink = data.find((link) => link.type === 'model_id')
+    const activeModel = modelList.data.find((model) => model.id === modelLink?.id)
 
     const samplerLink = data.find((link) => link.type === 'sampler_index')
     const samplerIndex = samplerLink?.value
@@ -92,6 +97,17 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
                       }
                     : undefined,
             type: 'connection_index',
+        },
+        {
+            options: modelList.data.map((item) => ({
+                label: item.name,
+                value: item.id,
+            })),
+            active:
+                activeModel && modelLink
+                    ? { label: activeModel.name, value: modelLink.id, id: modelLink.id }
+                    : undefined,
+            type: 'model_id',
         },
     ]
 }

@@ -110,6 +110,14 @@ export namespace Model {
         return result
     }
 
+    export const getModelWithMMProj = async (modelId: number) => {
+        const result = await db.query.model_data.findFirst({
+            where: eq(model_data.id, modelId),
+            with: { mmprojLink: true },
+        })
+        return result
+    }
+
     export const getModelExists = (path: string) => {
         return fileExists(path)
     }

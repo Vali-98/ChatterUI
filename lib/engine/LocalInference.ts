@@ -6,6 +6,7 @@ import { CompletionTimings } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { isCloseThinkTag, isOpenThinkTag } from '@lib/markdown/ThinkTags'
+import { CharacterLink } from '@lib/state/CharacterLinks'
 import { Characters } from '@lib/state/Characters'
 import { Chats, useInference } from '@lib/state/Chat'
 import { commonStopStrings, Instructs, outputPrefixes } from '@lib/state/Instructs'
@@ -21,7 +22,7 @@ import {
     ContextBuilderParams,
 } from './API/ContextBuilder'
 import { Llama, LlamaConfig } from './Local/LlamaLocal'
-import { KV } from './Local/Model'
+import { KV, Model } from './Local/Model'
 
 export const localSamplerData: APISampler[] = [
     { externalName: 'n_predict', samplerID: SamplerID.GENERATED_LENGTH },
@@ -198,31 +199,40 @@ const constructReplaceStrings = (): string[] => {
     return stops
 }
 
+const maybeLoadLinkedModel = async () => {
+    const charId = Characters.useCharacterStore.getState().id
+    if (!charId) return false
+    const links = await CharacterLink.db.query.links(charId)
+    const modelLink = links.find((link) => link.type === 'model_id')
+    if (!modelLink) return false
+    const model = await Model.getModelWithMMProj(modelLink.value)
+    if (!model) return false
+    Logger.infoToast(t('model.toast.autoLoadingModel', { name: model.name }))
+    await Llama.useLlamaModelStore.getState().load(model)
+    return true
+}
+
 const verifyModelLoaded = async (): Promise<boolean> => {
     const model = Llama.useLlamaModelStore.getState().model
 
-    // Model Loading Routine
-    if (!model) {
-        const lastModel = Llama.useLlamaPreferencesStore.getState().lastModel
-        const autoLoad = mmkv.getBoolean(AppSettings.AutoLoadLocal)
-        // If  autoload is disabled, just return
-        if (!autoLoad) {
-            Logger.warnToast(t('model.toast.noModelLoaded'))
-            return false
-        }
+    // Model Loading Routine, also check for character linked model
+    if (model || (await maybeLoadLinkedModel())) return true
 
-        // by default, autoload will attempt to load the last model used
-        if (!lastModel) {
-            Logger.warnToast(t('model.toast.noAutoLoadModelSet'))
-            return false
-        }
+    const lastModel = Llama.useLlamaPreferencesStore.getState().lastModel
+    const autoLoad = mmkv.getBoolean(AppSettings.AutoLoadLocal)
 
-        // attempt to load model
-        if (lastModel) {
-            Logger.infoToast(t('model.toast.autoLoadingModel', { name: lastModel.name }))
-            await Llama.useLlamaModelStore.getState().load(lastModel)
-        }
+    // If  autoload is disabled, just return
+    if (!autoLoad || !lastModel) {
+        Logger.warnToast(
+            !autoLoad ? t('model.toast.noModelLoaded') : t('model.toast.noAutoLoadModelSet')
+        )
+        return false
     }
+
+    // attempt to load model
+    Logger.infoToast(t('model.toast.autoLoadingModel', { name: lastModel.name }))
+    await Llama.useLlamaModelStore.getState().load(lastModel)
+
     return true
 }
 
