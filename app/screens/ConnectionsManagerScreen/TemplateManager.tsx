@@ -39,52 +39,55 @@ const TemplateManager = () => {
             <HeaderTitle title={t('connections.templates.title')} />
             <HeaderButton
                 headerRight={() => (
-                    <ContextMenu
-                        triggerIcon="setting"
-                        placement="bottom"
-                        buttons={[
-                            {
-                                label: t('connections.templates.import'),
-                                icon: 'download',
-                                onPress: async (close) => {
+                    <ContextMenu placement="bottom">
+                        <ContextMenu.Trigger icon="setting" />
+                        <ContextMenu.Body>
+                            <ContextMenu.Button
+                                label={t('connections.templates.import')}
+                                icon="download"
+                                closeOnPress={false}
+                                onPress={async (close) => {
                                     close()
                                     const result = await pickJSONDocument()
                                     if (!result.success) {
                                         return
                                     }
                                     addTemplate(result.data)
-                                },
-                            },
-                            {
-                                label: t('connections.templates.paste'),
-                                icon: 'file',
-                                onPress: (close) => {
+                                }}
+                            />
+                            <ContextMenu.Button
+                                label={t('connections.templates.paste')}
+                                icon="file"
+                                closeOnPress={false}
+                                onPress={(close) => {
                                     close()
                                     pasteInputRef.current?.open()
-                                },
-                            },
-                            {
-                                label: t('connections.templates.get'),
-                                icon: 'github',
-                                onPress: (close) => {
+                                }}
+                            />
+                            <ContextMenu.Button
+                                label={t('connections.templates.get')}
+                                icon="github"
+                                closeOnPress={false}
+                                onPress={(close) => {
                                     close()
                                     Linking.openURL(
                                         'https://github.com/Vali-98/ChatterUI/discussions/126'
                                     )
-                                },
-                            },
-                            {
-                                label: t('connections.templates.learn'),
-                                icon: 'info',
-                                onPress: (close) => {
+                                }}
+                            />
+                            <ContextMenu.Button
+                                label={t('connections.templates.learn')}
+                                icon="info"
+                                closeOnPress={false}
+                                onPress={(close) => {
                                     close()
                                     Linking.openURL(
                                         'https://github.com/Vali-98/ChatterUI/blob/dev/docs/CustomTemplates.md'
                                     )
-                                },
-                            },
-                        ]}
-                    />
+                                }}
+                            />
+                        </ContextMenu.Body>
+                    </ContextMenu>
                 )}
             />
             <InputSheet

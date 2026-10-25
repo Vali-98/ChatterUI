@@ -270,37 +270,37 @@ const ChatInput = () => {
                                 alignItems: 'center',
                             }}>
                             <ChatOptions disabled={!activeProvider} />
-                            <ContextMenu
-                                disabled={!activeProvider}
-                                triggerIcon="paper-clip"
-                                triggerIconSize={20}
-                                buttons={[
-                                    {
-                                        label: t('chat.input.actions.takePicture'),
-                                        icon: 'camera',
-                                        onPress: (close) => {
+                            <ContextMenu disabled={!activeProvider} placement="top">
+                                <ContextMenu.Trigger
+                                    icon="paper-clip"
+                                    iconSize={20}
+                                    iconStyle={{
+                                        color: color.text._400,
+                                        padding: 6,
+                                        backgroundColor: color.neutral._200,
+                                        borderRadius: 16,
+                                        opacity: activeProvider ? 1 : 0.5,
+                                    }}
+                                />
+                                <ContextMenu.Body>
+                                    <ContextMenu.Button
+                                        label={t('chat.input.actions.takePicture')}
+                                        icon="camera"
+                                        onPress={() => {
                                             cameraSheetRef.current?.open()
-                                            close()
-                                        },
-                                    },
-                                    {
-                                        label: t('chat.input.actions.addImage'),
-                                        icon: 'picture',
-                                        onPress: async (close) => {
+                                        }}
+                                    />
+                                    <ContextMenu.Button
+                                        label={t('chat.input.actions.addImage')}
+                                        icon="picture"
+                                        closeOnPress={false}
+                                        onPress={async (close) => {
                                             close()
                                             handlePickImage()
-                                        },
-                                    },
-                                ]}
-                                triggerStyle={{
-                                    color: color.text._400,
-                                    padding: 6,
-                                    backgroundColor: color.neutral._200,
-                                    borderRadius: 16,
-                                    opacity: activeProvider ? 1 : 0.5,
-                                }}
-                                placement="top"
-                            />
+                                        }}
+                                    />
+                                </ContextMenu.Body>
+                            </ContextMenu>
                         </Animated.View>
                     )}
                     {hideOptions && (

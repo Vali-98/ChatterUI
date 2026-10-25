@@ -29,23 +29,23 @@ const ModelNewMenu: React.FC<ModelNewMenuProps> = ({ modelImporting, setModelImp
 
     return (
         <View>
-            <ContextMenu
-                placement="bottom"
-                triggerIcon="file-add"
-                disabled={modelImporting}
-                buttons={[
-                    {
-                        label: t('model.copymodel'),
-                        icon: 'download',
-                        onPress: handleImportModel,
-                    },
-                    {
-                        label: t('model.externalmodel'),
-                        icon: 'link',
-                        onPress: handleSetExternal,
-                    },
-                ]}
-            />
+            <ContextMenu placement="bottom" disabled={modelImporting}>
+                <ContextMenu.Trigger icon="file-add" />
+                <ContextMenu.Body>
+                    <ContextMenu.Button
+                        label={t('model.copymodel')}
+                        icon="download"
+                        closeOnPress={false}
+                        onPress={handleImportModel}
+                    />
+                    <ContextMenu.Button
+                        label={t('model.externalmodel')}
+                        icon="link"
+                        closeOnPress={false}
+                        onPress={handleSetExternal}
+                    />
+                </ContextMenu.Body>
+            </ContextMenu>
         </View>
     )
 }

@@ -26,52 +26,50 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
     }
 
     return (
-        <ContextMenu
-            disabled={disabled}
-            buttons={[
-                {
-                    component: () => <ChatTokenCount />,
-                    border: true,
-                },
-                {
-                    onPress: (close) => {
+        <ContextMenu disabled={disabled} placement="top">
+            <ContextMenu.Trigger>
+                <AntDesign
+                    name="caret-up"
+                    style={[styles.optionsButton, { opacity: disabled ? 0.5 : 1 }]}
+                    size={24}
+                />
+            </ContextMenu.Trigger>
+            <ContextMenu.Body>
+                <ChatTokenCount />
+                <ContextMenu.Divider />
+                <ContextMenu.Button
+                    closeOnPress={false}
+                    onPress={(close) => {
                         close()
                         router.back()
-                    },
-                    label: t('chat.input.actions.mainMenu'),
-                    icon: 'backward',
-                },
-                {
-                    onPress: (close) => {
+                    }}
+                    label={t('chat.input.actions.mainMenu')}
+                    icon="backward"
+                />
+                <ContextMenu.Button
+                    onPress={() => {
                         ref?.current?.open()
-                        close()
-                    },
-                    label: t('chat.input.actions.authorNotes'),
-                    icon: 'paper-clip',
-                },
-                {
-                    onPress: (close) => {
+                    }}
+                    label={t('chat.input.actions.authorNotes')}
+                    icon="paper-clip"
+                />
+                <ContextMenu.Button
+                    closeOnPress={false}
+                    onPress={(close) => {
                         close()
                         router.push('/screens/CharacterEditorScreen')
-                    },
-                    label: t('chat.input.actions.editCharacter'),
-                    icon: 'edit',
-                },
-                {
-                    onPress: (close) => {
+                    }}
+                    label={t('chat.input.actions.editCharacter')}
+                    icon="edit"
+                />
+                <ContextMenu.Button
+                    onPress={() => {
                         setShowChat(true)
-                        close()
-                    },
-                    label: t('chat.input.actions.chatHistory'),
-                    icon: 'paper-clip',
-                },
-            ]}
-            placement="top">
-            <AntDesign
-                name="caret-up"
-                style={[styles.optionsButton, { opacity: disabled ? 0.5 : 1 }]}
-                size={24}
-            />
+                    }}
+                    label={t('chat.input.actions.chatHistory')}
+                    icon="paper-clip"
+                />
+            </ContextMenu.Body>
         </ContextMenu>
     )
 }

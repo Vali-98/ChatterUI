@@ -281,6 +281,9 @@ module.exports = {
             'ios_backgroundColor',
             'next',
             'previous',
+            'icon',
+            'iconName',
+            'variant',
         ],
     },
     words: {

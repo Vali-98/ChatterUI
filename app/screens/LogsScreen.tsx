@@ -24,7 +24,7 @@ const LogsScreen = () => {
 
     const handleExportLogs = () => {
         if (!logs) return
-        // eslint-disable-next-line i18next/no-literal-string, react-hooks/purity
+        // eslint-disable-next-line i18next/no-literal-string
         const filename = `logs-chatterui-${Date.now()}.txt`
         const data = logs
             .map((item) => `${Logger.LevelName[item.level]} ${item.timestamp}: ${item.message}`)
@@ -63,29 +63,26 @@ const LogsScreen = () => {
     }
 
     const headerRight = () => (
-        <ContextMenu
-            placement="bottom"
-            triggerIcon="setting"
-            buttons={[
-                {
-                    label: t('logs.export'),
-                    icon: 'export',
-                    onPress: (close) => {
+        <ContextMenu placement="bottom">
+            <ContextMenu.Trigger icon="setting" />
+            <ContextMenu.Body>
+                <ContextMenu.Button
+                    label={t('logs.export')}
+                    icon="export"
+                    onPress={() => {
                         handleExportLogs()
-                        close()
-                    },
-                },
-                {
-                    label: t('logs.flush'),
-                    icon: 'delete',
-                    onPress: (close) => {
+                    }}
+                />
+                <ContextMenu.Button
+                    label={t('logs.flush')}
+                    icon="delete"
+                    onPress={() => {
                         handleFlushLogs()
-                        close()
-                    },
-                    variant: 'warning',
-                },
-            ]}
-        />
+                    }}
+                    variant="warning"
+                />
+            </ContextMenu.Body>
+        </ContextMenu>
     )
 
     return (

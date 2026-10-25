@@ -90,45 +90,34 @@ const SamplerManagerScreen = () => {
     const samplerList = getSamplerList()
 
     const headerRight = () => (
-        <ContextMenu
-            triggerIcon="setting"
-            triggerIconSize={24}
-            placement="bottom"
-            buttons={[
-                {
-                    label: t('sampler.create'),
-                    icon: 'file-add',
-                    onPress: (close) => {
+        <ContextMenu placement="bottom">
+            <ContextMenu.Trigger icon="setting" iconSize={24} />
+            <ContextMenu.Body>
+                <ContextMenu.Button
+                    label={t('sampler.create')}
+                    icon="file-add"
+                    onPress={() => {
                         newSamplerInputRef.current?.open()
-                        close()
-                    },
-                },
-                {
-                    label: t('sampler.export'),
-                    icon: 'download',
-                    onPress: (close) => {
+                    }}
+                />
+                <ContextMenu.Button
+                    label={t('sampler.export')}
+                    icon="download"
+                    onPress={() => {
                         handleExportSampler()
-                        close()
-                    },
-                },
-                /*{
-                    label: 'Import Sampler',
-                    icon: 'upload',
-                    onPress: (close) => {
-                        handleImportSampler()
-                        close()
-                    },
-                },*/
-                {
-                    label: t('sampler.delete'),
-                    icon: 'delete',
-                    onPress: (close) => {
+                    }}
+                />
+                <ContextMenu.Button
+                    label={t('sampler.delete')}
+                    icon="delete"
+                    closeOnPress={false}
+                    onPress={(close) => {
                         if (handleDeleteSampler()) close()
-                    },
-                    variant: 'warning',
-                },
-            ]}
-        />
+                    }}
+                    variant="warning"
+                />
+            </ContextMenu.Body>
+        </ContextMenu>
     )
 
     return (

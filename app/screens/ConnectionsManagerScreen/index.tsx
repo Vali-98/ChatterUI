@@ -42,31 +42,30 @@ const ConnectionsManagerScreen = () => {
             <HeaderTitle title={t('connections.manager.header')} />
             <HeaderButton
                 headerRight={() => (
-                    <ContextMenu
-                        placement="bottom"
-                        triggerIcon="setting"
-                        buttons={[
-                            {
-                                icon: 'file',
-
-                                label: t('connections.options.manageTemplates'),
-                                onPress: (close) => {
+                    <ContextMenu placement="bottom">
+                        <ContextMenu.Trigger icon="setting" />
+                        <ContextMenu.Body>
+                            <ContextMenu.Button
+                                icon="file"
+                                label={t('connections.options.manageTemplates')}
+                                onPress={() => {
                                     router.push('/screens/ConnectionsManagerScreen/TemplateManager')
-
-                                    close()
-                                },
-                            },
-                            {
-                                icon: 'file-text',
-
-                                label: isCustomFieldsEnabled
-                                    ? t('connections.options.disableCustomFields')
-                                    : t('connections.options.enableCustomFields'),
-                                onPress: (close) =>
-                                    updatePreferences({ showCustomFields: !isCustomFieldsEnabled }),
-                            },
-                        ]}
-                    />
+                                }}
+                            />
+                            <ContextMenu.Button
+                                icon="file-text"
+                                label={
+                                    isCustomFieldsEnabled
+                                        ? t('connections.options.disableCustomFields')
+                                        : t('connections.options.enableCustomFields')
+                                }
+                                closeOnPress={false}
+                                onPress={() =>
+                                    updatePreferences({ showCustomFields: !isCustomFieldsEnabled })
+                                }
+                            />
+                        </ContextMenu.Body>
+                    </ContextMenu>
                 )}
             />
             {apiValues.length > 0 && (

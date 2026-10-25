@@ -231,37 +231,33 @@ const ChracterEditorScreen = () => {
     }
 
     const headerRight = () => (
-        <ContextMenu
-            placement="bottom"
-            triggerIcon="setting"
-            buttons={[
-                {
-                    label: t('common.actions.export'),
-                    icon: 'upload',
-                    onPress: (close) => {
+        <ContextMenu placement="bottom">
+            <ContextMenu.Trigger icon="setting" />
+            <ContextMenu.Body>
+                <ContextMenu.Button
+                    label={t('common.actions.export')}
+                    icon="upload"
+                    onPress={() => {
                         handleExportCard()
-                        close()
-                    },
-                },
-                {
-                    label: t('character.editor.actions.manageLinks'),
-                    icon: 'link',
-                    onPress: (close) => {
+                    }}
+                />
+                <ContextMenu.Button
+                    label={t('character.editor.actions.manageLinks')}
+                    icon="link"
+                    onPress={() => {
                         router.push('/screens/CharacterLinksScreen')
-                        close()
-                    },
-                },
-                {
-                    label: t('common.actions.delete'),
-                    icon: 'delete',
-                    onPress: (close) => {
+                    }}
+                />
+                <ContextMenu.Button
+                    label={t('common.actions.delete')}
+                    icon="delete"
+                    onPress={() => {
                         handleDeleteCard()
-                        close()
-                    },
-                    variant: 'warning',
-                },
-            ]}
-        />
+                    }}
+                    variant="warning"
+                />
+            </ContextMenu.Body>
+        </ContextMenu>
     )
 
     if (!charId) return <Redirect href=".." />
@@ -284,69 +280,74 @@ const ChracterEditorScreen = () => {
                         keyboardShouldPersistTaps="always"
                         contentContainerStyle={{ rowGap: 8, paddingBottom: 24 }}>
                         <View style={styles.characterHeader}>
-                            <ContextMenu
-                                placement="right"
-                                buttons={[
-                                    {
-                                        label: t('character.editor.actions.changeImage'),
-                                        icon: 'picture',
-                                        onPress: (close) => {
+                            <ContextMenu placement="right">
+                                <ContextMenu.Trigger>
+                                    <Avatar
+                                        targetImage={Characters.getImageDir(
+                                            currentCard?.image_id ?? -1
+                                        )}
+                                        style={styles.avatar}
+                                    />
+                                    <AntDesign
+                                        name="edit"
+                                        color={color.text._100}
+                                        style={styles.editHover}
+                                    />
+                                </ContextMenu.Trigger>
+                                <ContextMenu.Body>
+                                    <ContextMenu.Button
+                                        label={t('character.editor.actions.changeImage')}
+                                        icon="picture"
+                                        closeOnPress={false}
+                                        onPress={(close) => {
                                             close()
                                             handleImportImage()
-                                        },
-                                    },
-                                    {
-                                        label: t('character.editor.actions.changeBackground'),
-                                        icon: 'picture',
-                                        onPress: async (close) => {
+                                        }}
+                                    />
+                                    <ContextMenu.Button
+                                        label={t('character.editor.actions.changeBackground')}
+                                        icon="picture"
+                                        closeOnPress={false}
+                                        onPress={async (close) => {
                                             close()
                                             await Characters.importBackground(
                                                 charId,
                                                 characterCard.background_image
                                             )
-                                        },
-                                    },
-
-                                    {
-                                        label: t('character.editor.actions.viewImage'),
-                                        icon: 'search',
-                                        onPress: (close) => {
+                                        }}
+                                    />
+                                    <ContextMenu.Button
+                                        label={t('character.editor.actions.viewImage')}
+                                        icon="search"
+                                        closeOnPress={false}
+                                        onPress={(close) => {
                                             close()
                                             setShowViewer(true)
-                                        },
-                                    },
-                                    {
-                                        label: t('character.editor.dialogs.deleteImage.confirm'),
-                                        icon: 'delete',
-                                        onPress: (close) => {
+                                        }}
+                                    />
+                                    <ContextMenu.Button
+                                        label={t('character.editor.dialogs.deleteImage.confirm')}
+                                        icon="delete"
+                                        closeOnPress={false}
+                                        onPress={(close) => {
                                             close()
                                             handleDeleteImage()
-                                        },
-                                        variant: 'warning',
-                                    },
-                                    {
-                                        label: t('character.editor.actions.removeBackground'),
-                                        icon: 'delete',
-                                        onPress: (close) => {
+                                        }}
+                                        variant="warning"
+                                    />
+                                    <ContextMenu.Button
+                                        hidden={!backgroundImage}
+                                        label={t('character.editor.actions.removeBackground')}
+                                        icon="delete"
+                                        closeOnPress={false}
+                                        onPress={(close) => {
                                             close()
                                             if (backgroundImage)
                                                 Characters.deleteBackground(charId, backgroundImage)
-                                        },
-                                        disabled: !backgroundImage,
-                                        variant: 'warning',
-                                    },
-                                ]}>
-                                <Avatar
-                                    targetImage={Characters.getImageDir(
-                                        currentCard?.image_id ?? -1
-                                    )}
-                                    style={styles.avatar}
-                                />
-                                <AntDesign
-                                    name="edit"
-                                    color={color.text._100}
-                                    style={styles.editHover}
-                                />
+                                        }}
+                                        variant="warning"
+                                    />
+                                </ContextMenu.Body>
                             </ContextMenu>
 
                             <View style={styles.characterHeaderInfo}>

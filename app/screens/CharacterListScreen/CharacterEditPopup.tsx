@@ -135,23 +135,31 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
     }
 
     return (
-        <ContextMenu
-            disabled={nowLoading || path !== '/'}
-            onPress={setCurrentCharacter}
-            longPress
-            delayLongPress={300}
-            buttons={[
-                { label: t('common.actions.edit'), icon: 'edit', onPress: editCharacter },
-                { label: t('common.actions.clone'), icon: 'copy', onPress: cloneCard },
-                {
-                    label: t('common.actions.delete'),
-                    icon: 'delete',
-                    onPress: deleteCard,
-                    variant: 'warning',
-                },
-            ]}
-            placement="center">
-            <View pointerEvents="none">{children}</View>
+        <ContextMenu disabled={nowLoading || path !== '/'} placement="center">
+            <ContextMenu.Trigger onPress={setCurrentCharacter} longPress delayLongPress={300}>
+                <View pointerEvents="none">{children}</View>
+            </ContextMenu.Trigger>
+            <ContextMenu.Body>
+                <ContextMenu.Button
+                    label={t('common.actions.edit')}
+                    icon="edit"
+                    closeOnPress={false}
+                    onPress={editCharacter}
+                />
+                <ContextMenu.Button
+                    label={t('common.actions.clone')}
+                    icon="copy"
+                    closeOnPress={false}
+                    onPress={cloneCard}
+                />
+                <ContextMenu.Button
+                    label={t('common.actions.delete')}
+                    icon="delete"
+                    closeOnPress={false}
+                    onPress={deleteCard}
+                    variant="warning"
+                />
+            </ContextMenu.Body>
         </ContextMenu>
     )
 }

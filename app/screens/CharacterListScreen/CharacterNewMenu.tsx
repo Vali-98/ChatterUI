@@ -53,28 +53,25 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                 confirmLabel={t('common.actions.create')}
             />
 
-            <ContextMenu
-                triggerIcon="user-add"
-                buttons={[
-                    {
-                        label: t('character.list.actions.importFromFile'),
-                        onPress: (close) => {
+            <ContextMenu placement="bottom">
+                <ContextMenu.Trigger icon="user-add" />
+                <ContextMenu.Body>
+                    <ContextMenu.Button
+                        label={t('character.list.actions.importFromFile')}
+                        onPress={() => {
                             Characters.importCharacter()
-                            close()
-                        },
-                        icon: 'upload',
-                    },
-                    {
-                        label: t('character.list.actions.createCharacter'),
-                        onPress: (close) => {
+                        }}
+                        icon="upload"
+                    />
+                    <ContextMenu.Button
+                        label={t('character.list.actions.createCharacter')}
+                        onPress={() => {
                             inputRef.current?.open()
-                            close()
-                        },
-                        icon: 'edit',
-                    },
-                ]}
-                placement="bottom"
-            />
+                        }}
+                        icon="edit"
+                    />
+                </ContextMenu.Body>
+            </ContextMenu>
         </>
     )
 }

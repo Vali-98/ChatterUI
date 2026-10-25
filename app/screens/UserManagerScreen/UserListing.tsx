@@ -84,53 +84,61 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
     }
 
     return (
-        <ContextMenu
-            longPress
-            onPress={async () => {
-                await setCard(user.id)
-                setShowDrawer(false)
-            }}
-            placement="center"
-            buttons={[
-                {
-                    label: t('common.actions.clone'),
-                    icon: 'copy',
-                    onPress: handleCloneCard,
-                },
-                {
-                    label: t('common.actions.delete'),
-                    icon: 'delete',
-                    variant: 'warning',
-                    onPress: handleDeleteCard,
-                },
-            ]}>
-            <View
-                style={
-                    user.id === userId
-                        ? styles.longButtonSelectedContainer
-                        : styles.longButtonContainer
-                }>
-                <View style={styles.longButton}>
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            flex: 1,
-                        }}>
-                        <Avatar
-                            targetImage={Characters.getImageDir(user.image_id)}
-                            style={styles.avatar}
-                        />
-                        <View style={{ flex: 1, paddingLeft: 12 }}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={styles.nametag}>{user.name}</Text>
-                                <Text style={styles.timestamp}>
-                                    {user.last_modified && getFriendlyTimeStamp(user.last_modified)}
-                                </Text>
+        <ContextMenu placement="center">
+            <ContextMenu.Trigger
+                longPress
+                onPress={async () => {
+                    await setCard(user.id)
+                    setShowDrawer(false)
+                }}>
+                <View
+                    style={
+                        user.id === userId
+                            ? styles.longButtonSelectedContainer
+                            : styles.longButtonContainer
+                    }>
+                    <View style={styles.longButton}>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                flex: 1,
+                            }}>
+                            <Avatar
+                                targetImage={Characters.getImageDir(user.image_id)}
+                                style={styles.avatar}
+                            />
+                            <View style={{ flex: 1, paddingLeft: 12 }}>
+                                <View
+                                    style={{
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                    }}>
+                                    <Text style={styles.nametag}>{user.name}</Text>
+                                    <Text style={styles.timestamp}>
+                                        {user.last_modified &&
+                                            getFriendlyTimeStamp(user.last_modified)}
+                                    </Text>
+                                </View>
                             </View>
                         </View>
                     </View>
                 </View>
-            </View>
+            </ContextMenu.Trigger>
+            <ContextMenu.Body>
+                <ContextMenu.Button
+                    label={t('common.actions.clone')}
+                    icon="copy"
+                    closeOnPress={false}
+                    onPress={handleCloneCard}
+                />
+                <ContextMenu.Button
+                    label={t('common.actions.delete')}
+                    icon="delete"
+                    variant="warning"
+                    closeOnPress={false}
+                    onPress={handleDeleteCard}
+                />
+            </ContextMenu.Body>
         </ContextMenu>
     )
 }

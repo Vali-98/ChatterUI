@@ -129,47 +129,47 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                 }
                 defaultValue={item.name}
             />
-            <ContextMenu
-                placement="right"
-                longPress
-                onPress={onPress}
-                buttons={[
-                    {
-                        label: t('common.actions.rename'),
-                        icon: 'edit',
-                        onPress: (close) => {
-                            renameInputRef.current?.open()
-                            close()
-                        },
-                    },
-                    {
-                        label: t('common.actions.delete'),
-                        icon: 'delete',
-                        variant: 'warning',
-                        onPress: handleDeleteChat,
-                    },
-                    {
-                        label: t('common.actions.more'),
-                        submenu: [
-                            {
-                                label: t('common.actions.export'),
-                                icon: 'download',
-                                onPress: handleExportChat,
-                            },
-                            {
-                                label: t('common.actions.clone'),
-                                icon: 'copy',
-                                onPress: handleCloneChat,
-                            },
-                            {
-                                label: t('chat.drawer.user.linkAction'),
-                                icon: 'user',
-                                onPress: handleLinkUser,
-                            },
-                        ],
-                    },
-                ]}>
-                {children}
+            <ContextMenu placement="right">
+                <ContextMenu.Trigger longPress onPress={onPress}>
+                    {children}
+                </ContextMenu.Trigger>
+                <ContextMenu.Body>
+                    <ContextMenu.Button
+                        label={t('common.actions.rename')}
+                        icon="edit"
+                        onPress={() => renameInputRef.current?.open()}
+                    />
+                    <ContextMenu.Button
+                        label={t('common.actions.delete')}
+                        icon="delete"
+                        variant="warning"
+                        closeOnPress={false}
+                        onPress={handleDeleteChat}
+                    />
+                    <ContextMenu.Submenu>
+                        <ContextMenu.Trigger label={t('common.actions.more')} />
+                        <ContextMenu.Body>
+                            <ContextMenu.Button
+                                label={t('common.actions.export')}
+                                icon="download"
+                                closeOnPress={false}
+                                onPress={handleExportChat}
+                            />
+                            <ContextMenu.Button
+                                label={t('common.actions.clone')}
+                                icon="copy"
+                                closeOnPress={false}
+                                onPress={handleCloneChat}
+                            />
+                            <ContextMenu.Button
+                                label={t('chat.drawer.user.linkAction')}
+                                icon="user"
+                                closeOnPress={false}
+                                onPress={handleLinkUser}
+                            />
+                        </ContextMenu.Body>
+                    </ContextMenu.Submenu>
+                </ContextMenu.Body>
             </ContextMenu>
         </>
     )

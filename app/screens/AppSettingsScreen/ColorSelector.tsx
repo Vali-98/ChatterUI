@@ -224,41 +224,41 @@ const ColorSelector = () => {
             />
             <HeaderButton
                 headerRight={() => (
-                    <ContextMenu
-                        triggerIcon="setting"
-                        placement="bottom"
-                        buttons={[
-                            {
-                                label: t('settings.colors.contextMenu.importTheme'),
-                                icon: 'download',
-                                onPress: (close) => {
+                    <ContextMenu placement="bottom">
+                        <ContextMenu.Trigger icon="setting" />
+                        <ContextMenu.Body>
+                            <ContextMenu.Button
+                                label={t('settings.colors.contextMenu.importTheme')}
+                                icon="download"
+                                onPress={() => {
                                     pickJSONDocument().then((result) => {
                                         if (!result.success) return
                                         addCustomColor(result.data)
                                     })
-                                    close()
-                                },
-                            },
-                            {
-                                label: t('settings.colors.contextMenu.pasteTheme'),
-                                icon: 'file',
-                                onPress: (close) => {
+                                }}
+                            />
+                            <ContextMenu.Button
+                                label={t('settings.colors.contextMenu.pasteTheme')}
+                                icon="file"
+                                closeOnPress={false}
+                                onPress={(close) => {
                                     close()
                                     inputRef.current?.open()
-                                },
-                            },
-                            {
-                                label: t('settings.colors.contextMenu.getThemes'),
-                                icon: 'github',
-                                onPress: (close) => {
+                                }}
+                            />
+                            <ContextMenu.Button
+                                label={t('settings.colors.contextMenu.getThemes')}
+                                icon="github"
+                                closeOnPress={false}
+                                onPress={(close) => {
                                     close()
                                     Linking.openURL(
                                         'https://github.com/Vali-98/ChatterUI/discussions/218'
                                     )
-                                },
-                            },
-                        ]}
-                    />
+                                }}
+                            />
+                        </ContextMenu.Body>
+                    </ContextMenu>
                 )}
             />
             <InputSheet

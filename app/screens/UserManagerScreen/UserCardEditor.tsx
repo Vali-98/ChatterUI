@@ -114,40 +114,44 @@ const UserCardEditor = () => {
         <View style={styles.userContainer}>
             <AvatarViewer editorButton={false} />
             <View style={styles.nameBar}>
-                <ContextMenu
-                    placement="right"
-                    buttons={[
-                        {
-                            label: t('users.edit.image.change'),
-                            icon: 'picture',
-                            onPress: (close) => {
+                <ContextMenu placement="right">
+                    <ContextMenu.Trigger>
+                        <Avatar
+                            targetImage={Characters.getImageDir(imageID)}
+                            style={styles.userImage}
+                        />
+                        <AntDesign name="edit" color={color.text._100} style={styles.editHover} />
+                    </ContextMenu.Trigger>
+                    <ContextMenu.Body>
+                        <ContextMenu.Button
+                            label={t('users.edit.image.change')}
+                            icon="picture"
+                            closeOnPress={false}
+                            onPress={(close) => {
                                 close()
                                 handleUploadImage()
-                            },
-                        },
-                        {
-                            label: t('users.edit.image.view'),
-                            icon: 'search',
-                            onPress: (close) => {
+                            }}
+                        />
+                        <ContextMenu.Button
+                            label={t('users.edit.image.view')}
+                            icon="search"
+                            closeOnPress={false}
+                            onPress={(close) => {
                                 close()
                                 setShowViewer(true, true)
-                            },
-                        },
-                        {
-                            label: t('users.edit.image.delete'),
-                            icon: 'delete',
-                            onPress: (close) => {
+                            }}
+                        />
+                        <ContextMenu.Button
+                            label={t('users.edit.image.delete')}
+                            icon="delete"
+                            closeOnPress={false}
+                            onPress={(close) => {
                                 close()
                                 handleDeleteImage()
-                            },
-                            variant: 'warning',
-                        },
-                    ]}>
-                    <Avatar
-                        targetImage={Characters.getImageDir(imageID)}
-                        style={styles.userImage}
-                    />
-                    <AntDesign name="edit" color={color.text._100} style={styles.editHover} />
+                            }}
+                            variant="warning"
+                        />
+                    </ContextMenu.Body>
                 </ContextMenu>
                 <View style={{ marginLeft: spacing.xl2, rowGap: 12, flex: 1 }}>
                     <View

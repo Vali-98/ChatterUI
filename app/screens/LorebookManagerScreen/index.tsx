@@ -39,27 +39,25 @@ const LorebookManagerHeaderButtons = () => {
             />
             <HeaderButton
                 headerRight={() => (
-                    <ContextMenu
-                        triggerIcon="setting"
-                        buttons={[
-                            {
-                                label: t('lorebook.import'),
-                                icon: 'import',
-                                onPress: (close) => {
+                    <ContextMenu>
+                        <ContextMenu.Trigger icon="setting" />
+                        <ContextMenu.Body>
+                            <ContextMenu.Button
+                                label={t('lorebook.import')}
+                                icon="import"
+                                onPress={() => {
                                     Lorebooks.importFromJSON()
-                                    close()
-                                },
-                            },
-                            {
-                                label: t('common.actions.create'),
-                                icon: 'edit',
-                                onPress: (close) => {
+                                }}
+                            />
+                            <ContextMenu.Button
+                                label={t('common.actions.create')}
+                                icon="edit"
+                                onPress={() => {
                                     createLorebookInputRef.current?.open()
-                                    close()
-                                },
-                            },
-                        ]}
-                    />
+                                }}
+                            />
+                        </ContextMenu.Body>
+                    </ContextMenu>
                 )}
             />
         </>
@@ -113,29 +111,26 @@ const LorebookListItem: React.FC<{ lorebook: LorebookType }> = ({ lorebook }) =>
                 </TText>
             </ListButtonSection>
             <ListButtonSection>
-                <ContextMenu
-                    triggerStyle={{ paddingVertical: 12 }}
-                    triggerIcon="edit"
-                    buttons={[
-                        {
-                            label: t('common.actions.delete'),
-                            variant: 'warning',
-                            icon: 'delete',
-                            onPress: (close) => {
+                <ContextMenu>
+                    <ContextMenu.Trigger iconStyle={{ paddingVertical: 12 }} icon="edit" />
+                    <ContextMenu.Body>
+                        <ContextMenu.Button
+                            label={t('common.actions.delete')}
+                            variant="warning"
+                            icon="delete"
+                            onPress={() => {
                                 handleDeleteLorebook(lorebook.id, lorebook.name)
-                                close()
-                            },
-                        },
-                        {
-                            label: t('common.actions.export'),
-                            icon: 'export',
-                            onPress: (close) => {
+                            }}
+                        />
+                        <ContextMenu.Button
+                            label={t('common.actions.export')}
+                            icon="export"
+                            onPress={() => {
                                 Lorebooks.exportToJSON(lorebook.id)
-                                close()
-                            },
-                        },
-                    ]}
-                />
+                            }}
+                        />
+                    </ContextMenu.Body>
+                </ContextMenu>
             </ListButtonSection>
         </ListButton>
     )

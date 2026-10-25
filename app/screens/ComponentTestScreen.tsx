@@ -1,5 +1,4 @@
 /* eslint-disable i18next/no-literal-string */
-import AntDesign from '@react-native-vector-icons/ant-design/static'
 import React, { useState } from 'react'
 import { Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
@@ -44,6 +43,10 @@ const ComponentTestScreen = () => {
     const [textInputData, setTextInputData] = useState('')
     const [checkbox, setCheckbox] = useState(true)
     const [sw, setSw] = useState(true)
+    const [menuAction, setMenuAction] = useState('No action yet')
+    const [keepMenuOpen, setKeepMenuOpen] = useState(true)
+    const [showHiddenItem, setShowHiddenItem] = useState(false)
+    const [showDisabledItem, setShowDisabledItem] = useState(false)
     const { color } = Theme.useTheme()
     const inputRef = useBottomSheetRef()
 
@@ -90,72 +93,113 @@ const ComponentTestScreen = () => {
                     }}
                 />
 
-                <ContextMenu
-                    buttons={[
-                        { label: 'Edit', onPress: () => console.log('Edit pressed') },
-                        { label: 'Delete', onPress: () => console.log('Delete pressed') },
-                        {
-                            label: 'More',
-                            submenu: [
-                                {
-                                    label: 'SubOption ',
-                                    onPress: () => console.log('Sub 1'),
-                                },
-                                {
-                                    label: 'SubOptiaaaaoaaan 2',
-                                    onPress: () => console.log('Sub 2'),
-                                },
-                            ],
-                        },
-                        {
-                            label: 'More',
-                            submenu: [
-                                {
-                                    label: 'SubOption ',
-                                    onPress: () => console.log('Sub 1'),
-                                },
-                                {
-                                    label: 'SubOptiaaaaoaaan 2',
-                                    onPress: () => console.log('Sub 2'),
-                                },
-                            ],
-                        },
-                        {
-                            label: 'More',
-                            submenu: [
-                                {
-                                    label: 'SubOption ',
-                                    onPress: () => console.log('Sub 1'),
-                                },
-                                {
-                                    label: 'SubOptiaaaaoaaanaaaaaaaaaaaaa 2',
-                                    onPress: () => console.log('Sub 2'),
-                                },
-                            ],
-                        },
-                        {
-                            label: 'More',
-                            submenu: [
-                                {
-                                    label: 'SubOption ',
-                                    onPress: () => console.log('Sub 1'),
-                                },
-                                {
-                                    label: 'SubOptiaaaaoaaanaaaaaaaaaaaaa 2',
-                                    onPress: () => console.log('Sub 2'),
-                                },
-                            ],
-                        },
-                    ]}
-                    placement="bottom">
-                    <AntDesign
-                        name="edit"
-                        size={20}
-                        style={{
-                            color: color.text._100,
-                            alignSelf: 'center',
-                        }}
+                <Text style={{ color: color.text._100 }}>Context menu</Text>
+                <Text style={{ color: color.text._300 }}>{menuAction}</Text>
+                <Text style={{ color: color.text._300 }}>
+                    Test actions, disabled and hidden rows, conditional closing, nested menus and
+                    long press.
+                </Text>
+                <ThemedSwitch
+                    label="Show disabled row"
+                    value={showDisabledItem}
+                    onChangeValue={setShowDisabledItem}
+                />
+                <ContextMenu placement="bottom">
+                    <ContextMenu.Trigger
+                        icon="setting"
+                        accessibilityLabel="Open new test menu"
+                        style={{ padding: 12, alignSelf: 'flex-start' }}
                     />
+                    <ContextMenu.Body>
+                        <ContextMenu.Button
+                            label="Action (closes)"
+                            icon="edit"
+                            onPress={() => setMenuAction('Automatic close action')}
+                        />
+                        <ContextMenu.Button
+                            label="Disabled action"
+                            icon="stop"
+                            hidden={!showDisabledItem}
+                            disabled
+                            onPress={() => setMenuAction('ERROR: disabled action ran')}
+                        />
+                        <ContextMenu.Button
+                            label="Toggle hidden item"
+                            closeOnPress={false}
+                            onPress={() => setShowHiddenItem((show) => !show)}
+                        />
+                        <ContextMenu.Button
+                            label="Previously hidden item"
+                            hidden={!showHiddenItem}
+                            onPress={() => setMenuAction('Revealed item pressed')}
+                        />
+                        <ContextMenu.Divider />
+                        <View style={{ padding: 12 }}>
+                            <ThemedSwitch
+                                label="Keep menu open"
+                                value={keepMenuOpen}
+                                onChangeValue={setKeepMenuOpen}
+                            />
+                        </View>
+                        <ContextMenu.Button
+                            label="Conditional close"
+                            closeOnPress={false}
+                            onPress={(close) => {
+                                setMenuAction(
+                                    keepMenuOpen ? 'Kept menu open' : 'Manually closed menu'
+                                )
+                                if (!keepMenuOpen) close()
+                            }}
+                        />
+                        <ContextMenu.Submenu>
+                            <ContextMenu.Trigger label="Export" icon="upload" />
+                            <ContextMenu.Body>
+                                <ContextMenu.Button
+                                    label="JSON"
+                                    onPress={() => setMenuAction('Export JSON')}
+                                />
+                                <ContextMenu.Submenu>
+                                    <ContextMenu.Trigger label="More formats" />
+                                    <ContextMenu.Body>
+                                        <ContextMenu.Button
+                                            label="PNG"
+                                            onPress={() => setMenuAction('Export PNG')}
+                                        />
+                                    </ContextMenu.Body>
+                                </ContextMenu.Submenu>
+                            </ContextMenu.Body>
+                        </ContextMenu.Submenu>
+                        <ContextMenu.Submenu>
+                            <ContextMenu.Trigger label="Another submenu" />
+                            <ContextMenu.Body>
+                                <ContextMenu.Button
+                                    label="Closes sibling submenu"
+                                    variant="warning"
+                                    onPress={() => setMenuAction('Sibling submenu action')}
+                                />
+                            </ContextMenu.Body>
+                        </ContextMenu.Submenu>
+                    </ContextMenu.Body>
+                </ContextMenu>
+                <ContextMenu placement="top">
+                    <ContextMenu.Trigger
+                        longPress
+                        onPress={() => setMenuAction('Short press on custom trigger')}
+                        style={{
+                            padding: 12,
+                            borderWidth: 1,
+                            borderColor: color.neutral._400,
+                        }}>
+                        <Text style={{ color: color.text._100 }}>
+                            Hold to open (custom trigger)
+                        </Text>
+                    </ContextMenu.Trigger>
+                    <ContextMenu.Body>
+                        <ContextMenu.Button
+                            label="Long-press menu action"
+                            onPress={() => setMenuAction('Long-press menu action')}
+                        />
+                    </ContextMenu.Body>
                 </ContextMenu>
 
                 <Accordion label="Test Accordion">

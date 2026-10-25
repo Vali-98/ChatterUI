@@ -173,46 +173,40 @@ const FormattingManager = () => {
     }
 
     const headerRight = () => (
-        <ContextMenu
-            triggerIcon="setting"
-            triggerIconSize={24}
-            placement="bottom"
-            buttons={[
-                {
-                    label: t('formatting.createConfig'),
-                    icon: 'file-add',
-                    onPress: (close) => {
+        <ContextMenu placement="bottom">
+            <ContextMenu.Trigger icon="setting" iconSize={24} />
+            <ContextMenu.Body>
+                <ContextMenu.Button
+                    label={t('formatting.createConfig')}
+                    icon="file-add"
+                    onPress={() => {
                         newInstructInputRef.current?.open()
-                        close()
-                    },
-                },
-                {
-                    label: t('formatting.exportConfig'),
-                    icon: 'download',
-                    onPress: (close) => {
+                    }}
+                />
+                <ContextMenu.Button
+                    label={t('formatting.exportConfig')}
+                    icon="download"
+                    onPress={() => {
                         handleExportPreset()
-                        close()
-                    },
-                },
-                {
-                    label: t('formatting.deleteConfig'),
-                    icon: 'delete',
-                    onPress: (close) => {
+                    }}
+                />
+                <ContextMenu.Button
+                    label={t('formatting.deleteConfig')}
+                    icon="delete"
+                    onPress={() => {
                         handleDeletePreset()
-                        close()
-                    },
-                    variant: 'warning',
-                },
-                {
-                    label: t('formatting.regenerateDefaults'),
-                    icon: 'reload',
-                    onPress: (close) => {
+                    }}
+                    variant="warning"
+                />
+                <ContextMenu.Button
+                    label={t('formatting.regenerateDefaults')}
+                    icon="reload"
+                    onPress={() => {
                         handleRegenerateDefaults()
-                        close()
-                    },
-                },
-            ]}
-        />
+                    }}
+                />
+            </ContextMenu.Body>
+        </ContextMenu>
     )
 
     useAutosave({ data: currentInstruct, onSave: () => handleSaveInstruct(false), interval: 1000 })

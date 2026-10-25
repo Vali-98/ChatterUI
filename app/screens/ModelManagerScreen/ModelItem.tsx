@@ -182,76 +182,69 @@ const ModelItem: React.FC<ModelItemProps> = ({
             </ListButtonSection>
 
             <ListButtonSection style={styles.buttonContainer}>
-                <ContextMenu
-                    disabled={disableEdit}
-                    triggerIcon="edit"
-                    triggerStyle={{ color: disableEdit ? color.text._700 : color.text._400 }}
-                    triggerIconSize={22}
-                    buttons={[
-                        {
-                            label: t('model.linkmmproj'),
-                            component: () => (
-                                <DropdownSheet
-                                    modalTitle={t('model.selectmmproj')}
-                                    style={{
-                                        backgroundColor: color.neutral._200,
-                                        paddingVertical: 10,
-                                    }}
-                                    containerStyle={{ marginTop: 8 }}
-                                    placeholder={t('model.linkmmproj')}
-                                    data={mmprojList}
-                                    selected={
-                                        mmprojList.filter(
-                                            (e) => e.id === item.mmprojLink?.mmproj_id
-                                        )?.[0] ?? undefined
+                <ContextMenu disabled={disableEdit}>
+                    <ContextMenu.Trigger
+                        icon="edit"
+                        iconStyle={{ color: disableEdit ? color.text._700 : color.text._400 }}
+                        iconSize={22}
+                    />
+                    <ContextMenu.Body>
+                        {!(isMMPROJ || !!item.mmprojLink || mmprojList.length === 0) && (
+                            <DropdownSheet
+                                modalTitle={t('model.selectmmproj')}
+                                style={{
+                                    backgroundColor: color.neutral._200,
+                                    paddingVertical: 10,
+                                }}
+                                containerStyle={{ marginTop: 8 }}
+                                placeholder={t('model.linkmmproj')}
+                                data={mmprojList}
+                                selected={
+                                    mmprojList.filter(
+                                        (e) => e.id === item.mmprojLink?.mmproj_id
+                                    )?.[0] ?? undefined
+                                }
+                                labelExtractor={(item) => item.name}
+                                onChangeValue={async (value) => {
+                                    try {
+                                        if (item.mmprojLink) await Model.removeMMPROJLink(item)
+                                        await Model.createMMPROJLink(item, value)
+                                    } catch (e) {
+                                        Logger.errorToast(t('model.toast.failedtolink'), e)
                                     }
-                                    labelExtractor={(item) => item.name}
-                                    onChangeValue={async (value) => {
-                                        try {
-                                            if (item.mmprojLink) await Model.removeMMPROJLink(item)
-                                            await Model.createMMPROJLink(item, value)
-                                        } catch (e) {
-                                            Logger.errorToast(t('model.toast.failedtolink'), e)
-                                        }
-                                    }}
-                                    icon={'link'}
-                                    iconPosition="left"
-                                    iconSize={16}
-                                />
-                            ),
-                            disabled: isMMPROJ || !!item.mmprojLink || mmprojList.length === 0,
-                        },
-                        {
-                            label: t('model.unlinkmmproj'),
-                            onPress: (close) => {
+                                }}
+                                icon={'link'}
+                                iconPosition="left"
+                                iconSize={16}
+                            />
+                        )}
+                        <ContextMenu.Button
+                            hidden={isMMPROJ || !item.mmprojLink}
+                            label={t('model.unlinkmmproj')}
+                            onPress={() => {
                                 handleUnlinkMMPROJ()
-                                close()
-                            },
-                            disabled: isMMPROJ || !item.mmprojLink,
-                            icon: 'disconnect',
-                        },
-                        {
-                            label: t('common.actions.rename'),
-                            onPress: (close) => {
+                            }}
+                            icon="disconnect"
+                        />
+                        <ContextMenu.Button
+                            hidden={disableEdit}
+                            label={t('common.actions.rename')}
+                            onPress={() => {
                                 editInputRef.current?.open()
-                                close()
-                            },
-                            disabled: disableEdit,
-                            icon: 'edit',
-                        },
-
-                        {
-                            label: t('common.actions.delete'),
-                            onPress: (close) => {
+                            }}
+                            icon="edit"
+                        />
+                        <ContextMenu.Button
+                            hidden={disableDelete}
+                            label={t('common.actions.delete')}
+                            onPress={() => {
                                 handleDeleteModel()
-                                close()
-                            },
-                            disabled: disableDelete,
-                            variant: 'warning',
-                            icon: 'delete',
-                        },
-                    ]}
-                />
+                            }}
+                            variant="warning"
+                            icon="delete"
+                        />
+                    </ContextMenu.Body>
+                </ContextMenu>
 
                 {!isMMPROJ && (
                     <TouchableOpacity disabled={loadToggle} onPress={handleLoadModel}>
