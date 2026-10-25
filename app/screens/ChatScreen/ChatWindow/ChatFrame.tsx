@@ -5,7 +5,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 
 import Avatar from '@components/views/Avatar'
 import { AppSettings } from '@lib/constants/GlobalValues'
-import { Characters } from '@lib/state/Characters'
+import { Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/Chat'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
 import { Theme } from '@lib/theme/ThemeManager'

@@ -21,7 +21,7 @@ import { AppDirectory, deleteFile, listFiles, makeDirectory, readStringAsync } f
 import { lockScreenOrientation } from './Screen'
 import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
-import { Characters } from '../state/Characters'
+import { Characters } from '../state/characters'
 import { Chats } from '../state/Chat'
 import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
@@ -66,7 +66,7 @@ const setAppDefaultSettings = () => {
 const createDefaultCard = async () => {
     if (!mmkv.getBoolean(AppSettings.CreateDefaultCard)) return
     const result = await Characters.db.query.cardList('character')
-    if (result.length === 0) await Characters.createDefaultCard()
+    if (result.length === 0) await Characters.actions.createDefaultCard()
     mmkv.set(AppSettings.CreateDefaultCard, false)
 }
 

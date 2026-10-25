@@ -9,7 +9,7 @@ import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Storage } from '@lib/enums/Storage'
 
 import { CharacterLink } from './CharacterLinks'
-import { Characters } from './Characters'
+import { Characters } from './characters'
 import { Logger } from './Logger'
 import { replaceMacros } from '../state/Macros'
 import { createMMKVStorage } from '../storage/MMKV'

@@ -7,7 +7,7 @@ import { useShallow } from 'zustand/react/shallow'
 import ThemedButton from '@components/buttons/ThemedButton'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import InputSheet from '@components/views/InputSheet'
-import { Characters } from '@lib/state/Characters'
+import { Characters } from '@lib/state/characters'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import UserListing from './UserListing'

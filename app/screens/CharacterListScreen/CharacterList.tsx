@@ -8,7 +8,7 @@ import { useShallow } from 'zustand/react/shallow'
 import Drawer from '@components/views/Drawer'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { Characters, CharInfo } from '@lib/state/Characters'
+import { Characters, CharInfo } from '@lib/state/characters'
 import { CharacterSorter } from '@lib/state/CharacterSorter'
 import { TagHider } from '@lib/state/TagHider'
 

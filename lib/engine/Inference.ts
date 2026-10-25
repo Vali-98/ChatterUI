@@ -5,13 +5,14 @@ import { ChatSwipe } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { isCloseThinkTag, isOpenThinkTag } from '@lib/markdown/ThinkTags'
 import { useAppModeStore } from '@lib/state/AppMode'
+import { useCharacterTokenState } from '@lib/state/characters/tokenState'
 import { Chats, useInference } from '@lib/state/Chat'
 import { Instructs } from '@lib/state/Instructs'
 import { getCurrentSampler } from '@lib/state/samplerStore'
 import { useTTSStore } from '@lib/state/TTS'
 import { mmkv } from '@lib/storage/MMKV'
 
-import { Characters } from '../state/Characters'
+import { Characters } from '../state/characters'
 import { Logger } from '../state/Logger'
 import { APIBuilderParams, buildAndSendRequest } from './API/APIBuilder'
 import { APIConfiguration, APIValues } from './API/APIBuilder.types'
@@ -290,6 +291,10 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
 
         const dataSources = await getDataSources()
 
+        const tokenCounts = await useCharacterTokenState
+            .getState()
+            .getCounts(characterCard, userCard)
+
         return {
             apiConfig: Object.assign({}, apiConfig),
             apiValues: Object.assign({}, apiValues),
@@ -321,8 +326,7 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
             tokenizer: tokenizer,
             maxLength: length,
             cache: {
-                userCache: await userState.getCache(characterCard.name),
-                characterCache: await characterState.getCache(userCard.name),
+                ...tokenCounts,
                 instructCache: await instructState.getCache(characterCard.name, userCard.name),
             },
             dataSources: dataSources,

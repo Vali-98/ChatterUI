@@ -5,7 +5,7 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import TText from '@components/text/TText'
 import Avatar from '@components/views/Avatar'
 import SequenceAnimationView from '@components/views/SequenceAnimationView'
-import { Characters } from '@lib/state/Characters'
+import { Characters } from '@lib/state/characters'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import OnboardingView from './OnboardNavigation'

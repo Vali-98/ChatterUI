@@ -3,7 +3,7 @@ import { Text, TouchableOpacity } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 import Avatar from '@components/views/Avatar'
-import { Characters } from '@lib/state/Characters'
+import { Characters } from '@lib/state/characters'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const UserInfo = () => {

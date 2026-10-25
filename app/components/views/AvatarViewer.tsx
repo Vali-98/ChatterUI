@@ -8,7 +8,7 @@ import { useShallow } from 'zustand/react/shallow'
 import ThemedButton from '@components/buttons/ThemedButton'
 import Avatar from '@components/views/Avatar'
 import FadeBackrop from '@components/views/FadeBackdrop'
-import { Characters } from '@lib/state/Characters'
+import { Characters } from '@lib/state/characters'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
 import { Theme } from '@lib/theme/ThemeManager'
 

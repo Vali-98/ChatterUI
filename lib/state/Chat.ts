@@ -19,11 +19,11 @@ import {
     CompletionTimings,
 } from '@db/schema'
 import { Tokenizer } from '@lib/engine/Tokenizer'
-import { replaceMacros } from '@lib/state/Macros'
+import { getActiveMacros, replaceMacros } from '@lib/state/Macros'
 import { AppDirectory, copyFile, deleteFile, fileInfo } from '@lib/utils/File'
 import { convertToFormatInstruct } from '@lib/utils/TextFormat'
 
-import { Characters } from './Characters'
+import { Characters } from './characters'
 import { Logger } from './Logger'
 import { AppSettings } from '../constants/GlobalValues'
 import { mmkv } from '../storage/MMKV'
@@ -403,7 +403,9 @@ export namespace Chats {
                             greetings.map((item, index) => ({
                                 entry_id: entryId,
                                 active: index === 0,
-                                swipe: convertToFormatInstruct(replaceMacros(item)),
+                                swipe: convertToFormatInstruct(
+                                    replaceMacros(item, getActiveMacros({ temporal: false }))
+                                ),
                             }))
                         )
                     }
@@ -452,7 +454,11 @@ export namespace Chats {
 
                 const [{ swipeId }] = await database
                     .insert(chatSwipes)
-                    .values({ swipe: replaceMacros(message), entry_id: entryId, active: true })
+                    .values({
+                        swipe: replaceMacros(message, getActiveMacros({ temporal: false })),
+                        entry_id: entryId,
+                        active: true,
+                    })
                     .returning({ swipeId: chatSwipes.id })
                 await deactivateOtherSwipes(entryId, swipeId)
 
@@ -485,7 +491,7 @@ export namespace Chats {
                     .insert(chatSwipes)
                     .values({
                         entry_id: entryId,
-                        swipe: replaceMacros(message),
+                        swipe: replaceMacros(message, getActiveMacros({ temporal: false })),
                         active: true,
                     })
                     .returning()

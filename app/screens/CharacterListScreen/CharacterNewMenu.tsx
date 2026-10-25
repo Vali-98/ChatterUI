@@ -5,7 +5,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import InputSheet from '@components/views/InputSheet'
-import { Characters } from '@lib/state/Characters'
+import { Characters } from '@lib/state/characters'
 import { Logger } from '@lib/state/Logger'
 
 type CharacterNewMenuProps = {
@@ -59,7 +59,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                     <ContextMenu.Button
                         label={t('character.list.actions.importFromFile')}
                         onPress={() => {
-                            Characters.importCharacter()
+                            Characters.actions.importCharacter()
                         }}
                         icon="upload"
                     />

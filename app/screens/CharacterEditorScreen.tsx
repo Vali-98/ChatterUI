@@ -24,7 +24,7 @@ import HeaderTitle from '@components/views/HeaderTitle'
 import { db } from '@db/db'
 import { characterTags, tags } from '@db/schema'
 import { useDebounceTokenizer } from '@lib/hooks/Tokenizer'
-import { CharacterCardData, Characters } from '@lib/state/Characters'
+import { CharacterCardData, Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/Chat'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
 import { Logger } from '@lib/state/Logger'
@@ -110,7 +110,8 @@ const ChracterEditorScreen = () => {
     const handleExportCard = () => {
         try {
             if (!charId) return
-            Characters.exportCharacter(charId)
+            Characters.actions
+                .exportCharacter(charId)
                 .catch((e) => {
                     Logger.errorToast(t('character.editor.errors.exportFailed'))
                     Logger.error(e)
@@ -133,8 +134,8 @@ const ChracterEditorScreen = () => {
                 { label: t('common.actions.cancel') },
                 {
                     label: t('character.editor.dialogs.deleteCharacter.confirm'),
-                    onPress: () => {
-                        Characters.db.mutate.deleteCard(charId ?? -1)
+                    onPress: async () => {
+                        await Characters.actions.deleteCard(charId ?? -1)
                         unloadCharacter()
                         resetId()
                         setEdited(false)
@@ -160,10 +161,13 @@ const ChracterEditorScreen = () => {
                 { label: t('common.actions.cancel') },
                 {
                     label: t('character.editor.dialogs.deleteImage.confirm'),
-                    onPress: () => {
+                    onPress: async () => {
                         if (currentCard) {
-                            Characters.db.mutate.deleteImage(currentCard.id)
-                            Characters.deleteImage(currentCard.image_id)
+                            try {
+                                await Characters.actions.deleteImage(currentCard.id)
+                            } catch (error) {
+                                Logger.errorToast(t('common.errors.couldNotGetData'), error)
+                            }
                         }
                     },
                     type: 'warning',
@@ -176,10 +180,12 @@ const ChracterEditorScreen = () => {
         DocumentPicker.getDocumentAsync({
             copyToCacheDirectory: true,
             type: 'image/*',
-        }).then((result: DocumentPicker.DocumentPickerResult) => {
-            if (result.canceled || !charId) return
-            Characters.useCharacterStore.getState().updateImage(result.assets[0].uri)
         })
+            .then(async (result: DocumentPicker.DocumentPickerResult) => {
+                if (result.canceled || !charId) return
+                await Characters.actions.updateImage(charId, result.assets[0].uri)
+            })
+            .catch((error) => Logger.errorToast(t('common.errors.couldNotGetData'), error))
     }
 
     const handleAddAltMessage = async () => {
@@ -310,10 +316,7 @@ const ChracterEditorScreen = () => {
                                         closeOnPress={false}
                                         onPress={async (close) => {
                                             close()
-                                            await Characters.importBackground(
-                                                charId,
-                                                characterCard.background_image
-                                            )
+                                            await Characters.actions.importBackground(charId)
                                         }}
                                     />
                                     <ContextMenu.Button
@@ -343,7 +346,7 @@ const ChracterEditorScreen = () => {
                                         onPress={(close) => {
                                             close()
                                             if (backgroundImage)
-                                                Characters.deleteBackground(charId, backgroundImage)
+                                                Characters.actions.deleteBackground(charId)
                                         }}
                                         variant="warning"
                                     />

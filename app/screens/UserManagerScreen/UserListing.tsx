@@ -7,7 +7,7 @@ import Avatar from '@components/views/Avatar'
 import ContextMenu from '@components/views/ContextMenu'
 import Drawer from '@components/views/Drawer'
 import { CharacterLink } from '@lib/state/CharacterLinks'
-import { Characters } from '@lib/state/Characters'
+import { Characters } from '@lib/state/characters'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getFriendlyTimeStamp } from '@lib/utils/Time'
 
@@ -43,7 +43,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
                 {
                     label: t('users.edit.card.delete'),
                     onPress: async () => {
-                        await Characters.db.mutate.deleteCard(user.id)
+                        await Characters.actions.deleteCard(user.id)
                         await Characters.db.query.cardList('user').then(async (list) => {
                             if (list.length === 0) {
                                 // eslint-disable-next-line i18next/no-literal-string
@@ -76,7 +76,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
                     label: t('users.edit.card.clone'),
                     onPress: async () => {
                         close()
-                        await Characters.db.mutate.duplicateCard(user.id)
+                        await Characters.actions.duplicateCard(user.id)
                     },
                 },
             ],

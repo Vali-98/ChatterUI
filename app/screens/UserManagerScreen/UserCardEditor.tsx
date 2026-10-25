@@ -13,8 +13,9 @@ import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
 import AvatarViewer from '@components/views/AvatarViewer'
 import ContextMenu from '@components/views/ContextMenu'
-import { CharacterCardData, Characters } from '@lib/state/Characters'
+import { CharacterCardData, Characters } from '@lib/state/characters'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
+import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const UserCardEditor = () => {
@@ -23,13 +24,12 @@ const UserCardEditor = () => {
     const { color, spacing } = Theme.useTheme()
     const navigation = useNavigation()
     const [edited, setEdited] = useState(false)
-    const { userCard, imageID, id, setCard, updateImage } = Characters.useUserStore(
+    const { userCard, imageID, id, setCard } = Characters.useUserStore(
         useShallow((state) => ({
             userCard: state.card,
             imageID: state.card?.image_id ?? 0,
             id: state.id,
             setCard: state.setCard,
-            updateImage: state.updateImage,
         }))
     )
 
@@ -39,8 +39,8 @@ const UserCardEditor = () => {
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setCurrentCard(userCard)
-    }, [userCard])
+        setCurrentCard((current) => (edited && current?.id === userCard?.id ? current : userCard))
+    }, [userCard, edited])
 
     const updateCard = (card: CharacterCardData) => {
         setEdited(true)
@@ -59,10 +59,12 @@ const UserCardEditor = () => {
         DocumentPicker.getDocumentAsync({
             copyToCacheDirectory: true,
             type: 'image/*',
-        }).then((result) => {
-            if (result.canceled) return
-            if (id) updateImage(result.assets[0].uri)
         })
+            .then(async (result) => {
+                if (result.canceled) return
+                if (id) await Characters.actions.updateImage(id, result.assets[0].uri)
+            })
+            .catch((error) => Logger.errorToast(t('common.errors.couldNotGetData'), error))
     }
 
     const handleDeleteImage = () => {
@@ -73,10 +75,13 @@ const UserCardEditor = () => {
                 { label: t('common.actions.cancel') },
                 {
                     label: t('users.edit.image.delete'),
-                    onPress: () => {
+                    onPress: async () => {
                         if (currentCard) {
-                            Characters.db.mutate.deleteImage(currentCard.id)
-                            Characters.deleteImage(imageID)
+                            try {
+                                await Characters.actions.deleteImage(currentCard.id)
+                            } catch (error) {
+                                Logger.errorToast(t('common.errors.couldNotGetData'), error)
+                            }
                         }
                     },
                     type: 'warning',

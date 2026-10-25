@@ -4,7 +4,7 @@ import { Bar } from 'react-native-progress'
 
 import { SamplerID } from '@lib/constants/SamplerData'
 import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
-import { Characters } from '@lib/state/Characters'
+import { useCharacterTokenCounts } from '@lib/state/characters/tokenState'
 import { Chats } from '@lib/state/Chat'
 import { useCurrentSampler } from '@lib/state/samplerStore'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -12,9 +12,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 const ChatTokenCount: React.FC = () => {
     const { t } = useTranslation()
     const { id: chatId } = Chats.useChatState()
-    const cardTokenCount = Characters.useCharacterStore(
-        (state) => state.tokenCache?.description_length ?? 0
-    )
+    const cardTokenCount = useCharacterTokenCounts()?.characterCache.description_length ?? 0
     const { data } = useLiveQueryJoined(Chats.db.live.tokenCount(chatId ?? -1))
     const { color, fontSize } = Theme.useTheme()
     const sampler = useCurrentSampler()

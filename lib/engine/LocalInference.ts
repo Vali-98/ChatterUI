@@ -7,7 +7,8 @@ import { AppSettings } from '@lib/constants/GlobalValues'
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { isCloseThinkTag, isOpenThinkTag } from '@lib/markdown/ThinkTags'
 import { CharacterLink } from '@lib/state/CharacterLinks'
-import { Characters } from '@lib/state/Characters'
+import { Characters } from '@lib/state/characters'
+import { useCharacterTokenState } from '@lib/state/characters/tokenState'
 import { Chats, useInference } from '@lib/state/Chat'
 import { commonStopStrings, Instructs, outputPrefixes } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
@@ -478,6 +479,10 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
         const instructLength = engineData.context_length
         const length = Math.max(instructLength - samplers.genamt, 0)
 
+        const tokenCounts = await useCharacterTokenState
+            .getState()
+            .getCounts(characterCard, userCard)
+
         return {
             apiConfig: Object.assign({}, apiConfig),
             apiValues: Object.assign({}, apiValues),
@@ -506,8 +511,7 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
             tokenizer: Llama.useLlamaModelStore.getState().tokenLength,
             maxLength: length,
             cache: {
-                userCache: await userState.getCache(characterCard.name),
-                characterCache: await characterState.getCache(userCard.name),
+                ...tokenCounts,
                 instructCache: await instructState.getCache(characterCard.name, userCard.name),
             },
         }

@@ -1,16 +1,17 @@
 import { t } from 'i18next'
 
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { useTextFilterStore } from '@lib/hooks/TextFilter'
 import { buildThinkRules } from '@lib/markdown/ThinkTags'
 import { useAppModeStore } from '@lib/state/AppMode'
-import { CharacterCardData, CharacterTokenCache } from '@lib/state/Characters'
+import { CharacterCardData, CharacterTokenCache } from '@lib/state/characters'
 import { ChatEntry } from '@lib/state/Chat'
 import { defaultSystemPromptFormat, InstructTokenCache, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
-import { replaceMacros } from '@lib/state/Macros'
+import { getActiveMacros, replaceMacros } from '@lib/state/Macros'
 import { mmkv } from '@lib/storage/MMKV'
 import { readBase64Async } from '@lib/utils/File'
-import { Macro } from '@lib/utils/Macros'
+import { applyMacros } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import type { DataSource, DataSourceResult } from '../DataSources/types'
@@ -168,7 +169,10 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
 
         const role: 'user' | 'assistant' = message.is_user ? 'user' : 'assistant'
 
-        const content = replaceMacrosInternal(`${timestamp}${name}${swipe.swipe}`, instruct)
+        const content = filterContextText(
+            replaceMacros(`${timestamp}${name}${swipe.swipe}`),
+            instruct
+        )
 
         let attachments: ContentTypes[] | undefined
 
@@ -298,7 +302,7 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
     for (const insertion of pendingInsertions) {
         const syntheticMessage: ContextMessage = {
             role: 'user',
-            content: insertion.content,
+            content: filterContextText(insertion.content, instruct),
         }
 
         if (insertion.position.type === 'relative') {
@@ -355,7 +359,7 @@ export const buildChatCompletionContext = async (params: ContextBuilderParams) =
     const payload: Message[] = [
         {
             role: feats.systemRole,
-            [feats.contentName]: replaceMacrosInternal(systemPrompt, params.instruct),
+            [feats.contentName]: filterContextText(systemPrompt, params.instruct),
         },
     ]
 
@@ -427,24 +431,23 @@ export const buildTextCompletionContext = async (params: ContextBuilderParams) =
     }
 
     if (!endedAtAssistant) output += instruct.last_output_prefix
-    const result = replaceMacrosInternal(output, instruct)
+    const result = filterContextText(output, instruct)
     printContext(result)
     return result
 }
 
 const thinkRule = buildThinkRules()
 
-const getMacroRules = (instruct: InstructType) => {
-    const data: Macro[] = []
-    if (instruct.hide_think_tags) {
-        data.push(...thinkRule)
+const filterContextText = (text: string, instruct: InstructType) => {
+    let result = text
+    const { sendFilteredText, filter } = useTextFilterStore.getState()
+    if (!sendFilteredText) {
+        for (const pattern of filter) result = result.replace(new RegExp(pattern, 'gi'), '')
     }
-    // for expansion
-    return data
-}
-
-const replaceMacrosInternal = (data: string, instruct: InstructType) => {
-    return replaceMacros(data, { extraMacros: getMacroRules(instruct) })
+    if (instruct.hide_think_tags) {
+        for (const rule of thinkRule) result = result.replace(rule.macro, () => rule.value)
+    }
+    return result
 }
 
 const getValidAttachments = (
@@ -530,29 +533,31 @@ export const getSystemPrompt = ({
         },
         {
             macro: '{{character_desc}}',
-            value: character?.description ?? '',
+            value: replaceMacros(character?.description ?? ''),
             length: characterCache.description_length,
         },
         {
             macro: '{{user_desc}}',
-            value: user?.description ?? '',
+            value: replaceMacros(user?.description ?? ''),
             length: userCache.description_length,
         },
         {
             macro: '{{personality}}',
-            value: instruct.personality ? (character?.personality ?? '') : '',
+            value: instruct.personality ? replaceMacros(character?.personality ?? '') : '',
             length: instruct.personality ? characterCache.personality_length : 0,
         },
         {
             macro: '{{scenario}}',
-            value: instruct.scenario ? (character?.scenario ?? '') : '',
+            value: instruct.scenario ? replaceMacros(character?.scenario ?? '') : '',
             length: instruct.scenario ? characterCache.scenario_length : 0,
         },
     ]
+    const slots: Record<string, string> = {}
     macros.forEach((m) => {
-        systemPrompt = systemPrompt.replaceAll(m.macro, m.value)
+        slots[m.macro.slice(2, -2)] = m.value
         systemPromptLength += m.length
     })
+    systemPrompt = applyMacros(systemPrompt, { ...getActiveMacros(), ...slots })
     return { systemPrompt, systemPromptLength }
 }
 

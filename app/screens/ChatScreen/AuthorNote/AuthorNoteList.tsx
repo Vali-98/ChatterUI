@@ -2,7 +2,7 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { FlatList } from 'react-native-gesture-handler'
 
 import { AuthorNotes, NoteType } from '@lib/state/AuthorNotes'
-import { Characters } from '@lib/state/Characters'
+import { Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/Chat'
 
 import AuthorNoteEmpty from './AuthorNoteEmpty'

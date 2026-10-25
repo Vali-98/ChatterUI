@@ -1,24 +1,18 @@
-import { Macro, replaceMacroBase } from '@lib/utils/Macros'
+import { applyMacros, createMacroValues, MacroValues } from '@lib/utils/Macros'
 
-import { Characters } from './Characters'
+import { useCharacterState } from './characters/state'
+import { useUserStore } from './characters/store'
 
-/**
- * @param text text to be filtered
- * @param options extraMacros definition
- * @returns
- */
-export const replaceMacros = (
-    text: string,
-    options: { extraMacros: Macro[] } = { extraMacros: [] }
-) => {
-    let newtext: string = text
-    const charName = Characters.useCharacterStore.getState().card?.name ?? ''
-    const userName = Characters.useUserStore.getState().card?.name ?? ''
-    const rules: Macro[] = [
-        { macro: /{{?user}}?/g, value: userName },
-        { macro: /{{?char}}?/g, value: charName },
-        ...(options?.extraMacros ?? []),
-    ]
-    newtext = replaceMacroBase(text, { extraMacros: rules })
-    return newtext
-}
+export type { MacroValues } from '@lib/utils/Macros'
+
+export const getActiveMacros = ({ temporal = true }: { temporal?: boolean } = {}): MacroValues =>
+    createMacroValues(
+        {
+            char: useCharacterState.getState().card?.name ?? '',
+            user: useUserStore.getState().card?.name ?? '',
+        },
+        temporal ? new Date() : null
+    )
+
+export const replaceMacros = (text: string, values: MacroValues = getActiveMacros()): string =>
+    applyMacros(text ?? '', values)

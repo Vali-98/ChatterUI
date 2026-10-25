@@ -6,7 +6,7 @@ import { View } from 'react-native'
 import Alert from '@components/views/Alert'
 import ContextMenu from '@components/views/ContextMenu'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
-import { CharInfo, Characters } from '@lib/state/Characters'
+import { CharInfo, Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/Chat'
 import { Instructs } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
@@ -95,7 +95,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                 {
                     label: t('character.editor.dialogs.deleteCharacter.confirm'),
                     onPress: async () => {
-                        Characters.db.mutate.deleteCard(character.id ?? -1)
+                        await Characters.actions.deleteCard(character.id ?? -1)
                     },
                     type: 'warning',
                 },
@@ -116,7 +116,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                     label: t('character.editor.dialogs.clone.confirm'),
                     onPress: async () => {
                         setNowLoading(true)
-                        await Characters.db.mutate.duplicateCard(character.id)
+                        await Characters.actions.duplicateCard(character.id)
 
                         setNowLoading(false)
                     },

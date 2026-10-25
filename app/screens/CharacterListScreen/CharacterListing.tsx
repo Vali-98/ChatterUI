@@ -5,7 +5,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import Avatar from '@components/views/Avatar'
 import { AppSettings } from '@lib/constants/GlobalValues'
-import { Characters, CharInfo } from '@lib/state/Characters'
+import { Characters, CharInfo } from '@lib/state/characters'
 import { CharacterSorter } from '@lib/state/CharacterSorter'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getFriendlyTimeStamp } from '@lib/utils/Time'

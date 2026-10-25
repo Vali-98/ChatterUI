@@ -11,7 +11,7 @@ import { useDebounce } from '@lib/hooks/Debounce'
 import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
 import { useAppMode } from '@lib/state/AppMode'
 import { useBackgroundStore } from '@lib/state/BackgroundImage'
-import { Characters } from '@lib/state/Characters'
+import { Characters } from '@lib/state/characters'
 import { Chats, ScrollData } from '@lib/state/Chat'
 import { AppDirectory } from '@lib/utils/File'
 
