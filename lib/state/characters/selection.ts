@@ -4,31 +4,31 @@ import { createLiveQueryState, type LiveQueryStateBinding } from '@lib/state/cre
 import { Logger } from '@lib/state/Logger'
 
 import { db } from './db'
-import { getImageDir } from './images'
-import type { CharacterCardState } from './types'
+import { getCardImageUri } from './images'
+import type { CharacterCardSelectionState } from './types'
 
 /** Character and user selections have identical behavior; persistence is configured separately. */
 export const createCardSelection = () => {
     let liveQuery: LiveQueryStateBinding | undefined
-    const initializer: StateCreator<CharacterCardState> = (set, get) => ({
+    const initializer: StateCreator<CharacterCardSelectionState> = (set, get) => ({
         id: undefined,
         card: undefined,
         error: undefined,
-        setCard: async (id) => {
-            if (get().id === id) liveQuery?.refresh()
-            else set({ id: id, card: undefined, error: undefined })
+        setCard: async (characterId) => {
+            if (get().id === characterId) liveQuery?.refresh()
+            else set({ id: characterId, card: undefined, error: undefined })
             const { card, error } = get()
             if (error) throw error
             return card?.name
         },
         unloadCard: () => set({ id: undefined, card: undefined, error: undefined }),
-        getImage: () => getImageDir(get().card?.image_id ?? 0),
+        getImageUri: () => getCardImageUri(get().card?.image_id ?? 0),
     })
-    const bind = (state: StoreApi<CharacterCardState>) => {
+    const bind = (state: StoreApi<CharacterCardSelectionState>) => {
         liveQuery?.dispose()
         liveQuery = createLiveQueryState(state, {
             select: (value) => value.id,
-            query: db.query.cardQuery,
+            query: db.live.card,
             watch: (id) => [
                 { table: 'characters', rowId: id },
                 // SQLite notifications contain rowids, not these relations' character_id.

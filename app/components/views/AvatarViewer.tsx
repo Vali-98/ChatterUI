@@ -29,10 +29,10 @@ const AvatarViewer: React.FC<AvatarViewerProps> = ({ editorButton = true }) => {
         }))
     )
 
-    const { charName, charImageId } = Characters.useCharacterStore(
+    const { characterName, characterImageId } = Characters.useCharacterState(
         useShallow((state) => ({
-            charName: state.card?.name,
-            charImageId: state.card?.image_id,
+            characterName: state.card?.name,
+            characterImageId: state.card?.image_id,
         }))
     )
 
@@ -45,13 +45,13 @@ const AvatarViewer: React.FC<AvatarViewerProps> = ({ editorButton = true }) => {
 
     const [aspectRatio, setAspectRatio] = useState(1)
 
-    const imageId = isUser ? userImageId : charImageId
+    const imageId = isUser ? userImageId : characterImageId
 
-    const name = isUser ? userName : charName
+    const name = isUser ? userName : characterName
 
     useEffect(() => {
         Image.getSize(
-            Characters.getImageDir(imageId ?? -1),
+            Characters.getCardImageUri(imageId ?? -1),
             (width, height) => {
                 setAspectRatio(width / height)
             },
@@ -75,7 +75,7 @@ const AvatarViewer: React.FC<AvatarViewerProps> = ({ editorButton = true }) => {
                 <Animated.View style={styles.bodyContainer} entering={FadeInDown}>
                     <Avatar
                         contentFit="cover"
-                        targetImage={Characters.getImageDir(imageId ?? -1)}
+                        targetImage={Characters.getCardImageUri(imageId ?? -1)}
                         style={[styles.avatar, { aspectRatio: aspectRatio }]}
                     />
                     <Text style={styles.name}>{name}</Text>

@@ -1,17 +1,17 @@
 import * as characterActions from './actions'
 import { db as characterDb } from './db'
-import { getImageDir as characterImageDir } from './images'
-import { convertDBDataToCV2 as convertCharacterCard } from './schema'
-import { useCharacterState } from './state'
+import { getCardImageUri as characterImageUri } from './images'
+import { toCharacterCardV2 as convertToCharacterCardV2 } from './schema'
+import { useCharacterState as characterState } from './state'
 import { useUserStore as userStore } from './store'
 
-export type { CharInfo, CharacterTokenCache, CharacterCardData } from './types'
+export type { CharacterCardSummary, CharacterTokenCounts, CharacterCard } from './types'
 
 export namespace Characters {
     export const db = characterDb
     export const useUserStore = userStore
-    export const useCharacterStore = useCharacterState
-    export const getImageDir = characterImageDir
+    export const useCharacterState = characterState
+    export const getCardImageUri = characterImageUri
     export const actions = characterActions
-    export const convertDBDataToCV2 = convertCharacterCard
+    export const toCharacterCardV2 = convertToCharacterCardV2
 }

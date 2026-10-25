@@ -8,8 +8,8 @@ import Drawer from '@components/views/Drawer'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
-import { Characters, CharInfo } from '@lib/state/characters'
-import { CharacterSorter } from '@lib/state/CharacterSorter'
+import { Characters, CharacterCardSummary } from '@lib/state/characters'
+import { useCharacterSortStore } from '@lib/state/characters/sortStore'
 import { TagHider } from '@lib/state/TagHider'
 
 import CharacterListHeader from './CharacterListHeader'
@@ -21,11 +21,11 @@ import CharactersSearchEmpty from './CharactersSearchEmpty'
 const PAGE_SIZE = 30
 
 const CharacterList: React.FC = () => {
-    const [nowLoading, setNowLoading] = useState(false)
-    const { searchType, searchOrder, tagFilter, textFilter } = CharacterSorter.useSorterStore(
+    const [isLoading, setIsLoading] = useState(false)
+    const { sortBy, sortDirection, tagFilter, textFilter } = useCharacterSortStore(
         useShallow((state) => ({
-            searchType: state.searchType,
-            searchOrder: state.searchOrder,
+            sortBy: state.searchType,
+            sortDirection: state.searchOrder,
             tagFilter: state.tagFilter,
             textFilter: state.textFilter,
         }))
@@ -34,21 +34,21 @@ const CharacterList: React.FC = () => {
     const [pages, setPages] = useState(3)
     const [previousLength, setPreviousLength] = useState(0)
     const { data, updatedAt } = useLiveQueryAsync(
-        Characters.db.query.cardListQueryWindow(
-            'character',
-            searchType,
-            searchOrder,
-            PAGE_SIZE * pages,
-            0,
-            textFilter,
-            tagFilter,
-            hiddenTags
-        ),
+        Characters.db.live.cardListWindow({
+            type: 'character',
+            sortBy: sortBy,
+            sortDirection: sortDirection,
+            limit: PAGE_SIZE * pages,
+            offset: 0,
+            searchText: textFilter,
+            includedTags: tagFilter,
+            hiddenTags: hiddenTags,
+        }),
         {
             key: [
                 'character-list',
-                searchType,
-                searchOrder,
+                sortBy,
+                sortDirection,
                 textFilter,
                 tagFilter,
                 hiddenTags,
@@ -66,12 +66,12 @@ const CharacterList: React.FC = () => {
         }
     )
 
-    const characterList: CharInfo[] = useMemo(() => {
+    const characterList: CharacterCardSummary[] = useMemo(() => {
         return data.map((item) => ({
             ...item,
-            latestChat: item.chats[0]?.id,
-            latestSwipe: item.chats[0]?.messages[0]?.swipes[0]?.swipe,
-            latestName: item.chats[0]?.messages[0]?.name,
+            latestChatId: item.chats[0]?.id,
+            latestSwipeText: item.chats[0]?.messages[0]?.swipes[0]?.swipe,
+            latestMessageName: item.chats[0]?.messages[0]?.name,
             last_modified: item.last_modified ?? 0,
             tags: item.tags.map((item) => item.tag.tag),
         }))
@@ -87,7 +87,7 @@ const CharacterList: React.FC = () => {
             <HeaderButton
                 headerLeft={() => <Drawer.Button drawerID={Drawer.ID.SETTINGS} />}
                 headerRight={() => (
-                    <CharacterNewMenu nowLoading={nowLoading} setNowLoading={setNowLoading} />
+                    <CharacterNewMenu isLoading={isLoading} setIsLoading={setIsLoading} />
                 )}
             />
 
@@ -103,8 +103,8 @@ const CharacterList: React.FC = () => {
                     renderItem={({ item }) => (
                         <CharacterListing
                             character={item}
-                            nowLoading={nowLoading}
-                            setNowLoading={setNowLoading}
+                            isLoading={isLoading}
+                            setIsLoading={setIsLoading}
                         />
                     )}
                     onEndReachedThreshold={1}

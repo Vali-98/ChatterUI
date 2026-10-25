@@ -15,7 +15,7 @@ import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 import { readStringAsync } from '@lib/utils/File'
 
-import { CharacterLink } from './CharacterLinks'
+import { CharacterLinks } from './characters/links'
 
 export type SamplerConfig = {
     id: number
@@ -85,7 +85,10 @@ export const useSamplerStore = create<SamplerStore>()(
                     Logger.errorToast(t('sampler.toast.lastconfig'))
                     return
                 }
-                await CharacterLink.db.mutate.deleteByValue('sampler_id', id)
+                await CharacterLinks.db.delete.linksByTarget({
+                    type: 'sampler_id',
+                    value: id,
+                })
                 set((state) => {
                     const configList = state.configList.filter((config) => config.id !== id)
                     return {

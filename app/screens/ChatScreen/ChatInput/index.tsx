@@ -70,9 +70,9 @@ const ChatInput = () => {
     )
     const setHeight = useInputHeightStore(useShallow((state) => state.setHeight))
 
-    const { charName } = Characters.useCharacterStore(
+    const { characterName } = Characters.useCharacterState(
         useShallow((state) => ({
-            charName: state?.card?.name,
+            characterName: state?.card?.name,
         }))
     )
 
@@ -107,7 +107,7 @@ const ChatInput = () => {
                 attachments.map((item) => item.uri)
             )
         try {
-            const result = await Chats.db.mutate.createEntry(chatId, charName ?? '', false, '')
+            const result = await Chats.db.mutate.createEntry(chatId, characterName ?? '', false, '')
             setNewMessage('')
             setAttachments([])
             const swipeId = result?.swipes?.[0]?.id

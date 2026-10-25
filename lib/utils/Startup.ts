@@ -31,7 +31,7 @@ const loadNewestChat = async () => {
     Logger.info('Loading latest chat')
     const newestChat = await Chats.db.query.chatNewest()
     if (!newestChat) return
-    await Characters.useCharacterStore.getState().setCard(newestChat.character_id)
+    await Characters.useCharacterState.getState().setCard(newestChat.character_id)
     await Chats.useChatState.getState().setId(newestChat.id)
 }
 
@@ -65,7 +65,7 @@ const setAppDefaultSettings = () => {
 
 const createDefaultCard = async () => {
     if (!mmkv.getBoolean(AppSettings.CreateDefaultCard)) return
-    const result = await Characters.db.query.cardList('character')
+    const result = await Characters.db.query.cardList({ type: 'character' })
     if (result.length === 0) await Characters.actions.createDefaultCard()
     mmkv.set(AppSettings.CreateDefaultCard, false)
 }
@@ -188,14 +188,14 @@ const migrateTextIntent_0_8_8_to_0_8_9 = () => {
 }
 
 const createDefaultUserData = async () => {
-    const id = await Characters.db.mutate.createCard('User', 'user')
+    const id = await Characters.db.create.blankCard('User', { type: 'user' })
     await Characters.useUserStore.getState().setCard(id)
 }
 
 const setDefaultUser = async () => {
     if (!Characters.useUserStore.persist.hasHydrated())
         await Characters.useUserStore.persist.rehydrate()
-    const userList = await Characters.db.query.cardList('user')
+    const userList = await Characters.db.query.cardList({ type: 'user' })
     if (!userList) {
         Logger.error(
             'User database is Invalid, this should not happen! Please report this occurence.'
@@ -243,7 +243,6 @@ export const startupApp = () => {
     console.log('[APP STARTED]: T1APT')
     // DEV: Needed for Reset
     //Chats.useChatState.getState().reset()
-    //Characters.useCharacterCard.getState().unloadCard()
 
     // Sets default preferences
     setAppDefaultSettings()

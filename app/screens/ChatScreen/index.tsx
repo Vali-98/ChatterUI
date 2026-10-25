@@ -28,10 +28,10 @@ import ChatEditor from './ChatWindow/ChatEditor'
 const ChatScreen = () => {
     const { t } = useTranslation()
     const insets = useSafeAreaInsets()
-    const { unloadCharacter, charId } = Characters.useCharacterStore(
+    const { clearCharacterSelection, characterId } = Characters.useCharacterState(
         useShallow((state) => ({
-            unloadCharacter: state.unloadCard,
-            charId: state.id,
+            clearCharacterSelection: state.unloadCard,
+            characterId: state.id,
         }))
     )
     const userId = Characters.useUserStore(useShallow((state) => state.id))
@@ -55,20 +55,20 @@ const ChatScreen = () => {
 
     useEffect(() => {
         return () => {
-            unloadCharacter()
+            clearCharacterSelection()
             resetId()
         }
-    }, [unloadCharacter, resetId])
+    }, [clearCharacterSelection, resetId])
 
     const handleCreateChat = async () => {
-        if (charId)
-            Chats.db.mutate.createChat(charId).then((chatId) => {
+        if (characterId)
+            Chats.db.mutate.createChat(characterId).then((chatId) => {
                 if (chatId) setId(chatId)
             })
     }
 
     const handleImportChat = async () => {
-        if (!charId || !userId) {
+        if (!characterId || !userId) {
             Logger.errorToast(t('chat.import.errors.noChatCharacter'))
             return
         }
@@ -80,7 +80,7 @@ const ChatScreen = () => {
             return
         }
         const chat = result.data
-        chat.character_id = charId
+        chat.character_id = characterId
         chat.scroll_offset = 0
         delete chat.id
         chat.messages = chat.messages.map((message) => {

@@ -1,8 +1,8 @@
 import { create } from 'zustand'
 
 import { createCardSelection } from './selection'
-import type { CharacterCardState } from './types'
+import type { CharacterCardSelectionState } from './types'
 
 const selection = createCardSelection()
-export const useCharacterState = create<CharacterCardState>()(selection.initializer)
+export const useCharacterState = create<CharacterCardSelectionState>()(selection.initializer)
 selection.bind(useCharacterState)

@@ -21,10 +21,10 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
     const { t } = useTranslation()
     const renameInputRef = useBottomSheetRef()
 
-    const { charName, charId } = Characters.useCharacterStore(
+    const { characterName, characterId } = Characters.useCharacterState(
         useShallow((state) => ({
-            charId: state.id,
-            charName: state.card?.name ?? t('chat.drawer.labels.unknown'),
+            characterId: state.id,
+            characterName: state.card?.name ?? t('chat.drawer.labels.unknown'),
         }))
     )
 
@@ -47,11 +47,11 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                     label: t('chat.drawer.dialogs.delete.confirm'),
                     onPress: async () => {
                         await Chats.db.mutate.deleteChat(item.id)
-                        if (charId && chatId === item.id) {
-                            const returnedChatId = await Chats.db.query.chatNewestId(charId)
+                        if (characterId && chatId === item.id) {
+                            const returnedChatId = await Chats.db.query.chatNewestId(characterId)
                             const chatId = returnedChatId
                                 ? returnedChatId
-                                : await Chats.db.mutate.createChat(charId)
+                                : await Chats.db.mutate.createChat(characterId)
                             chatId && (await setId(chatId))
                         } else if (item.id === chatId) {
                             Logger.errorToast(t('chat.drawer.errors.defaultChatFailed'))
@@ -84,7 +84,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
 
     const handleExportChat = async (close: () => void) => {
         // eslint-disable-next-line i18next/no-literal-string
-        const name = `Chatlogs-${charName}-${item.id}.json`.replaceAll(' ', '_')
+        const name = `Chatlogs-${characterName}-${item.id}.json`.replaceAll(' ', '_')
         const chat = await Chats.db.query.chat(item.id)
         if (chat) {
             try {

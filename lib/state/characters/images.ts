@@ -2,22 +2,22 @@ import { Paths } from 'expo-file-system'
 
 import { copyFile, deleteFile, fileExists } from '@lib/utils/File'
 
-export const getImageDir = (imageId: number) => `${Paths.document.uri}characters/${imageId}.png`
+export const getCardImageUri = (imageId: number) => `${Paths.document.uri}characters/${imageId}.png`
 
-export const createImageId = (...reserved: number[]) => {
+export const createImageId = (...reservedImageIds: number[]) => {
     let id = Date.now()
-    while (reserved.includes(id) || fileExists(getImageDir(id))) id++
+    while (reservedImageIds.includes(id) || fileExists(getCardImageUri(id))) id++
     return id
 }
 
-export const deleteImage = async (imageId: number) => {
+export const deleteImageFile = async (imageId: number) => {
     if (imageId < 0) return
-    if (!(await deleteFile(getImageDir(imageId))))
+    if (!(await deleteFile(getCardImageUri(imageId))))
         throw new Error('Failed to delete character image')
 }
 
-export const copyImage = async (uri: string, imageId: number) => {
-    if (!(await copyFile({ from: uri, to: getImageDir(imageId) }))) {
+export const copyImageFile = async (imageId: number, imageUri: string) => {
+    if (!(await copyFile({ from: imageUri, to: getCardImageUri(imageId) }))) {
         throw new Error('Failed to copy character image')
     }
 }

@@ -16,7 +16,7 @@ const UserList = () => {
     const { t } = useTranslation()
     const { color, spacing, fontSize } = Theme.useTheme()
 
-    const { data } = useLiveQueryAsync(Characters.db.query.cardListQuery('user'), {
+    const { data } = useLiveQueryAsync(Characters.db.live.cardList({ type: 'user' }), {
         key: ['user-list'],
         watch: [
             { table: 'characters' },
@@ -45,7 +45,7 @@ const UserList = () => {
                 title={t('users.create')}
                 autoFocus
                 onConfirm={async (text) => {
-                    const id = await Characters.db.mutate.createCard(text, 'user')
+                    const id = await Characters.db.create.blankCard(text, { type: 'user' })
                     await setCard(id)
                 }}
             />

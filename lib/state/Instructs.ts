@@ -8,8 +8,8 @@ import { instructs } from '@db/schema'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Storage } from '@lib/enums/Storage'
 
-import { CharacterLink } from './CharacterLinks'
 import { Characters } from './characters'
+import { CharacterLinks } from './characters/links'
 import { Logger } from './Logger'
 import { replaceMacros } from '../state/Macros'
 import { createMMKVStorage } from '../storage/MMKV'
@@ -183,7 +183,7 @@ type InstructState = {
     load: (id: number) => Promise<void>
     setData: (instruct: InstructType) => void
     tokenCache: InstructTokenCache | undefined
-    getCache: (charName: string, userName: string) => Promise<InstructTokenCache>
+    getCache: (characterName: string, userName: string) => Promise<InstructTokenCache>
     replacedMacros: () => InstructType
     getStopSequence: () => string[]
 }
@@ -194,7 +194,7 @@ export type InstructListItem = {
 }
 
 export type InstructTokenCache = {
-    charName: string
+    characterName: string
     userName: string
     system_prompt_length: number
     system_prefix_length: number
@@ -236,14 +236,18 @@ export namespace Instructs {
                 setData: (instruct: InstructType) => {
                     set({ data: instruct, tokenCache: undefined })
                 },
-                getCache: async (charName: string, userName: string) => {
+                getCache: async (characterName: string, userName: string) => {
                     const cache = get().tokenCache
-                    if (cache && cache.charName === charName && cache.userName === userName)
+                    if (
+                        cache &&
+                        cache.characterName === characterName &&
+                        cache.userName === userName
+                    )
                         return cache
                     const instruct = get().replacedMacros()
                     if (!instruct)
                         return {
-                            charName: charName,
+                            characterName: characterName,
                             userName: userName,
                             system_prompt_length: 0,
                             system_prefix_length: 0,
@@ -258,7 +262,7 @@ export namespace Instructs {
                     const getTokenCount = Tokenizer.getTokenizer()
 
                     const newCache: InstructTokenCache = {
-                        charName: charName,
+                        characterName: characterName,
                         userName: userName,
                         system_prompt_length: await getTokenCount(instruct.system_prompt),
                         system_prefix_length: await getTokenCount(instruct.system_prefix),
@@ -302,10 +306,10 @@ export namespace Instructs {
                     const sequence: string[] = []
                     let extras: string[] = []
                     if (instruct.names) {
-                        const userName = Characters.useCharacterStore.getState().card?.name
-                        const charName = Characters.useCharacterStore.getState()?.card?.name
+                        const userName = Characters.useCharacterState.getState().card?.name
+                        const characterName = Characters.useCharacterState.getState()?.card?.name
                         if (userName) sequence.push(`${userName} :`)
-                        if (charName) sequence.push(`${charName} :`)
+                        if (characterName) sequence.push(`${characterName} :`)
                     }
 
                     if (instruct.stop_sequence !== '')
@@ -423,7 +427,10 @@ export namespace Instructs {
 
             export const deleteInstruct = async (id: number) => {
                 await database.delete(instructs).where(eq(instructs.id, id))
-                await CharacterLink.db.mutate.deleteByValue('instruct_id', id)
+                await CharacterLinks.db.delete.linksByTarget({
+                    type: 'instruct_id',
+                    value: id,
+                })
             }
         }
     }

@@ -26,15 +26,15 @@ const getNoteTypeFromIds = (note: AuthorNote) => {
 
 const getUpdateValue = (
     noteType: NoteType,
-    charId: number | undefined,
+    characterId: number | undefined,
     chatId: number | undefined
 ) => {
     let updates: Partial<AuthorNote> | null = null
     switch (noteType) {
         case NoteType.CHARACTER:
-            if (charId) {
+            if (characterId) {
                 updates = {
-                    character_id: charId,
+                    character_id: characterId,
                     chat_id: null,
                 }
             }
@@ -64,7 +64,7 @@ const AuthorNoteEditor = () => {
     const tokenizer = Tokenizer.useTokenizer()
     const { color, spacing, fontSize } = Theme.useTheme()
     const setCurrentNoteType = authorNoteBodyState(useShallow((state) => state.setCurrentNoteType))
-    const charId = Characters.useCharacterStore(useShallow((state) => state.id))
+    const characterId = Characters.useCharacterState(useShallow((state) => state.id))
     const chatId = Chats.useChatState(useShallow((state) => state.id))
     const { close, noteId, ref } = authorNoteEditorState(useShallow((state) => state))
     const [placeHolderNote, setPlaceHolderNote] = useState<AuthorNote | undefined>(undefined)
@@ -123,10 +123,10 @@ const AuthorNoteEditor = () => {
 
     const handleUpdateNoteType = async (
         noteType: NoteType,
-        charId: number | undefined,
+        characterId: number | undefined,
         chatId: number | undefined
     ) => {
-        const updates = getUpdateValue(noteType, charId, chatId)
+        const updates = getUpdateValue(noteType, characterId, chatId)
         if (!updates) return
         const updated = await AuthorNotes.db.mutate.updateNote(note.id, updates).then(() => true)
         if (updated) setCurrentNoteType(noteType)
@@ -202,7 +202,7 @@ const AuthorNoteEditor = () => {
                     selected={selectedNoteType}
                     onPress={(type) => {
                         if (type === selectedNoteType) return
-                        handleUpdateNoteType(type, charId, chatId)
+                        handleUpdateNoteType(type, characterId, chatId)
                     }}
                 />
             </ScrollView>

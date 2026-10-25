@@ -18,7 +18,7 @@ const AuthorNoteBody = () => {
         useShallow((state) => state)
     )
     const { id: chatId } = Chats.useChatState()
-    const { id: characterId } = Characters.useCharacterStore()
+    const { id: characterId } = Characters.useCharacterState()
 
     const handleAddNote = () => {
         try {

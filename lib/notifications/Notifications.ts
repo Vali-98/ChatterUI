@@ -61,7 +61,7 @@ export function useAppStateNotificationObserver() {
     const [autoLoad] = useMMKVBoolean(AppSettings.ChatOnStartup)
     const [useAuth] = useMMKVBoolean(AppSettings.LocallyAuthenticateUser)
     const { chatId: chatActive, setId } = Chats.useChat()
-    const { setCard } = Characters.useCharacterStore()
+    const { setCard } = Characters.useCharacterState()
 
     const redirect = useCallback(
         async (notification: Notifications.Notification) => {

@@ -24,13 +24,13 @@ import { db } from '@db/db'
 import { characterTags, tags } from '@db/schema'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { useDebounceTokenizer } from '@lib/hooks/Tokenizer'
-import { CharacterCardData, Characters } from '@lib/state/characters'
+import { CharacterCard, Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/Chat'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 
-const ChracterEditorScreen = () => {
+const CharacterEditorScreen = () => {
     const { t } = useTranslation()
     const styles = useStyles()
     const { color, spacing } = Theme.useTheme()
@@ -48,49 +48,50 @@ const ChracterEditorScreen = () => {
             .groupBy(tags.id),
         { key: ['tag-counts'], watch: [{ table: 'tags' }, { table: 'character_tags' }] }
     )
-    const { currentCard, charId, charName, unloadCharacter } = Characters.useCharacterStore(
-        useShallow((state) => ({
-            charId: state.id,
-            currentCard: state.card,
-            charName: state.card?.name,
-            unloadCharacter: state.unloadCard,
-        }))
-    )
+    const { selectedCard, characterId, characterName, clearCharacterSelection } =
+        Characters.useCharacterState(
+            useShallow((state) => ({
+                characterId: state.id,
+                selectedCard: state.card,
+                characterName: state.card?.name,
+                clearCharacterSelection: state.unloadCard,
+            }))
+        )
 
-    const [characterCard, setCharacterCard] = useState<CharacterCardData | undefined>(currentCard)
-    const descriptionTokens = useDebounceTokenizer(characterCard?.description ?? '', 300)
+    const [cardDraft, setCardDraft] = useState<CharacterCard | undefined>(selectedCard)
+    const descriptionTokens = useDebounceTokenizer(cardDraft?.description ?? '', 300)
     const { chatId, resetId } = Chats.useChat()
-    const backgroundImage = currentCard?.background_image
+    const backgroundImage = selectedCard?.background_image
     const setShowViewer = useAvatarViewerStore((state) => state.setShow)
-    const [edited, setEdited] = useState(false)
-    const [altSwipeIndex, setAltSwipeIndex] = useState(0)
+    const [isDirty, setIsDirty] = useState(false)
+    const [alternateGreetingIndex, setAlternateGreetingIndex] = useState(0)
 
-    const previousSavedCard = useRef(currentCard)
+    const previousSavedCard = useRef(selectedCard)
     useEffect(() => {
         // A dirty-flag change alone must not reset the draft before DB notifications arrive.
-        if (previousSavedCard.current === currentCard) return
-        previousSavedCard.current = currentCard
-        setCharacterCard((current) =>
-            edited && current?.id === currentCard?.id ? current : currentCard
+        if (previousSavedCard.current === selectedCard) return
+        previousSavedCard.current = selectedCard
+        setCardDraft((current) =>
+            isDirty && current?.id === selectedCard?.id ? current : selectedCard
         )
-    }, [currentCard, edited])
+    }, [selectedCard, isDirty])
 
-    const setCharacterCardEdited = (card: CharacterCardData) => {
-        if (!edited) setEdited(true)
-        setCharacterCard(card)
+    const updateCardDraft = (card: CharacterCard) => {
+        if (!isDirty) setIsDirty(true)
+        setCardDraft(card)
     }
 
-    const handleSaveCard = async () => {
-        if (!characterCard || !charId) return
-        const saved = await Characters.db.mutate.updateCard(characterCard, charId)
-        if (!saved || Characters.useCharacterStore.getState().id !== charId) return
-        setCharacterCard(saved)
-        setEdited(false)
+    const handleSaveCharacterCard = async () => {
+        if (!cardDraft || !characterId) return
+        const saved = await Characters.db.update.card(characterId, cardDraft)
+        if (!saved || Characters.useCharacterState.getState().id !== characterId) return
+        setCardDraft(saved)
+        setIsDirty(false)
         Logger.infoToast(t('character.editor.messages.saved'))
     }
 
-    usePreventRemove(edited, ({ data }) => {
-        if (!charId) return
+    usePreventRemove(isDirty, ({ data }) => {
+        if (!characterId) return
         Alert.alert({
             title: t('character.editor.dialogs.unsavedChanges.title'),
             description: t('character.editor.dialogs.unsavedChanges.description'),
@@ -99,7 +100,7 @@ const ChracterEditorScreen = () => {
                 {
                     label: t('common.actions.save'),
                     onPress: async () => {
-                        await handleSaveCard()
+                        await handleSaveCharacterCard()
                         navigation.dispatch(data.action)
                     },
                 },
@@ -116,9 +117,9 @@ const ChracterEditorScreen = () => {
 
     const handleExportCard = () => {
         try {
-            if (!charId) return
+            if (!characterId) return
             Characters.actions
-                .exportCharacter(charId)
+                .exportCard(characterId)
                 .catch((e) => {
                     Logger.errorToast(t('character.editor.errors.exportFailed'))
                     Logger.error(e)
@@ -135,18 +136,18 @@ const ChracterEditorScreen = () => {
         Alert.alert({
             title: t('character.editor.dialogs.deleteCharacter.title'),
             description: t('character.editor.dialogs.deleteCharacter.description', {
-                name: charName,
+                name: characterName,
             }),
             buttons: [
                 { label: t('common.actions.cancel') },
                 {
                     label: t('character.editor.dialogs.deleteCharacter.confirm'),
                     onPress: async () => {
-                        await Characters.actions.deleteCard(charId ?? -1)
-                        unloadCharacter()
+                        await Characters.actions.deleteCard(characterId ?? -1)
+                        clearCharacterSelection()
                         resetId()
-                        setEdited(false)
-                        Logger.info(t('character.editor.messages.deleted', { name: charName }))
+                        setIsDirty(false)
+                        Logger.info(t('character.editor.messages.deleted', { name: characterName }))
                     },
                     type: 'warning',
                 },
@@ -156,9 +157,9 @@ const ChracterEditorScreen = () => {
 
     useEffect(() => {
         return () => {
-            if (!chatId) unloadCharacter()
+            if (!chatId) clearCharacterSelection()
         }
-    }, [chatId, unloadCharacter])
+    }, [chatId, clearCharacterSelection])
 
     const handleDeleteImage = () => {
         Alert.alert({
@@ -169,9 +170,9 @@ const ChracterEditorScreen = () => {
                 {
                     label: t('character.editor.dialogs.deleteImage.confirm'),
                     onPress: async () => {
-                        if (currentCard) {
+                        if (selectedCard) {
                             try {
-                                await Characters.actions.deleteImage(currentCard.id)
+                                await Characters.actions.deleteCardImage(selectedCard.id)
                             } catch (error) {
                                 Logger.errorToast(t('common.errors.couldNotGetData'), error)
                             }
@@ -189,42 +190,42 @@ const ChracterEditorScreen = () => {
             type: 'image/*',
         })
             .then(async (result: DocumentPicker.DocumentPickerResult) => {
-                if (result.canceled || !charId) return
-                await Characters.actions.updateImage(charId, result.assets[0].uri)
+                if (result.canceled || !characterId) return
+                await Characters.actions.updateCardImage(characterId, result.assets[0].uri)
             })
             .catch((error) => Logger.errorToast(t('common.errors.couldNotGetData'), error))
     }
 
-    const handleAddAltMessage = async () => {
-        if (!charId || !characterCard) return
-        const id = await Characters.db.mutate.addAltGreeting(charId)
+    const handleAddAlternateGreeting = async () => {
+        if (!characterId || !cardDraft) return
+        const greetingId = await Characters.db.create.alternateGreeting(characterId)
 
         // optimistically update editor state
 
         const greetings = [
-            ...(characterCard?.alternate_greetings ?? []),
-            { id: id, greeting: '', character_id: charId },
+            ...(cardDraft?.alternate_greetings ?? []),
+            { id: greetingId, greeting: '', character_id: characterId },
         ]
-        setCharacterCardEdited({ ...characterCard, alternate_greetings: greetings })
-        if (characterCard.alternate_greetings.length !== 0) {
-            setAltSwipeIndex(altSwipeIndex + 1)
+        updateCardDraft({ ...cardDraft, alternate_greetings: greetings })
+        if (cardDraft.alternate_greetings.length !== 0) {
+            setAlternateGreetingIndex(alternateGreetingIndex + 1)
         }
     }
 
-    const deleteAltMessageRoutine = async () => {
-        const id = characterCard?.alternate_greetings[altSwipeIndex].id
-        if (!id || !charId) {
+    const deleteAlternateGreeting = async () => {
+        const greetingId = cardDraft?.alternate_greetings[alternateGreetingIndex].id
+        if (!greetingId || !characterId) {
             return
         }
-        await Characters.db.mutate.deleteAltGreeting(id)
-        const greetings = [...(characterCard?.alternate_greetings ?? [])].filter(
-            (item) => item.id !== id
+        await Characters.db.delete.alternateGreeting(greetingId)
+        const greetings = [...(cardDraft?.alternate_greetings ?? [])].filter(
+            (item) => item.id !== greetingId
         )
-        setAltSwipeIndex(0)
-        setCharacterCardEdited({ ...characterCard, alternate_greetings: greetings })
+        setAlternateGreetingIndex(0)
+        updateCardDraft({ ...cardDraft, alternate_greetings: greetings })
     }
 
-    const handleDeleteAltMessage = async () => {
+    const handleConfirmDeleteAlternateGreeting = async () => {
         Alert.alert({
             title: t('character.editor.dialogs.deleteAlternateMessage.title'),
             description: t('character.editor.dialogs.deleteAlternateMessage.description'),
@@ -233,7 +234,7 @@ const ChracterEditorScreen = () => {
                 {
                     label: t('character.editor.dialogs.deleteAlternateMessage.confirm'),
                     onPress: async () => {
-                        await deleteAltMessageRoutine()
+                        await deleteAlternateGreeting()
                     },
                     type: 'warning',
                 },
@@ -271,7 +272,7 @@ const ChracterEditorScreen = () => {
         </ContextMenu>
     )
 
-    if (!charId) return <Redirect href=".." />
+    if (!characterId) return <Redirect href=".." />
     return (
         <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
             <HeaderButton headerRight={headerRight} />
@@ -279,12 +280,12 @@ const ChracterEditorScreen = () => {
                 cachePolicy="none"
                 style={styles.mainContainer}
                 source={{
-                    uri: backgroundImage ? Characters.getImageDir(backgroundImage) : '',
+                    uri: backgroundImage ? Characters.getCardImageUri(backgroundImage) : '',
                 }}>
                 <HeaderTitle title={t('character.editor.title')} />
                 <AvatarViewer editorButton={false} />
 
-                {characterCard && (
+                {cardDraft && (
                     <KeyboardAwareScrollView
                         bottomOffset={16}
                         showsVerticalScrollIndicator={false}
@@ -294,8 +295,8 @@ const ChracterEditorScreen = () => {
                             <ContextMenu placement="right">
                                 <ContextMenu.Trigger>
                                     <Avatar
-                                        targetImage={Characters.getImageDir(
-                                            currentCard?.image_id ?? -1
+                                        targetImage={Characters.getCardImageUri(
+                                            selectedCard?.image_id ?? -1
                                         )}
                                         style={styles.avatar}
                                     />
@@ -321,7 +322,9 @@ const ChracterEditorScreen = () => {
                                         closeOnPress={false}
                                         onPress={async (close) => {
                                             close()
-                                            await Characters.actions.importBackground(charId)
+                                            await Characters.actions.importCardBackground(
+                                                characterId
+                                            )
                                         }}
                                     />
                                     <ContextMenu.Button
@@ -351,7 +354,7 @@ const ChracterEditorScreen = () => {
                                         onPress={(close) => {
                                             close()
                                             if (backgroundImage)
-                                                Characters.actions.deleteBackground(charId)
+                                                Characters.actions.deleteCardBackground(characterId)
                                         }}
                                         variant="warning"
                                     />
@@ -361,22 +364,22 @@ const ChracterEditorScreen = () => {
                             <View style={styles.characterHeaderInfo}>
                                 <View style={styles.buttonContainer}>
                                     <ThemedButton
-                                        disabled={!edited}
+                                        disabled={!isDirty}
                                         iconName="save"
                                         iconSize={20}
                                         label={t('common.actions.save')}
-                                        onPress={handleSaveCard}
-                                        variant={edited ? 'secondary' : 'disabled'}
+                                        onPress={handleSaveCharacterCard}
+                                        variant={isDirty ? 'secondary' : 'disabled'}
                                     />
                                 </View>
                                 <ThemedTextInput
                                     onChangeText={(mes) => {
-                                        setCharacterCardEdited({
-                                            ...characterCard,
+                                        updateCardDraft({
+                                            ...cardDraft,
                                             name: mes,
                                         })
                                     }}
-                                    value={characterCard?.name}
+                                    value={cardDraft?.name}
                                 />
                             </View>
                         </View>
@@ -390,12 +393,12 @@ const ChracterEditorScreen = () => {
                             containerStyle={styles.input}
                             numberOfLines={16}
                             onChangeText={(mes) => {
-                                setCharacterCardEdited({
-                                    ...characterCard,
+                                updateCardDraft({
+                                    ...cardDraft,
                                     description: mes,
                                 })
                             }}
-                            value={characterCard?.description}
+                            value={cardDraft?.description}
                         />
 
                         <ThemedTextInput
@@ -403,12 +406,12 @@ const ChracterEditorScreen = () => {
                             multiline
                             containerStyle={styles.input}
                             onChangeText={(mes) => {
-                                setCharacterCardEdited({
-                                    ...characterCard,
+                                updateCardDraft({
+                                    ...cardDraft,
                                     first_mes: mes,
                                 })
                             }}
-                            value={characterCard?.first_mes}
+                            value={cardDraft?.first_mes}
                             numberOfLines={16}
                         />
                         <View style={styles.input}>
@@ -421,20 +424,21 @@ const ChracterEditorScreen = () => {
                                 <Text style={{ color: color.text._100 }}>
                                     {t('character.editor.fields.alternateGreeting')}
                                     {'   '}
-                                    {characterCard.alternate_greetings.length !== 0 && (
+                                    {cardDraft.alternate_greetings.length !== 0 && (
                                         <Text
                                             style={{
                                                 color: color.text._100,
                                             }}>
-                                            {altSwipeIndex + 1} /{' '}
-                                            {characterCard.alternate_greetings.length}
+                                            {alternateGreetingIndex + 1} /{' '}
+                                            {cardDraft.alternate_greetings.length}
                                         </Text>
                                     )}
                                 </Text>
 
                                 <View style={{ flexDirection: 'row', columnGap: 32 }}>
-                                    <TouchableOpacity onPress={handleDeleteAltMessage}>
-                                        {characterCard.alternate_greetings.length !== 0 && (
+                                    <TouchableOpacity
+                                        onPress={handleConfirmDeleteAlternateGreeting}>
+                                        {cardDraft.alternate_greetings.length !== 0 && (
                                             <AntDesign
                                                 color={color.error._400}
                                                 name="delete"
@@ -442,14 +446,16 @@ const ChracterEditorScreen = () => {
                                             />
                                         )}
                                     </TouchableOpacity>
-                                    {characterCard.alternate_greetings.length > 0 && (
+                                    {cardDraft.alternate_greetings.length > 0 && (
                                         <TouchableOpacity
                                             onPress={() =>
-                                                setAltSwipeIndex(Math.max(altSwipeIndex - 1, 0))
+                                                setAlternateGreetingIndex(
+                                                    Math.max(alternateGreetingIndex - 1, 0)
+                                                )
                                             }>
                                             <AntDesign
                                                 color={
-                                                    altSwipeIndex === 0
+                                                    alternateGreetingIndex === 0
                                                         ? color.text._700
                                                         : color.text._100
                                                 }
@@ -458,10 +464,10 @@ const ChracterEditorScreen = () => {
                                             />
                                         </TouchableOpacity>
                                     )}
-                                    {altSwipeIndex ===
-                                        characterCard.alternate_greetings.length - 1 ||
-                                    characterCard.alternate_greetings.length === 0 ? (
-                                        <TouchableOpacity onPress={handleAddAltMessage}>
+                                    {alternateGreetingIndex ===
+                                        cardDraft.alternate_greetings.length - 1 ||
+                                    cardDraft.alternate_greetings.length === 0 ? (
+                                        <TouchableOpacity onPress={handleAddAlternateGreeting}>
                                             <AntDesign
                                                 color={color.text._100}
                                                 name="plus"
@@ -471,10 +477,10 @@ const ChracterEditorScreen = () => {
                                     ) : (
                                         <TouchableOpacity
                                             onPress={() =>
-                                                setAltSwipeIndex(
+                                                setAlternateGreetingIndex(
                                                     Math.min(
-                                                        altSwipeIndex + 1,
-                                                        characterCard.alternate_greetings.length - 1
+                                                        alternateGreetingIndex + 1,
+                                                        cardDraft.alternate_greetings.length - 1
                                                     )
                                                 )
                                             }>
@@ -488,20 +494,20 @@ const ChracterEditorScreen = () => {
                                 </View>
                             </View>
 
-                            {characterCard.alternate_greetings.length !== 0 ? (
+                            {cardDraft.alternate_greetings.length !== 0 ? (
                                 <ThemedTextInput
                                     multiline
                                     numberOfLines={16}
                                     onChangeText={(mes) => {
-                                        const greetings = [...characterCard.alternate_greetings]
-                                        greetings[altSwipeIndex].greeting = mes
-                                        setCharacterCardEdited({
-                                            ...characterCard,
+                                        const greetings = [...cardDraft.alternate_greetings]
+                                        greetings[alternateGreetingIndex].greeting = mes
+                                        updateCardDraft({
+                                            ...cardDraft,
                                             alternate_greetings: greetings,
                                         })
                                     }}
                                     value={
-                                        characterCard?.alternate_greetings?.[altSwipeIndex]
+                                        cardDraft?.alternate_greetings?.[alternateGreetingIndex]
                                             .greeting ?? ''
                                     }
                                 />
@@ -526,12 +532,12 @@ const ChracterEditorScreen = () => {
                             containerStyle={styles.input}
                             numberOfLines={4}
                             onChangeText={(mes) => {
-                                setCharacterCardEdited({
-                                    ...characterCard,
+                                updateCardDraft({
+                                    ...cardDraft,
                                     personality: mes,
                                 })
                             }}
-                            value={characterCard?.personality}
+                            value={cardDraft?.personality}
                         />
 
                         <ThemedTextInput
@@ -539,12 +545,12 @@ const ChracterEditorScreen = () => {
                             multiline
                             containerStyle={styles.input}
                             onChangeText={(mes) => {
-                                setCharacterCardEdited({
-                                    ...characterCard,
+                                updateCardDraft({
+                                    ...cardDraft,
                                     scenario: mes,
                                 })
                             }}
-                            value={characterCard?.scenario}
+                            value={cardDraft?.scenario}
                             numberOfLines={4}
                         />
 
@@ -553,12 +559,12 @@ const ChracterEditorScreen = () => {
                             multiline
                             containerStyle={styles.input}
                             onChangeText={(mes) => {
-                                setCharacterCardEdited({
-                                    ...characterCard,
+                                updateCardDraft({
+                                    ...cardDraft,
                                     mes_example: mes,
                                 })
                             }}
-                            value={characterCard?.mes_example}
+                            value={cardDraft?.mes_example}
                             numberOfLines={16}
                         />
 
@@ -567,14 +573,12 @@ const ChracterEditorScreen = () => {
                             containerStyle={styles.input}
                             suggestions={data
                                 .map((item) => item.tag)
-                                .filter(
-                                    (a) => !characterCard?.tags.some((item) => item.tag.tag === a)
-                                )}
+                                .filter((a) => !cardDraft?.tags.some((item) => item.tag.tag === a))}
                             showSuggestionsOnEmpty
-                            value={characterCard?.tags.map((item) => item.tag.tag) ?? []}
+                            value={cardDraft?.tags.map((item) => item.tag.tag) ?? []}
                             setValue={(value) => {
                                 const newTags = value
-                                    .filter((v) => !characterCard.tags.some((a) => a.tag.tag === v))
+                                    .filter((v) => !cardDraft.tags.some((a) => a.tag.tag === v))
                                     .map((a) => {
                                         const existing = data.filter((item) => item.tag === a)?.[0]
                                         if (existing) {
@@ -582,10 +586,10 @@ const ChracterEditorScreen = () => {
                                         }
                                         return { tag_id: -1, tag: { tag: a, id: -1 } }
                                     })
-                                setCharacterCardEdited({
-                                    ...characterCard,
+                                updateCardDraft({
+                                    ...cardDraft,
                                     tags: [
-                                        ...characterCard.tags.filter((v) =>
+                                        ...cardDraft.tags.filter((v) =>
                                             value.some((a) => a === v.tag.tag)
                                         ),
                                         ...newTags,
@@ -660,4 +664,4 @@ const useStyles = () => {
     })
 }
 
-export default ChracterEditorScreen
+export default CharacterEditorScreen

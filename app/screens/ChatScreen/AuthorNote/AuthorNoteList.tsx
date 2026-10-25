@@ -14,7 +14,7 @@ type AuthorNoteListProps = {
 
 const AuthorNoteList: React.FC<AuthorNoteListProps> = ({ noteType }) => {
     const { id: chatId } = Chats.useChatState()
-    const { id: characterId } = Characters.useCharacterStore()
+    const { id: characterId } = Characters.useCharacterState()
     const { data: noteIdList } = useLiveQueryAsync(
         AuthorNotes.db.live.noteIds(noteType, chatId ?? -1, characterId ?? -1),
         {

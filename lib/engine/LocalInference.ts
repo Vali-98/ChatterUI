@@ -6,8 +6,8 @@ import { CompletionTimings } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { isCloseThinkTag, isOpenThinkTag } from '@lib/markdown/ThinkTags'
-import { CharacterLink } from '@lib/state/CharacterLinks'
 import { Characters } from '@lib/state/characters'
+import { CharacterLinks } from '@lib/state/characters/links'
 import { useCharacterTokenState } from '@lib/state/characters/tokenState'
 import { Chats, useInference } from '@lib/state/Chat'
 import { commonStopStrings, Instructs, outputPrefixes } from '@lib/state/Instructs'
@@ -201,9 +201,9 @@ const constructReplaceStrings = (): string[] => {
 }
 
 const maybeLoadLinkedModel = async () => {
-    const charId = Characters.useCharacterStore.getState().id
-    if (!charId) return false
-    const links = await CharacterLink.db.query.links(charId)
+    const characterId = Characters.useCharacterState.getState().id
+    if (!characterId) return false
+    const links = await CharacterLinks.db.query.links(characterId)
     const modelLink = links.find((link) => link.type === 'model_id')
     if (!modelLink) return false
     const model = await Model.getModelWithMMProj(modelLink.value)
@@ -432,7 +432,7 @@ const localAPIConfig: APIConfiguration = {
 const obtainFields = async (): Promise<ContextBuilderParams | void> => {
     try {
         const userState = Characters.useUserStore.getState()
-        const characterState = Characters.useCharacterStore.getState()
+        const characterState = Characters.useCharacterState.getState()
 
         const instructState = Instructs.useInstruct.getState()
 
@@ -481,7 +481,7 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
 
         const tokenCounts = await useCharacterTokenState
             .getState()
-            .getCounts(characterCard, userCard)
+            .countTokens(characterCard, userCard)
 
         return {
             apiConfig: Object.assign({}, apiConfig),

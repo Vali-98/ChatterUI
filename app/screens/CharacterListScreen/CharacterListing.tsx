@@ -5,28 +5,28 @@ import { useShallow } from 'zustand/react/shallow'
 
 import Avatar from '@components/views/Avatar'
 import { AppSettings } from '@lib/constants/GlobalValues'
-import { Characters, CharInfo } from '@lib/state/characters'
-import { CharacterSorter } from '@lib/state/CharacterSorter'
+import { Characters, CharacterCardSummary } from '@lib/state/characters'
+import { useCharacterSortStore } from '@lib/state/characters/sortStore'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getFriendlyTimeStamp } from '@lib/utils/Time'
 
-import CharacterEditPopup from './CharacterEditPopup'
+import CharacterActionsMenu from './CharacterActionsMenu'
 import CharacterListingTags from './CharacterListingTags'
 
 type CharacterListingProps = {
-    character: CharInfo
-    nowLoading: boolean
-    setNowLoading: (b: boolean) => void
+    character: CharacterCardSummary
+    isLoading: boolean
+    setIsLoading: (b: boolean) => void
 }
 
 const CharacterListing: React.FC<CharacterListingProps> = ({
     character,
-    nowLoading,
-    setNowLoading,
+    isLoading,
+    setIsLoading,
 }) => {
     const { t } = useTranslation()
     const [showTags] = useMMKVBoolean(AppSettings.ShowTags)
-    const { setShowSearch, setTagFilter, tagFilter } = CharacterSorter.useSorterStore(
+    const { setShowSearch, setTagFilter, tagFilter } = useCharacterSortStore(
         useShallow((state) => ({
             setShowSearch: state.setShowSearch,
             setTagFilter: state.setTagFilter,
@@ -36,20 +36,20 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
     const styles = useStyles()
 
     const getPreviewText = () => {
-        if (character.latestSwipe === undefined || !character.latestName)
+        if (character.latestSwipeText === undefined || !character.latestMessageName)
             return t('character.list.emptyStates.noMessages')
-        return character.latestName + ':  ' + character.latestSwipe.trim()
+        return character.latestMessageName + ':  ' + character.latestSwipeText.trim()
     }
 
     return (
         <View>
-            <CharacterEditPopup
+            <CharacterActionsMenu
                 character={character}
-                setNowLoading={setNowLoading}
-                nowLoading={nowLoading}>
+                setIsLoading={setIsLoading}
+                isLoading={isLoading}>
                 <View style={styles.longButtonContainer}>
                     <Avatar
-                        targetImage={Characters.getImageDir(character.image_id)}
+                        targetImage={Characters.getCardImageUri(character.image_id)}
                         style={styles.avatar}
                     />
 
@@ -67,7 +67,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                         </Text>
                     </View>
                 </View>
-            </CharacterEditPopup>
+            </CharacterActionsMenu>
             <CharacterListingTags
                 tags={character.tags}
                 showTags={showTags!}

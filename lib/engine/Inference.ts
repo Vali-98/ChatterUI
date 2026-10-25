@@ -228,7 +228,7 @@ const getModelContextLength = (config: APIConfiguration, values: APIValues): num
 async function obtainFields(): Promise<APIBuilderParams | void> {
     try {
         const userState = Characters.useUserStore.getState()
-        const characterState = Characters.useCharacterStore.getState()
+        const characterState = Characters.useCharacterState.getState()
         const apiState = useConnectionStore.getState()
         const instructState = Instructs.useInstruct.getState()
 
@@ -293,7 +293,7 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
 
         const tokenCounts = await useCharacterTokenState
             .getState()
-            .getCounts(characterCard, userCard)
+            .countTokens(characterCard, userCard)
 
         return {
             apiConfig: Object.assign({}, apiConfig),

@@ -15,7 +15,7 @@ export enum NoteType {
 export namespace AuthorNotes {
     export namespace db {
         export namespace query {
-            export const getActiveNotes = async (charId: number, chatId: number) => {
+            export const getActiveNotes = async (characterId: number, chatId: number) => {
                 const activeChat = database
                     .select()
                     .from(authorNotes)
@@ -23,7 +23,9 @@ export namespace AuthorNotes {
                 const activeCharacter = database
                     .select()
                     .from(authorNotes)
-                    .where(and(eq(authorNotes.character_id, charId), eq(authorNotes.active, true)))
+                    .where(
+                        and(eq(authorNotes.character_id, characterId), eq(authorNotes.active, true))
+                    )
                 const activeGlobal = database
                     .select()
                     .from(authorNotes)
@@ -95,11 +97,11 @@ export namespace AuthorNotes {
                     .where(eq(authorNotes.chat_id, chatId))
             }
 
-            export const characterNotes = (charId: number) => {
+            export const characterNotes = (characterId: number) => {
                 return database
                     .select({ id: authorNotes.id })
                     .from(authorNotes)
-                    .where(eq(authorNotes.character_id, charId))
+                    .where(eq(authorNotes.character_id, characterId))
             }
             export const globalNotes = () => {
                 return database

@@ -13,7 +13,7 @@ import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
 import AvatarViewer from '@components/views/AvatarViewer'
 import ContextMenu from '@components/views/ContextMenu'
-import { CharacterCardData, Characters } from '@lib/state/characters'
+import { CharacterCard, Characters } from '@lib/state/characters'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -23,49 +23,51 @@ const UserCardEditor = () => {
     const styles = useStyles()
     const { color, spacing } = Theme.useTheme()
     const navigation = useNavigation()
-    const [edited, setEdited] = useState(false)
-    const { userCard, imageID, id } = Characters.useUserStore(
+    const [isDirty, setIsDirty] = useState(false)
+    const { selectedCard, imageId, id } = Characters.useUserStore(
         useShallow((state) => ({
-            userCard: state.card,
-            imageID: state.card?.image_id ?? 0,
+            selectedCard: state.card,
+            imageId: state.card?.image_id ?? 0,
             id: state.id,
         }))
     )
 
-    const [currentCard, setCurrentCard] = useState<CharacterCardData | undefined>(userCard)
+    const [cardDraft, setCardDraft] = useState<CharacterCard | undefined>(selectedCard)
 
     const setShowViewer = useAvatarViewerStore((state) => state.setShow)
 
-    const previousSavedCard = useRef(userCard)
+    const previousSavedCard = useRef(selectedCard)
     useEffect(() => {
         // A dirty-flag change alone must not reset the draft before DB notifications arrive.
-        if (previousSavedCard.current === userCard) return
-        previousSavedCard.current = userCard
-        setCurrentCard((current) => (edited && current?.id === userCard?.id ? current : userCard))
-    }, [userCard, edited])
+        if (previousSavedCard.current === selectedCard) return
+        previousSavedCard.current = selectedCard
+        setCardDraft((current) =>
+            isDirty && current?.id === selectedCard?.id ? current : selectedCard
+        )
+    }, [selectedCard, isDirty])
 
-    const updateCard = (card: CharacterCardData) => {
-        setEdited(true)
-        setCurrentCard(card)
+    const updateCardDraft = (card: CharacterCard) => {
+        setIsDirty(true)
+        setCardDraft(card)
     }
 
-    const handleSaveCard = async () => {
-        if (currentCard && id) {
-            const saved = await Characters.db.mutate.updateCard(currentCard, id)
+    const handleSaveUserCard = async () => {
+        if (cardDraft && id) {
+            const saved = await Characters.db.update.card(id, cardDraft)
             if (!saved || Characters.useUserStore.getState().id !== id) return
-            setCurrentCard(saved)
-            setEdited(false)
+            setCardDraft(saved)
+            setIsDirty(false)
         }
     }
 
-    const handleUploadImage = () => {
+    const handleImportImage = () => {
         DocumentPicker.getDocumentAsync({
             copyToCacheDirectory: true,
             type: 'image/*',
         })
             .then(async (result) => {
                 if (result.canceled) return
-                if (id) await Characters.actions.updateImage(id, result.assets[0].uri)
+                if (id) await Characters.actions.updateCardImage(id, result.assets[0].uri)
             })
             .catch((error) => Logger.errorToast(t('common.errors.couldNotGetData'), error))
     }
@@ -79,9 +81,9 @@ const UserCardEditor = () => {
                 {
                     label: t('users.edit.image.delete'),
                     onPress: async () => {
-                        if (currentCard) {
+                        if (cardDraft) {
                             try {
-                                await Characters.actions.deleteImage(currentCard.id)
+                                await Characters.actions.deleteCardImage(cardDraft.id)
                             } catch (error) {
                                 Logger.errorToast(t('common.errors.couldNotGetData'), error)
                             }
@@ -93,8 +95,8 @@ const UserCardEditor = () => {
         })
     }
 
-    usePreventRemove(edited, ({ data }) => {
-        if (!userCard) return
+    usePreventRemove(isDirty, ({ data }) => {
+        if (!selectedCard) return
         Alert.alert({
             title: t('character.editor.dialogs.unsavedChanges.title'),
             description: t('character.editor.dialogs.unsavedChanges.description'),
@@ -103,7 +105,7 @@ const UserCardEditor = () => {
                 {
                     label: t('common.actions.save'),
                     onPress: async () => {
-                        await handleSaveCard()
+                        await handleSaveUserCard()
                         navigation.dispatch(data.action)
                     },
                 },
@@ -125,7 +127,7 @@ const UserCardEditor = () => {
                 <ContextMenu placement="right">
                     <ContextMenu.Trigger>
                         <Avatar
-                            targetImage={Characters.getImageDir(imageID)}
+                            targetImage={Characters.getCardImageUri(imageId)}
                             style={styles.userImage}
                         />
                         <AntDesign name="edit" color={color.text._100} style={styles.editHover} />
@@ -137,7 +139,7 @@ const UserCardEditor = () => {
                             closeOnPress={false}
                             onPress={(close) => {
                                 close()
-                                handleUploadImage()
+                                handleImportImage()
                             }}
                         />
                         <ContextMenu.Button
@@ -168,22 +170,22 @@ const UserCardEditor = () => {
                             columnGap: 4,
                         }}>
                         <ThemedButton
-                            disabled={!edited}
+                            disabled={!isDirty}
                             iconName="save"
                             iconSize={20}
                             label={t('common.actions.save')}
-                            onPress={handleSaveCard}
-                            variant={edited ? 'secondary' : 'disabled'}
+                            onPress={handleSaveUserCard}
+                            variant={isDirty ? 'secondary' : 'disabled'}
                         />
                     </View>
 
                     <ThemedTextInput
                         style={{ height: 36 }}
-                        value={currentCard?.name ?? ''}
+                        value={cardDraft?.name ?? ''}
                         onChangeText={(text) => {
-                            if (currentCard)
-                                updateCard({
-                                    ...currentCard,
+                            if (cardDraft)
+                                updateCardDraft({
+                                    ...cardDraft,
                                     name: text,
                                 })
                         }}
@@ -203,11 +205,11 @@ const UserCardEditor = () => {
                 }}
                 numberOfLines={10}
                 label={t('common.labels.description')}
-                value={currentCard?.description ?? ''}
+                value={cardDraft?.description ?? ''}
                 onChangeText={(text) => {
-                    if (currentCard)
-                        updateCard({
-                            ...currentCard,
+                    if (cardDraft)
+                        updateCardDraft({
+                            ...cardDraft,
                             description: text,
                         })
                 }}

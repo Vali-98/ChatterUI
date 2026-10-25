@@ -4,7 +4,7 @@ import { AppSettings } from '@lib/constants/GlobalValues'
 import { useTextFilterStore } from '@lib/hooks/TextFilter'
 import { buildThinkRules } from '@lib/markdown/ThinkTags'
 import { useAppModeStore } from '@lib/state/AppMode'
-import { CharacterCardData, CharacterTokenCache } from '@lib/state/characters'
+import { CharacterCard, CharacterTokenCounts } from '@lib/state/characters'
 import { ChatEntry } from '@lib/state/Chat'
 import { defaultSystemPromptFormat, InstructTokenCache, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
@@ -23,8 +23,8 @@ export type MessageLoader = {
 }
 
 export type TokenCache = {
-    userCache: CharacterTokenCache
-    characterCache: CharacterTokenCache
+    userCounts: CharacterTokenCounts
+    characterCounts: CharacterTokenCounts
     instructCache: InstructTokenCache
 }
 
@@ -38,9 +38,9 @@ export interface ContextBuilderParams {
     apiConfig: APIConfiguration
     apiValues: APIValues
     messages: ChatEntry[]
-    character: CharacterCardData
+    character: CharacterCard
     instruct: InstructType
-    user: CharacterCardData
+    user: CharacterCard
     tokenizer: (data: string, media_paths?: string[]) => Promise<number> | number
     chatTokenizer: (entry: ChatEntry, index: number) => Promise<number>
     maxLength: number
@@ -98,7 +98,7 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
 
     const delta = performance.now()
 
-    const { characterCache, userCache, instructCache } = cache
+    const { characterCounts, userCounts, instructCache } = cache
 
     const usePrefix = mode === 'text'
     const useSuffix = false
@@ -109,8 +109,8 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
         instruct,
         user,
         character,
-        userCache,
-        characterCache,
+        userCounts,
+        characterCounts,
         instructCache,
         usePrefix,
         useSuffix,
@@ -490,17 +490,17 @@ export const getSystemPrompt = ({
     instruct,
     user,
     character,
-    userCache,
-    characterCache,
+    userCounts,
+    characterCounts,
     instructCache,
     usePrefix = true,
     useSuffix = true,
 }: {
     instruct: InstructType
-    user?: CharacterCardData
-    character?: CharacterCardData
-    userCache: CharacterTokenCache
-    characterCache: CharacterTokenCache
+    user?: CharacterCard
+    character?: CharacterCard
+    userCounts: CharacterTokenCounts
+    characterCounts: CharacterTokenCounts
     instructCache: InstructTokenCache
     usePrefix?: boolean
     useSuffix?: boolean
@@ -534,22 +534,22 @@ export const getSystemPrompt = ({
         {
             macro: '{{character_desc}}',
             value: replaceMacros(character?.description ?? ''),
-            length: characterCache.description_length,
+            length: characterCounts.descriptionTokens,
         },
         {
             macro: '{{user_desc}}',
             value: replaceMacros(user?.description ?? ''),
-            length: userCache.description_length,
+            length: userCounts.descriptionTokens,
         },
         {
             macro: '{{personality}}',
             value: instruct.personality ? replaceMacros(character?.personality ?? '') : '',
-            length: instruct.personality ? characterCache.personality_length : 0,
+            length: instruct.personality ? characterCounts.personalityTokens : 0,
         },
         {
             macro: '{{scenario}}',
             value: instruct.scenario ? replaceMacros(character?.scenario ?? '') : '',
-            length: instruct.scenario ? characterCache.scenario_length : 0,
+            length: instruct.scenario ? characterCounts.scenarioTokens : 0,
         },
     ]
     const slots: Record<string, string> = {}

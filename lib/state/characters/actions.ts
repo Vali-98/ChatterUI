@@ -14,14 +14,15 @@ import {
 } from '@lib/utils/File'
 
 import { db } from './db'
-import { copyImage, createImageId, deleteImage as deleteImageFile, getImageDir } from './images'
+import { copyImageFile, createImageId, deleteImageFile, getCardImageUri } from './images'
 import type { CharacterCardV2 } from './schema'
 import {
     characterCardV1Schema,
     characterCardV2Schema,
-    createBlankV2Card,
-    convertDBDataToCV2,
+    buildBlankCharacterCard,
+    toCharacterCardV2,
 } from './schema'
+import type { CreateCardOptions } from './types'
 
 const CHARACTER_CARD_TEXT_CHUNK_KEYWORDS = [
     'Description', // AI bot base description
@@ -31,110 +32,119 @@ const CHARACTER_CARD_TEXT_CHUNK_KEYWORDS = [
     'ccv3',
 ]
 
-const cleanupImage = async (id: number | null | undefined) => {
-    if (id === null || id === undefined) return
+const cleanupImageFile = async (imageId: number | null | undefined) => {
+    if (imageId === null || imageId === undefined) return
     try {
-        await deleteImageFile(id)
+        await deleteImageFile(imageId)
     } catch (error) {
         Logger.warn(error)
     }
 }
 
-const replaceImage = async (id: number, uri: string, background: boolean) => {
-    const card = await db.query.card(id)
-    if (!card) throw new Error('Character does not exist')
-    const imageId = createImageId(card.image_id, card.background_image ?? -1)
-    const oldImageId = background ? card.background_image : card.image_id
+const replaceCardImage = async (
+    characterId: number,
+    imageUri: string,
+    { target = 'image' }: { target?: 'image' | 'background' } = {}
+) => {
+    const character = await db.query.card(characterId)
+    if (!character) throw new Error('Character does not exist')
+    const imageId = createImageId(character.image_id, character.background_image ?? -1)
+    const oldImageId = target === 'background' ? character.background_image : character.image_id
     try {
-        await copyImage(uri, imageId)
-        if (background) await db.mutate.updateBackground(id, imageId)
-        else await db.mutate.updateCardField('image_id', imageId, id)
+        await copyImageFile(imageId, imageUri)
+        if (target === 'background') await db.update.backgroundImageReference(characterId, imageId)
+        else await db.update.cardFields(characterId, { image_id: imageId })
     } catch (error) {
-        await cleanupImage(imageId)
+        await cleanupImageFile(imageId)
         throw error
     }
-    await cleanupImage(oldImageId)
+    await cleanupImageFile(oldImageId)
 }
 
-export const updateImage = (id: number, uri: string) => replaceImage(id, uri, false)
+export const updateCardImage = (characterId: number, imageUri: string) =>
+    replaceCardImage(characterId, imageUri)
 
-export const deleteImage = async (id: number) => {
-    const card = await db.query.card(id)
-    if (!card) return
-    await db.mutate.deleteImage(id)
-    await cleanupImage(card.image_id)
+export const deleteCardImage = async (characterId: number) => {
+    const character = await db.query.card(characterId)
+    if (!character) return
+    await db.delete.imageReference(characterId)
+    await cleanupImageFile(character.image_id)
 }
 
-export const importBackground = async (id: number) => {
+export const importCardBackground = async (characterId: number) => {
     try {
         const result = await DocumentPicker.getDocumentAsync({
             copyToCacheDirectory: true,
             type: ['image/*'],
         })
         if (result.canceled) return
-        await replaceImage(id, result.assets[0].uri, true)
+        await replaceCardImage(characterId, result.assets[0].uri, { target: 'background' })
     } catch (error) {
         Logger.error(error)
     }
 }
 
-export const deleteBackground = async (id: number) => {
-    const card = await db.query.card(id)
-    if (!card) return
-    await db.mutate.deleteBackground(id)
-    await cleanupImage(card.background_image)
-    Logger.info(`Deleted background for character: ${id}`)
+export const deleteCardBackground = async (characterId: number) => {
+    const character = await db.query.card(characterId)
+    if (!character) return
+    await db.delete.backgroundImageReference(characterId)
+    await cleanupImageFile(character.background_image)
+    Logger.info(`Deleted background for character: ${characterId}`)
 }
 
-export const createCharacter = async (
+export const createCard = async (
     card: CharacterCardV2,
-    uri = '',
-    type: 'character' | 'user' = 'character'
+    { imageUri = '', type = 'character' }: CreateCardOptions = {}
 ) => {
-    const created = await db.mutate.createCharacter(card, type, createImageId())
+    const created = await db.create.card(card, { type: type, image_id: createImageId() })
     if (!created) return
-    if (uri) {
+    if (imageUri) {
         try {
-            await copyImage(uri, created.image_id)
+            await copyImageFile(created.image_id, imageUri)
         } catch (error) {
-            await db.mutate.deleteCard(created.id)
-            await cleanupImage(created.image_id)
+            await db.delete.card(created.id)
+            await cleanupImageFile(created.image_id)
             throw error
         }
     }
     return created.id
 }
 
-export const deleteCard = async (id: number) => {
-    const card = await db.query.card(id)
-    if (!card) return
-    await db.mutate.deleteCard(id)
-    await cleanupImage(card.image_id)
-    await cleanupImage(card.background_image)
+export const deleteCard = async (characterId: number) => {
+    const character = await db.query.card(characterId)
+    if (!character) return
+    await db.delete.card(characterId)
+    await cleanupImageFile(character.image_id)
+    await cleanupImageFile(character.background_image)
 }
 
-export const duplicateCard = async (id: number) => {
-    const card = await db.query.card(id)
-    if (!card) return
-    const createdId = await createCharacter(convertDBDataToCV2(card), '', card.type)
+export const duplicateCard = async (characterId: number) => {
+    const character = await db.query.card(characterId)
+    if (!character) return
+    const createdId = await createCard(toCharacterCardV2(character), { type: character.type })
     if (createdId === undefined) return
     try {
-        if (fileExists(getImageDir(card.image_id)))
-            await updateImage(createdId, getImageDir(card.image_id))
-        if (card.background_image !== null && fileExists(getImageDir(card.background_image))) {
-            await replaceImage(createdId, getImageDir(card.background_image), true)
+        if (fileExists(getCardImageUri(character.image_id)))
+            await updateCardImage(createdId, getCardImageUri(character.image_id))
+        if (
+            character.background_image !== null &&
+            fileExists(getCardImageUri(character.background_image))
+        ) {
+            await replaceCardImage(createdId, getCardImageUri(character.background_image), {
+                target: 'background',
+            })
         }
     } catch (error) {
         await deleteCard(createdId)
         throw error
     }
-    Logger.info(`Card cloned: ${card.name}`)
+    Logger.info(`Card cloned: ${character.name}`)
     return createdId
 }
 
-export const createCharacterFromImage = async (uri: string) => {
+export const importCardImage = async (imageUri: string) => {
     try {
-        const file = await readBase64Async(uri)
+        const file = await readBase64Async(imageUri)
         if (!file) {
             Logger.errorToast(t('character.editor.errors.createFromImage'))
             return
@@ -154,38 +164,38 @@ export const createCharacterFromImage = async (uri: string) => {
             return
         }
 
-        await createCharacterFromV2JSON(card, uri)
+        await importCardV2(card, imageUri)
     } catch (e) {
         Logger.errorToast(t('character.editor.errors.createFailed'))
         Logger.error(`${e}`)
     }
 }
 
-const createCharacterFromV1JSON = async (data: any, uri: string | undefined = undefined) => {
+const importCardV1 = async (data: unknown, imageUri?: string) => {
     const result = characterCardV1Schema.safeParse(data)
     if (result.error) {
         Logger.errorToast(t('character.editor.errors.invalidCharacterCard'))
         return
     }
-    const converted = createBlankV2Card(result.data.name, result.data)
+    const converted = buildBlankCharacterCard(result.data.name, result.data)
 
     Logger.info(`Creating new character: ${result.data.name}`)
-    return createCharacter(converted, uri)
+    return createCard(converted, { imageUri: imageUri })
 }
 
-const createCharacterFromV2JSON = async (data: any, uri: string | undefined = undefined) => {
+const importCardV2 = async (data: unknown, imageUri?: string) => {
     // check JSON def
     const result = characterCardV2Schema.safeParse(data)
     if (result.error) {
         Logger.warnToast(t('character.editor.errors.v2ParsingFailedFallingBack'))
-        return await createCharacterFromV1JSON(data, uri)
+        return await importCardV1(data, imageUri)
     }
 
     Logger.info(`Creating new character: ${result.data.data.name}`)
-    return await createCharacter(result.data, uri)
+    return await createCard(result.data, { imageUri: imageUri })
 }
 
-export const importCharacter = async () => {
+export const importCards = async () => {
     const result = await DocumentPicker.getDocumentAsync({
         copyToCacheDirectory: true,
         type: ['image/*', 'application/json'],
@@ -194,15 +204,15 @@ export const importCharacter = async () => {
     if (result.canceled) return
     await Promise.all(
         result.assets.map(async (item) => {
-            const isPNG = item.mimeType?.includes('image/')
-            const isJSON = item.mimeType?.includes('application/json')
+            const isImage = item.mimeType?.includes('image/')
+            const isJson = item.mimeType?.includes('application/json')
             try {
-                if (isJSON) {
+                if (isJson) {
                     const data = await readStringAsync(item.uri)
-                    await createCharacterFromV2JSON(JSON.parse(data))
+                    await importCardV2(JSON.parse(data))
                 }
 
-                if (isPNG) await createCharacterFromImage(item.uri)
+                if (isImage) await importCardImage(item.uri)
             } catch (e) {
                 Logger.error(`Failed to create card from '${item.name}': ${e}`)
             }
@@ -210,45 +220,48 @@ export const importCharacter = async () => {
     )
 }
 
-export const exportCharacter = async (id: number) => {
-    const dbcard = await db.query.card(id)
-    if (!dbcard) {
+export const exportCard = async (characterId: number) => {
+    const character = await db.query.card(characterId)
+    if (!character) {
         Logger.error('Exported card does not exist!')
         return
     }
     // name can be empty string, should at least have something
-    const exportedFileName = dbcard.name ?? 'Character'
-    const cardString = JSON.stringify(convertDBDataToCV2(dbcard))
+    const exportedFileName = character.name ?? 'Character'
+    const cardJson = JSON.stringify(toCharacterCardV2(character))
 
-    const imagePath = getImageDir(dbcard.image_id)
-    if (fileExists(imagePath)) {
-        const fileData = await readBase64Async(imagePath)
+    const imageUri = getCardImageUri(character.image_id)
+    if (fileExists(imageUri)) {
+        const fileData = await readBase64Async(imageUri)
         if (!fileData) return
         const exportData = replacePngTextChunk(
             fileData,
-            [{ data: cardString, keyword: 'chara', b64encode: true }],
+            [{ data: cardJson, keyword: 'chara', b64encode: true }],
             { removeKeywords: CHARACTER_CARD_TEXT_CHUNK_KEYWORDS }
         )
         await saveStringToDownload(exportData, exportedFileName + '.png', 'base64')
     } else {
-        await saveStringToDownload(cardString, exportedFileName + '.json', 'utf8')
+        await saveStringToDownload(cardJson, exportedFileName + '.json', 'utf8')
     }
 }
 
 export const createDefaultCard = async () => {
-    const filename = 'aibot'
-    const pngName = filename + '.png'
-    const cardDefaultDir = `${Paths.document.uri}appAssets/${pngName}`
+    const imageName = 'aibot'
+    const imageFileName = imageName + '.png'
+    const defaultImageUri = `${Paths.document.uri}appAssets/${imageFileName}`
 
     try {
-        if (!fileExists(cardDefaultDir)) {
+        if (!fileExists(defaultImageUri)) {
             Logger.info('Importing default card.')
             const [asset] = await Asset.loadAsync(require('../../../assets/models/aibot.raw'))
-            if (asset.localUri && !(await copyFile({ from: asset.localUri, to: cardDefaultDir }))) {
+            if (
+                asset.localUri &&
+                !(await copyFile({ from: asset.localUri, to: defaultImageUri }))
+            ) {
                 throw new Error('Failed to copy default character')
             }
         }
-        await createCharacterFromImage(cardDefaultDir)
+        await importCardImage(defaultImageUri)
     } catch (e) {
         Logger.errorToast(t('settings.character.errors.failedToCreateDefaultCharacter'))
         Logger.error('Error: ' + e)

@@ -26,8 +26,8 @@ export const createExampleDataSource = (): DataSource => ({
         const examples = character?.mes_example
         if (!examples) return []
 
-        const { characterCache } = cache
-        const tokenLength = characterCache.examples_length
+        const { characterCounts } = cache
+        const tokenLength = characterCounts.exampleTokens
 
         if (currentLength + tokenLength > maxLength) {
             return []

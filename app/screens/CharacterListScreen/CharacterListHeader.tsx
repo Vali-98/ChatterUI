@@ -14,7 +14,7 @@ import { db } from '@db/db'
 import { characterTags, tags } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
-import { CharacterSorter } from '@lib/state/CharacterSorter'
+import { useCharacterSortStore } from '@lib/state/characters/sortStore'
 import { Logger } from '@lib/state/Logger'
 import { TagHider } from '@lib/state/TagHider'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -29,7 +29,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
     const { t } = useTranslation()
     const [useTagHider, setUseTagHider] = useMMKVBoolean(AppSettings.UseTagHider)
     const { showSearch, setShowSearch, textFilter, setTextFilter, tagFilter, setTagFilter } =
-        CharacterSorter.useSorterStore(
+        useCharacterSortStore(
             useShallow((state) => ({
                 showSearch: state.showSearch,
                 setShowSearch: state.setShowSearch,
@@ -97,8 +97,8 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                         }}>
                         {t('character.list.sort.label')}
                     </Text>
-                    <SortButton type="modified" label={t('character.list.sort.recent')} />
-                    <SortButton type="name" label={t('character.list.columns.name')} />
+                    <SortButton sortBy="modified" label={t('character.list.sort.recent')} />
+                    <SortButton sortBy="name" label={t('character.list.columns.name')} />
                 </View>
                 <View
                     style={{

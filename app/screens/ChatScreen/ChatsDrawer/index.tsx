@@ -28,10 +28,10 @@ const ChatsDrawer = () => {
             setShow: state.setShow,
         }))
     )
-    const { charId } = Characters.useCharacterStore(
-        useShallow((state) => ({ charId: state.id ?? -1 }))
+    const { characterId } = Characters.useCharacterState(
+        useShallow((state) => ({ characterId: state.id ?? -1 }))
     )
-    const targetChar = show ? charId : -1
+    const targetChar = show ? characterId : -1
     const { data } = useLiveQueryAsync(Chats.db.query.chatListQuery(targetChar), {
         key: ['chat-list', targetChar],
         watch: [{ table: 'chats' }, { table: 'chat_entries' }],
@@ -57,9 +57,9 @@ const ChatsDrawer = () => {
         setShowDrawer(false)
     }
 
-    const search = useDebounce(async (query: string, charId?: number) => {
-        if (!charId || !query) return
-        const results = await Chats.db.query.searchChat(query, charId).catch((e) => {
+    const search = useDebounce(async (query: string, characterId?: number) => {
+        if (!characterId || !query) return
+        const results = await Chats.db.query.searchChat(query, characterId).catch((e) => {
             Logger.error(t('chat.drawer.search.errors.queryFailed', { error: String(e) }))
             return []
         })
@@ -69,12 +69,12 @@ const ChatsDrawer = () => {
 
     const setSearch = (query: string) => {
         setSearchQuery(query)
-        search(query, charId)
+        search(query, characterId)
     }
 
     const handleCreateChat = async () => {
-        if (charId)
-            Chats.db.mutate.createChat(charId).then((chatId) => {
+        if (characterId)
+            Chats.db.mutate.createChat(characterId).then((chatId) => {
                 if (chatId) handleLoadChat(chatId)
             })
     }

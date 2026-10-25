@@ -12,7 +12,8 @@ import { Theme } from '@lib/theme/ThemeManager'
 const ChatTokenCount: React.FC = () => {
     const { t } = useTranslation()
     const { id: chatId } = Chats.useChatState()
-    const cardTokenCount = useCharacterTokenCounts()?.characterCache.description_length ?? 0
+    const characterDescriptionTokens =
+        useCharacterTokenCounts()?.characterCounts.descriptionTokens ?? 0
     const { data } = useLiveQueryAsync(Chats.db.live.tokenCount(chatId ?? -1), {
         key: ['chat-token-count', chatId],
         watch: [{ table: 'chat_entries' }, { table: 'chat_swipes' }],
@@ -20,7 +21,7 @@ const ChatTokenCount: React.FC = () => {
     const { color, fontSize } = Theme.useTheme()
     const sampler = useCurrentSampler()
 
-    const tokenCount = parseFloat(data?.[0]?.totalTokens ?? '0') + cardTokenCount
+    const tokenCount = parseFloat(data?.[0]?.totalTokens ?? '0') + characterDescriptionTokens
 
     const maxLength = sampler?.data?.[SamplerID.CONTEXT_LENGTH] ?? 1024
 

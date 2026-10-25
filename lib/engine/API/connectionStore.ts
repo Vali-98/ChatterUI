@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
 
 import { Storage } from '@lib/enums/Storage'
-import { CharacterLink } from '@lib/state/CharacterLinks'
+import { CharacterLinks } from '@lib/state/characters/links'
 import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
@@ -109,7 +109,10 @@ export const useConnectionStore = create<ConnectionStore>()(
             },
             removeConnection: async (id) => {
                 if (!get().connections.some((connection) => connection.id === id)) return
-                await CharacterLink.db.mutate.deleteByValue('connection_id', id)
+                await CharacterLinks.db.delete.linksByTarget({
+                    type: 'connection_id',
+                    value: id,
+                })
                 set((state) => ({
                     connections: state.connections.filter((connection) => connection.id !== id),
                     activeConnectionId:

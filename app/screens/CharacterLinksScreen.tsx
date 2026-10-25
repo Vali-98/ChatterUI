@@ -11,8 +11,8 @@ import { LinkType } from '@db/schema'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Model } from '@lib/engine/Local/Model'
 import { useLiveQuerySync } from '@lib/hooks/liveQuery'
-import { CharacterLink } from '@lib/state/CharacterLinks'
 import { Characters } from '@lib/state/characters'
+import { CharacterLinks } from '@lib/state/characters/links'
 import { Instructs } from '@lib/state/Instructs'
 import { useSamplerStore } from '@lib/state/samplerStore'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -25,17 +25,20 @@ type LinkCollection = {
     type: LinkType
 }
 
-const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
+const useActiveCharacterLinks = (characterId: number): LinkCollection[] => {
     // db lists
     const data =
-        Characters.useCharacterStore((state) =>
-            state.id === charId ? state.card?.links : undefined
+        Characters.useCharacterState((state) =>
+            state.id === characterId ? state.card?.links : undefined
         ) ?? []
 
-    const { data: userList } = useLiveQuerySync(Characters.db.live.listSimple('user'), {
-        key: ['user-list-simple'],
-        watch: [{ table: 'characters' }],
-    })
+    const { data: userList } = useLiveQuerySync(
+        Characters.db.live.cardSummaries({ type: 'user' }),
+        {
+            key: ['user-list-simple'],
+            watch: [{ table: 'characters' }],
+        }
+    )
     const { data: instructList } = useLiveQuerySync(Instructs.db.query.instructListQuery(), {
         key: ['instruct-list'],
         watch: [{ table: 'instructs' }],
@@ -121,8 +124,8 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
 
 const CharacterLinkItem: React.FC<{
     linkCollection: LinkCollection
-    charId?: number | undefined
-}> = ({ linkCollection, charId }) => {
+    characterId?: number | undefined
+}> = ({ linkCollection, characterId }) => {
     const styles = useStyles()
     const ref = useBottomSheetRef()
     const { t } = useTranslation()
@@ -149,7 +152,7 @@ const CharacterLinkItem: React.FC<{
             <Pressable
                 disabled={!active}
                 onPress={() => {
-                    if (active) CharacterLink.db.mutate.deleteById(active.id)
+                    if (active) CharacterLinks.db.delete.link(active.id)
                 }}>
                 <AntDesign
                     name={active ? 'delete' : 'plus'}
@@ -165,8 +168,11 @@ const CharacterLinkItem: React.FC<{
                 labelExtractor={(item) => item.label}
                 selectLabel={t('common.actions.link')}
                 onSelect={async (item, ref) => {
-                    if (charId === undefined || !item) return ref.current?.close()
-                    CharacterLink.db.mutate.upsert(charId, linkCollection.type, item.value)
+                    if (characterId === undefined || !item) return ref.current?.close()
+                    CharacterLinks.db.upsert.link(characterId, {
+                        type: linkCollection.type,
+                        value: item.value,
+                    })
                     ref.current?.close()
                 }}
             />
@@ -177,8 +183,8 @@ const CharacterLinkItem: React.FC<{
 const CharacterLinksScreen = () => {
     const { t } = useTranslation()
     const styles = useStyles()
-    const charId = Characters.useCharacterStore((state) => state.id)
-    const links = useActiveCharacterLinks(charId ?? -1)
+    const characterId = Characters.useCharacterState((state) => state.id)
+    const links = useActiveCharacterLinks(characterId ?? -1)
 
     return (
         <SafeAreaView
@@ -193,7 +199,7 @@ const CharacterLinksScreen = () => {
                 data={links}
                 keyExtractor={(item) => item.type}
                 renderItem={({ item }) => (
-                    <CharacterLinkItem linkCollection={item} charId={charId} />
+                    <CharacterLinkItem linkCollection={item} characterId={characterId} />
                 )}
             />
         </SafeAreaView>

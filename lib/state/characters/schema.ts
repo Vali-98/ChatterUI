@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { CharacterCardData } from './types'
+import type { CharacterCard } from './types'
 
 export const characterCardV1Schema = z.object({
     name: z.string(),
@@ -34,32 +34,27 @@ export const characterCardV2Schema = z.object({
     data: characterCardV2DataSchema,
 })
 
-// placeholder types
-// type CharaterCardV1 = z.infer<typeof characterCardV1Schema>
-// type CharacterCardV2Data = z.infer<typeof characterCardV2DataSchema>
-
 export type CharacterCardV2 = z.infer<typeof characterCardV2Schema>
 
-export const createBlankV2Card = (
+export const buildBlankCharacterCard = (
     name: string,
-    options: {
-        description: string
-        personality: string
-        scenario: string
-        first_mes: string
-        mes_example: string
-    } = { description: '', personality: '', scenario: '', first_mes: '', mes_example: '' }
+    fields: Partial<
+        Pick<
+            CharacterCardV2['data'],
+            'description' | 'personality' | 'scenario' | 'first_mes' | 'mes_example'
+        >
+    > = {}
 ): CharacterCardV2 => {
     return {
         spec: 'chara_card_v2',
         spec_version: '2.0',
         data: {
             name: name,
-            description: options.description,
-            personality: options.personality,
-            scenario: options.scenario,
-            first_mes: options.first_mes,
-            mes_example: options.mes_example,
+            description: fields.description ?? '',
+            personality: fields.personality ?? '',
+            scenario: fields.scenario ?? '',
+            first_mes: fields.first_mes ?? '',
+            mes_example: fields.mes_example ?? '',
 
             // New fields start here
             creator_notes: '',
@@ -75,24 +70,24 @@ export const createBlankV2Card = (
     }
 }
 
-export const convertDBDataToCV2 = (data: NonNullable<CharacterCardData>): CharacterCardV2 => {
+export const toCharacterCardV2 = (card: CharacterCard): CharacterCardV2 => {
     return {
         spec: 'chara_card_v2',
         spec_version: '2.0',
         data: {
-            name: data.name,
-            description: data.description,
-            personality: data.personality,
-            scenario: data.scenario,
-            first_mes: data.first_mes,
-            mes_example: data.mes_example,
-            creator_notes: data.creator_notes,
-            system_prompt: data.system_prompt,
-            post_history_instructions: data.post_history_instructions,
-            creator: data.creator,
-            character_version: data.character_version,
-            tags: data.tags.map((item) => item.tag.tag),
-            alternate_greetings: data.alternate_greetings.map((item) => item.greeting),
+            name: card.name,
+            description: card.description,
+            personality: card.personality,
+            scenario: card.scenario,
+            first_mes: card.first_mes,
+            mes_example: card.mes_example,
+            creator_notes: card.creator_notes,
+            system_prompt: card.system_prompt,
+            post_history_instructions: card.post_history_instructions,
+            creator: card.creator,
+            character_version: card.character_version,
+            tags: card.tags.map((item) => item.tag.tag),
+            alternate_greetings: card.alternate_greetings.map((item) => item.greeting),
         },
     }
 }

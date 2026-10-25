@@ -96,7 +96,7 @@ export const sendGenerateCompleteNotification = async () => {
     const showMessage = mmkv.getBoolean(AppSettings.ShowNotificationText)
 
     const notificationTitle = showMessage
-        ? (Characters.useCharacterStore.getState().card?.name ?? '')
+        ? (Characters.useCharacterState.getState().card?.name ?? '')
         : 'Response Complete'
 
     const notificationText = showMessage
@@ -112,7 +112,7 @@ export const sendGenerateCompleteNotification = async () => {
             badge: 0,
             data: {
                 chatId: Chats.useChatState.getState().id,
-                characterId: Characters.useCharacterStore.getState().id,
+                characterId: Characters.useCharacterState.getState().id,
             },
         },
         trigger: null,
@@ -253,10 +253,12 @@ export namespace Chats {
                 return result
             }
 
-            export const chatNewestId = async (charId: number): Promise<number | undefined> => {
+            export const chatNewestId = async (
+                characterId: number
+            ): Promise<number | undefined> => {
                 const result = await database.query.chats.findFirst({
                     orderBy: desc(chats.last_modified),
-                    where: eq(chats.character_id, charId),
+                    where: eq(chats.character_id, characterId),
                 })
                 return result?.id
             }
@@ -268,7 +270,7 @@ export namespace Chats {
                 return result
             }
 
-            export const chatList = async (charId: number) => {
+            export const chatList = async (characterId: number) => {
                 const result = await database
                     .select({
                         ...getTableColumns(chats),
@@ -277,11 +279,11 @@ export namespace Chats {
                     .from(chats)
                     .leftJoin(chatEntries, eq(chats.id, chatEntries.chat_id))
                     .groupBy(chats.id)
-                    .where(eq(chats.character_id, charId))
+                    .where(eq(chats.character_id, characterId))
                 return result
             }
 
-            export const chatListQuery = (charId: number) => {
+            export const chatListQuery = (characterId: number) => {
                 return database
                     .select({
                         ...getTableColumns(chats),
@@ -290,7 +292,7 @@ export namespace Chats {
                     .from(chats)
                     .leftJoin(chatEntries, eq(chats.id, chatEntries.chat_id))
                     .groupBy(chats.id)
-                    .where(eq(chats.character_id, charId))
+                    .where(eq(chats.character_id, characterId))
                     .orderBy(desc(chats.last_modified))
             }
 
@@ -300,7 +302,7 @@ export namespace Chats {
 
             export const searchChat = async (
                 query: string,
-                charId: number
+                characterId: number
             ): Promise<ChatSearchResult[]> => {
                 return await database
                     .select({
@@ -318,7 +320,10 @@ export namespace Chats {
                     )
                     .innerJoin(chats, eq(chatEntries.chat_id, chats.id))
                     .where(
-                        and(like(chatSwipes.swipe, `%${query}%`), eq(chats.character_id, charId))
+                        and(
+                            like(chatSwipes.swipe, `%${query}%`),
+                            eq(chats.character_id, characterId)
+                        )
                     )
                     .orderBy(chatSwipes.send_date)
                     .limit(100)
@@ -363,20 +368,20 @@ export namespace Chats {
             }
         }
         export namespace mutate {
-            export const createChat = async (charId: number) => {
-                const card = await Characters.db.query.card(charId)
+            export const createChat = async (characterId: number) => {
+                const card = await Characters.db.query.card(characterId)
                 if (!card) {
                     Logger.error('Character does not exist!')
                     return
                 }
                 const userId = Characters.useUserStore.getState().id
-                const charName = card.name
+                const characterName = card.name
                 return await database.transaction(async (tx) => {
-                    if (!card || charName === undefined) return
+                    if (!card || characterName === undefined) return
                     const [{ chatId }] = await tx
                         .insert(chats)
                         .values({
-                            character_id: charId,
+                            character_id: characterId,
                             user_id: userId ?? null,
                         })
                         .returning({ chatId: chats.id })
@@ -410,7 +415,7 @@ export namespace Chats {
                         )
                     }
 
-                    await Characters.db.mutate.updateModified(charId)
+                    await Characters.db.update.cardTimestamp(characterId)
                     return chatId
                 })
             }
@@ -418,7 +423,7 @@ export namespace Chats {
             export const updateChatModified = async (chatID: number) => {
                 const chat = await database.query.chats.findFirst({ where: eq(chats.id, chatID) })
                 if (chat?.character_id) {
-                    await Characters.db.mutate.updateModified(chat.character_id)
+                    await Characters.db.update.cardTimestamp(chat.character_id)
                 }
                 await database
                     .update(chats)

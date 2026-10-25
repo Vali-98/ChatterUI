@@ -9,28 +9,28 @@ import { createMacroValues } from '@lib/utils/Macros'
 
 import { useCharacterState } from './state'
 import { useUserStore } from './store'
-import { countTokenText, prepareTokenText } from './tokenCache'
-import type { CharacterCardData, CharacterTokenCache } from './types'
+import { countCharacterTokens, prepareCharacterTokenText } from './tokenCache'
+import type { CharacterCard, CharacterTokenCounts } from './types'
 
-type TokenCounts = { characterCache: CharacterTokenCache; userCache: CharacterTokenCache }
-type TokenState = {
+type ParticipantTokenCounts = {
+    characterCounts: CharacterTokenCounts
+    userCounts: CharacterTokenCounts
+}
+type CharacterTokenState = {
     key?: string
     characterId?: number
     userId?: number
     model?: unknown
     tokenizer?: (text: string) => Promise<number>
-    counts?: TokenCounts
-    getCounts: (
-        character: NonNullable<CharacterCardData>,
-        user: NonNullable<CharacterCardData>
-    ) => Promise<TokenCounts>
+    counts?: ParticipantTokenCounts
+    countTokens: (character: CharacterCard, user: CharacterCard) => Promise<ParticipantTokenCounts>
 }
 
-export const useCharacterTokenState = create<TokenState>()((set, get) => ({
-    getCounts: async (character, user) => {
+export const useCharacterTokenState = create<CharacterTokenState>()((set, get) => ({
+    countTokens: async (character, user) => {
         const values = createMacroValues({ char: character.name, user: user.name })
-        const characterText = prepareTokenText(character, values)
-        const userText = prepareTokenText(user, values)
+        const characterText = prepareCharacterTokenText(character, values)
+        const userText = prepareCharacterTokenText(user, values)
         const key = JSON.stringify([
             character.id,
             user.id,
@@ -60,11 +60,17 @@ export const useCharacterTokenState = create<TokenState>()((set, get) => ({
             model: model,
             counts: undefined,
         })
-        const [characterCache, userCache] = await Promise.all([
-            countTokenText(characterText, user.name, tokenizer),
-            countTokenText(userText, character.name, tokenizer),
+        const [characterCounts, userCounts] = await Promise.all([
+            countCharacterTokens(characterText, {
+                otherParticipantName: user.name,
+                tokenizer: tokenizer,
+            }),
+            countCharacterTokens(userText, {
+                otherParticipantName: character.name,
+                tokenizer: tokenizer,
+            }),
         ])
-        const counts = { characterCache, userCache }
+        const counts = { characterCounts, userCounts }
         // An older calculation may finish after a different selection/model was requested.
         if (get().key === key && get().tokenizer === tokenizer && get().model === model)
             set({ counts })
@@ -79,10 +85,10 @@ export const useCharacterTokenCounts = () => {
     const localModel = Llama.useLlamaModelStore((state) => state.context)
     const remoteModel = Tokenizer.useTokenizerState((state) => state.model)
     const entry = useCharacterTokenState()
-    const getCounts = entry.getCounts
+    const countTokens = entry.countTokens
     useEffect(() => {
-        if (character && user) getCounts(character, user).catch(Logger.error)
-    }, [character, user, mode, localModel, remoteModel, getCounts])
+        if (character && user) countTokens(character, user).catch(Logger.error)
+    }, [character, user, mode, localModel, remoteModel, countTokens])
     const model = mode === 'local' ? localModel : remoteModel
     return character &&
         user &&

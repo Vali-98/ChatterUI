@@ -11,7 +11,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import OnboardingView from './OnboardNavigation'
 
 const OnboardingName = () => {
-    const getImage = Characters.useUserStore((state) => state.getImage)
+    const getImageUri = Characters.useUserStore((state) => state.getImageUri)
     const { color } = Theme.useTheme()
     const [canContinue, setCanContinue] = useState(false)
 
@@ -25,7 +25,7 @@ const OnboardingName = () => {
                 }}
                 onComplete={() => setCanContinue(true)}>
                 <Avatar
-                    targetImage={getImage()}
+                    targetImage={getImageUri()}
                     style={{
                         width: 120,
                         height: 120,

@@ -1,37 +1,63 @@
-import type { db } from './db'
+import type { characters } from '@db/schema'
 
-export type CharInfo = {
+import type { CharacterCardQuery } from './db'
+
+export type CharacterCardType = 'character' | 'user'
+export type CharacterSortBy = 'name' | 'modified'
+export type CharacterSortDirection = 'asc' | 'desc'
+
+export type CharacterCard = NonNullable<Awaited<CharacterCardQuery>>
+
+export type CharacterCardSummary = {
     name: string
     id: number
     image_id: number
     last_modified: number
     tags: string[]
-    links: {
-        id: number
-        type: 'user_id' | 'instruct_id' | 'connection_id' | 'sampler_id' | 'model_id'
-        character_id: number
-        value: number
-    }[]
-    latestSwipe?: string
-    latestName?: string
-    latestChat?: number
+    links: CharacterCard['links']
+    latestSwipeText?: string
+    latestMessageName?: string
+    latestChatId?: number
 }
 
-export type CharacterTokenCache = {
-    otherName: string
-    description_length: number
-    examples_length: number
-    personality_length: number
-    scenario_length: number
+export type CharacterCardListOptions = {
+    type?: CharacterCardType
+    sortBy?: 'id' | 'modified'
 }
 
-export type CharacterCardState = {
-    card?: CharacterCardData
+export type CharacterCardListPageOptions = {
+    type?: CharacterCardType
+    sortBy?: CharacterSortBy
+    sortDirection?: CharacterSortDirection
+    limit?: number
+    offset?: number
+    searchText?: string
+    includedTags?: string[]
+    hiddenTags?: string[]
+}
+
+export type CreateCardDatabaseOptions = Partial<
+    Pick<typeof characters.$inferInsert, 'type' | 'image_id'>
+>
+export type CreateCardOptions = {
+    type?: CharacterCardType
+    imageUri?: string
+}
+export type CharacterCardChanges = Partial<Omit<typeof characters.$inferInsert, 'id'>>
+
+export type CharacterTokenCounts = {
+    otherParticipantName: string
+    descriptionTokens: number
+    exampleTokens: number
+    personalityTokens: number
+    scenarioTokens: number
+}
+
+export type CharacterCardSelectionState = {
+    card?: CharacterCard
     id: number | undefined
     error?: Error
-    setCard: (id: number) => Promise<string | undefined>
+    setCard: (characterId: number) => Promise<string | undefined>
     unloadCard: () => void
-    getImage: () => string
+    getImageUri: () => string
 }
-
-export type CharacterCardData = Awaited<ReturnType<typeof db.query.cardQuery>>

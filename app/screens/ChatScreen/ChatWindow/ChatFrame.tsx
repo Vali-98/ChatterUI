@@ -25,7 +25,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
     const [alternate] = useMMKVBoolean(AppSettings.AlternatingChatMode)
 
     const setShowViewer = useAvatarViewerStore((state) => state.setShow)
-    const charImageId = Characters.useCharacterStore((state) => state.card?.image_id) ?? 0
+    const characterImageId = Characters.useCharacterState((state) => state.card?.image_id) ?? 0
     const userImageId = Characters.useUserStore((state) => state.card?.image_id) ?? 0
     const swipe = entry.swipes[0]
     if (!swipe) return
@@ -69,8 +69,8 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                                 marginRight: entry.is_user && alternate ? 0 : spacing.l,
                                 marginLeft: entry.is_user && alternate ? spacing.l : 0,
                             }}
-                            targetImage={Characters.getImageDir(
-                                entry.is_user ? userImageId : charImageId
+                            targetImage={Characters.getCardImageUri(
+                                entry.is_user ? userImageId : characterImageId
                             )}
                         />
                     </TouchableOpacity>
@@ -116,8 +116,8 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                                 borderRadius: borderRadius.xl,
                                 marginHorizontal: 4,
                             }}
-                            targetImage={Characters.getImageDir(
-                                entry.is_user ? userImageId : charImageId
+                            targetImage={Characters.getCardImageUri(
+                                entry.is_user ? userImageId : characterImageId
                             )}
                         />
                     </TouchableOpacity>

@@ -6,24 +6,24 @@ import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
 import ContextMenu from '@components/views/ContextMenu'
 import Drawer from '@components/views/Drawer'
-import { CharacterLink } from '@lib/state/CharacterLinks'
 import { Characters } from '@lib/state/characters'
+import { CharacterLinks } from '@lib/state/characters/links'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getFriendlyTimeStamp } from '@lib/utils/Time'
 
-type CharacterData = Awaited<ReturnType<typeof Characters.db.query.cardListQuery>>[0]
+type UserCardListItem = Awaited<ReturnType<typeof Characters.db.live.cardList>>[0]
 
-type CharacterListingProps = {
-    user: CharacterData
+type UserListingProps = {
+    user: UserCardListItem
 }
 
-const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
+const UserListing: React.FC<UserListingProps> = ({ user }) => {
     const { t } = useTranslation()
     const styles = useStyles()
     const setShow = Drawer.useDrawerStore((state) => state.setShow)
 
-    const setShowDrawer = (b: boolean) => {
-        setShow(Drawer.ID.USERLIST, b)
+    const setShowDrawer = (isOpen: boolean) => {
+        setShow(Drawer.ID.USERLIST, isOpen)
     }
 
     const { userId, setCard } = Characters.useUserStore(
@@ -44,21 +44,23 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
                     label: t('users.edit.card.delete'),
                     onPress: async () => {
                         await Characters.actions.deleteCard(user.id)
-                        await Characters.db.query.cardList('user').then(async (list) => {
+                        await Characters.db.query.cardList({ type: 'user' }).then(async (list) => {
                             if (list.length === 0) {
                                 // eslint-disable-next-line i18next/no-literal-string
                                 const defaultName = 'User'
-                                const id = await Characters.db.mutate.createCard(
-                                    defaultName,
-                                    'user'
-                                )
+                                const id = await Characters.db.create.blankCard(defaultName, {
+                                    type: 'user',
+                                })
                                 await setCard(id)
                                 return
                             }
                             if (userId && list.some((item) => item.id === userId)) return
                             setCard(list[0].id)
                         })
-                        await CharacterLink.db.mutate.deleteByValue('user_id', user.id)
+                        await CharacterLinks.db.delete.linksByTarget({
+                            type: 'user_id',
+                            value: user.id,
+                        })
                     },
                     type: 'warning',
                 },
@@ -66,7 +68,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
         })
     }
 
-    const handleCloneCard = (close: () => void) => {
+    const handleDuplicateCard = (close: () => void) => {
         Alert.alert({
             title: t('users.edit.card.clone'),
             description: t('users.edit.card.clonedesc', { name: user.name }),
@@ -104,7 +106,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
                                 flex: 1,
                             }}>
                             <Avatar
-                                targetImage={Characters.getImageDir(user.image_id)}
+                                targetImage={Characters.getCardImageUri(user.image_id)}
                                 style={styles.avatar}
                             />
                             <View style={{ flex: 1, paddingLeft: 12 }}>
@@ -129,7 +131,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
                     label={t('common.actions.clone')}
                     icon="copy"
                     closeOnPress={false}
-                    onPress={handleCloneCard}
+                    onPress={handleDuplicateCard}
                 />
                 <ContextMenu.Button
                     label={t('common.actions.delete')}

@@ -5,7 +5,7 @@ import { Storage } from '@lib/enums/Storage'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
 import { createCardSelection } from './selection'
-import type { CharacterCardState } from './types'
+import type { CharacterCardSelectionState } from './types'
 
 type UserSelection = { id?: number }
 
@@ -15,7 +15,7 @@ const readSelection = (persisted: unknown): UserSelection => {
 }
 
 const selection = createCardSelection()
-export const useUserStore = create<CharacterCardState>()(
+export const useUserStore = create<CharacterCardSelectionState>()(
     persist(selection.initializer, {
         name: Storage.UserCard,
         storage: createMMKVStorage(),

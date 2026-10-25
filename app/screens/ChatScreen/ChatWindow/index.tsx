@@ -28,7 +28,7 @@ type ChatWindowProps = {
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
-    const backgroundImage = Characters.useCharacterStore((state) => state.card?.background_image)
+    const backgroundImage = Characters.useCharacterState((state) => state.card?.background_image)
 
     const { appMode } = useAppMode()
     const [saveScroll] = useMMKVBoolean(AppSettings.SaveScrollPosition)
@@ -86,7 +86,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
             style={{ flex: 1 }}
             source={{
                 uri: backgroundImage
-                    ? Characters.getImageDir(backgroundImage)
+                    ? Characters.getCardImageUri(backgroundImage)
                     : image
                       ? AppDirectory.Assets + image
                       : '',

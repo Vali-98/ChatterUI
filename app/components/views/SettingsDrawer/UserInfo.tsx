@@ -9,10 +9,10 @@ import { Theme } from '@lib/theme/ThemeManager'
 const UserInfo = () => {
     const router = useRouter()
     const { color, spacing, borderWidth, fontSize } = Theme.useTheme()
-    const { userName, imageID } = Characters.useUserStore(
+    const { userName, imageId } = Characters.useUserStore(
         useShallow((state) => ({
             userName: state.card?.name,
-            imageID: state.card?.image_id ?? 0,
+            imageId: state.card?.image_id ?? 0,
         }))
     )
     return (
@@ -28,7 +28,7 @@ const UserInfo = () => {
                 padding: spacing.xl,
             }}>
             <Avatar
-                targetImage={Characters.getImageDir(imageID)}
+                targetImage={Characters.getCardImageUri(imageId)}
                 style={{
                     width: 80,
                     height: 80,

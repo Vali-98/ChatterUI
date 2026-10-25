@@ -3,13 +3,13 @@ import { addDatabaseChangeListener, type DatabaseChangeEvent } from 'expo-sqlite
 import { Storage } from '../lib/enums/Storage'
 import { useCharacterState } from '../lib/state/characters/state'
 import { useUserStore } from '../lib/state/characters/store'
-import type { CharacterCardData } from '../lib/state/characters/types'
+import type { CharacterCard } from '../lib/state/characters/types'
 
 jest.mock('expo-sqlite', () => ({ addDatabaseChangeListener: jest.fn() }))
 jest.mock('../db/db', () => ({ sqliteDB: { databasePath: '/db.db' } }))
 jest.mock('../lib/state/Logger', () => ({ Logger: { error: jest.fn() } }))
 jest.mock('../lib/state/characters/images', () => ({
-    getImageDir: (id: number) => `/cards/${id}.png`,
+    getCardImageUri: (id: number) => `/cards/${id}.png`,
 }))
 jest.mock('../lib/state/characters/db', () => {
     const { SQLiteSyncRelationalQuery } = require('drizzle-orm/sqlite-core/query-builders/query')
@@ -19,8 +19,8 @@ jest.mock('../lib/state/characters/db', () => {
         records: records,
         read: read,
         db: {
-            query: {
-                cardQuery: (id: number) =>
+            live: {
+                card: (id: number) =>
                     Object.assign(Object.create(SQLiteSyncRelationalQuery.prototype), {
                         mode: 'first',
                         sync: () => read(id),
@@ -49,7 +49,7 @@ jest.mock('../lib/storage/MMKV', () => {
 })
 
 const { records, read } = require('../lib/state/characters/db') as {
-    records: Map<number, CharacterCardData>
+    records: Map<number, CharacterCard>
     read: jest.Mock
 }
 const { values } = require('../lib/storage/MMKV') as { values: Map<string, string> }
@@ -73,7 +73,7 @@ const card = (id: number, name: string) =>
         tags: [],
         links: [],
         alternate_greetings: [],
-    }) as unknown as NonNullable<CharacterCardData>
+    }) as unknown as CharacterCard
 const flush = async () => {
     await Promise.resolve()
     await Promise.resolve()
@@ -107,14 +107,14 @@ test('character and user expose the same load API with a single live observer ea
     expect(await useCharacterState.getState().setCard(1)).toBe('Character')
     expect(await useUserStore.getState().setCard(2)).toBe('User')
     expect(listeners.size).toBe(2)
-    expect(useCharacterState.getState().getImage()).toBe('/cards/11.png')
-    expect(useUserStore.getState().getImage()).toBe('/cards/12.png')
+    expect(useCharacterState.getState().getImageUri()).toBe('/cards/11.png')
+    expect(useUserStore.getState().getImageUri()).toBe('/cards/12.png')
     expect(JSON.parse(values.get(Storage.UserCard)!)).toEqual({ state: { id: 2 }, version: 3 })
     records.set(1, { ...card(1, 'Renamed'), image_id: 123 })
     emit('characters', 1)
     await flush()
     expect(useCharacterState.getState().card?.name).toBe('Renamed')
-    expect(useCharacterState.getState().getImage()).toBe('/cards/123.png')
+    expect(useCharacterState.getState().getImageUri()).toBe('/cards/123.png')
 })
 
 test('all included relations refresh both snapshots and deletion clears their selection', async () => {

@@ -5,28 +5,28 @@ import Animated from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import useAnimatedActiveColorStyle from '@lib/hooks/AnimatedActiveColorStyle'
-import { CharacterSorter, SearchType } from '@lib/state/CharacterSorter'
+import { useCharacterSortStore } from '@lib/state/characters/sortStore'
+import type { CharacterSortBy } from '@lib/state/characters/types'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type SortButtonProps = {
-    type: SearchType
+    sortBy: CharacterSortBy
     label: string
 }
 
-const SortButton: React.FC<SortButtonProps> = ({ type, label }) => {
+const SortButton: React.FC<SortButtonProps> = ({ sortBy, label }) => {
     const styles = useStyles()
     const { color } = Theme.useTheme()
-    const { searchType, setSearchType, searchOrder, setSearchOrder } =
-        CharacterSorter.useSorterStore(
-            useShallow((state) => ({
-                searchType: state.searchType,
-                setSearchType: state.setType,
-                searchOrder: state.searchOrder,
-                setSearchOrder: state.setOrder,
-            }))
-        )
+    const { selectedSortBy, setSortBy, sortDirection, setSortDirection } = useCharacterSortStore(
+        useShallow((state) => ({
+            selectedSortBy: state.searchType,
+            setSortBy: state.setSortBy,
+            sortDirection: state.searchOrder,
+            setSortDirection: state.setSortDirection,
+        }))
+    )
 
-    const isCurrent = type === searchType
+    const isCurrent = sortBy === selectedSortBy
     const animatedStyle = useAnimatedActiveColorStyle({
         active: isCurrent,
         activeColor: color.primary._300,
@@ -37,16 +37,18 @@ const SortButton: React.FC<SortButtonProps> = ({ type, label }) => {
         <Animated.View style={[styles.buttonContainer, animatedStyle]}>
             <Pressable
                 onPress={() => {
-                    setSearchOrder(searchType !== type || searchOrder === 'asc' ? 'desc' : 'asc')
-                    setSearchType(type)
+                    setSortDirection(
+                        selectedSortBy !== sortBy || sortDirection === 'asc' ? 'desc' : 'asc'
+                    )
+                    setSortBy(sortBy)
                 }}
                 style={styles.sortButton}>
                 {isCurrent && (
                     <AntDesign
                         size={14}
                         name={
-                            (searchOrder === 'asc' && type === 'modified') ||
-                            (searchOrder === 'desc' && type === 'name')
+                            (sortDirection === 'asc' && sortBy === 'modified') ||
+                            (sortDirection === 'desc' && sortBy === 'name')
                                 ? 'caret-up'
                                 : 'caret-down'
                         }

@@ -6,23 +6,23 @@ import { View } from 'react-native'
 import Alert from '@components/views/Alert'
 import ContextMenu from '@components/views/ContextMenu'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
-import { CharInfo, Characters } from '@lib/state/characters'
+import { CharacterCardSummary, Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/Chat'
 import { Instructs } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { useSamplerStore } from '@lib/state/samplerStore'
 
-type CharacterEditPopupProps = {
-    character: CharInfo
-    nowLoading: boolean
-    setNowLoading: (b: boolean) => void
+type CharacterActionsMenuProps = {
+    character: CharacterCardSummary
+    isLoading: boolean
+    setIsLoading: (b: boolean) => void
     children: ReactNode
 }
 
-const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
+const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
     character,
-    setNowLoading,
-    nowLoading,
+    setIsLoading,
+    isLoading,
     children,
 }) => {
     const { t } = useTranslation()
@@ -30,21 +30,21 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
     const router = useRouter()
 
     const { setId } = Chats.useChat()
-    const setUser = Characters.useUserStore((state) => state.setCard)
+    const selectUserCard = Characters.useUserStore((state) => state.setCard)
     const setInstruct = Instructs.useInstruct((state) => state.load)
     const setConnection = useConnectionStore((state) => state.setActiveConnection)
     const setSampler = useSamplerStore((state) => state.setCurrentConfig)
 
-    const setCurrentCharacter = async () => {
-        if (nowLoading || path === '/screens/ChatScreen' || !character.id) return
+    const handleOpenChat = async () => {
+        if (isLoading || path === '/screens/ChatScreen' || !character.id) return
         try {
-            setNowLoading(true)
-            await setCurrentCard(character.id)
+            setIsLoading(true)
+            await selectCharacterCard(character.id)
             character?.links.forEach((item) => {
                 switch (item.type) {
                     case 'user_id':
                         Logger.info(t('character.editor.links.loadUser', { value: item.value }))
-                        setUser(item.value)
+                        selectUserCard(item.value)
                         break
                     case 'instruct_id':
                         Logger.info(t('character.editor.links.loadInstruct', { value: item.value }))
@@ -62,7 +62,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                         break
                 }
             })
-            let chatId = character.latestChat
+            let chatId = character.latestChatId
             if (!chatId) {
                 chatId = await Chats.db.mutate.createChat(character.id)
             }
@@ -71,17 +71,17 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                 return
             }
             await setId(chatId)
-            setNowLoading(false)
+            setIsLoading(false)
             router.push('/screens/ChatScreen')
         } catch (error) {
             Logger.errorToast(t('character.list.errors.load', { error }))
-            setNowLoading(false)
+            setIsLoading(false)
         }
     }
 
-    const setCurrentCard = Characters.useCharacterStore((state) => state.setCard)
+    const selectCharacterCard = Characters.useCharacterState((state) => state.setCard)
 
-    const deleteCard = (close: () => void) => {
+    const handleDeleteCard = (close: () => void) => {
         close()
         Alert.alert({
             title: t('character.editor.dialogs.deleteCharacter.title'),
@@ -103,7 +103,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
         })
     }
 
-    const cloneCard = (close: () => void) => {
+    const handleDuplicateCard = (close: () => void) => {
         close()
         Alert.alert({
             title: t('character.editor.dialogs.clone.title'),
@@ -115,28 +115,28 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                 {
                     label: t('character.editor.dialogs.clone.confirm'),
                     onPress: async () => {
-                        setNowLoading(true)
+                        setIsLoading(true)
                         await Characters.actions.duplicateCard(character.id)
 
-                        setNowLoading(false)
+                        setIsLoading(false)
                     },
                 },
             ],
         })
     }
 
-    const editCharacter = async (close: () => void) => {
-        if (nowLoading) return
-        setNowLoading(true)
-        await setCurrentCard(character.id)
-        setNowLoading(false)
+    const handleEditCard = async (close: () => void) => {
+        if (isLoading) return
+        setIsLoading(true)
+        await selectCharacterCard(character.id)
+        setIsLoading(false)
         close()
         router.push('/screens/CharacterEditorScreen')
     }
 
     return (
-        <ContextMenu disabled={nowLoading || path !== '/'} placement="center">
-            <ContextMenu.Trigger onPress={setCurrentCharacter} longPress delayLongPress={300}>
+        <ContextMenu disabled={isLoading || path !== '/'} placement="center">
+            <ContextMenu.Trigger onPress={handleOpenChat} longPress delayLongPress={300}>
                 <View pointerEvents="none">{children}</View>
             </ContextMenu.Trigger>
             <ContextMenu.Body>
@@ -144,19 +144,19 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                     label={t('common.actions.edit')}
                     icon="edit"
                     closeOnPress={false}
-                    onPress={editCharacter}
+                    onPress={handleEditCard}
                 />
                 <ContextMenu.Button
                     label={t('common.actions.clone')}
                     icon="copy"
                     closeOnPress={false}
-                    onPress={cloneCard}
+                    onPress={handleDuplicateCard}
                 />
                 <ContextMenu.Button
                     label={t('common.actions.delete')}
                     icon="delete"
                     closeOnPress={false}
-                    onPress={deleteCard}
+                    onPress={handleDeleteCard}
                     variant="warning"
                 />
             </ContextMenu.Body>
@@ -164,4 +164,4 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
     )
 }
 
-export default CharacterEditPopup
+export default CharacterActionsMenu

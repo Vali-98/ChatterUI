@@ -9,15 +9,15 @@ import { Characters } from '@lib/state/characters'
 import { Logger } from '@lib/state/Logger'
 
 type CharacterNewMenuProps = {
-    nowLoading: boolean
-    setNowLoading: (b: boolean) => void
+    isLoading: boolean
+    setIsLoading: (b: boolean) => void
 }
 
-const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowLoading }) => {
+const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ isLoading, setIsLoading }) => {
     const { t } = useTranslation()
-    const { setCurrentCard } = Characters.useCharacterStore(
+    const { selectCharacterCard } = Characters.useCharacterState(
         useShallow((state) => ({
-            setCurrentCard: state.setCard,
+            selectCharacterCard: state.setCard,
             id: state.id,
         }))
     )
@@ -30,11 +30,11 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
             Logger.errorToast(t('character.list.errors.nameEmpty'))
             return
         }
-        Characters.db.mutate.createCard(text).then(async (id) => {
-            if (nowLoading) return
-            setNowLoading(true)
-            await setCurrentCard(id)
-            setNowLoading(false)
+        Characters.db.create.blankCard(text).then(async (id) => {
+            if (isLoading) return
+            setIsLoading(true)
+            await selectCharacterCard(id)
+            setIsLoading(false)
             router.push('/screens/CharacterEditorScreen')
         })
     }
@@ -59,7 +59,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                     <ContextMenu.Button
                         label={t('character.list.actions.importFromFile')}
                         onPress={() => {
-                            Characters.actions.importCharacter()
+                            Characters.actions.importCards()
                         }}
                         icon="upload"
                     />
