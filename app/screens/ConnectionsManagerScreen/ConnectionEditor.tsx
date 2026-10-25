@@ -12,35 +12,34 @@ import Alert from '@components/views/Alert'
 import BottomSheet, { BottomSheetRef } from '@components/views/BottomSheet'
 import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { APIValues } from '@lib/engine/API/APIBuilder.types'
-import { APIManager, APIManagerValue } from '@lib/engine/API/APIManagerState'
+import { Connection, useConnectionStore } from '@lib/engine/API/connectionStore'
 import { useDebounce } from '@lib/hooks/Debounce'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getNestedValue } from '@lib/utils/Parsing'
 
 type ConnectionEditorProps = {
-    index: number
     ref: BottomSheetRef
-    originalValues: APIManagerValue
+    originalValues: Connection
 }
 
-const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ index, ref, originalValues }) => {
+const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ ref, originalValues }) => {
     const { color, fontSize } = Theme.useTheme()
     const styles = useStyles()
     const { t } = useTranslation()
 
-    const { editValue, getTemplates, removeValue, addValue, showCustomFields } =
-        APIManager.useConnectionsStore(
+    const { updateConnection, getTemplates, removeConnection, addConnection, showCustomFields } =
+        useConnectionStore(
             useShallow((state) => ({
-                removeValue: state.removeValue,
+                removeConnection: state.removeConnection,
                 getTemplates: state.getTemplates,
-                editValue: state.editValue,
-                addValue: state.addValue,
+                updateConnection: state.updateConnection,
+                addConnection: state.addConnection,
                 showCustomFields: state.preferences.showCustomFields,
             }))
         )
 
-    const [values, setValues] = useState<APIManagerValue>(originalValues)
+    const [values, setValues] = useState<Connection>(originalValues)
     const [modelList, setModelList] = useState<any[]>([])
 
     const template = useMemo(() => {
@@ -93,8 +92,13 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ index, ref, origina
                 { label: t('common.actions.cancel') },
                 {
                     label: t('connections.item.delete.button'),
-                    onPress: () => {
-                        removeValue(index)
+                    onPress: async () => {
+                        try {
+                            await removeConnection(originalValues.id)
+                            ref.current?.close()
+                        } catch (error) {
+                            Logger.errorToast(t('connections.item.delete.title'), error)
+                        }
                     },
                     type: 'warning',
                 },
@@ -289,7 +293,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ index, ref, origina
                         onPress={() => {
                             const newName = values.friendlyName + ` (${t('common.actions.clone')})`
                             const newValue = { ...values, friendlyName: newName }
-                            addValue(newValue)
+                            addConnection(newValue)
                             ref.current?.close()
                         }}
                     />
@@ -298,7 +302,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ index, ref, origina
                         label={t('common.actions.save')}
                         iconName="save"
                         onPress={() => {
-                            editValue(values, index)
+                            updateConnection(originalValues.id, values)
                             ref.current?.close()
                         }}
                     />

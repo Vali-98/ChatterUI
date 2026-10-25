@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useShallow } from 'zustand/react/shallow'
 
 import DropdownSheet from '@components/input/DropdownSheet'
 import HorizontalSelector from '@components/input/HorizontalSelector'
@@ -16,9 +15,9 @@ import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import InputSheet from '@components/views/InputSheet'
 import { SamplerID, Samplers } from '@lib/constants/SamplerData'
-import { APIConfiguration, APISampler } from '@lib/engine/API/APIBuilder.types'
-import { APIManager as APIStateNew } from '@lib/engine/API/APIManagerState'
+import { APISampler } from '@lib/engine/API/APIBuilder.types'
 import { localSamplerData } from '@lib/engine/LocalInference'
+import { useActiveConnection } from '@lib/hooks/ActiveConnection'
 import { useAppMode } from '@lib/state/AppMode'
 import { Logger } from '@lib/state/Logger'
 import { SamplersManager } from '@lib/state/SamplerState'
@@ -44,24 +43,11 @@ const SamplerManagerScreen = () => {
         configList,
     } = SamplersManager.useSamplers()
 
-    const { apiValues, activeIndex, getTemplates } = APIStateNew.useConnectionsStore(
-        useShallow((state) => ({
-            apiValues: state.values,
-            activeIndex: state.activeIndex,
-            getTemplates: state.getTemplates,
-        }))
-    )
+    const { activeTemplate } = useActiveConnection()
 
     const getSamplerList = (): APISampler[] => {
         if (appMode === 'local') return localSamplerData
-        if (activeIndex !== -1) {
-            const template = getTemplates().find(
-                (item: APIConfiguration) => item.name === apiValues[activeIndex].configName
-            )
-            if (!template) return []
-            return template.request.samplerFields
-        }
-        return []
+        return activeTemplate?.request.samplerFields ?? []
     }
 
     const handleExportSampler = () => {

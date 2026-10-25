@@ -1,6 +1,6 @@
 import { SamplerID } from '@lib/constants/SamplerData'
 import { APIConfiguration, APIValues } from '@lib/engine/API/APIBuilder.types'
-import { APIManager } from '@lib/engine/API/APIManagerState'
+import { useActiveConnectionTemplate } from '@lib/engine/API/connectionStore'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { useAppMode } from '@lib/state/AppMode'
 import { SamplersManager } from '@lib/state/SamplerState'
@@ -10,7 +10,7 @@ export const useContextLimit = (): number => {
     const localLimit = Llama.useLlamaPreferencesStore((state) => state.config.context_length)
     const sampler = SamplersManager.useCurrentSampler()
     const samplerLimit = sampler?.data?.[SamplerID.CONTEXT_LENGTH] ?? 4096
-    const { apiValue, apiConfig } = APIManager.useActiveValueTemplate()
+    const { apiValue, apiConfig } = useActiveConnectionTemplate()
 
     if (appMode === 'local') return localLimit
     if (apiConfig?.model.useModelContextLength && apiConfig && apiValue) {

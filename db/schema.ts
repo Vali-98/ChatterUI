@@ -98,7 +98,7 @@ export const tagsRelations = relations(tags, ({ many }) => ({
 export const linkTypes = [
     'user_id',
     'instruct_id',
-    'connection_index',
+    'connection_id',
     'sampler_index',
     'model_id',
 ] as const

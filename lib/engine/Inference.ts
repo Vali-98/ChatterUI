@@ -15,7 +15,7 @@ import { Characters } from '../state/Characters'
 import { Logger } from '../state/Logger'
 import { APIBuilderParams, buildAndSendRequest } from './API/APIBuilder'
 import { APIConfiguration, APIValues } from './API/APIBuilder.types'
-import { APIManager } from './API/APIManagerState'
+import { useConnectionStore } from './API/connectionStore'
 import { getDataSources } from './DataSources'
 import { localInference } from './LocalInference'
 import { Tokenizer } from './Tokenizer'
@@ -228,7 +228,7 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
     try {
         const userState = Characters.useUserStore.getState()
         const characterState = Characters.useCharacterStore.getState()
-        const apiState = APIManager.useConnectionsStore.getState()
+        const apiState = useConnectionStore.getState()
         const instructState = Instructs.useInstruct.getState()
 
         const userCard = userState.card
@@ -255,7 +255,9 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
             return
         }
 
-        const apiValues = apiState.values.find((item, index) => index === apiState.activeIndex)
+        const apiValues = apiState.connections.find(
+            (item) => item.id === apiState.activeConnectionId
+        )
         if (!apiValues) {
             Logger.warnToast(t('generation.errors.noActiveAPI'))
             return

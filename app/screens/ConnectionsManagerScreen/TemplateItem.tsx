@@ -4,21 +4,20 @@ import { Text, View } from 'react-native'
 import ThemedButton from '@components/buttons/ThemedButton'
 import Alert from '@components/views/Alert'
 import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
-import { APIManager } from '@lib/engine/API/APIManagerState'
+import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 
 type TemplateItemProps = {
     item: APIConfiguration
-    index: number
 }
 
-const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
+const TemplateItem: React.FC<TemplateItemProps> = ({ item }) => {
     const { t } = useTranslation()
     const { color, spacing, borderWidth, fontSize, borderRadius } = Theme.useTheme()
 
-    const removeTemplate = APIManager.useConnectionsStore((state) => state.removeTemplate)
+    const removeTemplate = useConnectionStore((state) => state.removeTemplate)
 
     const handleDelete = () => {
         Alert.alert({
@@ -29,7 +28,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
                 {
                     label: t('connections.templates.delete.confirm'),
                     onPress: () => {
-                        removeTemplate(index)
+                        removeTemplate(item.name)
                     },
                     type: 'warning',
                 },

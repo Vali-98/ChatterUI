@@ -8,7 +8,7 @@ import ListSheet from '@components/input/ListSheet'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { LinkType } from '@db/schema'
-import { APIManager } from '@lib/engine/API/APIManagerState'
+import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Model } from '@lib/engine/Local/Model'
 import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
 import { CharacterLink } from '@lib/state/CharacterLinks'
@@ -37,7 +37,7 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
     })
     const modelList = useLiveQueryJoined(Model.getModelListQuery(), [], { sync: true })
     const samplerList = SamplersManager.useSamplerStore((state) => state.configList)
-    const connectionsList = APIManager.useConnectionsStore((state) => state.values)
+    const connectionsList = useConnectionStore((state) => state.connections)
 
     // derived active values
     const userLink = data.find((link) => link.type === 'user_id')
@@ -53,10 +53,9 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
     const samplerIndex = samplerLink?.value
     const activeSampler = samplerIndex !== undefined ? samplerList?.[samplerIndex] : undefined
 
-    const connectionLink = data.find((link) => link.type === 'connection_index')
-    const connectionIndex = connectionLink?.value
-    const activeConnection =
-        connectionIndex !== undefined ? connectionsList?.[connectionIndex] : undefined
+    const connectionLink = data.find((link) => link.type === 'connection_id')
+    const connectionId = connectionLink?.value
+    const activeConnection = connectionsList.find((connection) => connection.id === connectionId)
 
     return [
         {
@@ -84,19 +83,19 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
             type: 'sampler_index',
         },
         {
-            options: connectionsList.map((item, index) => ({
+            options: connectionsList.map((item) => ({
                 label: item.friendlyName,
-                value: index,
+                value: item.id,
             })),
             active:
-                activeConnection && connectionIndex !== undefined && connectionLink
+                activeConnection && connectionId !== undefined && connectionLink
                     ? {
                           label: activeConnection.friendlyName,
-                          value: connectionIndex,
+                          value: connectionId,
                           id: connectionLink.id,
                       }
                     : undefined,
-            type: 'connection_index',
+            type: 'connection_id',
         },
         {
             options: modelList.data.map((item) => ({
@@ -123,7 +122,7 @@ const CharacterLinkItem: React.FC<{
         ['user_id']: t('character.editor.links.missingUser'),
         ['instruct_id']: t('character.editor.links.missingInstruct'),
         ['model_id']: t('character.editor.links.missingModel'),
-        ['connection_index']: t('character.editor.links.missingConnection'),
+        ['connection_id']: t('character.editor.links.missingConnection'),
         ['sampler_index']: t('character.editor.links.missingSampler'),
     }
     const active = linkCollection.active

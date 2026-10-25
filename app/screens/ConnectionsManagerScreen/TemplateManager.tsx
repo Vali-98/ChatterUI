@@ -9,7 +9,7 @@ import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import InputSheet from '@components/views/InputSheet'
-import { APIManager } from '@lib/engine/API/APIManagerState'
+import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { pickJSONDocument } from '@lib/utils/File'
@@ -17,7 +17,7 @@ import { pickJSONDocument } from '@lib/utils/File'
 import TemplateItem from './TemplateItem'
 
 const TemplateManager = () => {
-    const { templates, addTemplate } = APIManager.useConnectionsStore(
+    const { templates, addTemplate } = useConnectionStore(
         useShallow((state) => ({
             templates: state.customTemplates,
             addTemplate: state.addTemplate,
@@ -108,8 +108,8 @@ const TemplateManager = () => {
                 <FlatList
                     contentContainerStyle={{ rowGap: 4 }}
                     data={templates}
-                    keyExtractor={(item, index) => item.name}
-                    renderItem={({ item, index }) => <TemplateItem item={item} index={index} />}
+                    keyExtractor={(item) => item.name}
+                    renderItem={({ item }) => <TemplateItem item={item} />}
                 />
             )}
 

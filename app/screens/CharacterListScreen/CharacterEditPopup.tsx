@@ -5,7 +5,7 @@ import { View } from 'react-native'
 
 import Alert from '@components/views/Alert'
 import ContextMenu from '@components/views/ContextMenu'
-import { APIManager } from '@lib/engine/API/APIManagerState'
+import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { CharInfo, Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Instructs } from '@lib/state/Instructs'
@@ -32,7 +32,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
     const { setId } = Chats.useChat()
     const setUser = Characters.useUserStore((state) => state.setCard)
     const setInstruct = Instructs.useInstruct((state) => state.load)
-    const setConnectionIndex = APIManager.useConnectionsStore((state) => state.setActiveIndex)
+    const setConnection = useConnectionStore((state) => state.setActiveConnection)
     const setSampler = SamplersManager.useSamplerStore((state) => state.setConfig)
 
     const setCurrentCharacter = async () => {
@@ -50,11 +50,11 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                         Logger.info(t('character.editor.links.loadInstruct', { value: item.value }))
                         setInstruct(item.value)
                         break
-                    case 'connection_index':
+                    case 'connection_id':
                         Logger.info(
                             t('character.editor.links.loadConnection', { value: item.value })
                         )
-                        setConnectionIndex(item.value)
+                        setConnection(item.value)
                         break
                     case 'sampler_index':
                         Logger.info(t('character.editor.links.loadSampler', { value: item.value }))

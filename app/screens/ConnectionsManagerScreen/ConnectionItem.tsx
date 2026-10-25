@@ -6,46 +6,48 @@ import ListButton, { ListButtonSection } from '@components/buttons/ListButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
-import { APIManager, APIManagerValue } from '@lib/engine/API/APIManagerState'
+import { Connection, useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ConnectionEditor from './ConnectionEditor'
 
 type ConnectionItemProps = {
-    item: APIManagerValue
-    index: number
+    item: Connection
     pendingOpen?: number
 }
 
-const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index, pendingOpen }) => {
+const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, pendingOpen }) => {
     const { spacing } = Theme.useTheme()
     const styles = useStyles()
     const editorRef = useBottomSheetRef()
-    const { editValue } = APIManager.useConnectionsStore(
+    const { activeConnectionId, setActiveConnection } = useConnectionStore(
         useShallow((state) => ({
-            editValue: state.editValue,
+            activeConnectionId: state.activeConnectionId,
+            setActiveConnection: state.setActiveConnection,
         }))
     )
 
     useEffect(() => {
-        if (index === pendingOpen) editorRef.current?.open()
-    }, [editorRef, index, pendingOpen])
+        if (item.id === pendingOpen) editorRef.current?.open()
+    }, [editorRef, item.id, pendingOpen])
+
+    const active = item.id === activeConnectionId
 
     return (
-        <ListButton style={{ paddingLeft: spacing.l }} active={item.active}>
-            <ConnectionEditor index={index} originalValues={item} ref={editorRef} />
+        <ListButton style={{ paddingLeft: spacing.l }} active={active}>
+            <ConnectionEditor originalValues={item} ref={editorRef} />
             <ListButtonSection style={{ columnGap: spacing.xl, paddingVertical: spacing.xl }}>
                 <ThemedSwitch
-                    value={item.active}
+                    value={active}
                     onChangeValue={(value) => {
-                        editValue({ ...item, active: value }, index)
+                        setActiveConnection(value ? item.id : null)
                     }}
                 />
                 <View>
-                    <Text numberOfLines={1} style={item.active ? styles.name : styles.nameInactive}>
+                    <Text numberOfLines={1} style={active ? styles.name : styles.nameInactive}>
                         {item.friendlyName}
                     </Text>
-                    <Text style={item.active ? styles.config : styles.configInactive}>
+                    <Text style={active ? styles.config : styles.configInactive}>
                         {item.configName}
                     </Text>
                 </View>

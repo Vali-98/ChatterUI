@@ -41,7 +41,7 @@ export type CharInfo = {
     tags: string[]
     links: {
         id: number
-        type: 'user_id' | 'instruct_id' | 'connection_index' | 'sampler_index' | 'model_id'
+        type: 'user_id' | 'instruct_id' | 'connection_id' | 'sampler_index' | 'model_id'
         character_id: number
         value: number
     }[]

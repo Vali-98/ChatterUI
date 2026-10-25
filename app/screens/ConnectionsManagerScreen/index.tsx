@@ -11,7 +11,7 @@ import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { APIManager } from '@lib/engine/API/APIManagerState'
+import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ConnectionItem from './ConnectionItem'
@@ -19,9 +19,9 @@ import TemplatePicker from './TemplatePicker'
 
 const ConnectionsManagerScreen = () => {
     const { t } = useTranslation()
-    const { apiValues, updatePreferences, isCustomFieldsEnabled } = APIManager.useConnectionsStore(
+    const { apiValues, updatePreferences, isCustomFieldsEnabled } = useConnectionStore(
         useShallow((state) => ({
-            apiValues: state.values,
+            apiValues: state.connections,
             isCustomFieldsEnabled: state.preferences?.showCustomFields,
             updatePreferences: state.updatePreferences,
         }))
@@ -76,9 +76,9 @@ const ConnectionsManagerScreen = () => {
                     }}
                     contentContainerStyle={{ rowGap: 4, paddingBottom: 24 }}
                     data={apiValues}
-                    keyExtractor={(item, index) => item.configName + index}
-                    renderItem={({ item, index }) => (
-                        <ConnectionItem item={item} index={index} pendingOpen={pendingOpen} />
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <ConnectionItem item={item} pendingOpen={pendingOpen} />
                     )}
                     removeClippedSubviews={false}
                     showsVerticalScrollIndicator={false}

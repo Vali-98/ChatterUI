@@ -9,13 +9,13 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import Aicons, { AiconsGlyphName } from '@components/icons/Aicons'
 import BottomSheet, { BottomSheetRef } from '@components/views/BottomSheet'
 import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
-import { APIManager } from '@lib/engine/API/APIManagerState'
+import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import useAnimatedActiveColorStyle from '@lib/hooks/AnimatedActiveColorStyle'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type TemplatePickerProps = {
     ref: BottomSheetRef
-    setPending: (index: number) => void
+    setPending: (connectionId: number) => void
 }
 
 const TemplateItem: React.FC<{
@@ -84,11 +84,10 @@ const TemplatePicker: React.FC<TemplatePickerProps> = ({ ref, setPending }) => {
     const { t } = useTranslation()
     const [selected, setSelected] = useState<number | undefined>()
     const { color, fontSize, spacing } = Theme.useTheme()
-    const { addValue, getTemplates, valuesLength } = APIManager.useConnectionsStore(
+    const { addConnection, getTemplates } = useConnectionStore(
         useShallow((state) => ({
-            addValue: state.addValue,
+            addConnection: state.addConnection,
             getTemplates: state.getTemplates,
-            valuesLength: state.values.length,
         }))
     )
 
@@ -140,13 +139,12 @@ const TemplatePicker: React.FC<TemplatePickerProps> = ({ ref, setPending }) => {
                         if (selected === undefined) return
                         const template = templates.at(selected)
                         if (!template) return
-                        addValue({
+                        const connectionId = addConnection({
                             ...template.defaultValues,
-                            active: true,
                             configName: template.name,
                             friendlyName: t('connections.add.defaultFriendlyName'),
                         })
-                        setPending(valuesLength)
+                        setPending(connectionId)
                         ref.current?.close()
                     }}
                     variant={selected === undefined ? 'disabled' : 'primary'}
