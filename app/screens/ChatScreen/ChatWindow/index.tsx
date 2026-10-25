@@ -12,7 +12,7 @@ import { useLiveQuerySync } from '@lib/hooks/liveQuery'
 import { useAppMode } from '@lib/state/AppMode'
 import { useBackgroundStore } from '@lib/state/BackgroundImage'
 import { Characters } from '@lib/state/characters'
-import { Chats, ScrollData } from '@lib/state/Chat'
+import { Chats, ScrollData } from '@lib/state/chat'
 import { AppDirectory } from '@lib/utils/File'
 
 import ChatFooter from './ChatFooter'
@@ -37,7 +37,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
     const [autoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
     const scrolledChat = useRef(-1)
 
-    const { data: entryIdList, updatedAt } = useLiveQuerySync(Chats.db.live.entryIdList(chatId), {
+    const { data: entryIdList, updatedAt } = useLiveQuerySync(Chats.db.live.messageIds(chatId), {
         key: ['chat-entry-ids', chatId],
         watch: [{ table: 'chat_entries' }],
     })
@@ -53,7 +53,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
 
     const updateScrollPosition = useDebounce((position: number, chatId: number) => {
         if (chatId) {
-            Chats.db.mutate.updateScrollOffset(chatId, position)
+            Chats.db.update.chat(chatId, { scroll_offset: position })
         }
     }, 200)
 

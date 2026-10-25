@@ -1,12 +1,12 @@
 import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import { StyleSheet, Text, View } from 'react-native'
 
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ChatEditPopup from './ChatDrawerOptions'
 
-type ListItem = Awaited<ReturnType<typeof Chats.db.query.chatListQuery>>[0]
+type ListItem = Awaited<ReturnType<typeof Chats.db.live.chatList>>[0]
 
 type ChatDrawerItemProps = {
     item: ListItem
@@ -37,7 +37,7 @@ const ChatDrawerItem: React.FC<ChatDrawerItemProps> = ({ item, onLoad }) => {
                                 size={20}
                                 color={color.text._700}
                             />
-                            <Text style={styles.smallTextChat}>{item.entryCount}</Text>
+                            <Text style={styles.smallTextChat}>{item.messageCount}</Text>
                         </View>
                         <View style={{ flexDirection: 'row' }}>
                             <Text style={styles.smallText}>{date.toLocaleDateString()}</Text>

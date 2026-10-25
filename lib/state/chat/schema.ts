@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const CompletionTimingsSchema = z.object({
+const completionTimingsSchema = z.object({
     predicted_per_token_ms: z.number(),
     predicted_per_second: z.number().nullable(),
     predicted_ms: z.number(),
@@ -12,7 +12,7 @@ const CompletionTimingsSchema = z.object({
     prompt_n: z.number(),
 })
 
-const SwipeSchema = z.object({
+const swipeSchema = z.object({
     swipe: z.string(),
     id: z.number().optional(),
     entry_id: z.number(),
@@ -22,10 +22,10 @@ const SwipeSchema = z.object({
     active: z.boolean(),
     token_length: z.number().nullable(),
     reset_length: z.number().nullable(),
-    timings: CompletionTimingsSchema.nullable(),
+    timings: completionTimingsSchema.nullable(),
 })
 
-const AttachmentSchema = z.object({
+const attachmentSchema = z.object({
     id: z.number(),
     type: z.enum(['audio', 'image', 'document']),
     name: z.string(),
@@ -35,18 +35,18 @@ const AttachmentSchema = z.object({
     size: z.number(),
 })
 
-const MessageSchema = z.object({
+const messageSchema = z.object({
     id: z.number().optional(),
     name: z.string(),
     chat_id: z.number(),
     is_user: z.boolean(),
-    order: z.number(),
-    swipe_id: z.number(),
-    swipes: z.array(SwipeSchema),
-    attachments: z.array(AttachmentSchema),
+    order: z.number().default(0),
+    swipe_id: z.number().default(0),
+    swipes: z.array(swipeSchema),
+    attachments: z.array(attachmentSchema).default([]),
 })
 
-export const ChatImportSchema = z.object({
+export const chatImportSchema = z.object({
     id: z.number().optional(),
     name: z.string(),
     last_modified: z.number().nullable(),
@@ -54,11 +54,5 @@ export const ChatImportSchema = z.object({
     create_date: z.coerce.date(),
     user_id: z.number().nullable(),
     scroll_offset: z.number(),
-    messages: z.array(MessageSchema),
+    messages: z.array(messageSchema),
 })
-
-export type CompletionTimings = z.infer<typeof CompletionTimingsSchema>
-export type Swipe = z.infer<typeof SwipeSchema>
-export type Attachment = z.infer<typeof AttachmentSchema>
-export type Message = z.infer<typeof MessageSchema>
-export type Chat = z.infer<typeof ChatImportSchema>

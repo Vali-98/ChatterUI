@@ -6,7 +6,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import { AuthorNotes, NoteType } from '@lib/state/AuthorNotes'
 import { Characters } from '@lib/state/characters'
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 import { authorNoteBodyState } from '@lib/state/components/AuthorNotes'
 import { Logger } from '@lib/state/Logger'
 

@@ -3,7 +3,7 @@ import { FlatList } from 'react-native-gesture-handler'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { AuthorNotes, NoteType } from '@lib/state/AuthorNotes'
 import { Characters } from '@lib/state/characters'
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 
 import AuthorNoteEmpty from './AuthorNoteEmpty'
 import AuthorNoteItem from './AuthorNoteItem'

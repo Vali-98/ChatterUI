@@ -14,7 +14,7 @@ import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { useDebounceTokenizer } from '@lib/hooks/Tokenizer'
 import { AuthorNote, AuthorNotes, NoteType } from '@lib/state/AuthorNotes'
 import { Characters } from '@lib/state/characters'
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 import { authorNoteBodyState, authorNoteEditorState } from '@lib/state/components/AuthorNotes'
 import { Theme } from '@lib/theme/ThemeManager'
 

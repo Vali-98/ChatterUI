@@ -1,10 +1,10 @@
 import { Dimensions, View } from 'react-native'
 
 import ScaledImage from '@components/views/ScaledImage'
-import { Chats } from '@lib/state/Chat'
+import { ChatMessage } from '@lib/state/chat'
 
 type ChatAttachmentsProps = {
-    entry: Chats.db.live.LiveEntry
+    entry: ChatMessage
 }
 
 const ChatAttachments: React.FC<ChatAttachmentsProps> = ({ entry }) => {

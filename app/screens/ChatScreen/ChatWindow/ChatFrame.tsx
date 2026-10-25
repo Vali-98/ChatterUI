@@ -6,19 +6,19 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import Avatar from '@components/views/Avatar'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { Characters } from '@lib/state/characters'
-import { Chats } from '@lib/state/Chat'
+import { ChatMessage } from '@lib/state/chat'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type ChatFrameProps = {
     children?: ReactNode
     index: number
-    entry: Chats.db.live.LiveEntry
-    nowGenerating: boolean
+    entry: ChatMessage
+    isGenerating: boolean
     isLast?: boolean
 }
 
-const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, isLast, entry }) => {
+const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, isGenerating, isLast, entry }) => {
     const { t } = useTranslation()
     const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
     const [wide] = useMMKVBoolean(AppSettings.WideChatMode)
@@ -35,7 +35,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
             Math.max(
                 0,
                 // eslint-disable-next-line react-hooks/purity
-                ((nowGenerating && isLast ? Date.now() : swipe.gen_finished.getTime()) -
+                ((isGenerating && isLast ? Date.now() : swipe.gen_finished.getTime()) -
                     swipe.gen_started.getTime()) /
                     1000
             )

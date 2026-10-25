@@ -13,7 +13,7 @@ import { ChatSwipe } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useBackAction } from '@lib/hooks/BackAction'
 import { AuthorNotes } from '@lib/state/AuthorNotes'
-import { Chats, useInference } from '@lib/state/Chat'
+import { Chats, useGenerationState } from '@lib/state/chat'
 import { authorNoteEditorState } from '@lib/state/components/AuthorNotes'
 import { Logger } from '@lib/state/Logger'
 import { useTTSStore } from '@lib/state/TTS'
@@ -28,8 +28,8 @@ interface OptionsStateProps {
     setActiveIndex: (n: number | undefined) => void
 }
 
-useInference.subscribe(({ nowGenerating }) => {
-    if (nowGenerating) {
+useGenerationState.subscribe(({ isGenerating }) => {
+    if (isGenerating) {
         useChatActionsState.getState().setActiveIndex(undefined)
     }
 })
@@ -39,7 +39,7 @@ export const useChatActionsState = create<OptionsStateProps>()((set, get) => ({
 
 interface ChatActionProps {
     entryId: number
-    nowGenerating: boolean
+    isGenerating: boolean
     isLastMessage: boolean
     swipe: ChatSwipe
     index: number
@@ -47,7 +47,7 @@ interface ChatActionProps {
 
 const ChatQuickActions: React.FC<ChatActionProps> = ({
     entryId,
-    nowGenerating,
+    isGenerating,
     isLastMessage,
     swipe,
     index,
@@ -72,7 +72,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
 
     const handleEnableEdit = () => {
         if (showOptions) setShowOptions(undefined)
-        if (!nowGenerating) showEditor(entryId)
+        if (!isGenerating) showEditor(entryId)
     }
 
     const handleFork = () => {
@@ -85,7 +85,9 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
                 {
                     label: t('chat.quickActions.fork.button'),
                     onPress: async () => {
-                        const newChatId = await Chats.db.mutate.cloneChatFromId(chatId, index + 1)
+                        const newChatId = await Chats.actions.duplicateChat(chatId, {
+                            throughMessageId: entryId,
+                        })
                         if (!newChatId) {
                             Logger.errorToast(t('chat.quickActions.errors.cloneFailed'))
                             return
@@ -136,7 +138,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
     if (!swipe) return
 
     const isSpeaking = swipe.id === activeSwipeId
-    if (!isSpeaking && (!showOptions || nowGenerating)) return
+    if (!isSpeaking && (!showOptions || isGenerating)) return
 
     return (
         <View
@@ -171,7 +173,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
                         },
                     ],
                 }}>
-                {!(isLastMessage && nowGenerating) && (
+                {!(isLastMessage && isGenerating) && (
                     <>
                         {quickDelete && (
                             <Animated.View
@@ -187,7 +189,7 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
                                     }}
                                     onPress={() => {
                                         if (showOptions) setShowOptions(undefined)
-                                        Chats.db.mutate.deleteChatEntry(entryId)
+                                        Chats.actions.deleteMessage(entryId)
                                     }}
                                 />
                                 <View

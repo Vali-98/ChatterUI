@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 import { useLiveQuerySync } from '@lib/hooks/liveQuery'
-import { Chats, useInference } from '@lib/state/Chat'
+import { Chats, useGenerationState } from '@lib/state/chat'
 
 import ChatBubble from './ChatBubble'
 import ChatFrame from './ChatFrame'
@@ -17,7 +17,7 @@ type ChatItemProps = {
 type ChatItemBodyProps = ChatItemProps & { entrySwipeIds: number[] }
 
 const ChatItem: React.FC<ChatItemProps> = ({ entryId, ...rest }) => {
-    const { data: swipeidList } = useLiveQuerySync(Chats.db.live.swipeIdList(entryId), {
+    const { data: swipeidList } = useLiveQuerySync(Chats.db.live.swipeIds(entryId), {
         key: ['entry-swipe-ids', entryId],
         watch: [{ table: 'chat_swipes' }],
     })
@@ -39,8 +39,8 @@ const ChatItemBody: React.FC<ChatItemBodyProps> = ({
     entrySwipeIds,
     ...rest
 }) => {
-    const nowGenerating = useInference((state) => state.nowGenerating)
-    const { data: entry } = useLiveQuerySync(Chats.db.live.entry(entryId), {
+    const isGenerating = useGenerationState((state) => state.isGenerating)
+    const { data: entry } = useLiveQuerySync(Chats.db.live.message(entryId), {
         key: ['chat-entry', entryId],
         watch: [
             { table: 'chat_entries', rowId: entryId },
@@ -49,7 +49,7 @@ const ChatItemBody: React.FC<ChatItemBodyProps> = ({
         ],
     })
 
-    if (!entry || entrySwipeIds.length === 0) return // this should never be hit
+    if (!entry || entry.swipes.length === 0) return // this should never be hit
 
     return (
         <Animated.View
@@ -67,11 +67,11 @@ const ChatItemBody: React.FC<ChatItemBodyProps> = ({
             ]}>
             <ChatFrame
                 index={index}
-                nowGenerating={nowGenerating}
+                isGenerating={isGenerating}
                 isLast={isLastMessage}
                 entry={entry}>
                 <ChatBubble
-                    nowGenerating={nowGenerating}
+                    isGenerating={isGenerating}
                     entry={entry}
                     index={index}
                     isLastMessage={isLastMessage}

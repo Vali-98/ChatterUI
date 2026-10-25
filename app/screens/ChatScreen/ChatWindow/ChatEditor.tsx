@@ -7,7 +7,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import BottomSheet, { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type ChatEditorStateProps = {
@@ -36,7 +36,7 @@ const ChatEditor = () => {
     const { entryId, hide, ref } = useChatEditorStore()
     const styles = useStyles()
     const [placeholderText, setPlaceholderText] = useState('')
-    const { data: entry } = useLiveQueryAsync(Chats.db.live.entry(entryId), {
+    const { data: entry } = useLiveQueryAsync(Chats.db.live.message(entryId), {
         keepPreviousData: false,
         key: ['chat-editor-entry', entryId],
         watch: [
@@ -45,7 +45,7 @@ const ChatEditor = () => {
             { table: 'chat_attachment' },
         ],
     })
-    const { data: swipe } = useLiveQueryAsync(Chats.db.live.activeSwipeByEntry(entryId), {
+    const { data: swipe } = useLiveQueryAsync(Chats.db.live.activeSwipe(entryId), {
         keepPreviousData: false,
         key: ['chat-editor-swipe', entryId],
         watch: [{ table: 'chat_swipes' }],
@@ -59,12 +59,12 @@ const ChatEditor = () => {
     const handleEditMessage = () => {
         hide()
         if (swipe && placeholderText !== swipe.swipe)
-            Chats.db.mutate.updateChatSwipe(swipe.id, placeholderText)
+            Chats.actions.updateSwipe(swipe.id, placeholderText)
     }
 
     const handleDeleteMessage = () => {
         hide()
-        Chats.db.mutate.deleteChatEntry(entryId)
+        Chats.actions.deleteMessage(entryId)
     }
 
     return (

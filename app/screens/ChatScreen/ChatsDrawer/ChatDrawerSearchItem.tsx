@@ -1,13 +1,13 @@
 import { Text, TouchableOpacity, View } from 'react-native'
 
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getFriendlyTimeStamp } from '@lib/utils/Time'
 
 type ChatDrawerSearchItemProps = {
     query: string
-    item: Awaited<ReturnType<typeof Chats.db.query.searchChat>>[0]
-    onLoad: (id: number, setOffset?: { type: 'index' | 'entryId'; value: number }) => void
+    item: Awaited<ReturnType<typeof Chats.db.query.searchResults>>[0]
+    onLoad: (id: number) => void
 }
 
 const ChatDrawerSearchItem: React.FC<ChatDrawerSearchItemProps> = ({ item, onLoad, query }) => {
@@ -17,7 +17,7 @@ const ChatDrawerSearchItem: React.FC<ChatDrawerSearchItemProps> = ({ item, onLoa
 
     return (
         <TouchableOpacity
-            onPress={() => onLoad(item.chatId, { type: 'entryId', value: item.chatEntryId })}
+            onPress={() => onLoad(item.chat_id)}
             style={{
                 paddingHorizontal: spacing.m,
                 paddingVertical: spacing.m,
@@ -26,10 +26,10 @@ const ChatDrawerSearchItem: React.FC<ChatDrawerSearchItemProps> = ({ item, onLoa
             }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Text style={{ color: color.text._300, fontSize: fontSize.m, fontWeight: '500' }}>
-                    {item.chatName}
+                    {item.chat_name}
                 </Text>
                 <Text style={{ color: color.text._600, fontSize: fontSize.s }}>
-                    {getFriendlyTimeStamp(item.sendDate.getTime())}
+                    {getFriendlyTimeStamp(item.send_date.getTime())}
                 </Text>
             </View>
             <Text>

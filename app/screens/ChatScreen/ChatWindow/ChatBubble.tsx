@@ -5,7 +5,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useAppMode } from '@lib/state/AppMode'
-import { Chats } from '@lib/state/Chat'
+import { ChatMessage } from '@lib/state/chat'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ChatAttachments from './ChatAttachments'
@@ -17,15 +17,15 @@ import ChatTextLast from './ChatTextLast'
 
 type ChatTextProps = {
     index: number
-    nowGenerating: boolean
+    isGenerating: boolean
     isLastMessage: boolean
     isGreeting: boolean
-    entry: Chats.db.live.LiveEntry
+    entry: ChatMessage
 }
 
 const ChatBubble: React.FC<ChatTextProps> = ({
     index,
-    nowGenerating,
+    isGenerating,
     entry,
     isLastMessage,
     isGreeting,
@@ -43,7 +43,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
 
     const showEditor = useChatEditorStore((state) => state.show)
     const handleEnableEdit = () => {
-        if (!nowGenerating) showEditor(entry.id)
+        if (!isGenerating) showEditor(entry.id)
     }
 
     const swipe = entry.swipes[0]
@@ -56,7 +56,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
         <View>
             <Pressable
                 onPress={() => {
-                    setShowOptions(nowGenerating ? undefined : entry.id)
+                    setShowOptions(isGenerating ? undefined : entry.id)
                 }}
                 style={{
                     backgroundColor: bubbleColor,
@@ -80,7 +80,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                 }}
                 onLongPress={handleEnableEdit}>
                 {isLastMessage ? (
-                    <ChatTextLast nowGenerating={nowGenerating} swipe={swipe} />
+                    <ChatTextLast isGenerating={isGenerating} swipe={swipe} />
                 ) : (
                     <ChatText swipeText={swipe.swipe} />
                 )}
@@ -109,7 +109,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                     )}
 
                     <ChatQuickActions
-                        nowGenerating={nowGenerating}
+                        isGenerating={isGenerating}
                         isLastMessage={isLastMessage}
                         entryId={entry.id}
                         swipe={swipe}
@@ -118,7 +118,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                 </View>
             </Pressable>
             {showSwipe && (
-                <ChatSwipes swipe={swipe} nowGenerating={nowGenerating} isGreeting={isGreeting} />
+                <ChatSwipes swipe={swipe} isGenerating={isGenerating} isGreeting={isGreeting} />
             )}
         </View>
     )

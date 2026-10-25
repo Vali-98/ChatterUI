@@ -9,7 +9,7 @@ import { isCloseThinkTag, isOpenThinkTag } from '@lib/markdown/ThinkTags'
 import { Characters } from '@lib/state/characters'
 import { CharacterLinks } from '@lib/state/characters/links'
 import { useCharacterTokenState } from '@lib/state/characters/tokenState'
-import { Chats, useInference } from '@lib/state/Chat'
+import { Chats, useGenerationState } from '@lib/state/chat'
 import { commonStopStrings, Instructs, outputPrefixes } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { getCurrentSampler } from '@lib/state/samplerStore'
@@ -188,7 +188,7 @@ const constructStopSequence = (): string[] => {
 
 const stopGenerating = () => {
     // kept this helper for extendability
-    useInference.getState().stopGenerating()
+    Chats.actions.finishGeneration()
 }
 
 const constructReplaceStrings = (): string[] => {
@@ -316,7 +316,7 @@ const runLocalCompletion = async (
         return text.replaceAll(stopRegex, '')
     }
 
-    useInference.getState().setAbort(async () => {
+    useGenerationState.getState().setAbort(async () => {
         await Llama.useLlamaModelStore.getState().stopCompletion()
     })
 
@@ -491,23 +491,11 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
             character: Object.assign({}, characterCard),
             user: Object.assign({}, userCard),
             messages: [...messages],
-            chatTokenizer: async (entry, index) => {
-                // IMPORTANT - we use -1 for dummy entries
-                if (entry.id === -1) return 0
-                const [activeSwipe] = entry.swipes.filter((item) => item.active)
-                if (!activeSwipe) return 0
-                const tokenCount = activeSwipe.token_count ?? 0
-                if (tokenCount === 0 && activeSwipe.swipe.length > 0) {
-                    // assume that token length hasnt been calculated
-                    const tokenCount = await Llama.useLlamaModelStore.getState().tokenLength(
-                        activeSwipe.swipe,
-                        entry.attachments.map((item) => item.uri)
-                    )
-                    Chats.db.mutate.updateSwipeTokenLength(activeSwipe.id, tokenCount)
-                }
-
-                return tokenCount
-            },
+            chatTokenizer: (message) =>
+                Chats.actions.countMessageTokens(
+                    message,
+                    Llama.useLlamaModelStore.getState().tokenLength
+                ),
             tokenizer: Llama.useLlamaModelStore.getState().tokenLength,
             maxLength: length,
             cache: {

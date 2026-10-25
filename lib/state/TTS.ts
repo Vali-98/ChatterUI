@@ -7,7 +7,7 @@ import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
-import { Chats, useInference } from './Chat'
+import { Chats, useGenerationState } from './chat'
 
 type TTSState = {
     activeSwipeId?: number
@@ -44,18 +44,14 @@ type TTSState = {
 const sentenceEndRegex =
     /(?<=[^\d])([。…？！.?!])(?:["'`*_)]*)\s+(?=[A-Z0-9])|([。…？！.?!])(?:["'`*_)]*)$/gm
 
-useInference.subscribe(async ({ nowGenerating }) => {
-    const chatId = Chats.useChatState.getState().id
-
-    if (!chatId) return
-    const swipe = await Chats.db.query.chatLatestSwipe(chatId)
+useGenerationState.subscribe(async (state, previous) => {
+    if (state.isGenerating === previous.isGenerating) return
+    const swipeId = state.isGenerating ? state.currentSwipeId : previous.currentSwipeId
+    if (swipeId === undefined) return
+    const swipe = Chats.db.query.swipe(swipeId)
     if (!swipe) return
-
-    if (!nowGenerating) {
-        useTTSStore.getState().handleEndGeneration(swipe.id, swipe.swipe)
-    } else {
-        useTTSStore.getState().handleStartGeneration(swipe.id)
-    }
+    if (state.isGenerating) useTTSStore.getState().handleStartGeneration(swipe.id)
+    else await useTTSStore.getState().handleEndGeneration(swipe.id, swipe.swipe)
 })
 
 export const useTTSStore = create<TTSState>()(

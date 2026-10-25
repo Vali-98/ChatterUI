@@ -1,5 +1,5 @@
 import { AuthorNotes } from '@lib/state/AuthorNotes'
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 import { replaceMacros } from '@lib/state/Macros'
 
 import createLorebookDataSource from './lorebookSource'
@@ -51,7 +51,7 @@ const AUTHOR_NOTE_NAME = 'author_notes'
 const createAuthorNotesDataSource = async (): Promise<DataSource | undefined> => {
     const { id: chatId } = Chats.useChatState.getState()
     if (!chatId) return
-    const chatData = await Chats.db.query.chatShallow(chatId)
+    const chatData = await Chats.db.query.chatRow(chatId)
     if (!chatData) return
     const characterId = chatData.character_id
 

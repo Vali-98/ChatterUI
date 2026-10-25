@@ -12,7 +12,7 @@ import { YAxisOnlyTransition } from '@lib/animations/transitions'
 import { useDebounce } from '@lib/hooks/Debounce'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Characters } from '@lib/state/characters'
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -32,7 +32,7 @@ const ChatsDrawer = () => {
         useShallow((state) => ({ characterId: state.id ?? -1 }))
     )
     const targetChar = show ? characterId : -1
-    const { data } = useLiveQueryAsync(Chats.db.query.chatListQuery(targetChar), {
+    const { data } = useLiveQueryAsync(Chats.db.live.chatList(targetChar), {
         key: ['chat-list', targetChar],
         watch: [{ table: 'chats' }, { table: 'chat_entries' }],
         enabled: show,
@@ -45,7 +45,7 @@ const ChatsDrawer = () => {
     const { setId } = Chats.useChat()
 
     const [searchResults, setSearchResults] = useState<
-        Awaited<ReturnType<typeof Chats.db.query.searchChat>>
+        Awaited<ReturnType<typeof Chats.db.query.searchResults>>
     >([])
 
     const [showSearchBar, setShowSearchBar] = useState(false)
@@ -57,13 +57,14 @@ const ChatsDrawer = () => {
         setShowDrawer(false)
     }
 
-    const search = useDebounce(async (query: string, characterId?: number) => {
+    const search = useDebounce((query: string, characterId?: number) => {
         if (!characterId || !query) return
-        const results = await Chats.db.query.searchChat(query, characterId).catch((e) => {
-            Logger.error(t('chat.drawer.search.errors.queryFailed', { error: String(e) }))
-            return []
-        })
-        setSearchResults(results.sort((a, b) => b.sendDate.getTime() - a.sendDate.getTime()))
+        try {
+            setSearchResults(Chats.db.query.searchResults(characterId, query))
+        } catch (error) {
+            Logger.error(t('chat.drawer.search.errors.queryFailed', { error: String(error) }))
+            setSearchResults([])
+        }
         setShowSearchResults(true)
     }, 500)
 
@@ -74,7 +75,7 @@ const ChatsDrawer = () => {
 
     const handleCreateChat = async () => {
         if (characterId)
-            Chats.db.mutate.createChat(characterId).then((chatId) => {
+            Chats.actions.createChat(characterId).then((chatId) => {
                 if (chatId) handleLoadChat(chatId)
             })
     }
@@ -141,7 +142,7 @@ const ChatsDrawer = () => {
                     )}
                     <FlashList
                         data={searchResults}
-                        keyExtractor={(item) => item.swipeId.toString()}
+                        keyExtractor={(item) => item.swipe_id.toString()}
                         renderItem={({ item }) => (
                             <ChatDrawerSearchItem
                                 item={item}

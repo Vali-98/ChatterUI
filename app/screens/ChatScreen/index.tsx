@@ -13,9 +13,8 @@ import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import SettingsDrawer from '@components/views/SettingsDrawer'
 import { Characters } from '@lib/state/characters'
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 import { Logger } from '@lib/state/Logger'
-import { ChatImportSchema } from '@lib/utils/ChatSchema'
 import { FileUtils } from '@lib/utils/File'
 import ChatInput from '@screens/ChatScreen/ChatInput'
 import ChatsDrawer from '@screens/ChatScreen/ChatsDrawer'
@@ -62,7 +61,7 @@ const ChatScreen = () => {
 
     const handleCreateChat = async () => {
         if (characterId)
-            Chats.db.mutate.createChat(characterId).then((chatId) => {
+            Chats.actions.createChat(characterId).then((chatId) => {
                 if (chatId) setId(chatId)
             })
     }
@@ -74,33 +73,12 @@ const ChatScreen = () => {
         }
         const file = await FileUtils.pickText({ type: 'application/json' })
         if (!file.success) return
-        const result = ChatImportSchema.safeParse(JSON.parse(file.data))
-        if (!result.success) {
+        try {
+            await Chats.actions.importChat(characterId, JSON.parse(file.data))
+        } catch (error) {
             Logger.errorToast(t('chat.import.errors.failedToImport'))
-            return
+            Logger.error(String(error))
         }
-        const chat = result.data
-        chat.character_id = characterId
-        chat.scroll_offset = 0
-        delete chat.id
-        chat.messages = chat.messages.map((message) => {
-            delete message.id
-            message.swipes = message.swipes.map((swipe) => {
-                delete swipe.id
-                return swipe
-            })
-            message.attachments = []
-            return message
-        })
-
-        if (chat.user_id) {
-            const userExists = await Characters.db.query.card(chat.user_id)
-            if (!userExists) {
-                chat.user_id = null
-            }
-        }
-        chat.last_modified = Date.now()
-        Chats.db.mutate.cloneChat(chat)
     }
 
     const renderHeaderButtonRight = () => {

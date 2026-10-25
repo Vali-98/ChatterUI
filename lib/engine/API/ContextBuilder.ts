@@ -5,7 +5,7 @@ import { useTextFilterStore } from '@lib/hooks/TextFilter'
 import { buildThinkRules } from '@lib/markdown/ThinkTags'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { CharacterCard, CharacterTokenCounts } from '@lib/state/characters'
-import { ChatEntry } from '@lib/state/Chat'
+import { ChatMessage } from '@lib/state/chat'
 import { defaultSystemPromptFormat, InstructTokenCache, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { getActiveMacros, replaceMacros } from '@lib/state/Macros'
@@ -17,7 +17,7 @@ import { APIConfiguration, APIValues } from './APIBuilder.types'
 import type { DataSource, DataSourceResult } from '../DataSources/types'
 
 export type MessageLoader = {
-    retrieve: (page: number) => Promise<ChatEntry[]> // must retrieve messages in chronological order from oldest to newest
+    retrieve: (page: number) => Promise<ChatMessage[]> // must retrieve messages in chronological order from oldest to newest
     pageSize: number // we use this to determine if a last page has been reached, if (await retrieve()).length < pageSize
     initialPage: number // usually 0
 }
@@ -37,12 +37,12 @@ const printContext = (context: string) => {
 export interface ContextBuilderParams {
     apiConfig: APIConfiguration
     apiValues: APIValues
-    messages: ChatEntry[]
+    messages: ChatMessage[]
     character: CharacterCard
     instruct: InstructType
     user: CharacterCard
     tokenizer: (data: string, media_paths?: string[]) => Promise<number> | number
-    chatTokenizer: (entry: ChatEntry, index: number) => Promise<number>
+    chatTokenizer: (entry: ChatMessage, index: number) => Promise<number>
     maxLength: number
     cache: TokenCache
     bypassContextLength?: boolean
@@ -129,11 +129,11 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
      * Shared processor
      */
     const processMessage = async (
-        message: ChatEntry,
+        message: ChatMessage,
         index: number,
         isLast: boolean
     ): Promise<boolean> => {
-        const swipe = message.swipes[0]
+        const swipe = message.swipes.find((item) => item.active)
         if (!swipe) {
             Logger.errorToast(t('generation.warn.entryWithoutValidSwipeFound'))
             return false
@@ -235,7 +235,7 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
     if (messageLoader && completionState === 'initial_completed') {
         let page = messageLoader.initialPage
         while (true) {
-            let batch: ChatEntry[] | null = null
+            let batch: ChatMessage[] | null = null
 
             batch = await messageLoader.retrieve(page)
 
@@ -451,7 +451,7 @@ const filterContextText = (text: string, instruct: InstructType) => {
 }
 
 const getValidAttachments = (
-    entry: ChatEntry,
+    entry: ChatMessage,
     config: {
         type: 'chatCompletions'
         userRole: string

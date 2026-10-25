@@ -7,12 +7,11 @@ import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import InputSheet from '@components/views/InputSheet'
 import { Characters } from '@lib/state/characters'
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 import { Logger } from '@lib/state/Logger'
-import { saveStringToDownload } from '@lib/utils/File'
 
 type ChatEditPopupProps = {
-    item: Awaited<ReturnType<typeof Chats.db.query.chatListQuery>>[0]
+    item: Awaited<ReturnType<typeof Chats.db.live.chatList>>[0]
     children: ReactNode
     onPress: () => void
 }
@@ -21,10 +20,9 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
     const { t } = useTranslation()
     const renameInputRef = useBottomSheetRef()
 
-    const { characterName, characterId } = Characters.useCharacterState(
+    const { characterId } = Characters.useCharacterState(
         useShallow((state) => ({
             characterId: state.id,
-            characterName: state.card?.name ?? t('chat.drawer.labels.unknown'),
         }))
     )
 
@@ -46,12 +44,13 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                 {
                     label: t('chat.drawer.dialogs.delete.confirm'),
                     onPress: async () => {
-                        await Chats.db.mutate.deleteChat(item.id)
+                        await Chats.actions.deleteChat(item.id)
                         if (characterId && chatId === item.id) {
-                            const returnedChatId = await Chats.db.query.chatNewestId(characterId)
+                            const returnedChatId = (await Chats.db.query.latestChat(characterId))
+                                ?.id
                             const chatId = returnedChatId
                                 ? returnedChatId
-                                : await Chats.db.mutate.createChat(characterId)
+                                : await Chats.actions.createChat(characterId)
                             chatId && (await setId(chatId))
                         } else if (item.id === chatId) {
                             Logger.errorToast(t('chat.drawer.errors.defaultChatFailed'))
@@ -74,7 +73,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                 {
                     label: t('chat.drawer.dialogs.clone.confirm'),
                     onPress: async () => {
-                        await Chats.db.mutate.cloneChatFromId(item.id)
+                        await Chats.actions.duplicateChat(item.id)
                         close()
                     },
                 },
@@ -83,19 +82,13 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
     }
 
     const handleExportChat = async (close: () => void) => {
-        // eslint-disable-next-line i18next/no-literal-string
-        const name = `Chatlogs-${characterName}-${item.id}.json`.replaceAll(' ', '_')
-        const chat = await Chats.db.query.chat(item.id)
-        if (chat) {
-            try {
-                await saveStringToDownload(JSON.stringify(chat), name, 'utf8')
-                Logger.infoToast(t('chat.drawer.messages.exported', { name }))
-            } catch (e) {
-                Logger.errorToast(t('chat.drawer.errors.exportFailed'))
-                Logger.error(`${e}`)
-            }
-        } else {
-            Logger.errorToast(t('chat.drawer.errors.undefinedChat'))
+        try {
+            const name = await Chats.actions.exportChat(item.id)
+            if (name) Logger.infoToast(t('chat.drawer.messages.exported', { name }))
+            else Logger.errorToast(t('chat.drawer.errors.undefinedChat'))
+        } catch (error) {
+            Logger.errorToast(t('chat.drawer.errors.exportFailed'))
+            Logger.error(String(error))
         }
         close()
     }
@@ -111,7 +104,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
             close()
             return
         }
-        await Chats.db.mutate.updateUser(item.id, userId)
+        await Chats.db.update.chat(item.id, { user_id: userId })
         Logger.infoToast(t('chat.drawer.user.linked', { name: userName }))
         close()
     }
@@ -122,7 +115,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                 title={t('common.actions.rename')}
                 ref={renameInputRef}
                 onConfirm={async (text) => {
-                    await Chats.db.mutate.renameChat(item.id, text)
+                    await Chats.db.update.chat(item.id, { name: text })
                 }}
                 verifyText={(text) =>
                     text.length === 0 ? t('chat.drawer.rename.errors.nameCannotBeEmpty') : ''

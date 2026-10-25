@@ -5,7 +5,7 @@ import { Bar } from 'react-native-progress'
 import { SamplerID } from '@lib/constants/SamplerData'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { useCharacterTokenCounts } from '@lib/state/characters/tokenState'
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 import { useCurrentSampler } from '@lib/state/samplerStore'
 import { Theme } from '@lib/theme/ThemeManager'
 

@@ -7,7 +7,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import Alert from '@components/views/Alert'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { Characters } from '@lib/state/characters'
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 import { Logger } from '@lib/state/Logger'
 
 export const setupNotifications = () => {

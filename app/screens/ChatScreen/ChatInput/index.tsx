@@ -29,7 +29,7 @@ import { generateResponse } from '@lib/engine/Inference'
 import { useActiveProvider } from '@lib/hooks/ActiveProvider'
 import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
 import { Characters } from '@lib/state/characters'
-import { Chats, useInference } from '@lib/state/Chat'
+import { Chats, useGenerationState } from '@lib/state/chat'
 import { useChatInputTextStore } from '@lib/state/components/ChatInput'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -62,13 +62,8 @@ const ChatInput = () => {
     const [attachments, setAttachments] = useState<Attachment[]>([])
     const [hideOptions, setHideOptions] = useState(false)
     const cameraSheetRef = useBottomSheetRef()
-    const { nowGenerating, abortFunction } = useInference(
-        useShallow((state) => ({
-            nowGenerating: state.nowGenerating,
-            abortFunction: state.abortFunction,
-        }))
-    )
-    const setHeight = useInputHeightStore(useShallow((state) => state.setHeight))
+    const isGenerating = useGenerationState((state) => state.isGenerating)
+    const setHeight = useInputHeightStore((state) => state.setHeight)
 
     const { characterName } = Characters.useCharacterState(
         useShallow((state) => ({
@@ -91,30 +86,34 @@ const ChatInput = () => {
 
     const abortResponse = async () => {
         Logger.info(t('chat.input.errors.abortGeneration'))
-        if (abortFunction) await abortFunction()
+        await Chats.actions.abortGeneration()
     }
 
     const handleSend = async () => {
         Keyboard.dismiss()
         if (!chatId) return
         setDisableSend(true)
-        if (newMessage.trim() !== '' || attachments.length > 0)
-            Chats.db.mutate.createEntry(
-                chatId,
-                userName ?? '',
-                true,
-                newMessage,
-                attachments.map((item) => item.uri)
-            )
         try {
-            const result = await Chats.db.mutate.createEntry(chatId, characterName ?? '', false, '')
+            if (newMessage.trim() !== '' || attachments.length > 0) {
+                await Chats.actions.createMessage(chatId, {
+                    name: userName ?? '',
+                    is_user: true,
+                    text: newMessage,
+                    attachmentUris: attachments.map((item) => item.uri),
+                })
+            }
+            const result = await Chats.actions.createMessage(chatId, {
+                name: characterName ?? '',
+                is_user: false,
+                text: '',
+            })
             setNewMessage('')
             setAttachments([])
-            const swipeId = result?.swipes?.[0]?.id
-            if (swipeId) generateResponse(swipeId)
-        } catch (e) {
+            const swipeId = result.swipes.find((swipe) => swipe.active)?.id
+            if (swipeId !== undefined) generateResponse(swipeId)
+        } catch (error) {
             Logger.errorToast(t('chat.input.errors.failedToSend'))
-            Logger.error(e)
+            Logger.error(error)
         } finally {
             setDisableSend(false)
         }
@@ -364,20 +363,20 @@ const ChatInput = () => {
                             borderRadius: borderRadius.m,
                             backgroundColor: !activeProvider
                                 ? color.neutral._100
-                                : nowGenerating
+                                : isGenerating
                                   ? color.error._500
                                   : color.primary._500,
                             padding: spacing.s,
                             borderWidth: 2,
                             borderColor: !activeProvider
                                 ? color.primary._100
-                                : nowGenerating
+                                : isGenerating
                                   ? color.error._500
                                   : color.primary._500,
                         }}
-                        onPress={nowGenerating ? abortResponse : handleSend}>
+                        onPress={isGenerating ? abortResponse : handleSend}>
                         <MaterialIcons
-                            name={nowGenerating ? 'stop' : 'send'}
+                            name={isGenerating ? 'stop' : 'send'}
                             color={activeProvider ? color.neutral._100 : color.text._700}
                             size={24}
                         />

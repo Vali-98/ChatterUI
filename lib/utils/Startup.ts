@@ -22,17 +22,17 @@ import { lockScreenOrientation } from './Screen'
 import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
 import { Characters } from '../state/characters'
-import { Chats } from '../state/Chat'
+import { Chats } from '../state/chat'
 import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
 import { Theme } from '../theme/ThemeManager'
 
 const loadNewestChat = async () => {
     Logger.info('Loading latest chat')
-    const newestChat = await Chats.db.query.chatNewest()
+    const newestChat = await Chats.db.query.latestChat()
     if (!newestChat) return
     await Characters.useCharacterState.getState().setCard(newestChat.character_id)
-    await Chats.useChatState.getState().setId(newestChat.id)
+    await Chats.actions.loadChat(newestChat.id)
 }
 
 export const loadChatOnInit = async () => {

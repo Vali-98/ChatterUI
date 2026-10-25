@@ -7,7 +7,7 @@ import Alert from '@components/views/Alert'
 import ContextMenu from '@components/views/ContextMenu'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { CharacterCardSummary, Characters } from '@lib/state/characters'
-import { Chats } from '@lib/state/Chat'
+import { Chats } from '@lib/state/chat'
 import { Instructs } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
 import { useSamplerStore } from '@lib/state/samplerStore'
@@ -64,7 +64,7 @@ const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
             })
             let chatId = character.latestChatId
             if (!chatId) {
-                chatId = await Chats.db.mutate.createChat(character.id)
+                chatId = await Chats.actions.createChat(character.id)
             }
             if (!chatId) {
                 Logger.errorToast(t('character.list.errors.chatCreationFailed'))

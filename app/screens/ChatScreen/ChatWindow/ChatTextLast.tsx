@@ -8,21 +8,21 @@ import AnimatedEllipsis from '@components/text/AnimatedEllipsis'
 import { ChatSwipe } from '@db/schema'
 import { useTextFilter } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
-import { Chats, useInference } from '@lib/state/Chat'
+import { Chats, useGenerationState } from '@lib/state/chat'
 
 type ChatTextProps = {
-    nowGenerating: boolean
+    isGenerating: boolean
     swipe: ChatSwipe
 }
 
-const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
+const ChatTextLast: React.FC<ChatTextProps> = ({ isGenerating, swipe }) => {
     const { t } = useTranslation()
     const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
 
     const { buffer } = Chats.useBuffer()
     const [showHidden, setShowHidden] = useState(false)
     const viewRef = useRef<View>(null)
-    const currentSwipeId = useInference((state) => state.currentSwipeId)
+    const currentSwipeId = useGenerationState((state) => state.currentSwipeId)
     const animHeight = useAnimatedValue(-1)
     const targetHeight = useRef(-1)
     const firstRender = useRef(true)
@@ -34,7 +34,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
                 animHeight.setValue(measuredHeight)
                 return
             }
-            const showPadding = nowGenerating && buffer.data
+            const showPadding = isGenerating && buffer.data
             const overflowPadding = showPadding ? 12 : 0
             const newHeight = measuredHeight + overflowPadding
 
@@ -51,13 +51,13 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
             )
             targetHeight.current = newHeight
         })
-    }, [animHeight, buffer.data, nowGenerating])
+    }, [animHeight, buffer.data, isGenerating])
 
     useEffect(() => {
-        if (!nowGenerating && !firstRender.current) {
+        if (!isGenerating && !firstRender.current) {
             setTimeout(() => updateHeight(), 400)
         }
-    }, [nowGenerating, updateHeight])
+    }, [isGenerating, updateHeight])
 
     const filteredText = useTextFilter(swipe.swipe ?? '')
     const renderedText = showHidden ? swipe.swipe : filteredText.result
@@ -65,11 +65,11 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
             <View style={{ minHeight: 10 }} ref={viewRef} onLayout={updateHeight}>
-                {swipe.id === currentSwipeId && nowGenerating && buffer.data === '' && (
+                {swipe.id === currentSwipeId && isGenerating && buffer.data === '' && (
                     <AnimatedEllipsis />
                 )}
                 <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
-                    {nowGenerating && swipe.id === currentSwipeId
+                    {isGenerating && swipe.id === currentSwipeId
                         ? buffer.data.trim()
                         : renderedText}
                 </Markdown>
