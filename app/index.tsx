@@ -12,6 +12,7 @@ import useLocalAuth from '@lib/hooks/LocalAuth'
 import { Theme } from '@lib/theme/ThemeManager'
 import { loadChatOnInit, startupApp, useTextIntentFocus } from '@lib/utils/Startup'
 import CharacterList from '@screens/CharacterListScreen'
+// import OnboardingScreen from '@screens/OnboardingScreen'
 
 import migrations from '../db/migrations/migrations'
 
@@ -84,6 +85,8 @@ const Home = () => {
                 </TouchableOpacity>
             </View>
         )
+
+    //return <OnboardingScreen />
     if (success) return <CharacterList />
     return <HeaderTitle />
 }
