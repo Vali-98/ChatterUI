@@ -2,7 +2,7 @@ import AntDesign from '@react-native-vector-icons/ant-design/static'
 import * as DocumentPicker from 'expo-document-picker'
 import { useNavigation } from 'expo-router'
 import { usePreventRemove } from 'expo-router/build/react-navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
@@ -24,12 +24,11 @@ const UserCardEditor = () => {
     const { color, spacing } = Theme.useTheme()
     const navigation = useNavigation()
     const [edited, setEdited] = useState(false)
-    const { userCard, imageID, id, setCard } = Characters.useUserStore(
+    const { userCard, imageID, id } = Characters.useUserStore(
         useShallow((state) => ({
             userCard: state.card,
             imageID: state.card?.image_id ?? 0,
             id: state.id,
-            setCard: state.setCard,
         }))
     )
 
@@ -37,8 +36,11 @@ const UserCardEditor = () => {
 
     const setShowViewer = useAvatarViewerStore((state) => state.setShow)
 
+    const previousSavedCard = useRef(userCard)
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+        // A dirty-flag change alone must not reset the draft before DB notifications arrive.
+        if (previousSavedCard.current === userCard) return
+        previousSavedCard.current = userCard
         setCurrentCard((current) => (edited && current?.id === userCard?.id ? current : userCard))
     }, [userCard, edited])
 
@@ -49,9 +51,10 @@ const UserCardEditor = () => {
 
     const handleSaveCard = async () => {
         if (currentCard && id) {
-            await Characters.db.mutate.updateCard(currentCard, id)
+            const saved = await Characters.db.mutate.updateCard(currentCard, id)
+            if (!saved || Characters.useUserStore.getState().id !== id) return
+            setCurrentCard(saved)
             setEdited(false)
-            setCard(id)
         }
     }
 

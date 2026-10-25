@@ -27,10 +27,10 @@ type LinkCollection = {
 
 const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
     // db lists
-    const { data } = useLiveQuerySync(CharacterLink.db.live.links(charId), {
-        key: ['character-links', charId],
-        watch: [{ table: 'characterLinks' }],
-    })
+    const data =
+        Characters.useCharacterStore((state) =>
+            state.id === charId ? state.card?.links : undefined
+        ) ?? []
 
     const { data: userList } = useLiveQuerySync(Characters.db.live.listSimple('user'), {
         key: ['user-list-simple'],

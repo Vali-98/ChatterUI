@@ -105,6 +105,7 @@ export const createQueryObserver = <T>({
     if (enabled && mode === 'sync') refresh()
 
     return {
+        refresh: refresh,
         getSnapshot: () => snapshot,
         subscribe: (notify: () => void) => {
             subscribers.add(notify)

@@ -28,20 +28,13 @@ type ChatWindowProps = {
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
-    const charId = Characters.useCharacterStore((state) => state.card?.id)
+    const backgroundImage = Characters.useCharacterStore((state) => state.card?.background_image)
 
     const { appMode } = useAppMode()
     const [saveScroll] = useMMKVBoolean(AppSettings.SaveScrollPosition)
     const [showModelname] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [showJump, setShowJump] = useState(false)
     const [autoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
-    const { data: { background_image: backgroundImage } = {} } = useLiveQuerySync(
-        Characters.db.query.backgroundImageQuery(charId ?? -1),
-        {
-            key: ['character-background', charId],
-            watch: [{ table: 'characters', rowId: charId ?? -1 }],
-        }
-    )
     const scrolledChat = useRef(-1)
 
     const { data: entryIdList, updatedAt } = useLiveQuerySync(Chats.db.live.entryIdList(chatId), {

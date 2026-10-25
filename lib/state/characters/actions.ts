@@ -22,8 +22,6 @@ import {
     createBlankV2Card,
     convertDBDataToCV2,
 } from './schema'
-import { useCharacterState } from './state'
-import { useUserStore } from './store'
 
 const CHARACTER_CARD_TEXT_CHUNK_KEYWORDS = [
     'Description', // AI bot base description
@@ -32,12 +30,6 @@ const CHARACTER_CARD_TEXT_CHUNK_KEYWORDS = [
     'chara',
     'ccv3',
 ]
-
-const refreshSelection = async (id: number) => {
-    const card = await db.query.card(id)
-    if (useCharacterState.getState().id === id) useCharacterState.setState({ card })
-    if (useUserStore.getState().id === id) useUserStore.setState({ card })
-}
 
 const cleanupImage = async (id: number | null | undefined) => {
     if (id === null || id === undefined) return
@@ -61,7 +53,6 @@ const replaceImage = async (id: number, uri: string, background: boolean) => {
         await cleanupImage(imageId)
         throw error
     }
-    await refreshSelection(id)
     await cleanupImage(oldImageId)
 }
 
@@ -71,7 +62,6 @@ export const deleteImage = async (id: number) => {
     const card = await db.query.card(id)
     if (!card) return
     await db.mutate.deleteImage(id)
-    await refreshSelection(id)
     await cleanupImage(card.image_id)
 }
 
@@ -92,7 +82,6 @@ export const deleteBackground = async (id: number) => {
     const card = await db.query.card(id)
     if (!card) return
     await db.mutate.deleteBackground(id)
-    await refreshSelection(id)
     await cleanupImage(card.background_image)
     Logger.info(`Deleted background for character: ${id}`)
 }
@@ -120,8 +109,6 @@ export const deleteCard = async (id: number) => {
     const card = await db.query.card(id)
     if (!card) return
     await db.mutate.deleteCard(id)
-    if (useCharacterState.getState().id === id) useCharacterState.getState().unloadCard()
-    if (useUserStore.getState().id === id) useUserStore.getState().unloadCard()
     await cleanupImage(card.image_id)
     await cleanupImage(card.background_image)
 }

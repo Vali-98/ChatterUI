@@ -4,7 +4,7 @@ import * as DocumentPicker from 'expo-document-picker'
 import { ImageBackground } from 'expo-image'
 import { Redirect, useNavigation, useRouter } from 'expo-router'
 import { usePreventRemove } from 'expo-router/build/react-navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
@@ -48,30 +48,32 @@ const ChracterEditorScreen = () => {
             .groupBy(tags.id),
         { key: ['tag-counts'], watch: [{ table: 'tags' }, { table: 'character_tags' }] }
     )
-    const { currentCard, setCurrentCard, charId, charName, unloadCharacter } =
-        Characters.useCharacterStore(
-            useShallow((state) => ({
-                charId: state.id,
-                currentCard: state.card,
-                setCurrentCard: state.setCard,
-                charName: state.card?.name,
-                unloadCharacter: state.unloadCard,
-            }))
-        )
+    const { currentCard, charId, charName, unloadCharacter } = Characters.useCharacterStore(
+        useShallow((state) => ({
+            charId: state.id,
+            currentCard: state.card,
+            charName: state.card?.name,
+            unloadCharacter: state.unloadCard,
+        }))
+    )
 
     const [characterCard, setCharacterCard] = useState<CharacterCardData | undefined>(currentCard)
     const descriptionTokens = useDebounceTokenizer(characterCard?.description ?? '', 300)
     const { chatId, resetId } = Chats.useChat()
-    const { data: { background_image: backgroundImage } = {} } = useLiveQueryAsync(
-        Characters.db.query.backgroundImageQuery(charId ?? -1),
-        {
-            key: ['character-editor-background', charId],
-            watch: [{ table: 'characters', rowId: charId ?? -1 }],
-        }
-    )
+    const backgroundImage = currentCard?.background_image
     const setShowViewer = useAvatarViewerStore((state) => state.setShow)
     const [edited, setEdited] = useState(false)
     const [altSwipeIndex, setAltSwipeIndex] = useState(0)
+
+    const previousSavedCard = useRef(currentCard)
+    useEffect(() => {
+        // A dirty-flag change alone must not reset the draft before DB notifications arrive.
+        if (previousSavedCard.current === currentCard) return
+        previousSavedCard.current = currentCard
+        setCharacterCard((current) =>
+            edited && current?.id === currentCard?.id ? current : currentCard
+        )
+    }, [currentCard, edited])
 
     const setCharacterCardEdited = (card: CharacterCardData) => {
         if (!edited) setEdited(true)
@@ -79,12 +81,12 @@ const ChracterEditorScreen = () => {
     }
 
     const handleSaveCard = async () => {
-        if (characterCard && charId)
-            return Characters.db.mutate.updateCard(characterCard, charId).then(() => {
-                setCurrentCard(charId)
-                setEdited(() => false)
-                Logger.infoToast(t('character.editor.messages.saved'))
-            })
+        if (!characterCard || !charId) return
+        const saved = await Characters.db.mutate.updateCard(characterCard, charId)
+        if (!saved || Characters.useCharacterStore.getState().id !== charId) return
+        setCharacterCard(saved)
+        setEdited(false)
+        Logger.infoToast(t('character.editor.messages.saved'))
     }
 
     usePreventRemove(edited, ({ data }) => {
@@ -196,7 +198,6 @@ const ChracterEditorScreen = () => {
     const handleAddAltMessage = async () => {
         if (!charId || !characterCard) return
         const id = await Characters.db.mutate.addAltGreeting(charId)
-        await setCurrentCard(charId)
 
         // optimistically update editor state
 
@@ -216,7 +217,6 @@ const ChracterEditorScreen = () => {
             return
         }
         await Characters.db.mutate.deleteAltGreeting(id)
-        await setCurrentCard(charId)
         const greetings = [...(characterCard?.alternate_greetings ?? [])].filter(
             (item) => item.id !== id
         )

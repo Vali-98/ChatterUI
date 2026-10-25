@@ -369,6 +369,7 @@ export namespace db {
                             )
                         )
                 }
+                return await query.card(cardID)
             } catch (e) {
                 Logger.warn(`${e}`)
             }

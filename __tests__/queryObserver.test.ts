@@ -1,4 +1,4 @@
-import { createQueryObserver, equalQueryData } from '../lib/hooks/liveQuery/queryObserver'
+import { createQueryObserver, equalQueryData } from '../lib/queries/queryObserver'
 
 const deferred = <T>() => {
     let resolve!: (value: T) => void

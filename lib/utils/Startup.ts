@@ -189,10 +189,12 @@ const migrateTextIntent_0_8_8_to_0_8_9 = () => {
 
 const createDefaultUserData = async () => {
     const id = await Characters.db.mutate.createCard('User', 'user')
-    Characters.useUserStore.getState().setCard(id)
+    await Characters.useUserStore.getState().setCard(id)
 }
 
 const setDefaultUser = async () => {
+    if (!Characters.useUserStore.persist.hasHydrated())
+        await Characters.useUserStore.persist.rehydrate()
     const userList = await Characters.db.query.cardList('user')
     if (!userList) {
         Logger.error(
@@ -202,7 +204,7 @@ const setDefaultUser = async () => {
         Logger.warn('No Users exist, creating default Users')
         await createDefaultUserData()
     } else if (userList.length > 0 && !Characters.useUserStore.getState().card) {
-        Characters.useUserStore.getState().setCard(userList[0].id)
+        await Characters.useUserStore.getState().setCard(userList[0].id)
     }
 }
 
@@ -246,7 +248,7 @@ export const startupApp = () => {
     // Sets default preferences
     setAppDefaultSettings()
     generateDefaultDirectories()
-    setDefaultUser()
+    setDefaultUser().catch(Logger.error)
     setDefaultInstruct()
 
     // setup notifications

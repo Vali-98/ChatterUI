@@ -28,7 +28,7 @@ export type CharacterTokenCache = {
 export type CharacterCardState = {
     card?: CharacterCardData
     id: number | undefined
-    updateCard: (card: CharacterCardData) => void
+    error?: Error
     setCard: (id: number) => Promise<string | undefined>
     unloadCard: () => void
     getImage: () => string
