@@ -59,10 +59,6 @@ export const migrateSamplerStore = (persistedState: unknown, version: number) =>
     return state as PersistedSamplerStore
 }
 
-// Serialize deletions so concurrent requests cannot remove the final preset
-// or clear links for a preset that must be retained.
-let pendingDeletion: Promise<void> = Promise.resolve()
-
 export const useSamplerStore = create<SamplerStore>()(
     persist(
         (set, get) => ({
@@ -83,27 +79,21 @@ export const useSamplerStore = create<SamplerStore>()(
                 }))
                 return id
             },
-            deleteSamplerConfig: (id) => {
-                const deletion = pendingDeletion.then(async () => {
-                    if (!get().configList.some((config) => config.id === id)) return
-                    if (get().configList.length === 1) {
-                        Logger.errorToast(t('sampler.toast.lastconfig'))
-                        return
+            deleteSamplerConfig: async (id) => {
+                if (!get().configList.some((config) => config.id === id)) return
+                if (get().configList.length === 1) {
+                    Logger.errorToast(t('sampler.toast.lastconfig'))
+                    return
+                }
+                await CharacterLink.db.mutate.deleteByValue('sampler_id', id)
+                set((state) => {
+                    const configList = state.configList.filter((config) => config.id !== id)
+                    return {
+                        configList: configList,
+                        currentConfigId:
+                            state.currentConfigId === id ? configList[0].id : state.currentConfigId,
                     }
-                    await CharacterLink.db.mutate.deleteByValue('sampler_id', id)
-                    set((state) => {
-                        const configList = state.configList.filter((config) => config.id !== id)
-                        return {
-                            configList: configList,
-                            currentConfigId:
-                                state.currentConfigId === id
-                                    ? configList[0].id
-                                    : state.currentConfigId,
-                        }
-                    })
                 })
-                pendingDeletion = deletion.catch(() => {})
-                return deletion
             },
             setCurrentConfig: (id) => {
                 if (get().configList.some((config) => config.id === id)) {
