@@ -1,40 +1,25 @@
-import { useTextFilterStore } from '@lib/hooks/TextFilter'
+export type MacroValues = Readonly<Record<string, string | undefined>>
 
-export type Macro = {
-    macro: string | RegExp
-    value: string
-}
-
-type ReplaceMacroOptions = {
-    extraMacros?: Macro[]
-}
-
-const weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-
-const getDefaultMacros = () => {
-    const time = new Date()
-    let rules: Macro[] = [
-        { macro: '{{time}}', value: time.toLocaleTimeString() },
-        { macro: '{{date}}', value: time.toLocaleDateString() },
-        { macro: '{{weekday}}', value: weekday[time.getDay()] },
-    ]
-
-    const filterState = useTextFilterStore.getState()
-    if (!filterState.sendFilteredText) {
-        rules = [
-            ...rules,
-            ...filterState.filter.map((item) => ({ macro: new RegExp(item, 'gi'), value: '' })),
-        ]
+export const createMacroValues = (
+    names: { char: string; user: string },
+    now: Date | null = new Date()
+): MacroValues => {
+    if (!now) return names
+    return {
+        ...names,
+        time: now.toLocaleTimeString(),
+        date: now.toLocaleDateString(),
+        weekday: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][
+            now.getDay()
+        ],
     }
-    return rules
 }
 
-export const replaceMacroBase = (
-    text: string,
-    options: ReplaceMacroOptions = { extraMacros: [] }
-) => {
-    let newtext: string = text
-    const rules = [...getDefaultMacros(), ...(options?.extraMacros ?? [])]
-    for (const rule of rules) newtext = newtext.replaceAll(rule.macro, rule.value)
-    return newtext
-}
+export const applyMacros = (text: string, values: MacroValues): string =>
+    text.replace(
+        /(?<!\{)(?:\{\{([^{}]+)\}\}|\{(char|user)\})(?!\})/g,
+        (token, fullName: string | undefined, shortName: string | undefined) => {
+            const name = fullName ?? shortName!
+            return Object.hasOwn(values, name) ? (values[name] ?? token) : token
+        }
+    )
