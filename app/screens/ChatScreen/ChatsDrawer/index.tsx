@@ -84,7 +84,7 @@ const ChatsDrawer = () => {
                 </Text>
                 <ThemedButton
                     variant="tertiary"
-                    iconName={showSearchBar ? 'backward' : 'search'}
+                    iconName={showSearchBar ? 'menu' : 'search'}
                     onPress={() => {
                         setShowSearchBar(!showSearchBar)
                         setShowSearchResults(searchQuery.length > 0 && !showSearchBar)
