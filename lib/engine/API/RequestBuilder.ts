@@ -2,7 +2,7 @@ import merge from 'lodash.merge'
 
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { InstructType } from '@lib/state/Instructs'
-import { SamplersManager } from '@lib/state/SamplerState'
+import { getCurrentSampler } from '@lib/state/samplerStore'
 import { getNestedValue } from '@lib/utils/Parsing'
 
 import { APIConfiguration, APISampler, APIValues } from './APIBuilder.types'
@@ -171,7 +171,7 @@ const customRequest = async (
 
     let length = 0
 
-    const sampler = SamplersManager.getCurrentSampler()
+    const sampler = getCurrentSampler()
 
     if (config.model.useModelContextLength) {
         length = getModelContextLength(config, values) ?? 0

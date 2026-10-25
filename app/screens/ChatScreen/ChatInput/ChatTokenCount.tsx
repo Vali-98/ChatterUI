@@ -6,7 +6,7 @@ import { SamplerID } from '@lib/constants/SamplerData'
 import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
-import { SamplersManager } from '@lib/state/SamplerState'
+import { useCurrentSampler } from '@lib/state/samplerStore'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const ChatTokenCount: React.FC = () => {
@@ -17,7 +17,7 @@ const ChatTokenCount: React.FC = () => {
     )
     const { data } = useLiveQueryJoined(Chats.db.live.tokenCount(chatId ?? -1))
     const { color, fontSize } = Theme.useTheme()
-    const sampler = SamplersManager.useCurrentSampler()
+    const sampler = useCurrentSampler()
 
     const tokenCount = parseFloat(data?.[0]?.totalTokens ?? '0') + cardTokenCount
 

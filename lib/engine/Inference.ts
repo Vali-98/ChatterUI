@@ -7,7 +7,7 @@ import { isCloseThinkTag, isOpenThinkTag } from '@lib/markdown/ThinkTags'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { Chats, useInference } from '@lib/state/Chat'
 import { Instructs } from '@lib/state/Instructs'
-import { SamplersManager } from '@lib/state/SamplerState'
+import { getCurrentSampler } from '@lib/state/samplerStore'
 import { useTTSStore } from '@lib/state/TTS'
 import { mmkv } from '@lib/storage/MMKV'
 
@@ -272,7 +272,7 @@ async function obtainFields(): Promise<APIBuilderParams | void> {
             )
             return
         }
-        const samplers = SamplersManager.getCurrentSampler()
+        const samplers = getCurrentSampler()
         const modelLengthField = getModelContextLength(apiConfig, apiValues)
         const instructLength = samplers.max_length as number
         const modelLength = modelLengthField ?? (instructLength as number)

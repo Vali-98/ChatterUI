@@ -20,7 +20,7 @@ import { localSamplerData } from '@lib/engine/LocalInference'
 import { useActiveConnection } from '@lib/hooks/ActiveConnection'
 import { useAppMode } from '@lib/state/AppMode'
 import { Logger } from '@lib/state/Logger'
-import { SamplersManager } from '@lib/state/SamplerState'
+import { useSamplers } from '@lib/state/samplerStore'
 import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 
@@ -38,10 +38,10 @@ const SamplerManagerScreen = () => {
         deleteSamplerConfig,
         changeConfig,
         updateCurrentConfig,
-        currentConfigIndex,
+        currentConfigId,
         currentConfig,
         configList,
-    } = SamplersManager.useSamplers()
+    } = useSamplers()
 
     const { activeTemplate } = useActiveConnection()
 
@@ -74,7 +74,11 @@ const SamplerManagerScreen = () => {
                 {
                     label: t('sampler.alert.delete.title'),
                     onPress: async () => {
-                        deleteSamplerConfig(currentConfigIndex)
+                        try {
+                            await deleteSamplerConfig(currentConfigId)
+                        } catch (error) {
+                            Logger.errorToast(t('sampler.alert.delete.title'), error)
+                        }
                     },
                     type: 'warning',
                 },
@@ -155,8 +159,8 @@ const SamplerManagerScreen = () => {
                 selected={currentConfig}
                 data={configList}
                 onChangeValue={(item) => {
-                    if (item.name === currentConfig.name) return
-                    changeConfig(configList.indexOf(item))
+                    if (item.id === currentConfig.id) return
+                    changeConfig(item.id)
                 }}
                 labelExtractor={(item) => item.name}
             />

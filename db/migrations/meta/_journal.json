@@ -162,6 +162,13 @@
       "when": 1792909453412,
       "tag": "0022_connection_ids",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "6",
+      "when": 1792912328647,
+      "tag": "0023_sampler_ids",
+      "breakpoints": true
     }
   ]
 }

@@ -11,7 +11,7 @@ import { Characters } from '@lib/state/Characters'
 import { Chats, useInference } from '@lib/state/Chat'
 import { commonStopStrings, Instructs, outputPrefixes } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
-import { SamplersManager } from '@lib/state/SamplerState'
+import { getCurrentSampler } from '@lib/state/samplerStore'
 import { useTTSStore } from '@lib/state/TTS'
 import { mmkv } from '@lib/storage/MMKV'
 
@@ -51,7 +51,7 @@ export const localSamplerData: APISampler[] = [
 ]
 
 const getSamplerFields = (max_length?: number) => {
-    const preset: SamplerConfigData = SamplersManager.getCurrentSampler()
+    const preset: SamplerConfigData = getCurrentSampler()
     return localSamplerData
         .map((item: APISampler) => {
             const value = preset[item.samplerID]
@@ -473,7 +473,7 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
         }
 
         const engineData = Llama.useLlamaPreferencesStore.getState().config
-        const samplers = SamplersManager.getCurrentSampler()
+        const samplers = getCurrentSampler()
 
         const instructLength = engineData.context_length
         const length = Math.max(instructLength - samplers.genamt, 0)

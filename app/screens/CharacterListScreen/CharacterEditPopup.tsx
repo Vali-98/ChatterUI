@@ -10,7 +10,7 @@ import { CharInfo, Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Instructs } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
-import { SamplersManager } from '@lib/state/SamplerState'
+import { useSamplerStore } from '@lib/state/samplerStore'
 
 type CharacterEditPopupProps = {
     character: CharInfo
@@ -33,7 +33,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
     const setUser = Characters.useUserStore((state) => state.setCard)
     const setInstruct = Instructs.useInstruct((state) => state.load)
     const setConnection = useConnectionStore((state) => state.setActiveConnection)
-    const setSampler = SamplersManager.useSamplerStore((state) => state.setConfig)
+    const setSampler = useSamplerStore((state) => state.setCurrentConfig)
 
     const setCurrentCharacter = async () => {
         if (nowLoading || path === '/screens/ChatScreen' || !character.id) return
@@ -56,7 +56,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
                         )
                         setConnection(item.value)
                         break
-                    case 'sampler_index':
+                    case 'sampler_id':
                         Logger.info(t('character.editor.links.loadSampler', { value: item.value }))
                         setSampler(item.value)
                         break

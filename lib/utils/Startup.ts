@@ -14,7 +14,7 @@ import { setupNotifications } from '@lib/notifications/Notifications'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { useChatInputTextStore } from '@lib/state/components/ChatInput'
 import { Instructs } from '@lib/state/Instructs'
-import { SamplersManager } from '@lib/state/SamplerState'
+import { useSamplerStore } from '@lib/state/samplerStore'
 import { useTTSStore } from '@lib/state/TTS'
 
 import { AppDirectory, deleteFile, listFiles, makeDirectory, readStringAsync } from './File'
@@ -156,7 +156,7 @@ const migratePresets_0_8_3_to_0_8_4 = async () => {
     files.map(async (item) => {
         try {
             const data = await readStringAsync(`${presetPath}/${item}`)
-            SamplersManager.useSamplerStore.getState().addSamplerConfig({
+            useSamplerStore.getState().addSamplerConfig({
                 data: JSON.parse(data),
                 name: item.replace('.json', ''),
             })
@@ -273,7 +273,7 @@ export const startupApp = () => {
     Tokenizer.useTokenizerState.getState().loadModel()
 
     // Fix any missing samplers
-    SamplersManager.useSamplerStore.getState().fixConfigs()
+    useSamplerStore.getState().fixConfigs()
 
     // migrations for old versions
     migrateModelData_0_7_10_to_0_8_0()

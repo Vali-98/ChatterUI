@@ -93,13 +93,11 @@ export const tagsRelations = relations(tags, ({ many }) => ({
     characters: many(characterTags),
 }))
 
-// for now, use strict naming convention for _index based stores
-// this is needed as removals require shifting all db values of [type_index] by -1
 export const linkTypes = [
     'user_id',
     'instruct_id',
     'connection_id',
-    'sampler_index',
+    'sampler_id',
     'model_id',
 ] as const
 

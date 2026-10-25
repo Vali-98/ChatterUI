@@ -14,7 +14,7 @@ import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
 import { CharacterLink } from '@lib/state/CharacterLinks'
 import { Characters } from '@lib/state/Characters'
 import { Instructs } from '@lib/state/Instructs'
-import { SamplersManager } from '@lib/state/SamplerState'
+import { useSamplerStore } from '@lib/state/samplerStore'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type Link = { value: number; label: string }
@@ -36,7 +36,7 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
         sync: true,
     })
     const modelList = useLiveQueryJoined(Model.getModelListQuery(), [], { sync: true })
-    const samplerList = SamplersManager.useSamplerStore((state) => state.configList)
+    const samplerList = useSamplerStore((state) => state.configList)
     const connectionsList = useConnectionStore((state) => state.connections)
 
     // derived active values
@@ -49,9 +49,9 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
     const modelLink = data.find((link) => link.type === 'model_id')
     const activeModel = modelList.data.find((model) => model.id === modelLink?.id)
 
-    const samplerLink = data.find((link) => link.type === 'sampler_index')
-    const samplerIndex = samplerLink?.value
-    const activeSampler = samplerIndex !== undefined ? samplerList?.[samplerIndex] : undefined
+    const samplerLink = data.find((link) => link.type === 'sampler_id')
+    const samplerId = samplerLink?.value
+    const activeSampler = samplerList.find((config) => config.id === samplerId)
 
     const connectionLink = data.find((link) => link.type === 'connection_id')
     const connectionId = connectionLink?.value
@@ -75,12 +75,12 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
             type: 'instruct_id',
         },
         {
-            options: samplerList.map((item, index) => ({ label: item.name, value: index })),
+            options: samplerList.map((item) => ({ label: item.name, value: item.id })),
             active:
-                activeSampler && samplerIndex !== undefined && samplerLink
-                    ? { label: activeSampler.name, value: samplerIndex, id: samplerLink.id }
+                activeSampler && samplerId !== undefined && samplerLink
+                    ? { label: activeSampler.name, value: samplerId, id: samplerLink.id }
                     : undefined,
-            type: 'sampler_index',
+            type: 'sampler_id',
         },
         {
             options: connectionsList.map((item) => ({
@@ -123,7 +123,7 @@ const CharacterLinkItem: React.FC<{
         ['instruct_id']: t('character.editor.links.missingInstruct'),
         ['model_id']: t('character.editor.links.missingModel'),
         ['connection_id']: t('character.editor.links.missingConnection'),
-        ['sampler_index']: t('character.editor.links.missingSampler'),
+        ['sampler_id']: t('character.editor.links.missingSampler'),
     }
     const active = linkCollection.active
     const initialIndex = linkCollection.options.findIndex((item) => item.value === active?.value)
