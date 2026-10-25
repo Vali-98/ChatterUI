@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, View } from 'react-native'
 import { create } from 'zustand'
@@ -12,7 +12,7 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import BottomSheet, { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
 import { LorebookEntryType } from '@db/schema'
-import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Lorebooks } from '@lib/state/lorebooks'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -56,25 +56,17 @@ const LorebookEntryEditor = () => {
         setEdited(isEdited)
     }, [])
 
-    const { data: entry } = useLiveQueryJoined(
-        Lorebooks.db.live.lorebookEntry(entryId ?? -1),
-        [entryId ?? -1],
-        {
-            targets: [
-                {
-                    tableName: 'lorebook_entries',
-                    rowId: entryId ?? -1,
-                },
-            ],
-            onUpdated: (result) => {
-                const item = result
-
-                if (item) {
-                    setPlaceholderEntry(item)
-                }
-            },
-        }
-    )
+    const { data: entry } = useLiveQueryAsync(Lorebooks.db.live.lorebookEntry(entryId ?? -1), {
+        keepPreviousData: false,
+        key: ['lorebook-entry-editor', entryId],
+        watch: [{ table: 'lorebook_entries', rowId: entryId ?? -1 }],
+        enabled: entryId !== undefined,
+    })
+    useEffect(() => {
+        // Refresh the local draft when its saved database record changes.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        if (entry) setPlaceholderEntry(entry)
+    }, [entry])
 
     const backAction = useCallback(
         (closeSheet: () => void) => {

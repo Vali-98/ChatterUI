@@ -1,5 +1,4 @@
 import { FlashList } from '@shopify/flash-list'
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
@@ -7,6 +6,7 @@ import { useShallow } from 'zustand/react/shallow'
 import ThemedButton from '@components/buttons/ThemedButton'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import InputSheet from '@components/views/InputSheet'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Characters } from '@lib/state/characters'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -16,7 +16,17 @@ const UserList = () => {
     const { t } = useTranslation()
     const { color, spacing, fontSize } = Theme.useTheme()
 
-    const { data } = useLiveQuery(Characters.db.query.cardListQuery('user'))
+    const { data } = useLiveQueryAsync(Characters.db.query.cardListQuery('user'), {
+        key: ['user-list'],
+        watch: [
+            { table: 'characters' },
+            { table: 'character_tags' },
+            { table: 'tags' },
+            { table: 'chats' },
+            { table: 'chat_entries' },
+            { table: 'chat_swipes' },
+        ],
+    })
 
     const newUserInputRef = useBottomSheetRef()
     const { setCard, id } = Characters.useUserStore(

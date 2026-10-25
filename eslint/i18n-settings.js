@@ -343,6 +343,7 @@ module.exports = {
             'flexDirection',
             'textAlign',
             'borderColor',
+            'key',
         ],
     },
     'class-properties': {

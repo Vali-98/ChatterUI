@@ -1,5 +1,4 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
@@ -17,6 +16,7 @@ import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import InputSheet from '@components/views/InputSheet'
 import { LorebookType } from '@db/schema'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Lorebooks } from '@lib/state/lorebooks'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -154,7 +154,10 @@ const LorebookEmpty = () => {
 }
 
 const LorebookManagerScreen = () => {
-    const { data: lorebooks } = useLiveQuery(Lorebooks.db.live.lorebookList())
+    const { data: lorebooks } = useLiveQueryAsync(Lorebooks.db.live.lorebookList(), {
+        key: ['lorebook-list'],
+        watch: [{ table: 'lorebooks' }],
+    })
     const { t } = useTranslation()
 
     return (

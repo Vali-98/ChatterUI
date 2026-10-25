@@ -10,7 +10,7 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import Drawer from '@components/views/Drawer'
 import { YAxisOnlyTransition } from '@lib/animations/transitions'
 import { useDebounce } from '@lib/hooks/Debounce'
-import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
@@ -32,7 +32,11 @@ const ChatsDrawer = () => {
         useShallow((state) => ({ charId: state.id ?? -1 }))
     )
     const targetChar = show ? charId : -1
-    const { data } = useLiveQueryJoined(Chats.db.query.chatListQuery(targetChar), [targetChar])
+    const { data } = useLiveQueryAsync(Chats.db.query.chatListQuery(targetChar), {
+        key: ['chat-list', targetChar],
+        watch: [{ table: 'chats' }, { table: 'chat_entries' }],
+        enabled: show,
+    })
 
     const setShowDrawer = (b: boolean) => {
         setShow(Drawer.ID.CHATLIST, b)

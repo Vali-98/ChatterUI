@@ -1,4 +1,3 @@
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { usePathname } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { View } from 'react-native'
@@ -8,6 +7,7 @@ import { useShallow } from 'zustand/react/shallow'
 import Drawer from '@components/views/Drawer'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Characters, CharInfo } from '@lib/state/characters'
 import { CharacterSorter } from '@lib/state/CharacterSorter'
 import { TagHider } from '@lib/state/TagHider'
@@ -33,7 +33,7 @@ const CharacterList: React.FC = () => {
     const hiddenTags = TagHider.useHiddenTags()
     const [pages, setPages] = useState(3)
     const [previousLength, setPreviousLength] = useState(0)
-    const { data, updatedAt } = useLiveQuery(
+    const { data, updatedAt } = useLiveQueryAsync(
         Characters.db.query.cardListQueryWindow(
             'character',
             searchType,
@@ -44,7 +44,26 @@ const CharacterList: React.FC = () => {
             tagFilter,
             hiddenTags
         ),
-        [searchType, searchOrder, textFilter, tagFilter, hiddenTags, pages]
+        {
+            key: [
+                'character-list',
+                searchType,
+                searchOrder,
+                textFilter,
+                tagFilter,
+                hiddenTags,
+                pages,
+            ],
+            watch: [
+                { table: 'characters' },
+                { table: 'characterLinks' },
+                { table: 'character_tags' },
+                { table: 'tags' },
+                { table: 'chats' },
+                { table: 'chat_entries' },
+                { table: 'chat_swipes' },
+            ],
+        }
     )
 
     const characterList: CharInfo[] = useMemo(() => {

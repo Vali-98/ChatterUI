@@ -1,4 +1,3 @@
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
@@ -26,6 +25,7 @@ import InputSheet from '@components/views/InputSheet'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import useAutosave from '@lib/hooks/AutoSave'
 import { useCompletionMode } from '@lib/hooks/CompletionMode'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { useTextFilterStore } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { useAppMode } from '@lib/state/AppMode'
@@ -99,7 +99,10 @@ const FormattingManager = () => {
     )
     const instructID = currentInstruct?.id
     const { color, spacing, borderRadius } = Theme.useTheme()
-    const { data } = useLiveQuery(Instructs.db.query.instructListQuery())
+    const { data } = useLiveQueryAsync(Instructs.db.query.instructListQuery(), {
+        key: ['instruct-list'],
+        watch: [{ table: 'instructs' }],
+    })
     const instructList = data
     const selectedItem = data.filter((item) => item.id === instructID)?.[0]
     const newInstructInputRef = useBottomSheetRef()

@@ -5,7 +5,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
-import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
+import { useLiveQuerySync } from '@lib/hooks/liveQuery'
 import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { authorNoteEditorState } from '@lib/state/components/AuthorNotes'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -20,8 +20,9 @@ const AuthorNoteItem: React.FC<AuthorNoteItemProps> = ({ id }) => {
     const open = authorNoteEditorState(useShallow((state) => state.open))
     const {
         data: [note],
-    } = useLiveQueryJoined(AuthorNotes.db.live.note(id), [id], {
-        targets: [{ tableName: 'author_notes', rowId: id }],
+    } = useLiveQuerySync(AuthorNotes.db.live.note(id), {
+        key: ['author-note', id],
+        watch: [{ table: 'author_notes', rowId: id }],
     })
     if (!note)
         return (

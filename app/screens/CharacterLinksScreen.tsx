@@ -10,7 +10,7 @@ import HeaderTitle from '@components/views/HeaderTitle'
 import { LinkType } from '@db/schema'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Model } from '@lib/engine/Local/Model'
-import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
+import { useLiveQuerySync } from '@lib/hooks/liveQuery'
 import { CharacterLink } from '@lib/state/CharacterLinks'
 import { Characters } from '@lib/state/characters'
 import { Instructs } from '@lib/state/Instructs'
@@ -27,27 +27,35 @@ type LinkCollection = {
 
 const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
     // db lists
-    const { data } = useLiveQueryJoined(CharacterLink.db.live.links(charId), [], {
-        sync: true,
+    const { data } = useLiveQuerySync(CharacterLink.db.live.links(charId), {
+        key: ['character-links', charId],
+        watch: [{ table: 'characterLinks' }],
     })
 
-    const userList = useLiveQueryJoined(Characters.db.live.listSimple('user'), [], { sync: true })
-    const instructList = useLiveQueryJoined(Instructs.db.query.instructListQuery(), [], {
-        sync: true,
+    const { data: userList } = useLiveQuerySync(Characters.db.live.listSimple('user'), {
+        key: ['user-list-simple'],
+        watch: [{ table: 'characters' }],
     })
-    const modelList = useLiveQueryJoined(Model.getModelListQuery(), [], { sync: true })
+    const { data: instructList } = useLiveQuerySync(Instructs.db.query.instructListQuery(), {
+        key: ['instruct-list'],
+        watch: [{ table: 'instructs' }],
+    })
+    const { data: modelList } = useLiveQuerySync(Model.getModelListQuery(), {
+        key: ['model-list'],
+        watch: [{ table: 'model_data' }, { table: 'model_mmproj_links' }],
+    })
     const samplerList = useSamplerStore((state) => state.configList)
     const connectionsList = useConnectionStore((state) => state.connections)
 
     // derived active values
     const userLink = data.find((link) => link.type === 'user_id')
-    const activeUser = userList.data.find((user) => user.id === userLink?.value)
+    const activeUser = userList.find((user) => user.id === userLink?.value)
 
     const instructLink = data.find((link) => link.type === 'instruct_id')
-    const activeInstruct = instructList.data.find((instruct) => instruct.id === instructLink?.value)
+    const activeInstruct = instructList.find((instruct) => instruct.id === instructLink?.value)
 
     const modelLink = data.find((link) => link.type === 'model_id')
-    const activeModel = modelList.data.find((model) => model.id === modelLink?.id)
+    const activeModel = modelList.find((model) => model.id === modelLink?.id)
 
     const samplerLink = data.find((link) => link.type === 'sampler_id')
     const samplerId = samplerLink?.value
@@ -59,7 +67,7 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
 
     return [
         {
-            options: userList.data.map((item) => ({ label: item.name, value: item.id })),
+            options: userList.map((item) => ({ label: item.name, value: item.id })),
             active:
                 activeUser && userLink
                     ? { label: activeUser.name, value: activeUser.id, id: userLink.id }
@@ -67,7 +75,7 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
             type: 'user_id',
         },
         {
-            options: instructList.data.map((item) => ({ label: item.name, value: item.id })),
+            options: instructList.map((item) => ({ label: item.name, value: item.id })),
             active:
                 activeInstruct && instructLink
                     ? { label: activeInstruct.name, value: activeInstruct.id, id: instructLink.id }
@@ -98,7 +106,7 @@ const useActiveCharacterLinks = (charId: number): LinkCollection[] => {
             type: 'connection_id',
         },
         {
-            options: modelList.data.map((item) => ({
+            options: modelList.map((item) => ({
                 label: item.name,
                 value: item.id,
             })),

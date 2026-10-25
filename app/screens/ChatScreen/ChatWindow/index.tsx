@@ -8,7 +8,7 @@ import Drawer from '@components/views/Drawer'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useDebounce } from '@lib/hooks/Debounce'
-import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
+import { useLiveQuerySync } from '@lib/hooks/liveQuery'
 import { useAppMode } from '@lib/state/AppMode'
 import { useBackgroundStore } from '@lib/state/BackgroundImage'
 import { Characters } from '@lib/state/characters'
@@ -35,19 +35,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
     const [showModelname] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [showJump, setShowJump] = useState(false)
     const [autoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
-    const { data: { background_image: backgroundImage } = {} } = useLiveQueryJoined(
+    const { data: { background_image: backgroundImage } = {} } = useLiveQuerySync(
         Characters.db.query.backgroundImageQuery(charId ?? -1),
-        [charId],
-        { deepCheck: true }
+        {
+            key: ['character-background', charId],
+            watch: [{ table: 'characters', rowId: charId ?? -1 }],
+        }
     )
     const scrolledChat = useRef(-1)
 
-    const { data: entryIdList, updatedAt } = useLiveQueryJoined(Chats.db.live.entryIdList(chatId), [
-        chatId,
-        {
-            sync: true,
-        },
-    ])
+    const { data: entryIdList, updatedAt } = useLiveQuerySync(Chats.db.live.entryIdList(chatId), {
+        key: ['chat-entry-ids', chatId],
+        watch: [{ table: 'chat_entries' }],
+    })
 
     const { cause: scrollCause, index: scrollIndex } = scrollData ?? {}
     const flatlistRef = useRef<FlatList | null>(null)

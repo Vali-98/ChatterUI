@@ -1,5 +1,4 @@
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { create } from 'zustand'
@@ -7,7 +6,7 @@ import { create } from 'zustand'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import BottomSheet, { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
-import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -37,17 +36,25 @@ const ChatEditor = () => {
     const { entryId, hide, ref } = useChatEditorStore()
     const styles = useStyles()
     const [placeholderText, setPlaceholderText] = useState('')
-    const { data: entry } = useLiveQuery(Chats.db.live.entry(entryId), [entryId])
-    const { data: swipe } = useLiveQueryJoined(
-        Chats.db.live.activeSwipeByEntry(entryId),
-        [entryId],
-        {
-            onUpdated: (result) => {
-                const swipe = result?.swipe
-                setPlaceholderText(swipe ?? '')
-            },
-        }
-    )
+    const { data: entry } = useLiveQueryAsync(Chats.db.live.entry(entryId), {
+        keepPreviousData: false,
+        key: ['chat-editor-entry', entryId],
+        watch: [
+            { table: 'chat_entries', rowId: entryId },
+            { table: 'chat_swipes' },
+            { table: 'chat_attachment' },
+        ],
+    })
+    const { data: swipe } = useLiveQueryAsync(Chats.db.live.activeSwipeByEntry(entryId), {
+        keepPreviousData: false,
+        key: ['chat-editor-swipe', entryId],
+        watch: [{ table: 'chat_swipes' }],
+    })
+    useEffect(() => {
+        // Refresh the local draft when its saved database record changes.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setPlaceholderText(swipe?.swipe ?? '')
+    }, [swipe])
 
     const handleEditMessage = () => {
         hide()

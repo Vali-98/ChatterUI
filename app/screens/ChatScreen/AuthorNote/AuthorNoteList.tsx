@@ -1,6 +1,6 @@
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { FlatList } from 'react-native-gesture-handler'
 
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { AuthorNotes, NoteType } from '@lib/state/AuthorNotes'
 import { Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/Chat'
@@ -15,9 +15,12 @@ type AuthorNoteListProps = {
 const AuthorNoteList: React.FC<AuthorNoteListProps> = ({ noteType }) => {
     const { id: chatId } = Chats.useChatState()
     const { id: characterId } = Characters.useCharacterStore()
-    const { data: noteIdList } = useLiveQuery(
+    const { data: noteIdList } = useLiveQueryAsync(
         AuthorNotes.db.live.noteIds(noteType, chatId ?? -1, characterId ?? -1),
-        [noteType, characterId, chatId]
+        {
+            key: ['author-note-ids', noteType, characterId, chatId],
+            watch: [{ table: 'author_notes' }],
+        }
     )
     if (noteIdList.length === 0) return <AuthorNoteEmpty />
 

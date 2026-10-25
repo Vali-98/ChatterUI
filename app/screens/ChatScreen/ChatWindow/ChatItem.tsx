@@ -1,8 +1,7 @@
 import { StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
-import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
-import { useQueuedLiveQuery } from '@lib/hooks/LiveQueryQueued'
+import { useLiveQuerySync } from '@lib/hooks/liveQuery'
 import { Chats, useInference } from '@lib/state/Chat'
 
 import ChatBubble from './ChatBubble'
@@ -18,11 +17,10 @@ type ChatItemProps = {
 type ChatItemBodyProps = ChatItemProps & { entrySwipeIds: number[] }
 
 const ChatItem: React.FC<ChatItemProps> = ({ entryId, ...rest }) => {
-    const { data: swipeidList } = useLiveQueryJoined(
-        Chats.db.live.swipeIdList(entryId),
-        [entryId],
-        { deepCheck: true, sync: true }
-    )
+    const { data: swipeidList } = useLiveQuerySync(Chats.db.live.swipeIdList(entryId), {
+        key: ['entry-swipe-ids', entryId],
+        watch: [{ table: 'chat_swipes' }],
+    })
 
     return (
         <ChatItemBody
@@ -42,15 +40,13 @@ const ChatItemBody: React.FC<ChatItemBodyProps> = ({
     ...rest
 }) => {
     const nowGenerating = useInference((state) => state.nowGenerating)
-    const { data: entry } = useQueuedLiveQuery(Chats.db.live.entry(entryId), [entryId], {
-        targets: [
-            { tableName: 'chat_entries', rowId: entryId },
-            {
-                tableName: 'chat_swipes',
-                rowId: entrySwipeIds,
-            },
+    const { data: entry } = useLiveQuerySync(Chats.db.live.entry(entryId), {
+        key: ['chat-entry', entryId],
+        watch: [
+            { table: 'chat_entries', rowId: entryId },
+            { table: 'chat_swipes', rowId: entrySwipeIds },
+            { table: 'chat_attachment' },
         ],
-        sync: true,
     })
 
     if (!entry || entrySwipeIds.length === 0) return // this should never be hit

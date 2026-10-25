@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
@@ -10,7 +10,7 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import BottomSheet from '@components/views/BottomSheet'
 import { Tokenizer } from '@lib/engine/Tokenizer'
-import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { useDebounceTokenizer } from '@lib/hooks/Tokenizer'
 import { AuthorNote, AuthorNotes, NoteType } from '@lib/state/AuthorNotes'
 import { Characters } from '@lib/state/characters'
@@ -79,18 +79,17 @@ const AuthorNoteEditor = () => {
     )
     const {
         data: [note],
-    } = useLiveQueryJoined(AuthorNotes.db.live.note(noteId ?? -1), [noteId ?? -1], {
-        targets: [
-            {
-                tableName: 'author_notes',
-                rowId: noteId ?? -1,
-            },
-        ],
-        onUpdated: (result) => {
-            const [item] = result
-            if (item) handleSetPlaceholder(item)
-        },
+    } = useLiveQueryAsync(AuthorNotes.db.live.note(noteId ?? -1), {
+        keepPreviousData: false,
+        key: ['author-note-editor', noteId],
+        watch: [{ table: 'author_notes', rowId: noteId ?? -1 }],
+        enabled: noteId !== undefined,
     })
+    useEffect(() => {
+        // Refresh the local draft when its saved database record changes.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        if (note) handleSetPlaceholder(note)
+    }, [note, handleSetPlaceholder])
     const contentTokens = useDebounceTokenizer(placeHolderNote?.content ?? '', 300)
 
     const backAction = useCallback(

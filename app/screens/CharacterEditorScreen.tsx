@@ -1,6 +1,5 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { count, eq } from 'drizzle-orm'
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import * as DocumentPicker from 'expo-document-picker'
 import { ImageBackground } from 'expo-image'
 import { Redirect, useNavigation, useRouter } from 'expo-router'
@@ -23,6 +22,7 @@ import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { db } from '@db/db'
 import { characterTags, tags } from '@db/schema'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { useDebounceTokenizer } from '@lib/hooks/Tokenizer'
 import { CharacterCardData, Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/Chat'
@@ -36,7 +36,7 @@ const ChracterEditorScreen = () => {
     const { color, spacing } = Theme.useTheme()
     const navigation = useNavigation()
     const router = useRouter()
-    const data = useLiveQuery(
+    const { data } = useLiveQueryAsync(
         db
             .select({
                 tag: tags.tag,
@@ -45,7 +45,8 @@ const ChracterEditorScreen = () => {
             })
             .from(tags)
             .leftJoin(characterTags, eq(characterTags.tag_id, tags.id))
-            .groupBy(tags.id)
+            .groupBy(tags.id),
+        { key: ['tag-counts'], watch: [{ table: 'tags' }, { table: 'character_tags' }] }
     )
     const { currentCard, setCurrentCard, charId, charName, unloadCharacter } =
         Characters.useCharacterStore(
@@ -61,8 +62,12 @@ const ChracterEditorScreen = () => {
     const [characterCard, setCharacterCard] = useState<CharacterCardData | undefined>(currentCard)
     const descriptionTokens = useDebounceTokenizer(characterCard?.description ?? '', 300)
     const { chatId, resetId } = Chats.useChat()
-    const { data: { background_image: backgroundImage } = {} } = useLiveQuery(
-        Characters.db.query.backgroundImageQuery(charId ?? -1)
+    const { data: { background_image: backgroundImage } = {} } = useLiveQueryAsync(
+        Characters.db.query.backgroundImageQuery(charId ?? -1),
+        {
+            key: ['character-editor-background', charId],
+            watch: [{ table: 'characters', rowId: charId ?? -1 }],
+        }
     )
     const setShowViewer = useAvatarViewerStore((state) => state.setShow)
     const [edited, setEdited] = useState(false)
@@ -560,7 +565,7 @@ const ChracterEditorScreen = () => {
                         <StringArrayEditor
                             label={t('character.editor.fields.tags')}
                             containerStyle={styles.input}
-                            suggestions={data.data
+                            suggestions={data
                                 .map((item) => item.tag)
                                 .filter(
                                     (a) => !characterCard?.tags.some((item) => item.tag.tag === a)
@@ -571,9 +576,7 @@ const ChracterEditorScreen = () => {
                                 const newTags = value
                                     .filter((v) => !characterCard.tags.some((a) => a.tag.tag === v))
                                     .map((a) => {
-                                        const existing = data.data.filter(
-                                            (item) => item.tag === a
-                                        )?.[0]
+                                        const existing = data.filter((item) => item.tag === a)?.[0]
                                         if (existing) {
                                             return { tag_id: existing.id, tag: existing }
                                         }

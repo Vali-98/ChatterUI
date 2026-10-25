@@ -1,4 +1,3 @@
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SectionList } from 'react-native'
@@ -12,6 +11,7 @@ import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { Model } from '@lib/engine/Local/Model'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ModelEmpty from './ModelEmpty'
@@ -24,12 +24,14 @@ const ModelManagerScreen = () => {
     const { t } = useTranslation()
     const { spacing } = Theme.useTheme()
 
-    const { data: mmprojLinks } = useLiveQuery(Model.getMMPROJLinks())
-
-    const { data: modelList, updatedAt: modelUpdatedAt } = useLiveQuery(Model.getModelListQuery(), [
-        mmprojLinks,
-    ])
-    const { data: mmprojList } = useLiveQuery(Model.getMMPROJListQuery())
+    const { data: modelList, updatedAt: modelUpdatedAt } = useLiveQueryAsync(
+        Model.getModelListQuery(),
+        { key: ['model-list'], watch: [{ table: 'model_data' }, { table: 'model_mmproj_links' }] }
+    )
+    const { data: mmprojList } = useLiveQueryAsync(Model.getMMPROJListQuery(), {
+        key: ['mmproj-list'],
+        watch: [{ table: 'model_data' }, { table: 'model_mmproj_links' }],
+    })
 
     const [showSettings, setShowSettings] = useState(false)
     const [modelLoading, setModelLoading] = useState(false)

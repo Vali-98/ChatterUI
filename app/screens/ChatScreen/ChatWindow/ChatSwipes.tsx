@@ -1,10 +1,10 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import React, { useCallback } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { ChatSwipe } from '@db/schema'
 import { continueResponse, generateResponse, regenerateResponse } from '@lib/engine/Inference'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -17,7 +17,10 @@ type SwipesProps = {
 const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, swipe }) => {
     const styles = useStyles()
     const { color } = Theme.useTheme()
-    const { data: swipeIdListData } = useLiveQuery(Chats.db.live.swipeIdList(swipe.entry_id), [])
+    const { data: swipeIdListData } = useLiveQueryAsync(Chats.db.live.swipeIdList(swipe.entry_id), {
+        key: ['swipe-ids', swipe.entry_id],
+        watch: [{ table: 'chat_swipes' }],
+    })
     const swipeIdList = swipeIdListData.map((item) => item.id)
 
     const currentIndex = swipeIdList.indexOf(swipe.id)

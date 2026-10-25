@@ -3,7 +3,7 @@ import { View, Text } from 'react-native'
 import { Bar } from 'react-native-progress'
 
 import { SamplerID } from '@lib/constants/SamplerData'
-import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { useCharacterTokenCounts } from '@lib/state/characters/tokenState'
 import { Chats } from '@lib/state/Chat'
 import { useCurrentSampler } from '@lib/state/samplerStore'
@@ -13,7 +13,10 @@ const ChatTokenCount: React.FC = () => {
     const { t } = useTranslation()
     const { id: chatId } = Chats.useChatState()
     const cardTokenCount = useCharacterTokenCounts()?.characterCache.description_length ?? 0
-    const { data } = useLiveQueryJoined(Chats.db.live.tokenCount(chatId ?? -1))
+    const { data } = useLiveQueryAsync(Chats.db.live.tokenCount(chatId ?? -1), {
+        key: ['chat-token-count', chatId],
+        watch: [{ table: 'chat_entries' }, { table: 'chat_swipes' }],
+    })
     const { color, fontSize } = Theme.useTheme()
     const sampler = useCurrentSampler()
 

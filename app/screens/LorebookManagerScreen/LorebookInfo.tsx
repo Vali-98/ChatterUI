@@ -1,5 +1,4 @@
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
@@ -17,7 +16,7 @@ import Accordion from '@components/views/Accordion'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { LorebookType } from '@db/schema'
 import { useDebounce } from '@lib/hooks/Debounce'
-import { useLiveQueryJoined } from '@lib/hooks/LiveQueryJoined'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Lorebooks } from '@lib/state/lorebooks'
 
 import LorebookEntryEditor, { useLorebookEntryEditorState } from './LorebookEntryEditor'
@@ -35,17 +34,23 @@ const LorebookInfoScreen = () => {
     const { t } = useTranslation()
     const [search, setSearch] = useState('')
     const { id } = useLorebookInfoState()
-    const { data: entries } = useLiveQuery(
+    const { data: entries } = useLiveQueryAsync(
         Lorebooks.db.live.lorebookEntryNameList(id ?? -1, search),
-        [search]
+        { key: ['lorebook-entry-names', id, search], watch: [{ table: 'lorebook_entries' }] }
     )
     const [placeholderInfo, setPlaceholderInfo] = useState<LorebookType | undefined>(undefined)
     const openEditor = useLorebookEntryEditorState((state) => state.open)
-    useLiveQueryJoined(Lorebooks.db.live.lorebookInfo(id ?? -1), [id], {
-        onUpdated: (result) => {
-            if (result) setPlaceholderInfo(result)
-        },
+    const { data: info } = useLiveQueryAsync(Lorebooks.db.live.lorebookInfo(id ?? -1), {
+        keepPreviousData: false,
+        key: ['lorebook-info', id],
+        watch: [{ table: 'lorebooks', rowId: id ?? -1 }],
+        enabled: id !== undefined,
     })
+    useEffect(() => {
+        // Refresh the local draft when its saved database record changes.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        if (info) setPlaceholderInfo(info)
+    }, [info])
 
     const handleUpdateDebounce = useDebounce(
         async (lorebookInfo: LorebookType | Partial<LorebookType>) => {

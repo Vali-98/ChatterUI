@@ -1,5 +1,4 @@
 import { count, eq, notInArray } from 'drizzle-orm'
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useFocusEffect } from 'expo-router'
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -14,6 +13,7 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import { db } from '@db/db'
 import { characterTags, tags } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { CharacterSorter } from '@lib/state/CharacterSorter'
 import { Logger } from '@lib/state/Logger'
 import { TagHider } from '@lib/state/TagHider'
@@ -44,7 +44,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
     const [showTags, setShowTags] = useMMKVBoolean(AppSettings.ShowTags)
     const hiddenTags = TagHider.useHiddenTags()
 
-    const { data } = useLiveQuery(
+    const { data } = useLiveQueryAsync(
         db
             .select({
                 tag: tags.tag,
@@ -54,7 +54,10 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
             .leftJoin(characterTags, eq(characterTags.tag_id, tags.id))
             .groupBy(tags.tag)
             .where(notInArray(tags.tag, hiddenTags)),
-        [hiddenTags]
+        {
+            key: ['visible-tags', hiddenTags],
+            watch: [{ table: 'tags' }, { table: 'character_tags' }],
+        }
     )
 
     useFocusEffect(
