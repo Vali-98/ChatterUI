@@ -91,7 +91,7 @@ const ChatInput = () => {
 
     const handleSend = async () => {
         Keyboard.dismiss()
-        if (!chatId) return
+        if (!chatId || useGenerationState.getState().isGenerating) return
         setDisableSend(true)
         try {
             if (newMessage.trim() !== '' || attachments.length > 0) {

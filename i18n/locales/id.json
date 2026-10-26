@@ -574,7 +574,8 @@
         },
         "warn": {
             "entryWithoutValidSwipeFound": "Entri tanpa gesekan valid ditemukan",
-            "noMessagesAddedCheckLogs": "Tidak ada pesan yang ditambahkan. Periksa Log."
+            "noMessagesAddedCheckLogs": "Tidak ada pesan yang ditambahkan. Periksa Log.",
+            "systemPromptExceedsContext": "Prompt sistem melebihi panjang konteks yang tersedia."
         }
     },
     "horizontalSelector": {

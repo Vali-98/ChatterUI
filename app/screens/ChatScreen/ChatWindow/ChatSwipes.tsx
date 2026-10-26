@@ -5,7 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ChatSwipe } from '@db/schema'
 import { continueResponse, generateResponse, regenerateResponse } from '@lib/engine/Inference'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
-import { Chats } from '@lib/state/chat'
+import { Chats, useGenerationState } from '@lib/state/chat'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type SwipesProps = {
@@ -36,14 +36,16 @@ const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) 
     if (!swipeIdList || currentIndex === -1 || (isGreeting && swipeIdList.length === 1)) return
 
     const handleSwipeLeft = () => {
+        if (useGenerationState.getState().isGenerating) return
         if (currentIndex <= 0) return
         const newSwipeId = swipeIdList[currentIndex - 1]
         if (newSwipeId) Chats.db.update.activeSwipe(newSwipeId)
     }
 
-    const handleSwipeRight = async (message: string) => {
+    const handleSwipeRight = (message: string) => {
+        if (useGenerationState.getState().isGenerating) return
         if (currentIndex >= swipeIdList.length - 1) {
-            const newSwipe = await Chats.actions.createSwipe(swipe.entry_id, message)
+            const newSwipe = Chats.actions.createSwipe(swipe.entry_id, message)
             if (!newSwipe) return
             if (message) continueResponse(newSwipe)
             else generateResponse(newSwipe.id)

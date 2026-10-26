@@ -434,3 +434,58 @@ test('export includes every variant so importing can preserve the selected swipe
     ])
     expect(exported.messages[0].swipes[1].swipe).toBe('chosen')
 })
+
+test('duplicate completion callbacks share one save and notification', async () => {
+    useGenerationState.getState().startGenerating(31)
+    useChatState.getState().setBuffer({ data: 'response' })
+    jest.mocked(db.query.swipeContext).mockReturnValue({
+        chat_id: 10,
+        character_id: 1,
+        character_name: 'Character',
+    })
+    const first = finishGeneration()
+    const second = finishGeneration()
+    expect(second).toBe(first)
+    await Promise.all([first, second])
+    expect(db.update.swipe).toHaveBeenCalledTimes(1)
+    expect(notifyGenerationComplete).toHaveBeenCalledTimes(1)
+})
+
+test('an old frame cannot reset a newer regeneration of the same swipe', async () => {
+    useGenerationState.getState().startGenerating(31)
+    const oldId = useGenerationState.getState().generationId
+    await finishGeneration()
+    useGenerationState.getState().startGenerating(31)
+    useChatState.getState().setBuffer({ data: 'new attempt' })
+    frames[0](0)
+    await finishGeneration({ generationId: oldId })
+    expect(useGenerationState.getState().isGenerating).toBe(true)
+    expect(useChatState.getState().buffer.data).toBe('new attempt')
+    expect(db.update.swipe).toHaveBeenCalledTimes(1)
+})
+
+test('follow-up work sees persisted output and finishes before clearing the buffer', async () => {
+    useGenerationState.getState().startGenerating(31)
+    const onSaved = jest.fn(async () => {
+        expect(db.update.swipe).toHaveBeenCalledTimes(1)
+        expect(frames).toHaveLength(0)
+        expect(useGenerationState.getState().isGenerating).toBe(true)
+    })
+    await finishGeneration({ notify: false, onSaved })
+    expect(onSaved).toHaveBeenCalledTimes(1)
+    expect(frames).toHaveLength(1)
+    expect(notifyGenerationComplete).not.toHaveBeenCalled()
+})
+
+test('a failed save retains output and permits a retry', async () => {
+    useGenerationState.getState().startGenerating(31)
+    useChatState.getState().setBuffer({ data: 'unsaved output' })
+    jest.mocked(db.update.swipe).mockImplementationOnce(() => {
+        throw new Error('save failed')
+    })
+    await expect(finishGeneration()).rejects.toThrow('save failed')
+    expect(useChatState.getState().buffer.data).toBe('unsaved output')
+    expect(frames).toHaveLength(0)
+    await finishGeneration({ notify: false })
+    expect(db.update.swipe).toHaveBeenCalledTimes(2)
+})

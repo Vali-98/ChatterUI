@@ -574,7 +574,8 @@
         },
         "warn": {
             "entryWithoutValidSwipeFound": "Entry without valid swipe found",
-            "noMessagesAddedCheckLogs": "No messages added. Check Logs."
+            "noMessagesAddedCheckLogs": "No messages added. Check Logs.",
+            "systemPromptExceedsContext": "System prompt exceeds the available context length."
         }
     },
     "horizontalSelector": {

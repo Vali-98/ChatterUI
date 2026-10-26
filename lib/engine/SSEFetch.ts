@@ -1,70 +1,123 @@
 import { fetch } from 'expo/fetch'
 
 import { Logger } from '@lib/state/Logger'
+
 type SSEValues = {
     endpoint: string
     method: 'POST' | 'GET'
     body: string
-    headers: any
+    headers: Record<string, string>
+    signal: AbortSignal
+}
+
+// Network chunks can end anywhere, including inside UTF-8 characters or JSON records.
+class StreamRecords {
+    private pending = ''
+    private data: string[] = []
+    done = false
+
+    constructor(private readonly emit: (data: string) => void) {}
+
+    push(text: string, final = false) {
+        this.pending += text
+        while (!this.done) {
+            const newline = this.pending.search(/[\r\n]/)
+            if (newline === -1) break
+            if (!final && this.pending[newline] === '\r' && newline === this.pending.length - 1)
+                break
+            const width = this.pending.slice(newline, newline + 2) === '\r\n' ? 2 : 1
+            const line = this.pending.slice(0, newline)
+            this.pending = this.pending.slice(newline + width)
+            this.line(line)
+        }
+        if (final && !this.done) {
+            if (this.pending) this.line(this.pending)
+            this.pending = ''
+            this.dispatch()
+        }
+    }
+
+    private line(line: string) {
+        if (!line) return this.dispatch()
+        if (line.startsWith(':')) return
+        // Ollama and other NDJSON endpoints send one JSON object per line.
+        if (line.trimStart().startsWith('{')) {
+            JSON.parse(line)
+            this.emit(line)
+            return
+        }
+        const colon = line.indexOf(':')
+        const field = colon === -1 ? line : line.slice(0, colon)
+        let value = colon === -1 ? '' : line.slice(colon + 1)
+        if (value.startsWith(' ')) value = value.slice(1)
+        if (field === 'data') this.data.push(value)
+    }
+
+    private dispatch() {
+        if (!this.data.length) return
+        const data = this.data.join('\n')
+        this.data = []
+        if (data.trim() === '[DONE]') this.done = true
+        else this.emit(data)
+    }
 }
 
 export class SSEFetch {
-    private abortController: AbortController = new AbortController()
-    private decoder = new TextDecoder()
-    private onEvent = (data: string) => {}
+    private abortController = new AbortController()
+    private onEvent = (_data: string) => {}
     private onError = () => {}
     private onClose = () => {}
-    private closeStream = () => {}
+    private reader?: ReadableStreamDefaultReader<Uint8Array>
     private cancelled = false
+
     public abort() {
-        try {
-            this.abortController.abort()
-        } catch {
-        } finally {
-            this.closeStream()
-            this.closeStream = () => {
-                this.cancelled = true
-            }
-        }
+        this.cancelled = true
+        this.abortController.abort()
+        void this.reader?.cancel().catch(() => {})
     }
 
     public async start(values: SSEValues) {
         this.abortController = new AbortController()
-        const body = values.method === 'POST' ? { body: values.body } : {}
         this.cancelled = false
+        const decoder = new TextDecoder()
+        const records = new StreamRecords((data) => this.onEvent(data))
+        const abort = () => this.abort()
+        values.signal.addEventListener('abort', abort)
         try {
+            if (values.signal.aborted) {
+                this.abort()
+                return
+            }
             const res = await fetch(values.endpoint, {
                 signal: this.abortController.signal,
                 method: values.method,
                 headers: values.headers,
-                ...body,
+                ...(values.method === 'POST' ? { body: values.body } : {}),
             })
-            if (res.status !== 200 || !res.body) {
-                Logger.error('Status ' + res.status)
-                Logger.error(await res.text())
-                return this.onError()
+            if (!res.ok || !res.body) {
+                throw new Error(`Status ${res.status}: ${await res.text()}`)
             }
-            const reader = res.body.getReader()
-            this.closeStream = () => {
-                try {
-                    reader.cancel()
-                    this.cancelled = true
-                } catch {}
+            this.reader = res.body.getReader()
+            while (!this.cancelled && !records.done) {
+                const { value, done } = await this.reader.read()
+                if (this.cancelled) break
+                if (done) {
+                    records.push(decoder.decode(), true)
+                    break
+                }
+                records.push(decoder.decode(value, { stream: true }))
             }
-            while (true) {
-                const { value, done } = await reader.read()
-                if (done || this.cancelled) break
-
-                const data = this.decoder.decode(value)
-                const output = parseSSE(data)
-                output.forEach((item) => this.onEvent(item))
+        } catch (error) {
+            if (!this.cancelled) {
+                Logger.error('Request Failed: ' + error)
+                this.onError()
             }
-        } catch (e) {
-            if (this.abortController.signal.aborted) {
-                Logger.debug('Abort caught')
-            }
-            Logger.error('Request Failed: ' + e)
         } finally {
+            values.signal.removeEventListener('abort', abort)
+            try {
+                await this.reader?.cancel()
+            } catch {}
+            this.reader = undefined
             this.onClose()
         }
     }
@@ -72,36 +125,10 @@ export class SSEFetch {
     public setOnEvent(callback: (data: string) => void) {
         this.onEvent = callback
     }
-
     public setOnError(callback: () => void) {
         this.onError = callback
     }
-
     public setOnClose(callback: () => void) {
         this.onClose = callback
     }
-}
-
-function parseSSE(message: string) {
-    const output: string[] = []
-    const lines = message.split(/\n/)
-    for (const line of lines) {
-        // For some APIs like Ollama, they use a ndjson stream
-        if (line.startsWith('{')) {
-            try {
-                JSON.parse(line)
-                output.push(line)
-            } catch {
-                continue
-            }
-        }
-        const colonIndex = line.indexOf(':')
-        if (colonIndex === 0) continue
-        const field = colonIndex > 0 ? line.slice(0, colonIndex).trim() : line.trim()
-        const value = colonIndex > 0 ? line.slice(colonIndex + 1).trim() : ''
-        if (field !== 'data' || value.startsWith('[DONE]')) continue
-        output.push(value)
-    }
-
-    return output
 }

@@ -574,7 +574,8 @@
         },
         "warn": {
             "entryWithoutValidSwipeFound": "Найдена запись без действительного смахивания",
-            "noMessagesAddedCheckLogs": "Сообщения не добавлены. Проверьте логи."
+            "noMessagesAddedCheckLogs": "Сообщения не добавлены. Проверьте логи.",
+            "systemPromptExceedsContext": "Системный промпт превышает доступную длину контекста."
         }
     },
     "horizontalSelector": {

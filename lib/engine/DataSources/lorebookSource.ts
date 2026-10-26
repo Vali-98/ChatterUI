@@ -14,7 +14,6 @@ const MAX_CACHE_LIFETIME = 5
 type LorebookEntryCacheItem = {
     primaryKey: RegExp
     secondaryKey: RegExp
-    tokenCount: number
     searchTime: number
 }
 
@@ -33,7 +32,6 @@ class LorebookEntryCache {
         const item: LorebookEntryCacheItem = {
             primaryKey: createKeyRegex(entry.keys, entry.case_sensitive),
             secondaryKey: createKeyRegex(entry.secondary_keys, entry.case_sensitive),
-            tokenCount: await Tokenizer.getTokenizer()(entry.content),
             searchTime: this.lifetime,
         }
 
@@ -145,11 +143,6 @@ const getSingleLorebookSource = async (lorebook: LorebookType): Promise<DataSour
 
     if (enabledEntries.length === 0) return
 
-    const getTokenLength = async (entry: NonNullable<LorebookEntryType>): Promise<number> => {
-        const cached = (await lorebookEntryCache.get(entry)).tokenCount
-        return cached
-    }
-
     return {
         name: LOREBOOK_NAME,
         priority: 2,
@@ -169,10 +162,8 @@ const getSingleLorebookSource = async (lorebook: LorebookType): Promise<DataSour
             maxLength,
             currentLength,
             _tokenBudget,
-            lastMessageReached
+            _lastMessageReached
         ) => {
-            if (!lastMessageReached) return []
-
             const configuredBudget = lorebook.token_budget ?? 0
 
             if (configuredBudget <= 0) return []
@@ -208,7 +199,9 @@ const getSingleLorebookSource = async (lorebook: LorebookType): Promise<DataSour
                 matchedEntries.push({
                     entry: entry,
                     content: replaceMacros(entry.content),
-                    tokenLength: await getTokenLength(entry),
+                    tokenLength: await Tokenizer.getTokenizer()(
+                        `**${entry.name}**: ${replaceMacros(entry.content)}`
+                    ),
                     discoveryOrder: discoveryOrder++,
                 })
             }

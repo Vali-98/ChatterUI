@@ -2,7 +2,6 @@ import merge from 'lodash.merge'
 
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
 import { InstructType } from '@lib/state/Instructs'
-import { getCurrentSampler } from '@lib/state/samplerStore'
 import { getNestedValue } from '@lib/utils/Parsing'
 
 import { APIConfiguration, APISampler, APIValues } from './APIBuilder.types'
@@ -44,7 +43,7 @@ export const buildRequest = async ({
         case 'claude':
             return claudeRequest(apiConfig, instruct, fields)
         case 'custom':
-            return customRequest(apiConfig, apiValues, fields)
+            return customRequest(apiConfig, apiValues, samplers, stopSequence, prompt)
     }
 }
 
@@ -115,16 +114,35 @@ const claudeRequest = async (
     instruct: InstructType,
     { payloadFields, model, stop, prompt, custom }: Field
 ) => {
-    const systemPrompt = instruct.system_prompt
     const systemRole =
         config.request.completionType.type === 'chatCompletions'
             ? config.request.completionType.systemRole
             : 'system'
     const promptObject = prompt?.[config.request.promptKey]
+    const contentName =
+        config.request.completionType.type === 'chatCompletions'
+            ? config.request.completionType.contentName
+            : 'content'
+    const systemPrompt = Array.isArray(promptObject)
+        ? promptObject
+              .filter((item) => item.role === systemRole)
+              .map((item) => {
+                  const content = item[contentName]
+                  return typeof content === 'string'
+                      ? content
+                      : content
+                            .map((part) =>
+                                part.type === 'text' || part.type === 'input_text' ? part.text : ''
+                            )
+                            .filter(Boolean)
+                            .join('\n')
+              })
+              .join('\n\n')
+        : instruct.system_prompt
     const finalPrompt = Array.isArray(promptObject)
         ? {
               [config.request.promptKey]: promptObject.filter(
-                  (item) => item.role !== systemRole && item['content']
+                  (item) => item.role !== systemRole && item[contentName]
               ),
           }
         : prompt
@@ -161,41 +179,28 @@ const hordeRequest = async ({ payloadFields, model, stop, prompt, custom }: Fiel
     }
 }
 
-const customRequest = async (
+const customRequest = (
     config: APIConfiguration,
     values: APIValues,
-    { stop, prompt }: Field
+    samplers: SamplerConfigData,
+    stopSequence: string[],
+    prompt: string | Message[]
 ) => {
-    if (config.payload.type !== 'custom') return {}
-    const modelName = getModelName(config, values)
-
-    let length = 0
-
-    const sampler = getCurrentSampler()
-
-    if (config.model.useModelContextLength) {
-        length = getModelContextLength(config, values) ?? 0
-    } else {
-        length = sampler[SamplerID.CONTEXT_LENGTH]
+    if (config.payload.type !== 'custom') return ''
+    const replacements = new Map<string, string>([
+        ['{{generated_length}}', String(samplers[SamplerID.GENERATED_LENGTH])],
+        ['{{stop}}', JSON.stringify(stopSequence)],
+        ['{{prompt}}', typeof prompt === 'string' ? prompt : JSON.stringify(prompt)],
+        ['{{model}}', String(getModelName(config, values) ?? '')],
+    ])
+    for (const field of config.request.samplerFields) {
+        replacements.set(Samplers[field.samplerID].macro, String(samplers[field.samplerID] ?? ''))
     }
-
-    const responseBody = config.payload.customPayload
-
-    responseBody.replaceAll('{{generated_length}}', `${length}`)
-
-    config.request.samplerFields.map((item) => {
-        responseBody.replaceAll(
-            Samplers[item.samplerID].macro,
-            sampler?.[item.samplerID]?.toString() ?? ''
-        )
-    })
-    responseBody.replaceAll('{{stop}}', stop.toString())
-    responseBody.replaceAll(
-        '{{prompt}}',
-        typeof prompt === 'object' ? JSON.stringify(prompt) : prompt
+    // One pass: macro-like text inside the prompt must not be expanded a second time.
+    return config.payload.customPayload.replace(
+        /\{\{[^{}]+\}\}/g,
+        (macro) => replacements.get(macro) ?? macro
     )
-    responseBody.replaceAll('{{model}}', modelName.toString())
-    return responseBody
 }
 
 type Field = Awaited<ReturnType<typeof buildFields>>
@@ -221,7 +226,12 @@ const buildFields = async (
         (item) => item.samplerID === SamplerID.SEED
     )
 
-    if (seedObject[0] && config.request.removeSeedifNegative) {
+    if (
+        seedObject[0] &&
+        config.request.removeSeedifNegative &&
+        typeof payloadFields[seedObject[0].externalName] === 'number' &&
+        (payloadFields[seedObject[0].externalName] as number) < 0
+    ) {
         delete payloadFields?.[seedObject?.[0].externalName]
     }
 
@@ -243,6 +253,13 @@ const buildFields = async (
         ? Math.min(modelLength, instructLength)
         : instructLength
 
+    if (
+        !config.request.removeLength &&
+        contextLengthObject[0] &&
+        typeof instructLengthField === 'number'
+    ) {
+        payloadFields[contextLengthObject[0].externalName] = length
+    }
     const prompt = { [config.request.promptKey]: promptData }
 
     const custom = values.customFields ? buildCustomFields(values.customFields) : {}
@@ -326,8 +343,8 @@ const getSamplerFields = (
             if (typeof value === 'number') {
                 const type = samplerItem.values.type
                 if (
-                    type === 'float' ||
-                    (type === 'integer' && value === samplerItem.values.ignoreIf)
+                    (type === 'float' || type === 'integer') &&
+                    value === samplerItem.values.ignoreIf
                 ) {
                     return {}
                 }

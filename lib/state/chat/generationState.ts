@@ -3,6 +3,7 @@ import { create } from 'zustand'
 type AbortGeneration = () => void | Promise<void>
 
 type GenerationState = {
+    generationId: number
     isGenerating: boolean
     currentSwipeId?: number
     abortFunction?: AbortGeneration
@@ -12,9 +13,15 @@ type GenerationState = {
 }
 
 export const useGenerationState = create<GenerationState>((set) => ({
+    generationId: 0,
     isGenerating: false,
     startGenerating: (currentSwipeId) =>
-        set({ currentSwipeId: currentSwipeId, isGenerating: true, abortFunction: undefined }),
+        set((state) => ({
+            generationId: state.generationId + 1,
+            currentSwipeId: currentSwipeId,
+            isGenerating: true,
+            abortFunction: undefined,
+        })),
     reset: () => set({ isGenerating: false, currentSwipeId: undefined, abortFunction: undefined }),
     setAbort: (abortFunction) => set({ abortFunction }),
 }))

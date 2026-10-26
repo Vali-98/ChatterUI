@@ -1,3 +1,4 @@
+import { Tokenizer } from '@lib/engine/Tokenizer'
 import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { Chats } from '@lib/state/chat'
 import { replaceMacros } from '@lib/state/Macros'
@@ -48,8 +49,9 @@ export const createExampleDataSource = (): DataSource => ({
 })
 
 const AUTHOR_NOTE_NAME = 'author_notes'
-const createAuthorNotesDataSource = async (): Promise<DataSource | undefined> => {
-    const { id: chatId } = Chats.useChatState.getState()
+const createAuthorNotesDataSource = async (
+    chatId = Chats.useChatState.getState().id
+): Promise<DataSource | undefined> => {
     if (!chatId) return
     const chatData = await Chats.db.query.chatRow(chatId)
     if (!chatData) return
@@ -58,16 +60,19 @@ const createAuthorNotesDataSource = async (): Promise<DataSource | undefined> =>
     const activeNotes = await AuthorNotes.db.query.getActiveNotes(characterId, chatId)
     if (!activeNotes || activeNotes.length === 0) return
 
-    const tokenTotal = activeNotes.reduce((a, b) => a + (b.token_length ?? 0), 0)
-    const dataSourceResults: DataSourceResult[] = activeNotes.map((item) => ({
-        content: replaceMacros(item.content),
-        source: AUTHOR_NOTE_NAME,
-        tokenLength: item.token_length ?? 0,
-        position: {
-            type: 'index',
-            location: item.depth ?? 0,
-        },
-    }))
+    const tokenize = Tokenizer.getTokenizer()
+    const dataSourceResults: DataSourceResult[] = await Promise.all(
+        activeNotes.map(async (item) => {
+            const content = replaceMacros(item.content)
+            return {
+                content: content,
+                source: AUTHOR_NOTE_NAME,
+                tokenLength: await tokenize(content),
+                position: { type: 'index' as const, location: item.depth ?? 0 },
+            }
+        })
+    )
+    const tokenTotal = dataSourceResults.reduce((total, item) => total + item.tokenLength, 0)
 
     return {
         name: AUTHOR_NOTE_NAME,
@@ -79,9 +84,9 @@ const createAuthorNotesDataSource = async (): Promise<DataSource | undefined> =>
     }
 }
 
-export const getDataSources = async (): Promise<DataSource[]> => {
+export const getDataSources = async (chatId?: number): Promise<DataSource[]> => {
     let dataSources = [createExampleDataSource()]
-    const authorNotesSource = await createAuthorNotesDataSource()
+    const authorNotesSource = await createAuthorNotesDataSource(chatId)
     if (authorNotesSource) dataSources.push(authorNotesSource)
 
     const lorebooks = await createLorebookDataSource()

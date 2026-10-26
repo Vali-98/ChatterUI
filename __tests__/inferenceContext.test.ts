@@ -1,0 +1,218 @@
+import {
+    collectContext,
+    buildChatCompletionContext,
+    ContextBuilderParams,
+    getSystemPrompt,
+} from '../lib/engine/API/ContextBuilder'
+import { defaultTemplates } from '../lib/engine/API/DefaultAPI'
+import type { DataSource, DataSourceResult } from '../lib/engine/DataSources/types'
+import type { CharacterCard } from '../lib/state/characters/types'
+import type { ChatMessage } from '../lib/state/chat/types'
+import type { InstructType } from '../lib/state/Instructs'
+import { Logger } from '../lib/state/Logger'
+
+jest.mock('i18next', () => ({ t: (key: string) => key }))
+
+jest.mock('../lib/hooks/TextFilter', () => ({
+    useTextFilterStore: { getState: () => ({ sendFilteredText: true, filter: [] }) },
+}))
+jest.mock('../lib/markdown/ThinkTags', () => ({ buildThinkRules: () => [] }))
+jest.mock('../lib/state/AppMode', () => ({
+    useAppModeStore: { getState: () => ({ appMode: 'remote' }) },
+}))
+jest.mock('../lib/state/Instructs', () => ({ defaultSystemPromptFormat: '{{system_prompt}}' }))
+jest.mock('../lib/state/Logger', () => ({
+    Logger: { info: jest.fn(), warn: jest.fn(), warnToast: jest.fn(), errorToast: jest.fn() },
+}))
+jest.mock('../lib/state/Macros', () => ({
+    getActiveMacros: () => ({ char: 'Character', user: 'User' }),
+    replaceMacros: (text: string) =>
+        jest
+            .requireActual('../lib/utils/Macros')
+            .applyMacros(text, { char: 'Character', user: 'User' }),
+}))
+jest.mock('../lib/storage/MMKV', () => ({ mmkv: { getBoolean: () => false } }))
+jest.mock('../lib/utils/File', () => ({ readBase64Async: jest.fn() }))
+
+const message = (text: string, id: number): ChatMessage => ({
+    id,
+    chat_id: 1,
+    is_user: true,
+    name: 'User',
+    order: 0,
+    swipe_id: 0,
+    attachments: [],
+    swipes: [
+        {
+            id,
+            entry_id: id,
+            swipe: text,
+            active: true,
+            token_length: null,
+            reset_length: null,
+            timings: null,
+            send_date: new Date(),
+            gen_started: new Date(),
+            gen_finished: new Date(),
+        },
+    ],
+})
+const parameters = (): ContextBuilderParams & { mode: 'chat' } => ({
+    apiConfig: defaultTemplates[0],
+    apiValues: { ...defaultTemplates[0].defaultValues, configName: 'OpenAI' },
+    character: { name: 'Character' } as CharacterCard,
+    user: { name: 'User' } as CharacterCard,
+    instruct: {
+        system_prompt_format: '',
+        system_prompt: '',
+        timestamp: false,
+        names: false,
+        hide_think_tags: false,
+    } as InstructType,
+    messages: [message('old', 1), message('new', 2)],
+    mode: 'chat',
+    maxLength: 100,
+    tokenizer: async (text) => text.length,
+    chatTokenizer: async (entry) => entry.swipes[0].swipe.length,
+    cache: {
+        characterCounts: {
+            descriptionTokens: 30,
+            personalityTokens: 0,
+            scenarioTokens: 0,
+            exampleTokens: 0,
+            otherParticipantName: 'User',
+        },
+        userCounts: {
+            descriptionTokens: 20,
+            personalityTokens: 0,
+            scenarioTokens: 0,
+            exampleTokens: 0,
+            otherParticipantName: 'Character',
+        },
+        instructCache: {
+            characterName: 'Character',
+            userName: 'User',
+            system_prompt_length: 10,
+            system_prefix_length: 0,
+            system_suffix_length: 2,
+            input_prefix_length: 0,
+            input_suffix_length: 0,
+            output_prefix_length: 0,
+            output_suffix_length: 0,
+            last_output_prefix_length: 0,
+            user_alignment_message_length: 0,
+        },
+    },
+})
+
+const source = (content: string, position: DataSourceResult['position']): DataSource => ({
+    name: content,
+    priority: 1,
+    tokenBudget: 0,
+    retrieve: jest.fn(async () => [
+        { content, position, source: content, tokenLength: content.length },
+    ]),
+})
+
+test('data sources receive chronological history and relative insertion locations remain chronological', async () => {
+    const params = parameters()
+    const first = source('after', { type: 'relative', location: 'afterLast' })
+    params.dataSources = [first]
+    const result = await collectContext(params)
+    expect(jest.mocked(first.retrieve).mock.calls[0][1].map((item) => item.content)).toEqual([
+        'old',
+        'new',
+    ])
+    expect(result.messages.map((item) => item.content)).toEqual(['old', 'new', 'after'])
+    params.dataSources = [source('before', { type: 'relative', location: 'beforeLast' })]
+    expect((await collectContext(params)).messages.map((item) => item.content)).toEqual([
+        'old',
+        'before',
+        'new',
+    ])
+})
+
+test('indexed insertion is a depth counted from the newest message', async () => {
+    const params = parameters()
+    params.dataSources = [source('note', { type: 'index', location: 1 })]
+    expect((await collectContext(params)).messages.map((item) => item.content)).toEqual([
+        'old',
+        'note',
+        'new',
+    ])
+    params.dataSources = [source('note', { type: 'index', location: 100 })]
+    expect((await collectContext(params)).messages.map((item) => item.content)).toEqual([
+        'note',
+        'old',
+        'new',
+    ])
+})
+
+test('reserved tokens are charged once and unused reservation is available to later sources', async () => {
+    const params = parameters()
+    params.maxLength = 13
+    const reserved = source('note', { type: 'relative', location: 'afterSystem' })
+    reserved.tokenBudget = 4
+    const later = source('ok', { type: 'relative', location: 'afterLast' })
+    later.priority = 2
+    params.dataSources = [reserved, later]
+    const result = await collectContext(params)
+    expect(result.messages.map((item) => item.content)).toEqual(['old', 'new', 'ok'])
+    expect(result.systemPrompt).toBe('\nnote')
+})
+
+test('a source cannot exceed the remaining budget', async () => {
+    const params = parameters()
+    params.maxLength = 7
+    params.dataSources = [source('too long', { type: 'relative', location: 'afterLast' })]
+    expect((await collectContext(params)).messages.map((item) => item.content)).toEqual([
+        'old',
+        'new',
+    ])
+})
+
+test('budgeting accounts for macro-expanded message text and literal system text', async () => {
+    const params = parameters()
+    params.instruct.system_prompt_format = 'literal'
+    params.messages = [message('{{char}}', 1)]
+    params.maxLength = 15 // 7 literal characters + 9 expanded name characters do not fit.
+    expect((await collectContext(params)).messages).toEqual([])
+})
+
+test('system prompt cache counts only referenced slots, including repeated slots', () => {
+    const params = parameters()
+    params.instruct.system_prompt_format = '{{system_prompt}}{{system_prompt}}'
+    params.instruct.system_prompt = 'system'
+    const result = getSystemPrompt({
+        ...params,
+        ...params.cache,
+        usePrefix: false,
+        useSuffix: false,
+    })
+    expect(result.systemPrompt).toBe('systemsystem')
+    expect(result.systemPromptLength).toBe(20)
+})
+
+test('chat payloads honor the configured provider role names', async () => {
+    const params = parameters()
+    params.apiConfig = JSON.parse(JSON.stringify(params.apiConfig))
+    params.apiConfig.request.completionType = {
+        type: 'chatCompletions',
+        userRole: 'USER',
+        assistantRole: 'CHATBOT',
+        systemRole: 'SYSTEM',
+        contentName: 'message',
+    }
+    params.messages[1].is_user = false
+    const result = await buildChatCompletionContext(params)
+    expect(result?.map((item) => item.role)).toEqual(['SYSTEM', 'USER', 'CHATBOT'])
+})
+
+test('an oversized system prompt warns and still produces a payload', async () => {
+    const params = parameters()
+    params.maxLength = 1
+    params.instruct.system_prompt_format = 'A system prompt longer than the budget'
+    const result = await buildChatCompletionContext(params)
+    expect(result?.[0].content).toBe(params.instruct.system_prompt_format)
+    expect(Logger.warnToast).toHaveBeenCalledWith('generation.warn.systemPromptExceedsContext')
+})

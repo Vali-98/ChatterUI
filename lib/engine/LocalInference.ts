@@ -16,14 +16,17 @@ import { getCurrentSampler } from '@lib/state/samplerStore'
 import { useTTSStore } from '@lib/state/TTS'
 import { mmkv } from '@lib/storage/MMKV'
 
+import type { CompletionReason } from './API/APIBuilder'
 import { APIConfiguration, APISampler, APIValues } from './API/APIBuilder.types'
 import {
     buildChatCompletionContext,
     buildTextCompletionContext,
     ContextBuilderParams,
 } from './API/ContextBuilder'
+import { getDataSources } from './DataSources'
 import { Llama, LlamaConfig } from './Local/LlamaLocal'
 import { KV, Model } from './Local/Model'
+import { createStopFilter } from './stopSequenceFilter'
 
 export const localSamplerData: APISampler[] = [
     { externalName: 'n_predict', samplerID: SamplerID.GENERATED_LENGTH },
@@ -71,7 +74,7 @@ const getSamplerFields = (max_length?: number) => {
         .reduce((acc, obj) => Object.assign(acc, obj), {})
 }
 
-const buildLocalPayload = async () => {
+const buildLocalPayload = async (chatId?: number) => {
     const payloadFields = getSamplerFields()
     const rep_pen = payloadFields?.['penalty_repeat']
     const reasoning = payloadFields?.['enable_thinking'] as boolean
@@ -81,7 +84,7 @@ const buildLocalPayload = async () => {
     let mediaPaths: string[] = []
     const context = Llama.useLlamaModelStore.getState().context
 
-    const fields = await obtainFields()
+    const fields = await obtainFields(chatId)
 
     if (!fields) {
         return Logger.error('Failed to build fields')
@@ -89,7 +92,12 @@ const buildLocalPayload = async () => {
 
     const { apiConfig, ...rest } = fields
 
-    const completionType = apiConfig.request.completionType
+    const completionType = { ...apiConfig.request.completionType }
+    apiConfig.request.completionType = completionType
+    if (completionType.type === 'chatCompletions') {
+        completionType.supportsAudio = false
+        completionType.supportsImages = false
+    }
     if (context && (await context.isMultimodalEnabled())) {
         const mtmdSupport = await context.getMultimodalSupport()
         if (completionType.type === 'chatCompletions') {
@@ -113,7 +121,6 @@ const buildLocalPayload = async () => {
                         enable_thinking: reasoning,
                     })
                 if (typeof result === 'string') prompt = result
-                // Currently not used since we dont pass in { jinja: true }
                 else if (typeof result === 'object') {
                     prompt = result.prompt
                     mediaPaths = result.media_paths ?? []
@@ -186,11 +193,6 @@ const constructStopSequence = (): string[] => {
     return Instructs.useInstruct.getState().getStopSequence()
 }
 
-const stopGenerating = () => {
-    // kept this helper for extendability
-    Chats.actions.finishGeneration()
-}
-
 const constructReplaceStrings = (): string[] => {
     // default stop strings defined instructs
     const stops: string[] = constructStopSequence()
@@ -237,125 +239,119 @@ const verifyModelLoaded = async (): Promise<boolean> => {
     return true
 }
 
-export const localInference = async () => {
+export const localInference = async (generationId = useGenerationState.getState().generationId) => {
+    let reason: CompletionReason = 'failed'
+    const cancelled = () => reason === 'cancelled'
+    let cancelDecision: (() => void) | undefined
+    const current = () => {
+        const state = useGenerationState.getState()
+        return state.isGenerating && state.generationId === generationId
+    }
+    if (!current()) return
+    const swipeId = useGenerationState.getState().currentSwipeId
+    const chatId = swipeId === undefined ? undefined : Chats.db.query.swipeContext(swipeId)?.chat_id
+    const stop = (reason: CompletionReason) =>
+        Chats.actions.finishGeneration({
+            generationId: generationId,
+            notify: reason === 'completed',
+        })
+    useGenerationState.getState().setAbort(() => {
+        reason = 'cancelled'
+        cancelDecision?.()
+    })
     try {
-        // Model Loading Routine
-        if (!(await verifyModelLoaded())) {
-            return stopGenerating()
-        }
-
-        // verify that model has been loaded
+        if (!(await verifyModelLoaded()) || cancelled() || !current()) return
         const context = Llama.useLlamaModelStore.getState().context
-
         if (!context) {
             Logger.warnToast(t('model.toast.noModelLoaded'))
-            stopGenerating()
             return
         }
-
-        const payload = await buildLocalPayload()
-
+        const payload = await buildLocalPayload(chatId)
+        if (cancelled() || !current()) return
         if (!payload) {
             Logger.warnToast(t('generation.errors.failedToBuildPayload'))
-            stopGenerating()
             return
         }
-
         if (mmkv.getBoolean(AppSettings.SaveLocalKV) && !KV.useKVStore.getState().kvCacheLoaded) {
             const prompt = await Llama.useLlamaModelStore
                 .getState()
                 .tokenize(payload.prompt, payload.media_paths)
+            if (cancelled() || !current()) return
             const result = KV.useKVStore.getState().verifyKVCache(prompt?.tokens ?? [])
             if (!result.match) {
-                Alert.alert({
-                    title: 'Cache Mismatch',
-                    description: `KV Cache does not match current prompt:\n\n${result.matchLength} of ${result.cachedLength} tokens are identical.\n\nPress 'Load Anyway' if you don't mind losing the cache.`,
-                    buttons: [
-                        { label: 'Cancel', onPress: stopGenerating },
-                        {
-                            label: 'Load Anyway',
-                            onPress: async () => {
-                                Logger.warn('Overriding KV Cache despite mismatch')
-                                const result = await Llama.useLlamaModelStore.getState().loadKV()
-                                if (result) {
-                                    KV.useKVStore.getState().setKvCacheLoaded(true)
-                                }
-                                runLocalCompletion(payload)
-                            },
-                            type: 'warning',
-                        },
-                    ],
-                    onDismiss: stopGenerating,
+                const proceed = await new Promise<boolean>((resolve) => {
+                    cancelDecision = () => resolve(false)
+                    Alert.alert({
+                        title: 'Cache Mismatch',
+                        description: `KV Cache does not match current prompt:\n\n${result.matchLength} of ${result.cachedLength} tokens are identical.\n\nPress 'Load Anyway' if you don't mind losing the cache.`,
+                        buttons: [
+                            { label: 'Cancel', onPress: () => resolve(false) },
+                            { label: 'Load Anyway', onPress: () => resolve(true), type: 'warning' },
+                        ],
+                        onDismiss: () => resolve(false),
+                    })
                 })
-                return
+                cancelDecision = undefined
+                if (!proceed) {
+                    reason = 'cancelled'
+                    return
+                }
+                if (cancelled() || !current()) return
             }
-
-            const kvloadResult = await Llama.useLlamaModelStore.getState().loadKV()
-            if (kvloadResult) {
-                KV.useKVStore.getState().setKvCacheLoaded(true)
-            }
+            const loaded = await Llama.useLlamaModelStore.getState().loadKV()
+            if (loaded) KV.useKVStore.getState().setKvCacheLoaded(true)
         }
-        await runLocalCompletion(payload)
-    } catch (e) {
-        Logger.errorToast(t('model.toast.failedToRunLocalInference'), e)
-        stopGenerating()
+        if (cancelled() || !current()) return
+        useGenerationState.getState().setAbort(async () => {
+            reason = 'cancelled'
+            await Llama.useLlamaModelStore.getState().stopCompletion()
+        })
+        await runLocalCompletion(payload, current)
+        if (!cancelled()) reason = 'completed'
+    } catch (error) {
+        if (!cancelled()) Logger.errorToast(t('model.toast.failedToRunLocalInference'), error)
+    } finally {
+        await stop(reason)
     }
 }
 
 const runLocalCompletion = async (
-    payload: NonNullable<Awaited<ReturnType<typeof buildLocalPayload>>>
+    payload: NonNullable<Awaited<ReturnType<typeof buildLocalPayload>>>,
+    current: () => boolean
 ) => {
-    const stopRegex = RegExp(
-        constructReplaceStrings()
-            .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-            .join(`|`),
-        'g'
-    )
-
-    const cleanStopString = (text: string) => {
-        return text.replaceAll(stopRegex, '')
-    }
-
-    useGenerationState.getState().setAbort(async () => {
-        await Llama.useLlamaModelStore.getState().stopCompletion()
-    })
-
+    const filter = createStopFilter(constructReplaceStrings())
     let reasoningMode = false
-    const outputStream = (text: string) => {
-        const cleaned = cleanStopString(text)
-        Chats.useChatState.getState().insertToBuffer(cleanStopString(text))
-        /**
-         * @TODO implement think seperation for TTS
-         */
+    const appendOutput = (cleaned: string) => {
+        if (!current() || !cleaned) return
+        Chats.useChatState.getState().insertToBuffer(cleaned)
         if (reasoningMode) {
-            if (isCloseThinkTag(cleaned)) {
-                reasoningMode = false
-            }
+            if (isCloseThinkTag(cleaned)) reasoningMode = false
             return
         }
-
         if (isOpenThinkTag(cleaned)) {
-            reasoningMode = true
+            reasoningMode = !isCloseThinkTag(cleaned)
             return
         }
-        useTTSStore.getState().insertBuffer(cleanStopString(text))
+        useTTSStore.getState().insertBuffer(cleaned)
     }
-
+    const outputStream = (text: string) => appendOutput(filter.push(text))
     const outputCompleted = (text: string, timings: CompletionTimings) => {
+        if (!current()) return
         Chats.useChatState.getState().setBufferTimings(timings)
         if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(`Completion Output:\n${text}`)
-        stopGenerating()
     }
-
     const engineData = Llama.useLlamaPreferencesStore.getState().config
-
-    await Llama.useLlamaModelStore
-        .getState()
-        .completion({ ...payload, n_threads: engineData.threads }, outputStream, outputCompleted)
-        .catch((error) => {
-            Logger.errorToast(t('model.toast.failedToGenerateLocally'), JSON.stringify(error))
-            stopGenerating()
-        })
+    try {
+        await Llama.useLlamaModelStore
+            .getState()
+            .completion(
+                { ...payload, n_threads: engineData.threads },
+                outputStream,
+                outputCompleted
+            )
+    } finally {
+        appendOutput(filter.flush())
+    }
 }
 
 const localAPIValues: APIValues = {
@@ -429,7 +425,7 @@ const localAPIConfig: APIConfiguration = {
 
 // This is the 'big orchestrator' which compiles fields from
 // the whole app to send inference requests
-const obtainFields = async (): Promise<ContextBuilderParams | void> => {
+const obtainFields = async (targetChatId?: number): Promise<ContextBuilderParams | void> => {
     try {
         const userState = Characters.useUserStore.getState()
         const characterState = Characters.useCharacterState.getState()
@@ -442,12 +438,17 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
             return
         }
 
-        const characterCard = characterState.card
+        const characterCard =
+            targetChatId === undefined
+                ? characterState.card
+                : await Characters.db.query.card(
+                      Chats.db.query.chatRow(targetChatId)?.character_id ?? -1
+                  )
         if (!characterCard) {
             Logger.errorToast(t('generation.errors.noCharacter'))
             return
         }
-        const chatId = await Chats.useChatState.getState().id
+        const chatId = targetChatId ?? Chats.useChatState.getState().id
         if (!chatId) {
             Logger.errorToast(t('generation.errors.noActiveChat'))
             return
@@ -484,7 +485,13 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
             .countTokens(characterCard, userCard)
 
         return {
-            apiConfig: Object.assign({}, apiConfig),
+            apiConfig: {
+                ...apiConfig,
+                request: {
+                    ...apiConfig.request,
+                    completionType: { ...apiConfig.request.completionType },
+                },
+            },
             apiValues: Object.assign({}, apiValues),
 
             instruct: instructState.replacedMacros(),
@@ -498,6 +505,7 @@ const obtainFields = async (): Promise<ContextBuilderParams | void> => {
                 ),
             tokenizer: Llama.useLlamaModelStore.getState().tokenLength,
             maxLength: length,
+            dataSources: await getDataSources(chatId),
             cache: {
                 ...tokenCounts,
                 instructCache: await instructState.getCache(characterCard.name, userCard.name),

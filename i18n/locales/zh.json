@@ -574,7 +574,8 @@
         },
         "warn": {
             "entryWithoutValidSwipeFound": "发现没有有效滑动的条目",
-            "noMessagesAddedCheckLogs": "未添加消息。请检查日志。"
+            "noMessagesAddedCheckLogs": "未添加消息。请检查日志。",
+            "systemPromptExceedsContext": "系统提示词超出可用的上下文长度。"
         }
     },
     "horizontalSelector": {
