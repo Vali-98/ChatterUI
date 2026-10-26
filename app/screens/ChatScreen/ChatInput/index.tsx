@@ -25,11 +25,12 @@ import ContextMenu from '@components/views/ContextMenu'
 import { XAxisOnlyTransition } from '@lib/animations/transitions'
 import { AnimatedTextInput } from '@lib/components/AnimatedComponents'
 import { AppSettings } from '@lib/constants/GlobalValues'
-import { generateResponse } from '@lib/engine/Inference'
+import { useChatGenerating, useCanStartGeneration } from '@lib/engine/generation/hooks'
+import { abortGeneration } from '@lib/engine/generation/runtime'
+import { submitMessage } from '@lib/engine/Inference'
 import { useActiveProvider } from '@lib/hooks/ActiveProvider'
 import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
-import { Characters } from '@lib/state/characters'
-import { Chats, useGenerationState } from '@lib/state/chat'
+import { Chats } from '@lib/state/chat'
 import { useChatInputTextStore } from '@lib/state/components/ChatInput'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -58,64 +59,43 @@ const ChatInput = () => {
     const { available: activeProvider, mode } = useActiveProvider()
     const { color, borderRadius, spacing } = Theme.useTheme()
     const [sendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
-    const [disableSend, setDisableSend] = useState(false)
     const [attachments, setAttachments] = useState<Attachment[]>([])
     const [hideOptions, setHideOptions] = useState(false)
     const cameraSheetRef = useBottomSheetRef()
-    const isGenerating = useGenerationState((state) => state.isGenerating)
     const setHeight = useInputHeightStore((state) => state.setHeight)
 
-    const { characterName } = Characters.useCharacterState(
-        useShallow((state) => ({
-            characterName: state?.card?.name,
-        }))
-    )
-
     const { chatId } = Chats.useChat()
+    const isGenerating = useChatGenerating(chatId)
+    const canGenerate = useCanStartGeneration(chatId)
 
-    const { userName } = Characters.useUserStore(
-        useShallow((state) => ({ userName: state.card?.name }))
-    )
-
-    const { newMessage, setNewMessage } = useChatInputTextStore(
+    const { newMessage, setNewMessage, clearSubmittedText } = useChatInputTextStore(
         useShallow((state) => ({
             newMessage: state.text,
             setNewMessage: state.setText,
+            clearSubmittedText: state.clearSubmittedText,
         }))
     )
 
     const abortResponse = async () => {
         Logger.info(t('chat.input.errors.abortGeneration'))
-        await Chats.actions.abortGeneration()
+        if (chatId !== undefined) await abortGeneration(chatId)
     }
 
     const handleSend = async () => {
         Keyboard.dismiss()
-        if (!chatId || useGenerationState.getState().isGenerating) return
-        setDisableSend(true)
+        if (!chatId || !canGenerate) return
         try {
-            if (newMessage.trim() !== '' || attachments.length > 0) {
-                await Chats.actions.createMessage(chatId, {
-                    name: userName ?? '',
-                    is_user: true,
-                    text: newMessage,
-                    attachmentUris: attachments.map((item) => item.uri),
-                })
-            }
-            const result = await Chats.actions.createMessage(chatId, {
-                name: characterName ?? '',
-                is_user: false,
-                text: '',
+            const accepted = await submitMessage(chatId, {
+                text: newMessage,
+                attachmentUris: attachments.map((item) => item.uri),
             })
-            setNewMessage('')
-            setAttachments([])
-            const swipeId = result.swipes.find((swipe) => swipe.active)?.id
-            if (swipeId !== undefined) generateResponse(swipeId)
+            if (accepted) {
+                clearSubmittedText(chatId, newMessage)
+                setAttachments((current) => current.filter((item) => !attachments.includes(item)))
+            }
         } catch (error) {
             Logger.errorToast(t('chat.input.errors.failedToSend'))
             Logger.error(error)
-        } finally {
-            setDisableSend(false)
         }
     }
 
@@ -358,7 +338,11 @@ const ChatInput = () => {
                 />
                 <Animated.View layout={XAxisOnlyTransition}>
                     <TouchableOpacity
-                        disabled={disableSend || !chatId || !activeProvider}
+                        disabled={
+                            (!canGenerate && !isGenerating) ||
+                            !chatId ||
+                            (!activeProvider && !isGenerating)
+                        }
                         style={{
                             borderRadius: borderRadius.m,
                             backgroundColor: !activeProvider

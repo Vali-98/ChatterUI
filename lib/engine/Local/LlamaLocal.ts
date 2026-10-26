@@ -19,6 +19,8 @@ import { KV, Model, ModelListQueryType } from './Model'
 import { AppSettings } from '../../constants/GlobalValues'
 import { Logger } from '../../state/Logger'
 import { createMMKVStorage, mmkv } from '../../storage/MMKV'
+import { runLocalModelOperation } from '../generation/localResource'
+import { isActiveGeneration, useGenerationState } from '../generation/state'
 
 export type CompletionTimings = {
     predicted_per_token_ms: number
@@ -37,6 +39,18 @@ export type CompletionOutput = {
     timings: CompletionTimings
 }
 
+type ModelAccessOptions = { generationId?: number; config?: LlamaConfig }
+const assertModelAccess = (options: ModelAccessOptions = {}) => {
+    const owner = Object.values(useGenerationState.getState().generations).find(
+        (generation) => generation.mode === 'local' && isActiveGeneration(generation)
+    )
+    if (owner && owner.id !== options.generationId) {
+        const message = t('generation.errors.generationAlreadyInProgress')
+        Logger.warnToast(message)
+        throw new Error(message)
+    }
+}
+
 export type LlamaState = {
     context: LlamaContext | undefined
     model?: ModelDataType
@@ -44,17 +58,17 @@ export type LlamaState = {
     loadProgress: number
     chatCount: number
     promptCache?: string
-    load: (model: ModelListQueryType) => Promise<void>
-    loadMmproj: (model: ModelDataType) => Promise<void>
+    load: (model: ModelListQueryType, options?: ModelAccessOptions) => Promise<void>
+    loadMmproj: (model: ModelDataType, options?: ModelAccessOptions) => Promise<void>
     setLoadProgress: (progress: number) => void
-    unload: () => Promise<void>
-    unloadMmproj: () => Promise<void>
+    unload: (options?: ModelAccessOptions) => Promise<void>
     saveKV: (prompt: string | undefined, media_paths?: string[]) => Promise<void>
     loadKV: () => Promise<boolean>
     completion: (
         params: CompletionParams,
         callback: (text: string) => void,
-        completed: (text: string, timngs: CompletionTimings) => void
+        completed: (text: string, timngs: CompletionTimings) => void,
+        options?: { saveKV: boolean }
     ) => Promise<void>
     stopCompletion: () => Promise<void>
     tokenLength: (text: string, mediaPaths?: string[]) => Promise<number>
@@ -129,84 +143,25 @@ export namespace Llama {
         )
     )
 
-    export const useLlamaModelStore = create<LlamaState>()((set, get) => ({
-        context: undefined,
-        loadProgress: 0,
-        chatCount: 0,
-        promptCache: undefined,
-        load: async (model) => {
-            const config = useLlamaPreferencesStore.getState().config
-
-            if (get()?.model?.id === model.id) {
-                return Logger.errorToast(t('model.toast.modelAlreadyLoaded'))
+    export const useLlamaModelStore = create<LlamaState>()((set, get) => {
+        // Internal steps share their parent queue entry. Calling the public queued methods here
+        // would wait behind the load operation that is awaiting them.
+        const unloadModel = async (options: ModelAccessOptions) => {
+            assertModelAccess(options)
+            if (get().mmproj) {
+                await get().context?.releaseMultimodal()
             }
 
-            if (checkGGMLDeprecated(parseInt(model.quantization))) {
-                return Logger.errorToast(t('model.toast.quantizationNoLongerSupported'))
-            }
-
-            if (!(await Model.getModelExists(model.file_path))) {
-                Logger.errorToast(t('model.toast.modelDoesNotExist'))
-                Model.verifyModelList()
-                return
-            }
-
-            if (get().context !== undefined) {
-                await get().unload()
-            }
-
-            let model_path = model.file_path
-            if (model.file_path.includes('content://')) {
-                model_path = (await getContentFd(model_path)) ?? model_path
-            }
-
-            const params: ContextParams = {
-                model: model_path,
-                n_ctx: config.context_length,
-                n_threads: config.threads,
-                n_batch: config.batch,
-                ctx_shift: config.ctx_shift,
-                n_gpu_layers: config.gpu_layers,
-                use_mlock: true,
-                use_mmap: true,
-                devices: config.devices,
-            }
-
-            Logger.info(
-                `\n------ MODEL LOAD -----\n Model Name: ${model.name}\nStarting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}\nGPU Layers: ${params.n_gpu_layers}`
-            )
-
-            const progressCallback = (progress: number) => {
-                if (progress % 5 === 0) get().setLoadProgress(progress)
-            }
-
-            const llamaContext = await initLlama(params, progressCallback).catch((error) => {
-                Logger.errorToast(t('model.toast.couldNotLoadModel'), JSON.stringify(error))
-                if (model.file_path.includes('content://')) {
-                    closeFd(model_path)
-                }
-            })
-
-            if (!llamaContext) return
-
+            await get().context?.release()
             set({
-                context: llamaContext,
-                model: model,
-                chatCount: 1,
+                context: undefined,
+                model: undefined,
+                mmproj: undefined,
             })
-
-            if (model.mmprojLink) {
-                const mmproj = await Model.getModel(model.mmprojLink.mmproj_id)
-                if (mmproj) {
-                    get().loadMmproj(mmproj)
-                }
-            }
-
-            // updated EngineData
-            useLlamaPreferencesStore.getState().setLastModelLoaded(model)
-            KV.useKVStore.getState().setKvCacheLoaded(false)
-        },
-        loadMmproj: async (model: ModelDataType) => {
+            Logger.info('Model Unloaded')
+        }
+        const loadProjector = async (model: ModelDataType, options: ModelAccessOptions) => {
+            assertModelAccess(options)
             const context = get().context
             if (!context) return
 
@@ -233,130 +188,196 @@ export namespace Llama {
             set({
                 mmproj: model,
             })
-        },
-        setLoadProgress: (progress: number) => {
-            set({ loadProgress: progress })
-        },
-        unload: async () => {
-            if (get().mmproj) {
-                await get().context?.releaseMultimodal()
-            }
+        }
+        return {
+            context: undefined,
+            loadProgress: 0,
+            chatCount: 0,
+            promptCache: undefined,
+            load: (model, options = {}) =>
+                runLocalModelOperation(async () => {
+                    assertModelAccess(options)
+                    const config = options.config ?? useLlamaPreferencesStore.getState().config
 
-            await get().context?.release()
-            set({
-                context: undefined,
-                model: undefined,
-                mmproj: undefined,
-            })
-            Logger.info('Model Unloaded')
-        },
-        unloadMmproj: async () => {
-            if (!get().mmproj) return
-            await get()
-                .context?.releaseMultimodal()
-                .catch((e) => {
-                    Logger.errorToast(t('model.toast.failedToUnloadMMPROJ'), e)
-                })
-            set({
-                mmproj: undefined,
-            })
-        },
-        completion: async (
-            params: CompletionParams,
-            callback = (text: string) => {},
-            completed = (text: string) => {}
-        ) => {
-            const llamaContext = get().context
-            if (llamaContext === undefined) {
-                Logger.errorToast(t('model.toast.noModelLoaded'))
-                return
-            }
-
-            return llamaContext
-                .completion(params, (data) => {
-                    callback(data.token)
-                })
-                .then(async ({ text, timings }: CompletionOutput) => {
-                    completed(text, timings)
-                    Logger.info(
-                        `\n---- Start Chat ${get().chatCount} ----\n${textTimings(timings)}\n---- End Chat ${get().chatCount} ----\n`
-                    )
-                    set({ chatCount: get().chatCount + 1 })
-                    if (mmkv.getBoolean(AppSettings.SaveLocalKV)) {
-                        await get().saveKV(params.prompt, params.media_paths ?? [])
+                    if (get()?.model?.id === model.id) {
+                        return Logger.errorToast(t('model.toast.modelAlreadyLoaded'))
                     }
-                })
-        },
-        stopCompletion: async () => {
-            await get().context?.stopCompletion()
-        },
-        saveKV: async (prompt, media_paths) => {
-            const llamaContext = get().context
-            if (!llamaContext) {
-                Logger.errorToast(t('model.toast.noModelLoaded'))
-                return
-            }
 
-            if (prompt) {
-                const tokens = (await get().tokenize(prompt, media_paths ?? []))?.tokens
-                KV.useKVStore.getState().setKvCacheTokens(tokens ?? [])
-            }
+                    if (checkGGMLDeprecated(parseInt(model.quantization))) {
+                        return Logger.errorToast(t('model.toast.quantizationNoLongerSupported'))
+                    }
 
-            if (!fileExists(sessionFile)) {
-                Logger.warn('Session file does not exist, creating...')
-                await writeBase64File(sessionFile, '')
-            }
+                    if (!(await Model.getModelExists(model.file_path))) {
+                        Logger.errorToast(t('model.toast.modelDoesNotExist'))
+                        Model.verifyModelList()
+                        return
+                    }
 
-            const now = performance.now()
-            const data = await llamaContext.saveSession(sessionFile.replace('file://', ''))
-            Logger.info(
-                data === -1
-                    ? 'Failed to save KV cache'
-                    : `Saved KV in ${Math.floor(performance.now() - now)}ms with ${data} tokens`
-            )
-            Logger.info(`Current KV Size is: ${readableFileSize(await KV.getKVSize())}`)
-        },
-        loadKV: async () => {
-            let result = false
-            const llamaContext = get().context
-            if (!llamaContext) {
-                Logger.errorToast(t('model.toast.noModelLoaded'))
-                return false
-            }
-            if (!fileExists(sessionFile)) {
-                Logger.warn('No Cache found')
-                return false
-            }
-            await llamaContext
-                .loadSession(sessionFile.replace('file://', ''))
-                .then(() => {
-                    Logger.info('Session loaded from KV cache')
-                    result = true
-                })
-                .catch(() => {
-                    Logger.error('Session loaded could not load from KV cache')
-                })
-            return result
-        },
-        tokenLength: async (text: string, mediaPaths: string[] = []) => {
-            const finalPaths = get().mmproj ? mediaPaths : []
-            if (!get().mmproj && mediaPaths.length > 0) {
-                Logger.warnToast(t('model.toast.mediaAddedWithoutMMPROJModel'))
-            }
-            const result = await get().context?.tokenize(
-                text + finalPaths.map(() => RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER).join(),
-                {
-                    media_paths: finalPaths.map((item) => item.replace('file://', '')),
+                    assertModelAccess(options)
+                    if (get().context !== undefined) {
+                        await unloadModel(options)
+                    }
+
+                    let model_path = model.file_path
+                    if (model.file_path.includes('content://')) {
+                        model_path = (await getContentFd(model_path)) ?? model_path
+                    }
+
+                    const params: ContextParams = {
+                        model: model_path,
+                        n_ctx: config.context_length,
+                        n_threads: config.threads,
+                        n_batch: config.batch,
+                        ctx_shift: config.ctx_shift,
+                        n_gpu_layers: config.gpu_layers,
+                        use_mlock: true,
+                        use_mmap: true,
+                        devices: config.devices,
+                    }
+
+                    Logger.info(
+                        `\n------ MODEL LOAD -----\n Model Name: ${model.name}\nStarting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}\nGPU Layers: ${params.n_gpu_layers}`
+                    )
+
+                    const progressCallback = (progress: number) => {
+                        if (progress % 5 === 0) get().setLoadProgress(progress)
+                    }
+
+                    const llamaContext = await initLlama(params, progressCallback).catch(
+                        (error) => {
+                            Logger.errorToast(
+                                t('model.toast.couldNotLoadModel'),
+                                JSON.stringify(error)
+                            )
+                            if (model.file_path.includes('content://')) {
+                                closeFd(model_path)
+                            }
+                        }
+                    )
+
+                    if (!llamaContext) return
+
+                    set({
+                        context: llamaContext,
+                        model: model,
+                        chatCount: 1,
+                    })
+
+                    if (model.mmprojLink) {
+                        const mmproj = await Model.getModel(model.mmprojLink.mmproj_id)
+                        if (mmproj) {
+                            await loadProjector(mmproj, options)
+                        }
+                    }
+
+                    // updated EngineData
+                    useLlamaPreferencesStore.getState().setLastModelLoaded(model)
+                    KV.useKVStore.getState().setKvCacheLoaded(false)
+                }),
+            loadMmproj: (model, options = {}) =>
+                runLocalModelOperation(() => loadProjector(model, options)),
+            setLoadProgress: (progress: number) => {
+                set({ loadProgress: progress })
+            },
+            unload: (options = {}) => runLocalModelOperation(() => unloadModel(options)),
+            completion: async (
+                params: CompletionParams,
+                callback = (text: string) => {},
+                completed = (text: string) => {},
+                options = { saveKV: !!mmkv.getBoolean(AppSettings.SaveLocalKV) }
+            ) => {
+                const llamaContext = get().context
+                if (llamaContext === undefined) {
+                    Logger.errorToast(t('model.toast.noModelLoaded'))
+                    return
                 }
-            )
-            if (!result) return 0
-            return result.tokens.length
-        },
-        tokenize: async (text: string, media_paths: string[] = []) => {
-            const params = get().mmproj ? { media_paths } : {}
-            return await get().context?.tokenize(text, params)
-        },
-    }))
+
+                return llamaContext
+                    .completion(params, (data) => {
+                        callback(data.token)
+                    })
+                    .then(async ({ text, timings }: CompletionOutput) => {
+                        completed(text, timings)
+                        Logger.info(
+                            `\n---- Start Chat ${get().chatCount} ----\n${textTimings(timings)}\n---- End Chat ${get().chatCount} ----\n`
+                        )
+                        set({ chatCount: get().chatCount + 1 })
+                        if (options.saveKV) {
+                            await get().saveKV(params.prompt, params.media_paths ?? [])
+                        }
+                    })
+            },
+            stopCompletion: async () => {
+                await get().context?.stopCompletion()
+            },
+            saveKV: async (prompt, media_paths) => {
+                const llamaContext = get().context
+                if (!llamaContext) {
+                    Logger.errorToast(t('model.toast.noModelLoaded'))
+                    return
+                }
+
+                if (prompt) {
+                    const tokens = (await get().tokenize(prompt, media_paths ?? []))?.tokens
+                    KV.useKVStore.getState().setKvCacheTokens(tokens ?? [])
+                }
+
+                if (!fileExists(sessionFile)) {
+                    Logger.warn('Session file does not exist, creating...')
+                    await writeBase64File(sessionFile, '')
+                }
+
+                const now = performance.now()
+                const data = await llamaContext.saveSession(sessionFile.replace('file://', ''))
+                Logger.info(
+                    data === -1
+                        ? 'Failed to save KV cache'
+                        : `Saved KV in ${Math.floor(performance.now() - now)}ms with ${data} tokens`
+                )
+                Logger.info(`Current KV Size is: ${readableFileSize(await KV.getKVSize())}`)
+            },
+            loadKV: async () => {
+                let result = false
+                const llamaContext = get().context
+                if (!llamaContext) {
+                    Logger.errorToast(t('model.toast.noModelLoaded'))
+                    return false
+                }
+                if (!fileExists(sessionFile)) {
+                    Logger.warn('No Cache found')
+                    return false
+                }
+                await llamaContext
+                    .loadSession(sessionFile.replace('file://', ''))
+                    .then(() => {
+                        Logger.info('Session loaded from KV cache')
+                        result = true
+                    })
+                    .catch(() => {
+                        Logger.error('Session loaded could not load from KV cache')
+                    })
+                return result
+            },
+            tokenLength: async (text: string, mediaPaths: string[] = []) => {
+                const finalPaths = get().mmproj ? mediaPaths : []
+                if (!get().mmproj && mediaPaths.length > 0) {
+                    Logger.warnToast(t('model.toast.mediaAddedWithoutMMPROJModel'))
+                }
+                const result = await get().context?.tokenize(
+                    text + finalPaths.map(() => RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER).join(),
+                    {
+                        media_paths: finalPaths.map((item) => item.replace('file://', '')),
+                    }
+                )
+                if (!result) return 0
+                return result.tokens.length
+            },
+            tokenize: async (text: string, media_paths: string[] = []) => {
+                const params = get().mmproj ? { media_paths } : {}
+                return await get().context?.tokenize(text, params)
+            },
+        }
+    })
 
     const textTimings = (timings: CompletionTimings) => {
         return (

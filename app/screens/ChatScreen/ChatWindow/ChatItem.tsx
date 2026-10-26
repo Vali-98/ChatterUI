@@ -1,8 +1,9 @@
 import { StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
+import { useChatGenerating } from '@lib/engine/generation/hooks'
 import { useLiveQuerySync } from '@lib/hooks/liveQuery'
-import { Chats, useGenerationState } from '@lib/state/chat'
+import { Chats } from '@lib/state/chat'
 
 import ChatBubble from './ChatBubble'
 import ChatFrame from './ChatFrame'
@@ -39,7 +40,6 @@ const ChatItemBody: React.FC<ChatItemBodyProps> = ({
     entrySwipeIds,
     ...rest
 }) => {
-    const isGenerating = useGenerationState((state) => state.isGenerating)
     const { data: entry } = useLiveQuerySync(Chats.db.live.message(entryId), {
         key: ['chat-entry', entryId],
         watch: [
@@ -48,6 +48,8 @@ const ChatItemBody: React.FC<ChatItemBodyProps> = ({
             { table: 'chat_attachment' },
         ],
     })
+
+    const isGenerating = useChatGenerating(entry?.chat_id)
 
     if (!entry || entry.swipes.length === 0) return // this should never be hit
 

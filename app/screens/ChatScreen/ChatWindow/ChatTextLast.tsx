@@ -6,9 +6,11 @@ import Markdown from 'react-native-markdown-display'
 import ThemedButton from '@components/buttons/ThemedButton'
 import AnimatedEllipsis from '@components/text/AnimatedEllipsis'
 import { ChatSwipe } from '@db/schema'
+import { useSwipeGeneration } from '@lib/engine/generation/hooks'
+import { finishGeneration } from '@lib/engine/generation/lifecycle'
 import { useTextFilter } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
-import { Chats, useGenerationState } from '@lib/state/chat'
+import { Logger } from '@lib/state/Logger'
 
 type ChatTextProps = {
     isGenerating: boolean
@@ -19,10 +21,11 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ isGenerating, swipe }) => {
     const { t } = useTranslation()
     const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
 
-    const { buffer } = Chats.useBuffer()
+    const generation = useSwipeGeneration(swipe.id)
+    const buffer = { data: generation?.text ?? swipe.swipe }
     const [showHidden, setShowHidden] = useState(false)
     const viewRef = useRef<View>(null)
-    const currentSwipeId = useGenerationState((state) => state.currentSwipeId)
+    const currentSwipeId = generation?.swipeId
     const animHeight = useAnimatedValue(-1)
     const targetHeight = useRef(-1)
     const firstRender = useRef(true)
@@ -69,10 +72,16 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ isGenerating, swipe }) => {
                     <AnimatedEllipsis />
                 )}
                 <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
-                    {isGenerating && swipe.id === currentSwipeId
-                        ? buffer.data.trim()
-                        : renderedText}
+                    {generation ? buffer.data.trim() : renderedText}
                 </Markdown>
+                {generation?.error && !generation.persisted && (
+                    <ThemedButton
+                        label={t('common.actions.save')}
+                        onPress={() => {
+                            void finishGeneration(generation.id, 'failed').catch(Logger.stackTrace)
+                        }}
+                    />
+                )}
                 {filteredText.found && (
                     <View style={{ flexDirection: 'row' }}>
                         <ThemedButton

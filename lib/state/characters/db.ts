@@ -11,6 +11,7 @@ import {
     chats,
     tags,
 } from '@db/schema'
+import { assertChatEditable } from '@lib/state/chat/access'
 import { Logger } from '@lib/state/Logger'
 
 import { buildBlankCharacterCard } from './schema'
@@ -483,7 +484,13 @@ namespace remove {
     }
 
     export const card = async (characterId: number) => {
-        await database.delete(characters).where(eq(characters.id, characterId))
+        const ownedChats = database
+            .select({ id: chats.id })
+            .from(chats)
+            .where(eq(chats.character_id, characterId))
+            .all()
+        for (const chat of ownedChats) assertChatEditable(chat.id)
+        database.delete(characters).where(eq(characters.id, characterId)).run()
         await database
             .delete(tags)
             .where(

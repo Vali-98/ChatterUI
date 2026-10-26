@@ -1,3 +1,4 @@
+import { acquireChatLease, releaseChatLease, useChatAccessState } from '../lib/state/chat/access'
 import { db } from '../lib/state/chat/db'
 
 // Exercise the production Expo Drizzle adapter against real SQLite when Node provides it.
@@ -79,7 +80,10 @@ const message = (text: string) => ({
 afterAll(() => connection?.close())
 
 describeSQLite('chat database integration', () => {
-    beforeEach(reset)
+    beforeEach(() => {
+        useChatAccessState.setState({ leases: {} })
+        reset()
+    })
 
     test('creates an empty chat without attempting empty bulk inserts', () => {
         const id = db.create.chat({ character_id: 1 })
@@ -231,5 +235,43 @@ describeSQLite('chat database integration', () => {
         expect(db.query.chatRow(id)).toBeUndefined()
         expect(db.query.swipe(swipeId)).toBeUndefined()
         expect(db.query.chatAttachments(id)).toEqual([])
+    })
+})
+
+describeSQLite('chat mutation ownership and turn transactions', () => {
+    beforeEach(() => {
+        useChatAccessState.setState({ leases: {} })
+        reset()
+    })
+    test('a leased chat blocks edits and deletion while its owner can save output', () => {
+        const chatId = db.create.chat({ character_id: 1, messages: [message('original')] })
+        const entry = db.query.chat(chatId)!.messages[0]
+        const swipe = entry.swipes[0]
+        const token = acquireChatLease(chatId)
+        expect(() => db.delete.chat(chatId)).toThrow('busy')
+        expect(() => db.delete.message(entry.id)).toThrow('busy')
+        expect(() => db.update.swipe(swipe.id, { swipe: 'external edit' })).toThrow('busy')
+        expect(() => db.update.activeSwipe(swipe.id)).toThrow('busy')
+        expect(() => db.create.swipe(entry.id, { swipe: 'new' })).toThrow('busy')
+        expect(() => db.update.chat(chatId, { name: 'rename' })).toThrow('busy')
+        expect(() => db.update.chat(chatId, { scroll_offset: 2 })).not.toThrow()
+        expect(() => db.update.swipe(swipe.id, { token_length: 12 })).not.toThrow()
+        db.update.swipe(swipe.id, { swipe: 'owned output' }, { mutationToken: token })
+        expect(db.query.swipe(swipe.id)?.swipe).toBe('owned output')
+        releaseChatLease(chatId, token)
+        expect(() => db.delete.chat(chatId)).not.toThrow()
+    })
+    test('assistant insertion failure rolls back the user message too', () => {
+        const chatId = db.create.chat({ character_id: 1 })
+        connection!.exec(
+            "CREATE TRIGGER fail_swipe BEFORE INSERT ON chat_swipes WHEN NEW.swipe = 'fail' BEGIN SELECT RAISE(ABORT, 'failed assistant'); END"
+        )
+        expect(() =>
+            db.create.turn(chatId, {
+                user: { ...message('hello'), is_user: true },
+                assistant: message('fail'),
+            })
+        ).toThrow()
+        expect(db.query.chat(chatId)?.messages).toEqual([])
     })
 })

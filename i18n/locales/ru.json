@@ -796,6 +796,8 @@
         "chat": {
             "askInChatterUI": "Спросить в ChatterUI",
             "askInChatterUIDescription": "Используйте подсказки ChatterUI для определения намерения текста вместо поведения клавиатуры по умолчанию.",
+            "concurrentGenerations": "Параллельная генерация",
+            "concurrentGenerationsDescription": "Разрешить одновременную удалённую генерацию в разных чатах. Локальная генерация всегда выполняется по одной.",
             "autoGenerateTitles": "Автоматически создавать названия чатов",
             "autoGenerateTitlesDescription": "Автоматически создавайте названия для новых чатов.",
             "autoLoadUser": "Автоматически загружать выбранного пользователя",

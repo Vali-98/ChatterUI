@@ -42,6 +42,30 @@ export const getQueryInitialData = <Q extends LiveQuery>(query: Q): Awaited<Q> =
         ? undefined
         : []) as Awaited<Q>
 
+type CommittedObserver = { watch: readonly LiveQueryWatch[]; refresh: () => void }
+const committedObservers = new Set<CommittedObserver>()
+const watchesChanges = (watch: readonly LiveQueryWatch[], changes: readonly LiveQueryWatch[]) =>
+    watch.some((watched) =>
+        changes.some((change) => {
+            if (watched.table !== change.table) return false
+            if (
+                (Array.isArray(watched.rowId) && watched.rowId.length === 0) ||
+                (Array.isArray(change.rowId) && change.rowId.length === 0)
+            )
+                return false
+            if (watched.rowId === undefined || change.rowId === undefined) return true
+            const rows = typeof watched.rowId === 'number' ? [watched.rowId] : watched.rowId
+            const changedRows = typeof change.rowId === 'number' ? [change.rowId] : change.rowId
+            return rows.some((row) => changedRows.includes(row))
+        })
+    )
+
+/** Publish committed SQLite rows before releasing transient state that covers older snapshots. */
+export const publishDatabaseChanges = (changes: readonly LiveQueryWatch[]) => {
+    for (const observer of [...committedObservers])
+        if (watchesChanges(observer.watch, changes)) observer.refresh()
+}
+
 export const createDatabaseQueryObserver = <Q extends LiveQuery>(
     query: Q,
     {
@@ -53,11 +77,15 @@ export const createDatabaseQueryObserver = <Q extends LiveQuery>(
     mode: 'sync' | 'async' = 'sync'
 ) => {
     type Data = Awaited<Q>
+    const readSync = (): Data =>
+        (is(query, SQLiteSyncRelationalQuery) ? query.sync() : query.all()) as Data
     const read = (): Data | PromiseLike<Data> => {
         if (mode === 'async') return query as PromiseLike<Data>
-        return (is(query, SQLiteSyncRelationalQuery) ? query.sync() : query.all()) as Data
+        return readSync()
     }
     const listen = (invalidate: () => void) => {
+        const committed = { watch: watch, refresh: () => observer.refreshSync(readSync) }
+        committedObservers.add(committed)
         let active = true
         let pending = false
         const listener = addDatabaseChangeListener((event) => {
@@ -83,6 +111,7 @@ export const createDatabaseQueryObserver = <Q extends LiveQuery>(
         })
         return () => {
             active = false
+            committedObservers.delete(committed)
             listener.remove()
         }
     }

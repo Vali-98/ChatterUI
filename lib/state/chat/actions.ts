@@ -7,8 +7,10 @@ import { Logger } from '@lib/state/Logger'
 import { getActiveMacros, replaceMacros } from '@lib/state/Macros'
 import { mmkv } from '@lib/storage/MMKV'
 import { saveStringToDownload } from '@lib/utils/File'
+import type { MacroValues } from '@lib/utils/Macros'
 import { convertToFormatInstruct } from '@lib/utils/TextFormat'
 
+import { assertChatEditable, type ChatMutationOptions } from './access'
 import { copyAttachment, deleteAttachmentFiles, prepareAttachment } from './attachments'
 import { db } from './db'
 import { chatImportSchema } from './schema'
@@ -18,6 +20,7 @@ import type {
     ChatInput,
     ChatMessage,
     CreateMessageInput,
+    CreateTurnInput,
     UpdateSwipeOptions,
 } from './types'
 
@@ -91,6 +94,7 @@ export const createChat = async (characterId: number) => {
 }
 
 export const createMessage = async (chatId: number, input: CreateMessageInput) => {
+    assertChatEditable(chatId)
     const text = replaceMacros(input.text, getActiveMacros({ temporal: false }))
     const attachments: AttachmentInput[] = []
     try {
@@ -112,6 +116,57 @@ export const createMessage = async (chatId: number, input: CreateMessageInput) =
     }
 }
 
+export const createTurn = async (
+    chatId: number,
+    input: CreateTurnInput,
+    options: ChatMutationOptions & { signal: AbortSignal; macros: MacroValues }
+) => {
+    const attachments: AttachmentInput[] = []
+    const checkAccess = () => {
+        if (options.signal.aborted) throw new Error('Submission cancelled')
+        assertChatEditable(chatId, options)
+    }
+    try {
+        checkAccess()
+        for (const uri of input.attachmentUris ?? []) {
+            attachments.push(await prepareAttachment(uri))
+            checkAccess()
+        }
+        checkAccess()
+        return db.create.turn(
+            chatId,
+            {
+                user:
+                    input.text.trim() || attachments.length
+                        ? {
+                              name: input.userName,
+                              is_user: true,
+                              swipes: [
+                                  {
+                                      swipe: replaceMacros(input.text, {
+                                          char: options.macros.char,
+                                          user: options.macros.user,
+                                      }),
+                                      active: true,
+                                  },
+                              ],
+                              attachments: attachments,
+                          }
+                        : undefined,
+                assistant: {
+                    name: input.characterName,
+                    is_user: false,
+                    swipes: [{ swipe: '', active: true }],
+                },
+            },
+            { mutationToken: options.mutationToken }
+        )
+    } catch (error) {
+        deleteAttachmentFiles(attachments)
+        throw error
+    }
+}
+
 export const createSwipe = (messageId: number, text: string) =>
     db.create.swipe(messageId, { swipe: replaceMacros(text, getActiveMacros({ temporal: false })) })
 
@@ -122,20 +177,28 @@ export const updateSwipe = async (
 ) => {
     const swipe = db.query.swipe(swipeId)
     if (!swipe) return undefined
+    const context = db.query.swipeContext(swipeId)
+    if (context) assertChatEditable(context.chat_id, options)
     const imageUris = db.query
         .messageAttachments(swipe.entry_id)
         .filter((attachment) => attachment.type === 'image')
         .map((attachment) => attachment.uri)
     const fields: Parameters<typeof db.update.swipe>[1] = {
         swipe: text,
-        token_length: await Tokenizer.getTokenizer()(text, imageUris).catch(() => null),
+        token_length: await (options.tokenizer ?? Tokenizer.getTokenizer())(text, imageUris).catch(
+            () => null
+        ),
     }
     const now = new Date()
+    if (options.startedAt) fields.gen_started = options.startedAt
+    if (options.resetLength !== undefined) fields.reset_length = options.resetLength
     if (options.updateStarted) fields.gen_started = now
     if (options.updateFinished) fields.gen_finished = now
-    if (options.timings) fields.timings = options.timings
     if (options.resetTimings) fields.timings = null
-    return db.update.swipe(swipeId, fields)
+    if (options.timings) fields.timings = options.timings
+    return options.mutationToken === undefined
+        ? db.update.swipe(swipeId, fields)
+        : db.update.swipe(swipeId, fields, { mutationToken: options.mutationToken })
 }
 
 export const deleteChat = (chatId: number) => {

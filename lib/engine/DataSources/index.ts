@@ -1,7 +1,7 @@
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { Chats } from '@lib/state/chat'
-import { replaceMacros } from '@lib/state/Macros'
+import { replaceMacros, type MacroValues } from '@lib/state/Macros'
 
 import createLorebookDataSource from './lorebookSource'
 import { DataSource, DataSourceResult } from './types'
@@ -36,7 +36,7 @@ export const createExampleDataSource = (): DataSource => ({
 
         return [
             {
-                content: replaceMacros(examples),
+                content: replaceMacros(examples, params.macros),
                 source: 'character_examples',
                 tokenLength: tokenLength,
                 position: {
@@ -50,7 +50,8 @@ export const createExampleDataSource = (): DataSource => ({
 
 const AUTHOR_NOTE_NAME = 'author_notes'
 const createAuthorNotesDataSource = async (
-    chatId = Chats.useChatState.getState().id
+    chatId = Chats.useChatState.getState().id,
+    options?: SourceOptions
 ): Promise<DataSource | undefined> => {
     if (!chatId) return
     const chatData = await Chats.db.query.chatRow(chatId)
@@ -60,10 +61,10 @@ const createAuthorNotesDataSource = async (
     const activeNotes = await AuthorNotes.db.query.getActiveNotes(characterId, chatId)
     if (!activeNotes || activeNotes.length === 0) return
 
-    const tokenize = Tokenizer.getTokenizer()
+    const tokenize = options?.tokenizer ?? Tokenizer.getTokenizer()
     const dataSourceResults: DataSourceResult[] = await Promise.all(
         activeNotes.map(async (item) => {
-            const content = replaceMacros(item.content)
+            const content = replaceMacros(item.content, options?.macros)
             return {
                 content: content,
                 source: AUTHOR_NOTE_NAME,
@@ -84,12 +85,19 @@ const createAuthorNotesDataSource = async (
     }
 }
 
-export const getDataSources = async (chatId?: number): Promise<DataSource[]> => {
-    let dataSources = [createExampleDataSource()]
-    const authorNotesSource = await createAuthorNotesDataSource(chatId)
+export type SourceOptions = { macros: MacroValues; tokenizer: (text: string) => Promise<number> }
+
+export const getDataSources = async (
+    chatId?: number,
+    options?: SourceOptions
+): Promise<DataSource[]> => {
+    const dataSources = [createExampleDataSource()]
+    const [authorNotesSource, lorebooks] = await Promise.all([
+        createAuthorNotesDataSource(chatId, options),
+        createLorebookDataSource(),
+    ])
     if (authorNotesSource) dataSources.push(authorNotesSource)
 
-    const lorebooks = await createLorebookDataSource()
     if (lorebooks) {
         dataSources.push(...lorebooks)
     }

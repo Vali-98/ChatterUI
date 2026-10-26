@@ -796,6 +796,8 @@
         "chat": {
             "askInChatterUI": "Tanya di ChatterUI",
             "askInChatterUIDescription": "Gunakan prompt ChatterUI untuk maksud teks, bukan perilaku keyboard bawaan.",
+            "concurrentGenerations": "Generasi bersamaan",
+            "concurrentGenerationsDescription": "Izinkan generasi jarak jauh di beberapa obrolan sekaligus. Generasi lokal selalu berjalan satu per satu.",
             "autoGenerateTitles": "Hasilkan judul chat otomatis",
             "autoGenerateTitlesDescription": "Buat judul untuk chat baru secara otomatis.",
             "autoLoadUser": "Muat pengguna yang dipilih secara otomatis",

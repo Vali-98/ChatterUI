@@ -796,6 +796,8 @@
         "chat": {
             "askInChatterUI": "在 ChatterUI 中询问",
             "askInChatterUIDescription": "使用 ChatterUI 提示进行文本意图，而不是默认键盘行为。",
+            "concurrentGenerations": "并发生成",
+            "concurrentGenerationsDescription": "允许不同聊天同时进行远程生成。本地生成始终一次仅运行一个。",
             "autoGenerateTitles": "自动生成聊天标题",
             "autoGenerateTitlesDescription": "自动为新聊天创建标题。",
             "autoLoadUser": "自动加载所选用户",

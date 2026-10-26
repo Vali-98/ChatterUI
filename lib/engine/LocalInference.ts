@@ -5,15 +5,8 @@ import Alert from '@components/views/Alert'
 import { CompletionTimings } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { SamplerConfigData, SamplerID, Samplers } from '@lib/constants/SamplerData'
-import { isCloseThinkTag, isOpenThinkTag } from '@lib/markdown/ThinkTags'
-import { Characters } from '@lib/state/characters'
-import { CharacterLinks } from '@lib/state/characters/links'
-import { useCharacterTokenState } from '@lib/state/characters/tokenState'
-import { Chats, useGenerationState } from '@lib/state/chat'
-import { commonStopStrings, Instructs, outputPrefixes } from '@lib/state/Instructs'
+import { commonStopStrings, outputPrefixes } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
-import { getCurrentSampler } from '@lib/state/samplerStore'
-import { useTTSStore } from '@lib/state/TTS'
 import { mmkv } from '@lib/storage/MMKV'
 
 import type { CompletionReason } from './API/APIBuilder'
@@ -23,7 +16,15 @@ import {
     buildTextCompletionContext,
     ContextBuilderParams,
 } from './API/ContextBuilder'
-import { getDataSources } from './DataSources'
+import { prepareGenerationContext, type GenerationInputs } from './generation/inputs'
+import { finishGeneration } from './generation/lifecycle'
+import { getGenerationRuntime } from './generation/runtime'
+import {
+    appendGeneration,
+    isActiveGeneration,
+    updateGeneration,
+    useGenerationState,
+} from './generation/state'
 import { Llama, LlamaConfig } from './Local/LlamaLocal'
 import { KV, Model } from './Local/Model'
 import { createStopFilter } from './stopSequenceFilter'
@@ -54,8 +55,7 @@ export const localSamplerData: APISampler[] = [
     { externalName: 'thinking_budget_tokens', samplerID: SamplerID.REASONING_MAX_TOKENS },
 ]
 
-const getSamplerFields = (max_length?: number) => {
-    const preset: SamplerConfigData = getCurrentSampler()
+const getSamplerFields = (preset: SamplerConfigData, max_length?: number) => {
     return localSamplerData
         .map((item: APISampler) => {
             const value = preset[item.samplerID]
@@ -74,17 +74,17 @@ const getSamplerFields = (max_length?: number) => {
         .reduce((acc, obj) => Object.assign(acc, obj), {})
 }
 
-const buildLocalPayload = async (chatId?: number) => {
-    const payloadFields = getSamplerFields()
+const buildLocalPayload = async (generationId: number, inputs: GenerationInputs) => {
+    const payloadFields = getSamplerFields(inputs.samplers)
     const rep_pen = payloadFields?.['penalty_repeat']
     const reasoning = payloadFields?.['enable_thinking'] as boolean
     let thinkTags = {}
-    const localPreset: LlamaConfig = Llama.useLlamaPreferencesStore.getState().config
+    const localPreset: LlamaConfig = inputs.localConfig
     let prompt: undefined | string = undefined
     let mediaPaths: string[] = []
     const context = Llama.useLlamaModelStore.getState().context
 
-    const fields = await obtainFields(chatId)
+    const fields = await obtainFields(inputs)
 
     if (!fields) {
         return Logger.error('Failed to build fields')
@@ -108,9 +108,9 @@ const buildLocalPayload = async (chatId?: number) => {
     }
     const hasAudio = completionType.type === 'chatCompletions' && completionType.supportsAudio
     const hasImage = completionType.type === 'chatCompletions' && completionType.supportsImages
-    const bufferExists = !!Chats.useChatState.getState().buffer.data
+    const bufferExists = !!useGenerationState.getState().generations[generationId]?.text
 
-    if (mmkv.getBoolean(AppSettings.UseModelTemplate)) {
+    if (inputs.useModelTemplate) {
         const messages = await buildChatCompletionContext({ apiConfig, ...rest })
         try {
             if (messages) {
@@ -181,48 +181,45 @@ const buildLocalPayload = async (chatId?: number) => {
         penalize_nl: typeof rep_pen === 'number' && rep_pen > 1,
         n_threads: localPreset.threads,
         prompt: prompt ?? '',
-        stop: constructStopSequence(),
+        stop: inputs.stopSequence,
         emit_partial_completion: true,
         ...finalMediaPaths,
         ...thinkTags,
     }
 }
 
-const constructStopSequence = (): string[] => {
-    // kept this helper for extendability
-    return Instructs.useInstruct.getState().getStopSequence()
-}
-
-const constructReplaceStrings = (): string[] => {
-    // default stop strings defined instructs
-    const stops: string[] = constructStopSequence()
-    // additional stop strings based on context configuration
-    //    const output: string[] = []
-    //  return [...stops, ...output]
-    return stops
-}
-
-const maybeLoadLinkedModel = async () => {
-    const characterId = Characters.useCharacterState.getState().id
+const maybeLoadLinkedModel = async (
+    characterId: number,
+    generationId: number,
+    inputs: GenerationInputs
+) => {
     if (!characterId) return false
-    const links = await CharacterLinks.db.query.links(characterId)
+    const links = inputs.character.links
     const modelLink = links.find((link) => link.type === 'model_id')
     if (!modelLink) return false
     const model = await Model.getModelWithMMProj(modelLink.value)
     if (!model) return false
     Logger.infoToast(t('model.toast.autoLoadingModel', { name: model.name }))
-    await Llama.useLlamaModelStore.getState().load(model)
+    await Llama.useLlamaModelStore
+        .getState()
+        .load(model, { generationId: generationId, config: inputs.localConfig })
     return true
 }
 
-const verifyModelLoaded = async (): Promise<boolean> => {
+const verifyModelLoaded = async (
+    inputs: GenerationInputs,
+    generationId: number
+): Promise<boolean> => {
     const model = Llama.useLlamaModelStore.getState().model
+    if (inputs.localModel && inputs.localModel.id !== model?.id)
+        throw new Error('Local model changed before generation execution')
 
     // Model Loading Routine, also check for character linked model
-    if (model || (await maybeLoadLinkedModel())) return true
+    if (model || (await maybeLoadLinkedModel(inputs.character.id, generationId, inputs)))
+        return true
 
-    const lastModel = Llama.useLlamaPreferencesStore.getState().lastModel
-    const autoLoad = mmkv.getBoolean(AppSettings.AutoLoadLocal)
+    const lastModel = inputs.lastLocalModel
+    const autoLoad = inputs.autoLoadLocal
 
     // If  autoload is disabled, just return
     if (!autoLoad || !lastModel) {
@@ -234,45 +231,47 @@ const verifyModelLoaded = async (): Promise<boolean> => {
 
     // attempt to load model
     Logger.infoToast(t('model.toast.autoLoadingModel', { name: lastModel.name }))
-    await Llama.useLlamaModelStore.getState().load(lastModel)
+    await Llama.useLlamaModelStore
+        .getState()
+        .load(lastModel, { generationId: generationId, config: inputs.localConfig })
 
     return true
 }
 
-export const localInference = async (generationId = useGenerationState.getState().generationId) => {
+export const localInference = async (generationId: number, inputs: GenerationInputs) => {
     let reason: CompletionReason = 'failed'
     const cancelled = () => reason === 'cancelled'
     let cancelDecision: (() => void) | undefined
+    const runtime = getGenerationRuntime(generationId)
     const current = () => {
-        const state = useGenerationState.getState()
-        return state.isGenerating && state.generationId === generationId
+        const generation = useGenerationState.getState().generations[generationId]
+        return !!generation && isActiveGeneration(generation) && !runtime.controller.signal.aborted
     }
-    if (!current()) return
-    const swipeId = useGenerationState.getState().currentSwipeId
-    const chatId = swipeId === undefined ? undefined : Chats.db.query.swipeContext(swipeId)?.chat_id
-    const stop = (reason: CompletionReason) =>
-        Chats.actions.finishGeneration({
-            generationId: generationId,
-            notify: reason === 'completed',
-        })
-    useGenerationState.getState().setAbort(() => {
+    const generation = useGenerationState.getState().generations[generationId]
+    if (!generation || !isActiveGeneration(generation)) return
+    const stop = (reason: CompletionReason) => finishGeneration(generationId, reason)
+    const onAbort = () => {
         reason = 'cancelled'
         cancelDecision?.()
-    })
+    }
+    runtime.controller.signal.addEventListener('abort', onAbort)
+    if (runtime.controller.signal.aborted) onAbort()
     try {
-        if (!(await verifyModelLoaded()) || cancelled() || !current()) return
+        if (cancelled()) return
+        if (!(await verifyModelLoaded(inputs, generationId)) || cancelled() || !current()) return
         const context = Llama.useLlamaModelStore.getState().context
         if (!context) {
             Logger.warnToast(t('model.toast.noModelLoaded'))
             return
         }
-        const payload = await buildLocalPayload(chatId)
+        inputs.activateLocalTokenizer()
+        const payload = await buildLocalPayload(generationId, inputs)
         if (cancelled() || !current()) return
         if (!payload) {
             Logger.warnToast(t('generation.errors.failedToBuildPayload'))
             return
         }
-        if (mmkv.getBoolean(AppSettings.SaveLocalKV) && !KV.useKVStore.getState().kvCacheLoaded) {
+        if (inputs.saveLocalKV && !KV.useKVStore.getState().kvCacheLoaded) {
             const prompt = await Llama.useLlamaModelStore
                 .getState()
                 .tokenize(payload.prompt, payload.media_paths)
@@ -302,52 +301,48 @@ export const localInference = async (generationId = useGenerationState.getState(
             if (loaded) KV.useKVStore.getState().setKvCacheLoaded(true)
         }
         if (cancelled() || !current()) return
-        useGenerationState.getState().setAbort(async () => {
+        runtime.abortLocal = async () => {
             reason = 'cancelled'
             await Llama.useLlamaModelStore.getState().stopCompletion()
-        })
-        await runLocalCompletion(payload, current)
+        }
+        updateGeneration(generationId, { status: 'running' })
+        await runLocalCompletion(payload, current, generationId, inputs)
         if (!cancelled()) reason = 'completed'
     } catch (error) {
         if (!cancelled()) Logger.errorToast(t('model.toast.failedToRunLocalInference'), error)
     } finally {
+        inputs.activateLocalTokenizer()
+        runtime.controller.signal.removeEventListener('abort', onAbort)
         await stop(reason)
     }
 }
 
 const runLocalCompletion = async (
     payload: NonNullable<Awaited<ReturnType<typeof buildLocalPayload>>>,
-    current: () => boolean
+    current: () => boolean,
+    generationId: number,
+    inputs: GenerationInputs
 ) => {
-    const filter = createStopFilter(constructReplaceStrings())
-    let reasoningMode = false
+    const filter = createStopFilter(inputs.stopSequence)
     const appendOutput = (cleaned: string) => {
         if (!current() || !cleaned) return
-        Chats.useChatState.getState().insertToBuffer(cleaned)
-        if (reasoningMode) {
-            if (isCloseThinkTag(cleaned)) reasoningMode = false
-            return
-        }
-        if (isOpenThinkTag(cleaned)) {
-            reasoningMode = !isCloseThinkTag(cleaned)
-            return
-        }
-        useTTSStore.getState().insertBuffer(cleaned)
+        appendGeneration(generationId, cleaned)
     }
     const outputStream = (text: string) => appendOutput(filter.push(text))
     const outputCompleted = (text: string, timings: CompletionTimings) => {
         if (!current()) return
-        Chats.useChatState.getState().setBufferTimings(timings)
+        updateGeneration(generationId, { timings })
         if (mmkv.getBoolean(AppSettings.PrintContext)) Logger.info(`Completion Output:\n${text}`)
     }
-    const engineData = Llama.useLlamaPreferencesStore.getState().config
+    const engineData = inputs.localConfig
     try {
         await Llama.useLlamaModelStore
             .getState()
             .completion(
                 { ...payload, n_threads: engineData.threads },
                 outputStream,
-                outputCompleted
+                outputCompleted,
+                { saveKV: inputs.saveLocalKV }
             )
     } finally {
         appendOutput(filter.flush())
@@ -423,95 +418,15 @@ const localAPIConfig: APIConfiguration = {
     },
 }
 
-// This is the 'big orchestrator' which compiles fields from
-// the whole app to send inference requests
-const obtainFields = async (targetChatId?: number): Promise<ContextBuilderParams | void> => {
-    try {
-        const userState = Characters.useUserStore.getState()
-        const characterState = Characters.useCharacterState.getState()
-
-        const instructState = Instructs.useInstruct.getState()
-
-        const userCard = userState.card
-        if (!userCard) {
-            Logger.errorToast(t('generation.errors.noUser'))
-            return
-        }
-
-        const characterCard =
-            targetChatId === undefined
-                ? characterState.card
-                : await Characters.db.query.card(
-                      Chats.db.query.chatRow(targetChatId)?.character_id ?? -1
-                  )
-        if (!characterCard) {
-            Logger.errorToast(t('generation.errors.noCharacter'))
-            return
-        }
-        const chatId = targetChatId ?? Chats.useChatState.getState().id
-        if (!chatId) {
-            Logger.errorToast(t('generation.errors.noActiveChat'))
-            return
-        }
-
-        const messages = (await Chats.db.query.chat(chatId))?.messages
-        if (!messages) {
-            Logger.errorToast(t('generation.errors.noChatFound'))
-            return
-        }
-
-        const apiValues = localAPIValues
-        if (!apiValues) {
-            Logger.warnToast(t('generation.errors.noActiveAPI'))
-            return
-        }
-
-        const apiConfig = localAPIConfig
-        if (!apiConfig) {
-            Logger.errorToast(
-                t('generation.errors.configurationNotFound', { name: apiValues?.configName })
-            )
-            return
-        }
-
-        const engineData = Llama.useLlamaPreferencesStore.getState().config
-        const samplers = getCurrentSampler()
-
-        const instructLength = engineData.context_length
-        const length = Math.max(instructLength - samplers.genamt, 0)
-
-        const tokenCounts = await useCharacterTokenState
-            .getState()
-            .countTokens(characterCard, userCard)
-
-        return {
-            apiConfig: {
-                ...apiConfig,
-                request: {
-                    ...apiConfig.request,
-                    completionType: { ...apiConfig.request.completionType },
-                },
-            },
-            apiValues: Object.assign({}, apiValues),
-
-            instruct: instructState.replacedMacros(),
-            character: Object.assign({}, characterCard),
-            user: Object.assign({}, userCard),
-            messages: [...messages],
-            chatTokenizer: (message) =>
-                Chats.actions.countMessageTokens(
-                    message,
-                    Llama.useLlamaModelStore.getState().tokenLength
-                ),
-            tokenizer: Llama.useLlamaModelStore.getState().tokenLength,
-            maxLength: length,
-            dataSources: await getDataSources(chatId),
-            cache: {
-                ...tokenCounts,
-                instructCache: await instructState.getCache(characterCard.name, userCard.name),
-            },
-        }
-    } catch (e) {
-        Logger.errorToast(t('generation.errors.failedToOrchestrateRequestBuild'), e)
-    }
-}
+const obtainFields = async (inputs: GenerationInputs): Promise<ContextBuilderParams> => ({
+    ...(await prepareGenerationContext(inputs)),
+    apiConfig: {
+        ...localAPIConfig,
+        request: {
+            ...localAPIConfig.request,
+            completionType: { ...localAPIConfig.request.completionType },
+        },
+    },
+    apiValues: { ...localAPIValues },
+    maxLength: Math.max(0, inputs.localConfig.context_length - inputs.samplers.genamt),
+})

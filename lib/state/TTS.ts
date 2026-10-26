@@ -7,8 +7,6 @@ import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
-import { Chats, useGenerationState } from './chat'
-
 type TTSState = {
     activeSwipeId?: number
     voice?: Speech.Voice
@@ -44,16 +42,7 @@ type TTSState = {
 const sentenceEndRegex =
     /(?<=[^\d])([。…？！.?!])(?:["'`*_)]*)\s+(?=[A-Z0-9])|([。…？！.?!])(?:["'`*_)]*)$/gm
 
-useGenerationState.subscribe(async (state, previous) => {
-    if (state.isGenerating === previous.isGenerating) return
-    const swipeId = state.isGenerating ? state.currentSwipeId : previous.currentSwipeId
-    if (swipeId === undefined) return
-    const swipe = Chats.db.query.swipe(swipeId)
-    if (!swipe) return
-    if (state.isGenerating) useTTSStore.getState().handleStartGeneration(swipe.id)
-    else await useTTSStore.getState().handleEndGeneration(swipe.id, swipe.swipe)
-})
-
+// Automatic generation speech is suspended until it has an explicit generation owner.
 export const useTTSStore = create<TTSState>()(
     persist(
         (set, get) => ({

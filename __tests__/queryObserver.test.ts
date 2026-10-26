@@ -214,3 +214,22 @@ test('an initially empty sync query records success without notifying again on s
     expect(notify).not.toHaveBeenCalled()
     unsubscribe()
 })
+
+test('publishing a committed sync result supersedes an older asynchronous read', async () => {
+    let resolve!: (value: string) => void
+    const observer = createQueryObserver({
+        read: () =>
+            new Promise<string>((complete) => {
+                resolve = complete
+            }),
+        mode: 'async',
+        enabled: true,
+        listen: () => () => {},
+    })
+    const unsubscribe = observer.subscribe(() => {})
+    observer.refreshSync(() => 'committed')
+    resolve('older result')
+    await Promise.resolve()
+    expect(observer.getSnapshot().data).toBe('committed')
+    unsubscribe()
+})

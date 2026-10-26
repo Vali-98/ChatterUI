@@ -10,6 +10,8 @@ import type {
     chatSwipes,
 } from '@db/schema'
 
+import type { ChatMutationOptions } from './access'
+
 export type ChatMessage = ChatEntryType & {
     swipes: ChatSwipe[]
     attachments: ChatAttachmentType[]
@@ -18,9 +20,11 @@ export type ChatMessage = ChatEntryType & {
 export type Chat = ChatType & { messages: ChatMessage[] }
 
 export type ScrollData = { cause: 'search' | 'saveScroll'; index: number }
-export type OutputBuffer = { data: string; timings?: CompletionTimings; error?: string }
 
-export type UpdateSwipeOptions = {
+export type UpdateSwipeOptions = ChatMutationOptions & {
+    startedAt?: Date
+    resetLength?: number | null
+    tokenizer?: (text: string, imageUris?: string[]) => Promise<number>
     updateFinished?: boolean
     updateStarted?: boolean
     timings?: CompletionTimings
@@ -41,6 +45,13 @@ export type ChatInput = Omit<typeof chats.$inferInsert, 'id'> & { messages?: Mes
 export type CreateMessageInput = {
     name: string
     is_user: boolean
+    text: string
+    attachmentUris?: string[]
+}
+
+export type CreateTurnInput = {
+    userName: string
+    characterName: string
     text: string
     attachmentUris?: string[]
 }

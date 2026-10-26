@@ -3,9 +3,10 @@ import React, { useCallback } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { ChatSwipe } from '@db/schema'
+import { useCanStartGeneration } from '@lib/engine/generation/hooks'
 import { continueResponse, generateResponse, regenerateResponse } from '@lib/engine/Inference'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
-import { Chats, useGenerationState } from '@lib/state/chat'
+import { Chats } from '@lib/state/chat'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type SwipesProps = {
@@ -17,6 +18,8 @@ type SwipesProps = {
 const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) => {
     const styles = useStyles()
     const { color } = Theme.useTheme()
+    const { chatId } = Chats.useChat()
+    const canGenerate = useCanStartGeneration(chatId)
     const { data: swipeIdListData } = useLiveQueryAsync(Chats.db.live.swipeIds(swipe.entry_id), {
         key: ['swipe-ids', swipe.entry_id],
         watch: [{ table: 'chat_swipes' }],
@@ -36,14 +39,14 @@ const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) 
     if (!swipeIdList || currentIndex === -1 || (isGreeting && swipeIdList.length === 1)) return
 
     const handleSwipeLeft = () => {
-        if (useGenerationState.getState().isGenerating) return
+        if (!canGenerate) return
         if (currentIndex <= 0) return
         const newSwipeId = swipeIdList[currentIndex - 1]
         if (newSwipeId) Chats.db.update.activeSwipe(newSwipeId)
     }
 
     const handleSwipeRight = (message: string) => {
-        if (useGenerationState.getState().isGenerating) return
+        if (!canGenerate) return
         if (currentIndex >= swipeIdList.length - 1) {
             const newSwipe = Chats.actions.createSwipe(swipe.entry_id, message)
             if (!newSwipe) return

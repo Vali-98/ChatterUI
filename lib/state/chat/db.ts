@@ -3,6 +3,7 @@ import { and, asc, count, desc, eq, getTableColumns, like, lte, sum } from 'driz
 import { db as database } from '@db/db'
 import { characters, chatAttachments, chatEntries, chats, chatSwipes } from '@db/schema'
 
+import { assertChatEditable, type ChatMutationOptions } from './access'
 import type { ChatInput, MessageInput, SwipeInput } from './types'
 
 const live = {
@@ -215,6 +216,17 @@ const insertMessage = (tx: Transaction, chatId: number, input: MessageInput) => 
     return message.id
 }
 
+const assertMessageEditable = (messageId: number, options: ChatMutationOptions = {}) => {
+    const message = database.query.chatEntries
+        .findFirst({ where: eq(chatEntries.id, messageId) })
+        .sync()
+    if (message) assertChatEditable(message.chat_id, options)
+}
+const assertSwipeEditable = (swipeId: number, options: ChatMutationOptions = {}) => {
+    const swipe = query.swipe(swipeId)
+    if (swipe) assertMessageEditable(swipe.entry_id, options)
+}
+
 const create = {
     chat: (input: ChatInput) =>
         database.transaction((tx) => {
@@ -224,8 +236,9 @@ const create = {
             touchChat(tx, chat.id)
             return chat.id
         }),
-    message: (chatId: number, input: MessageInput) =>
+    message: (chatId: number, input: MessageInput, options: ChatMutationOptions = {}) =>
         database.transaction((tx) => {
+            assertChatEditable(chatId, options)
             const messageId = insertMessage(tx, chatId, input)
             touchChat(tx, chatId)
             return tx.query.chatEntries
@@ -235,8 +248,30 @@ const create = {
                 })
                 .sync()!
         }),
-    swipe: (messageId: number, input: Omit<SwipeInput, 'active'>) =>
+    turn: (
+        chatId: number,
+        input: { user?: MessageInput; assistant: MessageInput },
+        options: ChatMutationOptions = {}
+    ) =>
         database.transaction((tx) => {
+            assertChatEditable(chatId, options)
+            if (input.user) insertMessage(tx, chatId, input.user)
+            const messageId = insertMessage(tx, chatId, input.assistant)
+            touchChat(tx, chatId)
+            return tx.query.chatEntries
+                .findFirst({
+                    where: eq(chatEntries.id, messageId),
+                    with: { swipes: true, attachments: true },
+                })
+                .sync()!
+        }),
+    swipe: (
+        messageId: number,
+        input: Omit<SwipeInput, 'active'>,
+        options: ChatMutationOptions = {}
+    ) =>
+        database.transaction((tx) => {
+            assertMessageEditable(messageId, options)
             tx.update(chatSwipes)
                 .set({ active: false })
                 .where(eq(chatSwipes.entry_id, messageId))
@@ -254,11 +289,17 @@ const create = {
 const update = {
     chat: (
         chatId: number,
-        fields: Partial<Pick<typeof chats.$inferInsert, 'name' | 'user_id' | 'scroll_offset'>>
-    ) => database.update(chats).set(fields).where(eq(chats.id, chatId)).run(),
+        fields: Partial<Pick<typeof chats.$inferInsert, 'name' | 'user_id' | 'scroll_offset'>>,
+        options: ChatMutationOptions = {}
+    ) => {
+        if (fields.name !== undefined || fields.user_id !== undefined)
+            assertChatEditable(chatId, options)
+        return database.update(chats).set(fields).where(eq(chats.id, chatId)).run()
+    },
     chatTimestamp: (chatId: number) => database.transaction((tx) => touchChat(tx, chatId)),
-    activeSwipe: (swipeId: number) =>
+    activeSwipe: (swipeId: number, options: ChatMutationOptions = {}) =>
         database.transaction((tx) => {
+            assertSwipeEditable(swipeId, options)
             const swipe = tx.query.chatSwipes
                 .findFirst({ where: eq(chatSwipes.id, swipeId) })
                 .sync()
@@ -272,9 +313,12 @@ const update = {
         }),
     swipe: (
         swipeId: number,
-        fields: Partial<Omit<typeof chatSwipes.$inferInsert, 'id' | 'entry_id' | 'active'>>
+        fields: Partial<Omit<typeof chatSwipes.$inferInsert, 'id' | 'entry_id' | 'active'>>,
+        options: ChatMutationOptions = {}
     ) =>
         database.transaction((tx) => {
+            if (Object.keys(fields).some((key) => key !== 'token_length'))
+                assertSwipeEditable(swipeId, options)
             const swipe = tx
                 .update(chatSwipes)
                 .set(fields)
@@ -289,11 +333,13 @@ const update = {
 const remove = {
     chat: (chatId: number) =>
         database.transaction((tx) => {
+            assertChatEditable(chatId)
             touchChat(tx, chatId)
             tx.delete(chats).where(eq(chats.id, chatId)).run()
         }),
     message: (messageId: number) =>
         database.transaction((tx) => {
+            assertMessageEditable(messageId)
             touchMessage(tx, messageId)
             tx.delete(chatEntries).where(eq(chatEntries.id, messageId)).run()
         }),

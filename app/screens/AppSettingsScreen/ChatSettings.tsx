@@ -15,6 +15,9 @@ const ChatSettings = () => {
     const [firstMes, setFirstMes] = useMMKVBoolean(AppSettings.CreateFirstMes)
     const [chatOnStartup, setChatOnStartup] = useMMKVBoolean(AppSettings.ChatOnStartup)
     const [autoLoadUser, setAutoLoadUser] = useMMKVBoolean(AppSettings.AutoLoadUser)
+    const [concurrentGenerations, setConcurrentGenerations] = useMMKVBoolean(
+        AppSettings.ConcurrentGenerations
+    )
     const [autoTitle, setAutoTitle] = useMMKVBoolean(AppSettings.AutoGenerateTitle)
     const { enabled: textIntent, setEnabled: setTextIntent } = useTextIntentStatus()
     const router = useRouter()
@@ -41,6 +44,13 @@ const ChatSettings = () => {
                 value={autoLoadUser}
                 onChangeValue={setAutoLoadUser}
                 description={t('settings.chat.autoLoadUserDescription')}
+            />
+
+            <ThemedSwitch
+                label={t('settings.chat.concurrentGenerations')}
+                value={concurrentGenerations ?? true}
+                onChangeValue={setConcurrentGenerations}
+                description={t('settings.chat.concurrentGenerationsDescription')}
             />
 
             <ThemedSwitch

@@ -8,6 +8,7 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import BottomSheet, { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Chats } from '@lib/state/chat'
+import { useChatEditable } from '@lib/state/chat/access'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type ChatEditorStateProps = {
@@ -45,6 +46,10 @@ const ChatEditor = () => {
             { table: 'chat_attachment' },
         ],
     })
+    const editable = useChatEditable(entry?.chat_id ?? -1)
+    useEffect(() => {
+        if (!editable) hide()
+    }, [editable, hide])
     const { data: swipe } = useLiveQueryAsync(Chats.db.live.activeSwipe(entryId), {
         keepPreviousData: false,
         key: ['chat-editor-swipe', entryId],
@@ -57,12 +62,14 @@ const ChatEditor = () => {
     }, [swipe])
 
     const handleEditMessage = () => {
+        if (!editable) return
         hide()
         if (swipe && placeholderText !== swipe.swipe)
             Chats.actions.updateSwipe(swipe.id, placeholderText)
     }
 
     const handleDeleteMessage = () => {
+        if (!editable) return
         hide()
         Chats.actions.deleteMessage(entryId)
     }

@@ -11,7 +11,7 @@ import { Logger } from '@lib/state/Logger'
 import { getActiveMacros, replaceMacros } from '@lib/state/Macros'
 import { mmkv } from '@lib/storage/MMKV'
 import { readBase64Async } from '@lib/utils/File'
-import { applyMacros } from '@lib/utils/Macros'
+import { applyMacros, type MacroValues } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import type { DataSource, DataSourceResult } from '../DataSources/types'
@@ -35,6 +35,8 @@ const printContext = (context: string) => {
 }
 
 export interface ContextBuilderParams {
+    macros?: MacroValues
+    textFilter?: Pick<ReturnType<typeof useTextFilterStore.getState>, 'sendFilteredText' | 'filter'>
     apiConfig: APIConfiguration
     apiValues: APIValues
     messages: ChatMessage[]
@@ -106,17 +108,20 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
     const sortedDataSources = [...(dataSources ?? [])].sort((a, b) => a.priority - b.priority)
 
     let { systemPrompt, systemPromptLength } = getSystemPrompt({
-        instruct,
-        user,
-        character,
-        userCounts,
-        characterCounts,
-        instructCache,
-        usePrefix,
-        useSuffix,
+        instruct: instruct,
+        user: user,
+        character: character,
+        userCounts: userCounts,
+        characterCounts: characterCounts,
+        instructCache: instructCache,
+        usePrefix: usePrefix,
+        useSuffix: useSuffix,
+        macroValues: params.macros,
     })
 
-    systemPromptLength = await tokenizer(filterContextText(systemPrompt, instruct))
+    systemPromptLength = await tokenizer(
+        filterContextText(systemPrompt, instruct, params.textFilter)
+    )
     if (mode === 'text') systemPromptLength += await tokenizer(instruct.system_suffix ?? '')
     if (systemPromptLength > maxLength && !bypassContextLength)
         Logger.warnToast(t('generation.warn.systemPromptExceedsContext'))
@@ -150,8 +155,9 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
         const name = instruct.names ? `${message.name}: ` : ''
         const role: 'user' | 'assistant' = message.is_user ? 'user' : 'assistant'
         const content = filterContextText(
-            replaceMacros(`${timestamp}${name}${swipe.swipe}`),
-            instruct
+            replaceMacros(`${timestamp}${name}${swipe.swipe}`, params.macros),
+            instruct,
+            params.textFilter
         )
         const swipeLen = await chatTokenizer(message, index)
         const contentLength =
@@ -313,7 +319,7 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
     for (const insertion of pendingInsertions) {
         const syntheticMessage: ContextMessage = {
             role: 'user',
-            content: filterContextText(insertion.content, instruct),
+            content: filterContextText(insertion.content, instruct, params.textFilter),
         }
 
         if (insertion.position.type === 'relative') {
@@ -367,7 +373,11 @@ export const buildChatCompletionContext = async (params: ContextBuilderParams) =
     const payload: Message[] = [
         {
             role: feats.systemRole,
-            [feats.contentName]: filterContextText(systemPrompt, params.instruct),
+            [feats.contentName]: filterContextText(
+                systemPrompt,
+                params.instruct,
+                params.textFilter
+            ),
         },
     ]
 
@@ -439,16 +449,23 @@ export const buildTextCompletionContext = async (params: ContextBuilderParams) =
     }
 
     if (!endedAtAssistant) output += instruct.last_output_prefix
-    const result = filterContextText(output, instruct)
+    const result = filterContextText(output, instruct, params.textFilter)
     printContext(result)
     return result
 }
 
 const thinkRule = buildThinkRules()
 
-const filterContextText = (text: string, instruct: InstructType) => {
+const filterContextText = (
+    text: string,
+    instruct: InstructType,
+    settings: Pick<
+        ReturnType<typeof useTextFilterStore.getState>,
+        'sendFilteredText' | 'filter'
+    > = useTextFilterStore.getState()
+) => {
     let result = text
-    const { sendFilteredText, filter } = useTextFilterStore.getState()
+    const { sendFilteredText, filter } = settings
     if (!sendFilteredText) {
         for (const pattern of filter) result = result.replace(new RegExp(pattern, 'gi'), '')
     }
@@ -503,6 +520,7 @@ export const getSystemPrompt = ({
     instructCache,
     usePrefix = true,
     useSuffix = true,
+    macroValues = getActiveMacros(),
 }: {
     instruct: InstructType
     user?: CharacterCard
@@ -512,6 +530,7 @@ export const getSystemPrompt = ({
     instructCache: InstructTokenCache
     usePrefix?: boolean
     useSuffix?: boolean
+    macroValues?: MacroValues
 }) => {
     let systemPrompt = instruct.system_prompt_format
     if (systemPrompt === undefined) {
@@ -541,22 +560,24 @@ export const getSystemPrompt = ({
         },
         {
             macro: '{{character_desc}}',
-            value: replaceMacros(character?.description ?? ''),
+            value: replaceMacros(character?.description ?? '', macroValues),
             length: characterCounts.descriptionTokens,
         },
         {
             macro: '{{user_desc}}',
-            value: replaceMacros(user?.description ?? ''),
+            value: replaceMacros(user?.description ?? '', macroValues),
             length: userCounts.descriptionTokens,
         },
         {
             macro: '{{personality}}',
-            value: instruct.personality ? replaceMacros(character?.personality ?? '') : '',
+            value: instruct.personality
+                ? replaceMacros(character?.personality ?? '', macroValues)
+                : '',
             length: instruct.personality ? characterCounts.personalityTokens : 0,
         },
         {
             macro: '{{scenario}}',
-            value: instruct.scenario ? replaceMacros(character?.scenario ?? '') : '',
+            value: instruct.scenario ? replaceMacros(character?.scenario ?? '', macroValues) : '',
             length: instruct.scenario ? characterCounts.scenarioTokens : 0,
         },
     ]
@@ -566,7 +587,7 @@ export const getSystemPrompt = ({
         const occurrences = systemPrompt.split(m.macro).length - 1
         systemPromptLength += m.length * occurrences
     })
-    systemPrompt = applyMacros(systemPrompt, { ...getActiveMacros(), ...slots })
+    systemPrompt = applyMacros(systemPrompt, { ...macroValues, ...slots })
     return { systemPrompt, systemPromptLength }
 }
 

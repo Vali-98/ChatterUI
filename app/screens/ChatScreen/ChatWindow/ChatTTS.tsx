@@ -3,7 +3,8 @@ import { TouchableOpacity, View } from 'react-native'
 import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated'
 
 import { ChatSwipe } from '@db/schema'
-import { useGenerationState } from '@lib/state/chat'
+import { useChatGenerating } from '@lib/engine/generation/hooks'
+import { Chats } from '@lib/state/chat'
 import { Logger } from '@lib/state/Logger'
 import { useTTSStore } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -16,7 +17,8 @@ const ChatTTS: React.FC<TTSProps> = ({ swipe }) => {
     const { color } = Theme.useTheme()
     const { startTTS, activeSwipeId, stopTTS, enabled } = useTTSStore()
     const swipeText = swipe.swipe
-    const isGenerating = useGenerationState((state) => state.isGenerating)
+    const { chatId } = Chats.useChat()
+    const isGenerating = useChatGenerating(chatId)
     const isSpeaking = swipe.id === activeSwipeId
     const handleSpeak = async () => {
         swipeText && (await startTTS(swipeText, swipe.id))

@@ -796,6 +796,8 @@
         "chat": {
             "askInChatterUI": "Ask in ChatterUI",
             "askInChatterUIDescription": "Use ChatterUI prompts for text intent instead of the default keyboard behavior.",
+            "concurrentGenerations": "Concurrent generations",
+            "concurrentGenerationsDescription": "Allow remote generations in different chats at the same time. Local generation always runs one at a time.",
             "autoGenerateTitles": "Auto-generate chat titles",
             "autoGenerateTitlesDescription": "Create titles for new chats automatically.",
             "autoLoadUser": "Auto-load selected user",

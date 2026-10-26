@@ -62,7 +62,8 @@ export const buildAndSendRequest = (params: APIBuilderParams): RequestHandle => 
                 await finish('cancelled')
                 return
             }
-            const bypassContextLength = mmkv.getBoolean(AppSettings.BypassContextLength)
+            const bypassContextLength =
+                params.bypassContextLength ?? mmkv.getBoolean(AppSettings.BypassContextLength)
             const prompt = await buildContext({ ...params, bypassContextLength })
             if (isAborted()) {
                 await finish('cancelled')

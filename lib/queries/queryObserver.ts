@@ -106,6 +106,16 @@ export const createQueryObserver = <T>({
 
     return {
         refresh: refresh,
+        // A committed local write can synchronously advance snapshots before an overlay is released.
+        refreshSync: (readCommitted: () => T) => {
+            ++generation
+            try {
+                success(readCommitted())
+            } catch (error) {
+                failure(error)
+                throw error
+            }
+        },
         getSnapshot: () => snapshot,
         subscribe: (notify: () => void) => {
             subscribers.add(notify)

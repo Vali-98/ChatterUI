@@ -1,5 +1,5 @@
 import { setStringAsync } from 'expo-clipboard'
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -13,7 +13,7 @@ import { ChatSwipe } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useBackAction } from '@lib/hooks/BackAction'
 import { AuthorNotes } from '@lib/state/AuthorNotes'
-import { Chats, useGenerationState } from '@lib/state/chat'
+import { Chats } from '@lib/state/chat'
 import { authorNoteEditorState } from '@lib/state/components/AuthorNotes'
 import { Logger } from '@lib/state/Logger'
 import { useTTSStore } from '@lib/state/TTS'
@@ -28,11 +28,6 @@ interface OptionsStateProps {
     setActiveIndex: (n: number | undefined) => void
 }
 
-useGenerationState.subscribe(({ isGenerating }) => {
-    if (isGenerating) {
-        useChatActionsState.getState().setActiveIndex(undefined)
-    }
-})
 export const useChatActionsState = create<OptionsStateProps>()((set, get) => ({
     setActiveIndex: (n) => set({ activeEntryId: get().activeEntryId === n ? undefined : n }),
 }))
@@ -69,6 +64,10 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
 
     const { activeSwipeId } = useTTSStore()
     const showOptions = activeEntryId === entryId
+
+    useEffect(() => {
+        if (isGenerating && showOptions) setShowOptions(undefined)
+    }, [isGenerating, showOptions, setShowOptions])
 
     const handleEnableEdit = () => {
         if (showOptions) setShowOptions(undefined)

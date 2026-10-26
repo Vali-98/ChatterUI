@@ -8,6 +8,7 @@ import ContextMenu from '@components/views/ContextMenu'
 import InputSheet from '@components/views/InputSheet'
 import { Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/chat'
+import { useChatEditable } from '@lib/state/chat/access'
 import { Logger } from '@lib/state/Logger'
 
 type ChatEditPopupProps = {
@@ -18,6 +19,7 @@ type ChatEditPopupProps = {
 
 const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }) => {
     const { t } = useTranslation()
+    const editable = useChatEditable(item.id)
     const renameInputRef = useBottomSheetRef()
 
     const { characterId } = Characters.useCharacterState(
@@ -129,11 +131,13 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                 <ContextMenu.Body>
                     <ContextMenu.Button
                         label={t('common.actions.rename')}
+                        disabled={!editable}
                         icon="edit"
                         onPress={() => renameInputRef.current?.open()}
                     />
                     <ContextMenu.Button
                         label={t('common.actions.delete')}
+                        disabled={!editable}
                         icon="delete"
                         variant="warning"
                         closeOnPress={false}
@@ -156,6 +160,7 @@ const ChatEditPopup: React.FC<ChatEditPopupProps> = ({ item, children, onPress }
                             />
                             <ContextMenu.Button
                                 label={t('chat.drawer.user.linkAction')}
+                                disabled={!editable}
                                 icon="user"
                                 closeOnPress={false}
                                 onPress={handleLinkUser}

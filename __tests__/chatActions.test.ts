@@ -1,3 +1,4 @@
+import { useChatAccessState } from '../lib/state/chat/access'
 import { randomUUID } from 'expo-crypto'
 
 import { Tokenizer } from '../lib/engine/Tokenizer'
@@ -8,6 +9,7 @@ import {
     countMessageTokens,
     createChat,
     createMessage,
+    createTurn,
     deleteChat,
     deleteMessage,
     duplicateChat,
@@ -17,8 +19,17 @@ import {
     updateSwipe,
 } from '../lib/state/chat/actions'
 import { db } from '../lib/state/chat/db'
-import { abortGeneration, finishGeneration } from '../lib/state/chat/generationActions'
-import { useGenerationState } from '../lib/state/chat/generationState'
+import { finishGeneration } from '../lib/engine/generation/lifecycle'
+import {
+    abortGeneration,
+    beginGeneration,
+    getGenerationRuntime,
+} from '../lib/engine/generation/runtime'
+import {
+    updateGeneration,
+    appendGeneration,
+    useGenerationState,
+} from '../lib/engine/generation/state'
 import { notifyGenerationComplete } from '../lib/state/chat/notifications'
 import { useChatState } from '../lib/state/chat/state'
 import type { Chat } from '../lib/state/chat/types'
@@ -26,6 +37,11 @@ import { Logger } from '../lib/state/Logger'
 import { mmkv } from '../lib/storage/MMKV'
 import { copyFile, deleteFile, fileInfo, saveStringToDownload } from '../lib/utils/File'
 
+jest.mock('../lib/queries/databaseQuery', () => ({ publishDatabaseChanges: jest.fn() }))
+jest.mock('react-native-background-actions', () => ({
+    __esModule: true,
+    default: { start: jest.fn(), stop: jest.fn() },
+}))
 jest.mock('mime/lite', () => ({
     __esModule: true,
     default: {
@@ -74,7 +90,7 @@ jest.mock('../lib/state/chat/db', () => ({
             chatAttachments: jest.fn(),
             messageAttachments: jest.fn(),
         },
-        create: { chat: jest.fn(), message: jest.fn(), swipe: jest.fn() },
+        create: { chat: jest.fn(), message: jest.fn(), swipe: jest.fn(), turn: jest.fn() },
         update: { swipe: jest.fn() },
         delete: { chat: jest.fn(), message: jest.fn() },
     },
@@ -137,6 +153,7 @@ let frames: FrameRequestCallback[]
 let frameSpy: jest.SpyInstance
 
 beforeEach(() => {
+    useChatAccessState.setState({ leases: {} })
     jest.resetAllMocks()
     source = createSource()
     frames = []
@@ -162,8 +179,8 @@ beforeEach(() => {
     userSelection.setCard.mockResolvedValue('User')
     jest.mocked(Characters.useUserStore.getState).mockReturnValue(userSelection)
     useChatState.getState().reset()
-    useChatState.getState().setBuffer({ data: '' })
-    useGenerationState.getState().reset()
+    useGenerationState.setState({ generations: {} })
+    jest.mocked(db.update.swipe).mockReturnValue(source.messages[0].swipes[1])
 })
 
 afterEach(() => frameSpy.mockRestore())
@@ -382,46 +399,42 @@ test('swipe edits include image token costs and use null for a failed token calc
     )
 })
 
-test('generation finalization saves its captured swipe and notifies for its actual chat', async () => {
-    useGenerationState.getState().startGenerating(31)
+const startGeneration = (swipeId = 31, chatId = 10, text = 'response') =>
+    beginGeneration({ swipeId, chatId, mode: 'remote', text })!
+
+test('generation publishes its saved data and retires output without UI acknowledgment', async () => {
+    const generation = startGeneration()
     useChatState.getState().setChat(999)
-    useChatState.getState().setBuffer({ data: 'response' })
     jest.mocked(db.query.swipeContext).mockReturnValue({
         chat_id: 10,
         character_id: 1,
         character_name: 'Character',
     })
-    await finishGeneration()
-    expect(db.update.swipe).toHaveBeenCalledWith(31, expect.objectContaining({ swipe: 'response' }))
+    await finishGeneration(generation.id, 'completed')
+    expect(db.update.swipe).toHaveBeenCalledWith(
+        31,
+        expect.objectContaining({ swipe: 'response' }),
+        expect.objectContaining({ mutationToken: expect.any(Symbol) })
+    )
     expect(notifyGenerationComplete).toHaveBeenCalledWith({
         chatId: 10,
         characterId: 1,
         characterName: 'Character',
         text: 'response',
     })
-    frames[0](0)
-    expect(useGenerationState.getState().isGenerating).toBe(false)
-    expect(useChatState.getState().buffer.data).toBe('')
+    expect(frames).toHaveLength(0)
+    expect(useGenerationState.getState().generations[generation.id]).toBeUndefined()
 })
 
-test('an old completion frame cannot clear a newer generation', async () => {
-    useGenerationState.getState().startGenerating(31)
-    await finishGeneration()
-    useGenerationState.getState().startGenerating(100)
-    useChatState.getState().setBuffer({ data: 'new response' })
-    frames[0](0)
-    expect(useGenerationState.getState().currentSwipeId).toBe(100)
-    expect(useChatState.getState().buffer.data).toBe('new response')
-})
-
-test('abort uses the registered backend callback and new generations clear stale callbacks', async () => {
+test('abort targets one chat without cancelling another', async () => {
+    const first = startGeneration()
+    const second = startGeneration(100, 11)
     const abort = jest.fn(async () => {})
-    useGenerationState.getState().startGenerating(31)
-    useGenerationState.getState().setAbort(abort)
-    await abortGeneration()
+    getGenerationRuntime(first.id).abortLocal = abort
+    await abortGeneration(10)
+    expect(getGenerationRuntime(first.id).controller.signal.aborted).toBe(true)
+    expect(getGenerationRuntime(second.id).controller.signal.aborted).toBe(false)
     expect(abort).toHaveBeenCalledTimes(1)
-    useGenerationState.getState().startGenerating(100)
-    expect(useGenerationState.getState().abortFunction).toBeUndefined()
 })
 
 test('export includes every variant so importing can preserve the selected swipe', async () => {
@@ -436,56 +449,114 @@ test('export includes every variant so importing can preserve the selected swipe
 })
 
 test('duplicate completion callbacks share one save and notification', async () => {
-    useGenerationState.getState().startGenerating(31)
-    useChatState.getState().setBuffer({ data: 'response' })
+    const generation = startGeneration()
     jest.mocked(db.query.swipeContext).mockReturnValue({
         chat_id: 10,
         character_id: 1,
         character_name: 'Character',
     })
-    const first = finishGeneration()
-    const second = finishGeneration()
+    const first = finishGeneration(generation.id, 'completed')
+    const second = finishGeneration(generation.id, 'completed')
     expect(second).toBe(first)
     await Promise.all([first, second])
     expect(db.update.swipe).toHaveBeenCalledTimes(1)
     expect(notifyGenerationComplete).toHaveBeenCalledTimes(1)
 })
 
-test('an old frame cannot reset a newer regeneration of the same swipe', async () => {
-    useGenerationState.getState().startGenerating(31)
-    const oldId = useGenerationState.getState().generationId
-    await finishGeneration()
-    useGenerationState.getState().startGenerating(31)
-    useChatState.getState().setBuffer({ data: 'new attempt' })
-    frames[0](0)
-    await finishGeneration({ generationId: oldId })
-    expect(useGenerationState.getState().isGenerating).toBe(true)
-    expect(useChatState.getState().buffer.data).toBe('new attempt')
+test('old completion callbacks cannot remove a new attempt on the same swipe', async () => {
+    const old = startGeneration()
+    await finishGeneration(old.id, 'completed')
+    const next = startGeneration()
+    updateGeneration(next.id, { text: 'new attempt' })
+    await finishGeneration(old.id, 'completed')
+    expect(useGenerationState.getState().generations[next.id]).toMatchObject({
+        status: 'preparing',
+        text: 'new attempt',
+    })
     expect(db.update.swipe).toHaveBeenCalledTimes(1)
 })
 
-test('follow-up work sees persisted output and finishes before clearing the buffer', async () => {
-    useGenerationState.getState().startGenerating(31)
-    const onSaved = jest.fn(async () => {
-        expect(db.update.swipe).toHaveBeenCalledTimes(1)
-        expect(frames).toHaveLength(0)
-        expect(useGenerationState.getState().isGenerating).toBe(true)
-    })
-    await finishGeneration({ notify: false, onSaved })
-    expect(onSaved).toHaveBeenCalledTimes(1)
-    expect(frames).toHaveLength(1)
-    expect(notifyGenerationComplete).not.toHaveBeenCalled()
-})
-
 test('a failed save retains output and permits a retry', async () => {
-    useGenerationState.getState().startGenerating(31)
-    useChatState.getState().setBuffer({ data: 'unsaved output' })
+    const generation = startGeneration(31, 10, 'unsaved output')
     jest.mocked(db.update.swipe).mockImplementationOnce(() => {
         throw new Error('save failed')
     })
-    await expect(finishGeneration()).rejects.toThrow('save failed')
-    expect(useChatState.getState().buffer.data).toBe('unsaved output')
-    expect(frames).toHaveLength(0)
-    await finishGeneration({ notify: false })
+    await expect(finishGeneration(generation.id, 'completed')).rejects.toThrow('save failed')
+    expect(useGenerationState.getState().generations[generation.id]).toMatchObject({
+        text: 'unsaved output',
+        persisted: false,
+        status: 'failed',
+    })
+    await finishGeneration(generation.id, 'completed')
     expect(db.update.swipe).toHaveBeenCalledTimes(2)
+})
+
+test('failed or cancelled regeneration without output preserves the original saved response', async () => {
+    const generation = startGeneration(31, 10, '')
+    getGenerationRuntime(generation.id).originalSwipe = source.messages[0].swipes[1]
+    await finishGeneration(generation.id, 'failed')
+    expect(db.update.swipe).not.toHaveBeenCalled()
+    expect(useGenerationState.getState().generations[generation.id]).toBeUndefined()
+    expect(useChatAccessState.getState().leases[10]).toBeUndefined()
+})
+
+test('regeneration with partial output saves that output on cancellation', async () => {
+    const generation = startGeneration(31, 10, '')
+    getGenerationRuntime(generation.id).originalSwipe = source.messages[0].swipes[1]
+    appendGeneration(generation.id, 'partial replacement')
+    await finishGeneration(generation.id, 'cancelled')
+    expect(db.update.swipe).toHaveBeenCalledWith(
+        31,
+        expect.objectContaining({ swipe: 'partial replacement' }),
+        expect.any(Object)
+    )
+})
+
+test('turn preparation cancels after attachment copying and cleans staged files without inserting messages', async () => {
+    const controller = new AbortController()
+    jest.mocked(copyFile).mockImplementationOnce(async () => {
+        controller.abort()
+        return true
+    })
+    await expect(
+        createTurn(
+            10,
+            {
+                text: 'hello',
+                userName: 'User',
+                characterName: 'Character',
+                attachmentUris: ['/original/image.png'],
+            },
+            { signal: controller.signal, macros: { char: 'Character', user: 'User' } }
+        )
+    ).rejects.toThrow('cancelled')
+    expect(db.create.turn).not.toHaveBeenCalled()
+    expect(deleteFile).toHaveBeenCalledWith('/attachments/attachment-1.png')
+})
+
+test('turn transaction failure removes copied attachments', async () => {
+    jest.mocked(db.create.turn).mockImplementationOnce(() => {
+        throw new Error('rollback')
+    })
+    await expect(
+        createTurn(
+            10,
+            {
+                text: 'hello',
+                userName: 'User',
+                characterName: 'Character',
+                attachmentUris: ['/original/image.png'],
+            },
+            { signal: new AbortController().signal, macros: { char: 'Character', user: 'User' } }
+        )
+    ).rejects.toThrow('rollback')
+    expect(deleteFile).toHaveBeenCalledWith('/attachments/attachment-1.png')
+})
+
+test('an empty successful regeneration also leaves the original response intact', async () => {
+    const generation = startGeneration(31, 10, '')
+    getGenerationRuntime(generation.id).originalSwipe = source.messages[0].swipes[1]
+    await finishGeneration(generation.id, 'completed')
+    expect(db.update.swipe).not.toHaveBeenCalled()
+    expect(notifyGenerationComplete).not.toHaveBeenCalled()
 })

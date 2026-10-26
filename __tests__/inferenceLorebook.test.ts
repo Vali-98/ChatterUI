@@ -51,7 +51,7 @@ beforeEach(() => {
 test('lorebooks can scan recent history when older history was truncated', async () => {
     const [source] = await createLorebookDataSource()
     const results = await source.retrieve(
-        {} as ContextBuilderParams,
+        { tokenizer: Tokenizer.getTokenizer() } as ContextBuilderParams,
         [
             { role: 'user', content: 'old' },
             { role: 'user', content: 'new' },
@@ -70,7 +70,7 @@ test('entry token counts use the current tokenizer instead of a cache from a dif
     const [source] = await createLorebookDataSource()
     const read = () =>
         source.retrieve(
-            {} as ContextBuilderParams,
+            { tokenizer: Tokenizer.getTokenizer() } as ContextBuilderParams,
             [{ role: 'user', content: 'new' }],
             100,
             0,
