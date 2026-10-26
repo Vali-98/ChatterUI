@@ -1,11 +1,10 @@
 import { useFocusEffect } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { StyleSheet, View } from 'react-native'
 import Animated, {
     measure,
     useAnimatedRef,
     useAnimatedStyle,
-    useAnimatedReaction,
     useFrameCallback,
     useSharedValue,
     runOnJS,
@@ -15,6 +14,7 @@ import Animated, {
 
 import { CHAT_CONTROL_EDGE, CHAT_CONTROL_GAP } from '@lib/constants/ChatControls'
 import { useChatGenerating } from '@lib/engine/generation/hooks'
+import { useBackAction } from '@lib/hooks/BackAction'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Chats } from '@lib/state/chat'
 import { chatControlLift } from '@lib/state/components/chatControlBounds'
@@ -25,10 +25,16 @@ import { useChatActionBounds } from './ChatActionAnchor'
 import ChatQuickActions from './ChatQuickActions'
 
 const ChatActionOverlay = ({ chatId }: { chatId: number }) => {
-    const [interactive, setInteractive] = useState(false)
     const entryId = useChatActionsState((state) => state.activeEntryId)
     const initialEntry = useChatActionsState((state) => state.activeEntry)
     const dismiss = useChatActionsState((state) => state.dismiss)
+    useBackAction(
+        useCallback(() => {
+            if (entryId === undefined) return false
+            dismiss(entryId)
+            return true
+        }, [entryId, dismiss])
+    )
     useFocusEffect(useCallback(() => () => dismiss(), [dismiss]))
     const inputHeight = useChatControlLayoutState((state) => state.inputHeight)
     const playerHeight = useChatControlLayoutState((state) => state.playerHeight)
@@ -125,22 +131,6 @@ const ChatActionOverlay = ({ chatId }: { chatId: number }) => {
             ? 1
             : 0,
     }))
-    // Native hit testing uses the regular React prop. Bridge only visibility transitions,
-    // rather than updating pointerEvents through animatedProps on the layout-animated view.
-    useAnimatedReaction(
-        () => {
-            const placed = placeChatControl(
-                message.value,
-                viewport.value,
-                size.value,
-                playerHeight > 0 ? playerHeight + CHAT_CONTROL_GAP + chatControlLift.value : 0
-            )
-            return message.value.entryId === entryId && placed.visible
-        },
-        (next, previous) => {
-            if (next !== previous) runOnJS(setInteractive)(next)
-        }
-    )
     const swipe = entry?.swipes.find((item) => item.active)
     return (
         <Animated.View
@@ -154,7 +144,7 @@ const ChatActionOverlay = ({ chatId }: { chatId: number }) => {
                     collapsable={false}
                     entering={FadeIn.duration(120)}
                     exiting={FadeOut.duration(200)}
-                    pointerEvents={interactive ? 'auto' : 'none'}
+                    pointerEvents="box-none"
                     style={[{ position: 'absolute' }, position]}
                     onLayout={(event) => {
                         const { width, height } = event.nativeEvent.layout

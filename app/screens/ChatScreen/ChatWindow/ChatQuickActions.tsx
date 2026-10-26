@@ -1,5 +1,5 @@
 import { setStringAsync } from 'expo-clipboard'
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -11,7 +11,6 @@ import Alert from '@components/views/Alert'
 import { ChatControlPanel } from '@components/views/ChatControlColumn'
 import { ChatSwipe } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
-import { useBackAction } from '@lib/hooks/BackAction'
 import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { Chats } from '@lib/state/chat'
 import { authorNoteEditorState } from '@lib/state/components/AuthorNotes'
@@ -95,14 +94,6 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ entryId, isGenerating, sw
             ],
         })
     }
-
-    const backAction = useCallback(() => {
-        if (!swipe) return false
-        setShowOptions(undefined)
-        return true
-    }, [setShowOptions, swipe])
-
-    useBackAction(backAction)
 
     if (!swipe) return
 
