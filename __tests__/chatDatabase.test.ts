@@ -1,3 +1,5 @@
+import { migrateSwipeReasoning } from '../db/reasoningMigration'
+import { db as database } from '../db/db'
 import { acquireChatLease, releaseChatLease, useChatAccessState } from '../lib/state/chat/access'
 import { db } from '../lib/state/chat/db'
 
@@ -273,5 +275,132 @@ describeSQLite('chat mutation ownership and turn transactions', () => {
             })
         ).toThrow()
         expect(db.query.chat(chatId)?.messages).toEqual([])
+    })
+})
+
+describeSQLite('separate swipe reasoning', () => {
+    beforeEach(() => {
+        useChatAccessState.setState({ leases: {} })
+        reset()
+    })
+    const create = () => {
+        const chatId = db.create.chat({ character_id: 1, messages: [message('Answer')] })
+        const swipeId = db.query.chat(chatId)!.messages[0].swipes[0].id
+        return { chatId, swipeId }
+    }
+    test('UI reads include reasoning; default context reads do not fetch it', () => {
+        const { chatId, swipeId } = create()
+        db.update.swipe(swipeId, { reasoning: 'Private thought' })
+        statements.length = 0
+        const chat = db.live.chat(chatId).sync()!
+        expect(chat.messages[0].swipes[0].reasoning).toBeUndefined()
+        expect(statements.some((sql) => sql.includes('swipe_reasoning'))).toBe(false)
+        const entry = db.live.message(chat.messages[0].id).sync()!
+        expect(entry.swipes[0].reasoning?.content).toBe('Private thought')
+        expect(
+            db.live.chat(chatId, { includeReasoning: true }).sync()!.messages[0].swipes[0].reasoning
+                ?.content
+        ).toBe('Private thought')
+    })
+    test('inserts/imports normalize assistant text but preserve literal user messages', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [
+                message('<think>Private</think>Answer'),
+                { ...message('<think>User text</think>'), is_user: true },
+            ],
+        })
+        const chat = db.query.chatCopy(chatId)!
+        expect(chat.messages[0].swipes[0]).toMatchObject({
+            swipe: 'Answer',
+            reasoning: { content: 'Private' },
+        })
+        expect(chat.messages[1].swipes[0]).toMatchObject({
+            swipe: '<think>User text</think>',
+            reasoning: null,
+        })
+    })
+    test('reasoning checkpoints survive edits and cascade with their owning swipe', () => {
+        const { chatId, swipeId } = create()
+        db.update.swipe(swipeId, { reasoning: 'Original and continued', resetReasoningLength: 8 })
+        db.update.swipe(swipeId, { reasoning: 'Edited' })
+        expect(db.query.reasoning(swipeId)).toMatchObject({ content: 'Edited', reset_length: 8 })
+        const lease = acquireChatLease(chatId)
+        expect(() => db.update.swipe(swipeId, { reasoning: 'Forbidden' })).toThrow()
+        releaseChatLease(chatId, lease)
+        db.delete.chat(chatId)
+        expect(db.query.reasoning(swipeId)).toBeUndefined()
+    })
+    test('legacy conversion is repeatable and leaves user text and timestamps untouched', () => {
+        const { chatId, swipeId } = create()
+        const user = db.create.message(chatId, {
+            ...message('<think>Keep user literal</think>'),
+            is_user: true,
+        })
+        connection!
+            .prepare(
+                'UPDATE chat_swipes SET swipe = ?, token_length = 50, reset_length = 3 WHERE id = ?'
+            )
+            .run('<think>Private</think>Answer', swipeId)
+        const before = db.query.swipe(swipeId)!
+        migrateSwipeReasoning(database)
+        migrateSwipeReasoning(database)
+        expect(db.query.swipe(swipeId)).toMatchObject({
+            swipe: 'Answer',
+            token_length: null,
+            reset_length: null,
+            send_date: before.send_date,
+        })
+        expect(db.query.reasoning(swipeId)?.content).toBe('Private')
+        expect(db.live.message(user.id).sync()!.swipes[0].swipe).toBe(
+            '<think>Keep user literal</think>'
+        )
+    })
+    test('a failed reasoning write rolls back the answer update', () => {
+        const { swipeId } = create()
+        connection!.exec(
+            "CREATE TEMP TRIGGER fail_reasoning BEFORE INSERT ON swipe_reasoning BEGIN SELECT RAISE(ABORT, 'test failure'); END"
+        )
+        try {
+            expect(() =>
+                db.update.swipe(swipeId, { swipe: 'Changed', reasoning: 'Thought' })
+            ).toThrow()
+            expect(db.query.swipe(swipeId)?.swipe).toBe('Answer')
+        } finally {
+            connection!.exec('DROP TRIGGER fail_reasoning')
+        }
+    })
+    test('a failed legacy conversion rolls back all converted rows before retry', () => {
+        const { chatId, swipeId } = create()
+        const other = db.create.message(chatId, message('Other')).swipes[0].id
+        for (const id of [swipeId, other])
+            connection!
+                .prepare('UPDATE chat_swipes SET swipe = ? WHERE id = ?')
+                .run('<think>Private</think>Answer', id)
+        connection!.exec(
+            `CREATE TEMP TRIGGER fail_migration BEFORE INSERT ON swipe_reasoning WHEN NEW.swipe_id = ${other} BEGIN SELECT RAISE(ABORT, 'test failure'); END`
+        )
+        try {
+            expect(() => migrateSwipeReasoning(database)).toThrow()
+            expect(db.query.swipe(swipeId)?.swipe).toBe('<think>Private</think>Answer')
+            expect(db.query.reasoning(swipeId)).toBeUndefined()
+        } finally {
+            connection!.exec('DROP TRIGGER fail_migration')
+        }
+        migrateSwipeReasoning(database)
+        expect(db.query.swipe(swipeId)?.swipe).toBe('Answer')
+        expect(db.query.reasoning(other)?.content).toBe('Private')
+    })
+    test('rerunning conversion preserves existing reasoning when inline content is found', () => {
+        const { swipeId } = create()
+        db.update.swipe(swipeId, {
+            swipe: '<think>Additional</think>Answer',
+            reasoning: 'Original',
+        })
+        migrateSwipeReasoning(database)
+        expect(db.query.swipe(swipeId)?.swipe).toBe('Answer')
+        expect(db.query.reasoning(swipeId)?.content).toBe('Original\n\nAdditional')
+        migrateSwipeReasoning(database)
+        expect(db.query.reasoning(swipeId)?.content).toBe('Original\n\nAdditional')
     })
 })

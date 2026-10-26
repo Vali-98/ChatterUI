@@ -93,7 +93,11 @@ const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) 
     const handleSwipeRight = (message: string) => {
         if (!canGenerate) return
         if (currentIndex >= swipeIdList.length - 1) {
-            const newSwipe = Chats.actions.createSwipe(swipe.entry_id, message)
+            const newSwipe = Chats.actions.createSwipe(
+                swipe.entry_id,
+                message,
+                message ? { sourceSwipeId: swipe.id } : {}
+            )
             if (!newSwipe) return
             if (message) continueResponse(newSwipe)
             else generateResponse(newSwipe.id)

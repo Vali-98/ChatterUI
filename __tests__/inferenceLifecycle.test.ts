@@ -55,10 +55,6 @@ jest.mock('../lib/engine/DataSources', () => ({ getDataSources: jest.fn() }))
 jest.mock('../lib/engine/Tokenizer', () => ({
     Tokenizer: { getTokenizer: () => async (text: string) => text.length },
 }))
-jest.mock('../lib/markdown/ThinkTags', () => ({
-    isOpenThinkTag: (text: string) => text.startsWith('<think>'),
-    isCloseThinkTag: (text: string) => text.endsWith('</think>'),
-}))
 jest.mock('../lib/state/AppMode', () => ({ useAppModeStore: { getState: jest.fn() } }))
 jest.mock('../lib/state/characters', () => ({
     Characters: {
@@ -107,6 +103,7 @@ jest.mock('../lib/state/chat', () => ({
         db: {
             query: {
                 swipe: jest.fn(),
+                reasoning: jest.fn(),
                 swipeContext: (id: number) => ({ chat_id: id === 31 ? 10 : 11 }),
                 chatName: jest.fn(() => 'Named chat'),
             },
@@ -451,4 +448,16 @@ test('multimodal capability changes do not leak between local models', async () 
     expect(
         jest.mocked(buildChatCompletionContext).mock.calls[1][0].apiConfig.request.completionType
     ).toMatchObject({ supportsImages: false })
+})
+
+test('regenerating a continuation preserves a reasoning checkpoint even when the answer prefix is empty', async () => {
+    jest.mocked(Chats.db.query.reasoning).mockReturnValueOnce({
+        swipe_id: 31,
+        content: 'Original thoughtAdditional thought',
+        reset_length: 'Original thought'.length,
+    })
+    await regenerateResponse({ id: 31, swipe: 'Continued answer', reset_length: 0 } as any)
+    const generation = Object.values(useGenerationState.getState().generations)[0]
+    expect(generation.text).toBe('')
+    expect(generation.reasoning).toBe('Original thought')
 })

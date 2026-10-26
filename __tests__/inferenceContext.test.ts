@@ -16,7 +16,6 @@ jest.mock('i18next', () => ({ t: (key: string) => key }))
 jest.mock('../lib/hooks/TextFilter', () => ({
     useTextFilterStore: { getState: () => ({ sendFilteredText: true, filter: [] }) },
 }))
-jest.mock('../lib/markdown/ThinkTags', () => ({ buildThinkRules: () => [] }))
 jest.mock('../lib/state/AppMode', () => ({
     useAppModeStore: { getState: () => ({ appMode: 'remote' }) },
 }))
@@ -215,4 +214,59 @@ test('an oversized system prompt warns and still produces a payload', async () =
     const result = await buildChatCompletionContext(params)
     expect(result?.[0].content).toBe(params.instruct.system_prompt_format)
     expect(Logger.warnToast).toHaveBeenCalledWith('generation.warn.systemPromptExceedsContext')
+})
+
+test('native chat requests omit reasoning even when the inline hide setting is disabled', async () => {
+    const params = parameters()
+    params.messages[0].is_user = false
+    params.messages[0].swipes[0].reasoning = {
+        swipe_id: 1,
+        content: 'Private reasoning',
+        reset_length: null,
+    }
+    const result = await buildChatCompletionContext(params)
+    expect(JSON.stringify(result)).not.toContain('Private reasoning')
+    expect(JSON.stringify(result)).not.toContain('<think>')
+})
+
+test('formatted text reasoning is included only when explicitly allowed and counted in the budget', async () => {
+    const params = parameters()
+    params.messages = [message('Answer', 1)]
+    params.messages[0].is_user = false
+    params.messages[0].swipes[0].reasoning = {
+        swipe_id: 1,
+        content: 'Private reasoning',
+        reset_length: null,
+    }
+    params.maxLength = 1000
+    const included = await collectContext({ ...params, mode: 'text' })
+    expect(included.messages[0].content).toBe('<think>Private reasoning</think>\nAnswer')
+    params.instruct.hide_think_tags = true
+    const excluded = await collectContext({ ...params, mode: 'text' })
+    expect(excluded.messages[0].content).toBe('Answer')
+})
+
+test('native chat content keeps user-authored think tags as literal message content', async () => {
+    const params = parameters()
+    params.messages = [message('An example: <think>literal</think>', 1)]
+    params.instruct.hide_think_tags = true
+    const result = await collectContext(params)
+    expect(result.messages[0].content).toBe('An example: <think>literal</think>')
+})
+
+test('reasoning-only final swipes are included when formatted-text policy permits them', async () => {
+    const params = parameters()
+    params.messages = [message('', 1)]
+    params.messages[0].is_user = false
+    params.messages[0].swipes[0].reasoning = {
+        swipe_id: 1,
+        content: 'Unfinished thought',
+        reset_length: null,
+    }
+    params.maxLength = 1000
+    expect((await collectContext({ ...params, mode: 'text' })).messages[0].content).toBe(
+        '<think>Unfinished thought</think>\n'
+    )
+    params.instruct.hide_think_tags = true
+    expect((await collectContext({ ...params, mode: 'text' })).messages).toEqual([])
 })

@@ -1,57 +1,27 @@
 export const thinkTags = [
     {
+        prefix: '<think',
         open: /^<think\b[^>]*>/,
         close: '</think>',
     },
     {
+        prefix: '<thinking',
         open: /^<thinking\b[^>]*>/,
         close: '</thinking>',
     },
     {
+        prefix: '<|channel>thought',
         open: /^<\|channel>thought/,
         close: '<channel|>',
     },
     {
+        prefix: '<seed:think>',
         open: /^<seed:think>/,
         close: '</seed:think>',
     },
     {
+        prefix: '<thought',
         open: /^<thought\b[^>]*>/,
         close: '</thought>',
     },
 ]
-
-function escapeRegex(str: string) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-export function buildThinkRules() {
-    return thinkTags.map((tag) => {
-        const openSource =
-            tag.open instanceof RegExp ? tag.open.source.replace(/^\^/, '') : escapeRegex(tag.open)
-
-        const closeSource = escapeRegex(tag.close)
-
-        return {
-            /**
-             * @TODO investigate if cut off think tags should be ignored
-             */
-            macro: new RegExp(`${openSource}[\\s\\S]*?(?:${closeSource}|$)`, 'g'),
-            value: '',
-        }
-    })
-}
-
-export const isOpenThinkTag = (buffer: string) => {
-    return thinkTags.some((tag) => {
-        if (tag.open instanceof RegExp) {
-            return tag.open.test(buffer)
-        }
-
-        return buffer.endsWith(tag.open)
-    })
-}
-
-export const isCloseThinkTag = (buffer: string) => {
-    return thinkTags.some((tag) => buffer.endsWith(tag.close))
-}

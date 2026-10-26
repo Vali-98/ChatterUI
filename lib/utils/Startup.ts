@@ -239,7 +239,8 @@ const setCPUThreads = () => {
     mmkv.set(Global.CPUThreads, newThreads)
 }
 
-export const startupApp = () => {
+export const startupApp = async () => {
+    await migrateData()
     console.log('[APP STARTED]: T1APT')
     // DEV: Needed for Reset
     //Chats.useChatState.getState().reset()
@@ -284,7 +285,6 @@ export const startupApp = () => {
     migrateAppMode_0_8_5_to_0_8_6()
     migrateTextIntent_0_8_8_to_0_8_9()
     lockScreenOrientation()
-    migrateData()
     const backgroundColor = Theme.useColorState.getState().color.neutral._100
     setUIBackgroundColor(backgroundColor)
 

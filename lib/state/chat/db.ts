@@ -1,20 +1,32 @@
 import { and, asc, count, desc, eq, getTableColumns, like, lte, sum } from 'drizzle-orm'
 
 import { db as database } from '@db/db'
-import { characters, chatAttachments, chatEntries, chats, chatSwipes } from '@db/schema'
+import {
+    characters,
+    chatAttachments,
+    chatEntries,
+    chats,
+    chatSwipes,
+    swipeReasoning,
+} from '@db/schema'
+import { splitReasoning } from '@lib/engine/reasoning/parser'
 
 import { assertChatEditable, type ChatMutationOptions } from './access'
-import type { ChatInput, MessageInput, SwipeInput } from './types'
+import type { Chat, ChatInput, MessageInput, SwipeInput } from './types'
 
 const live = {
-    chat: (chatId: number) =>
+    chat: (chatId: number, options: { includeReasoning?: boolean } = {}) =>
         database.query.chats.findFirst({
             where: eq(chats.id, chatId),
             with: {
                 messages: {
                     orderBy: asc(chatEntries.id),
                     with: {
-                        swipes: { where: eq(chatSwipes.active, true), limit: 1 },
+                        swipes: {
+                            where: eq(chatSwipes.active, true),
+                            limit: 1,
+                            with: { reasoning: options.includeReasoning ? true : undefined },
+                        },
                         attachments: true,
                     },
                 },
@@ -38,13 +50,14 @@ const live = {
         database.query.chatEntries.findFirst({
             where: eq(chatEntries.id, messageId),
             with: {
-                swipes: { where: eq(chatSwipes.active, true), limit: 1 },
+                swipes: { where: eq(chatSwipes.active, true), limit: 1, with: { reasoning: true } },
                 attachments: true,
             },
         }),
     activeSwipe: (messageId: number) =>
         database.query.chatSwipes.findFirst({
             where: and(eq(chatSwipes.entry_id, messageId), eq(chatSwipes.active, true)),
+            with: { reasoning: true },
         }),
     swipeIds: (messageId: number) =>
         database.query.chatSwipes.findMany({
@@ -87,6 +100,10 @@ const query = {
             .sync(),
     swipe: (swipeId: number) =>
         database.query.chatSwipes.findFirst({ where: eq(chatSwipes.id, swipeId) }).sync(),
+    reasoning: (swipeId: number) =>
+        database.query.swipeReasoning
+            .findFirst({ where: eq(swipeReasoning.swipe_id, swipeId) })
+            .sync(),
     swipeContext: (swipeId: number) =>
         database
             .select({
@@ -122,7 +139,7 @@ const query = {
             .orderBy(desc(chatSwipes.send_date))
             .limit(100)
             .all(),
-    chatCopy: (chatId: number, options: { throughMessageId?: number } = {}) => {
+    chatCopy: (chatId: number, options: { throughMessageId?: number } = {}): Chat | undefined => {
         if (options.throughMessageId !== undefined) {
             const boundary = database.query.chatEntries
                 .findFirst({
@@ -144,7 +161,10 @@ const query = {
                             where: lte(chatEntries.id, options.throughMessageId),
                         }),
                         orderBy: asc(chatEntries.id),
-                        with: { swipes: { orderBy: asc(chatSwipes.id) }, attachments: true },
+                        with: {
+                            swipes: { orderBy: asc(chatSwipes.id), with: { reasoning: true } },
+                            attachments: true,
+                        },
                     },
                 },
             })
@@ -185,6 +205,39 @@ const touchMessage = (tx: Transaction, messageId: number) => {
     if (message) touchChat(tx, message.chat_id)
 }
 
+const writeReasoning = (
+    tx: Transaction,
+    swipeId: number,
+    content: string | null | undefined,
+    resetLength?: number | null
+) => {
+    if (content === undefined) return
+    if (!content) {
+        tx.delete(swipeReasoning).where(eq(swipeReasoning.swipe_id, swipeId)).run()
+        return
+    }
+    tx.insert(swipeReasoning)
+        .values({ swipe_id: swipeId, content: content, reset_length: resetLength })
+        .onConflictDoUpdate({
+            target: swipeReasoning.swipe_id,
+            set: { content, ...(resetLength !== undefined && { reset_length: resetLength }) },
+        })
+        .run()
+}
+
+const insertSwipe = (tx: Transaction, messageId: number, input: SwipeInput, normalize: boolean) => {
+    const { reasoning, ...fields } = input
+    const parsed =
+        normalize && reasoning === undefined ? splitReasoning(fields.swipe ?? '') : undefined
+    const swipe = tx
+        .insert(chatSwipes)
+        .values({ ...fields, swipe: parsed?.text ?? fields.swipe, entry_id: messageId })
+        .returning()
+        .get()
+    writeReasoning(tx, swipe.id, reasoning?.content ?? parsed?.reasoning, reasoning?.reset_length)
+    return swipe
+}
+
 const insertMessage = (tx: Transaction, chatId: number, input: MessageInput) => {
     const { swipes, attachments = [], ...fields } = input
     // `order` is a required legacy column. Chronology uses the message ID.
@@ -194,16 +247,8 @@ const insertMessage = (tx: Transaction, chatId: number, input: MessageInput) => 
         .returning()
         .get()
     const activeIndex = swipes.findIndex((swipe) => swipe.active)
-    if (swipes.length)
-        tx.insert(chatSwipes)
-            .values(
-                swipes.map((swipe, index) => ({
-                    ...swipe,
-                    entry_id: message.id,
-                    active: index === activeIndex,
-                }))
-            )
-            .run()
+    for (const [index, swipe] of swipes.entries())
+        insertSwipe(tx, message.id, { ...swipe, active: index === activeIndex }, !input.is_user)
     if (attachments.length)
         tx.insert(chatAttachments)
             .values(
@@ -276,11 +321,10 @@ const create = {
                 .set({ active: false })
                 .where(eq(chatSwipes.entry_id, messageId))
                 .run()
-            const swipe = tx
-                .insert(chatSwipes)
-                .values({ ...input, entry_id: messageId, active: true })
-                .returning()
-                .get()
+            const owner = tx.query.chatEntries
+                .findFirst({ where: eq(chatEntries.id, messageId) })
+                .sync()
+            const swipe = insertSwipe(tx, messageId, { ...input, active: true }, !owner?.is_user)
             touchMessage(tx, messageId)
             return swipe
         }),
@@ -313,19 +357,27 @@ const update = {
         }),
     swipe: (
         swipeId: number,
-        fields: Partial<Omit<typeof chatSwipes.$inferInsert, 'id' | 'entry_id' | 'active'>>,
+        fields: Partial<Omit<typeof chatSwipes.$inferInsert, 'id' | 'entry_id' | 'active'>> & {
+            reasoning?: string | null
+            resetReasoningLength?: number | null
+        },
         options: ChatMutationOptions = {}
     ) =>
         database.transaction((tx) => {
             if (Object.keys(fields).some((key) => key !== 'token_length'))
                 assertSwipeEditable(swipeId, options)
-            const swipe = tx
-                .update(chatSwipes)
-                .set(fields)
-                .where(eq(chatSwipes.id, swipeId))
-                .returning()
-                .get()
-            if (swipe && fields.swipe !== undefined) touchMessage(tx, swipe.entry_id)
+            const { reasoning, resetReasoningLength, ...columns } = fields
+            const swipe = Object.keys(columns).length
+                ? tx
+                      .update(chatSwipes)
+                      .set(columns)
+                      .where(eq(chatSwipes.id, swipeId))
+                      .returning()
+                      .get()
+                : tx.query.chatSwipes.findFirst({ where: eq(chatSwipes.id, swipeId) }).sync()
+            if (swipe) writeReasoning(tx, swipeId, reasoning, resetReasoningLength)
+            if (swipe && (fields.swipe !== undefined || reasoning !== undefined))
+                touchMessage(tx, swipe.entry_id)
             return swipe
         }),
 }

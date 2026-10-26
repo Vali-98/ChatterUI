@@ -186,6 +186,18 @@ export const chatSwipes = sqliteTable(
     (table) => [index('chat_swipes_entry_active_idx').on(table.entry_id, table.active)]
 )
 
+export const swipeReasoning = sqliteTable('swipe_reasoning', {
+    swipe_id: integer('swipe_id')
+        .primaryKey()
+        .references(() => chatSwipes.id, { onDelete: 'cascade' }),
+    content: text('content').notNull(),
+    reset_length: integer('reset_length'),
+})
+
+export const swipeReasoningRelations = relations(swipeReasoning, ({ one }) => ({
+    swipe: one(chatSwipes, { fields: [swipeReasoning.swipe_id], references: [chatSwipes.id] }),
+}))
+
 export const chatsRelations = relations(chats, ({ many, one }) => ({
     messages: many(chatEntries),
     character: one(characters, {
@@ -204,6 +216,7 @@ export const chatEntriesRelations = relations(chatEntries, ({ one, many }) => ({
 }))
 
 export const swipesRelations = relations(chatSwipes, ({ one }) => ({
+    reasoning: one(swipeReasoning),
     entry: one(chatEntries, {
         fields: [chatSwipes.entry_id],
         references: [chatEntries.id],
@@ -458,7 +471,9 @@ export const authorNotes = sqliteTable(
 )
 
 export type ModelDataType = typeof model_data.$inferSelect
-export type ChatSwipe = typeof chatSwipes.$inferSelect
+export type ChatSwipe = typeof chatSwipes.$inferSelect & {
+    reasoning?: typeof swipeReasoning.$inferSelect | null
+}
 export type ChatEntryType = typeof chatEntries.$inferSelect
 export type ChatType = typeof chats.$inferSelect
 export type ChatAttachmentType = typeof chatAttachments.$inferSelect

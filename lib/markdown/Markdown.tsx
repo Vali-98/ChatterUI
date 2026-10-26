@@ -7,14 +7,12 @@ import { Platform, StyleSheet, Text, useWindowDimensions, View } from 'react-nat
 import { MarkdownIt } from 'react-native-markdown-display'
 
 import ThemedButton from '@components/buttons/ThemedButton'
-import Accordion from '@components/views/Accordion'
 import { ChatStyle } from '@lib/state/ChatStyle'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import latexPlugin from './MarkdownLatexPlugin'
 import doubleQuotePlugin from './MarkdownQuotePlugin'
-import thinkPlugin from './MarkdownThinkPlugin'
 
 const getDeepASTDirection = (astNode: any): 'ltr' | 'rtl' | 'neutral' => {
     if (!astNode) return 'neutral'
@@ -106,10 +104,7 @@ const ImageAdapter = ({
 }
 
 export namespace MarkdownStyle {
-    export const Rules = MarkdownIt({ typographer: true })
-        .use(thinkPlugin)
-        .use(doubleQuotePlugin)
-        .use(latexPlugin)
+    export const Rules = MarkdownIt({ typographer: true }).use(doubleQuotePlugin).use(latexPlugin)
 
     export const RenderRules: Record<string, (...props: any) => ReactNode> = {
         fence: (node: any, children: any, parent: any, styles: any, inheritedStyles = {}) => {
@@ -171,20 +166,6 @@ export namespace MarkdownStyle {
                     {children}
                     {close}
                 </Text>
-            )
-        },
-        think: (node: any, children: any, parent: any, styles: any) => {
-            return (
-                <Accordion
-                    key={node.key}
-                    label={node.sourceInfo ? 'Thought Process' : 'Thinking...'}
-                    style={{
-                        flex: 1,
-                        marginBottom: 8,
-                        elevation: 8,
-                    }}>
-                    {children}
-                </Accordion>
             )
         },
         latex_block: (node: any, children: any, parent: any, styles: any) => {

@@ -70,8 +70,6 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                     borderColor: color.neutral._200,
                     borderWidth: 1,
                     marginBottom: showSwipe ? 0 : 4,
-                    paddingVertical: spacing.sm,
-                    paddingHorizontal: spacing.m,
                     minHeight: 40,
                     borderRadius: borderRadius.m,
                     shadowColor: color.shadow,
@@ -89,32 +87,36 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                 {isLastMessage ? (
                     <ChatTextLast isGenerating={isGenerating} swipe={swipe} />
                 ) : (
-                    <ChatText swipeText={swipe.swipe} />
+                    <ChatText swipeText={swipe.swipe} reasoning={swipe.reasoning?.content} />
                 )}
-                <ChatAttachments entry={entry} />
-                <View
-                    style={{
-                        flexDirection: 'row',
-                    }}>
-                    {showTPS && appMode === 'local' && timings && (
-                        <Text
+                {(entry.attachments.length > 0 || (showTPS && appMode === 'local' && timings)) && (
+                    <View style={{ paddingHorizontal: spacing.m, paddingBottom: spacing.sm }}>
+                        <ChatAttachments entry={entry} />
+                        <View
                             style={{
-                                color: color.text._500,
-                                fontWeight: '300',
-                                textAlign: 'right',
-                                fontSize: fontSize.s,
+                                flexDirection: 'row',
                             }}>
-                            {t('chat.bubble.promptSpeed', {
-                                tokens: getFiniteValue(timings.prompt_per_second),
-                                seconds: getFiniteValue(timings.prompt_ms / 1000),
-                            })}
-                            {t('chat.bubble.textGenerationSpeed', {
-                                tokens: getFiniteValue(timings.predicted_per_second),
-                                seconds: getFiniteValue(timings.predicted_ms / 1000),
-                            })}
-                        </Text>
-                    )}
-                </View>
+                            {showTPS && appMode === 'local' && timings && (
+                                <Text
+                                    style={{
+                                        color: color.text._500,
+                                        fontWeight: '300',
+                                        textAlign: 'right',
+                                        fontSize: fontSize.s,
+                                    }}>
+                                    {t('chat.bubble.promptSpeed', {
+                                        tokens: getFiniteValue(timings.prompt_per_second),
+                                        seconds: getFiniteValue(timings.prompt_ms / 1000),
+                                    })}
+                                    {t('chat.bubble.textGenerationSpeed', {
+                                        tokens: getFiniteValue(timings.predicted_per_second),
+                                        seconds: getFiniteValue(timings.predicted_ms / 1000),
+                                    })}
+                                </Text>
+                            )}
+                        </View>
+                    </View>
+                )}
             </AnimatedPressable>
             {showSwipe && (
                 <ChatSwipes swipe={swipe} isGenerating={isGenerating} isGreeting={isGreeting} />

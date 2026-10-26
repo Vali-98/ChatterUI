@@ -176,6 +176,11 @@
         }
     },
     "chat": {
+        "reasoning": {
+            "label": "Рассуждения",
+            "generating": "Размышление…",
+            "content": "Содержимое"
+        },
         "bubble": {
             "promptSpeed": "Подсказка: {{tokens}} t/s | {{seconds}}s",
             "textGenerationSpeed": "Генерация текста: {{tokens}} т/с | \n{{seconds}}s"

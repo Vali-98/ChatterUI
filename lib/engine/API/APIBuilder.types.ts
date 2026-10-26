@@ -71,6 +71,7 @@ export interface APIRequestFormat {
     // how we get data out of the response stream, eg data.content.delta.text
     responseParsePattern: string
     // how we get data out of the reasoning stream, eg data.content.reason.text
+    // Receive-only. TODO: Templates must explicitly describe native reasoning replay before it is sent.
     reasoningParsePattern?: string | string[]
     // whether or not to remove the max_length field
     removeLength: boolean

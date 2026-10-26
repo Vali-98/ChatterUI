@@ -169,6 +169,13 @@
       "when": 1792912328647,
       "tag": "0023_sampler_ids",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "6",
+      "when": 1793022174069,
+      "tag": "0024_swipe_reasoning",
+      "breakpoints": true
     }
   ]
 }

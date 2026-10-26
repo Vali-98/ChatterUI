@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
 import type { CompletionTimings } from '@db/schema'
+import { createReasoningParser } from '@lib/engine/reasoning/parser'
 
 export type GenerationStatus =
     | 'preparing'
@@ -16,6 +17,7 @@ export type Generation = {
     mode: 'local' | 'remote'
     status: GenerationStatus
     text: string
+    reasoning: string
     timings?: CompletionTimings
     error?: string
     persisted: boolean
@@ -31,12 +33,14 @@ export const useGenerationState = create<{ generations: Record<number, Generatio
     generations: {},
 }))
 
+const parsers = new Map<number, ReturnType<typeof createReasoningParser>>()
 let nextId = 0
 export const createGeneration = (
-    input: Pick<Generation, 'chatId' | 'swipeId' | 'mode' | 'text'>
+    input: Pick<Generation, 'chatId' | 'swipeId' | 'mode' | 'text'> & { reasoning?: string }
 ) => {
     const generation: Generation = {
         ...input,
+        reasoning: input.reasoning ?? '',
         id: ++nextId,
         status: 'preparing',
         persisted: false,
@@ -66,10 +70,39 @@ export const updateGeneration = (
     })
 }
 
-export const appendGeneration = (id: number, text: string) => {
+export const appendGeneration = (id: number, text: string, type: 'text' | 'reasoning' = 'text') => {
     const generation = useGenerationState.getState().generations[id]
-    if (generation && isActiveGeneration(generation))
-        updateGeneration(id, { text: generation.text + text, receivedOutput: true })
+    if (!generation || !isActiveGeneration(generation) || generation.status === 'saving') return
+    const output =
+        type === 'reasoning'
+            ? { text: '', reasoning: text }
+            : (parsers.get(id)?.push(text) ?? { text: text, reasoning: '' })
+    updateGeneration(id, {
+        text: generation.text + output.text,
+        reasoning: generation.reasoning + output.reasoning,
+        receivedOutput:
+            generation.receivedOutput || output.text.length > 0 || output.reasoning.length > 0,
+    })
+}
+
+export const enableGenerationInlineReasoning = (id: number) => {
+    if (!parsers.has(id)) parsers.set(id, createReasoningParser())
+}
+export const primeGenerationReasoning = (id: number, endTag: string) => {
+    enableGenerationInlineReasoning(id)
+    parsers.get(id)!.startReasoning(endTag)
+}
+
+export const flushGenerationContent = (id: number) => {
+    const output = parsers.get(id)?.finish()
+    const generation = useGenerationState.getState().generations[id]
+    if (output && generation && (output.text || output.reasoning))
+        updateGeneration(id, {
+            text: generation.text + output.text,
+            reasoning: generation.reasoning + output.reasoning,
+            receivedOutput: true,
+        })
+    parsers.delete(id)
 }
 
 export const generationForChat = (chatId?: number) =>
@@ -79,6 +112,7 @@ export const generationForChat = (chatId?: number) =>
 
 // Persistence advances database observers before releasing this transient output.
 export const removeGenerationOutput = (id: number) => {
+    parsers.delete(id)
     useGenerationState.setState((state) => {
         const generations = { ...state.generations }
         delete generations[id]

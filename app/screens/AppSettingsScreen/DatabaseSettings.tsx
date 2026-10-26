@@ -10,7 +10,7 @@ import appConfig from '@appconfig'
 import ThemedButton from '@components/buttons/ThemedButton'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
-import { migrateData } from '@db/dataMigrations'
+import { migrateData, resetDataMigrationFlags } from '@db/dataMigrations'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { copyFile, deleteFile } from '@lib/utils/File'
@@ -42,7 +42,10 @@ const DatabaseSettings = () => {
                 from: uri,
                 to: dbPath,
             })
-            if (result) reloadAppAsync()
+            if (result) {
+                resetDataMigrationFlags()
+                reloadAppAsync()
+            }
         }
 
         const dbAppVersion = name.split('-')?.[0]
@@ -73,7 +76,7 @@ const DatabaseSettings = () => {
                 { label: t('common.actions.cancel') },
                 {
                     label: t('settings.database.alert.rerunMigrations.confirm'),
-                    onPress: () => migrateData({ bypass: true }),
+                    onPress: () => migrateData({ bypass: true }).catch(Logger.stackTrace),
                     type: 'warning',
                 },
             ],

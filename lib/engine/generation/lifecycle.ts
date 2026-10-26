@@ -7,7 +7,12 @@ import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'
 
 import { getGenerationRuntime, releaseGenerationRuntime } from './runtime'
-import { removeGenerationOutput, updateGeneration, useGenerationState } from './state'
+import {
+    flushGenerationContent,
+    removeGenerationOutput,
+    updateGeneration,
+    useGenerationState,
+} from './state'
 import type { CompletionReason } from '../API/APIBuilder'
 
 export const finishGeneration = (id: number, reason: CompletionReason): Promise<void> => {
@@ -24,6 +29,7 @@ export const finishGeneration = (id: number, reason: CompletionReason): Promise<
 }
 
 async function saveGeneration(id: number, reason: CompletionReason) {
+    flushGenerationContent(id)
     const generation = useGenerationState.getState().generations[id]
     if (!generation) return
     updateGeneration(id, { status: 'saving', error: undefined })
@@ -33,6 +39,7 @@ async function saveGeneration(id: number, reason: CompletionReason) {
         ? runtime.originalSwipe
         : await updateSwipe(generation.swipeId, generation.text, {
               ...runtime.swipeChanges,
+              reasoning: generation.reasoning,
               mutationToken: runtime.mutationToken,
               tokenizer: runtime.inputs?.tokenizer,
               timings: generation.timings,
@@ -42,6 +49,7 @@ async function saveGeneration(id: number, reason: CompletionReason) {
     // component, render timing, or text comparison participates in this handoff.
     publishDatabaseChanges([
         { table: 'chat_swipes', rowId: generation.swipeId },
+        { table: 'swipe_reasoning', rowId: generation.swipeId },
         { table: 'chats', rowId: generation.chatId },
     ])
     updateGeneration(id, { status: saved ? reason : 'cancelled', persisted: true })

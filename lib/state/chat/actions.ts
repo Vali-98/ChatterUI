@@ -167,8 +167,18 @@ export const createTurn = async (
     }
 }
 
-export const createSwipe = (messageId: number, text: string) =>
-    db.create.swipe(messageId, { swipe: replaceMacros(text, getActiveMacros({ temporal: false })) })
+export const createSwipe = (
+    messageId: number,
+    text: string,
+    options: { sourceSwipeId?: number } = {}
+) =>
+    db.create.swipe(messageId, {
+        swipe: replaceMacros(text, getActiveMacros({ temporal: false })),
+        reasoning:
+            options.sourceSwipeId !== undefined
+                ? db.query.reasoning(options.sourceSwipeId)
+                : undefined,
+    })
 
 export const updateSwipe = async (
     swipeId: number,
@@ -185,6 +195,10 @@ export const updateSwipe = async (
         .map((attachment) => attachment.uri)
     const fields: Parameters<typeof db.update.swipe>[1] = {
         swipe: text,
+        ...(options.reasoning !== undefined && { reasoning: options.reasoning }),
+        ...(options.resetReasoningLength !== undefined && {
+            resetReasoningLength: options.resetReasoningLength,
+        }),
         token_length: await (options.tokenizer ?? Tokenizer.getTokenizer())(text, imageUris).catch(
             () => null
         ),
@@ -200,6 +214,14 @@ export const updateSwipe = async (
         ? db.update.swipe(swipeId, fields)
         : db.update.swipe(swipeId, fields, { mutationToken: options.mutationToken })
 }
+
+// An edited message is the new baseline; normal regenerate replaces only output after it.
+export const editSwipe = (swipeId: number, input: { text: string; reasoning: string }) =>
+    updateSwipe(swipeId, input.text, {
+        reasoning: input.reasoning,
+        resetLength: input.text.length,
+        resetReasoningLength: input.reasoning.length,
+    })
 
 export const deleteChat = (chatId: number) => {
     const attachments = db.query.chatAttachments(chatId)

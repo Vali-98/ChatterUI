@@ -2,7 +2,6 @@ import { t } from 'i18next'
 
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useTextFilterStore } from '@lib/hooks/TextFilter'
-import { buildThinkRules } from '@lib/markdown/ThinkTags'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { CharacterCard, CharacterTokenCounts } from '@lib/state/characters'
 import { ChatMessage } from '@lib/state/chat'
@@ -47,6 +46,7 @@ export interface ContextBuilderParams {
     chatTokenizer: (entry: ChatMessage, index: number) => Promise<number>
     maxLength: number
     cache: TokenCache
+    includeInlineReasoning?: boolean
     bypassContextLength?: boolean
     messageLoader?: MessageLoader
     dataSources?: DataSource[]
@@ -148,14 +148,21 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
             Logger.errorToast(t('generation.warn.entryWithoutValidSwipeFound'))
             return false
         }
-        if (!swipe.swipe && isLast) return true
         const timestamp = instruct.timestamp
             ? `[${swipe.send_date.toDateString()} ${swipe.send_date.toLocaleTimeString()}]\n`
             : ''
         const name = instruct.names ? `${message.name}: ` : ''
         const role: 'user' | 'assistant' = message.is_user ? 'user' : 'assistant'
+        // TODO: Native reasoning replay belongs to explicit provider/template capabilities.
+        const reasoning =
+            (mode === 'text' || params.includeInlineReasoning) &&
+            !instruct.hide_think_tags &&
+            swipe.reasoning?.content
+                ? `<think>${swipe.reasoning.content}</think>\n`
+                : ''
+        if (!swipe.swipe && !reasoning && isLast) return true
         const content = filterContextText(
-            replaceMacros(`${timestamp}${name}${swipe.swipe}`, params.macros),
+            replaceMacros(`${timestamp}${name}${reasoning}${swipe.swipe}`, params.macros),
             instruct,
             params.textFilter
         )
@@ -454,8 +461,6 @@ export const buildTextCompletionContext = async (params: ContextBuilderParams) =
     return result
 }
 
-const thinkRule = buildThinkRules()
-
 const filterContextText = (
     text: string,
     instruct: InstructType,
@@ -468,9 +473,6 @@ const filterContextText = (
     const { sendFilteredText, filter } = settings
     if (!sendFilteredText) {
         for (const pattern of filter) result = result.replace(new RegExp(pattern, 'gi'), '')
-    }
-    if (instruct.hide_think_tags) {
-        for (const rule of thinkRule) result = result.replace(rule.macro, () => rule.value)
     }
     return result
 }

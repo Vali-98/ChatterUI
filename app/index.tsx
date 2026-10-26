@@ -1,7 +1,7 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { SplashScreen } from 'expo-router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
@@ -18,15 +18,17 @@ import migrations from '../db/migrations/migrations'
 
 const useStartupRoutine = () => {
     const { success, error } = useMigrations(db, migrations)
+    const [ready, setReady] = useState(false)
+    const [startupError, setStartupError] = useState<Error>()
     const { authorized, retry } = useLocalAuth()
 
     useTextIntentFocus()
 
     useEffect(() => {
-        if (authorized && success) {
+        if (authorized && ready) {
             loadChatOnInit()
         }
-    }, [authorized, success])
+    }, [authorized, ready])
 
     useEffect(() => {
         /**
@@ -35,13 +37,29 @@ const useStartupRoutine = () => {
          * - startupApp() - creates defaults
          */
         if (success) {
-            startupApp()
-            SplashScreen.hideAsync()
+            let active = true
+            void startupApp()
+                .then(() => {
+                    if (active) setReady(true)
+                })
+                .catch((error) => {
+                    if (active)
+                        setStartupError(error instanceof Error ? error : new Error(String(error)))
+                })
+                .finally(() => SplashScreen.hideAsync())
+            return () => {
+                active = false
+            }
         }
         if (error) SplashScreen.hideAsync()
     }, [success, error])
 
-    return { authorized, retry, error, success }
+    return {
+        authorized: authorized,
+        retry: retry,
+        error: error ?? startupError,
+        success: success && ready,
+    }
 }
 
 const Home = () => {

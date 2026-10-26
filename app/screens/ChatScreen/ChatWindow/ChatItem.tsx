@@ -20,7 +20,7 @@ type ChatItemBodyProps = ChatItemProps & { entrySwipeIds: number[] }
 const ChatItem: React.FC<ChatItemProps> = ({ entryId, ...rest }) => {
     const { data: swipeidList } = useLiveQuerySync(Chats.db.live.swipeIds(entryId), {
         key: ['entry-swipe-ids', entryId],
-        watch: [{ table: 'chat_swipes' }],
+        watch: [{ table: 'chat_swipes' }, { table: 'swipe_reasoning' }],
     })
 
     return (
@@ -45,6 +45,7 @@ const ChatItemBody: React.FC<ChatItemBodyProps> = ({
         watch: [
             { table: 'chat_entries', rowId: entryId },
             { table: 'chat_swipes', rowId: entrySwipeIds },
+            { table: 'swipe_reasoning', rowId: entrySwipeIds },
             { table: 'chat_attachment' },
         ],
     })

@@ -14,6 +14,10 @@ const completionTimingsSchema = z.object({
 
 const swipeSchema = z.object({
     swipe: z.string(),
+    reasoning: z
+        .object({ content: z.string(), reset_length: z.number().nullable().optional() })
+        .nullable()
+        .optional(),
     id: z.number().optional(),
     entry_id: z.number(),
     send_date: z.coerce.date(),

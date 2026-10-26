@@ -176,6 +176,11 @@
         }
     },
     "chat": {
+        "reasoning": {
+            "label": "Penalaran",
+            "generating": "Sedang berpikir…",
+            "content": "Konten"
+        },
         "bubble": {
             "promptSpeed": "Prompt: {{tokens}} t/s | {{seconds}}s",
             "textGenerationSpeed": "Pembuatan Teks: {{tokens}} t/s | \n{{seconds}}s"

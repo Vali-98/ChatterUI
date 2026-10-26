@@ -176,6 +176,7 @@
         }
     },
     "chat": {
+        "reasoning": { "label": "Reasoning", "generating": "Thinking…", "content": "Content" },
         "bubble": {
             "promptSpeed": "Prompt: {{tokens}} t/s | {{seconds}}s",
             "textGenerationSpeed": "    Text Gen: {{tokens}} t/s | {{seconds}}s"

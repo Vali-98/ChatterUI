@@ -21,6 +21,8 @@ import { finishGeneration } from './generation/lifecycle'
 import { getGenerationRuntime } from './generation/runtime'
 import {
     appendGeneration,
+    enableGenerationInlineReasoning,
+    primeGenerationReasoning,
     isActiveGeneration,
     updateGeneration,
     useGenerationState,
@@ -323,6 +325,13 @@ const runLocalCompletion = async (
     generationId: number,
     inputs: GenerationInputs
 ) => {
+    enableGenerationInlineReasoning(generationId)
+    const thinking = payload as typeof payload & {
+        thinking_forced_open?: boolean
+        thinking_end_tag?: string
+    }
+    if (thinking.thinking_forced_open && thinking.thinking_end_tag)
+        primeGenerationReasoning(generationId, thinking.thinking_end_tag)
     const filter = createStopFilter(inputs.stopSequence)
     const appendOutput = (cleaned: string) => {
         if (!current() || !cleaned) return

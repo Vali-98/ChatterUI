@@ -9,7 +9,12 @@ export type GenerationRuntime = {
     chatId: number
     mutationToken: symbol
     originalSwipe?: ChatSwipe
-    swipeChanges?: { startedAt?: Date; resetLength?: number | null; resetTimings?: boolean }
+    swipeChanges?: {
+        startedAt?: Date
+        resetLength?: number | null
+        resetReasoningLength?: number | null
+        resetTimings?: boolean
+    }
     done: Promise<void>
     resolve: () => void
     inputs?: GenerationInputs

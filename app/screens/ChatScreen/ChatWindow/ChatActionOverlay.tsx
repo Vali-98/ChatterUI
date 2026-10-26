@@ -1,11 +1,11 @@
 import { useFocusEffect } from 'expo-router'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import Animated, {
     measure,
     useAnimatedRef,
     useAnimatedStyle,
-    useAnimatedProps,
+    useAnimatedReaction,
     useFrameCallback,
     useSharedValue,
     runOnJS,
@@ -25,6 +25,7 @@ import { useChatActionBounds } from './ChatActionAnchor'
 import ChatQuickActions from './ChatQuickActions'
 
 const ChatActionOverlay = ({ chatId }: { chatId: number }) => {
+    const [interactive, setInteractive] = useState(false)
     const entryId = useChatActionsState((state) => state.activeEntryId)
     const initialEntry = useChatActionsState((state) => state.activeEntry)
     const dismiss = useChatActionsState((state) => state.dismiss)
@@ -39,10 +40,22 @@ const ChatActionOverlay = ({ chatId }: { chatId: number }) => {
     const offscreenFrames = useSharedValue(0)
     const { data: entry } = useLiveQueryAsync(Chats.db.live.message(entryId ?? -1), {
         key: ['selected-message-actions', entryId],
-        initialData: initialEntry,
+        initialData: initialEntry
+            ? {
+                  ...initialEntry,
+                  swipes: initialEntry.swipes.map((swipe) => ({
+                      ...swipe,
+                      reasoning: swipe.reasoning ?? null,
+                  })),
+              }
+            : undefined,
         keepPreviousData: false,
         enabled: entryId !== undefined,
-        watch: [{ table: 'chat_entries', rowId: entryId }, { table: 'chat_swipes' }],
+        watch: [
+            { table: 'chat_entries', rowId: entryId },
+            { table: 'chat_swipes' },
+            { table: 'swipe_reasoning' },
+        ],
     })
     const frame = useFrameCallback(() => {
         const bounds = measure(ref)
@@ -97,26 +110,37 @@ const ChatActionOverlay = ({ chatId }: { chatId: number }) => {
             playerHeight > 0 ? playerHeight + CHAT_CONTROL_GAP + chatControlLift.value : 0
         )
         return {
-            opacity: placed.visible ? 1 : 0,
             maxWidth: Math.max(0, bounds.right - bounds.left - CHAT_CONTROL_EDGE * 2),
             top: placed.top,
             right: placed.right,
         }
     })
-    const interaction = useAnimatedProps(() => {
-        const placed = placeChatControl(
+    const visibility = useAnimatedStyle(() => ({
+        opacity: placeChatControl(
             message.value,
             viewport.value,
             size.value,
             playerHeight > 0 ? playerHeight + CHAT_CONTROL_GAP + chatControlLift.value : 0
-        )
-        return {
-            pointerEvents:
-                message.value.entryId === entryId && placed.visible
-                    ? ('auto' as const)
-                    : ('none' as const),
+        ).visible
+            ? 1
+            : 0,
+    }))
+    // Native hit testing uses the regular React prop. Bridge only visibility transitions,
+    // rather than updating pointerEvents through animatedProps on the layout-animated view.
+    useAnimatedReaction(
+        () => {
+            const placed = placeChatControl(
+                message.value,
+                viewport.value,
+                size.value,
+                playerHeight > 0 ? playerHeight + CHAT_CONTROL_GAP + chatControlLift.value : 0
+            )
+            return message.value.entryId === entryId && placed.visible
+        },
+        (next, previous) => {
+            if (next !== previous) runOnJS(setInteractive)(next)
         }
-    })
+    )
     const swipe = entry?.swipes.find((item) => item.active)
     return (
         <Animated.View
@@ -130,7 +154,7 @@ const ChatActionOverlay = ({ chatId }: { chatId: number }) => {
                     collapsable={false}
                     entering={FadeIn.duration(120)}
                     exiting={FadeOut.duration(200)}
-                    animatedProps={interaction}
+                    pointerEvents={interactive ? 'auto' : 'none'}
                     style={[{ position: 'absolute' }, position]}
                     onLayout={(event) => {
                         const { width, height } = event.nativeEvent.layout
@@ -142,11 +166,13 @@ const ChatActionOverlay = ({ chatId }: { chatId: number }) => {
                         )
                             size.set({ width: Math.round(width), height: Math.round(height) })
                     }}>
-                    <ChatQuickActions
-                        entryId={entry.id}
-                        swipe={swipe}
-                        isGenerating={isGenerating}
-                    />
+                    <Animated.View collapsable={false} pointerEvents="box-none" style={visibility}>
+                        <ChatQuickActions
+                            entryId={entry.id}
+                            swipe={swipe}
+                            isGenerating={isGenerating}
+                        />
+                    </Animated.View>
                 </Animated.View>
             )}
         </Animated.View>

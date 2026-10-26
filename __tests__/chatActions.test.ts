@@ -17,6 +17,7 @@ import {
     importChat,
     loadChat,
     updateSwipe,
+    editSwipe,
 } from '../lib/state/chat/actions'
 import { db } from '../lib/state/chat/db'
 import { finishGeneration } from '../lib/engine/generation/lifecycle'
@@ -28,6 +29,7 @@ import {
 import {
     updateGeneration,
     appendGeneration,
+    enableGenerationInlineReasoning,
     useGenerationState,
 } from '../lib/engine/generation/state'
 import { notifyGenerationComplete } from '../lib/state/chat/notifications'
@@ -559,4 +561,70 @@ test('an empty successful regeneration also leaves the original response intact'
     await finishGeneration(generation.id, 'completed')
     expect(db.update.swipe).not.toHaveBeenCalled()
     expect(notifyGenerationComplete).not.toHaveBeenCalled()
+})
+
+test('fork/export source reasoning remains attached to copied swipe inputs', async () => {
+    source.messages[0].swipes[1].reasoning = {
+        swipe_id: source.messages[0].swipes[1].id,
+        content: 'Saved reasoning',
+        reset_length: 5,
+    }
+    await duplicateChat(source.id)
+    expect(
+        jest.mocked(db.create.chat).mock.calls[0][0].messages![0].swipes[1].reasoning
+    ).toMatchObject({ content: 'Saved reasoning', reset_length: 5 })
+})
+
+test.each(['completed', 'cancelled', 'failed'] as const)(
+    'persists separate reasoning and answer on %s',
+    async (reason) => {
+        const generation = startGeneration(31, 10, '')
+        appendGeneration(generation.id, 'Native thought', 'reasoning')
+        appendGeneration(generation.id, 'Answer')
+        await finishGeneration(generation.id, reason)
+        expect(db.update.swipe).toHaveBeenCalledWith(
+            31,
+            expect.objectContaining({ swipe: 'Answer', reasoning: 'Native thought' }),
+            expect.anything()
+        )
+    }
+)
+
+test('a save retry retains the flushed tail of cancelled inline reasoning', async () => {
+    const generation = startGeneration(31, 10, '')
+    enableGenerationInlineReasoning(generation.id)
+    appendGeneration(generation.id, '<think>Unfinished reasoning')
+    jest.mocked(db.update.swipe).mockImplementationOnce(() => {
+        throw new Error('save failed')
+    })
+    await expect(finishGeneration(generation.id, 'cancelled')).rejects.toThrow('save failed')
+    expect(useGenerationState.getState().generations[generation.id]).toMatchObject({
+        text: '',
+        reasoning: 'Unfinished reasoning',
+        persisted: false,
+    })
+    await finishGeneration(generation.id, 'cancelled')
+    expect(db.update.swipe).toHaveBeenLastCalledWith(
+        31,
+        expect.objectContaining({ swipe: '', reasoning: 'Unfinished reasoning' }),
+        expect.anything()
+    )
+})
+
+test.each([
+    { text: 'Edited answer', reasoning: 'Saved thought' },
+    { text: 'Answer', reasoning: 'Edited thought' },
+    { text: '', reasoning: 'Reasoning only' },
+    { text: 'Answer', reasoning: '' },
+])('manual editing establishes both continuation checkpoints: %j', async (input) => {
+    await editSwipe(31, input)
+    expect(db.update.swipe).toHaveBeenCalledWith(
+        31,
+        expect.objectContaining({
+            swipe: input.text,
+            reasoning: input.reasoning,
+            reset_length: input.text.length,
+            resetReasoningLength: input.reasoning.length,
+        })
+    )
 })

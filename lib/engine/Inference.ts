@@ -18,6 +18,7 @@ import { scheduleDeferredTask } from './generation/scheduler'
 import { runGenerationTask } from './generation/service'
 import {
     appendGeneration,
+    enableGenerationInlineReasoning,
     attachGenerationSwipe,
     isActiveGeneration,
     updateGeneration,
@@ -25,7 +26,7 @@ import {
 } from './generation/state'
 import { localInference } from './LocalInference'
 
-const beginGeneration = (swipeId: number, text = '') => {
+const beginGeneration = (swipeId: number, text = '', reasoning = '') => {
     const context = Chats.db.query.swipeContext(swipeId)
     if (!context) return
     const mode = useAppModeStore.getState().appMode
@@ -34,6 +35,7 @@ const beginGeneration = (swipeId: number, text = '') => {
         swipeId: swipeId,
         mode: mode,
         text: text,
+        reasoning: reasoning,
     })
     if (!generation) {
         Logger.infoToast(t('generation.errors.generationAlreadyInProgress'))
@@ -45,7 +47,15 @@ const beginGeneration = (swipeId: number, text = '') => {
         inputs.messages = inputs.messages.map((message) => ({
             ...message,
             swipes: message.swipes.map((swipe) =>
-                swipe.id === swipeId ? { ...swipe, swipe: text } : swipe
+                swipe.id === swipeId
+                    ? {
+                          ...swipe,
+                          swipe: text,
+                          reasoning: reasoning
+                              ? { swipe_id: swipeId, content: reasoning, reset_length: null }
+                              : null,
+                      }
+                    : swipe
             ),
         }))
         getGenerationRuntime(generation.id).inputs = inputs
@@ -85,7 +95,9 @@ export async function submitMessage(chatId: number, input: SubmitMessageInput) {
             const swipe = message.swipes.find((item) => item.active)
             if (!swipe) throw new Error('New response has no active swipe')
             attachGenerationSwipe(generation.id, swipe.id)
-            inputs.messages = Chats.db.live.chat(chatId).sync()?.messages ?? []
+            inputs.messages =
+                Chats.db.live.chat(chatId, { includeReasoning: inputs.includeReasoning }).sync()
+                    ?.messages ?? []
             getGenerationRuntime(generation.id).inputs = inputs
             void startGenerationTask(generation.id).catch(Logger.stackTrace)
         })
@@ -101,14 +113,22 @@ export async function submitMessage(chatId: number, input: SubmitMessageInput) {
 }
 
 export async function regenerateResponse(swipe: ChatSwipe, regenCache = true) {
-    const replacement =
-        regenCache && swipe.reset_length ? swipe.swipe.slice(0, swipe.reset_length) : ''
-    const generationId = beginGeneration(swipe.id, replacement)
+    const resetLength = regenCache ? swipe.reset_length : null
+    const hasCheckpoint = typeof resetLength === 'number'
+    const replacement = hasCheckpoint ? swipe.swipe.slice(0, resetLength) : ''
+    const reasoning = Chats.db.query.reasoning(swipe.id)
+    const generationId = beginGeneration(
+        swipe.id,
+        replacement,
+        hasCheckpoint ? (reasoning?.content.slice(0, reasoning.reset_length ?? 0) ?? '') : ''
+    )
     if (generationId === undefined) return
     try {
         getGenerationRuntime(generationId).swipeChanges = {
             startedAt: new Date(),
             resetTimings: true,
+            resetLength: hasCheckpoint ? resetLength : null,
+            resetReasoningLength: hasCheckpoint ? (reasoning?.reset_length ?? null) : null,
         }
         await startGenerationTask(generationId)
     } catch (error) {
@@ -118,10 +138,14 @@ export async function regenerateResponse(swipe: ChatSwipe, regenCache = true) {
 }
 
 export async function continueResponse(swipe: ChatSwipe) {
-    const generationId = beginGeneration(swipe.id, swipe.swipe)
+    const reasoning = Chats.db.query.reasoning(swipe.id)?.content ?? ''
+    const generationId = beginGeneration(swipe.id, swipe.swipe, reasoning)
     if (generationId === undefined) return
     try {
-        getGenerationRuntime(generationId).swipeChanges = { resetLength: swipe.swipe.length }
+        getGenerationRuntime(generationId).swipeChanges = {
+            resetLength: swipe.swipe.length,
+            resetReasoningLength: reasoning.length,
+        }
         await startGenerationTask(generationId)
     } catch (error) {
         Logger.errorToast(t('generation.errors.completionFailed'), error)
@@ -177,6 +201,7 @@ async function chatInferenceStream(generationId: number, inputs: GenerationInput
         if (
             reason === 'completed' &&
             output?.receivedOutput &&
+            output.text.trim() &&
             !controller.signal.aborted &&
             inputs.autoTitle &&
             Chats.db.query.chatName(chatId) === 'New Chat'
@@ -187,13 +212,9 @@ async function chatInferenceStream(generationId: number, inputs: GenerationInput
             })
         }
     }
-    let reasoning = false
     const onData: APIBuilderParams['onData'] = (output) => {
-        if (!isGenerationActive(generationId)) return
-        if (output.type === 'reasoning' && !reasoning) appendGeneration(generationId, '<think>')
-        if (output.type !== 'reasoning' && reasoning) appendGeneration(generationId, '</think>\n')
-        reasoning = output.type === 'reasoning'
-        appendGeneration(generationId, output.content)
+        if (!isGenerationActive(generationId) || output.type === 'tool_call') return
+        appendGeneration(generationId, output.content, output.type)
     }
 
     const { controller } = getGenerationRuntime(generationId)
@@ -212,6 +233,11 @@ async function chatInferenceStream(generationId: number, inputs: GenerationInput
         await stop('failed')
         return
     }
+    if (
+        fields.apiConfig.request.completionType.type === 'textCompletions' ||
+        !fields.apiConfig.request.reasoningParsePattern?.length
+    )
+        enableGenerationInlineReasoning(generationId)
     updateGeneration(generationId, { status: 'running' })
     const request = buildAndSendRequest(fields)
     await request.done

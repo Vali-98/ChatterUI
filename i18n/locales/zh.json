@@ -176,6 +176,7 @@
         }
     },
     "chat": {
+        "reasoning": { "label": "推理", "generating": "思考中…", "content": "内容" },
         "bubble": {
             "promptSpeed": "提示：{{tokens}} t/s | {{seconds}}s",
             "textGenerationSpeed": "文本生成：{{tokens}} t/s | \n{{seconds}}s"

@@ -4,7 +4,7 @@ const reasoningTags = thinkTags.map((tag) => ({
     open: new RegExp(tag.open.source, 'i'),
     close: tag.close,
 }))
-const openingPrefixes = ['<think', '<thinking', '<thought', '<seed:think>', '<|channel>thought']
+const openingPrefixes = thinkTags.map((tag) => tag.prefix)
 const cleanSpeechText = (text: string) =>
     text
         .replace(/!\[[^\]]*\]\([^)]*\)/g, '')

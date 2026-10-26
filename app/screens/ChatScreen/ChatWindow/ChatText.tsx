@@ -6,13 +6,18 @@ import Markdown from 'react-native-markdown-display'
 import ThemedButton from '@components/buttons/ThemedButton'
 import { useTextFilter } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
+import { Theme } from '@lib/theme/ThemeManager'
+
+import ChatReasoning from './ChatReasoning'
 
 type ChatTextProps = {
+    reasoning?: string
     swipeText: string
 }
 
-const ChatText: React.FC<ChatTextProps> = ({ swipeText }) => {
+const ChatText: React.FC<ChatTextProps> = ({ swipeText, reasoning }) => {
     const { t } = useTranslation()
+    const { spacing } = Theme.useTheme()
     const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
     const [showHidden, setShowHidden] = useState(false)
     const viewRef = useRef<View>(null)
@@ -43,34 +48,39 @@ const ChatText: React.FC<ChatTextProps> = ({ swipeText }) => {
         })
     }
 
+    const filteredReasoning = useTextFilter(reasoning ?? '')
+    const renderedReasoning = showHidden ? reasoning : filteredReasoning.result
     const filteredText = useTextFilter(swipeText?.trim() ?? '')
     const renderedText = showHidden ? swipeText?.trim() : filteredText.result
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
             <View style={{ minHeight: 10 }} ref={viewRef} onLayout={updateHeight}>
-                <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
-                    {renderedText}
-                </Markdown>
-                {filteredText.found && (
-                    <View style={{ flexDirection: 'row' }}>
-                        <ThemedButton
-                            onPress={() => setShowHidden(!showHidden)}
-                            variant="secondary"
-                            label={
-                                showHidden
-                                    ? t('chat.filteredText.hide')
-                                    : t('chat.filteredText.show')
-                            }
-                            labelStyle={{ flex: 0, fontSize: 12 }}
-                            buttonStyle={{
-                                paddingVertical: 0,
-                                paddingBottom: 0,
-                                paddingHorizontal: 0,
-                                borderWidth: 0,
-                            }}
-                        />
-                    </View>
-                )}
+                {renderedReasoning ? <ChatReasoning content={renderedReasoning} /> : null}
+                <View style={{ paddingHorizontal: spacing.m, paddingVertical: spacing.sm }}>
+                    <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
+                        {renderedText}
+                    </Markdown>
+                    {(filteredText.found || filteredReasoning.found) && (
+                        <View style={{ flexDirection: 'row' }}>
+                            <ThemedButton
+                                onPress={() => setShowHidden(!showHidden)}
+                                variant="secondary"
+                                label={
+                                    showHidden
+                                        ? t('chat.filteredText.hide')
+                                        : t('chat.filteredText.show')
+                                }
+                                labelStyle={{ flex: 0, fontSize: 12 }}
+                                buttonStyle={{
+                                    paddingVertical: 0,
+                                    paddingBottom: 0,
+                                    paddingHorizontal: 0,
+                                    borderWidth: 0,
+                                }}
+                            />
+                        </View>
+                    )}
+                </View>
             </View>
         </Animated.View>
     )

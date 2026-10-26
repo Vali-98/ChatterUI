@@ -4,15 +4,20 @@ import { db } from '@db/db'
 import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'
 
+import { migrateSwipeReasoning } from './reasoningMigration'
 import { chatSwipes } from './schema'
 
 const MIGRATION_TAG = '[MIGRATION]'
 
 enum MigrationId {
+    MIGRATE_REASONING = 'migration.swipe_reasoning',
     MIGRATE_SWIPE_ID = 'migration.deprecate_swipe_id',
 }
 
 const migrationRoutines: Record<MigrationId, () => Promise<void>> = {
+    [MigrationId.MIGRATE_REASONING]: async () => {
+        migrateSwipeReasoning(db)
+    },
     [MigrationId.MIGRATE_SWIPE_ID]: async () => {
         const [{ swipeCount }] = await db
             .select({ swipeCount: count(chatSwipes.id) })
@@ -50,11 +55,16 @@ const migrationRoutines: Record<MigrationId, () => Promise<void>> = {
     },
 }
 
+// Flags belong to the currently installed database, so discard them after a database restore.
+export const resetDataMigrationFlags = () => {
+    for (const migrationId of Object.values(MigrationId)) mmkv.remove(migrationId)
+}
+
 type MigrateDataParams = {
     bypass?: boolean
 }
 /**
- * This data migration is needed as drizzle-orm does not allow for DML in custom migrations
+ * Application-side data transformations run after the schema migrations
  * @param MigrateDataParams
  */
 export const migrateData = async ({ bypass }: MigrateDataParams = {}) => {
@@ -68,6 +78,7 @@ export const migrateData = async ({ bypass }: MigrateDataParams = {}) => {
         } catch (e) {
             Logger.errorToast(MIGRATION_TAG + ' Migration Failed')
             Logger.error(`${e}`)
+            throw e
         }
     }
 }

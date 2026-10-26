@@ -4,7 +4,7 @@ import { AppSettings } from '@lib/constants/GlobalValues'
 import { useTextFilterStore } from '@lib/hooks/TextFilter'
 import { Characters } from '@lib/state/characters'
 import { countCharacterTokens, prepareCharacterTokenText } from '@lib/state/characters/tokenCache'
-import { Chats } from '@lib/state/chat'
+import { Chats, type ChatMessage } from '@lib/state/chat'
 import {
     commonStopStrings,
     Instructs,
@@ -33,11 +33,6 @@ const copyInputs = <T>(value: T): T => {
 
 // All selection/configuration reads happen synchronously, before preparation awaits anything.
 export const captureGenerationInputs = (chatId: number, mode: 'remote' | 'local') => {
-    const chat = Chats.db.live.chat(chatId).sync()
-    if (!chat) throw new Error('Chat no longer exists')
-    const character = Characters.db.live.card(chat.character_id).sync()
-    const user = Characters.useUserStore.getState().card
-    if (!character || !user) throw new Error('Generation requires a character and user card')
     const connectionState = useConnectionStore.getState()
     const connection = connectionState.connections.find(
         (item) => item.id === connectionState.activeConnectionId
@@ -50,6 +45,14 @@ export const captureGenerationInputs = (chatId: number, mode: 'remote' | 'local'
     const rawInstruct = copyInputs(
         Instructs.useInstruct.getState().data ?? Instructs.defaultInstruct
     )
+    const includeReasoning =
+        !rawInstruct.hide_think_tags &&
+        (mode === 'local' || template?.request.completionType.type === 'textCompletions')
+    const chat = Chats.db.live.chat(chatId, { includeReasoning }).sync()
+    if (!chat) throw new Error('Chat no longer exists')
+    const character = Characters.db.live.card(chat.character_id).sync()
+    const user = Characters.useUserStore.getState().card
+    if (!character || !user) throw new Error('Generation requires a character and user card')
     const macros = createMacroValues({ char: character.name, user: user.name }, new Date())
     const instruct = Object.fromEntries(
         Object.entries(rawInstruct).map(([key, value]) => [
@@ -100,11 +103,12 @@ export const captureGenerationInputs = (chatId: number, mode: 'remote' | 'local'
     // Preparation consumes the rejection; attachment copying/model loading may still be pending.
     void dataSources.catch(() => {})
     return {
+        includeReasoning: includeReasoning,
         chatId: chatId,
         mode: mode,
         character: copyInputs(character),
         user: copyInputs(user),
-        messages: copyInputs(chat.messages),
+        messages: copyInputs(chat.messages) as ChatMessage[],
         instruct: instruct,
         macros: macros,
         samplers: copyInputs(getCurrentSampler()),
@@ -161,7 +165,8 @@ export const prepareGenerationContext = async (inputs: GenerationInputs) => {
         bypassContextLength: inputs.bypassContextLength,
         messages: copyInputs(inputs.messages),
         tokenizer: tokenizer,
-        chatTokenizer: (message: (typeof inputs.messages)[number]) =>
+        includeInlineReasoning: inputs.mode === 'local',
+        chatTokenizer: (message: ChatMessage) =>
             Chats.actions.countMessageTokens(message, tokenizer),
         cache: { characterCounts, userCounts, instructCache },
         dataSources: await inputs.dataSources,

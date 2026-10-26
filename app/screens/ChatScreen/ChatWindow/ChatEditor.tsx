@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { create } from 'zustand'
 
 import ThemedButton from '@components/buttons/ThemedButton'
+import HorizontalSelector from '@components/input/HorizontalSelector'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import BottomSheet, { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
@@ -36,36 +37,44 @@ const ChatEditor = () => {
     const { t } = useTranslation()
     const { entryId, hide, ref } = useChatEditorStore()
     const styles = useStyles()
-    const [placeholderText, setPlaceholderText] = useState('')
+    const [draft, setDraft] = useState({
+        content: '',
+        reasoning: '',
+        field: 'content' as 'content' | 'reasoning',
+    })
     const { data: entry } = useLiveQueryAsync(Chats.db.live.message(entryId), {
         keepPreviousData: false,
         key: ['chat-editor-entry', entryId],
         watch: [
             { table: 'chat_entries', rowId: entryId },
             { table: 'chat_swipes' },
+            { table: 'swipe_reasoning' },
             { table: 'chat_attachment' },
         ],
     })
     const editable = useChatEditable(entry?.chat_id ?? -1)
     useEffect(() => {
-        if (!editable) hide()
-    }, [editable, hide])
-    const { data: swipe } = useLiveQueryAsync(Chats.db.live.activeSwipe(entryId), {
-        keepPreviousData: false,
-        key: ['chat-editor-swipe', entryId],
-        watch: [{ table: 'chat_swipes' }],
-    })
+        if (entry && !editable) hide()
+    }, [entry, editable, hide])
+    const swipe = entry?.swipes[0]
     useEffect(() => {
         // Refresh the local draft when its saved database record changes.
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setPlaceholderText(swipe?.swipe ?? '')
+        setDraft({
+            content: swipe?.swipe ?? '',
+            reasoning: swipe?.reasoning?.content ?? '',
+            field: 'content',
+        })
     }, [swipe])
 
     const handleEditMessage = () => {
         if (!editable) return
         hide()
-        if (swipe && placeholderText !== swipe.swipe)
-            Chats.actions.updateSwipe(swipe.id, placeholderText)
+        if (
+            swipe &&
+            (draft.content !== swipe.swipe || draft.reasoning !== (swipe.reasoning?.content ?? ''))
+        )
+            Chats.actions.editSwipe(swipe.id, { text: draft.content, reasoning: draft.reasoning })
     }
 
     const handleDeleteMessage = () => {
@@ -85,10 +94,23 @@ const ChatEditor = () => {
                         <Text style={styles.timeText}>{swipe?.send_date.toLocaleTimeString()}</Text>
                     </View>
 
+                    {!!swipe.reasoning?.content && (
+                        <HorizontalSelector<'content' | 'reasoning'>
+                            selected={draft.field}
+                            values={[
+                                { value: 'content', label: t('chat.reasoning.content') },
+                                { value: 'reasoning', label: t('chat.reasoning.label') },
+                            ]}
+                            style={{ flex: 0 }}
+                            onPress={(field) => setDraft((draft) => ({ ...draft, field }))}
+                        />
+                    )}
                     <ThemedTextInput
                         containerStyle={{ flex: 0, flexShrink: 1 }}
-                        value={placeholderText}
-                        onChangeText={setPlaceholderText}
+                        value={draft[draft.field]}
+                        onChangeText={(text) =>
+                            setDraft((draft) => ({ ...draft, [draft.field]: text }))
+                        }
                         multiline
                     />
 
@@ -107,7 +129,13 @@ const ChatEditor = () => {
                             iconName="reload"
                             variant="tertiary"
                             label={t('chat.editor.actions.reset')}
-                            onPress={() => setPlaceholderText(swipe?.swipe ?? '')}
+                            onPress={() =>
+                                setDraft({
+                                    content: swipe?.swipe ?? '',
+                                    reasoning: swipe?.reasoning?.content ?? '',
+                                    field: 'content',
+                                })
+                            }
                         />
                         <ThemedButton
                             label={t('chat.editor.actions.confirm')}

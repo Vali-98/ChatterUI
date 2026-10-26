@@ -11,6 +11,9 @@ import { finishGeneration } from '@lib/engine/generation/lifecycle'
 import { useTextFilter } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { Logger } from '@lib/state/Logger'
+import { Theme } from '@lib/theme/ThemeManager'
+
+import ChatReasoning from './ChatReasoning'
 
 type ChatTextProps = {
     isGenerating: boolean
@@ -19,6 +22,7 @@ type ChatTextProps = {
 
 const ChatTextLast: React.FC<ChatTextProps> = ({ isGenerating, swipe }) => {
     const { t } = useTranslation()
+    const { spacing } = Theme.useTheme()
     const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
 
     const generation = useSwipeGeneration(swipe.id)
@@ -62,45 +66,59 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ isGenerating, swipe }) => {
         }
     }, [isGenerating, updateHeight])
 
+    const filteredReasoning = useTextFilter(swipe.reasoning?.content ?? '')
+    const reasoning = generation
+        ? generation.reasoning
+        : showHidden
+          ? swipe.reasoning?.content
+          : filteredReasoning.result
     const filteredText = useTextFilter(swipe.swipe ?? '')
     const renderedText = showHidden ? swipe.swipe : filteredText.result
 
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
             <View style={{ minHeight: 10 }} ref={viewRef} onLayout={updateHeight}>
-                {swipe.id === currentSwipeId && isGenerating && buffer.data === '' && (
-                    <AnimatedEllipsis />
-                )}
-                <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
-                    {generation ? buffer.data.trim() : renderedText}
-                </Markdown>
-                {generation?.error && !generation.persisted && (
-                    <ThemedButton
-                        label={t('common.actions.save')}
-                        onPress={() => {
-                            void finishGeneration(generation.id, 'failed').catch(Logger.stackTrace)
-                        }}
-                    />
-                )}
-                {filteredText.found && (
-                    <View style={{ flexDirection: 'row' }}>
+                {reasoning ? (
+                    <ChatReasoning content={reasoning} generating={!!generation && isGenerating} />
+                ) : null}
+                <View style={{ paddingHorizontal: spacing.m, paddingVertical: spacing.sm }}>
+                    {swipe.id === currentSwipeId &&
+                        isGenerating &&
+                        buffer.data === '' &&
+                        !generation?.reasoning && <AnimatedEllipsis />}
+                    <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
+                        {generation ? buffer.data.trim() : renderedText}
+                    </Markdown>
+                    {generation?.error && !generation.persisted && (
                         <ThemedButton
-                            onPress={() => setShowHidden(!showHidden)}
-                            variant="secondary"
-                            label={
-                                showHidden
-                                    ? t('chat.filteredText.hide')
-                                    : t('chat.filteredText.show')
-                            }
-                            labelStyle={{ flex: 0, fontSize: 12 }}
-                            buttonStyle={{
-                                paddingVertical: 0,
-                                paddingHorizontal: 0,
-                                borderWidth: 0,
+                            label={t('common.actions.save')}
+                            onPress={() => {
+                                void finishGeneration(generation.id, 'failed').catch(
+                                    Logger.stackTrace
+                                )
                             }}
                         />
-                    </View>
-                )}
+                    )}
+                    {(filteredText.found || filteredReasoning.found) && (
+                        <View style={{ flexDirection: 'row' }}>
+                            <ThemedButton
+                                onPress={() => setShowHidden(!showHidden)}
+                                variant="secondary"
+                                label={
+                                    showHidden
+                                        ? t('chat.filteredText.hide')
+                                        : t('chat.filteredText.show')
+                                }
+                                labelStyle={{ flex: 0, fontSize: 12 }}
+                                buttonStyle={{
+                                    paddingVertical: 0,
+                                    paddingHorizontal: 0,
+                                    borderWidth: 0,
+                                }}
+                            />
+                        </View>
+                    )}
+                </View>
             </View>
         </Animated.View>
     )
