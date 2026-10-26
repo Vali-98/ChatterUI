@@ -21,7 +21,6 @@ import { abortGeneration, beginGeneration } from '../lib/engine/generation/runti
 import { useGenerationState } from '../lib/engine/generation/state'
 import { useAppModeStore } from '../lib/state/AppMode'
 import { Chats } from '../lib/state/chat'
-import { useTTSStore } from '../lib/state/TTS'
 import { mmkv } from '../lib/storage/MMKV'
 
 jest.mock('react-native-background-actions', () => ({
@@ -90,10 +89,6 @@ jest.mock('../lib/state/Instructs', () => ({
 jest.mock('../lib/state/samplerStore', () => ({
     getCurrentSampler: () => require('../lib/constants/SamplerData').defaultSamplerConfig,
 }))
-jest.mock('../lib/state/TTS', () => {
-    const state = { insertBuffer: jest.fn() }
-    return { useTTSStore: { getState: () => state } }
-})
 jest.mock('../lib/storage/MMKV', () => ({ mmkv: { getBoolean: jest.fn() } }))
 jest.mock('../lib/state/Logger', () => ({
     Logger: {
@@ -341,7 +336,6 @@ test('local split stops are removed without dropping ordinary suffixes', async (
     const { generation, pending } = startLocal({ saveLocalKV: false })
     await pending
     expect(useGenerationState.getState().generations[generation.id].text).toBe('hello  world S')
-    expect(useTTSStore.getState().insertBuffer).not.toHaveBeenCalled()
 })
 
 test('cancellation during preparation prevents dispatch', async () => {

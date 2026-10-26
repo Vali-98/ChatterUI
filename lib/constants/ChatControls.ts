@@ -1,0 +1,4 @@
+export const CHAT_CONTROL_EDGE = 12
+export const CHAT_CONTROL_GAP = 8
+export const CHAT_CONTROL_PADDING_VERTICAL = 4
+export const CHAT_CONTROL_ELEVATION = 6

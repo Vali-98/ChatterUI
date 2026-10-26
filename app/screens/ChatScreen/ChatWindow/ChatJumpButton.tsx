@@ -1,16 +1,14 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { Pressable } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
-import { useShallow } from 'zustand/react/shallow'
 
+import { useChatControlLayoutState } from '@lib/state/components/ChatControls'
 import { Theme } from '@lib/theme/ThemeManager'
-
-import { useInputHeightStore } from '../ChatInput'
 
 const ChatJumpButton: React.FC<{ jump: () => void; visible: boolean }> = ({ jump, visible }) => {
     const { color } = Theme.useTheme()
 
-    const chatInputHeight = useInputHeightStore(useShallow((state) => state.height))
+    const chatInputHeight = useChatControlLayoutState((state) => state.inputHeight)
     if (!visible) return
     return (
         <Animated.View entering={FadeInDown}>

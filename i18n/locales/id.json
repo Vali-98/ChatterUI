@@ -949,6 +949,24 @@
         "placeholder": "Masukkan nilai..."
     },
     "tts": {
+        "globalPlayer": "Pemutar TTS global",
+        "globalPlayerDescription": "Lanjutkan pemutaran di luar obrolan. Jika nonaktif, meninggalkan layar obrolan akan menghentikan dan memutus pemutaran.",
+        "keepPlayerOpen": "Biarkan pemutar terbuka setelah pemutaran",
+        "keepPlayerOpenDescription": "Tetap tampilkan tombol Putar ulang dan Tutup setelah pemutaran selesai.",
+        "replay": "Putar ulang",
+        "stop": "Hentikan suara",
+        "speak": "Baca keras",
+        "jumpToMessage": "Buka pesan",
+        "playbackFailed": "Pemutaran suara gagal",
+        "sourceUnavailable": "Pesan sumber tidak tersedia",
+        "player": "Pemutar teks",
+        "preview": "Pratinjau suara",
+        "status": {
+            "waiting": "Menunggu teks",
+            "speaking": "Berbicara",
+            "finished": "Selesai",
+            "failed": "Suara gagal"
+        },
         "autoafter": "TTS Otomatis Setelah Inferensi",
         "language": "Bahasa",
         "live": "TTS Otomatis Selama Inferensi",

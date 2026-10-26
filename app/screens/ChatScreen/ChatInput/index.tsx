@@ -14,7 +14,6 @@ import Animated, {
     LinearTransition,
     ZoomOut,
 } from 'react-native-reanimated'
-import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
@@ -31,6 +30,7 @@ import { submitMessage } from '@lib/engine/Inference'
 import { useActiveProvider } from '@lib/hooks/ActiveProvider'
 import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
 import { Chats } from '@lib/state/chat'
+import { useChatControlLayoutState } from '@lib/state/components/ChatControls'
 import { useChatInputTextStore } from '@lib/state/components/ChatInput'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -43,16 +43,6 @@ export type Attachment = {
     name: string
 }
 
-type ChatInputHeightStoreProps = {
-    height: number
-    setHeight: (n: number) => void
-}
-
-export const useInputHeightStore = create<ChatInputHeightStoreProps>()((set) => ({
-    height: 54,
-    setHeight: (n) => set({ height: Math.ceil(n) }),
-}))
-
 const ChatInput = () => {
     const { t } = useTranslation()
     const inputRef = useUnfocusTextInput()
@@ -62,7 +52,7 @@ const ChatInput = () => {
     const [attachments, setAttachments] = useState<Attachment[]>([])
     const [hideOptions, setHideOptions] = useState(false)
     const cameraSheetRef = useBottomSheetRef()
-    const setHeight = useInputHeightStore((state) => state.setHeight)
+    const setHeight = useChatControlLayoutState((state) => state.setInputHeight)
 
     const { chatId } = Chats.useChat()
     const isGenerating = useChatGenerating(chatId)

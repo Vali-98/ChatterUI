@@ -15,7 +15,7 @@ import { useAppModeStore } from '@lib/state/AppMode'
 import { useChatInputTextStore } from '@lib/state/components/ChatInput'
 import { Instructs } from '@lib/state/Instructs'
 import { useSamplerStore } from '@lib/state/samplerStore'
-import { useTTSStore } from '@lib/state/TTS'
+import { useTTSSettingsStore } from '@lib/tts/settingsStore'
 
 import { AppDirectory, deleteFile, listFiles, makeDirectory, readStringAsync } from './File'
 import { lockScreenOrientation } from './Screen'
@@ -113,11 +113,11 @@ const migrateTTSData_0_8_5_to_0_8_6 = () => {
     */
     if (mmkv.getBoolean('ttsauto')) {
         mmkv.remove('ttsauto')
-        useTTSStore.getState().setAuto(true)
+        useTTSSettingsStore.getState().setAuto(true)
     }
     if (mmkv.getBoolean('ttsenable')) {
         mmkv.remove('ttsenable')
-        useTTSStore.getState().setEnabled(true)
+        useTTSSettingsStore.getState().setEnabled(true)
     }
     const speakerData = mmkv.getString('ttsspeaker')
     if (speakerData) {
@@ -132,7 +132,7 @@ const migrateTTSData_0_8_5_to_0_8_6 = () => {
             })
             const result = voiceSchema.safeParse(voiceData)
             if (result.success) {
-                useTTSStore.getState().setVoice(voiceData)
+                useTTSSettingsStore.getState().setVoice(voiceData)
             } else throw new Error('Schema validation failed')
         } catch (e) {
             Logger.error('migrateTTSData_0_8_5_to_0_8_6 Failed')

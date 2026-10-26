@@ -12,8 +12,9 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import SectionTitle from '@components/text/SectionTitle'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { Logger } from '@lib/state/Logger'
-import { useTTSStore } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
+import { previewSpeech } from '@lib/tts/actions'
+import { useTTSSettingsStore } from '@lib/tts/settingsStore'
 import { groupBy } from '@lib/utils/Array'
 
 type LanguageListItem = {
@@ -34,7 +35,11 @@ const TTSManagerScreen = () => {
         setRate,
         liveTTS,
         setLiveTTS,
-    } = useTTSStore()
+        globalPlayer,
+        setGlobalPlayer,
+        keepPlayerOpen,
+        setKeepPlayerOpen,
+    } = useTTSSettingsStore()
     const [lang, setLang] = useState(voice?.language ?? 'en-US')
     const [modelList, setModelList] = useState<Speech.Voice[]>([])
     const languageList: LanguageListItem = groupBy(modelList, 'language')
@@ -70,30 +75,26 @@ const TTSManagerScreen = () => {
                 onChangeValue={(value) => {
                     if (value) {
                         getVoices(true)
-                    } else Speech.stop()
+                    }
                     setEnabled(value)
                 }}
             />
+            <ThemedSwitch value={auto} onChangeValue={setAuto} label={t('tts.autoafter')} />
+
+            <ThemedSwitch value={liveTTS} onChangeValue={setLiveTTS} label={t('tts.live')} />
+
             <ThemedSwitch
-                value={auto}
-                onChangeValue={(value) => {
-                    if (value) {
-                        setLiveTTS(false)
-                    }
-                    setAuto(value)
-                }}
-                label={t('tts.autoafter')}
+                value={globalPlayer}
+                onChangeValue={setGlobalPlayer}
+                label={t('tts.globalPlayer')}
+                description={t('tts.globalPlayerDescription')}
             />
 
             <ThemedSwitch
-                value={liveTTS}
-                onChangeValue={(value) => {
-                    if (value) {
-                        setAuto(false)
-                    }
-                    setLiveTTS(value)
-                }}
-                label={t('tts.live')}
+                value={keepPlayerOpen}
+                onChangeValue={setKeepPlayerOpen}
+                label={t('tts.keepPlayerOpen')}
+                description={t('tts.keepPlayerOpenDescription')}
             />
 
             <ThemedSlider
@@ -162,11 +163,7 @@ const TTSManagerScreen = () => {
                             Logger.warnToast(t('tts.nospeaker'))
                             return
                         }
-                        Speech.speak(testAudioText, {
-                            language: voice.language,
-                            voice: voice.identifier,
-                            rate: rate,
-                        })
+                        previewSpeech(testAudioText)
                     }}
                 />
             </View>

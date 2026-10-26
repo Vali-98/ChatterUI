@@ -1,12 +1,16 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
+import { useFocusEffect } from 'expo-router'
 import React, { useCallback } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { measure, useAnimatedRef, useFrameCallback } from 'react-native-reanimated'
 
 import { ChatSwipe } from '@db/schema'
 import { useCanStartGeneration } from '@lib/engine/generation/hooks'
 import { continueResponse, generateResponse, regenerateResponse } from '@lib/engine/Inference'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Chats } from '@lib/state/chat'
+import { chatSwipeControlBounds } from '@lib/state/components/chatControlBounds'
+import { useChatControlLayoutState } from '@lib/state/components/ChatControls'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type SwipesProps = {
@@ -27,6 +31,47 @@ const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) 
     const swipeIdList = swipeIdListData.map((item) => item.id)
 
     const currentIndex = swipeIdList.indexOf(swipe.id)
+    const ref = useAnimatedRef<View>()
+    const entryId = swipe.entry_id
+    const playerHeight = useChatControlLayoutState((state) => state.playerHeight)
+    const visible = currentIndex !== -1 && !(isGreeting && swipeIdList.length === 1)
+    const frame = useFrameCallback(() => {
+        const bounds = measure(ref)
+        if (!bounds || bounds.height <= 0 || bounds.width <= 0) {
+            chatSwipeControlBounds.set((previous) =>
+                previous?.entryId === entryId ? null : previous
+            )
+            return
+        }
+        const next = {
+            top: Math.round(bounds.pageY),
+            bottom: Math.round(bounds.pageY + bounds.height),
+            left: Math.round(bounds.pageX),
+            right: Math.round(bounds.pageX + bounds.width),
+            entryId: entryId,
+        }
+        const previous = chatSwipeControlBounds.value
+        if (
+            !previous ||
+            previous.entryId !== next.entryId ||
+            previous.top !== next.top ||
+            previous.bottom !== next.bottom ||
+            previous.left !== next.left ||
+            previous.right !== next.right
+        )
+            chatSwipeControlBounds.set(next)
+    }, false)
+    useFocusEffect(
+        useCallback(() => {
+            frame.setActive(visible && playerHeight > 0)
+            return () => {
+                frame.setActive(false)
+                chatSwipeControlBounds.set((previous) =>
+                    previous?.entryId === entryId ? null : previous
+                )
+            }
+        }, [frame, visible, playerHeight, entryId])
+    )
 
     const getTextColor = useCallback(
         (b: boolean) => {
@@ -65,7 +110,7 @@ const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) 
     const disableSwipeRight = isGenerating || isLastAltGreeting
 
     return (
-        <View style={styles.swipesItem}>
+        <View ref={ref} collapsable={false} style={styles.swipesItem}>
             <TouchableOpacity
                 style={styles.swipeButton}
                 onPress={handleSwipeLeft}

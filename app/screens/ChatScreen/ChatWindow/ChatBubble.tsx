@@ -1,19 +1,23 @@
 import { useTranslation } from 'react-i18next'
 import { Pressable, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
+import Animated from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useAppMode } from '@lib/state/AppMode'
 import { ChatMessage } from '@lib/state/chat'
+import { useChatActionsState } from '@lib/state/components/ChatControls'
 import { Theme } from '@lib/theme/ThemeManager'
 
+import { useMessageActionAnchor } from './ChatActionAnchor'
 import ChatAttachments from './ChatAttachments'
 import { useChatEditorStore } from './ChatEditor'
-import ChatQuickActions, { useChatActionsState } from './ChatQuickActions'
 import ChatSwipes from './ChatSwipes'
 import ChatText from './ChatText'
 import ChatTextLast from './ChatTextLast'
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 type ChatTextProps = {
     index: number
@@ -30,6 +34,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
     isLastMessage,
     isGreeting,
 }) => {
+    const anchorRef = useMessageActionAnchor(entry.id)
     const { t } = useTranslation()
     const { appMode } = useAppMode()
     const [showTPS] = useMMKVBoolean(AppSettings.ShowTokenPerSecond)
@@ -54,9 +59,11 @@ const ChatBubble: React.FC<ChatTextProps> = ({
     const bubbleColor = entry.is_user ? color.neutral._200 : color.neutral._200
     return (
         <View>
-            <Pressable
+            <AnimatedPressable
+                ref={anchorRef}
+                collapsable={false}
                 onPress={() => {
-                    setShowOptions(isGenerating ? undefined : entry.id)
+                    setShowOptions(isGenerating ? undefined : entry.id, entry)
                 }}
                 style={{
                     backgroundColor: bubbleColor,
@@ -107,16 +114,8 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                             })}
                         </Text>
                     )}
-
-                    <ChatQuickActions
-                        isGenerating={isGenerating}
-                        isLastMessage={isLastMessage}
-                        entryId={entry.id}
-                        swipe={swipe}
-                        index={index}
-                    />
                 </View>
-            </Pressable>
+            </AnimatedPressable>
             {showSwipe && (
                 <ChatSwipes swipe={swipe} isGenerating={isGenerating} isGreeting={isGreeting} />
             )}

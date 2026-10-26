@@ -1,6 +1,6 @@
 import { ImageBackground } from 'expo-image'
 import { useEffect, useRef, useState } from 'react'
-import { FlatList } from 'react-native'
+import { FlatList, type FlatListProps } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -15,12 +15,29 @@ import { Characters } from '@lib/state/characters'
 import { Chats, ScrollData } from '@lib/state/chat'
 import { AppDirectory } from '@lib/utils/File'
 
+import { ChatActionAnchorProvider } from './ChatActionAnchor'
+import ChatActionOverlay from './ChatActionOverlay'
 import ChatFooter from './ChatFooter'
 import ChatHeader from './ChatHeader'
 import ChatHeaderGradient from './ChatHeaderGradient'
 import ChatItem from './ChatItem'
 import ChatJumpButton from './ChatJumpButton'
 import ChatModelName from './ChatModelName'
+
+type ChatListItem = { index: number; entryId: number; isLastMessage: boolean; isGreeting: boolean }
+const ChatCellRenderer: NonNullable<FlatListProps<ChatListItem>['CellRendererComponent']> = ({
+    item,
+    index: _cellIndex,
+    ...rest
+}) => (
+    <ChatItem
+        index={item.index}
+        entryId={item.entryId}
+        isLastMessage={item.isLastMessage}
+        isGreeting={item.isGreeting}
+        {...rest}
+    />
+)
 
 type ChatWindowProps = {
     chatId: number
@@ -35,7 +52,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
     const [showModelname] = useMMKVBoolean(AppSettings.ShowModelInChat)
     const [showJump, setShowJump] = useState(false)
     const [autoScroll] = useMMKVBoolean(AppSettings.AutoScroll)
-    const scrolledChat = useRef(-1)
+    const scrolledRequest = useRef<ScrollData | undefined>(undefined)
 
     const { data: entryIdList, updatedAt } = useLiveQuerySync(Chats.db.live.messageIds(chatId), {
         key: ['chat-entry-ids', chatId],
@@ -61,115 +78,111 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
 
     useEffect(() => {
         if (
-            scrolledChat.current === chatId ||
-            !scrollCause ||
-            !scrollIndex ||
+            !scrollData ||
+            scrolledRequest.current === scrollData ||
+            scrollIndex === undefined ||
             entryIdList.length === 0
         )
             return
         const isSave = scrollCause === 'saveScroll'
-        if (!saveScroll && isSave) return
-        const offset = Math.max(0, scrollIndex + (isSave ? 1 : 0))
-
-        if (offset > 2)
+        scrolledRequest.current = scrollData
+        if (isSave && !saveScroll) return
+        const offset = Math.min(entryIdList.length - 1, Math.max(0, scrollIndex + (isSave ? 1 : 0)))
+        if (scrollCause === 'search' || offset > 2)
             flatlistRef.current?.scrollToIndex({
                 index: offset,
                 animated: scrollCause === 'search',
                 viewOffset: 32,
             })
-        scrolledChat.current = chatId
-    }, [scrollCause, scrollIndex, saveScroll, entryIdList.length, chatId, scrolledChat])
+    }, [scrollData, scrollCause, scrollIndex, saveScroll, entryIdList.length])
 
     return (
-        <ImageBackground
-            cachePolicy="none"
-            style={{ flex: 1 }}
-            source={{
-                uri: backgroundImage
-                    ? Characters.getCardImageUri(backgroundImage)
-                    : image
-                      ? AppDirectory.Assets + image
-                      : '',
-            }}>
-            {showModelname && appMode === 'local' && (
-                <HeaderTitle headerTitle={() => !showSettings && !showChat && <ChatModelName />} />
-            )}
-
-            <FlatList
-                CellRendererComponent={({ item, index, ...rest }) => (
-                    <ChatItem
-                        index={item.index}
-                        entryId={item.entryId}
-                        isLastMessage={item.isLastMessage}
-                        isGreeting={item.isGreeting}
-                        {...rest}
+        <ChatActionAnchorProvider>
+            <ImageBackground
+                cachePolicy="none"
+                style={{ flex: 1 }}
+                source={{
+                    uri: backgroundImage
+                        ? Characters.getCardImageUri(backgroundImage)
+                        : image
+                          ? AppDirectory.Assets + image
+                          : '',
+                }}>
+                {showModelname && appMode === 'local' && (
+                    <HeaderTitle
+                        headerTitle={() => !showSettings && !showChat && <ChatModelName />}
                     />
                 )}
-                ref={flatlistRef}
-                maintainVisibleContentPosition={
-                    autoScroll ? null : { minIndexForVisible: 0, autoscrollToTopThreshold: 50 }
-                }
-                keyboardShouldPersistTaps="handled"
-                inverted
-                data={entryIdList.map((item, index) => ({
-                    index: entryIdList.length - index - 1,
-                    entryId: item.id,
-                    isGreeting: index === entryIdList.length - 1,
-                    isLastMessage: index === 0,
-                }))}
-                keyExtractor={(item) => item.entryId.toString()}
-                renderItem={() => <></>}
-                scrollEventThrottle={16}
-                onViewableItemsChanged={(item) => {
-                    const index = item.viewableItems?.at(0)?.index
 
-                    if (index && chatId)
-                        updateScrollPosition(
-                            index - (item.viewableItems.length === 1 ? 1 : 0),
-                            chatId
-                        )
-                    if (index) {
-                        setShowJump(index > 15)
+                <FlatList
+                    CellRendererComponent={ChatCellRenderer}
+                    ref={flatlistRef}
+                    maintainVisibleContentPosition={
+                        autoScroll ? null : { minIndexForVisible: 0, autoscrollToTopThreshold: 50 }
                     }
-                }}
-                onScrollToIndexFailed={(error) => {
-                    flatlistRef.current?.scrollToOffset({
-                        offset: error.averageItemLength * error.index,
-                        animated: true,
-                    })
-                    setTimeout(() => {
-                        if (entryIdList.length !== 0 && flatlistRef.current !== null) {
-                            flatlistRef.current?.scrollToIndex({
-                                index: error.index,
-                                animated: true,
-                                viewOffset: 32,
-                            })
-                        }
-                    }, 100)
-                }}
-                contentContainerStyle={{
-                    paddingBottom: 32,
-                    rowGap: 8,
-                }}
-                ListFooterComponent={
-                    updatedAt && (() => <ChatFooter chatLength={entryIdList.length} />)
-                }
-                ListHeaderComponent={() => <ChatHeader />}
-            />
-            <ChatJumpButton
-                jump={() => {
-                    setShowJump(false)
-                    flatlistRef?.current?.scrollToIndex({
-                        index: 0,
-                        animated: false,
-                        viewPosition: 1,
-                    })
-                }}
-                visible={showJump}
-            />
+                    keyboardShouldPersistTaps="handled"
+                    inverted
+                    data={entryIdList.map((item, index) => ({
+                        index: entryIdList.length - index - 1,
+                        entryId: item.id,
+                        isGreeting: index === entryIdList.length - 1,
+                        isLastMessage: index === 0,
+                    }))}
+                    keyExtractor={(item) => item.entryId.toString()}
+                    renderItem={() => <></>}
+                    scrollEventThrottle={16}
+                    onViewableItemsChanged={(item) => {
+                        const index = item.viewableItems?.at(0)?.index
 
-            <ChatHeaderGradient />
-        </ImageBackground>
+                        if (index && chatId)
+                            updateScrollPosition(
+                                index - (item.viewableItems.length === 1 ? 1 : 0),
+                                chatId
+                            )
+                        if (index) {
+                            setShowJump(index > 15)
+                        }
+                    }}
+                    onScrollToIndexFailed={(error) => {
+                        flatlistRef.current?.scrollToOffset({
+                            offset: error.averageItemLength * error.index,
+                            animated: true,
+                        })
+                        setTimeout(() => {
+                            if (entryIdList.length !== 0 && flatlistRef.current !== null) {
+                                flatlistRef.current?.scrollToIndex({
+                                    index: error.index,
+                                    animated: true,
+                                    viewOffset: 32,
+                                })
+                            }
+                        }, 100)
+                    }}
+                    contentContainerStyle={{
+                        paddingBottom: 32,
+                        rowGap: 8,
+                    }}
+                    ListFooterComponent={
+                        updatedAt && (() => <ChatFooter chatLength={entryIdList.length} />)
+                    }
+                    ListHeaderComponent={ChatHeader}
+                />
+                <ChatJumpButton
+                    jump={() => {
+                        setShowJump(false)
+                        flatlistRef?.current?.scrollToIndex({
+                            index: 0,
+                            animated: false,
+                            viewPosition: 1,
+                        })
+                    }}
+                    visible={showJump}
+                />
+
+                <ChatActionOverlay chatId={chatId} />
+                <ChatHeaderGradient />
+            </ImageBackground>
+        </ChatActionAnchorProvider>
     )
 }
 

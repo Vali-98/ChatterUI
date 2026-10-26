@@ -949,6 +949,24 @@
         "placeholder": "输入值..."
     },
     "tts": {
+        "globalPlayer": "全局 TTS 播放器",
+        "globalPlayerDescription": "在聊天以外继续播放。关闭后，离开聊天界面将停止并断开播放。",
+        "keepPlayerOpen": "播放结束后保持播放器打开",
+        "keepPlayerOpenDescription": "播放结束后保留重播和关闭按钮。",
+        "replay": "重播",
+        "stop": "停止朗读",
+        "speak": "朗读",
+        "jumpToMessage": "跳转到消息",
+        "playbackFailed": "语音播放失败",
+        "sourceUnavailable": "源消息不可用",
+        "player": "文本播放器",
+        "preview": "语音预览",
+        "status": {
+            "waiting": "等待文本",
+            "speaking": "正在朗读",
+            "finished": "已完成",
+            "failed": "朗读失败"
+        },
         "autoafter": "推理后自动语音",
         "language": "语言",
         "live": "推理期间自动语音",

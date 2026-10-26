@@ -949,6 +949,24 @@
         "placeholder": "Enter value..."
     },
     "tts": {
+        "globalPlayer": "Global TTS player",
+        "globalPlayerDescription": "Continue playback outside chats. When off, leaving the chat screen stops and detaches playback.",
+        "keepPlayerOpen": "Keep player open after playback",
+        "keepPlayerOpenDescription": "Keep Replay and Close controls available after playback finishes.",
+        "replay": "Replay",
+        "stop": "Stop speech",
+        "speak": "Read aloud",
+        "jumpToMessage": "Jump to message",
+        "playbackFailed": "Speech playback failed",
+        "sourceUnavailable": "Source message is unavailable",
+        "player": "Text player",
+        "preview": "Voice preview",
+        "status": {
+            "waiting": "Waiting for text",
+            "speaking": "Speaking",
+            "finished": "Finished",
+            "failed": "Speech failed"
+        },
         "autoafter": "Automatically TTS After Inference",
         "language": "Language",
         "live": "Automatically TTS During Inference",

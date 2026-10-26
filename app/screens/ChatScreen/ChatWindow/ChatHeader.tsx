@@ -1,14 +1,10 @@
 import React from 'react'
 import { View } from 'react-native'
-import { useShallow } from 'zustand/react/shallow'
 
-import { useInputHeightStore } from '../ChatInput'
-/**
- * Used to match top of chat to input height
- * @returns ChatHeader component
- */
+import { useChatControlLayoutState } from '@lib/state/components/ChatControls'
+// The inverted list's header provides space below the latest message for floating controls.
 const ChatHeader = () => {
-    const chatInputHeight = useInputHeightStore(useShallow((state) => state.height))
+    const chatInputHeight = useChatControlLayoutState((state) => state.inputHeight)
     return (
         <View
             style={{
