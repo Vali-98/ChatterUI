@@ -654,6 +654,7 @@ export const defaultTemplates: APIConfiguration[] = [
                 contentName: 'content',
                 supportsAudio: true,
                 supportsImages: true,
+                endWithUserTurn: true,
             },
             authHeader: 'Authorization',
             authPrefix: 'Bearer ',

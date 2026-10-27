@@ -10,6 +10,8 @@ import type { CharacterCard } from '../lib/state/characters/types'
 import type { ChatMessage } from '../lib/state/chat/types'
 import type { InstructType } from '../lib/state/Instructs'
 import { Logger } from '../lib/state/Logger'
+import { mmkv } from '../lib/storage/MMKV'
+import { DEFAULT_CONTINUATION_PROMPT } from '../lib/constants/GlobalValues'
 import { readBase64Async } from '../lib/utils/File'
 
 jest.mock('i18next', () => ({ t: (key: string) => key }))
@@ -31,7 +33,9 @@ jest.mock('../lib/state/Macros', () => ({
             .requireActual('../lib/utils/Macros')
             .applyMacros(text, { char: 'Character', user: 'User' }),
 }))
-jest.mock('../lib/storage/MMKV', () => ({ mmkv: { getBoolean: () => false } }))
+jest.mock('../lib/storage/MMKV', () => ({
+    mmkv: { getBoolean: () => false, getString: jest.fn() },
+}))
 jest.mock('../lib/utils/File', () => ({ readBase64Async: jest.fn() }))
 
 const message = (text: string, id: number): ChatMessage => ({
@@ -323,3 +327,52 @@ test.each([
         ])
     )
 })
+
+test('Google continuation ends with a synthetic user instruction after the existing assistant response', async () => {
+    const params = parameters()
+    params.apiConfig = defaultTemplates.find((template) => template.name === 'Google AI Studio')!
+    params.messages = [message('Question', 1), { ...message('Partial answer', 2), is_user: false }]
+    const payload = await buildChatCompletionContext(params)
+    expect(payload?.slice(-2)).toEqual([
+        { role: 'assistant', content: 'Partial answer' },
+        { role: 'user', content: expect.stringContaining('Continue the previous response') },
+    ])
+    expect(params.messages).toHaveLength(2)
+})
+
+test('endWithUserTurn does not add an instruction when the request already ends with a user message', async () => {
+    const params = parameters()
+    params.apiConfig = defaultTemplates.find((template) => template.name === 'Google AI Studio')!
+    params.messages = [{ ...message('Answer', 1), is_user: false }, message('Next question', 2)]
+    const payload = await buildChatCompletionContext(params)
+    expect(payload?.at(-1)).toEqual({ role: 'user', content: 'Next question' })
+    expect(payload).toHaveLength(3)
+})
+
+test('templates without endWithUserTurn retain assistant prefill', async () => {
+    const params = parameters()
+    params.messages = [{ ...message('Partial answer', 1), is_user: false }]
+    expect((await buildChatCompletionContext(params))?.at(-1)).toEqual({
+        role: 'assistant',
+        content: 'Partial answer',
+    })
+})
+
+test.each([
+    ['Custom continuation instruction', 'Custom continuation instruction'],
+    ['   ', DEFAULT_CONTINUATION_PROMPT],
+])(
+    'continuation uses the configured instruction or the default for blank text',
+    async (saved, expected) => {
+        const params = parameters()
+        params.apiConfig = defaultTemplates.find(
+            (template) => template.name === 'Google AI Studio'
+        )!
+        params.messages = [{ ...message('Partial answer', 1), is_user: false }]
+        jest.mocked(mmkv.getString).mockReturnValueOnce(saved)
+        expect((await buildChatCompletionContext(params))?.at(-1)).toEqual({
+            role: 'user',
+            content: expected,
+        })
+    }
+)

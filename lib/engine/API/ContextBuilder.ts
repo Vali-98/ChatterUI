@@ -1,6 +1,10 @@
 import { t } from 'i18next'
 
-import { AppSettings } from '@lib/constants/GlobalValues'
+import {
+    AppSettings,
+    CONTINUATION_PROMPT_KEY,
+    DEFAULT_CONTINUATION_PROMPT,
+} from '@lib/constants/GlobalValues'
 import { useTextFilterStore } from '@lib/hooks/TextFilter'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { CharacterCard, CharacterTokenCounts } from '@lib/state/characters'
@@ -427,6 +431,13 @@ export const buildChatCompletionContext = async (params: ContextBuilderParams) =
                 [feats.contentName]: msg.content,
             })
         }
+    }
+    if (feats.endWithUserTurn && messages.at(-1)?.role === 'assistant') {
+        payload.push({
+            role: feats.userRole,
+            [feats.contentName]:
+                mmkv.getString(CONTINUATION_PROMPT_KEY)?.trim() || DEFAULT_CONTINUATION_PROMPT,
+        })
     }
     printContext(
         JSON.stringify(

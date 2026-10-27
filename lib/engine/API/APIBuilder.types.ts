@@ -62,6 +62,7 @@ export interface APIRequestFormat {
               contentName: string
               supportsAudio?: boolean
               supportsImages?: boolean
+              endWithUserTurn?: boolean
           }
         | { type: 'textCompletions' }
     // key for the authorization header

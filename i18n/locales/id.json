@@ -1,5 +1,7 @@
 {
     "audio": {
+        "saved": "Audio disimpan",
+        "saveFailed": "Gagal menyimpan audio",
         "record": "Rekam audio",
         "stopRecording": "Hentikan rekaman",
         "recordAgain": "Rekam lagi",
@@ -932,6 +934,8 @@
             "warningText": "PERINGATAN: pastikan database yang diimpor dari versi aplikasi yang sama!"
         },
         "generating": {
+            "continuationPrompt": "Instruksi kelanjutan",
+            "continuationPromptDescription": "Dikirim sebagai pesan pengguna sementara saat melanjutkan dengan API yang memerlukan giliran pengguna terakhir, seperti Google AI Studio. Tidak disimpan dalam riwayat obrolan. Kosongkan untuk menggunakan bawaan.",
             "bypassContextLength": "Lewati Panjang Konteks",
             "bypassContextLengthDescription": "Mengabaikan batas panjang konteks saat membangun prompt",
             "printContext": "Cetak Konteks",

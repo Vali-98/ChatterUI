@@ -1,5 +1,7 @@
 {
     "audio": {
+        "saved": "Audio saved",
+        "saveFailed": "Could not save audio",
         "record": "Record audio",
         "stopRecording": "Stop recording",
         "recordAgain": "Record again",
@@ -932,6 +934,8 @@
             "warningText": "WARNING: ensure imported database is from the same app version!"
         },
         "generating": {
+            "continuationPrompt": "Continuation instruction",
+            "continuationPromptDescription": "Sent as a temporary user message when continuing with APIs that require a final user turn, such as Google AI Studio. It is not saved in chat history. Leave blank to use the default.",
             "bypassContextLength": "Bypass Context Length",
             "bypassContextLengthDescription": "Ignores context length limits when building prompts",
             "printContext": "Print Context",

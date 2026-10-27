@@ -1,5 +1,7 @@
 {
     "audio": {
+        "saved": "音频已保存",
+        "saveFailed": "无法保存音频",
         "record": "录制音频",
         "stopRecording": "停止录制",
         "recordAgain": "重新录制",
@@ -932,6 +934,8 @@
             "warningText": "警告：确保导入的数据库来自相同的应用版本！"
         },
         "generating": {
+            "continuationPrompt": "续写指令",
+            "continuationPromptDescription": "使用 Google AI Studio 等要求以用户轮次结尾的 API 续写时，会将此内容作为临时用户消息发送。不会保存到聊天记录中。留空则使用默认指令。",
             "bypassContextLength": "绕过上下文长度",
             "bypassContextLengthDescription": "构建提示时忽略上下文长度限制",
             "printContext": "打印上下文",

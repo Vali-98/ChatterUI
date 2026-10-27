@@ -1,15 +1,20 @@
+import { localDownload } from '@vali98/react-native-fs'
+import { shareAsync } from 'expo-sharing'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { View } from 'react-native'
+import { Platform, View } from 'react-native'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
 import { pauseAudio, playAudio } from '@lib/audio/player'
 import { useAudioState, type AudioSource } from '@lib/audio/state'
+import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const AudioAttachment = ({ source }: { source: AudioSource }) => {
     const { t } = useTranslation()
     const { color } = Theme.useTheme()
+    const [saving, setSaving] = useState(false)
     const status = useAudioState((state) =>
         state.session?.uri === source.uri ? state.session.status : undefined
     )
@@ -31,6 +36,29 @@ const AudioAttachment = ({ source }: { source: AudioSource }) => {
             <TText numberOfLines={1} ellipsizeMode="middle" style={{ flex: 1 }}>
                 {source.name}
             </TText>
+
+            <ThemedButton
+                variant="tertiary"
+                iconName="download"
+                iconSize={24}
+                disabled={saving}
+                accessibilityLabel={t('common.actions.save')}
+                onPress={async (event) => {
+                    event.stopPropagation()
+                    setSaving(true)
+                    try {
+                        if (Platform.OS === 'ios') await shareAsync(source.uri)
+                        else {
+                            await localDownload(source.uri.replace('file://', ''))
+                            Logger.infoToast(t('audio.saved'))
+                        }
+                    } catch (error) {
+                        Logger.errorToast(t('audio.saveFailed'), error)
+                    } finally {
+                        setSaving(false)
+                    }
+                }}
+            />
             <ThemedButton
                 variant="tertiary"
                 iconName={playing ? 'pause-circle' : 'play-circle'}
