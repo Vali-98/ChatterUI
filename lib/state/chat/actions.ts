@@ -17,6 +17,7 @@ import { chatImportSchema } from './schema'
 import { useChatState } from './state'
 import type {
     AttachmentInput,
+    EditMessageInput,
     ChatInput,
     ChatMessage,
     CreateMessageInput,
@@ -222,6 +223,22 @@ export const editSwipe = (swipeId: number, input: { text: string; reasoning: str
         resetLength: input.text.length,
         resetReasoningLength: input.reasoning.length,
     })
+
+export const editMessage = async (messageId: number, input: EditMessageInput) => {
+    const context = db.query.swipeContext(input.swipeId)
+    if (!context) throw new Error('The message no longer exists')
+    assertChatEditable(context.chat_id)
+    const attachments: AttachmentInput[] = []
+    let removed: ReturnType<typeof db.update.message>
+    try {
+        for (const uri of input.attachmentUris) attachments.push(await prepareAttachment(uri))
+        removed = db.update.message(messageId, { ...input, attachments })
+    } catch (error) {
+        deleteAttachmentFiles(attachments)
+        throw error
+    }
+    deleteAttachmentFiles(removed)
+}
 
 export const deleteChat = (chatId: number) => {
     const attachments = db.query.chatAttachments(chatId)

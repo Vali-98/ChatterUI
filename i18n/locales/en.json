@@ -176,6 +176,21 @@
         }
     },
     "chat": {
+        "attachments": {
+            "estimatedTokens": "≈{{count}} tokens (estimate)",
+            "title": "Attachments",
+            "empty": "No attachments",
+            "remove": "Remove attachment",
+            "view": "View {{name}}",
+            "previous": "Previous image",
+            "next": "Next image",
+            "save": "Save image",
+            "share": "Share image",
+            "saved": "Image saved",
+            "exportFailed": "Could not export image",
+            "editFailed": "Could not save message",
+            "addFailed": "Could not add images"
+        },
         "reasoning": {
             "label": "Reasoning",
             "generating": "Thinking…",
@@ -335,6 +350,7 @@
             "reset": "Reset",
             "save": "Save",
             "search": "Search",
+            "share": "Share",
             "select": "Select",
             "test": "Test",
             "tryAgain": "Try Again"

@@ -59,3 +59,11 @@ export type CreateTurnInput = {
     text: string
     attachmentUris?: string[]
 }
+
+export type EditMessageInput = {
+    swipeId: number
+    text: string
+    reasoning: string
+    retainedAttachmentIds: number[]
+    attachmentUris: string[]
+}

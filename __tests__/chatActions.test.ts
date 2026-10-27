@@ -30,6 +30,7 @@ import {
     loadChat,
     updateSwipe,
     editSwipe,
+    editMessage,
 } from '../lib/state/chat/actions'
 import { db } from '../lib/state/chat/db'
 import { notifyGenerationComplete } from '../lib/state/chat/notifications'
@@ -93,7 +94,7 @@ jest.mock('../lib/state/chat/db', () => ({
             messageAttachments: jest.fn(),
         },
         create: { chat: jest.fn(), message: jest.fn(), swipe: jest.fn(), turn: jest.fn() },
-        update: { swipe: jest.fn() },
+        update: { swipe: jest.fn(), message: jest.fn() },
         delete: { chat: jest.fn(), message: jest.fn() },
     },
 }))
@@ -628,4 +629,47 @@ test.each([
             resetReasoningLength: input.reasoning.length,
         })
     )
+})
+
+describe('attachment edits', () => {
+    const edit = {
+        swipeId: 31,
+        text: 'edited',
+        reasoning: '',
+        retainedAttachmentIds: [],
+        attachmentUris: ['/picked/new.png'],
+    }
+    test('copies new files before committing, then removes only the files returned by the commit', async () => {
+        jest.mocked(db.query.swipeContext).mockReturnValue({ chat_id: 10 } as ReturnType<
+            typeof db.query.swipeContext
+        >)
+        jest.mocked(db.update.message).mockImplementation(() => {
+            expect(copyFile).toHaveBeenCalled()
+            expect(deleteFile).not.toHaveBeenCalled()
+            return [{ uri: '/attachments/old.png' }] as ReturnType<typeof db.update.message>
+        })
+        await editMessage(20, edit)
+        expect(deleteFile).toHaveBeenCalledWith('/attachments/old.png')
+        expect(deleteFile).not.toHaveBeenCalledWith('/attachments/attachment-1.png')
+    })
+    test('failed commits remove new copies and preserve old attachment files', async () => {
+        jest.mocked(db.query.swipeContext).mockReturnValue({ chat_id: 10 } as ReturnType<
+            typeof db.query.swipeContext
+        >)
+        jest.mocked(db.update.message).mockImplementation(() => {
+            throw new Error('write failed')
+        })
+        await expect(editMessage(20, edit)).rejects.toThrow('write failed')
+        expect(deleteFile).toHaveBeenCalledWith('/attachments/attachment-1.png')
+        expect(deleteFile).not.toHaveBeenCalledWith('/attachments/old.png')
+    })
+    test('an incomplete copy does not commit or delete existing files', async () => {
+        jest.mocked(db.query.swipeContext).mockReturnValue({ chat_id: 10 } as ReturnType<
+            typeof db.query.swipeContext
+        >)
+        jest.mocked(copyFile).mockResolvedValueOnce(false)
+        await expect(editMessage(20, edit)).rejects.toThrow('Failed to copy')
+        expect(db.update.message).not.toHaveBeenCalled()
+        expect(deleteFile).not.toHaveBeenCalledWith('/attachments/old.png')
+    })
 })

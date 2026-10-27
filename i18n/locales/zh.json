@@ -176,6 +176,21 @@
         }
     },
     "chat": {
+        "attachments": {
+            "estimatedTokens": "≈{{count}} token（估算）",
+            "title": "附件",
+            "empty": "暂无附件",
+            "remove": "移除附件",
+            "view": "查看 {{name}}",
+            "previous": "上一张图片",
+            "next": "下一张图片",
+            "save": "保存图片",
+            "share": "分享图片",
+            "saved": "图片已保存",
+            "exportFailed": "无法导出图片",
+            "editFailed": "无法保存消息",
+            "addFailed": "无法添加图片"
+        },
         "reasoning": {
             "label": "推理",
             "generating": "思考中…",
@@ -335,6 +350,7 @@
             "reset": "重置",
             "save": "保存",
             "search": "搜索",
+            "share": "分享",
             "select": "选择",
             "test": "测试",
             "tryAgain": "再试一次"

@@ -176,6 +176,21 @@
         }
     },
     "chat": {
+        "attachments": {
+            "estimatedTokens": "≈{{count}} token (perkiraan)",
+            "title": "Lampiran",
+            "empty": "Tidak ada lampiran",
+            "remove": "Hapus lampiran",
+            "view": "Lihat {{name}}",
+            "previous": "Gambar sebelumnya",
+            "next": "Gambar berikutnya",
+            "save": "Simpan gambar",
+            "share": "Bagikan gambar",
+            "saved": "Gambar disimpan",
+            "exportFailed": "Gagal mengekspor gambar",
+            "editFailed": "Gagal menyimpan pesan",
+            "addFailed": "Gagal menambahkan gambar"
+        },
         "reasoning": {
             "label": "Penalaran",
             "generating": "Sedang berpikir…",
@@ -335,6 +350,7 @@
             "reset": "Mengatur ulang",
             "save": "Simpan",
             "search": "Cari",
+            "share": "Bagikan",
             "select": "Memilih",
             "test": "Uji",
             "tryAgain": "Coba Lagi"

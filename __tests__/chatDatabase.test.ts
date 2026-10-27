@@ -102,6 +102,90 @@ describeSQLite('chat database integration', () => {
         reset()
     })
 
+    test('message edits commit text, reasoning and attachments together', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [
+                {
+                    ...message('old'),
+                    attachments: [
+                        { uri: '/old.png', name: 'old.png', type: 'image', mime_type: 'image/png' },
+                    ],
+                },
+            ],
+        })
+        const original = db.query.chat(chatId)!.messages[0]
+        const removed = db.update.message(original.id, {
+            swipeId: original.swipes[0].id,
+            text: 'edited',
+            reasoning: 'thought',
+            retainedAttachmentIds: [],
+            attachments: [
+                { uri: '/new.png', name: 'new.png', type: 'image', mime_type: 'image/png' },
+            ],
+        })
+        const saved = db.live.message(original.id).sync()!
+        expect(removed.map((item) => item.uri)).toEqual(['/old.png'])
+        expect(saved.attachments.map((item) => item.uri)).toEqual(['/new.png'])
+        expect(saved.swipes[0]).toMatchObject({
+            swipe: 'edited',
+            reset_length: 6,
+            token_length: null,
+            reasoning: { content: 'thought', reset_length: 7 },
+        })
+    })
+
+    test('failed attachment insertion rolls back the text and removed attachment rows', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [
+                {
+                    ...message('old'),
+                    attachments: [
+                        { uri: '/old.png', name: 'old.png', type: 'image', mime_type: 'image/png' },
+                    ],
+                },
+            ],
+        })
+        const original = db.query.chat(chatId)!.messages[0]
+        expect(() =>
+            db.update.message(original.id, {
+                swipeId: original.swipes[0].id,
+                text: 'edited',
+                reasoning: '',
+                retainedAttachmentIds: [],
+                attachments: [
+                    { uri: null, name: 'invalid', type: 'image', mime_type: 'image/png' } as never,
+                ],
+            })
+        ).toThrow()
+        expect(db.live.message(original.id).sync()).toMatchObject({
+            attachments: [{ uri: '/old.png' }],
+            swipes: [{ swipe: 'old' }],
+        })
+    })
+
+    test('a swipe from another message cannot be edited through the attachment editor', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [message('one'), message('two')],
+        })
+        const [one, two] = db.query.chat(chatId)!.messages
+        expect(() =>
+            db.update.message(one.id, {
+                swipeId: two.swipes[0].id,
+                text: 'wrong',
+                reasoning: '',
+                retainedAttachmentIds: [],
+                attachments: [],
+            })
+        ).toThrow()
+        expect(db.query.chat(chatId)!.messages.map((item) => item.swipes[0].swipe)).toEqual([
+            'one',
+            'two',
+        ])
+    })
+
     test('a replacement retires the old summary atomically, and deletion restores raw history', () => {
         const chatId = db.create.chat({
             character_id: 1,

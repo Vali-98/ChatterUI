@@ -13,7 +13,14 @@ import { splitReasoning } from '@lib/engine/reasoning/parser'
 import { invalidateSummarySources } from '@lib/summaries/db'
 
 import { assertChatEditable, type ChatMutationOptions } from './access'
-import type { Chat, ChatInput, MessageInput, SwipeInput } from './types'
+import type {
+    Chat,
+    ChatInput,
+    MessageInput,
+    SwipeInput,
+    AttachmentInput,
+    EditMessageInput,
+} from './types'
 
 const live = {
     chat: (chatId: number, options: { includeReasoning?: boolean } = {}) =>
@@ -335,6 +342,57 @@ const create = {
 }
 
 const update = {
+    message: (
+        messageId: number,
+        input: Omit<EditMessageInput, 'attachmentUris'> & { attachments: AttachmentInput[] }
+    ) =>
+        database.transaction((tx) => {
+            const message = tx.query.chatEntries
+                .findFirst({ where: eq(chatEntries.id, messageId) })
+                .sync()
+            const swipe = tx.query.chatSwipes
+                .findFirst({ where: eq(chatSwipes.id, input.swipeId) })
+                .sync()
+            if (!message || !swipe || swipe.entry_id !== messageId || !swipe.active)
+                throw new Error('The message or active swipe has changed')
+            assertChatEditable(message.chat_id)
+            const previous = tx.query.chatAttachments
+                .findMany({ where: eq(chatAttachments.chat_entry_id, messageId) })
+                .sync()
+            const retained = new Set(input.retainedAttachmentIds)
+            if (input.retainedAttachmentIds.some((id) => !previous.some((item) => item.id === id)))
+                throw new Error('A retained attachment no longer exists')
+            const removed = previous.filter((item) => !retained.has(item.id))
+            for (const item of removed)
+                tx.delete(chatAttachments).where(eq(chatAttachments.id, item.id)).run()
+            if (input.attachments.length)
+                tx.insert(chatAttachments)
+                    .values(
+                        input.attachments.map((item) => ({ ...item, chat_entry_id: messageId }))
+                    )
+                    .run()
+            if (swipe.swipe !== input.text) {
+                tx.update(chatSwipes)
+                    .set({ swipe: input.text, reset_length: input.text.length, token_length: null })
+                    .where(eq(chatSwipes.id, input.swipeId))
+                    .run()
+            }
+            const reasoning = tx.query.swipeReasoning
+                .findFirst({ where: eq(swipeReasoning.swipe_id, input.swipeId) })
+                .sync()
+            if ((reasoning?.content ?? '') !== input.reasoning)
+                writeReasoning(tx, input.swipeId, input.reasoning, input.reasoning.length)
+            if (removed.length || input.attachments.length) {
+                tx.update(chatSwipes)
+                    .set({ token_length: null })
+                    .where(eq(chatSwipes.entry_id, messageId))
+                    .run()
+            }
+            if (swipe.swipe !== input.text || removed.length || input.attachments.length)
+                invalidateSummarySources(tx, messageId)
+            touchChat(tx, message.chat_id)
+            return removed
+        }),
     chat: (
         chatId: number,
         fields: Partial<Pick<typeof chats.$inferInsert, 'name' | 'user_id' | 'scroll_offset'>>,
