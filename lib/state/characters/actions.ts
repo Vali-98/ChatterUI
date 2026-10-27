@@ -1,17 +1,10 @@
 import { extractPngTextChunk, replacePngTextChunk } from '@vali98/react-native-png-utils'
 import { Asset } from 'expo-asset'
 import * as DocumentPicker from 'expo-document-picker'
-import { Paths } from 'expo-file-system'
 import { t } from 'i18next'
 
 import { Logger } from '@lib/state/Logger'
-import {
-    copyFile,
-    fileExists,
-    readBase64Async,
-    readStringAsync,
-    saveStringToDownload,
-} from '@lib/utils/File'
+import { fileExists, readBase64Async, readStringAsync, saveStringToDownload } from '@lib/utils/File'
 
 import { db } from './db'
 import { copyImageFile, createImageId, deleteImageFile, getCardImageUri } from './images'
@@ -164,7 +157,7 @@ export const importCardImage = async (imageUri: string) => {
             return
         }
 
-        await importCardV2(card, imageUri)
+        return await importCardV2(card, imageUri)
     } catch (e) {
         Logger.errorToast(t('character.editor.errors.createFailed'))
         Logger.error(`${e}`)
@@ -246,22 +239,10 @@ export const exportCard = async (characterId: number) => {
 }
 
 export const createDefaultCard = async () => {
-    const imageName = 'aibot'
-    const imageFileName = imageName + '.png'
-    const defaultImageUri = `${Paths.document.uri}appAssets/${imageFileName}`
-
     try {
-        if (!fileExists(defaultImageUri)) {
-            Logger.info('Importing default card.')
-            const [asset] = await Asset.loadAsync(require('../../../assets/models/aibot.raw'))
-            if (
-                asset.localUri &&
-                !(await copyFile({ from: asset.localUri, to: defaultImageUri }))
-            ) {
-                throw new Error('Failed to copy default character')
-            }
-        }
-        await importCardImage(defaultImageUri)
+        const [asset] = await Asset.loadAsync(require('../../../assets/models/aibot.raw'))
+        if (!asset.localUri) throw new Error('Default character asset has no local URI')
+        return await importCardImage(asset.localUri)
     } catch (e) {
         Logger.errorToast(t('settings.character.errors.failedToCreateDefaultCharacter'))
         Logger.error('Error: ' + e)

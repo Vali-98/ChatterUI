@@ -1,5 +1,9 @@
+import { extractPngTextChunk } from '@vali98/react-native-png-utils'
+import { Asset } from 'expo-asset'
+import { readBase64Async } from '../lib/utils/File'
 import {
     createCard,
+    createDefaultCard,
     deleteCardImage,
     duplicateCard,
     updateCardImage,
@@ -13,13 +17,17 @@ jest.mock('@vali98/react-native-png-utils', () => ({
     extractPngTextChunk: jest.fn(),
     replacePngTextChunk: jest.fn(),
 }))
-jest.mock('expo-asset', () => ({ Asset: {} }))
+jest.mock('expo-asset', () => ({ Asset: { loadAsync: jest.fn() } }))
+jest.mock('../assets/models/aibot.raw', () => 123)
 jest.mock('expo-document-picker', () => ({ getDocumentAsync: jest.fn() }))
 jest.mock('expo-file-system', () => ({ Paths: { document: { uri: '/document/' } } }))
 jest.mock('../lib/state/Logger', () => ({
-    Logger: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
+    Logger: { info: jest.fn(), warn: jest.fn(), error: jest.fn(), errorToast: jest.fn() },
 }))
-jest.mock('../lib/utils/File', () => ({ fileExists: jest.fn(() => true) }))
+jest.mock('../lib/utils/File', () => ({
+    fileExists: jest.fn(() => true),
+    readBase64Async: jest.fn(),
+}))
 jest.mock('../lib/state/characters/images', () => {
     let nextImageId = 100
     return {
@@ -134,4 +142,34 @@ test('deleting a card image clears the database reference and deletes its physic
     expect(cards.get(1)!.image_id).toBe(-1)
     expect(deleteImageFile).toHaveBeenCalledWith(20)
     expect(cards.get(1)!.background_image).toBe(30)
+})
+
+test('the default card imports the bundled asset directly and returns its new ID', async () => {
+    jest.mocked(Asset.loadAsync).mockResolvedValueOnce([
+        { localUri: 'file:///bundle/aibot.raw' },
+    ] as never)
+    jest.mocked(readBase64Async).mockResolvedValueOnce('png-data')
+    jest.mocked(extractPngTextChunk).mockReturnValueOnce([
+        { keyword: 'Description', data: JSON.stringify(buildBlankCharacterCard('AI Bot')) },
+    ])
+    expect(await createDefaultCard()).toBe(2)
+    expect(readBase64Async).toHaveBeenCalledWith('file:///bundle/aibot.raw')
+    expect(copyImageFile).toHaveBeenCalledWith(expect.any(Number), 'file:///bundle/aibot.raw')
+    expect(cards.get(2)?.name).toBe('AI Bot')
+})
+
+test('a missing local asset URI reports no created ID', async () => {
+    jest.mocked(Asset.loadAsync).mockResolvedValueOnce([{ localUri: null }] as never)
+    expect(await createDefaultCard()).toBeUndefined()
+    expect(db.create.card).not.toHaveBeenCalled()
+})
+
+test('a failed card import reports no created ID so startup can retry', async () => {
+    jest.mocked(Asset.loadAsync).mockResolvedValueOnce([
+        { localUri: 'file:///bundle/aibot.raw' },
+    ] as never)
+    jest.mocked(readBase64Async).mockResolvedValueOnce('png-data')
+    jest.mocked(extractPngTextChunk).mockReturnValueOnce([])
+    expect(await createDefaultCard()).toBeUndefined()
+    expect(db.create.card).not.toHaveBeenCalled()
 })

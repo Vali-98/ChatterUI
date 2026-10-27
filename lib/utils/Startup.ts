@@ -65,9 +65,8 @@ const setAppDefaultSettings = () => {
 
 const createDefaultCard = async () => {
     if (!mmkv.getBoolean(AppSettings.CreateDefaultCard)) return
-    const result = await Characters.db.query.cardList({ type: 'character' })
-    if (result.length === 0) await Characters.actions.createDefaultCard()
-    mmkv.set(AppSettings.CreateDefaultCard, false)
+    const id = await Characters.actions.createDefaultCard()
+    if (id !== undefined) mmkv.set(AppSettings.CreateDefaultCard, false)
 }
 
 const setCPUFeatures = async () => {
@@ -143,9 +142,7 @@ const migrateTTSData_0_8_5_to_0_8_6 = () => {
 
 export const generateDefaultDirectories = async () => {
     // Removed: 'instruct', 'persona', 'presets', 'lorebooks'
-    Object.values(AppDirectory).map((dir) => {
-        makeDirectory(dir)
-    })
+    await Promise.all(Object.values(AppDirectory).map(makeDirectory))
 }
 
 const migratePresets_0_8_3_to_0_8_4 = async () => {
@@ -247,7 +244,9 @@ export const startupApp = async () => {
 
     // Sets default preferences
     setAppDefaultSettings()
-    generateDefaultDirectories()
+    await generateDefaultDirectories()
+    // The default card now imports directly from its bundled Expo asset.
+    deleteFile(`${AppDirectory.Assets}aibot.png`)
     setDefaultUser().catch(Logger.error)
     setDefaultInstruct()
 
@@ -255,7 +254,7 @@ export const startupApp = async () => {
     setupNotifications()
 
     // Initialize the default card
-    createDefaultCard()
+    await createDefaultCard()
 
     // get fp16, i8mm and dotprod data
     setCPUFeatures()
