@@ -14,6 +14,7 @@ import { runGenerationTask } from './service'
 import { generationForChat, isActiveGeneration, useGenerationState } from './state'
 
 export type DeferredTaskOptions = Pick<DeferredTask, 'mode' | 'kind'> & {
+    resourceId?: number
     timeoutMs?: number
     queueTimeoutMs?: number
 }
@@ -77,6 +78,7 @@ export const scheduleDeferredTask = (
     const id = ++nextDeferredTaskId
     const task: DeferredTask = {
         id: id,
+        resourceId: options.resourceId,
         chatId: chatId,
         kind: options.kind,
         mode: options.mode,

@@ -14,6 +14,7 @@ import { applyMacros, type MacroValues } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import type { DataSource, DataSourceResult } from '../DataSources/types'
+import type { ContextStats } from '../generation/contextStatsState'
 
 export type MessageLoader = {
     retrieve: (page: number) => Promise<ChatMessage[]> // must retrieve messages in chronological order from oldest to newest
@@ -34,6 +35,8 @@ const printContext = (context: string) => {
 }
 
 export interface ContextBuilderParams {
+    onContextStats?: (stats: ContextStats) => void
+    summaryTokens?: Record<number, { summarizedMessages: number; rawHistory: number }>
     macros?: MacroValues
     textFilter?: Pick<ReturnType<typeof useTextFilterStore.getState>, 'sendFilteredText' | 'filter'>
     apiConfig: APIConfiguration
@@ -129,6 +132,11 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
     const reservedBudget = sortedDataSources.reduce((acc, curr) => acc + curr.tokenBudget, 0)
 
     let totalLength = systemPromptLength + reservedBudget
+    let historyTokens = 0
+    let summaryTokens = 0
+    let summarizedMessages = 0
+    let rawSummaryTokens = 0
+    let dataSourceTokens = 0
 
     let hasImage = false
     let completionState: CompletionState = 'initial_completed'
@@ -148,10 +156,11 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
             Logger.errorToast(t('generation.warn.entryWithoutValidSwipeFound'))
             return false
         }
-        const timestamp = instruct.timestamp
-            ? `[${swipe.send_date.toDateString()} ${swipe.send_date.toLocaleTimeString()}]\n`
-            : ''
-        const name = instruct.names ? `${message.name}: ` : ''
+        const timestamp =
+            message.id >= 0 && instruct.timestamp
+                ? `[${swipe.send_date.toDateString()} ${swipe.send_date.toLocaleTimeString()}]\n`
+                : ''
+        const name = message.id >= 0 && instruct.names ? `${message.name}: ` : ''
         const role: 'user' | 'assistant' = message.is_user ? 'user' : 'assistant'
         // TODO: Native reasoning replay belongs to explicit provider/template capabilities.
         const reasoning =
@@ -228,6 +237,12 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
         contextMessages.push({ role, content, attachments })
 
         totalLength += shardLen
+        const summary = params.summaryTokens?.[message.id]
+        if (summary) {
+            summaryTokens += shardLen
+            summarizedMessages += summary.summarizedMessages
+            rawSummaryTokens += summary.rawHistory
+        } else historyTokens += shardLen
 
         return true
     }
@@ -307,6 +322,7 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
                 if (totalLength + length > maxLength && !bypassContextLength) continue
                 pendingInsertions.push(result)
                 totalLength += length
+                dataSourceTokens += length
 
                 Logger.info(
                     `[DataSource:${source.name}] inserted ${result.tokenLength} tokens from ${result.source}`
@@ -360,6 +376,17 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
     Logger.info(`Approximate Context Size: ${totalLength}`)
     Logger.info(`${(performance.now() - delta).toFixed(2)}ms`)
 
+    params.onContextStats?.({
+        total: totalLength,
+        capacity: maxLength,
+        response: 0,
+        system: systemPromptLength,
+        history: historyTokens,
+        summaries: summaryTokens,
+        dataSources: dataSourceTokens,
+        summarizedMessages: summarizedMessages,
+        rawHistory: historyTokens + rawSummaryTokens,
+    })
     if (contextMessages.length === 0) warnNoMessages()
     return {
         systemPrompt: systemPrompt,
@@ -584,13 +611,15 @@ export const getSystemPrompt = ({
         },
     ]
     const slots: Record<string, string> = {}
+    const components: { key: string; tokens: number }[] = []
     macros.forEach((m) => {
         slots[m.macro.slice(2, -2)] = m.value
         const occurrences = systemPrompt.split(m.macro).length - 1
         systemPromptLength += m.length * occurrences
+        components.push({ key: m.macro.slice(2, -2), tokens: m.length * occurrences })
     })
     systemPrompt = applyMacros(systemPrompt, { ...macroValues, ...slots })
-    return { systemPrompt, systemPromptLength }
+    return { systemPrompt, systemPromptLength, components }
 }
 
 const warnNoMessages = () => {

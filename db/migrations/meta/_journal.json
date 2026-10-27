@@ -176,6 +176,20 @@
       "when": 1793022174069,
       "tag": "0024_swipe_reasoning",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "6",
+      "when": 1793035012614,
+      "tag": "0025_chat_summaries",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "6",
+      "when": 1793036104610,
+      "tag": "0026_summary_draft_attempts",
+      "breakpoints": true
     }
   ]
 }

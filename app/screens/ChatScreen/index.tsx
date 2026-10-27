@@ -23,6 +23,7 @@ import ChatWindow from '@screens/ChatScreen/ChatWindow'
 import AuthorNoteSheet from './AuthorNote'
 import AuthorNoteEditor from './AuthorNote/AuthorNoteEditor'
 import ChatEditor from './ChatWindow/ChatEditor'
+import SummarySheet from './Summaries'
 
 const ChatScreen = () => {
     const { t } = useTranslation()
@@ -144,6 +145,7 @@ const ChatScreen = () => {
                         <ChatInput />
                         <AvatarViewer />
                         <ChatEditor />
+                        <SummarySheet />
                         <AuthorNoteSheet />
                         <AuthorNoteEditor />
                     </View>

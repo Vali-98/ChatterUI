@@ -13,8 +13,12 @@ import {
 } from '@lib/state/Instructs'
 import { getCurrentSampler } from '@lib/state/samplerStore'
 import { mmkv } from '@lib/storage/MMKV'
+import { summaryList } from '@lib/summaries/db'
+import { summarizeHistory } from '@lib/summaries/history'
+import { useSummarySettingsStore } from '@lib/summaries/settingsStore'
 import { applyMacros, createMacroValues } from '@lib/utils/Macros'
 
+import { recordContextStats } from './contextStatsState'
 import { useConnectionStore } from '../API/connectionStore'
 import { getDataSources } from '../DataSources'
 import { Llama } from '../Local/LlamaLocal'
@@ -32,7 +36,11 @@ const copyInputs = <T>(value: T): T => {
 }
 
 // All selection/configuration reads happen synchronously, before preparation awaits anything.
-export const captureGenerationInputs = (chatId: number, mode: 'remote' | 'local') => {
+export const captureGenerationInputs = (
+    chatId: number,
+    mode: 'remote' | 'local',
+    options: { includeDataSources?: boolean; includeSummaries?: boolean } = {}
+) => {
     const connectionState = useConnectionStore.getState()
     const connection = connectionState.connections.find(
         (item) => item.id === connectionState.activeConnectionId
@@ -99,10 +107,17 @@ export const captureGenerationInputs = (chatId: number, mode: 'remote' | 'local'
                   await tokenizerReady
                   return localTokenizer(text, images)
               }
-    const dataSources = getDataSources(chatId, { macros, tokenizer })
+    const dataSources =
+        options.includeDataSources === false
+            ? Promise.resolve([])
+            : getDataSources(chatId, { macros, tokenizer })
     // Preparation consumes the rejection; attachment copying/model loading may still be pending.
     void dataSources.catch(() => {})
     return {
+        summaries:
+            options.includeSummaries !== false && useSummarySettingsStore.getState().enabled
+                ? summaryList(chatId).all()
+                : [],
         includeReasoning: includeReasoning,
         chatId: chatId,
         mode: mode,
@@ -131,7 +146,10 @@ export const captureGenerationInputs = (chatId: number, mode: 'remote' | 'local'
 }
 export type GenerationInputs = ReturnType<typeof captureGenerationInputs>
 
-export const prepareGenerationContext = async (inputs: GenerationInputs) => {
+export const prepareGenerationContext = async (
+    inputs: GenerationInputs,
+    options: { recordStats?: boolean } = {}
+) => {
     const { character, user, tokenizer, instruct, macros } = inputs
     const [characterCounts, userCounts] = await Promise.all([
         countCharacterTokens(prepareCharacterTokenText(character, macros), {
@@ -156,18 +174,46 @@ export const prepareGenerationContext = async (inputs: GenerationInputs) => {
         output_suffix_length: await tokenizer(instruct.output_suffix),
         user_alignment_message_length: await tokenizer(instruct.user_alignment_message),
     }
+    const history = summarizeHistory(inputs.messages, inputs.summaries ?? [])
+    const summaryTokens: Record<number, { summarizedMessages: number; rawHistory: number }> = {}
+    for (const summary of inputs.summaries ?? []) {
+        const id = -10_000 - summary.id
+        if (!history.some((message) => message.id === id)) continue
+        const sources = inputs.messages.filter(
+            (message) => message.id >= summary.start_entry_id && message.id <= summary.end_entry_id
+        )
+        summaryTokens[id] = {
+            summarizedMessages: sources.length,
+            // Historical cached counts are approximate. Do not retokenize compressed history.
+            rawHistory: sources.reduce((total, message) => {
+                const swipe = message.swipes.find((item) => item.active)
+                return total + (swipe?.token_length ?? Math.ceil((swipe?.swipe.length ?? 0) / 4))
+            }, 0),
+        }
+    }
     return {
+        onContextStats:
+            options.recordStats === false
+                ? undefined
+                : (stats: Parameters<typeof recordContextStats>[1]) =>
+                      recordContextStats(inputs.chatId, {
+                          ...stats,
+                          response: inputs.samplers.genamt,
+                      }),
+        summaryTokens: summaryTokens,
         character: character,
         user: user,
         instruct: instruct,
         macros: macros,
         textFilter: inputs.textFilter,
         bypassContextLength: inputs.bypassContextLength,
-        messages: copyInputs(inputs.messages),
+        messages: copyInputs(history),
         tokenizer: tokenizer,
         includeInlineReasoning: inputs.mode === 'local',
         chatTokenizer: (message: ChatMessage) =>
-            Chats.actions.countMessageTokens(message, tokenizer),
+            message.id < 0
+                ? tokenizer(message.swipes.find((swipe) => swipe.active)?.swipe ?? '')
+                : Chats.actions.countMessageTokens(message, tokenizer),
         cache: { characterCounts, userCounts, instructCache },
         dataSources: await inputs.dataSources,
     }

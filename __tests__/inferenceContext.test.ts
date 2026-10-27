@@ -192,6 +192,26 @@ test('system prompt cache counts only referenced slots, including repeated slots
     expect(result.systemPromptLength).toBe(20)
 })
 
+test('system allocation reports only card fields included by the prompt format', () => {
+    const params = parameters()
+    params.instruct.system_prompt_format =
+        '{{system_prompt}}{{character_desc}}{{user_desc}}{{personality}}'
+    params.instruct.personality = false
+    const result = getSystemPrompt({
+        ...params,
+        ...params.cache,
+        usePrefix: false,
+        useSuffix: false,
+    })
+    const parts = Object.fromEntries(result.components.map((item) => [item.key, item.tokens]))
+    expect(parts.system_prompt).toBe(10)
+    expect(parts.character_desc).toBe(30)
+    expect(parts.user_desc).toBe(20)
+    expect(parts.personality).toBe(0)
+    expect(parts.scenario).toBe(0)
+    expect(result.systemPromptLength).toBe(60)
+})
+
 test('chat payloads honor the configured provider role names', async () => {
     const params = parameters()
     params.apiConfig = JSON.parse(JSON.stringify(params.apiConfig))

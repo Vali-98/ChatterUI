@@ -1,8 +1,8 @@
 import { defaultSamplerConfig } from '../lib/constants/SamplerData'
 import { useConnectionStore } from '../lib/engine/API/connectionStore'
-import { Llama } from '../lib/engine/Local/LlamaLocal'
 import { getDataSources } from '../lib/engine/DataSources'
 import { captureGenerationInputs, prepareGenerationContext } from '../lib/engine/generation/inputs'
+import { Llama } from '../lib/engine/Local/LlamaLocal'
 import { Tokenizer } from '../lib/engine/Tokenizer'
 import { useTextFilterStore } from '../lib/hooks/TextFilter'
 import { Characters } from '../lib/state/characters'
@@ -10,6 +10,10 @@ import { buildBlankCharacterCard } from '../lib/state/characters/schema'
 import { Chats } from '../lib/state/chat'
 import { Instructs } from '../lib/state/Instructs'
 
+jest.mock('../lib/summaries/db', () => ({ summaryList: () => ({ all: () => [] }) }))
+jest.mock('../lib/summaries/settingsStore', () => ({
+    useSummarySettingsStore: { getState: () => ({ enabled: false }) },
+}))
 jest.mock('../lib/engine/API/connectionStore', () => ({
     useConnectionStore: { getState: jest.fn() },
 }))

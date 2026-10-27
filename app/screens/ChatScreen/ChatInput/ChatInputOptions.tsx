@@ -1,10 +1,13 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useRouter } from 'expo-router'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 
 import ContextMenu from '@components/views/ContextMenu'
 import Drawer from '@components/views/Drawer'
+import { Chats } from '@lib/state/chat'
+import { useSummaryPanelState } from '@lib/summaries/panelState'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import { useAuthorNoteState } from '../AuthorNote'
@@ -18,7 +21,11 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
     const { t } = useTranslation()
     const router = useRouter()
     const styles = useStyles()
+    // The percentage-based graph follows the action rows instead of sizing the menu.
+    const [optionsWidth, setOptionsWidth] = useState(0)
     const { ref } = useAuthorNoteState()
+    const chatId = Chats.useChatState((state) => state.id)
+    const openSummaries = useSummaryPanelState((state) => state.open)
     const setShow = Drawer.useDrawerStore((state) => state.setShow)
 
     const setShowChat = (b: boolean) => {
@@ -35,40 +42,56 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
                 />
             </ContextMenu.Trigger>
             <ContextMenu.Body>
-                <ChatTokenCount />
+                <View style={{ width: optionsWidth, alignSelf: 'flex-start' }}>
+                    <ChatTokenCount />
+                </View>
                 <ContextMenu.Divider />
-                <ContextMenu.Button
-                    closeOnPress={false}
-                    onPress={(close) => {
-                        close()
-                        router.back()
-                    }}
-                    label={t('chat.input.actions.mainMenu')}
-                    icon="backward"
-                />
-                <ContextMenu.Button
-                    onPress={() => {
-                        ref?.current?.open()
-                    }}
-                    label={t('chat.input.actions.authorNotes')}
-                    icon="paper-clip"
-                />
-                <ContextMenu.Button
-                    closeOnPress={false}
-                    onPress={(close) => {
-                        close()
-                        router.push('/screens/CharacterEditorScreen')
-                    }}
-                    label={t('chat.input.actions.editCharacter')}
-                    icon="edit"
-                />
-                <ContextMenu.Button
-                    onPress={() => {
-                        setShowChat(true)
-                    }}
-                    label={t('chat.input.actions.chatHistory')}
-                    icon="paper-clip"
-                />
+                <View
+                    style={{ alignSelf: 'flex-start' }}
+                    onLayout={(event) =>
+                        setOptionsWidth(Math.ceil(event.nativeEvent.layout.width))
+                    }>
+                    <ContextMenu.Button
+                        label={t('summary.title')}
+                        icon="file-text"
+                        disabled={chatId === undefined}
+                        onPress={() => {
+                            if (chatId !== undefined) openSummaries(chatId)
+                        }}
+                    />
+                    <ContextMenu.Button
+                        closeOnPress={false}
+                        onPress={(close) => {
+                            close()
+                            router.back()
+                        }}
+                        label={t('chat.input.actions.mainMenu')}
+                        icon="backward"
+                    />
+                    <ContextMenu.Button
+                        onPress={() => {
+                            ref?.current?.open()
+                        }}
+                        label={t('chat.input.actions.authorNotes')}
+                        icon="paper-clip"
+                    />
+                    <ContextMenu.Button
+                        closeOnPress={false}
+                        onPress={(close) => {
+                            close()
+                            router.push('/screens/CharacterEditorScreen')
+                        }}
+                        label={t('chat.input.actions.editCharacter')}
+                        icon="edit"
+                    />
+                    <ContextMenu.Button
+                        onPress={() => {
+                            setShowChat(true)
+                        }}
+                        label={t('chat.input.actions.chatHistory')}
+                        icon="paper-clip"
+                    />
+                </View>
             </ContextMenu.Body>
         </ContextMenu>
     )

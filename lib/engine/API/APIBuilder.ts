@@ -25,6 +25,7 @@ type DataOutput = {
 export interface APIBuilderParams
     extends ContextBuilderParams,
         Omit<RequestBuilderParams, 'prompt'> {
+    onFinishReason?: (reason: string) => void
     onData: (data: DataOutput) => void
     onEnd?: (data: string) => void | Promise<void>
     signal: AbortSignal
@@ -103,6 +104,11 @@ export const buildAndSendRequest = (params: APIBuilderParams): RequestHandle => 
                 signal: params.signal,
                 onEvent: (event) => {
                     const parsed = typeof event === 'string' ? JSON.parse(event) : event
+                    const finishReason =
+                        parsed?.choices?.[0]?.finish_reason ??
+                        parsed?.delta?.stop_reason ??
+                        parsed?.stop_reason
+                    if (typeof finishReason === 'string') params.onFinishReason?.(finishReason)
                     const reasoning = apiConfig.request.reasoningParsePattern
                     if (reasoning && apiConfig.request.completionType.type === 'chatCompletions')
                         parseOutput(parsed, reasoning, 'reasoning')

@@ -1,10 +1,22 @@
-import { useChatAccessState } from '../lib/state/chat/access'
 import { randomUUID } from 'expo-crypto'
 
+import { finishGeneration } from '../lib/engine/generation/lifecycle'
+import {
+    abortGeneration,
+    beginGeneration,
+    getGenerationRuntime,
+} from '../lib/engine/generation/runtime'
+import {
+    updateGeneration,
+    appendGeneration,
+    enableGenerationInlineReasoning,
+    useGenerationState,
+} from '../lib/engine/generation/state'
 import { Tokenizer } from '../lib/engine/Tokenizer'
 import { Characters } from '../lib/state/characters'
 import { buildBlankCharacterCard } from '../lib/state/characters/schema'
 import type { CharacterCard } from '../lib/state/characters/types'
+import { useChatAccessState } from '../lib/state/chat/access'
 import {
     countMessageTokens,
     createChat,
@@ -20,18 +32,6 @@ import {
     editSwipe,
 } from '../lib/state/chat/actions'
 import { db } from '../lib/state/chat/db'
-import { finishGeneration } from '../lib/engine/generation/lifecycle'
-import {
-    abortGeneration,
-    beginGeneration,
-    getGenerationRuntime,
-} from '../lib/engine/generation/runtime'
-import {
-    updateGeneration,
-    appendGeneration,
-    enableGenerationInlineReasoning,
-    useGenerationState,
-} from '../lib/engine/generation/state'
 import { notifyGenerationComplete } from '../lib/state/chat/notifications'
 import { useChatState } from '../lib/state/chat/state'
 import type { Chat } from '../lib/state/chat/types'
@@ -39,6 +39,7 @@ import { Logger } from '../lib/state/Logger'
 import { mmkv } from '../lib/storage/MMKV'
 import { copyFile, deleteFile, fileInfo, saveStringToDownload } from '../lib/utils/File'
 
+jest.mock('../lib/engine/summaries/actions', () => ({ maybeGenerateSummary: jest.fn() }))
 jest.mock('../lib/queries/databaseQuery', () => ({ publishDatabaseChanges: jest.fn() }))
 jest.mock('react-native-background-actions', () => ({
     __esModule: true,

@@ -261,6 +261,7 @@ const titleGeneratorStream = async (inputs: GenerationInputs, signal: AbortSigna
         },
         {
             signal: signal,
+            recordStats: false,
             stopGenerating: (reason) => {
                 completion.reason = reason
             },
@@ -320,10 +321,16 @@ const titleGeneratorStream = async (inputs: GenerationInputs, signal: AbortSigna
 type ObtainFieldsOptions = Pick<APIBuilderParams, 'onData' | 'onEnd' | 'stopGenerating'> & {
     controller?: AbortController
     signal?: AbortSignal
+    recordStats?: boolean
 }
 
 function obtainFields(inputs: GenerationInputs, options: ObtainFieldsOptions) {
-    const { controller = new AbortController(), signal = controller.signal, ...handlers } = options
+    const {
+        controller = new AbortController(),
+        signal = controller.signal,
+        recordStats = true,
+        ...handlers
+    } = options
     const ready = (async (): Promise<APIBuilderParams | void> => {
         try {
             const apiConfig = inputs.apiConfig
@@ -344,7 +351,7 @@ function obtainFields(inputs: GenerationInputs, options: ObtainFieldsOptions) {
                     : instructLength) - samplers.genamt
             )
             const limit = apiConfig.request.stopSequenceLimit
-            const context = await prepareGenerationContext(inputs)
+            const context = await prepareGenerationContext(inputs, { recordStats })
             return {
                 ...context,
                 ...handlers,

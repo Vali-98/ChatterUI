@@ -4,6 +4,7 @@ import { Switch, Text, View } from 'react-native'
 import { Theme } from '@lib/theme/ThemeManager'
 
 interface ThemedSwitchProps {
+    disabled?: boolean
     description?: string
     label?: string
     value: boolean | undefined
@@ -11,6 +12,7 @@ interface ThemedSwitchProps {
 }
 
 const ThemedSwitch: React.FC<ThemedSwitchProps> = ({
+    disabled,
     description,
     label,
     value,
@@ -22,6 +24,7 @@ const ThemedSwitch: React.FC<ThemedSwitchProps> = ({
             <View
                 style={{ flexDirection: 'row', paddingVertical: spacing.m, alignItems: 'center' }}>
                 <Switch
+                    disabled={disabled}
                     trackColor={{
                         false: color.neutral._300,
                         true: color.neutral._500,

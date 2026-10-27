@@ -1,5 +1,6 @@
 import { initLlama } from 'cui-llama.rn'
 
+import { useDeferredTaskState } from '../lib/engine/generation/deferredState'
 import { useLocalModelResourceState } from '../lib/engine/generation/localResource'
 import { useGenerationState } from '../lib/engine/generation/state'
 import { Llama } from '../lib/engine/Local/LlamaLocal'
@@ -41,6 +42,7 @@ const context = (events: string[]) => ({
 })
 beforeEach(() => {
     jest.clearAllMocks()
+    useDeferredTaskState.setState({ tasks: {} })
     useGenerationState.setState({ generations: {} })
     Llama.useLlamaModelStore.setState({ model: undefined, context: undefined, mmproj: undefined })
     jest.mocked(Model.getModelExists).mockReturnValue(true)
@@ -89,4 +91,26 @@ test('a queued model load waits for native unloading to finish', async () => {
     expect(initLlama).toHaveBeenCalledTimes(1)
     expect(Llama.useLlamaModelStore.getState().model?.id).toBe(2)
     expect(useLocalModelResourceState.getState().operations).toBe(0)
+})
+
+test('model unloading is blocked until a deferred local summary has settled', async () => {
+    const previous = context([])
+    Llama.useLlamaModelStore.setState({ model: model(1), context: previous as any })
+    useDeferredTaskState.setState({
+        tasks: {
+            1: {
+                id: 1,
+                chatId: 1,
+                kind: 'summary',
+                mode: 'local',
+                status: 'running',
+                createdAt: 0,
+            },
+        },
+    })
+    await expect(Llama.useLlamaModelStore.getState().unload()).rejects.toThrow()
+    expect(previous.release).not.toHaveBeenCalled()
+    useDeferredTaskState.setState({ tasks: {} })
+    await Llama.useLlamaModelStore.getState().unload()
+    expect(previous.release).toHaveBeenCalledTimes(1)
 })

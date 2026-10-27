@@ -1,7 +1,21 @@
-import { migrateSwipeReasoning } from '../db/reasoningMigration'
 import { db as database } from '../db/db'
+import { migrateSwipeReasoning } from '../db/reasoningMigration'
+import { authorNotes, lorebookEntries, lorebooks } from '../db/schema'
+import {
+    contextAuthorNotes,
+    contextHistory,
+    contextLorebooks,
+} from '../lib/queries/contextAllocation'
 import { acquireChatLease, releaseChatLease, useChatAccessState } from '../lib/state/chat/access'
 import { db } from '../lib/state/chat/db'
+import {
+    acceptSummary,
+    createSummaryDraft,
+    getSummary,
+    restrictSummarySources,
+    updateSummary,
+} from '../lib/summaries/db'
+import { selectSummarySources } from '../lib/summaries/history'
 
 // Exercise the production Expo Drizzle adapter against real SQLite when Node provides it.
 // Action tests below this layer remain available on older Node releases.
@@ -85,6 +99,178 @@ describeSQLite('chat database integration', () => {
     beforeEach(() => {
         useChatAccessState.setState({ leases: {} })
         reset()
+    })
+
+    test('summary coverage invalidates atomically on text changes, swipe selection and deletion', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [
+                message('first long response'),
+                message('second response'),
+                message('latest response'),
+            ],
+        })
+        const history = db.query.chat(chatId)!.messages
+        const draft = createSummaryDraft(chatId, selectSummarySources(history, []))
+        updateSummary(draft.id, { content: 'Memory' })
+        acceptSummary(draft.id)
+        const first = history[0].swipes[0]
+        db.update.swipe(first.id, { token_length: 20, reasoning: 'unrelated reasoning' })
+        expect(getSummary(draft.id)?.source_changed).toBe(false)
+        db.update.swipe(first.id, { swipe: first.swipe })
+        expect(getSummary(draft.id)?.source_changed).toBe(false)
+        db.update.swipe(first.id, { swipe: 'edited content' })
+        expect(getSummary(draft.id)?.source_changed).toBe(true)
+        acceptSummary(draft.id)
+        const replacement = db.create.swipe(history[0].id, { swipe: 'replacement' })
+        expect(getSummary(draft.id)?.source_changed).toBe(true)
+        acceptSummary(draft.id)
+        db.update.swipe(replacement.id, { swipe: 'changed replacement' })
+        expect(getSummary(draft.id)?.source_changed).toBe(true)
+        acceptSummary(draft.id)
+        db.update.activeSwipe(first.id)
+        expect(getSummary(draft.id)?.source_changed).toBe(true)
+        acceptSummary(draft.id)
+        db.delete.message(history[0].id)
+        expect(getSummary(draft.id)?.source_changed).toBe(true)
+        expect(getSummary(draft.id)?.content).toBe('Memory')
+    })
+
+    test('drafts track edits during generation and enforce one unresolved draft per chat', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [
+                message('first response'),
+                message('second response'),
+                message('latest response'),
+            ],
+        })
+        const history = db.query.chat(chatId)!.messages
+        const sources = selectSummarySources(history, [])
+        const draft = createSummaryDraft(chatId, sources)
+        expect(() => createSummaryDraft(chatId, sources)).toThrow()
+        db.update.swipe(history[0].swipes[0].id, { swipe: 'changed while running' })
+        expect(getSummary(draft.id)?.source_changed).toBe(true)
+        updateSummary(draft.id, { content: 'Memory' })
+        expect(() => acceptSummary(draft.id, { requireUnchanged: true })).toThrow(
+            'Source history changed'
+        )
+        expect(getSummary(draft.id)?.status).toBe('draft')
+        restrictSummarySources(draft.id, [sources[0]])
+        expect(getSummary(draft.id)?.source_changed).toBe(true)
+        expect(getSummary(draft.id)?.eligible_end_id).toBe(sources.at(-1)!.id)
+        updateSummary(draft.id, { status: 'discarded' })
+        expect(() => createSummaryDraft(chatId, sources)).not.toThrow()
+        db.delete.chat(chatId)
+        expect(getSummary(draft.id)).toBeUndefined()
+    })
+
+    test('failed source writes roll back summary invalidation and keep refreshes active swipe coverage', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [
+                message('first response'),
+                message('second response'),
+                message('latest response'),
+            ],
+        })
+        const history = db.query.chat(chatId)!.messages
+        const draft = createSummaryDraft(chatId, selectSummarySources(history, []))
+        const replacement = db.create.swipe(history[0].id, { swipe: 'replacement' })
+        updateSummary(draft.id, { content: 'Memory' })
+        acceptSummary(draft.id)
+        db.update.swipe(history[0].swipes[0].id, { swipe: 'inactive swipe edit' })
+        expect(getSummary(draft.id)?.source_changed).toBe(false)
+        connection!.exec(
+            "CREATE TRIGGER fail_summary BEFORE UPDATE ON chat_summaries BEGIN SELECT RAISE(ABORT, 'test failure'); END"
+        )
+        try {
+            expect(() => db.update.swipe(replacement.id, { swipe: 'failed edit' })).toThrow()
+            expect(db.query.swipe(replacement.id)?.swipe).toBe('replacement')
+        } finally {
+            connection!.exec('DROP TRIGGER fail_summary')
+        }
+        expect(getSummary(draft.id)?.source_changed).toBe(false)
+    })
+
+    test('context allocation uses stored token counts and estimates uncounted active text', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [message('12345678'), message('12345678')],
+        })
+        const messages = db.query.chat(chatId)!.messages
+        db.update.swipe(messages[0].swipes[0].id, { token_length: 10 })
+        expect(Number(db.live.tokenCount(chatId).all()[0].totalTokens)).toBe(12)
+        db.create.swipe(messages[1].id, { swipe: '1234', token_length: 3 })
+        expect(Number(db.live.tokenCount(chatId).all()[0].totalTokens)).toBe(13)
+    })
+
+    test('live allocation queries include only active swipes and applicable data sources', () => {
+        const chatId = db.create.chat({ character_id: 1, messages: [message('12345678')] })
+        const otherChatId = db.create.chat({ character_id: 1 })
+        const entry = db.query.chat(chatId)!.messages[0]
+        db.update.swipe(entry.swipes[0].id, { reasoning: 'reasoning' })
+        expect(contextHistory(chatId).all()[0]).toMatchObject({
+            content_length: 8,
+            reasoning_length: 9,
+            token_length: null,
+        })
+        db.create.swipe(entry.id, { swipe: 'new', token_length: 2 })
+        expect(contextHistory(chatId).all()).toHaveLength(1)
+        expect(contextHistory(chatId).all()[0]).toMatchObject({
+            content_length: 3,
+            token_length: 2,
+        })
+        try {
+            database
+                .insert(authorNotes)
+                .values([
+                    { content: 'global', token_length: 10 },
+                    { content: 'character', character_id: 1, token_length: 20 },
+                    { content: 'chat', chat_id: chatId, token_length: 30 },
+                    { content: 'other chat', chat_id: otherChatId, token_length: 40 },
+                    { content: 'inactive', active: false, token_length: 50 },
+                ])
+                .run()
+            expect(
+                contextAuthorNotes(chatId, 1)
+                    .all()
+                    .map((note) => note.token_length)
+                    .sort()
+            ).toEqual([10, 20, 30])
+            expect(
+                contextAuthorNotes()
+                    .all()
+                    .map((note) => note.token_length)
+            ).toEqual([10])
+            database
+                .insert(lorebooks)
+                .values(
+                    [101, 102, 103].map((id) => ({
+                        id: id,
+                        name: 'Book',
+                        description: '',
+                        active: true,
+                        token_budget: 500,
+                    }))
+                )
+                .run()
+            database
+                .insert(lorebookEntries)
+                .values([
+                    { lorebook_id: 101, name: 'Enabled', enable: true },
+                    { lorebook_id: 102, name: 'Disabled', enable: false },
+                ])
+                .run()
+            expect(
+                contextLorebooks()
+                    .all()
+                    .map((book) => book.id)
+            ).toEqual([101])
+        } finally {
+            database.delete(authorNotes).run()
+            database.delete(lorebooks).run()
+        }
     })
 
     test('creates an empty chat without attempting empty bulk inserts', () => {

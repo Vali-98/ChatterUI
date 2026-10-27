@@ -19,6 +19,7 @@ import { KV, Model, ModelListQueryType } from './Model'
 import { AppSettings } from '../../constants/GlobalValues'
 import { Logger } from '../../state/Logger'
 import { createMMKVStorage, mmkv } from '../../storage/MMKV'
+import { isDeferredTaskRunning, useDeferredTaskState } from '../generation/deferredState'
 import { runLocalModelOperation } from '../generation/localResource'
 import { isActiveGeneration, useGenerationState } from '../generation/state'
 
@@ -44,7 +45,10 @@ const assertModelAccess = (options: ModelAccessOptions = {}) => {
     const owner = Object.values(useGenerationState.getState().generations).find(
         (generation) => generation.mode === 'local' && isActiveGeneration(generation)
     )
-    if (owner && owner.id !== options.generationId) {
+    const deferredOwner = Object.values(useDeferredTaskState.getState().tasks).some(
+        (task) => task.mode === 'local' && isDeferredTaskRunning(task)
+    )
+    if (deferredOwner || (owner && owner.id !== options.generationId)) {
         const message = t('generation.errors.generationAlreadyInProgress')
         Logger.warnToast(message)
         throw new Error(message)

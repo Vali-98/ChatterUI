@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, getTableColumns, like, lte, sum } from 'drizzle-orm'
+import { and, asc, count, desc, eq, getTableColumns, like, lte, sql } from 'drizzle-orm'
 
 import { db as database } from '@db/db'
 import {
@@ -10,6 +10,7 @@ import {
     swipeReasoning,
 } from '@db/schema'
 import { splitReasoning } from '@lib/engine/reasoning/parser'
+import { invalidateSummarySources } from '@lib/summaries/db'
 
 import { assertChatEditable, type ChatMutationOptions } from './access'
 import type { Chat, ChatInput, MessageInput, SwipeInput } from './types'
@@ -67,7 +68,9 @@ const live = {
         }),
     tokenCount: (chatId: number) =>
         database
-            .select({ totalTokens: sum(chatSwipes.token_length) })
+            .select({
+                totalTokens: sql<string>`coalesce(sum(coalesce(${chatSwipes.token_length}, (length(${chatSwipes.swipe}) + 3) / 4)), 0)`,
+            })
             .from(chatSwipes)
             .innerJoin(chatEntries, eq(chatSwipes.entry_id, chatEntries.id))
             .where(and(eq(chatEntries.chat_id, chatId), eq(chatSwipes.active, true))),
@@ -321,6 +324,7 @@ const create = {
                 .set({ active: false })
                 .where(eq(chatSwipes.entry_id, messageId))
                 .run()
+            invalidateSummarySources(tx, messageId)
             const owner = tx.query.chatEntries
                 .findFirst({ where: eq(chatEntries.id, messageId) })
                 .sync()
@@ -348,6 +352,7 @@ const update = {
                 .findFirst({ where: eq(chatSwipes.id, swipeId) })
                 .sync()
             if (!swipe) return false
+            if (!swipe.active) invalidateSummarySources(tx, swipe.entry_id, swipeId)
             tx.update(chatSwipes)
                 .set({ active: false })
                 .where(eq(chatSwipes.entry_id, swipe.entry_id))
@@ -366,6 +371,10 @@ const update = {
         database.transaction((tx) => {
             if (Object.keys(fields).some((key) => key !== 'token_length'))
                 assertSwipeEditable(swipeId, options)
+            const previous =
+                fields.swipe !== undefined
+                    ? tx.query.chatSwipes.findFirst({ where: eq(chatSwipes.id, swipeId) }).sync()
+                    : undefined
             const { reasoning, resetReasoningLength, ...columns } = fields
             const swipe = Object.keys(columns).length
                 ? tx
@@ -375,6 +384,8 @@ const update = {
                       .returning()
                       .get()
                 : tx.query.chatSwipes.findFirst({ where: eq(chatSwipes.id, swipeId) }).sync()
+            if (swipe?.active && fields.swipe !== undefined && previous?.swipe !== fields.swipe)
+                invalidateSummarySources(tx, swipe.entry_id)
             if (swipe) writeReasoning(tx, swipeId, reasoning, resetReasoningLength)
             if (swipe && (fields.swipe !== undefined || reasoning !== undefined))
                 touchMessage(tx, swipe.entry_id)
@@ -393,6 +404,7 @@ const remove = {
         database.transaction((tx) => {
             assertMessageEditable(messageId)
             touchMessage(tx, messageId)
+            invalidateSummarySources(tx, messageId)
             tx.delete(chatEntries).where(eq(chatEntries.id, messageId)).run()
         }),
 }

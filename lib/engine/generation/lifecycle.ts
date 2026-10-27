@@ -14,6 +14,7 @@ import {
     useGenerationState,
 } from './state'
 import type { CompletionReason } from '../API/APIBuilder'
+import { maybeGenerateSummary } from '../summaries/actions'
 
 export const finishGeneration = (id: number, reason: CompletionReason): Promise<void> => {
     const generation = useGenerationState.getState().generations[id]
@@ -55,6 +56,13 @@ async function saveGeneration(id: number, reason: CompletionReason) {
     updateGeneration(id, { status: saved ? reason : 'cancelled', persisted: true })
     removeGenerationOutput(id)
     releaseGenerationRuntime(id)
+    if (saved && !preserveOriginal && reason === 'completed' && runtime.inputs) {
+        try {
+            maybeGenerateSummary(runtime.inputs)
+        } catch (error) {
+            Logger.stackTrace(error)
+        }
+    }
     const context = db.query.swipeContext(generation.swipeId)
     if (
         saved &&

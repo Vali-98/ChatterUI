@@ -127,6 +127,11 @@ const getPaths = (remote: boolean, t: (input: string) => string): ButtonData[] =
         name: t('navigation.dataSources'),
         path: [
             {
+                name: t('summary.settings'),
+                path: '/screens/SummarySettingsScreen',
+                icon: 'file-text',
+            },
+            {
                 name: t('navigation.lorebooks'),
                 path: '/screens/LorebookManagerScreen',
                 icon: 'book',

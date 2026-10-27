@@ -26,6 +26,8 @@ import m0021 from './0021_productive_nebula.sql';
 import m0022 from './0022_connection_ids.sql';
 import m0023 from './0023_sampler_ids.sql';
 import m0024 from './0024_swipe_reasoning.sql';
+import m0025 from './0025_chat_summaries.sql';
+import m0026 from './0026_summary_draft_attempts.sql';
 
   export default {
     journal,
@@ -54,7 +56,9 @@ m0020,
 m0021,
 m0022,
 m0023,
-m0024
+m0024,
+m0025,
+m0026
     }
   }
   

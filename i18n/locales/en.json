@@ -176,7 +176,11 @@
         }
     },
     "chat": {
-        "reasoning": { "label": "Reasoning", "generating": "Thinking…", "content": "Content" },
+        "reasoning": {
+            "label": "Reasoning",
+            "generating": "Thinking…",
+            "content": "Content"
+        },
         "bubble": {
             "promptSpeed": "Prompt: {{tokens}} t/s | {{seconds}}s",
             "textGenerationSpeed": "    Text Gen: {{tokens}} t/s | {{seconds}}s"
@@ -1001,5 +1005,109 @@
         },
         "nameplaceholder": "Empty names are discouraged",
         "profilecount": "User Profiles"
+    },
+    "summary": {
+        "title": "Summaries",
+        "settings": "Summary settings",
+        "enabled": "Enabled",
+        "autoGenerate": "Auto-generate summaries",
+        "threshold": "Auto-generate threshold (%)",
+        "outputTokens": "Summary output tokens",
+        "autoContinue": "Automatically continue limited drafts",
+        "autoContinueDescription": "Try once on a later completed turn. Cancelled drafts and drafts put aside with Later are never resumed automatically.",
+        "warnOnChanges": "Warn when source history changes",
+        "prompt": "Summarizer prompt",
+        "historyDescription": "Uses plain conversation text through the second-latest character response. Images and other data sources are excluded. Local summarization temporarily replaces the model’s active context; saved chat KV files are preserved.",
+        "unfinished": "Unfinished summary",
+        "changed": "Summary source changed",
+        "review": "Review",
+        "later": "Later",
+        "continue": "Continue",
+        "save": "Save & use",
+        "keep": "Keep",
+        "regenerate": "Regenerate",
+        "discard": "Discard",
+        "discardConfirm": "Discard this unfinished summary?",
+        "generate": "Generate summary",
+        "disabled": "Enable summaries in Data Sources to generate and use them.",
+        "paused": "Automatic summaries are paused until this draft is resolved.",
+        "inactive": "Disabled",
+        "sourceChanged": "Source history changed. Keep, edit, or regenerate this summary.",
+        "useInContext": "Use in context",
+        "actionFailed": "Could not update summary",
+        "status": {
+            "draft": "Draft",
+            "accepted": "Summary",
+            "discarded": "Discarded"
+        },
+        "tasks": {
+            "running": {
+                "summary": "Generating summary",
+                "title": "Generating title"
+            },
+            "cancelling": {
+                "summary": "Cancelling summary",
+                "title": "Cancelling title"
+            },
+            "pending": {
+                "summary": "Summary queued",
+                "title": "Title queued"
+            }
+        },
+        "statsTitle": "Last prompt (approx.)",
+        "noStats": "No prompt has been built yet.",
+        "stats": {
+            "total": "Total",
+            "capacity": "Prompt capacity",
+            "system": "System",
+            "history": "Recent history",
+            "summaries": "Summaries",
+            "dataSources": "Data sources",
+            "summarizedMessages": "Messages summarized",
+            "rawHistory": "History before compression",
+            "response": "Reserved response"
+        },
+        "coverage_one": "{{count}} message",
+        "coverage_other": "{{count}} messages",
+        "compression": "History reduction"
+    },
+    "contextAllocation": {
+        "title": "Context allocation",
+        "estimate": "Estimated allocation",
+        "estimateDescription": "Current context estimate using saved token counts and text lengths.",
+        "system": "System",
+        "history": "History",
+        "summaries": "Summaries",
+        "dataSources": "Data sources",
+        "response": "Reserved response",
+        "free": "Free",
+        "used": "Used",
+        "reserved": "Reserved",
+        "capacity": "Context capacity",
+        "usage": "{{used}} / {{capacity}} used",
+        "overflow": "{{count}} tokens over capacity",
+        "opportunistic": "Uses remaining space",
+        "opportunisticDescription": "Lorebook budgets are limits, not fixed reservations. Matching entries and examples may use free space when the prompt is built.",
+        "upTo": "Up to {{count}}",
+        "details": {
+            "system_prompt": "System prompt",
+            "character_desc": "Character description",
+            "user_desc": "User description",
+            "personality": "Character personality",
+            "scenario": "Character scenario",
+            "system_prefix": "System prefix",
+            "system_suffix": "System suffix",
+            "systemFormatting": "Prompt formatting",
+            "messages": "Active messages",
+            "summaries": "Summaries",
+            "reasoning": "Reasoning",
+            "messageFormatting": "Message formatting",
+            "response": "Completion output",
+            "globalNotes": "Global author notes",
+            "characterNotes": "Character author notes",
+            "chatNotes": "Chat author notes",
+            "lorebooks": "Lorebooks",
+            "examples": "Character examples"
+        }
     }
 }
