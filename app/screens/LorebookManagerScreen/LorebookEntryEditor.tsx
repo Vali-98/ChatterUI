@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, View } from 'react-native'
+import { View } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedSlider from '@components/input/ThemedSlider'
-import ThemedSwitch from '@components/input/ThemedSwitch'
+import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import BottomSheet, { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
@@ -135,7 +136,8 @@ const LorebookEntryEditor = () => {
         <BottomSheet onRequestClose={backAction} sheetStyle={{ flex: 1 }} ref={ref}>
             {entry && placeholderEntry && entryId && (
                 <>
-                    <ScrollView
+                    <KeyboardAwareScrollView
+                        keyboardShouldPersistTaps="handled"
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{
                             rowGap: spacing.xl,
@@ -156,6 +158,7 @@ const LorebookEntryEditor = () => {
 
                         <ThemedTextInput
                             label={t('common.labels.content')}
+                            multiline
                             containerStyle={{ flex: 0 }}
                             numberOfLines={10}
                             value={placeholderEntry.content}
@@ -164,25 +167,26 @@ const LorebookEntryEditor = () => {
 
                         <ThemedTextInput
                             label={t('common.labels.comment')}
+                            multiline
                             containerStyle={{ flex: 0 }}
                             numberOfLines={3}
                             value={placeholderEntry.comment}
                             onChangeText={(value) => updateEntry('comment', value)}
                         />
 
-                        <ThemedSwitch
+                        <ThemedSwitchRow
                             label={t('common.actions.enable')}
                             value={placeholderEntry.enable}
                             onChangeValue={(value) => updateEntry('enable', value)}
                         />
 
-                        <ThemedSwitch
+                        <ThemedSwitchRow
                             label={t('lorebook.fields.caseSensitive')}
                             value={placeholderEntry.case_sensitive}
                             onChangeValue={(value) => updateEntry('case_sensitive', value)}
                         />
 
-                        <ThemedSwitch
+                        <ThemedSwitchRow
                             label={t('lorebook.fields.selective')}
                             value={placeholderEntry.selective}
                             onChangeValue={(value) => updateEntry('selective', value)}
@@ -196,7 +200,7 @@ const LorebookEntryEditor = () => {
                             />
                         )}
 
-                        <ThemedSwitch
+                        <ThemedSwitchRow
                             label={t('lorebook.fields.constant')}
                             value={placeholderEntry.constant}
                             onChangeValue={(value) => updateEntry('constant', value)}
@@ -219,7 +223,7 @@ const LorebookEntryEditor = () => {
                             value={placeholderEntry.priority}
                             onValueChange={(value) => updateEntry('priority', value)}
                         />
-                    </ScrollView>
+                    </KeyboardAwareScrollView>
 
                     <View
                         style={{

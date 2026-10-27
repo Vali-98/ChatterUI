@@ -2,7 +2,7 @@ import { getThreads } from '@vali98/react-native-cpu-info'
 import { useFocusEffect } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BackHandler, Platform, View } from 'react-native'
+import { BackHandler, Platform } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { Easing, SlideInRight, SlideOutRight } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
@@ -10,7 +10,7 @@ import { useShallow } from 'zustand/react/shallow'
 import ThemedButton from '@components/buttons/ThemedButton'
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import ThemedSlider from '@components/input/ThemedSlider'
-import ThemedSwitch from '@components/input/ThemedSwitch'
+import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
 import { AppSettings } from '@lib/constants/GlobalValues'
@@ -69,7 +69,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             title: t('model.alert.deletekv.title'),
             description: t('model.alert.deletekv.description', { size: readableFileSize(kvSize) }),
             buttons: [
-                { label: t('common.actions.delete') },
+                { label: t('common.actions.cancel') },
                 {
                     label: t('model.alert.deletekv.title'),
                     onPress: async () => {
@@ -87,10 +87,10 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
         <Animated.ScrollView
             showsVerticalScrollIndicator={false}
             style={{ flex: 1 }}
+            contentContainerStyle={{ rowGap: 8, paddingBottom: 24 }}
             entering={SlideInRight.easing(Easing.inOut(Easing.cubic))}
             exiting={SlideOutRight.easing(Easing.inOut(Easing.cubic))}>
             <SectionTitle>{t('model.settings.cpu')}</SectionTitle>
-            <View style={{ marginTop: 16 }} />
             {config && (
                 <>
                     <ThemedSlider
@@ -122,7 +122,6 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                         disabled={modelImporting || modelLoading}
                     />
 
-                    {/* Note: llama.rn does not have any Android gpu acceleration */}
                     {(Platform.OS === 'ios' || devices.length > 1) && (
                         <ThemedSlider
                             label={t('model.gpulayers')}
@@ -135,7 +134,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                         />
                     )}
 
-                    <ThemedSwitch
+                    <ThemedSwitchRow
                         label={t('model.contextshift')}
                         value={config.ctx_shift}
                         onChangeValue={(value) => {
@@ -161,21 +160,21 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                 </>
             )}
             <SectionTitle>{t('model.settings.advanced')}</SectionTitle>
-            <ThemedSwitch
+            <ThemedSwitchRow
                 label={t('model.modelnamechat')}
                 value={showModelInChat}
                 onChangeValue={setShowModelInChat}
             />
-            <ThemedSwitch
+            <ThemedSwitchRow
                 label={t('model.autoload')}
                 value={autoloadLocal}
                 onChangeValue={setAutoloadLocal}
             />
-            <ThemedSwitch
+            <ThemedSwitchRow
                 label={t('model.savekv')}
                 value={saveKV}
                 onChangeValue={setSaveKV}
-                description={saveKV ? '' : t('model.savekvdesc')}
+                description={t('model.savekvdesc')}
             />
             {saveKV && (
                 <ThemedButton

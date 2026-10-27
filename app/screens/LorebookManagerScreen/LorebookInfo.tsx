@@ -8,7 +8,7 @@ import { create } from 'zustand'
 import ListButton from '@components/buttons/ListButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSlider from '@components/input/ThemedSlider'
-import ThemedSwitch from '@components/input/ThemedSwitch'
+import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import SectionTitle from '@components/text/SectionTitle'
 import TText from '@components/text/TText'
@@ -101,7 +101,7 @@ const LorebookInfoScreen = () => {
                         max={128000}
                         onValueChange={(token_budget) => handleUpdate({ token_budget })}
                     />
-                    <ThemedSwitch
+                    <ThemedSwitchRow
                         label={t('lorebook.fields.recursiveScanning')}
                         value={placeholderInfo?.recursive_scanning ?? false}
                         onChangeValue={(recursive_scanning) => handleUpdate({ recursive_scanning })}

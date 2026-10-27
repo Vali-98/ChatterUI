@@ -1,29 +1,27 @@
 import { useTranslation } from 'react-i18next'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 
 import ThemedSlider from '@components/input/ThemedSlider'
-import ThemedSwitch from '@components/input/ThemedSwitch'
+import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import ThemedTextInput from '@components/input/ThemedTextInput'
+import SettingsPage from '@components/settings/SettingsPage'
 import SectionTitle from '@components/text/SectionTitle'
 import TText from '@components/text/TText'
-import HeaderTitle from '@components/views/HeaderTitle'
 import { useSummarySettingsStore } from '@lib/summaries/settingsStore'
 
 const SummarySettingsScreen = () => {
     const { t } = useTranslation()
     const settings = useSummarySettingsStore()
     return (
-        <KeyboardAwareScrollView contentContainerStyle={{ padding: 16, rowGap: 16 }}>
-            <HeaderTitle title={t('summary.settings')} />
-            <SectionTitle>{t('summary.title')}</SectionTitle>
-            <ThemedSwitch
+        <SettingsPage title={t('summary.settings')}>
+            <ThemedSwitchRow
+                divider
                 label={t('summary.enabled')}
                 value={settings.enabled}
                 onChangeValue={(enabled) => settings.update({ enabled })}
             />
             {settings.enabled && (
                 <>
-                    <ThemedSwitch
+                    <ThemedSwitchRow
                         label={t('summary.autoGenerate')}
                         value={settings.autoGenerate}
                         onChangeValue={(autoGenerate) => settings.update({ autoGenerate })}
@@ -40,7 +38,7 @@ const SummarySettingsScreen = () => {
                                     settings.update({ autoThreshold })
                                 }
                             />
-                            <ThemedSwitch
+                            <ThemedSwitchRow
                                 label={t('summary.autoContinue')}
                                 description={t('summary.autoContinueDescription')}
                                 value={settings.autoContinueDrafts}
@@ -58,7 +56,8 @@ const SummarySettingsScreen = () => {
                         value={settings.maxOutputTokens}
                         onValueChange={(maxOutputTokens) => settings.update({ maxOutputTokens })}
                     />
-                    <ThemedSwitch
+                    <ThemedSwitchRow
+                        divider
                         label={t('summary.warnOnChanges')}
                         value={settings.warnOnSourceChanges}
                         onChangeValue={(warnOnSourceChanges) =>
@@ -75,7 +74,7 @@ const SummarySettingsScreen = () => {
                     <TText color="400">{t('summary.historyDescription')}</TText>
                 </>
             )}
-        </KeyboardAwareScrollView>
+        </SettingsPage>
     )
 }
 export default SummarySettingsScreen

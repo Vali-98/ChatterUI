@@ -11,7 +11,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedCheckbox from '@components/input/ThemedCheckbox'
-import ThemedSwitch from '@components/input/ThemedSwitch'
+import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import SectionTitle from '@components/text/SectionTitle'
 import Accordion from '@components/views/Accordion'
@@ -115,7 +115,7 @@ const FormattingManager = () => {
         }))
     )
 
-    const handleSaveInstruct = (log: boolean) => {
+    const handleSaveInstruct = () => {
         if (currentInstruct && instructID)
             Instructs.db.mutate.updateInstruct(instructID, currentInstruct)
     }
@@ -212,7 +212,7 @@ const FormattingManager = () => {
         </ContextMenu>
     )
 
-    useAutosave({ data: currentInstruct, onSave: () => handleSaveInstruct(false), interval: 1000 })
+    useAutosave({ data: currentInstruct, onSave: () => handleSaveInstruct(), interval: 1000 })
 
     if (!currentInstruct) return
 
@@ -287,11 +287,11 @@ const FormattingManager = () => {
                 showsVerticalScrollIndicator={false}
                 style={{
                     flex: 1,
-                    marginTop: 16,
                 }}
                 contentContainerStyle={{
                     rowGap: spacing.xl,
                     paddingHorizontal: spacing.xl,
+                    paddingBottom: 32,
                 }}>
                 <View
                     style={{
@@ -313,7 +313,12 @@ const FormattingManager = () => {
                         modalTitle={t('formatting.selectConfig')}
                         search
                     />
-                    <ThemedButton iconName="save" iconSize={28} variant="tertiary" />
+                    <ThemedButton
+                        iconName="save"
+                        iconSize={28}
+                        variant="tertiary"
+                        onPress={() => handleSaveInstruct()}
+                    />
                 </View>
                 <SectionTitle>{t('instruct.formatting')}</SectionTitle>
                 <ThemedTextInput
@@ -351,7 +356,6 @@ const FormattingManager = () => {
                 )}
 
                 <StringArrayEditor
-                    containerStyle={{}}
                     label={t('formatting.sections.stopSequence')}
                     value={
                         currentInstruct.stop_sequence
@@ -466,7 +470,7 @@ const FormattingManager = () => {
 
                 <StringArrayEditor value={textFilter} setValue={setTextFilter} />
 
-                <ThemedSwitch
+                <ThemedSwitchRow
                     label={t('instruct.filteredtext.label')}
                     description={t('instruct.filteredtext.description')}
                     value={sendFilteredText}
@@ -475,7 +479,7 @@ const FormattingManager = () => {
 
                 <SectionTitle>{t('instruct.localtemplate.title')}</SectionTitle>
 
-                <ThemedSwitch
+                <ThemedSwitchRow
                     label={t('instruct.localtemplate.label')}
                     description={t('instruct.localtemplate.description')}
                     value={useTemplate}

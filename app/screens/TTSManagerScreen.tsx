@@ -2,15 +2,14 @@ import * as Speech from 'expo-speech'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import ThemedSlider from '@components/input/ThemedSlider'
-import ThemedSwitch from '@components/input/ThemedSwitch'
+import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import ThemedTextInput from '@components/input/ThemedTextInput'
+import SettingsPage from '@components/settings/SettingsPage'
 import SectionTitle from '@components/text/SectionTitle'
-import HeaderTitle from '@components/views/HeaderTitle'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { previewSpeech } from '@lib/tts/actions'
@@ -45,52 +44,44 @@ const TTSManagerScreen = () => {
     const languageList: LanguageListItem = groupBy(modelList, 'language')
     const [testAudioText, setTestAudioText] = useState(t('tts.test'))
 
-    const languages = Object.keys(languageList)
-        .sort()
-        .map((name) => {
-            return name
-        })
+    const languages = Object.keys(languageList).sort()
+    const voices = languageList[lang] ?? []
 
-    const getVoices = (value = false) => {
-        Speech.getAvailableVoicesAsync().then((list) => setModelList(list))
-    }
+    const getVoices = () =>
+        Speech.getAvailableVoicesAsync()
+            .then(setModelList)
+            .catch((error) => Logger.error(error))
+
     useEffect(() => {
-        getVoices()
+        void getVoices()
     }, [])
 
     return (
-        <KeyboardAwareScrollView
-            style={{
-                marginVertical: 16,
-                paddingVertical: 16,
-                paddingHorizontal: 16,
-            }}
-            contentContainerStyle={{ rowGap: 8 }}>
-            <HeaderTitle title="TTS" />
-            <SectionTitle>{t('common.navigation.settings')}</SectionTitle>
-
-            <ThemedSwitch
+        <SettingsPage title="TTS">
+            <ThemedSwitchRow
+                divider
                 label={t('common.actions.enable')}
                 value={enabled}
                 onChangeValue={(value) => {
                     if (value) {
-                        getVoices(true)
+                        void getVoices()
                     }
                     setEnabled(value)
                 }}
             />
-            <ThemedSwitch value={auto} onChangeValue={setAuto} label={t('tts.autoafter')} />
+            <ThemedSwitchRow value={auto} onChangeValue={setAuto} label={t('tts.autoafter')} />
 
-            <ThemedSwitch value={liveTTS} onChangeValue={setLiveTTS} label={t('tts.live')} />
+            <ThemedSwitchRow value={liveTTS} onChangeValue={setLiveTTS} label={t('tts.live')} />
 
-            <ThemedSwitch
+            <ThemedSwitchRow
                 value={globalPlayer}
                 onChangeValue={setGlobalPlayer}
                 label={t('tts.globalPlayer')}
                 description={t('tts.globalPlayerDescription')}
             />
 
-            <ThemedSwitch
+            <ThemedSwitchRow
+                divider
                 value={keepPlayerOpen}
                 onChangeValue={setKeepPlayerOpen}
                 label={t('tts.keepPlayerOpen')}
@@ -108,38 +99,36 @@ const TTSManagerScreen = () => {
             />
 
             <SectionTitle style={{ marginTop: 8 }}>
-                {t('tts.language')} ({Object.keys(languageList).length})
+                {t('tts.language')} ({languages.length})
             </SectionTitle>
-            <View style={{ marginTop: 8 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}>
-                    <DropdownSheet
-                        containerStyle={{ flex: 1 }}
-                        selected={lang}
-                        data={languages}
-                        labelExtractor={(item) => item}
-                        placeholder={t('tts.selectlang')}
-                        onChangeValue={(item) => setLang(item)}
-                    />
-                    <ThemedButton
-                        iconName="reload"
-                        iconSize={20}
-                        onPress={() => getVoices()}
-                        variant="secondary"
-                    />
-                </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}>
+                <DropdownSheet
+                    containerStyle={{ flex: 1 }}
+                    selected={lang}
+                    data={languages}
+                    labelExtractor={(item) => item}
+                    placeholder={t('tts.selectlang')}
+                    onChangeValue={(item) => setLang(item)}
+                />
+                <ThemedButton
+                    iconName="reload"
+                    iconSize={20}
+                    onPress={() => getVoices()}
+                    variant="secondary"
+                />
             </View>
 
             <SectionTitle style={{ marginTop: 8 }}>
-                {t('tts.voices')} ({modelList.filter((item) => item.language === lang).length})
+                {t('tts.voices')} ({voices.length})
             </SectionTitle>
 
             <DropdownSheet
                 style={{ marginBottom: 8 }}
                 search
                 modalTitle={t('tts.selectvoice')}
-                selected={voice}
-                data={languageList?.[lang] ?? []}
-                labelExtractor={(item) => item.identifier}
+                selected={voices.find((item) => item.identifier === voice?.identifier)}
+                data={voices}
+                labelExtractor={(item) => item.name}
                 placeholder={t('tts.selectvoice')}
                 onChangeValue={(item) => setVoice(item)}
             />
@@ -167,7 +156,7 @@ const TTSManagerScreen = () => {
                     }}
                 />
             </View>
-        </KeyboardAwareScrollView>
+        </SettingsPage>
     )
 }
 
