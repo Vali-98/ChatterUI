@@ -5,6 +5,13 @@ jest.mock('../lib/storage/MMKV', () => ({
     createMMKVStorage: () => ({ getItem: () => null, setItem: jest.fn(), removeItem: jest.fn() }),
 }))
 
+const initialOptions = useTTSSettingsStore.persist.getOptions()
+beforeEach(() => {
+    useTTSSettingsStore.persist.setOptions(initialOptions)
+    useTTSSettingsStore.setState(useTTSSettingsStore.getInitialState(), true)
+    jest.clearAllMocks()
+})
+
 test('existing version-one voice and automatic playback preferences are preserved', async () => {
     const preferences = {
         enabled: true,

@@ -29,13 +29,14 @@ const ListButton: React.FC<{
     children?: ReactNode
     onPress?: () => void | Promise<void>
     active?: boolean
+    warning?: boolean
     style?: ViewStyle
-}> = ({ children, onPress, active = true, style }) => {
+}> = ({ children, onPress, active = true, warning = false, style }) => {
     const { spacing, borderWidth, color } = Theme.useTheme()
 
     const animatedStyle = useAnimatedActiveColorStyle({
-        deactiveColor: color.neutral._200,
-        activeColor: color.primary._500,
+        deactiveColor: warning ? color.warning : color.neutral._200,
+        activeColor: warning ? color.warning : color.primary._500,
         active: active,
     })
 

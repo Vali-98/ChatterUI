@@ -29,13 +29,7 @@ export const updateSummary = (
     fields: Partial<
         Pick<
             typeof chatSummaries.$inferInsert,
-            | 'content'
-            | 'status'
-            | 'enabled'
-            | 'source_changed'
-            | 'notice_dismissed'
-            | 'attempt_count'
-            | 'error'
+            'content' | 'status' | 'source_changed' | 'notice_dismissed' | 'error'
         >
     >
 ) => db.update(chatSummaries).set(fields).where(eq(chatSummaries.id, id)).run()
@@ -49,7 +43,6 @@ export const createSummaryDraft = (chatId: number, messages: ChatMessage[], repl
                 chat_id: chatId,
                 start_entry_id: messages[0].id,
                 end_entry_id: messages.at(-1)!.id,
-                eligible_end_id: messages.at(-1)!.id,
                 replaces_id: replacesId,
             })
             .returning()
@@ -127,7 +120,11 @@ export const acceptSummary = (
         const content = options.content
         if (options.requireUnchanged && summary?.source_changed)
             throw new Error('Source history changed during summarization')
-        if (!summary || !(content ?? summary.content).trim() || summary.status === 'discarded')
+        if (
+            !summary ||
+            !(content ?? summary.content).trim() ||
+            !['draft', 'accepted'].includes(summary.status)
+        )
             throw new Error('Summary cannot be accepted')
         // Keeping/editing acknowledges the current active swipes. Future switches must still invalidate it.
         const current = tx
@@ -160,19 +157,30 @@ export const acceptSummary = (
                     )
                 )
                 .run()
-        if (summary.enabled)
-            tx.update(chatSummaries)
-                .set({ enabled: false })
-                .where(
-                    and(
-                        eq(chatSummaries.chat_id, summary.chat_id),
-                        ne(chatSummaries.id, id),
-                        eq(chatSummaries.status, 'accepted'),
-                        lte(chatSummaries.start_entry_id, summary.end_entry_id),
-                        gte(chatSummaries.end_entry_id, summary.start_entry_id)
-                    )
+        tx.update(chatSummaries)
+            .set({ status: 'replaced', notice_dismissed: true })
+            .where(
+                and(
+                    eq(chatSummaries.chat_id, summary.chat_id),
+                    ne(chatSummaries.id, id),
+                    eq(chatSummaries.status, 'accepted'),
+                    lte(chatSummaries.start_entry_id, summary.end_entry_id),
+                    gte(chatSummaries.end_entry_id, summary.start_entry_id)
                 )
-                .run()
+            )
+            .run()
+        tx.update(chatSummaries)
+            .set({ status: 'replaced', notice_dismissed: true })
+            .where(
+                and(
+                    eq(chatSummaries.chat_id, summary.chat_id),
+                    ne(chatSummaries.id, id),
+                    eq(chatSummaries.status, 'draft'),
+                    gte(chatSummaries.start_entry_id, summary.start_entry_id),
+                    lte(chatSummaries.end_entry_id, summary.end_entry_id)
+                )
+            )
+            .run()
         tx.update(chatSummaries)
             .set({
                 content: content ?? summary.content,
@@ -204,8 +212,6 @@ export const resetSummaryDraft = (id: number, messages: ChatMessage[]) =>
             .update(chatSummaries)
             .set({
                 content: '',
-                attempt_count: 0,
-                eligible_end_id: Math.max(summary.eligible_end_id, messages.at(-1)!.id),
                 error: null,
                 source_changed: false,
                 notice_dismissed: false,
@@ -216,3 +222,6 @@ export const resetSummaryDraft = (id: number, messages: ChatMessage[]) =>
             .returning()
             .get()
     })
+
+export const deleteSummary = (id: number) =>
+    db.delete(chatSummaries).where(eq(chatSummaries.id, id)).run()

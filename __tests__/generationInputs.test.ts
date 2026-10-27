@@ -1,7 +1,11 @@
 import { defaultSamplerConfig } from '../lib/constants/SamplerData'
 import { useConnectionStore } from '../lib/engine/API/connectionStore'
 import { getDataSources } from '../lib/engine/DataSources'
-import { captureGenerationInputs, prepareGenerationContext } from '../lib/engine/generation/inputs'
+import {
+    captureGenerationInputs,
+    estimateGenerationContext,
+    prepareGenerationContext,
+} from '../lib/engine/generation/inputs'
 import { Llama } from '../lib/engine/Local/LlamaLocal'
 import { Tokenizer } from '../lib/engine/Tokenizer'
 import { useTextFilterStore } from '../lib/hooks/TextFilter'
@@ -10,6 +14,18 @@ import { buildBlankCharacterCard } from '../lib/state/characters/schema'
 import { Chats } from '../lib/state/chat'
 import { Instructs } from '../lib/state/Instructs'
 
+jest.mock('../lib/utils/File', () => ({ readBase64Async: jest.fn() }))
+jest.mock('../lib/state/Macros', () => ({
+    getActiveMacros: () => ({ char: 'Character One', user: 'User One' }),
+    replaceMacros: (text: string, macros: any) =>
+        require('../lib/utils/Macros').applyMacros(text, macros),
+}))
+jest.mock('../lib/state/AppMode', () => ({
+    useAppModeStore: { getState: () => ({ appMode: 'remote' }) },
+}))
+jest.mock('../lib/state/Logger', () => ({
+    Logger: { info: jest.fn(), warn: jest.fn(), warnToast: jest.fn(), errorToast: jest.fn() },
+}))
 jest.mock('../lib/summaries/db', () => ({ summaryList: () => ({ all: () => [] }) }))
 jest.mock('../lib/summaries/settingsStore', () => ({
     useSummarySettingsStore: { getState: () => ({ enabled: false }) },
@@ -168,4 +184,33 @@ test('local tokenization waits for model loading and then stays bound to that co
         context: { tokenize: async () => ({ tokens: [] }) },
     } as any)
     expect(await pending).toBe(3)
+})
+
+test('preflight estimates the full history and reservations without native tokenization or file reads', async () => {
+    const inputs = captureGenerationInputs(10, 'remote')
+    inputs.messages = [
+        {
+            id: 1,
+            is_user: true,
+            name: 'User',
+            swipes: [{ id: 1, active: true, swipe: 'history '.repeat(80), token_length: 150 }],
+            attachments: [{ type: 'image', uri: 'file://image.png' }],
+        },
+    ] as any
+    inputs.samplers.max_length = 512
+    inputs.samplers.genamt = 64
+    const retrieve = jest.fn(async () => [])
+    inputs.dataSources = Promise.resolve([
+        { name: 'notes', priority: 1, tokenBudget: 50, retrieve },
+    ])
+    const tokenizer = jest.fn(async () => {
+        throw new Error('Native tokenizer should not run')
+    })
+    inputs.tokenizer = tokenizer
+    const stats = await estimateGenerationContext(inputs)
+    expect(stats.capacity).toBe(448)
+    expect(stats.total).toBeGreaterThanOrEqual(150 + 512 + 50)
+    expect(tokenizer).not.toHaveBeenCalled()
+    expect(Chats.actions.countMessageTokens).not.toHaveBeenCalled()
+    expect(retrieve).not.toHaveBeenCalled()
 })

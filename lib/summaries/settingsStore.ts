@@ -28,7 +28,7 @@ export const useSummarySettingsStore = create<
             autoContinueDrafts: false,
             autoGenerate: false,
             autoThreshold: 80,
-            maxOutputTokens: 512,
+            maxOutputTokens: 1024,
             warnOnSourceChanges: true,
             prompt: defaultSummarizerPrompt,
             update: (changes) => set(changes),

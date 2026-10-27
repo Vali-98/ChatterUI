@@ -340,8 +340,7 @@ const update = {
         fields: Partial<Pick<typeof chats.$inferInsert, 'name' | 'user_id' | 'scroll_offset'>>,
         options: ChatMutationOptions = {}
     ) => {
-        if (fields.name !== undefined || fields.user_id !== undefined)
-            assertChatEditable(chatId, options)
+        if (fields.user_id !== undefined) assertChatEditable(chatId, options)
         return database.update(chats).set(fields).where(eq(chats.id, chatId)).run()
     },
     chatTimestamp: (chatId: number) => database.transaction((tx) => touchChat(tx, chatId)),

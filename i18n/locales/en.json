@@ -1008,13 +1008,13 @@
     },
     "summary": {
         "title": "Summaries",
-        "settings": "Summary settings",
+        "settings": "Summaries",
         "enabled": "Enabled",
         "autoGenerate": "Auto-generate summaries",
         "threshold": "Auto-generate threshold (%)",
         "outputTokens": "Summary output tokens",
         "autoContinue": "Automatically continue limited drafts",
-        "autoContinueDescription": "Try once on a later completed turn. Cancelled drafts and drafts put aside with Later are never resumed automatically.",
+        "autoContinueDescription": "Continue drafts that reached the output limit before the next completion. Cancelled drafts and drafts put aside with Later stay paused.",
         "warnOnChanges": "Warn when source history changes",
         "prompt": "Summarizer prompt",
         "historyDescription": "Uses plain conversation text through the second-latest character response. Images and other data sources are excluded. Local summarization temporarily replaces the model’s active context; saved chat KV files are preserved.",
@@ -1023,22 +1023,18 @@
         "review": "Review",
         "later": "Later",
         "continue": "Continue",
-        "save": "Save & use",
-        "keep": "Keep",
         "regenerate": "Regenerate",
-        "discard": "Discard",
-        "discardConfirm": "Discard this unfinished summary?",
         "generate": "Generate summary",
         "disabled": "Enable summaries in Data Sources to generate and use them.",
         "paused": "Automatic summaries are paused until this draft is resolved.",
         "inactive": "Disabled",
-        "sourceChanged": "Source history changed. Keep, edit, or regenerate this summary.",
+        "sourceChanged": "Source history changed. Save to keep this summary, or regenerate it.",
         "useInContext": "Use in context",
         "actionFailed": "Could not update summary",
         "status": {
             "draft": "Draft",
             "accepted": "Summary",
-            "discarded": "Discarded"
+            "discarded": "Deleted"
         },
         "tasks": {
             "running": {
@@ -1069,7 +1065,11 @@
         },
         "coverage_one": "{{count}} message",
         "coverage_other": "{{count}} messages",
-        "compression": "History reduction"
+        "compression": "History reduction",
+        "empty": "No summaries generated",
+        "deleteTitle": "Delete summary?",
+        "deleteConfirm": "Delete this summary? The original chat history is retained.",
+        "replaceWithNewer": "Replace with newer history"
     },
     "contextAllocation": {
         "title": "Context allocation",
@@ -1108,6 +1108,7 @@
             "chatNotes": "Chat author notes",
             "lorebooks": "Lorebooks",
             "examples": "Character examples"
-        }
+        },
+        "summarySavings": "Estimated tokens saved by summaries: {{count}}"
     }
 }

@@ -41,7 +41,7 @@ test('eligibility protects the most recent exchange and includes the second-late
     expect(selectSummarySources([message(1)], [])).toEqual([])
     expect(summaryCutoff([...messages, message(8), message(9, '')])).toBe(5)
 })
-test('accepted chunks replace covered history in chronological order; drafts and disabled summaries do not', () => {
+test('accepted chunks replace covered history in chronological order; drafts and replaced summaries do not', () => {
     const result = summarizeHistory(messages, [
         summary(1, 1, 3),
         summary(2, 4, 5),
@@ -54,7 +54,7 @@ test('accepted chunks replace covered history in chronological order; drafts and
         'message 6',
         'message 7',
     ])
-    expect(summarizeHistory(messages, [summary(1, 1, 5, { enabled: false })])).toBe(messages)
+    expect(summarizeHistory(messages, [summary(1, 1, 5, { status: 'replaced' })])).toBe(messages)
 })
 test('new chunks stop before existing coverage and replacements can regenerate their original range', () => {
     expect(selectSummarySources(messages, [summary(1, 3, 5)]).map((entry) => entry.id)).toEqual([
@@ -88,4 +88,16 @@ test('kept summaries retain their chronological position after all covered messa
     const result = summarizeHistory(remaining, [summary(1, 1, 3)])
     expect(result[0].swipes[0].swipe).toContain('memory 1')
     expect(result.slice(1)).toEqual(remaining)
+})
+
+test('replacing a draft can expand its sources while ordinary regeneration keeps the original range', () => {
+    const draft = summary(1, 1, 3, { status: 'draft' })
+    expect(selectSummarySources(messages, [draft], 1).map((entry) => entry.id)).toEqual([1, 2, 3])
+    expect(selectSummarySources(messages, [draft], 1, true).map((entry) => entry.id)).toEqual([
+        1, 2, 3, 4, 5,
+    ])
+    const accepted = summary(2, 4, 5)
+    expect(
+        selectSummarySources(messages, [draft, accepted], 1, true).map((entry) => entry.id)
+    ).toEqual([1, 2, 3])
 })

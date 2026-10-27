@@ -10,6 +10,7 @@ export type DeferredTaskStatus =
     | 'timed_out'
 export type DeferredTask = {
     id: number
+    parentGenerationId?: number
     resourceId?: number
     chatId: number
     kind: 'title' | 'summary'

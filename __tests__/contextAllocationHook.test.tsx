@@ -87,6 +87,7 @@ test('current history keeps updating after a previous prompt exists', async () =
         reasoning_length: 0,
     })
     await act(async () => screen.update(<Consumer response={30} />))
+    expect(result!.summarySavings).toBe(0)
     expect(result!.values.history).toBe(150)
     expect(result!.reserved).toBe(30)
     expect(result!.free).toBe(15)
@@ -115,5 +116,34 @@ test('author-note reservations are live while lorebook limits remain opportunist
     mockData.notes[0].token_length = 25
     await act(async () => screen.update(<Consumer />))
     expect(result!.reserved).toBe(45)
+    await act(async () => screen.unmount())
+})
+
+test('summary savings compare covered history against the replacement text', async () => {
+    mockData.history[0].is_user = false
+    mockData.history.push({ ...mockData.history[0], id: 2 })
+    mockData.summaries = [
+        {
+            id: 1,
+            status: 'accepted',
+            enabled: true,
+            content: 'Memory',
+            start_entry_id: 1,
+            end_entry_id: 1,
+        },
+    ]
+    let result!: ReturnType<typeof useContextAllocation>
+    const Consumer = () => {
+        result = useContextAllocation()
+        return null
+    }
+    let screen!: ReturnType<typeof create>
+    await act(async () => {
+        screen = create(<Consumer />)
+    })
+    expect(result.summarySavings).toBe(
+        100 - Math.ceil('[Summary of earlier conversation]\nMemory'.length / 4)
+    )
+    expect(result.values.history).toBe(200 - result.summarySavings)
     await act(async () => screen.unmount())
 })

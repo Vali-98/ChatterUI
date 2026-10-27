@@ -1,13 +1,13 @@
-import { isDeferredTaskRunning, useDeferredTaskState } from '../lib/engine/generation/deferredState'
-import { useChatAccessState } from '../lib/state/chat/access'
 import BackgroundService from 'react-native-background-actions'
 
-import { runGenerationTask } from '../lib/engine/generation/service'
 import { AppSettings } from '../lib/constants/GlobalValues'
+import { isDeferredTaskRunning, useDeferredTaskState } from '../lib/engine/generation/deferredState'
 import { runLocalModelOperation } from '../lib/engine/generation/localResource'
 import { beginGeneration } from '../lib/engine/generation/runtime'
 import { canStartGeneration, scheduleDeferredTask } from '../lib/engine/generation/scheduler'
+import { runGenerationTask } from '../lib/engine/generation/service'
 import { updateGeneration, useGenerationState } from '../lib/engine/generation/state'
+import { useChatAccessState } from '../lib/state/chat/access'
 import { mmkv } from '../lib/storage/MMKV'
 
 jest.mock('react-native-background-actions', () => ({
@@ -267,4 +267,52 @@ test('an optional queue deadline cancels a task before it runs', async () => {
     } finally {
         jest.useRealTimers()
     }
+})
+
+test('deferred tasks have no execution deadline by default', async () => {
+    jest.useFakeTimers()
+    try {
+        let finish!: () => void
+        const handle = scheduleDeferredTask(
+            42,
+            () =>
+                new Promise<void>((resolve) => {
+                    finish = resolve
+                }),
+            { mode: 'remote', kind: 'summary' }
+        )
+        await jest.advanceTimersByTimeAsync(600_000)
+        expect(useDeferredTaskState.getState().tasks[handle.id].status).toBe('running')
+        finish()
+        await handle.done
+        expect(useDeferredTaskState.getState().tasks[handle.id].status).toBe('completed')
+    } finally {
+        jest.useRealTimers()
+    }
+})
+
+test('a summary dependency can run while its local parent owns the reserved chat', async () => {
+    jest.mocked(mmkv.getBoolean).mockReturnValue(false)
+    const parent = begin(1, 'local')!
+    updateGeneration(parent.id, { status: 'summarizing' })
+    let finish!: () => void
+    const run = jest.fn(
+        () =>
+            new Promise<void>((resolve) => {
+                finish = resolve
+            })
+    )
+    const child = scheduleDeferredTask(1, run, {
+        mode: 'local',
+        kind: 'summary',
+        parentGenerationId: parent.id,
+    })
+    await tick()
+    expect(run).toHaveBeenCalledTimes(1)
+    expect(canStartGeneration(1, 'local')).toBe(false)
+    expect(canStartGeneration(2, 'local')).toBe(false)
+    finish()
+    await child.done
+    expect(useGenerationState.getState().generations[parent.id].status).toBe('summarizing')
+    expect(canStartGeneration(2, 'local')).toBe(false)
 })

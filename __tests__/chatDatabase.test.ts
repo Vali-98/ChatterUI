@@ -11,6 +11,7 @@ import { db } from '../lib/state/chat/db'
 import {
     acceptSummary,
     createSummaryDraft,
+    deleteSummary as deleteSummaryRow,
     getSummary,
     restrictSummarySources,
     updateSummary,
@@ -101,6 +102,70 @@ describeSQLite('chat database integration', () => {
         reset()
     })
 
+    test('a replacement retires the old summary atomically, and deletion restores raw history', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [message('one'), message('two'), message('three')],
+        })
+        const history = db.query.chat(chatId)!.messages
+        const original = createSummaryDraft(chatId, history.slice(0, 1))
+        updateSummary(original.id, { content: 'Old memory' })
+        acceptSummary(original.id)
+        const replacement = createSummaryDraft(chatId, history.slice(0, 1), original.id)
+        updateSummary(replacement.id, { content: 'New memory' })
+        expect(getSummary(original.id)?.status).toBe('accepted')
+        acceptSummary(replacement.id)
+        expect(getSummary(original.id)?.status).toBe('replaced')
+        expect(getSummary(replacement.id)?.status).toBe('accepted')
+        deleteSummaryRow(replacement.id)
+        expect(getSummary(replacement.id)).toBeUndefined()
+        expect(
+            connection!
+                .prepare('SELECT COUNT(*) AS count FROM summary_sources WHERE summary_id = ?')
+                .get(replacement.id)?.count
+        ).toBe(0)
+        expect(db.query.chat(chatId)!.messages).toHaveLength(3)
+    })
+
+    test.each([true, false])('accepting a summary retires a covered draft only (%s)', (covered) => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [message('one'), message('two'), message('three'), message('four')],
+        })
+        const history = db.query.chat(chatId)!.messages
+        const replacement = createSummaryDraft(chatId, history.slice(0, 2))
+        updateSummary(replacement.id, { content: 'Replacement memory' })
+        acceptSummary(replacement.id)
+        const draft = createSummaryDraft(
+            chatId,
+            covered ? history.slice(0, 1) : history.slice(2, 3)
+        )
+        acceptSummary(replacement.id)
+        expect(getSummary(draft.id)?.status).toBe(covered ? 'replaced' : 'draft')
+    })
+
+    test.each([
+        ['Output limit reached; continue the draft', 'output_limit'],
+        ['Cancelled', 'cancelled'],
+        ['Connection failed', 'failed'],
+    ])('saved legacy summary errors become typed errors: %s', (messageText, reason) => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [message('one'), message('two'), message('three')],
+        })
+        const draft = createSummaryDraft(chatId, db.query.chat(chatId)!.messages.slice(0, 1))
+        connection!
+            .prepare('UPDATE chat_summaries SET error = ? WHERE id = ?')
+            .run(messageText, draft.id)
+        connection!.exec(
+            require('fs').readFileSync(
+                require('path').join(__dirname, '../db/migrations/0027_summary_errors.sql'),
+                'utf8'
+            )
+        )
+        expect(getSummary(draft.id)?.error).toEqual({ reason, message: messageText })
+    })
+
     test('summary coverage invalidates atomically on text changes, swipe selection and deletion', () => {
         const chatId = db.create.chat({
             character_id: 1,
@@ -158,7 +223,7 @@ describeSQLite('chat database integration', () => {
         expect(getSummary(draft.id)?.status).toBe('draft')
         restrictSummarySources(draft.id, [sources[0]])
         expect(getSummary(draft.id)?.source_changed).toBe(true)
-        expect(getSummary(draft.id)?.eligible_end_id).toBe(sources.at(-1)!.id)
+        expect(getSummary(draft.id)?.end_entry_id).toBe(sources[0].id)
         updateSummary(draft.id, { status: 'discarded' })
         expect(() => createSummaryDraft(chatId, sources)).not.toThrow()
         db.delete.chat(chatId)
@@ -441,7 +506,9 @@ describeSQLite('chat mutation ownership and turn transactions', () => {
         expect(() => db.update.swipe(swipe.id, { swipe: 'external edit' })).toThrow('busy')
         expect(() => db.update.activeSwipe(swipe.id)).toThrow('busy')
         expect(() => db.create.swipe(entry.id, { swipe: 'new' })).toThrow('busy')
-        expect(() => db.update.chat(chatId, { name: 'rename' })).toThrow('busy')
+        expect(() => db.update.chat(chatId, { name: 'rename' })).not.toThrow()
+        expect(db.query.chatRow(chatId)?.name).toBe('rename')
+        expect(() => db.update.chat(chatId, { user_id: 2 })).toThrow('busy')
         expect(() => db.update.chat(chatId, { scroll_offset: 2 })).not.toThrow()
         expect(() => db.update.swipe(swipe.id, { token_length: 12 })).not.toThrow()
         db.update.swipe(swipe.id, { swipe: 'owned output' }, { mutationToken: token })

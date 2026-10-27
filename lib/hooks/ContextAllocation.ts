@@ -200,6 +200,27 @@ export const useContextAllocation = (generatedLength?: number) => {
             ...(instruct.examples && character?.mes_example
                 ? [{ key: 'examples', tokens: estimate(character.mes_example) }]
                 : []),
-        ]
+        ],
+        Math.max(
+            0,
+            messages
+                .filter((message) =>
+                    selected.some(
+                        (summary) =>
+                            message.id >= summary.start_entry_id &&
+                            message.id <= summary.end_entry_id
+                    )
+                )
+                .reduce(
+                    (total, message) =>
+                        total + (message.token_length ?? Math.ceil(message.content_length / 4)),
+                    0
+                ) -
+                selected.reduce(
+                    (total, summary) =>
+                        total + estimate(`[Summary of earlier conversation]\n${summary.content}`),
+                    0
+                )
+        )
     )
 }

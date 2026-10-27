@@ -153,6 +153,13 @@ const ContextUsage = ({
                                     ))}
                         </View>
                     ))}
+                    {allocation.summarySavings > 0 && (
+                        <TText color="400">
+                            {t('contextAllocation.summarySavings', {
+                                count: allocation.summarySavings,
+                            })}
+                        </TText>
+                    )}
                     {allocation.opportunistic.length > 0 && (
                         <>
                             <View

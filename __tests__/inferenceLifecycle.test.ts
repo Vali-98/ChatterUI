@@ -1,5 +1,5 @@
-import { useChatAccessState } from '../lib/state/chat/access'
 import BackgroundService from 'react-native-background-actions'
+
 import { AppSettings } from '../lib/constants/GlobalValues'
 import { buildAndSendRequest } from '../lib/engine/API/APIBuilder'
 import {
@@ -7,6 +7,10 @@ import {
     buildTextCompletionContext,
 } from '../lib/engine/API/ContextBuilder'
 import { getDataSources } from '../lib/engine/DataSources'
+import { captureGenerationInputs } from '../lib/engine/generation/inputs'
+import { finishGeneration } from '../lib/engine/generation/lifecycle'
+import { abortGeneration, beginGeneration } from '../lib/engine/generation/runtime'
+import { useGenerationState } from '../lib/engine/generation/state'
 import {
     continueResponse,
     generateResponse,
@@ -15,13 +19,12 @@ import {
 } from '../lib/engine/Inference'
 import { Llama } from '../lib/engine/Local/LlamaLocal'
 import { localInference } from '../lib/engine/LocalInference'
-import { captureGenerationInputs } from '../lib/engine/generation/inputs'
-import { finishGeneration } from '../lib/engine/generation/lifecycle'
-import { abortGeneration, beginGeneration } from '../lib/engine/generation/runtime'
-import { useGenerationState } from '../lib/engine/generation/state'
+import { prepareAutomaticSummary } from '../lib/engine/summaries/actions'
 import { useAppModeStore } from '../lib/state/AppMode'
 import { Chats } from '../lib/state/chat'
+import { useChatAccessState } from '../lib/state/chat/access'
 import { mmkv } from '../lib/storage/MMKV'
+import { useSummarySettingsStore } from '../lib/summaries/settingsStore'
 
 jest.mock('react-native-background-actions', () => ({
     __esModule: true,
@@ -32,6 +35,11 @@ jest.mock('../app/components/views/Alert', () => ({
     __esModule: true,
     default: { alert: jest.fn() },
 }))
+jest.mock('../lib/summaries/settingsStore', () => ({
+    useSummarySettingsStore: { getState: jest.fn(() => ({ enabled: true, autoGenerate: false })) },
+}))
+jest.mock('../lib/summaries/db', () => ({ summaryList: () => ({ all: () => [] }) }))
+jest.mock('../lib/engine/summaries/actions', () => ({ prepareAutomaticSummary: jest.fn() }))
 jest.mock('../lib/engine/API/APIBuilder', () => ({ buildAndSendRequest: jest.fn() }))
 jest.mock('../lib/engine/API/ContextBuilder', () => ({
     buildChatCompletionContext: jest.fn(),
@@ -119,6 +127,7 @@ jest.mock('../lib/state/chat', () => ({
     },
 }))
 jest.mock('../lib/engine/generation/inputs', () => ({
+    generationContextLimit: () => 4096,
     captureGenerationInputs: jest.fn((chatId, mode) => ({
         chatId,
         mode,
@@ -205,6 +214,11 @@ const startLocal = (overrides = {}) => {
     return { generation, pending: localInference(generation.id, inputs) }
 }
 beforeEach(() => {
+    jest.mocked(useSummarySettingsStore.getState).mockReturnValue({
+        enabled: true,
+        autoGenerate: false,
+    } as any)
+    jest.mocked(prepareAutomaticSummary).mockReset()
     useChatAccessState.setState({ leases: {} })
     jest.clearAllMocks()
     useGenerationState.setState({ generations: {} })
@@ -356,12 +370,16 @@ test('title uses parent inputs and an independent signal after foreground comple
     const capture = jest.mocked(captureGenerationInputs)
     const base = capture.getMockImplementation()!
     capture.mockImplementationOnce((chatId, mode) => ({ ...base(chatId, mode), autoTitle: true }))
+    let requests = 0
     jest.mocked(buildAndSendRequest).mockImplementation((params) => {
+        const isTitle = ++requests === 2
         params.onData({ type: 'text', content: 'generated text' })
         return {
             abort: jest.fn(),
             done: Promise.resolve().then(async () => {
                 await params.stopGenerating?.('completed')
+                if (isTitle)
+                    useChatAccessState.setState({ leases: { 10: Symbol('next-generation') } })
                 await params.onEnd?.('')
             }),
         }
@@ -372,13 +390,9 @@ test('title uses parent inputs and an independent signal after foreground comple
     expect(capture).toHaveBeenCalledTimes(1)
     expect(calls[1][0].apiValues).toBe(calls[0][0].apiValues)
     expect(calls[1][0].signal).not.toBe(calls[0][0].signal)
-    expect(calls[1][0].samplers.genamt).toBe(50)
-    await tickUntil(
-        () =>
-            jest.mocked(Chats.db.update.chat).mock.calls.length > 0 ||
-            jest.mocked(buildAndSendRequest).mock.calls.length === 2
-    )
-    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(calls[1][0].samplers).toEqual(calls[0][0].samplers)
+    await tickUntil(() => jest.mocked(Chats.db.update.chat).mock.calls.length > 0)
+    expect(Chats.db.update.chat).toHaveBeenCalledWith(10, { name: 'Generated Text' })
     name.mockRestore()
 })
 
@@ -460,4 +474,74 @@ test('regenerating a continuation preserves a reasoning checkpoint even when the
     const generation = Object.values(useGenerationState.getState().generations)[0]
     expect(generation.text).toBe('')
     expect(generation.reasoning).toBe('Original thought')
+})
+
+test.each(['local', 'remote'] as const)(
+    'a %s completion waits for compaction and proceeds when compaction is cancelled',
+    async (mode) => {
+        jest.mocked(useSummarySettingsStore.getState).mockReturnValue({
+            enabled: true,
+            autoGenerate: true,
+        } as any)
+        let finish!: () => void
+        const cancel = jest.fn(() => finish())
+        const done = new Promise<void>((resolve) => {
+            finish = resolve
+        })
+        jest.mocked(prepareAutomaticSummary).mockResolvedValue({
+            id: 77,
+            summaryId: 1,
+            done,
+            cancel,
+        })
+        jest.mocked(useAppModeStore.getState).mockReturnValue({ appMode: mode } as any)
+        jest.mocked(mmkv.getBoolean).mockReturnValue(false)
+        const pending = generateResponse(31)
+        await tickUntil(() =>
+            Object.values(useGenerationState.getState().generations).some(
+                (item) => item.status === 'summarizing'
+            )
+        )
+        expect(model.completion).not.toHaveBeenCalled()
+        expect(buildAndSendRequest).not.toHaveBeenCalled()
+        expect(await submitMessage(10, { text: 'duplicate' })).toBe(false)
+        cancel()
+        await pending
+        if (mode === 'local') expect(model.completion).toHaveBeenCalledTimes(1)
+        else expect(buildAndSendRequest).toHaveBeenCalledTimes(1)
+    }
+)
+
+test('stopping the parent request also cancels compaction and prevents dispatch', async () => {
+    jest.mocked(useSummarySettingsStore.getState).mockReturnValue({
+        enabled: true,
+        autoGenerate: true,
+    } as any)
+    let finish!: () => void
+    const cancel = jest.fn(() => finish())
+    const done = new Promise<void>((resolve) => {
+        finish = resolve
+    })
+    jest.mocked(prepareAutomaticSummary).mockResolvedValue({ id: 77, summaryId: 1, done, cancel })
+    const pending = generateResponse(31)
+    await tickUntil(() =>
+        Object.values(useGenerationState.getState().generations).some(
+            (item) => item.status === 'summarizing'
+        )
+    )
+    await abortGeneration(10)
+    await pending
+    expect(cancel).toHaveBeenCalledTimes(1)
+    expect(buildAndSendRequest).not.toHaveBeenCalled()
+    expect(finishGeneration).toHaveBeenCalledWith(expect.any(Number), 'cancelled')
+})
+
+test('compaction preparation failure does not discard the pending chat completion', async () => {
+    jest.mocked(useSummarySettingsStore.getState).mockReturnValue({
+        enabled: true,
+        autoGenerate: true,
+    } as any)
+    jest.mocked(prepareAutomaticSummary).mockRejectedValue(new Error('Cannot prepare summary'))
+    await generateResponse(31)
+    expect(buildAndSendRequest).toHaveBeenCalledTimes(1)
 })

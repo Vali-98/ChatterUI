@@ -54,6 +54,16 @@ test('committed snapshots replace output without UI acknowledgment, equality che
         screen = create(<Consumer />)
     })
     rendered.length = 0
+    const committed = createDatabaseQueryObserver(query, {
+        watch: [{ table: 'chat_swipes', rowId: 1 }],
+    })
+    const stopQuery = committed.subscribe(() => {})
+    const observableText: string[] = []
+    const stopOutput = useGenerationState.subscribe((state) => {
+        observableText.push(
+            state.generations[generation.id]?.text ?? committed.getSnapshot().data!.text
+        )
+    })
     await act(async () => {
         saved = 'complete response'
         publishDatabaseChanges([{ table: 'chat_swipes', rowId: 1 }])
@@ -63,6 +73,11 @@ test('committed snapshots replace output without UI acknowledgment, equality che
     expect(useGenerationState.getState().generations[generation.id]).toBeUndefined()
     expect(rendered.length).toBeGreaterThan(0)
     expect(rendered.every((text) => text === 'complete response')).toBe(true)
+    // Check the state transitions too: React batching can hide an incorrect intermediate snapshot.
+    expect(observableText.length).toBeGreaterThan(0)
+    expect(observableText.every((text) => text === 'complete response')).toBe(true)
+    stopOutput()
+    stopQuery()
     await act(async () => {
         saved = 'later edit'
         publishDatabaseChanges([{ table: 'chat_swipes', rowId: 1 }])

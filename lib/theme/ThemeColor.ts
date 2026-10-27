@@ -24,6 +24,7 @@ export const themeColorSchemaV1 = z.object({
     primary: colorGradientSchema,
     neutral: colorGradientSchema,
     error: colorGradientSchema,
+    warning: hexColorSchema.optional(),
     text: colorGradientSchema,
 })
 

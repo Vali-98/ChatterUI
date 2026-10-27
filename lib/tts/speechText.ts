@@ -26,6 +26,7 @@ export const createSpeechTextStream = (maxChunkLength = 1000) => {
     let pending = ''
     let visible = ''
     let hiddenClose: string | undefined
+    let skippingUrlTail = false
     const chunks = (text: string) => {
         const output: string[] = []
         let remaining = cleanSpeechText(text)
@@ -101,16 +102,24 @@ export const createSpeechTextStream = (maxChunkLength = 1000) => {
         while ((match = boundary.exec(visible))) {
             const end = match.index + match[0].length
             const candidate = visible.slice(consumed, end)
-            // Keep incomplete Markdown links together rather than speaking their syntax/URL.
-            if (
-                (candidate.match(/\[/g)?.length ?? 0) > (candidate.match(/\]/g)?.length ?? 0) ||
-                /\]\([^)]*$/.test(candidate)
-            )
-                continue
             output.push(...chunks(candidate))
             consumed = end
         }
         visible = visible.slice(consumed)
+        while (!final && visible.length >= maxChunkLength) {
+            let end = visible.lastIndexOf(' ', maxChunkLength)
+            if (end < maxChunkLength / 2) end = maxChunkLength
+            if (/[\uD800-\uDBFF]/.test(visible[end - 1])) end--
+            const part = visible.slice(0, end)
+            const splitUrl = /https?:\/\/\S*$/.test(part) && !/\s/.test(visible[end] ?? '')
+            output.push(...chunks(part))
+            visible = visible.slice(end)
+            if (splitUrl) {
+                const space = visible.search(/\s/)
+                skippingUrlTail = space === -1
+                visible = space === -1 ? '' : visible.slice(space)
+            }
+        }
         if (final) {
             output.push(...chunks(visible))
             visible = ''
@@ -124,6 +133,12 @@ export const createSpeechTextStream = (maxChunkLength = 1000) => {
             visible = ''
         },
         push: (text: string) => {
+            if (skippingUrlTail) {
+                const space = text.search(/\s/)
+                if (space === -1) return []
+                text = text.slice(space)
+                skippingUrlTail = false
+            }
             pending += text
             filter(false)
             return drain(false)

@@ -52,14 +52,6 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
                         setOptionsWidth(Math.ceil(event.nativeEvent.layout.width))
                     }>
                     <ContextMenu.Button
-                        label={t('summary.title')}
-                        icon="file-text"
-                        disabled={chatId === undefined}
-                        onPress={() => {
-                            if (chatId !== undefined) openSummaries(chatId)
-                        }}
-                    />
-                    <ContextMenu.Button
                         closeOnPress={false}
                         onPress={(close) => {
                             close()
@@ -67,6 +59,14 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
                         }}
                         label={t('chat.input.actions.mainMenu')}
                         icon="backward"
+                    />
+                    <ContextMenu.Button
+                        label={t('summary.title')}
+                        icon="file-text"
+                        disabled={chatId === undefined}
+                        onPress={() => {
+                            if (chatId !== undefined) openSummaries(chatId)
+                        }}
                     />
                     <ContextMenu.Button
                         onPress={() => {

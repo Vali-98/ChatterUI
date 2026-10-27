@@ -3,12 +3,14 @@ import { t } from 'i18next'
 import { ChatSwipe } from '@db/schema'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { Chats } from '@lib/state/chat'
-import { useChatAccessState } from '@lib/state/chat/access'
+import { summaryList } from '@lib/summaries/db'
+import { useSummarySettingsStore } from '@lib/summaries/settingsStore'
 
 import { Logger } from '../state/Logger'
 import { APIBuilderParams, buildAndSendRequest, CompletionReason } from './API/APIBuilder'
 import {
     captureGenerationInputs,
+    generationContextLimit,
     prepareGenerationContext,
     type GenerationInputs,
 } from './generation/inputs'
@@ -24,7 +26,8 @@ import {
     updateGeneration,
     useGenerationState,
 } from './generation/state'
-import { localInference } from './LocalInference'
+import { localInference, verifyModelLoaded } from './LocalInference'
+import { prepareAutomaticSummary } from './summaries/actions'
 
 const beginGeneration = (swipeId: number, text = '', reasoning = '') => {
     const context = Chats.db.query.swipeContext(swipeId)
@@ -51,6 +54,7 @@ const beginGeneration = (swipeId: number, text = '', reasoning = '') => {
                     ? {
                           ...swipe,
                           swipe: text,
+                          token_length: null,
                           reasoning: reasoning
                               ? { swipe_id: swipeId, content: reasoning, reset_length: null }
                               : null,
@@ -165,6 +169,42 @@ const startGenerationTask = async (generationId: number) => {
     try {
         await runGenerationTask(async () => {
             try {
+                const controller = getGenerationRuntime(generationId).controller
+                const summarySettings = useSummarySettingsStore.getState()
+                if (summarySettings.enabled && summarySettings.autoGenerate) {
+                    if (inputs.mode === 'local') {
+                        if (!(await verifyModelLoaded(inputs, generationId))) {
+                            await finishGeneration(generationId, 'failed')
+                            return
+                        }
+                        inputs.activateLocalTokenizer()
+                    }
+                    try {
+                        const summary = await prepareAutomaticSummary(inputs, {
+                            parentGenerationId: generationId,
+                            signal: controller.signal,
+                        })
+                        if (summary) {
+                            updateGeneration(generationId, { status: 'summarizing' })
+                            const cancelSummary = () => summary.cancel()
+                            controller.signal.addEventListener('abort', cancelSummary)
+                            if (controller.signal.aborted) cancelSummary()
+                            try {
+                                await summary.done
+                            } finally {
+                                controller.signal.removeEventListener('abort', cancelSummary)
+                            }
+                        }
+                    } catch (error) {
+                        Logger.stackTrace(error)
+                    }
+                    inputs.summaries = summaryList(inputs.chatId).all()
+                    updateGeneration(generationId, { status: 'preparing' })
+                }
+                if (controller.signal.aborted) {
+                    await finishGeneration(generationId, 'cancelled')
+                    return
+                }
                 if (inputs.mode === 'local') await localInference(generationId, inputs)
                 else await chatInferenceStream(generationId, inputs)
             } catch (error) {
@@ -248,42 +288,27 @@ const titleGeneratorStream = async (inputs: GenerationInputs, signal: AbortSigna
     if (Chats.db.query.chatName(chatId) !== 'New Chat') return
     let titleOutput = ''
     const completion: { reason: CompletionReason } = { reason: 'failed' }
-    const { ready } = obtainFields(
-        {
-            ...inputs,
-            samplers: {
-                ...inputs.samplers,
-                genamt: 50,
-                reasoning_max_tokens: 0,
-                reasoning_effort: 'low',
-                reasoning_exclude: true,
-            },
+    const { ready } = obtainFields(inputs, {
+        signal: signal,
+        recordStats: false,
+        stopGenerating: (reason) => {
+            completion.reason = reason
         },
-        {
-            signal: signal,
-            recordStats: false,
-            stopGenerating: (reason) => {
-                completion.reason = reason
-            },
-            onData: (output) => {
-                if (output.type === 'text') titleOutput += output.content
-            },
-            onEnd: () => {
-                const title = titleOutput
-                    .trim()
-                    .replace(/["'.*]/g, '')
-                    .replace(/\b\w/g, (char) => char.toUpperCase())
-                    .trim()
-                if (!title) throw new Error('Generated title was blank')
-                Logger.debug('Autogenerated Name: ' + title)
-                if (
-                    Chats.db.query.chatName(chatId) === 'New Chat' &&
-                    !useChatAccessState.getState().leases[chatId]
-                )
-                    Chats.db.update.chat(chatId, { name: title })
-            },
-        }
-    )
+        onData: (output) => {
+            if (output.type === 'text') titleOutput += output.content
+        },
+        onEnd: () => {
+            const title = titleOutput
+                .trim()
+                .replace(/["'.*]/g, '')
+                .replace(/\b\w/g, (char) => char.toUpperCase())
+                .trim()
+            if (!title) throw new Error('Generated title was blank')
+            Logger.debug('Autogenerated Name: ' + title)
+            if (Chats.db.query.chatName(chatId) === 'New Chat')
+                Chats.db.update.chat(chatId, { name: title })
+        },
+    })
     const fields = await ready
     if (!fields) {
         throw new Error('Title preparation failed')
@@ -337,19 +362,7 @@ function obtainFields(inputs: GenerationInputs, options: ObtainFieldsOptions) {
             const apiValues = inputs.apiValues
             if (!apiConfig || !apiValues) return
             const samplers = { ...inputs.samplers }
-            const modelLengthField = apiConfig.model.contextSizeParser
-                .split('.')
-                .reduce((value, key) => value?.[key], apiValues.model)
-            const instructLength = samplers.max_length
-            const modelLength = Number.isInteger(modelLengthField)
-                ? modelLengthField
-                : instructLength
-            const length = Math.max(
-                0,
-                (apiConfig.model.useModelContextLength
-                    ? Math.min(modelLength, instructLength)
-                    : instructLength) - samplers.genamt
-            )
+            const length = Math.max(0, generationContextLimit(inputs) - samplers.genamt)
             const limit = apiConfig.request.stopSequenceLimit
             const context = await prepareGenerationContext(inputs, { recordStats })
             return {

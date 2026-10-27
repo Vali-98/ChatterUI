@@ -14,8 +14,9 @@ import { runGenerationTask } from './service'
 import { generationForChat, isActiveGeneration, useGenerationState } from './state'
 
 export type DeferredTaskOptions = Pick<DeferredTask, 'mode' | 'kind'> & {
+    parentGenerationId?: number
     resourceId?: number
-    timeoutMs?: number
+    timeoutMs?: number | null
     queueTimeoutMs?: number
 }
 export type DeferredTaskHandle = { id: number; done: Promise<void>; cancel: () => void }
@@ -26,7 +27,7 @@ type DeferredRuntime = {
     run: DeferredTaskRun
     resolve?: () => void
     timedOut: boolean
-    timeoutMs: number
+    timeoutMs: number | null
     timer?: ReturnType<typeof setTimeout>
 }
 const deferredRuntimes = new Map<number, DeferredRuntime>()
@@ -79,6 +80,7 @@ export const scheduleDeferredTask = (
     const task: DeferredTask = {
         id: id,
         resourceId: options.resourceId,
+        parentGenerationId: options.parentGenerationId,
         chatId: chatId,
         kind: options.kind,
         mode: options.mode,
@@ -89,7 +91,7 @@ export const scheduleDeferredTask = (
         controller: new AbortController(),
         run: run,
         timedOut: false,
-        timeoutMs: options.timeoutMs ?? 120_000,
+        timeoutMs: options.timeoutMs ?? null,
     }
     deferredRuntimes.set(id, runtime)
     useDeferredTaskState.setState((state) => ({ tasks: { ...state.tasks, [id]: task } }))
@@ -128,7 +130,8 @@ const runPendingDeferredTasks = () => {
         const runtime = deferredRuntimes.get(task.id)
         if (task.status !== 'pending' || !runtime?.resolve) continue
         const foreground = Object.values(useGenerationState.getState().generations).filter(
-            isActiveGeneration
+            (generation) =>
+                isActiveGeneration(generation) && generation.id !== task.parentGenerationId
         )
         const deferred = Object.values(useDeferredTaskState.getState().tasks).filter(
             isDeferredTaskRunning
@@ -144,10 +147,11 @@ const runPendingDeferredTasks = () => {
             continue
         if (runtime.timer) clearTimeout(runtime.timer)
         updateDeferredTask(task.id, { status: 'running', startedAt: Date.now() })
-        runtime.timer = setTimeout(() => {
-            runtime.timedOut = true
-            cancelDeferredTask(task.id)
-        }, runtime.timeoutMs)
+        if (runtime.timeoutMs !== null)
+            runtime.timer = setTimeout(() => {
+                runtime.timedOut = true
+                cancelDeferredTask(task.id)
+            }, runtime.timeoutMs)
         void Promise.resolve()
             .then(() => runtime.run(runtime.controller.signal))
             .then(

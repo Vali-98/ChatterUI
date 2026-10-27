@@ -173,7 +173,14 @@ export namespace Theme {
             : selectedColor
 
         return useMemo(
-            () => ({ color, spacing, font, borderWidth, fontSize, borderRadius }),
+            () => ({
+                color: { ...color, warning: color.warning ?? '#d4a017' },
+                spacing: spacing,
+                font: font,
+                borderWidth: borderWidth,
+                fontSize: fontSize,
+                borderRadius: borderRadius,
+            }),
             [color]
         )
     }

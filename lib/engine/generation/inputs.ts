@@ -20,6 +20,8 @@ import { applyMacros, createMacroValues } from '@lib/utils/Macros'
 
 import { recordContextStats } from './contextStatsState'
 import { useConnectionStore } from '../API/connectionStore'
+import { collectContext } from '../API/ContextBuilder'
+import { defaultTemplates } from '../API/DefaultAPI'
 import { getDataSources } from '../DataSources'
 import { Llama } from '../Local/LlamaLocal'
 import { Tokenizer } from '../Tokenizer'
@@ -216,5 +218,70 @@ export const prepareGenerationContext = async (
                 : Chats.actions.countMessageTokens(message, tokenizer),
         cache: { characterCounts, userCounts, instructCache },
         dataSources: await inputs.dataSources,
+    }
+}
+
+export const generationContextLimit = (inputs: GenerationInputs) => {
+    if (inputs.mode === 'local') return inputs.localConfig.context_length
+    const configured = inputs.samplers.max_length
+    const modelValue = inputs.apiConfig?.model.contextSizeParser
+        ?.split('.')
+        .reduce((value, key) => value?.[key], inputs.apiValues?.model)
+    return inputs.apiConfig?.model.useModelContextLength && Number.isInteger(modelValue)
+        ? Math.min(configured, modelValue)
+        : configured
+}
+
+// A trigger estimate must not tokenize the entire old history or load attachment files.
+export const estimateGenerationContext = async (inputs: GenerationInputs) => {
+    const estimate = (text: string) => Math.ceil(text.length / 4)
+    const context = await prepareGenerationContext(
+        { ...inputs, tokenizer: async (text) => estimate(text), dataSources: Promise.resolve([]) },
+        { recordStats: false }
+    )
+    const sources = await inputs.dataSources
+    const capacity = Math.max(0, generationContextLimit(inputs) - inputs.samplers.genamt)
+    let total = 0
+    const originalMessages = new Map(inputs.messages.map((message) => [message.id, message]))
+    await collectContext({
+        ...context,
+        apiConfig: inputs.apiConfig ?? defaultTemplates[0],
+        apiValues: inputs.apiValues ?? {
+            ...defaultTemplates[0].defaultValues,
+            configName: defaultTemplates[0].name,
+        },
+        messages: context.messages.map((message) => ({ ...message, attachments: [] })),
+        chatTokenizer: async (message) => {
+            const swipe = message.swipes.find((item) => item.active)
+            return swipe?.token_length ?? estimate(swipe?.swipe ?? '')
+        },
+        bypassContextLength: true,
+        maxLength: capacity,
+        mode:
+            inputs.mode === 'local'
+                ? inputs.useModelTemplate
+                    ? 'chat'
+                    : 'text'
+                : inputs.apiConfig?.request.completionType.type === 'textCompletions'
+                  ? 'text'
+                  : 'chat',
+        onContextStats: (stats) => {
+            total = stats.total
+        },
+    })
+    const imageTokens = context.messages.reduce(
+        (sum, message) =>
+            sum +
+            (originalMessages.get(message.id)?.attachments.filter((item) => item.type === 'image')
+                .length ?? 0) *
+                512,
+        0
+    )
+    return {
+        total:
+            total +
+            imageTokens +
+            sources.reduce((sum, source) => sum + Math.max(0, source.tokenBudget), 0),
+        capacity,
     }
 }

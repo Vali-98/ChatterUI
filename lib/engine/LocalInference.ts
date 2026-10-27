@@ -42,7 +42,7 @@ const maybeLoadLinkedModel = async (
     return true
 }
 
-const verifyModelLoaded = async (
+export const verifyModelLoaded = async (
     inputs: GenerationInputs,
     generationId: number
 ): Promise<boolean> => {

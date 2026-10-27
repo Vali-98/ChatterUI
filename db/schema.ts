@@ -188,6 +188,11 @@ export const chatSwipes = sqliteTable(
 )
 
 // Coverage keeps historical IDs after source deletion so the summary remains reviewable.
+export type SummaryError = {
+    reason: 'output_limit' | 'cancelled' | 'failed'
+    message: string
+}
+
 export const chatSummaries = sqliteTable(
     'chat_summaries',
     {
@@ -196,18 +201,21 @@ export const chatSummaries = sqliteTable(
             .notNull()
             .references(() => chats.id, { onDelete: 'cascade' }),
         content: text('content').notNull().default(''),
-        status: text('status', { enum: ['draft', 'accepted', 'discarded'] })
+        status: text('status', { enum: ['draft', 'accepted', 'replaced', 'discarded'] })
             .notNull()
             .default('draft'),
+        /** @deprecated Summary usage is determined by status. */
         enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
         source_changed: integer('source_changed', { mode: 'boolean' }).notNull().default(false),
         notice_dismissed: integer('notice_dismissed', { mode: 'boolean' }).notNull().default(false),
         start_entry_id: integer('start_entry_id').notNull(),
         end_entry_id: integer('end_entry_id').notNull(),
+        /** @deprecated Automatic regeneration no longer suppresses deleted ranges. */
         eligible_end_id: integer('eligible_end_id').notNull().default(0),
         replaces_id: integer('replaces_id'),
+        /** @deprecated Automatic continuation has no attempt counter. */
         attempt_count: integer('attempt_count').notNull().default(0),
-        error: text('error'),
+        error: text('error', { mode: 'json' }).$type<SummaryError>(),
         created_at: integer('created_at')
             .notNull()
             .$defaultFn(() => Date.now()),

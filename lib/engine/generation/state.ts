@@ -5,6 +5,7 @@ import { createReasoningParser } from '@lib/engine/reasoning/parser'
 
 export type GenerationStatus =
     | 'preparing'
+    | 'summarizing'
     | 'running'
     | 'saving'
     | 'completed'
@@ -26,6 +27,7 @@ export type Generation = {
 
 export const isActiveGeneration = (generation: Generation) =>
     generation.status === 'preparing' ||
+    generation.status === 'summarizing' ||
     generation.status === 'running' ||
     generation.status === 'saving'
 

@@ -28,6 +28,7 @@ import m0023 from './0023_sampler_ids.sql';
 import m0024 from './0024_swipe_reasoning.sql';
 import m0025 from './0025_chat_summaries.sql';
 import m0026 from './0026_summary_draft_attempts.sql';
+import m0027 from './0027_summary_errors.sql';
 
   export default {
     journal,
@@ -58,7 +59,8 @@ m0022,
 m0023,
 m0024,
 m0025,
-m0026
+m0026,
+m0027
     }
   }
   

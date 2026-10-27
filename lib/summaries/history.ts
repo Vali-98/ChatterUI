@@ -17,21 +17,26 @@ export const usableSummaries = (messages: ChatMessage[], summaries: ChatSummary[
 
 export const usableSummariesBefore = (cutoff: number | undefined, summaries: ChatSummary[]) => {
     if (cutoff === undefined) return []
-    let end = -1
-    return [...summaries]
-        .sort((a, b) => a.start_entry_id - b.start_entry_id)
-        .filter((summary) => {
-            if (
-                summary.status !== 'accepted' ||
-                !summary.enabled ||
-                !summary.content.trim() ||
-                summary.end_entry_id > cutoff ||
-                summary.start_entry_id <= end
+    // Resolve overlapping accepted ranges in favor of the newest summary.
+    const selected: ChatSummary[] = []
+    for (const summary of [...summaries].sort((a, b) => b.id - a.id)) {
+        if (
+            summary.status !== 'accepted' ||
+            !summary.content.trim() ||
+            summary.end_entry_id > cutoff
+        )
+            continue
+        if (
+            selected.some(
+                (other) =>
+                    summary.start_entry_id <= other.end_entry_id &&
+                    summary.end_entry_id >= other.start_entry_id
             )
-                return false
-            end = summary.end_entry_id
-            return true
-        })
+        )
+            continue
+        selected.push(summary)
+    }
+    return selected.sort((a, b) => a.start_entry_id - b.start_entry_id)
 }
 
 export const summarizeHistory = (
@@ -90,7 +95,8 @@ export const summaryMessage = (id: number, text: string, isUser = true): ChatMes
 export const selectSummarySources = (
     messages: ChatMessage[],
     summaries: ChatSummary[],
-    replacesId?: number
+    replacesId?: number,
+    extendRange = false
 ) => {
     const cutoff = summaryCutoff(messages)
     if (cutoff === undefined) return []
@@ -104,7 +110,7 @@ export const selectSummarySources = (
             message.id <= cutoff &&
             (!replacement ||
                 (message.id >= replacement.start_entry_id &&
-                    message.id <= replacement.end_entry_id))
+                    (extendRange || message.id <= replacement.end_entry_id)))
     )
     const selected: ChatMessage[] = []
     for (const message of eligible) {

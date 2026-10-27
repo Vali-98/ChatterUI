@@ -8,7 +8,8 @@ export type AllocationItems = {
 export const contextAllocation = (
     items: AllocationItems,
     capacity: number,
-    opportunistic: AllocationItem[] = []
+    opportunistic: AllocationItem[] = [],
+    summarySavings = 0
 ) => {
     const sum = (values: AllocationItem[]) =>
         values.reduce((total, item) => total + Math.max(0, item.tokens), 0)
@@ -19,6 +20,7 @@ export const contextAllocation = (
     const limit = Math.max(0, capacity)
     const free = Math.max(0, limit - used - reserved)
     return {
+        summarySavings: summarySavings,
         values: { system, history, reserved, free },
         items: items,
         opportunistic: opportunistic,

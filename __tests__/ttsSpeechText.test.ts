@@ -49,3 +49,23 @@ test('long text respects the native chunk limit', () => {
     expect(chunks.every((chunk) => chunk.length <= 20)).toBe(true)
     expect(chunks.join(' ')).toBe('word '.repeat(30).trim())
 })
+
+test('an unmatched bracket does not hold back complete sentences', () => {
+    const stream = createSpeechTextStream()
+    expect(stream.push('Status [ready. Next turn. ')).toEqual(['Status [ready.', 'Next turn.'])
+})
+
+test('long punctuationless text starts speaking before generation finishes', () => {
+    const stream = createSpeechTextStream(20)
+    const input = 'ordinary words '.repeat(8)
+    const early = stream.push(input)
+    expect(early.length).toBeGreaterThan(0)
+    expect([...early, ...stream.finish()].join(' ')).toBe(input.trim())
+})
+
+test('a long URL remains excluded when speech flushes before its end', () => {
+    const stream = createSpeechTextStream(20)
+    const first = stream.push('https://example.com/' + 'private-path'.repeat(8))
+    const rest = stream.push('more-path Read this instead. ')
+    expect([...first, ...rest, ...stream.finish()]).toEqual(['Read this instead.'])
+})

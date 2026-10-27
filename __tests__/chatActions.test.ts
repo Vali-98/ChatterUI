@@ -39,7 +39,6 @@ import { Logger } from '../lib/state/Logger'
 import { mmkv } from '../lib/storage/MMKV'
 import { copyFile, deleteFile, fileInfo, saveStringToDownload } from '../lib/utils/File'
 
-jest.mock('../lib/engine/summaries/actions', () => ({ maybeGenerateSummary: jest.fn() }))
 jest.mock('../lib/queries/databaseQuery', () => ({ publishDatabaseChanges: jest.fn() }))
 jest.mock('react-native-background-actions', () => ({
     __esModule: true,
@@ -350,14 +349,15 @@ test('initial greetings use the target card name and leave temporal macros untou
 })
 
 test('import rebuilds ownership, drops external file references, and leaves its input intact', async () => {
-    const before = JSON.stringify(source)
-    await importChat(9, JSON.parse(before))
+    const imported = JSON.parse(JSON.stringify(source))
+    const before = JSON.stringify(imported)
+    await importChat(9, imported)
     const input = jest.mocked(db.create.chat).mock.calls[0][0]
     expect(input).toMatchObject({ character_id: 9, user_id: null, scroll_offset: 0 })
     expect(input.messages![0].attachments).toEqual([])
     expect(input.messages![0].swipes[1].active).toBe(true)
     expect(input).not.toHaveProperty('id')
-    expect(JSON.stringify(source)).toBe(before)
+    expect(JSON.stringify(imported)).toBe(before)
     await expect(importChat(9, {})).rejects.toThrow()
     expect(db.create.chat).toHaveBeenCalledTimes(1)
 })

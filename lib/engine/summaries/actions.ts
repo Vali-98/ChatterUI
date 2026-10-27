@@ -1,3 +1,4 @@
+import type { SummaryError } from '@db/schema'
 import { createDatabaseQueryObserver } from '@lib/queries/databaseQuery'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { Chats } from '@lib/state/chat'
@@ -5,6 +6,7 @@ import { Logger } from '@lib/state/Logger'
 import {
     acceptSummary,
     createSummaryDraft,
+    deleteSummary as deleteSummaryRow,
     getSummary,
     resetSummaryDraft,
     restrictSummarySources,
@@ -21,10 +23,12 @@ import {
 import { useSummarySettingsStore, type SummarySettings } from '@lib/summaries/settingsStore'
 
 import { buildAndSendRequest, type CompletionReason } from '../API/APIBuilder'
-import { useContextStatsState } from '../generation/contextStatsState'
+import { buildContext } from '../API/ContextBuilder'
 import { isDeferredTaskActive, useDeferredTaskState } from '../generation/deferredState'
 import {
     captureGenerationInputs,
+    estimateGenerationContext,
+    generationContextLimit,
     prepareGenerationContext,
     type GenerationInputs,
 } from '../generation/inputs'
@@ -54,40 +58,30 @@ export const assertSummaryEditable = (id: number) => {
         throw new Error('Summary is busy generating')
     return summary
 }
-export const keepSummary = (id: number, content?: string) => {
+export const saveSummary = (id: number, content: string) => {
     assertSummaryEditable(id)
     acceptSummary(id, { content: content })
-}
-export const setSummaryEnabled = (id: number, enabled: boolean) => {
-    const summary = assertSummaryEditable(id)
-    if (summary.status !== 'accepted') return
-    // Keep the replacement range unambiguous when re-enabling an older summary.
-    if (enabled)
-        for (const other of summaryList(summary.chat_id).all()) {
-            if (
-                other.id !== id &&
-                other.enabled &&
-                other.status === 'accepted' &&
-                other.start_entry_id <= summary.end_entry_id &&
-                other.end_entry_id >= summary.start_entry_id
-            )
-                updateSummary(other.id, { enabled: false })
-        }
-    updateSummary(id, { enabled })
 }
 export const dismissSummaryNotice = (id: number) => {
     updateSummary(id, { notice_dismissed: true })
 }
-export const discardSummary = (id: number) => {
+export const deleteSummary = (id: number) => {
     const summary = assertSummaryEditable(id)
-    if (summary.status !== 'draft') throw new Error('Only drafts can be discarded')
-    updateSummary(id, {
-        status: 'discarded',
-        enabled: false,
-        notice_dismissed: true,
-        content: '',
-        error: null,
-    })
+    deleteSummaryRow(id)
+    if (
+        useSummarySettingsStore.getState().autoGenerate &&
+        useSummarySettingsStore.getState().enabled
+    ) {
+        try {
+            const inputs = captureGenerationInputs(
+                summary.chat_id,
+                useAppModeStore.getState().appMode
+            )
+            return prepareAutomaticSummary(inputs).catch(Logger.stackTrace)
+        } catch (error) {
+            Logger.stackTrace(error)
+        }
+    }
 }
 
 export const generateSummary = (
@@ -95,9 +89,10 @@ export const generateSummary = (
     options: {
         summaryId?: number
         draftContent?: string
+        supersedeDraft?: boolean
         continueDraft?: boolean
         inputs?: GenerationInputs
-        automatic?: boolean
+        parentGenerationId?: number
     } = {}
 ) => {
     const settings = { ...useSummarySettingsStore.getState() }
@@ -117,10 +112,7 @@ export const generateSummary = (
         throw new Error('Resolve the unfinished summary first')
     if (
         options.continueDraft &&
-        (!existing ||
-            existing.status !== 'draft' ||
-            existing.source_changed ||
-            !(options.draftContent ?? existing.content).trim())
+        (!existing || existing.status !== 'draft' || existing.source_changed)
     )
         throw new Error('This draft must be regenerated')
     // Read current persisted history. Captured connection/model/user configuration remains immutable.
@@ -129,20 +121,13 @@ export const generateSummary = (
         : inputs.messages
     if (options.continueDraft && existing!.end_entry_id > (summaryCutoff(messages) ?? -1))
         throw new Error('Draft now covers protected recent history; regenerate it instead')
-    const sources = selectSummarySources(messages, summaries, existing?.id)
-    if (!sources.length) throw new Error('Not enough eligible history to summarize')
     if (
-        options.automatic &&
-        !options.continueDraft &&
-        summaries.some(
-            (summary) =>
-                summary.status === 'discarded' &&
-                !summary.source_changed &&
-                summary.start_entry_id === sources[0].id &&
-                summary.eligible_end_id >= sources.at(-1)!.id
-        )
+        options.supersedeDraft &&
+        (!existing || existing.status !== 'draft' || options.continueDraft)
     )
-        return
+        throw new Error('Only unfinished summaries can be replaced with newer history')
+    const sources = selectSummarySources(messages, summaries, existing?.id, options.supersedeDraft)
+    if (!sources.length) throw new Error('Not enough eligible history to summarize')
     let draft =
         existing?.status === 'draft' ? existing : createSummaryDraft(chatId, sources, existing?.id)
     if (existing?.status === 'draft' && !options.continueDraft) {
@@ -153,7 +138,6 @@ export const generateSummary = (
         content: prefix,
         notice_dismissed: false,
         error: null,
-        attempt_count: draft.attempt_count + 1,
     })
     const task: DeferredTaskHandle = scheduleDeferredTask(
         chatId,
@@ -178,7 +162,7 @@ export const generateSummary = (
             kind: 'summary',
             mode: inputs.mode,
             resourceId: draft.id,
-            timeoutMs: 300_000,
+            parentGenerationId: options.parentGenerationId,
         }
     )
     return { ...task, summaryId: draft.id }
@@ -194,7 +178,6 @@ const runSummary = async (
 ) => {
     if (!getSummary(id)) return
     let content = prefix
-    let lastSave = 0
     const parser = createReasoningParser()
     const parseInline =
         inputs.mode === 'local' ||
@@ -202,14 +185,11 @@ const runSummary = async (
         !inputs.apiConfig?.request.reasoningParsePattern?.length
     const append = (text: string) => {
         content += text
-        if (Date.now() - lastSave >= 1000) {
-            updateSummary(id, { content })
-            lastSave = Date.now()
-        }
     }
     const receive = (text: string) => append(parseInline ? parser.push(text).text : text)
     let successful = false
     let reachedLimit = false
+    let failureReason: SummaryError['reason'] = 'failed'
     try {
         if (signal.aborted) throw new Error('Cancelled')
         if (inputs.mode === 'local') {
@@ -220,24 +200,25 @@ const runSummary = async (
                 throw new Error('Local model changed before summarization')
             inputs.activateLocalTokenizer()
         }
-        const maxContext = summaryContextLimit(inputs)
+        const maxContext = generationContextLimit(inputs)
         const promptTokens = await inputs.tokenizer(settings.prompt + prefix)
-        const available = maxContext - settings.maxOutputTokens - promptTokens - 512
+        const available = maxContext - settings.maxOutputTokens - promptTokens
         const selected: typeof sources = []
         let tokens = 0
+        const sourceTokenCounts: number[] = []
         for (const source of sources) {
             if (signal.aborted) throw new Error('Cancelled')
             const count = await inputs.tokenizer(summaryTranscript([source]) + '\n\n')
             if (tokens + count > available) break
             tokens += count
             selected.push(source)
+            sourceTokenCounts.push(count)
         }
         if (!selected.length)
             throw new Error('Eligible history does not fit the summarizer context')
         // Continuation must cover exactly the original range, never silently shrink its coverage.
         if (prefix && selected.length !== sources.length)
             throw new Error('Draft no longer fits; regenerate it instead')
-        restrictSummarySources(id, selected)
         const requestInputs: GenerationInputs = {
             ...inputs,
             apiValues: inputs.apiValues
@@ -260,20 +241,54 @@ const runSummary = async (
             samplers: {
                 ...inputs.samplers,
                 genamt: settings.maxOutputTokens,
-                enable_thinking: false,
-                reasoning_max_tokens: 0,
-                reasoning_exclude: true,
-                reasoning_effort: 'low',
             },
             dataSources: Promise.resolve([]),
             saveLocalKV: false,
-            bypassContextLength: false,
+            // This request is fitted below as a complete prompt. The generic chat collector
+            // must not independently omit the transcript after its coverage has been saved.
+            bypassContextLength: true,
         }
+        let payload: Awaited<ReturnType<typeof buildLocalPayload>> = undefined
+        let context: Awaited<ReturnType<typeof prepareGenerationContext>> | undefined
+        while (true) {
+            if (signal.aborted) throw new Error('Cancelled')
+            let promptLength: number
+            if (inputs.mode === 'local') {
+                payload = await buildLocalPayload(requestInputs, {
+                    continuing: !!prefix,
+                    recordStats: false,
+                })
+                if (!payload) throw new Error('Could not build summary prompt')
+                promptLength = await inputs.tokenizer(payload.prompt)
+            } else {
+                if (!inputs.apiConfig || !inputs.apiValues)
+                    throw new Error('No connection selected')
+                context = await prepareGenerationContext(requestInputs, { recordStats: false })
+                let collectedLength = 0
+                const prompt = await buildContext({
+                    ...context,
+                    apiConfig: inputs.apiConfig,
+                    apiValues: requestInputs.apiValues!,
+                    maxLength: maxContext - settings.maxOutputTokens,
+                    onContextStats: (stats) => {
+                        collectedLength = stats.total
+                    },
+                })
+                if (!prompt) throw new Error('Could not build summary prompt')
+                promptLength =
+                    typeof prompt === 'string' ? await inputs.tokenizer(prompt) : collectedLength
+            }
+            if (promptLength + settings.maxOutputTokens <= maxContext) break
+            if (prefix) throw new Error('Draft no longer fits; regenerate it instead')
+            selected.pop()
+            tokens -= sourceTokenCounts.pop()!
+            if (!selected.length)
+                throw new Error('Eligible history does not fit the summarizer context')
+            requestInputs.messages[0] = summaryMessage(-1, summaryTranscript(selected))
+        }
+        if (signal.aborted) throw new Error('Cancelled')
+        restrictSummarySources(id, selected)
         if (inputs.mode === 'local') {
-            const payload = await buildLocalPayload(requestInputs, {
-                continuing: !!prefix,
-                recordStats: false,
-            })
             if (!payload) throw new Error('Could not build summary prompt')
             const thinking = payload as typeof payload & {
                 thinking_forced_open?: boolean
@@ -303,8 +318,8 @@ const runSummary = async (
                 signal.removeEventListener('abort', stop)
             }
         } else {
-            if (!inputs.apiConfig || !inputs.apiValues) throw new Error('No connection selected')
-            const context = await prepareGenerationContext(requestInputs, { recordStats: false })
+            if (!context || !inputs.apiConfig || !inputs.apiValues)
+                throw new Error('Could not build summary prompt')
             const completion: { reason: CompletionReason } = { reason: 'failed' }
             const result = buildAndSendRequest({
                 ...context,
@@ -331,7 +346,6 @@ const runSummary = async (
         append(parseInline ? parser.finish().text : '')
         updateSummary(id, { content })
         const completionText = content.slice(prefix.length)
-        reachedLimit ||= (await inputs.tokenizer(completionText)) >= settings.maxOutputTokens
         const summary = getSummary(id)
         if (
             !signal.aborted &&
@@ -347,73 +361,65 @@ const runSummary = async (
             if (signal.aborted) throw new Error('Cancelled')
             acceptSummary(id, { requireUnchanged: true })
         } else if (signal.aborted) throw new Error('Cancelled')
-        else if (reachedLimit) throw new Error('Output limit reached; continue or edit the draft')
-        else if (!successful) throw new Error('Summary generation failed')
+        else if (reachedLimit) {
+            failureReason = 'output_limit'
+            throw new Error('Output limit reached; continue or edit the draft')
+        } else if (!successful) throw new Error('Summary generation failed')
         else if (!completionText.trim()) throw new Error('Summary returned no text')
         else if (!content.trim()) throw new Error('Summary was empty')
     } catch (error) {
         append(parseInline ? parser.finish().text : '')
         updateSummary(id, {
             content: content,
-            error: signal.aborted
-                ? 'Cancelled'
-                : String(error instanceof Error ? error.message : error),
+            error: {
+                reason: signal.aborted ? 'cancelled' : failureReason,
+                message: signal.aborted
+                    ? 'Cancelled'
+                    : String(error instanceof Error ? error.message : error),
+            },
         })
         throw error
     }
 }
 
-export const summaryContextLimit = (inputs: GenerationInputs) => {
-    if (inputs.mode === 'local') return inputs.localConfig.context_length
-    const configured = inputs.samplers.max_length
-    const path = inputs.apiConfig?.model.contextSizeParser
-    const modelValue = path
-        ?.split('.')
-        .reduce((value, key) => value?.[key], inputs.apiValues?.model)
-    return inputs.apiConfig?.model.useModelContextLength && Number.isInteger(modelValue)
-        ? Math.min(configured, modelValue)
-        : configured
-}
-
-export const maybeGenerateSummary = (inputs: GenerationInputs) => {
+// Return a task for the caller to await; ignored drafts never grow or retry implicitly.
+export const prepareAutomaticSummary = async (
+    inputs: GenerationInputs,
+    options: { parentGenerationId?: number; signal?: AbortSignal } = {}
+) => {
     const settings = useSummarySettingsStore.getState()
-    if (!settings.enabled || !settings.autoGenerate) return
-    const stats = useContextStatsState.getState().chats[inputs.chatId]
+    if (!settings.enabled || !settings.autoGenerate || options.signal?.aborted) return
+    const summaries = summaryList(inputs.chatId).all()
+    const draft = summaries.find((summary) => summary.status === 'draft')
     if (
-        !stats ||
+        draft &&
+        (!settings.autoContinueDrafts ||
+            draft.source_changed ||
+            draft.notice_dismissed ||
+            !draft.content.trim() ||
+            draft.error?.reason !== 'output_limit' ||
+            summaryTask(draft.id))
+    )
+        return
+    if (
+        !draft &&
+        !selectSummarySources(
+            Chats.db.query.chat(inputs.chatId)?.messages ?? inputs.messages,
+            summaries
+        ).length
+    )
+        return
+    const stats = await estimateGenerationContext({ ...inputs, summaries })
+    if (
+        options.signal?.aborted ||
         stats.capacity <= 0 ||
         stats.total / stats.capacity < settings.autoThreshold / 100
     )
         return
-    const draft = summaryList(inputs.chatId)
-        .all()
-        .find((summary) => summary.status === 'draft')
-    if (draft) {
-        if (
-            settings.autoContinueDrafts &&
-            !draft.source_changed &&
-            !draft.notice_dismissed &&
-            draft.content.trim() &&
-            draft.error?.startsWith('Output limit reached') &&
-            draft.attempt_count < 2 &&
-            !summaryTask(draft.id)
-        ) {
-            try {
-                generateSummary(inputs.chatId, {
-                    inputs: inputs,
-                    summaryId: draft.id,
-                    continueDraft: true,
-                    automatic: true,
-                })
-            } catch (error) {
-                Logger.stackTrace(error)
-            }
-        }
-        return
-    }
-    try {
-        generateSummary(inputs.chatId, { inputs: inputs, automatic: true })
-    } catch (error) {
-        Logger.stackTrace(error)
-    }
+    return generateSummary(inputs.chatId, {
+        inputs,
+        summaryId: draft?.id,
+        continueDraft: !!draft,
+        parentGenerationId: options.parentGenerationId,
+    })
 }

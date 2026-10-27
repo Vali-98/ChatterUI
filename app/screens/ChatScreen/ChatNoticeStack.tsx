@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { View } from 'react-native'
+import { Pressable, View } from 'react-native'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
@@ -28,10 +28,7 @@ const ChatNoticeStack = ({ chatId }: { chatId: number }) => {
     const unresolved = summaries.filter(
         (summary) =>
             (summary.status === 'draft' ||
-                (warn &&
-                    summary.status === 'accepted' &&
-                    summary.enabled &&
-                    summary.source_changed)) &&
+                (warn && summary.status === 'accepted' && summary.source_changed)) &&
             !tasks.some(
                 (task) =>
                     task.kind === 'summary' &&
@@ -67,32 +64,42 @@ const ChatNoticeStack = ({ chatId }: { chatId: number }) => {
                     </ChatControlPanel>
                 ))}
                 {notices.slice(0, 3).map((summary) => (
-                    <ChatControlPanel key={summary.id} style={{ columnGap: 8 }}>
-                        <TText numberOfLines={1}>
-                            {t(
-                                summary.status === 'draft'
-                                    ? 'summary.unfinished'
-                                    : 'summary.changed'
-                            )}
-                        </TText>
-                        <ThemedButton
-                            label={t('summary.review')}
-                            variant="tertiary"
-                            onPress={() => open(chatId, summary.id)}
-                        />
-                        <TText>·</TText>
-                        <ThemedButton
-                            label={t('summary.later')}
-                            variant="tertiary"
-                            onPress={() => dismissSummaryNotice(summary.id)}
-                        />
-                    </ChatControlPanel>
+                    <Pressable
+                        key={summary.id}
+                        onPress={() => open(chatId, summary.id)}
+                        accessibilityRole="button">
+                        <ChatControlPanel style={{ columnGap: 8, borderColor: color.warning }}>
+                            <TText numberOfLines={1}>
+                                {t(
+                                    summary.status === 'draft'
+                                        ? 'summary.unfinished'
+                                        : 'summary.changed'
+                                )}
+                            </TText>
+                            <TText color="400">·</TText>
+                            <ThemedButton
+                                label={t('summary.later')}
+                                labelStyle={{ color: color.text._400 }}
+                                variant="tertiary"
+                                onPress={(event) => {
+                                    event.stopPropagation()
+                                    dismissSummaryNotice(summary.id)
+                                }}
+                            />
+                        </ChatControlPanel>
+                    </Pressable>
                 ))}
                 {hidden > 0 && (
                     <ThemedButton
                         iconName="file-text"
                         label={String(hidden)}
+                        iconSize={14}
                         variant="secondary"
+                        buttonStyle={{
+                            backgroundColor: color.neutral._100,
+                            paddingVertical: 4,
+                            paddingHorizontal: 8,
+                        }}
                         accessibilityLabel={t('summary.title')}
                         onPress={() => open(chatId)}
                     />
