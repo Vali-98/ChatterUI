@@ -848,6 +848,7 @@
             "builtIn": "Built-in",
             "contextMenu": {
                 "getThemes": "Get Themes",
+                "exportTheme": "Export Theme",
                 "importTheme": "Import Theme",
                 "pasteTheme": "Paste Theme"
             },
@@ -945,7 +946,54 @@
             "description": "Hide characters with the following tags from the character list.",
             "label": "Hidden Tags"
         },
-        "title": "Settings"
+        "title": "Settings",
+        "categories": {
+            "appearance": {
+                "title": "Appearance",
+                "description": "Themes, backgrounds and chat styling"
+            },
+            "chat": {
+                "title": "Chat & characters",
+                "description": "Messaging, scrolling and character preferences"
+            },
+            "generation": {
+                "title": "Generation",
+                "description": "Concurrency, titles and prompt configuration"
+            },
+            "device": {
+                "title": "Notifications & device",
+                "description": "Alerts, orientation and keeping the screen awake"
+            },
+            "data": {
+                "title": "Data & storage",
+                "description": "Database backup, restore and default content"
+            },
+            "privacy": {
+                "title": "Privacy",
+                "description": "App lock and access"
+            },
+            "advanced": {
+                "title": "Advanced",
+                "description": "Context debugging and application logs",
+                "contextTitle": "Context debugging"
+            }
+        },
+        "appearance": {
+            "preview": "Chat preview",
+            "previewUser": "User",
+            "previewCharacter": "Character",
+            "previewQuestion": "Could we take the scenic route?",
+            "previewAnswer": "\"Of course.\" *The trail winds beneath the trees.*\n\nWe have **plenty of time** to explore.",
+            "previewInput": "Message…",
+            "editPalette": "Edit and preview",
+            "light": "Light",
+            "dark": "Dark",
+            "background": "Chat background",
+            "appBackground": "App background",
+            "characterBackground": "Character background",
+            "previewBackground": "Preview background",
+            "backgroundOverride": "Characters with their own background use it instead of the app background."
+        }
     },
     "stringArrayEditor": {
         "add": "Add",

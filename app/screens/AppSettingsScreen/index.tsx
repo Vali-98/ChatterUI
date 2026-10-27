@@ -1,49 +1,58 @@
-import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 
-import HeaderTitle from '@components/views/HeaderTitle'
-import { Theme } from '@lib/theme/ThemeManager'
+import SettingsLink from '@components/settings/SettingsLink'
+import SettingsPage from '@components/settings/SettingsPage'
 
-import CharacterSettings from './CharacterSettings'
-import ChatSettings from './ChatSettings'
-import ChatWindowSettings from './ChatWindowSettings'
-import DatabaseSettings from './DatabaseSettings'
-import GeneratingSettings from './GeneratingSettings'
 import LanguageSettings from './LanguageSettings'
-import NotificationSettings from './NotificationSettings'
-import ScreenSettings from './ScreenSettings'
-import SecuritySettings from './SecuritySettings'
-import StyleSettings from './StyleSettings'
 
 const AppSettingsMenu = () => {
     const { t } = useTranslation()
-    const { spacing } = Theme.useTheme()
-
     return (
-        <KeyboardAwareScrollView
-            style={{
-                marginVertical: spacing.xl2,
-                paddingHorizontal: spacing.xl2,
-                paddingBottom: spacing.xl3,
-            }}
-            contentContainerStyle={{ rowGap: spacing.sm }}>
-            <HeaderTitle title={t('settings.title')} />
-
-            <StyleSettings />
-            <ChatSettings />
-            <ChatWindowSettings />
-            <CharacterSettings />
-            <GeneratingSettings />
-            <NotificationSettings />
-            <ScreenSettings />
+        <SettingsPage title={t('settings.title')}>
+            <SettingsLink
+                href="/screens/AppSettingsScreen/AppearanceSettings"
+                icon="skin"
+                title={t('settings.categories.appearance.title')}
+                description={t('settings.categories.appearance.description')}
+            />
+            <SettingsLink
+                href="/screens/AppSettingsScreen/ChatSettings"
+                icon="message"
+                title={t('settings.categories.chat.title')}
+                description={t('settings.categories.chat.description')}
+            />
+            <SettingsLink
+                href="/screens/AppSettingsScreen/GeneratingSettings"
+                icon="control"
+                title={t('settings.categories.generation.title')}
+                description={t('settings.categories.generation.description')}
+            />
+            <SettingsLink
+                href="/screens/AppSettingsScreen/DeviceSettings"
+                icon="bell"
+                title={t('settings.categories.device.title')}
+                description={t('settings.categories.device.description')}
+            />
+            <SettingsLink
+                href="/screens/AppSettingsScreen/DataSettings"
+                icon="database"
+                title={t('settings.categories.data.title')}
+                description={t('settings.categories.data.description')}
+            />
+            <SettingsLink
+                href="/screens/AppSettingsScreen/PrivacySettings"
+                icon="lock"
+                title={t('settings.categories.privacy.title')}
+                description={t('settings.categories.privacy.description')}
+            />
             <LanguageSettings />
-            <DatabaseSettings />
-            <SecuritySettings />
-
-            <View style={{ paddingVertical: spacing.xl3 }} />
-        </KeyboardAwareScrollView>
+            <SettingsLink
+                href="/screens/AppSettingsScreen/AdvancedSettings"
+                icon="code"
+                title={t('settings.categories.advanced.title')}
+                description={t('settings.categories.advanced.description')}
+            />
+        </SettingsPage>
     )
 }
 

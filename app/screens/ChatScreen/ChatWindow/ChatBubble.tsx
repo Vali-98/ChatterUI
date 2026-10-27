@@ -5,6 +5,7 @@ import Animated from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { useChatBubbleStyle } from '@lib/hooks/useChatBubbleStyle'
 import { useAppMode } from '@lib/state/AppMode'
 import { ChatMessage } from '@lib/state/chat'
 import { useChatActionsState } from '@lib/state/components/ChatControls'
@@ -34,11 +35,12 @@ const ChatBubble: React.FC<ChatTextProps> = ({
     isLastMessage,
     isGreeting,
 }) => {
+    const bubbleStyle = useChatBubbleStyle()
     const anchorRef = useMessageActionAnchor(entry.id)
     const { t } = useTranslation()
     const { appMode } = useAppMode()
     const [showTPS] = useMMKVBoolean(AppSettings.ShowTokenPerSecond)
-    const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
+    const { color, spacing, fontSize } = Theme.useTheme()
 
     const { setShowOptions } = useChatActionsState(
         useShallow((state) => ({
@@ -56,7 +58,6 @@ const ChatBubble: React.FC<ChatTextProps> = ({
 
     const showSwipe = !entry.is_user && isLastMessage
     const timings = swipe.timings
-    const bubbleColor = entry.is_user ? color.neutral._200 : color.neutral._200
     return (
         <View>
             <AnimatedPressable
@@ -65,24 +66,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                 onPress={() => {
                     setShowOptions(isGenerating ? undefined : entry.id, entry)
                 }}
-                style={{
-                    backgroundColor: bubbleColor,
-                    borderColor: color.neutral._200,
-                    borderWidth: 1,
-                    marginBottom: showSwipe ? 0 : 4,
-                    minHeight: 40,
-                    borderRadius: borderRadius.m,
-                    shadowColor: color.shadow,
-                    boxShadow: [
-                        {
-                            offsetX: 1,
-                            offsetY: 1,
-                            spreadDistance: 2,
-                            color: color.shadow,
-                            blurRadius: 4,
-                        },
-                    ],
-                }}
+                style={[bubbleStyle, { marginBottom: showSwipe ? 0 : 4 }]}
                 onLongPress={handleEnableEdit}>
                 {isLastMessage ? (
                     <ChatTextLast isGenerating={isGenerating} swipe={swipe} />

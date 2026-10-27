@@ -1,30 +1,45 @@
 import { useTranslation } from 'react-i18next'
-import { View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 
-import DropdownSheet from '@components/input/DropdownSheet'
-import SectionTitle from '@components/text/SectionTitle'
+import ListButton from '@components/buttons/ListButton'
+import SettingsLink from '@components/settings/SettingsLink'
+import TText from '@components/text/TText'
+import BottomSheet, { useBottomSheetRef } from '@components/views/BottomSheet'
 import { supportedLanguages, useLanguageStore } from '@i18n/i18n'
 
-const GeneratingSettings = () => {
+const LanguageSettings = () => {
     const { i18n, t } = useTranslation()
     const { language, setLanguage } = useLanguageStore()
-
-    const handleSetLanguage = (lang: string) => {
-        i18n.changeLanguage(lang)
-        setLanguage(lang)
-    }
-
+    const sheetRef = useBottomSheetRef()
     return (
-        <View style={{ rowGap: 8 }}>
-            <SectionTitle>{t('settings.language.title')}</SectionTitle>
-            <DropdownSheet
-                selected={supportedLanguages.find((item) => item.id === language)}
-                data={supportedLanguages}
-                onChangeValue={(item) => handleSetLanguage(item.id)}
-                labelExtractor={(item) => item.label}
+        <View>
+            <SettingsLink
+                icon="global"
+                title={t('settings.language.title')}
+                onPress={() => sheetRef.current?.open()}
             />
+            <BottomSheet ref={sheetRef}>
+                <View style={{ paddingBottom: 12 }}>
+                    <TText size={18}>{t('settings.language.title')}</TText>
+                </View>
+                <ScrollView contentContainerStyle={{ rowGap: 8 }}>
+                    {supportedLanguages.map((item) => (
+                        <ListButton
+                            key={item.id}
+                            active={item.id === language}
+                            style={{ paddingHorizontal: 16, paddingVertical: 14, minHeight: 48 }}
+                            onPress={() => {
+                                void i18n.changeLanguage(item.id)
+                                setLanguage(item.id)
+                                sheetRef.current?.close()
+                            }}>
+                            <TText>{item.label}</TText>
+                        </ListButton>
+                    ))}
+                </ScrollView>
+            </BottomSheet>
         </View>
     )
 }
 
-export default GeneratingSettings
+export default LanguageSettings

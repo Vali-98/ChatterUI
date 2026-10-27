@@ -848,6 +848,7 @@
             "builtIn": "内置",
             "contextMenu": {
                 "getThemes": "获取主题",
+                "exportTheme": "导出主题",
                 "importTheme": "导入主题",
                 "pasteTheme": "粘贴主题"
             },
@@ -945,7 +946,54 @@
             "description": "从角色列表中隐藏具有以下标签的角色。",
             "label": "隐藏标签"
         },
-        "title": "设置"
+        "title": "设置",
+        "categories": {
+            "appearance": {
+                "title": "外观",
+                "description": "主题、背景和聊天样式"
+            },
+            "chat": {
+                "title": "聊天与角色",
+                "description": "消息、滚动和角色偏好"
+            },
+            "generation": {
+                "title": "生成",
+                "description": "并发生成、标题和提示配置"
+            },
+            "device": {
+                "title": "通知与设备",
+                "description": "提醒、屏幕方向和保持亮屏"
+            },
+            "data": {
+                "title": "数据与存储",
+                "description": "数据库备份、恢复和默认内容"
+            },
+            "privacy": {
+                "title": "隐私",
+                "description": "应用锁与访问"
+            },
+            "advanced": {
+                "title": "高级",
+                "description": "上下文调试和应用日志",
+                "contextTitle": "上下文调试"
+            }
+        },
+        "appearance": {
+            "preview": "聊天预览",
+            "previewUser": "用户",
+            "previewCharacter": "角色",
+            "previewQuestion": "我们可以走风景优美的那条路吗？",
+            "previewAnswer": "“当然。” *小路蜿蜒穿过树荫。*\n\n我们有**充足的时间**去探索。",
+            "previewInput": "消息…",
+            "editPalette": "编辑与预览",
+            "light": "浅色",
+            "dark": "深色",
+            "background": "聊天背景",
+            "appBackground": "应用背景",
+            "characterBackground": "角色背景",
+            "previewBackground": "预览背景",
+            "backgroundOverride": "有专属背景的角色将使用角色背景，而不是应用背景。"
+        }
     },
     "stringArrayEditor": {
         "add": "添加",

@@ -1,3 +1,4 @@
+import { randomUUID } from 'expo-crypto'
 import { getDocumentAsync } from 'expo-document-picker'
 import { t } from 'i18next'
 import { create } from 'zustand'
@@ -11,7 +12,7 @@ import { Logger } from './Logger'
 
 type BackgroundImageStateProps = {
     image?: string
-    importImage: () => void
+    importImage: () => Promise<void>
     removeImage: () => void
 }
 
@@ -28,10 +29,16 @@ export const useBackgroundStore = create<BackgroundImageStateProps>()(
                     })
                     if (result.canceled) return
                     const uri = result.assets[0].uri
-                    const name = result.assets[0].name
-                    copyFile({ from: uri, to: AppDirectory.Assets + name })
-
+                    const name = `background-${randomUUID()}-${result.assets[0].name}`
+                    const path = AppDirectory.Assets + name
+                    if (!(await copyFile({ from: uri, to: path }))) {
+                        deleteFile(path)
+                        Logger.errorToast(t('common.errors.failedToCopy'))
+                        return
+                    }
+                    const previousImage = get().image
                     set({ image: name })
+                    if (previousImage) deleteFile(AppDirectory.Assets + previousImage)
                     Logger.infoToast(t('common.messages.successfullyImported'))
                 } catch (e) {
                     Logger.error('Something went wrong with importing: ' + e)

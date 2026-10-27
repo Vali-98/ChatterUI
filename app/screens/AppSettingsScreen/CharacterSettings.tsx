@@ -6,8 +6,6 @@ import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
 import { Characters } from '@lib/state/characters'
 
-import TagHiderSettings from './TagHiderSettings'
-
 const CharacterSettings = () => {
     const { t } = useTranslation()
 
@@ -33,7 +31,6 @@ const CharacterSettings = () => {
                     })
                 }}
             />
-            <TagHiderSettings />
         </View>
     )
 }

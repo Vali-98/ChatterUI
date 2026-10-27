@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
-import ThemedSwitch from '@components/input/ThemedSwitch'
+import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import SectionTitle from '@components/text/SectionTitle'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { registerForPushNotificationsAsync } from '@lib/notifications/Notifications'
@@ -26,7 +26,7 @@ const NotificationSettings = () => {
     return (
         <View>
             <SectionTitle>{t('settings.notification.title')}</SectionTitle>
-            <ThemedSwitch
+            <ThemedSwitchRow
                 label={t('settings.notification.enableNotifications')}
                 value={notificationOnGenerate}
                 onChangeValue={async (value) => {
@@ -44,21 +44,21 @@ const NotificationSettings = () => {
             />
             {notificationOnGenerate && (
                 <View>
-                    <ThemedSwitch
+                    <ThemedSwitchRow
                         label={t('settings.notification.playSound')}
                         value={notificationSound}
                         onChangeValue={setNotificationSound}
                         description=""
                     />
 
-                    <ThemedSwitch
+                    <ThemedSwitchRow
                         label={t('settings.notification.vibrate')}
                         value={notificationVibrate}
                         onChangeValue={setNotificationVibrate}
                         description=""
                     />
 
-                    <ThemedSwitch
+                    <ThemedSwitchRow
                         label={t('settings.notification.showText')}
                         value={showNotificationText}
                         onChangeValue={setShowNotificationText}

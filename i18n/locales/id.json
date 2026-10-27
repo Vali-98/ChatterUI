@@ -848,6 +848,7 @@
             "builtIn": "Bawaan",
             "contextMenu": {
                 "getThemes": "Dapatkan Tema",
+                "exportTheme": "Ekspor Tema",
                 "importTheme": "Impor Tema",
                 "pasteTheme": "Tempel Tema"
             },
@@ -945,7 +946,54 @@
             "description": "Sembunyikan karakter dengan tag berikut dari daftar karakter.",
             "label": "Tag Tersembunyi"
         },
-        "title": "Pengaturan"
+        "title": "Pengaturan",
+        "categories": {
+            "appearance": {
+                "title": "Tampilan",
+                "description": "Tema, latar belakang, dan gaya obrolan"
+            },
+            "chat": {
+                "title": "Obrolan & karakter",
+                "description": "Pesan, gulir, dan preferensi karakter"
+            },
+            "generation": {
+                "title": "Generasi",
+                "description": "Generasi bersamaan, judul, dan konfigurasi prompt"
+            },
+            "device": {
+                "title": "Notifikasi & perangkat",
+                "description": "Peringatan, orientasi, dan layar tetap menyala"
+            },
+            "data": {
+                "title": "Data & penyimpanan",
+                "description": "Cadangan basis data, pemulihan, dan konten bawaan"
+            },
+            "privacy": {
+                "title": "Privasi",
+                "description": "Kunci aplikasi dan akses"
+            },
+            "advanced": {
+                "title": "Lanjutan",
+                "description": "Debug konteks dan log aplikasi",
+                "contextTitle": "Debug konteks"
+            }
+        },
+        "appearance": {
+            "preview": "Pratinjau obrolan",
+            "previewUser": "Pengguna",
+            "previewCharacter": "Karakter",
+            "previewQuestion": "Bisakah kita lewat jalan yang indah?",
+            "previewAnswer": "\"Tentu.\" *Jalan setapak berkelok di bawah pepohonan.*\n\nKita punya **banyak waktu** untuk menjelajah.",
+            "previewInput": "Pesan…",
+            "editPalette": "Edit dan pratinjau",
+            "light": "Terang",
+            "dark": "Gelap",
+            "background": "Latar belakang obrolan",
+            "appBackground": "Latar aplikasi",
+            "characterBackground": "Latar karakter",
+            "previewBackground": "Pratinjau latar belakang",
+            "backgroundOverride": "Karakter dengan latar belakang sendiri menggunakannya sebagai pengganti latar aplikasi."
+        }
     },
     "stringArrayEditor": {
         "add": "Tambah",

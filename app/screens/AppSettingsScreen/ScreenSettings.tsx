@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
-import ThemedSwitch from '@components/input/ThemedSwitch'
+import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import SectionTitle from '@components/text/SectionTitle'
 import { AppSettings } from '@lib/constants/GlobalValues'
 
@@ -15,14 +15,14 @@ const ScreenSettings = () => {
     return (
         <View style={{ rowGap: 8 }}>
             <SectionTitle>{t('settings.screen.title')}</SectionTitle>
-            <ThemedSwitch
+            <ThemedSwitchRow
                 label={t('settings.screen.unlockOrientation')}
                 description={t('settings.screen.unlockOrientationDescription')}
                 value={unlockOrientation}
                 onChangeValue={setUnlockOrientation}
             />
 
-            <ThemedSwitch
+            <ThemedSwitchRow
                 label={t('settings.screen.keepAwake')}
                 description={t('settings.screen.keepAwakeDescription')}
                 value={keepAwake}

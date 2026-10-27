@@ -1,5 +1,5 @@
 import { t } from 'i18next'
-import { useMemo } from 'react'
+import { createContext, createElement, useContext, useMemo, type ReactNode } from 'react'
 import { useColorScheme } from 'react-native'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -10,6 +10,11 @@ import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
 import { DefaultColorSchemes, ThemeColor, themeColorSchemaV1 } from './ThemeColor'
+
+const PreviewColorContext = createContext<ThemeColor | undefined>(undefined)
+
+export const ThemePreview = ({ color, children }: { color: ThemeColor; children: ReactNode }) =>
+    createElement(PreviewColorContext.Provider, { value: color }, children)
 
 interface ColorStateProps {
     useSystemDarkMode: boolean
@@ -156,6 +161,7 @@ export namespace Theme {
     const font = ''
 
     export const useTheme = () => {
+        const previewColor = useContext(PreviewColorContext)
         const systemTheme = useColorScheme()
         const { selectedColor, useSystemDarkMode, lightColor, darkColor } = useColorState(
             useShallow((state) => ({
@@ -166,11 +172,9 @@ export namespace Theme {
             }))
         )
 
-        const color = useSystemDarkMode
-            ? systemTheme === 'dark'
-                ? darkColor
-                : lightColor
-            : selectedColor
+        const color =
+            previewColor ??
+            (useSystemDarkMode ? (systemTheme === 'dark' ? darkColor : lightColor) : selectedColor)
 
         return useMemo(
             () => ({

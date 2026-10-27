@@ -1,36 +1,29 @@
-import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
-import ThemedSwitch from '@components/input/ThemedSwitch'
-import SectionTitle from '@components/text/SectionTitle'
+import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
+import SettingsPage from '@components/settings/SettingsPage'
 import { AppSettings } from '@lib/constants/GlobalValues'
 
 const GeneratingSettings = () => {
     const { t } = useTranslation()
-    const [printContext, setPrintContext] = useMMKVBoolean(AppSettings.PrintContext)
-    const [bypassContextLength, setBypassContextLength] = useMMKVBoolean(
-        AppSettings.BypassContextLength
-    )
+    const [concurrent, setConcurrent] = useMMKVBoolean(AppSettings.ConcurrentGenerations)
+    const [autoTitle, setAutoTitle] = useMMKVBoolean(AppSettings.AutoGenerateTitle)
     return (
-        <View style={{ rowGap: 8 }}>
-            <SectionTitle>{t('settings.generating.title')}</SectionTitle>
-
-            <ThemedSwitch
-                label={t('settings.generating.printContext')}
-                value={printContext}
-                onChangeValue={setPrintContext}
-                description={t('settings.generating.printContextDescription')}
+        <SettingsPage title={t('settings.categories.generation.title')}>
+            <ThemedSwitchRow
+                label={t('settings.chat.concurrentGenerations')}
+                description={t('settings.chat.concurrentGenerationsDescription')}
+                value={concurrent ?? true}
+                onChangeValue={setConcurrent}
             />
-
-            <ThemedSwitch
-                label={t('settings.generating.bypassContextLength')}
-                value={bypassContextLength}
-                onChangeValue={setBypassContextLength}
-                description={t('settings.generating.bypassContextLengthDescription')}
+            <ThemedSwitchRow
+                label={t('settings.chat.autoGenerateTitles')}
+                description={t('settings.chat.autoGenerateTitlesDescription')}
+                value={autoTitle}
+                onChangeValue={setAutoTitle}
             />
-        </View>
+        </SettingsPage>
     )
 }
 

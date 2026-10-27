@@ -4,7 +4,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
 import StringArrayEditor from '@components/input/StringArrayEditor'
-import ThemedSwitch from '@components/input/ThemedSwitch'
+import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { TagHider } from '@lib/state/TagHider'
 
@@ -20,7 +20,7 @@ const TagHiderSettings = () => {
 
     return (
         <View>
-            <ThemedSwitch
+            <ThemedSwitchRow
                 label={t('settings.tagHider.label')}
                 description={t('settings.tagHider.description')}
                 value={tagHider}
