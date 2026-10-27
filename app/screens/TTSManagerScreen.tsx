@@ -10,6 +10,7 @@ import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import SettingsPage from '@components/settings/SettingsPage'
 import SectionTitle from '@components/text/SectionTitle'
+import { isAudioActive, useAudioState } from '@lib/audio/state'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { previewSpeech } from '@lib/tts/actions'
@@ -23,6 +24,7 @@ type LanguageListItem = {
 const TTSManagerScreen = () => {
     const { t } = useTranslation()
     const { color } = Theme.useTheme()
+    const audioActive = useAudioState((state) => state.recording || isAudioActive(state.session))
     const {
         voice,
         setVoice,
@@ -146,7 +148,7 @@ const TTSManagerScreen = () => {
                 />
                 <ThemedButton
                     label={t('common.actions.test')}
-                    variant="secondary"
+                    variant={audioActive ? 'disabled' : 'secondary'}
                     onPress={() => {
                         if (voice === undefined) {
                             Logger.warnToast(t('tts.nospeaker'))

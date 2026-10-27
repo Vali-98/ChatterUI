@@ -1,4 +1,25 @@
 {
+    "audio": {
+        "record": "录制音频",
+        "stopRecording": "停止录制",
+        "recordAgain": "重新录制",
+        "attach": "添加附件",
+        "microphonePermission": "录制音频需要麦克风权限。",
+        "recordFailed": "无法录制音频",
+        "settings": "音频播放",
+        "globalPlayer": "全局音频播放器",
+        "globalPlayerDescription": "离开当前聊天后继续播放音频。",
+        "keepPlayerOpen": "播放结束后保留播放器",
+        "keepPlayerOpenDescription": "音频结束后显示重播和关闭按钮。",
+        "play": "播放",
+        "pause": "暂停",
+        "stop": "停止",
+        "replay": "重播",
+        "seek": "调整播放进度",
+        "playbackFailed": "无法播放音频",
+        "add": "添加音频",
+        "addFailed": "无法添加音频"
+    },
     "about": {
         "description": {
             "primary": "ChatterUI 是由 Vali-98 开发的免费开源应用",

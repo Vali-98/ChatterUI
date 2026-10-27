@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Dimensions, Pressable, View } from 'react-native'
 
 import AttachmentViewer from '@components/media/AttachmentViewer'
+import AudioAttachment from '@components/media/AudioAttachment'
 import ScaledImage from '@components/views/ScaledImage'
 import { ChatMessage } from '@lib/state/chat'
 
@@ -15,6 +16,7 @@ const ChatAttachments: React.FC<ChatAttachmentsProps> = ({ entry }) => {
     const [viewerIndex, setViewerIndex] = useState<number>()
     if (entry.attachments.length < 1) return
     const images = entry.attachments.filter((item) => item.type === 'image')
+    const audio = entry.attachments.filter((item) => item.type === 'audio')
     return (
         <View style={{ rowGap: 8 }}>
             {viewerIndex !== undefined && (
@@ -24,6 +26,17 @@ const ChatAttachments: React.FC<ChatAttachmentsProps> = ({ entry }) => {
                     onClose={() => setViewerIndex(undefined)}
                 />
             )}
+            {audio.map((item) => (
+                <AudioAttachment
+                    key={item.id}
+                    source={{
+                        uri: item.uri,
+                        name: item.name,
+                        chatId: entry.chat_id,
+                        messageId: entry.id,
+                    }}
+                />
+            ))}
             {images.length > 0 && (
                 <View
                     style={{

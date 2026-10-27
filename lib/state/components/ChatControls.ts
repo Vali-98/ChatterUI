@@ -5,10 +5,10 @@ import type { ChatMessage } from '@lib/state/chat/types'
 export const useChatControlLayoutState = create<{
     inputHeight: number
     playerHeight: number
-    playerId?: number
+    playerId?: number | string
     setInputHeight: (height: number) => void
-    setPlayerHeight: (height: number, playerId: number) => void
-    releasePlayerHeight: (playerId: number) => void
+    setPlayerHeight: (height: number, playerId: number | string) => void
+    releasePlayerHeight: (playerId: number | string) => void
 }>((set) => ({
     inputHeight: 54,
     playerHeight: 0,

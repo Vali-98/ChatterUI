@@ -6,7 +6,7 @@ import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated'
 
 import { AlertProvider } from '@components/views/Alert'
 import { PortalHost } from '@components/views/Portal'
-import TTSPlayer from '@components/views/TTSPlayer'
+import PlaybackPlayer from '@components/views/PlaybackPlayer'
 import { useAppStateNotificationObserver } from '@lib/notifications/Notifications'
 import { Theme } from '@lib/theme/ThemeManager'
 import '../i18n/i18n'
@@ -44,7 +44,7 @@ const Layout = () => {
                     }}>
                     <Stack.Screen name="index" options={{ animation: 'fade' }} />
                 </Stack>
-                <TTSPlayer />
+                <PlaybackPlayer />
                 <PortalHost />
             </KeyboardProvider>
         </GestureHandlerRootView>

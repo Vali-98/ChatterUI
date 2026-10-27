@@ -1,4 +1,25 @@
 {
+    "audio": {
+        "record": "Rekam audio",
+        "stopRecording": "Hentikan rekaman",
+        "recordAgain": "Rekam lagi",
+        "attach": "Lampirkan",
+        "microphonePermission": "Izin mikrofon diperlukan untuk merekam audio.",
+        "recordFailed": "Gagal merekam audio",
+        "settings": "Pemutaran audio",
+        "globalPlayer": "Pemutar audio global",
+        "globalPlayerDescription": "Lanjutkan audio saat keluar dari obrolannya.",
+        "keepPlayerOpen": "Biarkan pemutar terbuka setelah pemutaran",
+        "keepPlayerOpenDescription": "Tampilkan Putar ulang dan Tutup setelah audio selesai.",
+        "play": "Putar",
+        "pause": "Jeda",
+        "stop": "Hentikan",
+        "replay": "Putar ulang",
+        "seek": "Geser posisi audio",
+        "playbackFailed": "Gagal memutar audio",
+        "add": "Tambah audio",
+        "addFailed": "Gagal menambahkan audio"
+    },
     "about": {
         "description": {
             "primary": "ChatterUI adalah aplikasi gratis dan sumber terbuka yang dikembangkan oleh Vali-98",

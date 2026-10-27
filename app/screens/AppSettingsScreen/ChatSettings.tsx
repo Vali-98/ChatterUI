@@ -7,6 +7,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import SettingsPage from '@components/settings/SettingsPage'
 import SectionTitle from '@components/text/SectionTitle'
+import { useAudioSettingsStore } from '@lib/audio/settingsStore'
 import { AppSettings } from '@lib/constants/GlobalValues'
 
 import ChatWindowSettings from './ChatWindowSettings'
@@ -18,6 +19,7 @@ const ChatSettings = () => {
     const [chatOnStartup, setChatOnStartup] = useMMKVBoolean(AppSettings.ChatOnStartup)
     const [autoLoadUser, setAutoLoadUser] = useMMKVBoolean(AppSettings.AutoLoadUser)
     const { enabled: textIntent, setEnabled: setTextIntent } = useTextIntentStatus()
+    const audio = useAudioSettingsStore()
     return (
         <SettingsPage title={t('settings.categories.chat.title')}>
             <View style={{ rowGap: 8 }}>
@@ -52,6 +54,21 @@ const ChatSettings = () => {
                 />
             </View>
             <ChatWindowSettings />
+            <View style={{ rowGap: 8 }}>
+                <SectionTitle>{t('audio.settings')}</SectionTitle>
+                <ThemedSwitchRow
+                    label={t('audio.globalPlayer')}
+                    description={t('audio.globalPlayerDescription')}
+                    value={audio.globalPlayer}
+                    onChangeValue={audio.setGlobalPlayer}
+                />
+                <ThemedSwitchRow
+                    label={t('audio.keepPlayerOpen')}
+                    description={t('audio.keepPlayerOpenDescription')}
+                    value={audio.keepPlayerOpen}
+                    onChangeValue={audio.setKeepPlayerOpen}
+                />
+            </View>
             <View style={{ rowGap: 8 }}>
                 <SectionTitle>{t('settings.character.title')}</SectionTitle>
                 <TagHiderSettings />

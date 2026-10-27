@@ -67,3 +67,12 @@ test('startup failure rejects each waiting task and permits a later restart', as
     await tick()
     expect(BackgroundService.start).toHaveBeenCalledTimes(2)
 })
+
+test('service startup supplies the foreground type required by Android', async () => {
+    await runGenerationTask(async () => {})
+    await tick()
+    expect(BackgroundService.start).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.objectContaining({ foregroundServiceType: ['dataSync'] })
+    )
+})

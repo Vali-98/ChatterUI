@@ -1,9 +1,10 @@
-import BackgroundService from 'react-native-background-actions'
+import BackgroundService, { type BackgroundTaskOptions } from 'react-native-background-actions'
 
 import { Logger } from '@lib/state/Logger'
 
-const options = {
+const options: BackgroundTaskOptions = {
     taskName: 'chatterui_completion_task',
+    foregroundServiceType: ['dataSync'],
     taskTitle: 'Running completion...',
     taskDesc: 'ChatterUI is running completion tasks',
     taskIcon: { name: 'ic_launcher', type: 'mipmap' },

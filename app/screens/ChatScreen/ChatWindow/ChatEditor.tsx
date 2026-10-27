@@ -8,9 +8,11 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import AttachmentViewer from '@components/media/AttachmentViewer'
+import AudioAttachment from '@components/media/AudioAttachment'
 import TText from '@components/text/TText'
 import BottomSheet, { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
 import ScaledImage from '@components/views/ScaledImage'
+import { pickAudioAttachments } from '@lib/audio/files'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Chats, type ChatMessage } from '@lib/state/chat'
 import { useChatEditable } from '@lib/state/chat/access'
@@ -52,6 +54,8 @@ const MessageEditor = ({
     const { t } = useTranslation()
     const [original] = useState(entry)
     const swipe = original.swipes[0]
+    const hasAttachments = original.attachments.length > 0
+    const hasReasoning = !!swipe.reasoning?.content
     const initialDraft = () => ({
         content: swipe.swipe,
         reasoning: swipe.reasoning?.content ?? '',
@@ -123,74 +127,131 @@ const MessageEditor = ({
                     {swipe.send_date.toLocaleTimeString()}
                 </TText>
             </View>
-            <HorizontalSelector<EditorField>
-                selected={field}
-                values={[
-                    { value: 'content', label: t('chat.reasoning.content') },
-                    ...(swipe.reasoning?.content
-                        ? [{ value: 'reasoning' as EditorField, label: t('chat.reasoning.label') }]
-                        : []),
-                    { value: 'attachments', label: t('chat.attachments.title') },
-                ]}
-                style={{ flex: 0 }}
-                onPress={setField}
-            />
-            {field === 'attachments' ? (
-                <ScrollView contentContainerStyle={{ rowGap: 12, paddingBottom: 8 }}>
-                    {draft.attachments.length === 0 && (
-                        <TText color="400" style={{ paddingVertical: 24 }}>
-                            {t('chat.attachments.empty')}
-                        </TText>
-                    )}
-                    {draft.attachments.map((item) => (
-                        <View
-                            key={item.uri}
-                            style={{ flexDirection: 'row', alignItems: 'center', columnGap: 12 }}>
-                            {item.type === 'image' && (
-                                <ThemedButton
-                                    variant="tertiary"
-                                    onPress={() => setViewerIndex(images.indexOf(item))}
-                                    buttonStyle={{ padding: 0 }}>
-                                    <ScaledImage
-                                        uri={item.uri}
-                                        style={{ height: 72, maxWidth: 120, borderRadius: 8 }}
-                                    />
-                                </ThemedButton>
-                            )}
-                            <TText numberOfLines={2} style={{ flex: 1 }}>
-                                {item.name}
+            <View style={{ flexShrink: 1, rowGap: 0 }}>
+                {(hasAttachments || hasReasoning) && (
+                    <HorizontalSelector<EditorField>
+                        selected={field}
+                        values={[
+                            { value: 'content', label: t('chat.reasoning.content') },
+                            ...(hasReasoning
+                                ? [
+                                      {
+                                          value: 'reasoning' as EditorField,
+                                          label: t('chat.reasoning.label'),
+                                      },
+                                  ]
+                                : []),
+                            ...(hasAttachments
+                                ? [
+                                      {
+                                          value: 'attachments' as EditorField,
+                                          label: t('chat.attachments.title'),
+                                      },
+                                  ]
+                                : []),
+                        ]}
+                        style={{ flex: 0, marginBottom: 0 }}
+                        onPress={setField}
+                    />
+                )}
+                {field === 'attachments' ? (
+                    <ScrollView contentContainerStyle={{ rowGap: 12, paddingBottom: 8 }}>
+                        {draft.attachments.length === 0 && (
+                            <TText color="400" style={{ paddingVertical: 24 }}>
+                                {t('chat.attachments.empty')}
                             </TText>
-                            <ThemedButton
-                                iconName="close"
-                                variant={saving ? 'disabled' : 'tertiary'}
-                                accessibilityLabel={t('chat.attachments.remove')}
-                                onPress={() =>
+                        )}
+                        {draft.attachments.map((item) => (
+                            <View
+                                key={item.uri}
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    columnGap: 12,
+                                }}>
+                                {item.type === 'image' && (
+                                    <ThemedButton
+                                        variant="tertiary"
+                                        onPress={() => setViewerIndex(images.indexOf(item))}
+                                        buttonStyle={{ padding: 0 }}>
+                                        <ScaledImage
+                                            uri={item.uri}
+                                            style={{ height: 72, maxWidth: 120, borderRadius: 8 }}
+                                        />
+                                    </ThemedButton>
+                                )}
+                                {item.type === 'audio' ? (
+                                    <View style={{ flex: 1 }}>
+                                        <AudioAttachment
+                                            source={{
+                                                uri: item.uri,
+                                                name: item.name,
+                                                chatId: entry.chat_id,
+                                                messageId: entry.id,
+                                            }}
+                                        />
+                                    </View>
+                                ) : (
+                                    <TText numberOfLines={2} style={{ flex: 1 }}>
+                                        {item.name}
+                                    </TText>
+                                )}
+                                <ThemedButton
+                                    iconName="close"
+                                    variant={saving ? 'disabled' : 'tertiary'}
+                                    accessibilityLabel={t('chat.attachments.remove')}
+                                    onPress={() =>
+                                        setDraft((draft) => ({
+                                            ...draft,
+                                            attachments: draft.attachments.filter(
+                                                (attachment) => attachment !== item
+                                            ),
+                                        }))
+                                    }
+                                />
+                            </View>
+                        ))}
+                        <ThemedButton
+                            iconName="picture"
+                            label={t('chat.input.actions.addImage')}
+                            variant={saving ? 'disabled' : 'secondary'}
+                            onPress={addImages}
+                        />
+                        <ThemedButton
+                            iconName="sound"
+                            label={t('audio.add')}
+                            variant={saving ? 'disabled' : 'secondary'}
+                            onPress={async () => {
+                                try {
+                                    const selected = await pickAudioAttachments()
                                     setDraft((draft) => ({
                                         ...draft,
-                                        attachments: draft.attachments.filter(
-                                            (attachment) => attachment !== item
-                                        ),
+                                        attachments: [
+                                            ...draft.attachments,
+                                            ...selected.filter(
+                                                (item) =>
+                                                    !draft.attachments.some(
+                                                        (existing) => existing.uri === item.uri
+                                                    )
+                                            ),
+                                        ],
                                     }))
+                                } catch (error) {
+                                    Logger.errorToast(t('audio.addFailed'), error)
                                 }
-                            />
-                        </View>
-                    ))}
-                    <ThemedButton
-                        iconName="picture"
-                        label={t('chat.input.actions.addImage')}
-                        variant={saving ? 'disabled' : 'secondary'}
-                        onPress={addImages}
+                            }}
+                        />
+                    </ScrollView>
+                ) : (
+                    <ThemedTextInput
+                        containerStyle={{ flex: 0, flexShrink: 1 }}
+                        value={draft[field]}
+                        editable={!saving}
+                        onChangeText={(text) => setDraft((draft) => ({ ...draft, [field]: text }))}
+                        multiline
                     />
-                </ScrollView>
-            ) : (
-                <ThemedTextInput
-                    containerStyle={{ flex: 0, flexShrink: 1 }}
-                    value={draft[field]}
-                    editable={!saving}
-                    onChangeText={(text) => setDraft((draft) => ({ ...draft, [field]: text }))}
-                    multiline
-                />
-            )}
+                )}
+            </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <ThemedButton
                     label={t('chat.editor.actions.delete')}

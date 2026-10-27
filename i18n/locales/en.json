@@ -1,4 +1,25 @@
 {
+    "audio": {
+        "record": "Record audio",
+        "stopRecording": "Stop recording",
+        "recordAgain": "Record again",
+        "attach": "Attach",
+        "microphonePermission": "Microphone permission is required to record audio.",
+        "recordFailed": "Could not record audio",
+        "settings": "Audio playback",
+        "globalPlayer": "Global audio player",
+        "globalPlayerDescription": "Continue audio when leaving its chat.",
+        "keepPlayerOpen": "Keep player open after playback",
+        "keepPlayerOpenDescription": "Show Replay and Close after audio finishes.",
+        "play": "Play",
+        "pause": "Pause",
+        "stop": "Stop",
+        "replay": "Replay",
+        "seek": "Seek audio",
+        "playbackFailed": "Could not play audio",
+        "add": "Add audio",
+        "addFailed": "Could not add audio"
+    },
     "about": {
         "description": {
             "primary": "ChatterUI is a free and open-source application developed by Vali-98",

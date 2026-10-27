@@ -13,6 +13,7 @@ import Animated, {
 } from 'react-native-reanimated'
 
 import { ChatSwipe } from '@db/schema'
+import { isAudioActive, useAudioState } from '@lib/audio/state'
 import { useChatGenerating } from '@lib/engine/generation/hooks'
 import { Chats } from '@lib/state/chat'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -36,8 +37,9 @@ const ChatTTS = ({ swipe }: { swipe: ChatSwipe }) => {
         return () => cancelAnimation(opacity)
     }, [active, opacity])
     const pulse = useAnimatedStyle(() => ({ opacity: opacity.value }))
+    const audioActive = useAudioState((state) => state.recording || isAudioActive(state.session))
     if (!enabled) return null
-    const disabled = active || generating || !hasVoice
+    const disabled = active || generating || !hasVoice || audioActive
     return (
         <Animated.View entering={ZoomIn.duration(200)} exiting={ZoomOut.duration(200)}>
             <Pressable

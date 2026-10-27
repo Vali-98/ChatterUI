@@ -79,10 +79,7 @@ export type ContextMessage = {
 }
 
 export type CompletionState =
-    | 'initial_truncated'
-    | 'initial_completed'
-    | 'loader_completed'
-    | 'loader_truncated'
+    'initial_truncated' | 'initial_completed' | 'loader_completed' | 'loader_truncated'
 
 export const collectContext = async (params: ContextBuilderParams & { mode: 'chat' | 'text' }) => {
     const {
@@ -226,7 +223,10 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
                             type: 'input_audio',
                             input_audio: {
                                 data: base64,
-                                format: item.mime_type.split('/')[1],
+                                format:
+                                    item.mime_type === 'audio/mpeg'
+                                        ? 'mp3'
+                                        : item.mime_type.split('/')[1],
                             },
                         }
                     })

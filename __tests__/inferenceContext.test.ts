@@ -10,6 +10,7 @@ import type { CharacterCard } from '../lib/state/characters/types'
 import type { ChatMessage } from '../lib/state/chat/types'
 import type { InstructType } from '../lib/state/Instructs'
 import { Logger } from '../lib/state/Logger'
+import { readBase64Async } from '../lib/utils/File'
 
 jest.mock('i18next', () => ({ t: (key: string) => key }))
 
@@ -289,4 +290,36 @@ test('reasoning-only final swipes are included when formatted-text policy permit
     )
     params.instruct.hide_think_tags = true
     expect((await collectContext({ ...params, mode: 'text' })).messages).toEqual([])
+})
+
+test.each([
+    ['audio/mpeg', 'mp3'],
+    ['audio/wav', 'wav'],
+])('audio input maps %s to API format %s', async (mimeType, format) => {
+    const params = parameters()
+    params.instruct.send_audio = true
+    params.messages = [message('Listen to this clip', 1)]
+    params.messages[0].attachments = [
+        {
+            id: 1,
+            chat_entry_id: 1,
+            uri: 'file:///clip',
+            name: 'clip',
+            type: 'audio',
+            mime_type: mimeType,
+            size: 100,
+        },
+    ]
+    jest.mocked(readBase64Async).mockResolvedValue('encoded-audio')
+    const payload = await buildChatCompletionContext(params)
+    expect(payload).toEqual(
+        expect.arrayContaining([
+            expect.objectContaining({
+                role: 'user',
+                content: expect.arrayContaining([
+                    { type: 'input_audio', input_audio: { data: 'encoded-audio', format } },
+                ]),
+            }),
+        ])
+    )
 })

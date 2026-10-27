@@ -5,6 +5,7 @@ import Animated, {
     measure,
     useAnimatedRef,
     useAnimatedStyle,
+    useAnimatedReaction,
     useFrameCallback,
     useSharedValue,
     runOnJS,
@@ -17,6 +18,7 @@ import { useChatGenerating } from '@lib/engine/generation/hooks'
 import { useBackAction } from '@lib/hooks/BackAction'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Chats } from '@lib/state/chat'
+import type { ChatSwipe } from '@db/schema'
 import { chatControlLift } from '@lib/state/components/chatControlBounds'
 import { useChatActionsState, useChatControlLayoutState } from '@lib/state/components/ChatControls'
 import { placeChatControl } from '@lib/utils/controlPlacement'
@@ -41,7 +43,6 @@ const ChatActionOverlay = ({ chatId }: { chatId: number }) => {
     const isGenerating = useChatGenerating(chatId)
     const { message, viewport } = useChatActionBounds()
     const ref = useAnimatedRef<View>()
-    const size = useSharedValue({ width: 0, height: 38 })
     const missingFrames = useSharedValue(0)
     const offscreenFrames = useSharedValue(0)
     const { data: entry } = useLiveQueryAsync(Chats.db.live.message(entryId ?? -1), {
@@ -106,31 +107,6 @@ const ChatActionOverlay = ({ chatId }: { chatId: number }) => {
         if (isGenerating || (entryId !== undefined && (!entry || entry.chat_id !== chatId)))
             dismiss()
     }, [isGenerating, entryId, entry, chatId, dismiss])
-    const position = useAnimatedStyle(() => {
-        const anchor = message.value
-        const bounds = viewport.value
-        const placed = placeChatControl(
-            anchor,
-            bounds,
-            size.value,
-            playerHeight > 0 ? playerHeight + CHAT_CONTROL_GAP + chatControlLift.value : 0
-        )
-        return {
-            maxWidth: Math.max(0, bounds.right - bounds.left - CHAT_CONTROL_EDGE * 2),
-            top: placed.top,
-            right: placed.right,
-        }
-    })
-    const visibility = useAnimatedStyle(() => ({
-        opacity: placeChatControl(
-            message.value,
-            viewport.value,
-            size.value,
-            playerHeight > 0 ? playerHeight + CHAT_CONTROL_GAP + chatControlLift.value : 0
-        ).visible
-            ? 1
-            : 0,
-    }))
     const swipe = entry?.swipes.find((item) => item.active)
     return (
         <Animated.View
@@ -138,33 +114,85 @@ const ChatActionOverlay = ({ chatId }: { chatId: number }) => {
             collapsable={false}
             pointerEvents="box-none"
             style={[StyleSheet.absoluteFill, { zIndex: 100 }]}>
-            {entryId !== undefined && entry && swipe && !isGenerating && (
-                <Animated.View
+            {entryId !== undefined && entry?.id === entryId && swipe && !isGenerating && (
+                <PositionedChatActions
                     key={entry.id}
-                    collapsable={false}
-                    entering={FadeIn.duration(120)}
-                    exiting={FadeOut.duration(200)}
-                    pointerEvents="box-none"
-                    style={[{ position: 'absolute' }, position]}
-                    onLayout={(event) => {
-                        const { width, height } = event.nativeEvent.layout
-                        if (
-                            width > 0 &&
-                            height > 0 &&
-                            (size.value.width !== Math.round(width) ||
-                                size.value.height !== Math.round(height))
-                        )
-                            size.set({ width: Math.round(width), height: Math.round(height) })
-                    }}>
-                    <Animated.View collapsable={false} pointerEvents="box-none" style={visibility}>
-                        <ChatQuickActions
-                            entryId={entry.id}
-                            swipe={swipe}
-                            isGenerating={isGenerating}
-                        />
-                    </Animated.View>
-                </Animated.View>
+                    entryId={entry.id}
+                    swipe={swipe}
+                    isGenerating={isGenerating}
+                    playerHeight={playerHeight}
+                />
             )}
+        </Animated.View>
+    )
+}
+// Each selected entry owns its position, including while its old panel exits.
+// A new panel remains hidden until its own message anchor has been measured.
+const PositionedChatActions = ({
+    entryId,
+    swipe,
+    isGenerating,
+    playerHeight,
+}: {
+    entryId: number
+    swipe: ChatSwipe
+    isGenerating: boolean
+    playerHeight: number
+}) => {
+    const { message, viewport } = useChatActionBounds()
+    const size = useSharedValue({ width: 0, height: 38 })
+    const placement = useSharedValue({
+        top: 0,
+        right: CHAT_CONTROL_EDGE,
+        maxWidth: 0,
+        visible: false,
+    })
+    useAnimatedReaction(
+        () => ({
+            anchor: message.value,
+            bounds: viewport.value,
+            size: size.value,
+            lift: chatControlLift.value,
+        }),
+        ({ anchor, bounds, size, lift }) => {
+            if (anchor.entryId !== entryId) return
+            placement.set({
+                ...placeChatControl(
+                    anchor,
+                    bounds,
+                    size,
+                    playerHeight > 0 ? playerHeight + CHAT_CONTROL_GAP + lift : 0
+                ),
+                maxWidth: Math.max(0, bounds.right - bounds.left - CHAT_CONTROL_EDGE * 2),
+            })
+        }
+    )
+    const position = useAnimatedStyle(() => ({
+        top: placement.value.top,
+        right: placement.value.right,
+        maxWidth: placement.value.maxWidth,
+    }))
+    const visibility = useAnimatedStyle(() => ({ opacity: placement.value.visible ? 1 : 0 }))
+    return (
+        <Animated.View
+            collapsable={false}
+            entering={FadeIn.duration(120)}
+            exiting={FadeOut.duration(200)}
+            pointerEvents="box-none"
+            style={[{ position: 'absolute' }, position]}
+            onLayout={(event) => {
+                const { width, height } = event.nativeEvent.layout
+                if (
+                    width > 0 &&
+                    height > 0 &&
+                    (size.value.width !== Math.round(width) ||
+                        size.value.height !== Math.round(height))
+                )
+                    size.set({ width: Math.round(width), height: Math.round(height) })
+            }}>
+            <Animated.View collapsable={false} pointerEvents="box-none" style={visibility}>
+                <ChatQuickActions entryId={entryId} swipe={swipe} isGenerating={isGenerating} />
+            </Animated.View>
         </Animated.View>
     )
 }

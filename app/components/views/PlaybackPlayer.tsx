@@ -3,35 +3,25 @@ import Octicons from '@react-native-vector-icons/octicons/static'
 import { usePathname } from 'expo-router'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { View, useWindowDimensions } from 'react-native'
-import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
-import Animated, {
-    FadeIn,
-    FadeOut,
-    ZoomIn,
-    ZoomOut,
-    runOnJS,
-    useAnimatedStyle,
-    useAnimatedReaction,
-} from 'react-native-reanimated'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { View } from 'react-native'
+import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
-import { CHAT_CONTROL_EDGE, CHAT_CONTROL_GAP } from '@lib/constants/ChatControls'
-import { chatSwipeControlBounds, chatControlLift } from '@lib/state/components/chatControlBounds'
-import { useChatControlLayoutState } from '@lib/state/components/ChatControls'
+import AudioControls from '@components/media/AudioControls'
+import { observeAudioPlayback, setAudioChatScope, stopAudio } from '@lib/audio/player'
+import { useAudioState } from '@lib/audio/state'
+import { Chats } from '@lib/state/chat'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { jumpToTTSSource } from '@lib/tts/actions'
 import { observeGenerationTTS } from '@lib/tts/generationBridge'
 import { replayTTS, setTTSChatVisible, stopTTS } from '@lib/tts/player'
 import { useTTSState } from '@lib/tts/state'
-import { getChatControlLift } from '@lib/utils/controlPlacement'
 
-import { ChatControlColumn, ChatControlPanel } from './ChatControlColumn'
+import PlaybackOverlay from './PlaybackOverlay'
 
-const TTSPlayer = () => {
+const PlaybackPlayer = () => {
     const { t } = useTranslation()
     const { color } = Theme.useTheme()
     const session = useTTSState(
@@ -47,60 +37,29 @@ const TTSPlayer = () => {
                 : undefined
         )
     )
-    const { height: windowHeight } = useWindowDimensions()
-    const playerHeight = useChatControlLayoutState((state) => state.playerHeight)
-    const inputHeight = useChatControlLayoutState((state) => state.inputHeight)
-    const setPlayerHeight = useChatControlLayoutState((state) => state.setPlayerHeight)
-    const releasePlayerHeight = useChatControlLayoutState((state) => state.releasePlayerHeight)
+    const audioId = useAudioState((state) => state.session?.id)
+    const chatId = Chats.useChatState((state) => state.id)
     const isChat = usePathname().endsWith('/screens/ChatScreen')
     useEffect(() => {
         setTTSChatVisible(isChat)
-    }, [isChat])
-    const insets = useSafeAreaInsets()
-    const { height } = useReanimatedKeyboardAnimation()
-    useAnimatedReaction(
-        () => {
-            if (!isChat || playerHeight <= 0) return 0
-            const bottomInset =
-                Math.max(insets.bottom, -height.value) + inputHeight + CHAT_CONTROL_EDGE
-            const bottom = windowHeight - bottomInset
-            return getChatControlLift(
-                { top: bottom - playerHeight, bottom: bottom },
-                chatSwipeControlBounds.value,
-                CHAT_CONTROL_GAP
-            )
-        },
-        (lift) => {
-            if (chatControlLift.value !== lift) chatControlLift.set(lift)
-        }
-    )
-    const position = useAnimatedStyle(() => ({
-        bottom:
-            Math.max(insets.bottom, -height.value) +
-            (isChat ? inputHeight + CHAT_CONTROL_EDGE + chatControlLift.value : CHAT_CONTROL_EDGE),
-    }))
+        setAudioChatScope(isChat ? chatId : undefined)
+    }, [isChat, chatId])
     useEffect(() => {
-        const unsubscribe = observeGenerationTTS()
+        const unsubscribeTTS = observeGenerationTTS()
+        const unsubscribeAudio = observeAudioPlayback()
         return () => {
-            unsubscribe()
+            unsubscribeTTS()
+            unsubscribeAudio()
             void stopTTS()
+            stopAudio()
         }
     }, [])
-    if (!session) return null
     return (
-        <Animated.View
-            key={session.id}
-            pointerEvents="box-none"
-            exiting={FadeOut.duration(200).withCallback(() => {
-                runOnJS(releasePlayerHeight)(session.id)
-            })}
-            entering={FadeIn.duration(120)}
-            style={[{ position: 'absolute', right: CHAT_CONTROL_EDGE, maxWidth: '92%' }, position]}>
-            <ChatControlColumn>
-                <ChatControlPanel
-                    onLayout={(event) =>
-                        setPlayerHeight(event.nativeEvent.layout.height, session.id)
-                    }>
+        <PlaybackOverlay id={audioId !== undefined ? `audio-${audioId}` : session?.id}>
+            {audioId !== undefined ? (
+                <AudioControls />
+            ) : session ? (
+                <>
                     <Animated.Text
                         entering={ZoomIn.duration(200)}
                         exiting={ZoomOut.duration(200)}
@@ -182,9 +141,9 @@ const TTSPlayer = () => {
                             }}
                         />
                     </Animated.View>
-                </ChatControlPanel>
-            </ChatControlColumn>
-        </Animated.View>
+                </>
+            ) : null}
+        </PlaybackOverlay>
     )
 }
-export default TTSPlayer
+export default PlaybackPlayer

@@ -1,6 +1,7 @@
 import * as Speech from 'expo-speech'
 import { t } from 'i18next'
 
+import { isAudioActive, useAudioState } from '@lib/audio/state'
 import { Logger } from '@lib/state/Logger'
 
 import { useTTSSettingsStore } from './settingsStore'
@@ -110,6 +111,8 @@ export const startTTSSession = (
 ) => {
     const settings = useTTSSettingsStore.getState()
     if (
+        useAudioState.getState().recording ||
+        isAudioActive(useAudioState.getState().session) ||
         (!settings.enabled && !options.allowDisabled) ||
         (!settings.globalPlayer && !chatVisible && source.kind !== 'preview') ||
         (options.automatic && isTTSActive(useTTSState.getState().session))
@@ -174,7 +177,14 @@ export const finishTTSSource = (id: number) => {
 export const replayTTS = () => {
     const active = playback
     const session = useTTSState.getState().session
-    if (!active || session?.id !== active.id || session.status !== 'finished') return
+    if (
+        useAudioState.getState().recording ||
+        isAudioActive(useAudioState.getState().session) ||
+        !active ||
+        session?.id !== active.id ||
+        session.status !== 'finished'
+    )
+        return
     active.queue = [...active.replayChunks]
     updateTTSSession(active.id, {
         status: 'waiting',

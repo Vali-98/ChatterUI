@@ -103,6 +103,14 @@ module.exports = {
                     },
                 },
             ],
+            [
+                'expo-audio',
+                {
+                    enableBackgroundPlayback: true,
+                    recordAudioAndroid: true,
+                    microphonePermission: 'Allow ChatterUI to access your microphone',
+                },
+            ],
             'expo-localization',
             'expo-router',
             'expo-font',

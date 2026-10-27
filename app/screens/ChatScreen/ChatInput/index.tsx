@@ -17,11 +17,14 @@ import Animated, {
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
+import AudioAttachment from '@components/media/AudioAttachment'
+import AudioRecordingSheet from '@components/media/AudioRecordingSheet'
 import Alert from '@components/views/Alert'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import CameraSheet from '@components/views/CameraSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import { XAxisOnlyTransition } from '@lib/animations/transitions'
+import { pickAudioAttachments } from '@lib/audio/files'
 import { AnimatedTextInput } from '@lib/components/AnimatedComponents'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useChatGenerating, useCanStartGeneration } from '@lib/engine/generation/hooks'
@@ -52,6 +55,7 @@ const ChatInput = () => {
     const [attachments, setAttachments] = useState<Attachment[]>([])
     const [hideOptions, setHideOptions] = useState(false)
     const cameraSheetRef = useBottomSheetRef()
+    const recordingSheetRef = useBottomSheetRef()
     const setHeight = useChatControlLayoutState((state) => state.setInputHeight)
 
     const { chatId } = Chats.useChat()
@@ -177,17 +181,29 @@ const ChatInput = () => {
                             entering={BounceIn}
                             exiting={ZoomOut.duration(100)}
                             style={{ alignItems: 'center', rowGap: 8 }}>
-                            <Image
-                                source={{ uri: item.uri }}
-                                style={{
-                                    width: 128,
-                                    height: undefined,
-                                    aspectRatio: 1,
-                                    borderRadius: borderRadius.m,
-                                    borderWidth: 1,
-                                    borderColor: color.primary._500,
-                                }}
-                            />
+                            {item.type === 'image' ? (
+                                <Image
+                                    source={{ uri: item.uri }}
+                                    style={{
+                                        width: 128,
+                                        height: undefined,
+                                        aspectRatio: 1,
+                                        borderRadius: borderRadius.m,
+                                        borderWidth: 1,
+                                        borderColor: color.primary._500,
+                                    }}
+                                />
+                            ) : (
+                                <View style={{ width: 260 }}>
+                                    <AudioAttachment
+                                        source={{
+                                            uri: item.uri,
+                                            name: item.name,
+                                            chatId: chatId ?? -1,
+                                        }}
+                                    />
+                                </View>
+                            )}
 
                             <ThemedButton
                                 iconName="close"
@@ -208,6 +224,11 @@ const ChatInput = () => {
                         </Animated.View>
                     )
                 }}
+            />
+            <AudioRecordingSheet
+                ref={recordingSheetRef}
+                chatId={chatId ?? -1}
+                onAttach={(recording) => setAttachments((current) => [...current, recording])}
             />
             <CameraSheet
                 onTakePicture={(picture) => {
@@ -257,6 +278,34 @@ const ChatInput = () => {
                                         icon="camera"
                                         onPress={() => {
                                             cameraSheetRef.current?.open()
+                                        }}
+                                    />
+                                    <ContextMenu.Button
+                                        label={t('audio.record')}
+                                        icon="audio"
+                                        onPress={() => recordingSheetRef.current?.open()}
+                                    />
+                                    <ContextMenu.Button
+                                        label={t('audio.add')}
+                                        icon="sound"
+                                        closeOnPress={false}
+                                        onPress={async (close) => {
+                                            close()
+                                            try {
+                                                const selected = await pickAudioAttachments()
+                                                setAttachments((current) => [
+                                                    ...current,
+                                                    ...selected.filter(
+                                                        (item) =>
+                                                            !current.some(
+                                                                (existing) =>
+                                                                    existing.uri === item.uri
+                                                            )
+                                                    ),
+                                                ])
+                                            } catch (error) {
+                                                Logger.errorToast(t('audio.addFailed'), error)
+                                            }
                                         }}
                                     />
                                     <ContextMenu.Button

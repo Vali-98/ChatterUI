@@ -1,5 +1,7 @@
 import * as Speech from 'expo-speech'
 
+import { useAudioState } from '../lib/audio/state'
+
 import {
     appendTTSText,
     finishTTSSource,
@@ -35,6 +37,8 @@ const voice = {
 } as Speech.Voice
 beforeEach(async () => {
     await stopTTS()
+    useAudioState.setState({ session: undefined })
+    useAudioState.setState({ recording: false })
     jest.clearAllMocks()
     useTTSSettingsStore.setState({
         enabled: true,
@@ -202,4 +206,33 @@ test('global playback survives leaving chats and can be detached by changing its
     useTTSSettingsStore.setState({ globalPlayer: false })
     enforceTTSPlaybackScope()
     expect(useTTSState.getState().session).toBeUndefined()
+})
+
+test.each(['loading', 'playing', 'paused'] as const)(
+    'audio %s blocks manual, automatic and preview TTS starts',
+    (status) => {
+        useAudioState.setState({
+            session: {
+                id: 1,
+                uri: 'file:///audio.mp3',
+                name: 'audio.mp3',
+                chatId: 1,
+                status,
+                currentTime: 0,
+                duration: 10,
+            },
+        })
+        expect(startTTSSession({ kind: 'manual' }, { automatic: false })).toBeUndefined()
+        expect(startTTSSession({ kind: 'completion' }, { automatic: true })).toBeUndefined()
+        expect(
+            startTTSSession({ kind: 'preview' }, { automatic: false, allowDisabled: true })
+        ).toBeUndefined()
+        expect(Speech.speak).not.toHaveBeenCalled()
+    }
+)
+
+test('microphone recording blocks TTS even without an audio playback session', () => {
+    useAudioState.setState({ recording: true })
+    expect(startTTSSession({ kind: 'manual' }, { automatic: false })).toBeUndefined()
+    expect(startTTSSession({ kind: 'completion' }, { automatic: true })).toBeUndefined()
 })
