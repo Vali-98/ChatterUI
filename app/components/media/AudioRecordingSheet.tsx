@@ -13,6 +13,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
 import BottomSheet, { type BottomSheetRef } from '@components/views/BottomSheet'
 import ThemedSpinner from '@components/views/ThemedSpinner'
+import { convertAudioAttachment } from '@lib/audio/files'
 import { stopAudio, stopAudioSource } from '@lib/audio/player'
 import { useAudioState } from '@lib/audio/state'
 import { Logger } from '@lib/state/Logger'
@@ -41,6 +42,7 @@ const RecordingControls = ({
     const mounted = useRef(true)
     const file = useRef<string | null>(null)
     const attached = useRef(false)
+    const converting = useRef(false)
     const stopping = useRef(false)
     const error = useRef<string | null>(null)
     const finish = async (uri: string | null) => {
@@ -54,9 +56,28 @@ const RecordingControls = ({
             return
         }
         if (!uri) throw new Error(t('audio.recordFailed'))
-        file.current = uri
-        setRecording({ uri: uri, name: uri.split('/').pop() ?? '', type: 'audio' })
-        setPhase('ready')
+        stopping.current = true
+        setPhase('stopping')
+        converting.current = true
+        try {
+            const converted = await convertAudioAttachment(
+                uri,
+                uri.split('/').pop() ?? 'recording.m4a'
+            )
+            file.current = converted.uri
+            deleteFile(uri)
+            if (!mounted.current) {
+                deleteFile(converted.uri)
+                return
+            }
+            setRecording(converted)
+            setPhase('ready')
+        } catch (error) {
+            if (!mounted.current) deleteFile(uri)
+            throw error
+        } finally {
+            converting.current = false
+        }
     }
     const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY, (status) => {
         if (status.hasError) error.current = status.error ?? t('audio.recordFailed')
@@ -81,7 +102,7 @@ const RecordingControls = ({
                 .finally(() => {
                     useAudioState.setState({ recording: false })
                 })
-            if (!attached.current && file.current) {
+            if (!attached.current && !converting.current && file.current) {
                 stopAudioSource(file.current)
                 deleteFile(file.current)
             }
