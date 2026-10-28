@@ -3,8 +3,11 @@ import { bundledExtensions, openDatabaseSync } from 'expo-sqlite'
 
 import * as schema from './schema'
 
-//deleteDatabaseAsync('db.db')
 export const sqliteDB = openDatabaseSync('db.db', { enableChangeListener: true })
+
+sqliteDB.execSync(`
+    PRAGMA foreign_keys = ON;
+`)
 const extension = bundledExtensions['sqlite-vec']
 if (extension) sqliteDB.loadExtensionAsync(extension?.libPath, extension?.entryPoint)
 export const db = drizzle(sqliteDB, { schema })
@@ -14,5 +17,3 @@ export type TableNames = {
         ? TName & string
         : never
 }[keyof typeof schema]
-
-sqliteDB.execAsync('PRAGMA foreign_keys = ON;')
