@@ -14,7 +14,7 @@ type EdgeFadesProps = EdgeFadeOptions & {
     edges: { start: boolean; end: boolean }
 }
 
-const EdgeFades = ({ horizontal, edges, edgeLength = 28, edgeColour }: EdgeFadesProps) => {
+const EdgeFades = ({ horizontal, edges, edgeLength = 12, edgeColour }: EdgeFadesProps) => {
     const { color } = Theme.useTheme()
     const colour = edgeColour ?? color.neutral._100
     const rgba = processColor(colour)
