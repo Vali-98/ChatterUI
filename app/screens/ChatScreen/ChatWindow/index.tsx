@@ -5,6 +5,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
 import Drawer from '@components/views/Drawer'
+import { EdgeFadeFlatList } from '@components/views/EdgeFade'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useDebounce } from '@lib/hooks/Debounce'
@@ -19,7 +20,6 @@ import { ChatActionAnchorProvider } from './ChatActionAnchor'
 import ChatActionOverlay from './ChatActionOverlay'
 import ChatFooter from './ChatFooter'
 import ChatHeader from './ChatHeader'
-import ChatHeaderGradient from './ChatHeaderGradient'
 import ChatItem from './ChatItem'
 import ChatJumpButton from './ChatJumpButton'
 import ChatModelName from './ChatModelName'
@@ -117,7 +117,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                     />
                 )}
 
-                <FlatList
+                <EdgeFadeFlatList
                     CellRendererComponent={ChatCellRenderer}
                     ref={flatlistRef}
                     maintainVisibleContentPosition={
@@ -187,7 +187,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                     <ChatNotices chatId={chatId} />
                     <DownloadNotice />
                 </NoticeStack>
-                <ChatHeaderGradient />
             </ImageBackground>
         </ChatActionAnchorProvider>
     )
