@@ -386,7 +386,8 @@
             "resume": "继续",
             "clear": "清除",
             "restart": "重新开始",
-            "collapse": "收起"
+            "collapse": "收起",
+            "openSettings": "打开设置"
         },
         "alert": {
             "unsaved": {
@@ -964,7 +965,10 @@
             "showText": "显示通知文本",
             "showTextDescription": "在通知中显示生成的消息",
             "title": "通知",
-            "vibrate": "通知振动"
+            "vibrate": "通知振动",
+            "permissionDescription": "ChatterUI 需要通知权限，才能在回复完成时通知你。",
+            "responseComplete": "回复已完成",
+            "responseCompleteDescription": "ChatterUI 已完成回复。"
         },
         "screen": {
             "keepAwake": "保持唤醒",

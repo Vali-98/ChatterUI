@@ -2,11 +2,12 @@ import AntDesign, { AntDesignIconName } from '@react-native-vector-icons/ant-des
 import { Href, useRouter } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
 
 import Drawer from '@components/views/Drawer'
+import { EdgeFadeFlatList } from '@components/views/EdgeFade'
 import { onboardingGuideIds } from '@lib/guides/definitions'
 import { useGuideState } from '@lib/guides/state'
 import { useOnboardingStore } from '@lib/onboarding/store'
@@ -95,7 +96,7 @@ const RouteList = () => {
     }
     const paths = getPaths(appMode === 'remote', t)
     return (
-        <FlatList
+        <EdgeFadeFlatList
             showsVerticalScrollIndicator={false}
             data={
                 __DEV__ || devMode

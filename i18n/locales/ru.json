@@ -386,7 +386,8 @@
             "resume": "Продолжить",
             "clear": "Очистить",
             "restart": "Начать заново",
-            "collapse": "Свернуть"
+            "collapse": "Свернуть",
+            "openSettings": "Открыть настройки"
         },
         "alert": {
             "unsaved": {
@@ -964,7 +965,10 @@
             "showText": "Показывать текст в уведомлении",
             "showTextDescription": "Показывает сгенерированные сообщения в уведомлениях",
             "title": "Уведомления",
-            "vibrate": "Вибрация уведомлений"
+            "vibrate": "Вибрация уведомлений",
+            "permissionDescription": "ChatterUI нужно разрешение на уведомления, чтобы сообщать о завершении ответа.",
+            "responseComplete": "Ответ готов",
+            "responseCompleteDescription": "ChatterUI завершил генерацию ответа."
         },
         "screen": {
             "keepAwake": "Держать в бодрствовании",

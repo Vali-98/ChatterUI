@@ -386,7 +386,8 @@
             "resume": "Lanjutkan",
             "clear": "Bersihkan",
             "restart": "Mulai ulang",
-            "collapse": "Ciutkan"
+            "collapse": "Ciutkan",
+            "openSettings": "Buka pengaturan"
         },
         "alert": {
             "unsaved": {
@@ -964,7 +965,10 @@
             "showText": "Tampilkan Teks di Notifikasi",
             "showTextDescription": "Menampilkan pesan yang dihasilkan di notifikasi",
             "title": "Notifikasi",
-            "vibrate": "Getaran Notifikasi"
+            "vibrate": "Getaran Notifikasi",
+            "permissionDescription": "ChatterUI memerlukan izin notifikasi untuk memberi tahu Anda saat respons selesai.",
+            "responseComplete": "Respons selesai",
+            "responseCompleteDescription": "ChatterUI telah menyelesaikan respons."
         },
         "screen": {
             "keepAwake": "Tetap Aktif",

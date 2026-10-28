@@ -1,7 +1,8 @@
 import * as Notifications from 'expo-notifications'
 import { router } from 'expo-router'
+import { t } from 'i18next'
 import { useCallback, useEffect } from 'react'
-import { AppState, Linking, Platform } from 'react-native'
+import { AppState, Linking } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 import Alert from '@components/views/Alert'
@@ -9,42 +10,40 @@ import { AppSettings } from '@lib/constants/GlobalValues'
 import { Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/chat'
 import { Logger } from '@lib/state/Logger'
+import { mmkv } from '@lib/storage/MMKV'
+
+import { ensureCompletionNotificationChannel } from './channels'
 
 export const setupNotifications = () => {
     Notifications.setNotificationHandler({
-        handleNotification: async () => ({
-            shouldPlaySound: false,
-            shouldSetBadge: false,
-            shouldShowAlert: false,
-            shouldShowBanner: false,
-            shouldShowList: false,
-        }),
+        handleNotification: async () => {
+            const background = AppState.currentState !== 'active'
+            return {
+                shouldPlaySound: background && !!mmkv.getBoolean(AppSettings.PlayNotificationSound),
+                shouldSetBadge: false,
+                shouldShowBanner: background,
+                shouldShowList: background,
+            }
+        },
     })
 }
 
 export async function registerForPushNotificationsAsync() {
-    if (Platform.OS === 'android') {
-        await Notifications.setNotificationChannelAsync('chatterUI', {
-            name: 'chatterUI',
-            importance: Notifications.AndroidImportance.DEFAULT,
-            vibrationPattern: [250, 0, 250, 250],
-            lightColor: '#7d6294',
-        })
+    await ensureCompletionNotificationChannel()
+    let permissions = await Notifications.getPermissionsAsync()
+    if (!permissions.granted && permissions.canAskAgain) {
+        permissions = await Notifications.requestPermissionsAsync()
     }
-
-    // @TODO: Figure this out
-    // const permissions = await Notifications.getPermissionsAsync()
-    let finalStatus = 'granted'
-    if (finalStatus !== 'granted') {
+    if (!permissions.granted) {
         Alert.alert({
-            title: 'Permission Required',
-            description: 'ChatterUI requires permissions to send you notifications.',
+            title: t('common.errors.permissionRequired'),
+            description: t('settings.notification.permissionDescription'),
             buttons: [
                 {
-                    label: 'Cancel',
+                    label: t('common.actions.cancel'),
                 },
                 {
-                    label: 'Open Permissions',
+                    label: t('common.actions.openSettings'),
                     onPress: () => {
                         Linking.openSettings()
                     },

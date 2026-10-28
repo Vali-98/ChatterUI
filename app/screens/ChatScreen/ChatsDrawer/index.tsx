@@ -1,4 +1,4 @@
-import { FlashList } from '@shopify/flash-list'
+import { EdgeFadeFlashList } from '@components/views/EdgeFade'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -114,7 +114,7 @@ const ChatsDrawer = () => {
                         layout={YAxisOnlyTransition}
                         entering={FadeIn.duration(200)}
                         style={styles.listContainer}>
-                        <FlashList
+                        <EdgeFadeFlashList
                             keyboardShouldPersistTaps="always"
                             data={data}
                             keyExtractor={(item) => item.id.toString()}
@@ -140,7 +140,7 @@ const ChatsDrawer = () => {
                             {t('chat.drawer.search.resultsFound', { count: searchResults.length })}
                         </Text>
                     )}
-                    <FlashList
+                    <EdgeFadeFlashList
                         data={searchResults}
                         keyExtractor={(item) => item.swipe_id.toString()}
                         renderItem={({ item }) => (

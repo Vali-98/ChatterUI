@@ -1,6 +1,6 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useTranslation } from 'react-i18next'
-import { FlatList, Linking, Text, View } from 'react-native'
+import { Linking, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -8,6 +8,7 @@ import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
+import { EdgeFadeFlatList } from '@components/views/EdgeFade'
 import InputSheet from '@components/views/InputSheet'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Logger } from '@lib/state/Logger'
@@ -110,7 +111,7 @@ const TemplateManager = () => {
                 title={t('connections.templates.pasteSheetTitle')}
             />
             {templates.length > 0 && (
-                <FlatList
+                <EdgeFadeFlatList
                     contentContainerStyle={{ rowGap: 4 }}
                     data={templates}
                     keyExtractor={(item) => item.name}

@@ -386,7 +386,8 @@
             "resume": "Resume",
             "clear": "Clear",
             "restart": "Restart",
-            "collapse": "Collapse"
+            "collapse": "Collapse",
+            "openSettings": "Open settings"
         },
         "alert": {
             "unsaved": {
@@ -964,7 +965,10 @@
             "showText": "Show Text In Notification",
             "showTextDescription": "Shows generated messages in notifications",
             "title": "Notifications",
-            "vibrate": "Notification Vibration"
+            "vibrate": "Notification Vibration",
+            "permissionDescription": "ChatterUI needs notification permission to notify you when a response is complete.",
+            "responseComplete": "Response complete",
+            "responseCompleteDescription": "ChatterUI has finished a response."
         },
         "screen": {
             "keepAwake": "Keep Awake",

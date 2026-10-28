@@ -17,7 +17,7 @@ const ContextUsage = ({
 }) => {
     const { t } = useTranslation()
     const ref = useBottomSheetRef()
-    const { color } = Theme.useTheme()
+    const { color, spacing } = Theme.useTheme()
     const allocation = useContextAllocation(generatedLength)
     const { values } = allocation
     const colors: Record<keyof ContextAllocation['values'], string> = {
@@ -111,8 +111,10 @@ const ContextUsage = ({
                     )}
                 </View>
             </Pressable>
-            <BottomSheet ref={ref} sheetStyle={{ maxHeight: '85%' }}>
-                <ScrollView contentContainerStyle={{ rowGap: 12 }}>
+            <BottomSheet
+                ref={ref}
+                sheetStyle={{ maxHeight: '85%', paddingLeft: 0, paddingRight: 0 }}>
+                <ScrollView contentContainerStyle={{ rowGap: 12, paddingHorizontal: spacing.xl2 }}>
                     <TText size={18}>{t('contextAllocation.title')}</TText>
                     <TText color="400">{t('contextAllocation.estimateDescription')}</TText>
                     {bar()}

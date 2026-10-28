@@ -2,7 +2,7 @@ import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FlatList, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -11,6 +11,7 @@ import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
+import { EdgeFadeFlatList } from '@components/views/EdgeFade'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -69,7 +70,7 @@ const ConnectionsManagerScreen = () => {
                 )}
             />
             {apiValues.length > 0 && (
-                <FlatList
+                <EdgeFadeFlatList
                     style={{
                         paddingHorizontal: spacing.xl,
                     }}
