@@ -13,7 +13,7 @@ import InputSheet from '@components/views/InputSheet'
 import { Logger } from '@lib/state/Logger'
 import { DefaultColorSchemes, type ThemeColor } from '@lib/theme/ThemeColor'
 import { Theme } from '@lib/theme/ThemeManager'
-import { pickJSONDocument, saveStringToDownload } from '@lib/utils/File'
+import { FileUtils, saveStringToDownload } from '@lib/utils/File'
 
 export type ThemeTarget = 'light' | 'dark'
 
@@ -70,7 +70,9 @@ const ThemePicker = ({
                                 label={t('settings.colors.contextMenu.importTheme')}
                                 icon="download"
                                 onPress={async () => {
-                                    const result = await pickJSONDocument()
+                                    const result = await FileUtils.pickJSON({
+                                        type: 'application/json',
+                                    })
                                     if (result.success) state.addCustomColor(result.data)
                                 }}
                             />

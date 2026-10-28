@@ -50,7 +50,7 @@ export namespace FileUtils {
         }, params)
     }
 
-    export const pickJSON = async (params: { type?: string } = {}): Promise<PickerResult> => {
+    export const pickJSON = async (params: { type?: string } = {}): Promise<JSONPickerResult> => {
         const result = await pickText(params)
         if (!result.success) return result
         try {
@@ -92,42 +92,6 @@ export const saveStringToDownload = async (
 type PickerResult = { success: false } | { success: true; data: string }
 
 type JSONPickerResult = { success: false } | { success: true; data: any }
-
-/**@deprecated */
-export const pickJSONDocument = async (): Promise<JSONPickerResult> => {
-    const result = await pickStringDocument({ type: 'application/json' })
-    if (!result.success) return result
-    try {
-        const jsonData = JSON.parse(result.data)
-        return { success: true, data: jsonData }
-    } catch {
-        return { success: false }
-    }
-}
-
-/**@deprecated */
-export const pickStringDocument = async ({
-    encoding = 'utf8',
-    type = '*/*',
-}: {
-    encoding?: 'utf8' | 'base64'
-    type?: string
-} = {}): Promise<PickerResult> => {
-    const result = await getDocumentAsync({ type: type })
-    if (result.canceled) {
-        return { success: false }
-    }
-    const uri = result.assets[0].uri
-    const file = new File(uri)
-    let data = ''
-    if (encoding === 'utf8') data = await file.text()
-    else data = await file.base64()
-
-    if (!data) {
-        return { success: false }
-    }
-    return { success: true, data: data }
-}
 
 const gb = 1000 ** 3
 const mb = 1000 ** 2

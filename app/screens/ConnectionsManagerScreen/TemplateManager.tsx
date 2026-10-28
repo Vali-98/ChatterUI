@@ -12,7 +12,7 @@ import InputSheet from '@components/views/InputSheet'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
-import { pickJSONDocument } from '@lib/utils/File'
+import { FileUtils } from '@lib/utils/File'
 
 import TemplateItem from './TemplateItem'
 
@@ -48,7 +48,9 @@ const TemplateManager = () => {
                                 closeOnPress={false}
                                 onPress={async (close) => {
                                     close()
-                                    const result = await pickJSONDocument()
+                                    const result = await FileUtils.pickJSON({
+                                        type: 'application/json',
+                                    })
                                     if (!result.success) {
                                         return
                                     }
