@@ -41,9 +41,10 @@ export const usableSummariesBefore = (cutoff: number | undefined, summaries: Cha
 
 export const summarizeHistory = (
     messages: ChatMessage[],
-    summaries: ChatSummary[]
+    summaries: ChatSummary[],
+    cutoff = summaryCutoff(messages)
 ): ChatMessage[] => {
-    const selected = usableSummaries(messages, summaries)
+    const selected = usableSummariesBefore(cutoff, summaries)
     if (!selected.length) return messages
     const result: ChatMessage[] = []
     let index = 0

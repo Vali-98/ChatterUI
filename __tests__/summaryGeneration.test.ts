@@ -1,3 +1,4 @@
+import { Chats } from '../lib/state/chat'
 import type { APIBuilderParams } from '../lib/engine/API/APIBuilder'
 import { buildAndSendRequest } from '../lib/engine/API/APIBuilder'
 import { buildContext } from '../lib/engine/API/ContextBuilder'
@@ -33,7 +34,14 @@ jest.mock('../lib/state/AppMode', () => ({
 }))
 jest.mock('../lib/state/Logger', () => ({ Logger: { stackTrace: jest.fn() } }))
 jest.mock('../lib/state/chat', () => ({
-    Chats: { db: { query: { chat: () => ({ messages: mockMessages }) } } },
+    Chats: {
+        db: {
+            query: {
+                chat: jest.fn(() => ({ messages: mockMessages })),
+                hasSummarySources: jest.fn(() => true),
+            },
+        },
+    },
 }))
 jest.mock('../lib/summaries/settingsStore', () => ({
     useSummarySettingsStore: { getState: jest.fn() },
@@ -457,4 +465,13 @@ test('an ignored draft keeps its original text and coverage as the chat grows', 
     expect(getSummary(1)).toEqual(before)
     expect(mockRuns).toHaveLength(1)
     expect(estimateGenerationContext).not.toHaveBeenCalled()
+})
+
+test('automatic preflight checks metadata without loading the full chat below its threshold', async () => {
+    inputs.history = { throughId: 100, cutoff: 90, snapshots: new Map() }
+    jest.mocked(estimateGenerationContext).mockResolvedValue({ total: 20, capacity: 100 })
+    expect(await prepareAutomaticSummary(inputs)).toBeUndefined()
+    expect(Chats.db.query.hasSummarySources).toHaveBeenCalledWith(1, 90, [])
+    expect(Chats.db.query.chat).not.toHaveBeenCalled()
+    expect(mockRuns).toHaveLength(0)
 })

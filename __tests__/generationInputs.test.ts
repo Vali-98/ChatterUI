@@ -53,7 +53,13 @@ jest.mock('../lib/state/characters', () => ({
     },
 }))
 jest.mock('../lib/state/chat', () => ({
-    Chats: { db: { live: { chat: jest.fn() } }, actions: { countMessageTokens: jest.fn() } },
+    Chats: {
+        db: {
+            live: { chat: jest.fn(), historyPage: jest.fn() },
+            query: { chatRow: jest.fn(), historyCutoff: jest.fn(), historyStats: jest.fn() },
+        },
+        actions: { countMessageTokens: jest.fn() },
+    },
 }))
 jest.mock('../lib/state/Instructs', () => ({
     commonStopStrings: ['COMMON'],
@@ -111,9 +117,16 @@ beforeEach(() => {
     jest.mocked(Instructs.useInstruct.getState).mockReturnValue({ data: instruct } as any)
     jest.mocked(Characters.useUserStore.getState).mockReturnValue({ card: user } as any)
     jest.mocked(Characters.db.live.card).mockReturnValue({ sync: () => character } as any)
-    jest.mocked(Chats.db.live.chat).mockReturnValue({
-        sync: () => ({ character_id: 1, messages: [] }),
-    } as any)
+    jest.mocked(Chats.db.query.chatRow).mockReturnValue({ character_id: 1 } as any)
+    jest.mocked(Chats.db.live.historyPage).mockReturnValue({ sync: () => [] } as any)
+    jest.mocked(Chats.db.query.historyCutoff).mockReturnValue(undefined)
+    jest.mocked(Chats.db.query.historyStats).mockReturnValue({
+        messageCount: 0,
+        tokens: 0,
+        userCount: 0,
+        nameTokens: 0,
+        imageTokens: 0,
+    })
     jest.mocked(Tokenizer.useTokenizerState.getState).mockReturnValue({
         model: { tokenize: async (text: string) => ({ tokens: [...text] }) },
     } as any)
@@ -162,7 +175,7 @@ test('uses the owning chat character and both participant names in stop sequence
 })
 
 test('missing owning chat fails before requesting any sources', () => {
-    jest.mocked(Chats.db.live.chat).mockReturnValue({ sync: () => undefined } as any)
+    jest.mocked(Chats.db.query.chatRow).mockReturnValue(undefined)
     expect(() => captureGenerationInputs(10, 'remote')).toThrow('Chat no longer exists')
     expect(getDataSources).not.toHaveBeenCalled()
 })
@@ -213,4 +226,33 @@ test('preflight estimates the full history and reservations without native token
     expect(tokenizer).not.toHaveBeenCalled()
     expect(Chats.actions.countMessageTokens).not.toHaveBeenCalled()
     expect(retrieve).not.toHaveBeenCalled()
+})
+
+test('preflight aggregates older cached counts instead of reading older message pages', async () => {
+    const inputs = captureGenerationInputs(10, 'remote')
+    inputs.messages = [
+        {
+            id: 90,
+            is_user: true,
+            name: 'User',
+            swipes: [{ active: true, swipe: 'recent', token_length: 2 }],
+            attachments: [],
+        },
+    ] as any
+    inputs.history = { throughId: 100, cutoff: undefined, snapshots: new Map() }
+    jest.mocked(Chats.db.query.historyStats).mockReturnValue({
+        messageCount: 89,
+        tokens: 5000,
+        imageTokens: 512,
+        nameTokens: 100,
+        userCount: 45,
+    })
+    jest.mocked(Chats.db.live.historyPage).mockClear()
+    const stats = await estimateGenerationContext(inputs)
+    expect(stats.total).toBeGreaterThanOrEqual(5512)
+    expect(Chats.db.live.historyPage).not.toHaveBeenCalled()
+    expect(Chats.db.query.historyStats).toHaveBeenCalledWith(
+        10,
+        expect.objectContaining({ throughId: 100, beforeId: 90 })
+    )
 })

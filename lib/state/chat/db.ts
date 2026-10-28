@@ -1,4 +1,19 @@
-import { and, asc, count, desc, eq, getTableColumns, like, lte, sql } from 'drizzle-orm'
+import {
+    and,
+    asc,
+    count,
+    desc,
+    eq,
+    getTableColumns,
+    like,
+    lt,
+    lte,
+    gte,
+    notBetween,
+    notInArray,
+    inArray,
+    sql,
+} from 'drizzle-orm'
 
 import { db as database } from '@db/db'
 import {
@@ -22,7 +37,43 @@ import type {
     EditMessageInput,
 } from './types'
 
+type HistoryRange = { start_entry_id: number; end_entry_id: number }
+type HistoryPageOptions = {
+    entryIds?: number[]
+    beforeId?: number
+    fromId?: number
+    throughId?: number
+    limit: number
+    includeReasoning?: boolean
+    excludeRanges?: HistoryRange[]
+}
+const historyWhere = (chatId: number, options: Omit<HistoryPageOptions, 'limit'>) =>
+    and(
+        eq(chatEntries.chat_id, chatId),
+        options.entryIds === undefined ? undefined : inArray(chatEntries.id, options.entryIds),
+        options.fromId === undefined ? undefined : gte(chatEntries.id, options.fromId),
+        options.beforeId === undefined ? undefined : lt(chatEntries.id, options.beforeId),
+        options.throughId === undefined ? undefined : lte(chatEntries.id, options.throughId),
+        ...(options.excludeRanges ?? []).map((range) =>
+            notBetween(chatEntries.id, range.start_entry_id, range.end_entry_id)
+        )
+    )
+
 const live = {
+    historyPage: (chatId: number, options: HistoryPageOptions) =>
+        database.query.chatEntries.findMany({
+            where: historyWhere(chatId, options),
+            orderBy: desc(chatEntries.id),
+            limit: options.limit,
+            with: {
+                swipes: {
+                    where: eq(chatSwipes.active, true),
+                    limit: 1,
+                    with: { reasoning: options.includeReasoning ? true : undefined },
+                },
+                attachments: true,
+            },
+        }),
     chat: (chatId: number, options: { includeReasoning?: boolean } = {}) =>
         database.query.chats.findFirst({
             where: eq(chats.id, chatId),
@@ -84,6 +135,69 @@ const live = {
 }
 
 const query = {
+    historyCutoff: (chatId: number, throughId: number, excludeIds: number[] = []) =>
+        database
+            .select({ id: chatEntries.id })
+            .from(chatEntries)
+            .innerJoin(
+                chatSwipes,
+                and(eq(chatSwipes.entry_id, chatEntries.id), eq(chatSwipes.active, true))
+            )
+            .where(
+                and(
+                    historyWhere(chatId, { throughId }),
+                    eq(chatEntries.is_user, false),
+                    sql`trim(${chatSwipes.swipe}) != ''`,
+                    excludeIds.length ? notInArray(chatEntries.id, excludeIds) : undefined
+                )
+            )
+            .orderBy(desc(chatEntries.id))
+            .limit(1)
+            .offset(1)
+            .get()?.id,
+    hasSummarySources: (chatId: number, throughId: number, excludeRanges: HistoryRange[]) =>
+        !!database
+            .select({ id: chatEntries.id })
+            .from(chatEntries)
+            .where(historyWhere(chatId, { throughId, excludeRanges }))
+            .limit(1)
+            .get(),
+    historyHints: (chatId: number, options: HistoryPageOptions) =>
+        database
+            .select({
+                id: chatEntries.id,
+                is_user: chatEntries.is_user,
+                tokens: sql<number>`coalesce(${chatSwipes.token_length}, (length(${chatSwipes.swipe}) + 3) / 4, 0) + ${options.includeReasoning ? sql`coalesce((length(${swipeReasoning.content}) + 3) / 4, 0)` : sql`0`}`,
+                nameTokens: sql<number>`(length(${chatEntries.name}) + 5) / 4`,
+                imageTokens: sql<number>`(select count(*) from ${chatAttachments} where ${chatAttachments.chat_entry_id} = ${chatEntries.id} and ${chatAttachments.type} = 'image') * 512`,
+            })
+            .from(chatEntries)
+            .innerJoin(
+                chatSwipes,
+                and(eq(chatSwipes.entry_id, chatEntries.id), eq(chatSwipes.active, true))
+            )
+            .leftJoin(swipeReasoning, eq(swipeReasoning.swipe_id, chatSwipes.id))
+            .where(historyWhere(chatId, options))
+            .orderBy(desc(chatEntries.id))
+            .limit(options.limit)
+            .all(),
+    historyStats: (chatId: number, options: Omit<HistoryPageOptions, 'limit'> = {}) =>
+        database
+            .select({
+                messageCount: count(chatEntries.id),
+                tokens: sql<number>`coalesce(sum(coalesce(${chatSwipes.token_length}, (length(${chatSwipes.swipe}) + 3) / 4) + ${options.includeReasoning ? sql`coalesce((length(${swipeReasoning.content}) + 3) / 4, 0)` : sql`0`}), 0)`,
+                nameTokens: sql<number>`coalesce(sum((length(${chatEntries.name}) + 5) / 4), 0)`,
+                userCount: sql<number>`coalesce(sum(case when ${chatEntries.is_user} then 1 else 0 end), 0)`,
+                imageTokens: sql<number>`coalesce(sum((select count(*) from ${chatAttachments} where ${chatAttachments.chat_entry_id} = ${chatEntries.id} and ${chatAttachments.type} = 'image') * 512), 0)`,
+            })
+            .from(chatEntries)
+            .innerJoin(
+                chatSwipes,
+                and(eq(chatSwipes.entry_id, chatEntries.id), eq(chatSwipes.active, true))
+            )
+            .leftJoin(swipeReasoning, eq(swipeReasoning.swipe_id, chatSwipes.id))
+            .where(historyWhere(chatId, options))
+            .get()!,
     chat: (chatId: number) => live.chat(chatId).sync(),
     chatRow: (chatId: number) =>
         database.query.chats.findFirst({ where: eq(chats.id, chatId) }).sync(),

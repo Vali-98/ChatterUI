@@ -21,9 +21,7 @@ import type { DataSource, DataSourceResult } from '../DataSources/types'
 import type { ContextStats } from '../generation/contextStatsState'
 
 export type MessageLoader = {
-    retrieve: (page: number) => Promise<ChatMessage[]> // must retrieve messages in chronological order from oldest to newest
-    pageSize: number // we use this to determine if a last page has been reached, if (await retrieve()).length < pageSize
-    initialPage: number // usually 0
+    loadOlder: (remainingTokens: number) => Promise<ChatMessage[]> // chronological order within each older batch
 }
 
 export type TokenCache = {
@@ -265,14 +263,15 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
     }
 
     if (messageLoader && completionState === 'initial_completed') {
-        let page = messageLoader.initialPage
+        let isLatestMessage = messages.length === 0
         while (true) {
-            let batch: ChatMessage[] | null = null
-
-            batch = await messageLoader.retrieve(page)
+            const batch = await messageLoader.loadOlder(
+                bypassContextLength ? Infinity : Math.max(0, maxLength - totalLength)
+            )
 
             for (let i = batch.length - 1; i >= 0; i--) {
-                const success = await processMessage(batch[i], -1, false)
+                const success = await processMessage(batch[i], -1, isLatestMessage)
+                isLatestMessage = false
                 if (!success) {
                     completionState = 'loader_truncated'
                     break
@@ -281,12 +280,10 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
 
             if (completionState === 'loader_truncated') break
 
-            if (batch.length < messageLoader.pageSize || batch.length === 0) {
+            if (batch.length === 0) {
                 completionState = 'loader_completed'
                 break
             }
-
-            page++
         }
     }
 

@@ -19,9 +19,11 @@ import {
     summaryCutoff,
     summaryMessage,
     summaryTranscript,
+    usableSummariesBefore,
 } from '@lib/summaries/history'
 import { useSummarySettingsStore, type SummarySettings } from '@lib/summaries/settingsStore'
 
+import { generationHistoryCutoff } from '../generation/history'
 import { buildAndSendRequest, type CompletionReason } from '../API/APIBuilder'
 import { buildContext } from '../API/ContextBuilder'
 import { isDeferredTaskActive, useDeferredTaskState } from '../generation/deferredState'
@@ -108,6 +110,7 @@ export const generateSummary = (
         captureGenerationInputs(chatId, useAppModeStore.getState().appMode, {
             includeDataSources: false,
             includeSummaries: false,
+            history: 'full',
         })
     const summaries = summaryList(chatId).all()
     const unresolved = summaries.find((summary) => summary.status === 'draft')
@@ -224,6 +227,7 @@ const runSummary = async (
             throw new Error('Draft no longer fits; regenerate it instead')
         const requestInputs: GenerationInputs = {
             ...inputs,
+            history: undefined,
             apiValues: inputs.apiValues
                 ? { ...inputs.apiValues, prefill: '', firstMessage: '' }
                 : undefined,
@@ -404,14 +408,20 @@ export const prepareAutomaticSummary = async (
             summaryTask(draft.id))
     )
         return
-    if (
-        !draft &&
-        !selectSummarySources(
-            Chats.db.query.chat(inputs.chatId)?.messages ?? inputs.messages,
-            summaries
-        ).length
-    )
-        return
+    if (!draft) {
+        const cutoff = inputs.history
+            ? generationHistoryCutoff(inputs.chatId, inputs.history, inputs.messages)
+            : undefined
+        const eligible = inputs.history
+            ? cutoff !== undefined &&
+              Chats.db.query.hasSummarySources(
+                  inputs.chatId,
+                  cutoff,
+                  usableSummariesBefore(cutoff, summaries)
+              )
+            : selectSummarySources(inputs.messages, summaries).length > 0
+        if (!eligible) return
+    }
     const stats = await estimateGenerationContext({ ...inputs, summaries })
     if (
         options.signal?.aborted ||

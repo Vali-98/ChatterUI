@@ -1,3 +1,8 @@
+import {
+    captureHistory,
+    createHistoryReader,
+    generationHistoryCutoff,
+} from '../lib/engine/generation/history'
 import { db as database } from '../db/db'
 import { migrateSwipeReasoning } from '../db/reasoningMigration'
 import { authorNotes, lorebookEntries, lorebooks } from '../db/schema'
@@ -18,6 +23,8 @@ import {
 } from '../lib/summaries/db'
 import { selectSummarySources } from '../lib/summaries/history'
 
+jest.mock('../lib/state/chat', () => ({ Chats: { db: require('../lib/state/chat/db').db } }))
+
 // Exercise the production Expo Drizzle adapter against real SQLite when Node provides it.
 // Action tests below this layer remain available on older Node releases.
 jest.mock('../db/db', () => {
@@ -26,8 +33,7 @@ jest.mock('../db/db', () => {
     const path = require('path')
     const schema = require('../db/schema')
     const sqlite = process.getBuiltinModule?.('node:sqlite') as
-        | typeof import('node:sqlite')
-        | undefined
+        typeof import('node:sqlite') | undefined
     let connection = sqlite
         ? new sqlite.DatabaseSync(':memory:', { enableDoubleQuotedStringLiterals: true })
         : undefined
@@ -739,5 +745,158 @@ describeSQLite('separate swipe reasoning', () => {
         expect(db.query.reasoning(swipeId)?.content).toBe('Original\n\nAdditional')
         migrateSwipeReasoning(database)
         expect(db.query.reasoning(swipeId)?.content).toBe('Original\n\nAdditional')
+    })
+})
+
+describeSQLite('paged inference history', () => {
+    beforeEach(() => {
+        useChatAccessState.setState({ leases: {} })
+        reset()
+    })
+    test('loads a bounded first batch and pages backward without admitting later entries', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: Array.from({ length: 130 }, (_, i) => message(`entry ${i}`)),
+        })
+        const captured = captureHistory(chatId, false)
+        expect(captured.messages).toHaveLength(2)
+        const last = captured.messages.at(-1)!
+        const newer = db.create.message(chatId, message('inserted after capture'))
+        const overridden = captured.messages.map((entry) =>
+            entry.id === last.id
+                ? { ...entry, swipes: [{ ...entry.swipes[0], swipe: 'continuation prefix' }] }
+                : entry
+        )
+        const reader = createHistoryReader({
+            chatId,
+            ...captured,
+            messages: overridden,
+            includeReasoning: false,
+            summaries: [],
+        })
+        const batches = []
+        for (let batch = reader.read(); batch.length; batch = reader.read()) batches.unshift(batch)
+        const entries = batches.flat()
+        expect(entries).toHaveLength(130)
+        expect(new Set(entries.map((entry) => entry.id)).size).toBe(130)
+        expect(entries.map((entry) => entry.id)).toEqual(
+            [...entries.map((entry) => entry.id)].sort((a, b) => a - b)
+        )
+        expect(entries.some((entry) => entry.id === newer.id)).toBe(false)
+        expect(entries.at(-1)!.swipes[0].swipe).toBe('continuation prefix')
+    })
+    test('substitutes accepted summaries while skipping their source rows and retaining metadata counts', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: Array.from({ length: 100 }, (_, i) => message(`entry ${i}`)),
+        })
+        const all = db.query.chat(chatId)!.messages
+        const draft = createSummaryDraft(chatId, all.slice(0, 80))
+        acceptSummary(draft.id, { content: 'Earlier facts' })
+        const summary = getSummary(draft.id)!
+        const reader = createHistoryReader({
+            chatId,
+            ...captureHistory(chatId, false),
+            includeReasoning: false,
+            summaries: [summary],
+        })
+        const page = reader.read()
+        expect(page).toHaveLength(21)
+        expect(page[0].id).toBe(-10_000 - summary.id)
+        expect(page.slice(1).map((entry) => entry.id)).toEqual(
+            all.slice(80).map((entry) => entry.id)
+        )
+        expect(reader.summaryTokens[page[0].id].summarizedMessages).toBe(80)
+        expect(reader.read()).toEqual([])
+        expect(db.query.hasSummarySources(chatId, summary.end_entry_id, [summary])).toBe(false)
+        expect(db.query.hasSummarySources(chatId, all[90].id, [summary])).toBe(true)
+    })
+    test('cached lengths size body reads to the available budget', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: Array.from({ length: 100 }, (_, i) => ({
+                ...message(`entry ${i}`),
+                swipes: [{ swipe: `entry ${i}`, active: true, token_length: 1000 }],
+            })),
+        })
+        const captured = captureHistory(chatId, false)
+        const reader = createHistoryReader({
+            chatId,
+            ...captured,
+            includeReasoning: false,
+            summaries: [],
+        })
+        const first = reader.read(1500)
+        expect(first).toHaveLength(2)
+        expect(captured.history.snapshots.size).toBe(2)
+        expect(reader.read(500)).toHaveLength(1)
+        expect(captured.history.snapshots.size).toBe(3)
+    })
+    test('budget hints charge summary text rather than covered swipes and never fetch their bodies', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: Array.from({ length: 100 }, (_, i) => ({
+                ...message('abcd'),
+                swipes: [{ swipe: 'abcd', active: true, token_length: i < 80 ? 1000 : null }],
+            })),
+        })
+        const all = db.query.chat(chatId)!.messages
+        const draft = createSummaryDraft(chatId, all.slice(0, 80))
+        acceptSummary(draft.id, { content: 'Short memory.' })
+        const summary = getSummary(draft.id)!
+        const captured = captureHistory(chatId, false)
+        const reader = createHistoryReader({
+            chatId,
+            ...captured,
+            includeReasoning: false,
+            summaries: [summary],
+        })
+        const page = reader.read(40)
+        expect(page).toHaveLength(21)
+        expect(page[0].id).toBe(-10_000 - summary.id)
+        expect(
+            [...captured.history.snapshots.keys()].every((id) => id > summary.end_entry_id)
+        ).toBe(true)
+        expect(reader.read(40)).toEqual([])
+    })
+    test('clearing a regenerated response preserves the second-latest completed-response cutoff', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [message('one'), message('two'), message('three')],
+        })
+        const captured = captureHistory(chatId, false)
+        const last = captured.messages.at(-1)!
+        const messages = captured.messages.map((entry) =>
+            entry.id === last.id ? { ...entry, swipes: [{ ...entry.swipes[0], swipe: '' }] } : entry
+        )
+        expect(generationHistoryCutoff(chatId, captured.history, messages)).toBe(
+            db.query.chat(chatId)!.messages[0].id
+        )
+    })
+    test('history pages select only the active swipe and include reasoning only when requested', () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: [
+                {
+                    ...message('answer'),
+                    swipes: [
+                        { swipe: 'inactive', active: false },
+                        {
+                            swipe: 'answer',
+                            active: true,
+                            reasoning: { content: 'private thought' },
+                        },
+                    ],
+                },
+            ],
+        })
+        const page = db.live.historyPage(chatId, { limit: 32 }).sync()
+        expect(page[0].swipes).toHaveLength(1)
+        expect(page[0].swipes[0].swipe).toBe('answer')
+        expect(page[0].swipes[0].reasoning).toBeUndefined()
+        const withReasoning = db.live
+            .historyPage(chatId, { limit: 32, includeReasoning: true })
+            .sync()
+        expect(withReasoning[0].swipes[0].reasoning?.content).toBe('private thought')
     })
 })

@@ -27,6 +27,7 @@ import {
     useGenerationState,
 } from './generation/state'
 import { localInference, verifyModelLoaded } from './LocalInference'
+import { captureHistory } from './generation/history'
 import { prepareAutomaticSummary } from './summaries/actions'
 
 const beginGeneration = (swipeId: number, text = '', reasoning = '') => {
@@ -99,9 +100,9 @@ export async function submitMessage(chatId: number, input: SubmitMessageInput) {
             const swipe = message.swipes.find((item) => item.active)
             if (!swipe) throw new Error('New response has no active swipe')
             attachGenerationSwipe(generation.id, swipe.id)
-            inputs.messages =
-                Chats.db.live.chat(chatId, { includeReasoning: inputs.includeReasoning }).sync()
-                    ?.messages ?? []
+            const captured = captureHistory(chatId, inputs.includeReasoning)
+            inputs.messages = captured.messages
+            inputs.history = captured.history
             getGenerationRuntime(generation.id).inputs = inputs
             void startGenerationTask(generation.id).catch(Logger.stackTrace)
         })

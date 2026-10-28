@@ -14,10 +14,16 @@ import {
 import { getCurrentSampler } from '@lib/state/samplerStore'
 import { mmkv } from '@lib/storage/MMKV'
 import { summaryList } from '@lib/summaries/db'
-import { summarizeHistory } from '@lib/summaries/history'
+import { summarizeHistory, usableSummariesBefore } from '@lib/summaries/history'
 import { useSummarySettingsStore } from '@lib/summaries/settingsStore'
 import { applyMacros, createMacroValues } from '@lib/utils/Macros'
 
+import {
+    captureHistory,
+    createHistoryReader,
+    generationHistoryCutoff,
+    type GenerationHistory,
+} from './history'
 import { recordContextStats } from './contextStatsState'
 import { useConnectionStore } from '../API/connectionStore'
 import { collectContext } from '../API/ContextBuilder'
@@ -37,11 +43,12 @@ const copyInputs = <T>(value: T): T => {
     return value
 }
 
-// All selection/configuration reads happen synchronously, before preparation awaits anything.
+// Capture selections/configuration and the history boundary before preparation awaits anything.
+// Older messages are fetched in bounded batches while building context.
 export const captureGenerationInputs = (
     chatId: number,
     mode: 'remote' | 'local',
-    options: { includeDataSources?: boolean; includeSummaries?: boolean } = {}
+    options: { includeDataSources?: boolean; includeSummaries?: boolean; history?: 'full' } = {}
 ) => {
     const connectionState = useConnectionStore.getState()
     const connection = connectionState.connections.find(
@@ -58,8 +65,15 @@ export const captureGenerationInputs = (
     const includeReasoning =
         !rawInstruct.hide_think_tags &&
         (mode === 'local' || template?.request.completionType.type === 'textCompletions')
-    const chat = Chats.db.live.chat(chatId, { includeReasoning }).sync()
+    const chat = Chats.db.query.chatRow(chatId)
     if (!chat) throw new Error('Chat no longer exists')
+    const captured =
+        options.history === 'full'
+            ? {
+                  messages: Chats.db.live.chat(chatId, { includeReasoning }).sync()?.messages ?? [],
+                  history: undefined as GenerationHistory | undefined,
+              }
+            : captureHistory(chatId, includeReasoning)
     const character = Characters.db.live.card(chat.character_id).sync()
     const user = Characters.useUserStore.getState().card
     if (!character || !user) throw new Error('Generation requires a character and user card')
@@ -125,7 +139,8 @@ export const captureGenerationInputs = (
         mode: mode,
         character: copyInputs(character),
         user: copyInputs(user),
-        messages: copyInputs(chat.messages) as ChatMessage[],
+        messages: copyInputs(captured.messages) as ChatMessage[],
+        history: captured.history,
         instruct: instruct,
         macros: macros,
         samplers: copyInputs(getCurrentSampler()),
@@ -150,7 +165,7 @@ export type GenerationInputs = ReturnType<typeof captureGenerationInputs>
 
 export const prepareGenerationContext = async (
     inputs: GenerationInputs,
-    options: { recordStats?: boolean } = {}
+    options: { recordStats?: boolean; loadHistory?: boolean } = {}
 ) => {
     const { character, user, tokenizer, instruct, macros } = inputs
     const [characterCounts, userCounts] = await Promise.all([
@@ -176,9 +191,42 @@ export const prepareGenerationContext = async (
         output_suffix_length: await tokenizer(instruct.output_suffix),
         user_alignment_message_length: await tokenizer(instruct.user_alignment_message),
     }
-    const history = summarizeHistory(inputs.messages, inputs.summaries ?? [])
-    const summaryTokens: Record<number, { summarizedMessages: number; rawHistory: number }> = {}
-    for (const summary of inputs.summaries ?? []) {
+    const textMode =
+        inputs.mode === 'local'
+            ? !inputs.useModelTemplate
+            : inputs.apiConfig?.request.completionType.type === 'textCompletions'
+    const reader =
+        options.loadHistory !== false && inputs.history
+            ? createHistoryReader({
+                  chatId: inputs.chatId,
+                  history: inputs.history,
+                  messages: inputs.messages,
+                  includeReasoning: inputs.includeReasoning,
+                  summaries: inputs.summaries ?? [],
+                  estimateOverhead: (hint) =>
+                      (hint.id >= 0 && instruct.names ? hint.nameTokens : 0) +
+                      (hint.id >= 0 && instruct.timestamp ? 10 : 0) +
+                      (textMode
+                          ? hint.is_user
+                              ? instructCache.input_prefix_length +
+                                instructCache.input_suffix_length
+                              : instructCache.output_prefix_length +
+                                instructCache.output_suffix_length
+                          : 0),
+              })
+            : undefined
+    const history = reader
+        ? []
+        : summarizeHistory(
+              inputs.messages,
+              inputs.summaries ?? [],
+              inputs.history
+                  ? generationHistoryCutoff(inputs.chatId, inputs.history, inputs.messages)
+                  : undefined
+          )
+    const summaryTokens: Record<number, { summarizedMessages: number; rawHistory: number }> =
+        reader?.summaryTokens ?? {}
+    for (const summary of reader ? [] : (inputs.summaries ?? [])) {
         const id = -10_000 - summary.id
         if (!history.some((message) => message.id === id)) continue
         const sources = inputs.messages.filter(
@@ -210,6 +258,12 @@ export const prepareGenerationContext = async (
         textFilter: inputs.textFilter,
         bypassContextLength: inputs.bypassContextLength,
         messages: copyInputs(history),
+        messageLoader: reader
+            ? {
+                  loadOlder: async (remainingTokens: number) =>
+                      copyInputs(reader.read(remainingTokens)),
+              }
+            : undefined,
         tokenizer: tokenizer,
         includeInlineReasoning: inputs.mode === 'local',
         chatTokenizer: (message: ChatMessage) =>
@@ -237,7 +291,7 @@ export const estimateGenerationContext = async (inputs: GenerationInputs) => {
     const estimate = (text: string) => Math.ceil(text.length / 4)
     const context = await prepareGenerationContext(
         { ...inputs, tokenizer: async (text) => estimate(text), dataSources: Promise.resolve([]) },
-        { recordStats: false }
+        { recordStats: false, loadHistory: false }
     )
     const sources = await inputs.dataSources
     const capacity = Math.max(0, generationContextLimit(inputs) - inputs.samplers.genamt)
@@ -277,9 +331,40 @@ export const estimateGenerationContext = async (inputs: GenerationInputs) => {
                 512,
         0
     )
+    // Only aggregate old cached lengths; preflight must not materialize old text or media.
+    const older = inputs.history
+        ? Chats.db.query.historyStats(inputs.chatId, {
+              throughId: inputs.history.throughId,
+              beforeId: inputs.messages[0]?.id,
+              includeReasoning: inputs.includeReasoning,
+              excludeRanges: usableSummariesBefore(
+                  generationHistoryCutoff(inputs.chatId, inputs.history, inputs.messages),
+                  inputs.summaries ?? []
+              ),
+          })
+        : undefined
+    const textMode =
+        inputs.mode === 'local'
+            ? !inputs.useModelTemplate
+            : inputs.apiConfig?.request.completionType.type === 'textCompletions'
+    const olderTokens = older
+        ? older.tokens +
+          older.imageTokens +
+          (inputs.instruct.names ? older.nameTokens : 0) +
+          (inputs.instruct.timestamp ? older.messageCount * 10 : 0) +
+          (textMode
+              ? older.userCount *
+                    (context.cache.instructCache.input_prefix_length +
+                        context.cache.instructCache.input_suffix_length) +
+                (older.messageCount - older.userCount) *
+                    (context.cache.instructCache.output_prefix_length +
+                        context.cache.instructCache.output_suffix_length)
+              : 0)
+        : 0
     return {
         total:
             total +
+            olderTokens +
             imageTokens +
             sources.reduce((sum, source) => sum + Math.max(0, source.tokenBudget), 0),
         capacity,

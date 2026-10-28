@@ -110,12 +110,16 @@ jest.mock('../lib/state/chat', () => ({
     Chats: {
         db: {
             query: {
+                historyCutoff: () => undefined,
                 swipe: jest.fn(),
                 reasoning: jest.fn(),
                 swipeContext: (id: number) => ({ chat_id: id === 31 ? 10 : 11 }),
                 chatName: jest.fn(() => 'Named chat'),
             },
-            live: { chat: () => ({ sync: () => ({ messages: [] }) }) },
+            live: {
+                chat: () => ({ sync: () => ({ messages: [] }) }),
+                historyPage: () => ({ sync: () => [] }),
+            },
             update: { swipe: jest.fn(), chat: jest.fn() },
         },
         actions: {

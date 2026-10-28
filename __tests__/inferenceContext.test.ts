@@ -376,3 +376,45 @@ test.each([
         })
     }
 )
+
+test('paged history matches full history and stops fetching as soon as context is full', async () => {
+    const params = parameters()
+    const all = ['a', 'b', 'c', 'd'].map((text, index) => message(text, index + 1))
+    params.maxLength = 3
+    const full = await collectContext({ ...params, messages: all })
+    const loadOlder = jest.fn(async () => all.slice(0, 2))
+    const paged = await collectContext({
+        ...params,
+        messages: all.slice(2),
+        messageLoader: { loadOlder },
+    })
+    expect(paged.messages).toEqual(full.messages)
+    expect(paged.messages.map((entry) => entry.content)).toEqual(['b', 'c', 'd'])
+    expect(loadOlder).toHaveBeenCalledTimes(1)
+})
+
+test('the loader receives the actual remaining budget and can fill an underestimated window', async () => {
+    const params = parameters()
+    params.messages = []
+    params.maxLength = 3
+    const loadOlder = jest
+        .fn()
+        .mockResolvedValueOnce([message('d', 4)])
+        .mockResolvedValueOnce([message('c', 3)])
+        .mockResolvedValueOnce([message('b', 2)])
+        .mockResolvedValueOnce([message('a', 1)])
+    const result = await collectContext({ ...params, messageLoader: { loadOlder } })
+    expect(result.messages.map((entry) => entry.content)).toEqual(['b', 'c', 'd'])
+    expect(loadOlder.mock.calls).toEqual([[3], [2], [1], [0]])
+})
+
+test('a latest empty assistant placeholder is skipped when the first messages arrive through the loader', async () => {
+    const params = parameters()
+    params.messages = []
+    const loadOlder = jest
+        .fn()
+        .mockResolvedValueOnce([message('question', 1), { ...message('', 2), is_user: false }])
+        .mockResolvedValueOnce([])
+    const result = await collectContext({ ...params, messageLoader: { loadOlder } })
+    expect(result.messages.map((entry) => entry.content)).toEqual(['question'])
+})
