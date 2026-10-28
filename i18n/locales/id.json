@@ -376,7 +376,16 @@
             "share": "Bagikan",
             "select": "Memilih",
             "test": "Uji",
-            "tryAgain": "Coba Lagi"
+            "tryAgain": "Coba Lagi",
+            "next": "Berikutnya",
+            "skip": "Lewati",
+            "gotIt": "Mengerti",
+            "done": "Selesai",
+            "download": "Unduh",
+            "pause": "Jeda",
+            "resume": "Lanjutkan",
+            "clear": "Bersihkan",
+            "restart": "Mulai ulang"
         },
         "alert": {
             "unsaved": {
@@ -796,7 +805,9 @@
         "models": "Model",
         "sampler": "Sampler",
         "settings": "Pengaturan",
-        "tts": "TTS"
+        "tts": "TTS",
+        "dev_onboarding": "[DEV] Mulai ulang orientasi",
+        "dev_guides": "[DEV] Ulangi panduan antarmuka"
     },
     "sampler": {
         "alert": {
@@ -1199,5 +1210,93 @@
             "examples": "Character examples"
         },
         "summarySavings": "Estimated tokens saved by summaries: {{count}}"
+    },
+    "onboarding": {
+        "welcome": "Selamat datang di ChatterUI",
+        "tagline": "Obrolan Anda, perangkat Anda.",
+        "capabilities": "Model di perangkat · Server mandiri · Penyedia API",
+        "start": "Mulai",
+        "finish": "Mulai mengobrol",
+        "later": "Siapkan nanti",
+        "persona": "Sesuaikan profil Anda",
+        "personaDescription": "Pilih bagaimana Anda tampil dalam percakapan. Deskripsi Anda membantu karakter mengenal Anda.",
+        "description": "Deskripsi (opsional)",
+        "chooseAvatar": "Pilih avatar",
+        "personaLater": "Anda dapat mengubahnya nanti di Persona Pengguna.",
+        "mode": "Atur mode aplikasi",
+        "localDescription": "Jalankan model yang diunduh di perangkat Anda. Ukuran dan kecepatan model bergantung pada perangkat keras Anda.",
+        "remoteDescription": "Gunakan penyedia API atau model yang berjalan di komputer Anda sendiri.",
+        "modeLater": "Anda dapat beralih antara Lokal dan Jarak Jauh dari menu samping.",
+        "localSetup": "Dapatkan model",
+        "remoteSetup": "Tambahkan koneksi",
+        "connectionReady": "Siap terhubung",
+        "connectionReadyHint": "Anda dapat memilih model dan mengelola koneksi nanti di menu Koneksi.",
+        "providers": "Penyedia model",
+        "selfHosted": "Server mandiri",
+        "selfHostedDescription": "Hubungkan ke server yang kompatibel dengan OpenAI di komputer Anda sendiri.",
+        "otherApis": "API lainnya",
+        "models": {
+            "idle": "Masukkan detail koneksi untuk memuat model yang tersedia.",
+            "loading": "Memuat model…",
+            "ready": "Daftar model dimuat.",
+            "failed": "Tidak dapat memuat model. Periksa alamat dan kredensial, lalu coba lagi. Anda juga dapat memilih model nanti."
+        },
+        "connectionLater": "Anda dapat mengganti penyedia kapan saja di menu Koneksi.",
+        "appearance": "Pilih tema",
+        "appearanceLater": "Anda dapat mengubah tema dan tampilan obrolan nanti di Pengaturan → Tampilan.",
+        "ready": "Anda sudah siap",
+        "readyDescription": "Karakter bawaan akan dibuat agar Anda bisa mengobrol.\n\nAda yang keliru? Jangan khawatir.\nSemua pengaturan dapat diubah kapan saja.",
+        "namePlaceholder": "Pengguna",
+        "descriptionPlaceholder": "Sedikit tentang Anda…",
+        "addDescription": "Tambahkan deskripsi",
+        "showAll": "Tampilkan semua opsi",
+        "configured": "Sudah disiapkan",
+        "modelReady": "Siap digunakan",
+        "autoLoadHint": "Model Anda akan dimuat otomatis saat Anda mengirim pesan dalam mode lokal.",
+        "noRecommendations": "Rekomendasi model akan segera hadir. Anda dapat mengimpor atau menautkan model GGUF di bawah.",
+        "importInstead": "Impor model",
+        "linkInstead": "Tautkan model",
+        "importExplanation": "Salin ke ChatterUI.",
+        "linkExplanation": "Gunakan langsung dari penyimpanan.",
+        "downloadSection": "Unduh model",
+        "storageSection": "Gunakan model yang sudah Anda miliki"
+    },
+    "downloads": {
+        "fits": "Diperkirakan sesuai untuk perangkat Anda",
+        "large": "Mungkin menggunakan terlalu banyak memori",
+        "failed": "Unduhan gagal",
+        "restartHint": "Tidak dapat melanjutkan unduhan ini. Mulai ulang untuk mengunduhnya kembali.",
+        "badge": "Unduhan ({{count}})",
+        "status": {
+            "paused": "Dijeda",
+            "downloading": "Mengunduh",
+            "pausing": "Menjeda…",
+            "completed": "Selesai",
+            "failed": "Gagal"
+        }
+    },
+    "guides": {
+        "skip": "Lewati panduan",
+        "progress": "Langkah {{current}} dari {{total}}",
+        "main": {
+            "welcome": "Selamat datang di ChatterUI!\n\nMari kenali aplikasi ini sebentar.",
+            "characters": "Karakter Anda ada di sini. Pilih satu untuk memulai percakapan.\n\nAI Bot sudah disiapkan untuk Anda.",
+            "import": "Gunakan tombol ini untuk menambahkan atau mengimpor karakter.",
+            "menu": "Buka menu utama di sini untuk mengubah mode aplikasi dan mengelola pengaturan Anda."
+        },
+        "chat": {
+            "history": "Gunakan tombol-tombol ini untuk melihat riwayat obrolan atau memulai obrolan baru dengan karakter ini. Anda juga dapat mengusap ke kiri untuk membuka panel obrolan.",
+            "options": "Opsi obrolan Anda ada di sini, termasuk penggunaan konteks, catatan penulis, dan ringkasan."
+        },
+        "drawer": {
+            "persona": "Ketuk persona Anda di sini untuk mengubah nama, deskripsi, atau gambar.",
+            "options": "Inilah alat dan pengaturan aplikasi. Silakan jelajahi setelah panduan ini selesai!"
+        }
+    },
+    "background": {
+        "title": "ChatterUI sedang bekerja",
+        "description": "Pembuatan respons dan unduhan berlanjut di latar belakang",
+        "downloading": "Mengunduh ({{count}})",
+        "downloadHint": "Ketuk untuk melihat unduhan. Tugas aktif lainnya tetap berjalan."
     }
 }

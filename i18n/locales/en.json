@@ -376,7 +376,16 @@
             "share": "Share",
             "select": "Select",
             "test": "Test",
-            "tryAgain": "Try Again"
+            "tryAgain": "Try Again",
+            "next": "Next",
+            "skip": "Skip",
+            "gotIt": "Got it",
+            "done": "Done",
+            "download": "Download",
+            "pause": "Pause",
+            "resume": "Resume",
+            "clear": "Clear",
+            "restart": "Restart"
         },
         "alert": {
             "unsaved": {
@@ -796,7 +805,9 @@
         "models": "Models",
         "sampler": "Sampler",
         "settings": "Settings",
-        "tts": "TTS"
+        "tts": "TTS",
+        "dev_onboarding": "[DEV] Restart onboarding",
+        "dev_guides": "[DEV] Replay interface guides"
     },
     "sampler": {
         "alert": {
@@ -1199,5 +1210,93 @@
             "examples": "Character examples"
         },
         "summarySavings": "Estimated tokens saved by summaries: {{count}}"
+    },
+    "onboarding": {
+        "welcome": "Welcome to ChatterUI",
+        "tagline": "Your chats, your device.",
+        "capabilities": "On-device models · Self-hosted servers · API providers",
+        "start": "Get started",
+        "finish": "Start chatting",
+        "later": "Set up later",
+        "persona": "Make it yours",
+        "personaDescription": "Choose how you appear in conversations. Your description helps characters get to know you.",
+        "description": "Description (optional)",
+        "chooseAvatar": "Choose avatar",
+        "personaLater": "You can change this later in User Personas.",
+        "mode": "Set your app mode",
+        "localDescription": "Run downloaded models on your device. Model size and speed depend on your hardware.",
+        "remoteDescription": "Use an API provider or a model running on your own computer.",
+        "modeLater": "You can switch between Local and Remote from the side menu.",
+        "localSetup": "Get a model",
+        "remoteSetup": "Add a connection",
+        "connectionReady": "Ready to connect",
+        "connectionReadyHint": "You can choose a model and manage connections later in Connections.",
+        "providers": "Model providers",
+        "selfHosted": "Self-hosted",
+        "selfHostedDescription": "Connect to an OpenAI-compatible server on your own machine.",
+        "otherApis": "Other APIs",
+        "models": {
+            "idle": "Enter your connection details to load available models.",
+            "loading": "Loading models…",
+            "ready": "Model list loaded.",
+            "failed": "Could not load models. Check the address and credentials, then retry. You can also choose a model later."
+        },
+        "connectionLater": "You can change providers any time in the Connections menu.",
+        "appearance": "Choose a theme",
+        "appearanceLater": "You can change themes and chat styling later in Settings → Appearance.",
+        "ready": "You’re ready",
+        "readyDescription": "A default character will be generated for you to chat with.\n\n Made a mistake? Don't worry.\nAll settings can be changed anytime.",
+        "namePlaceholder": "User",
+        "descriptionPlaceholder": "A little about you…",
+        "addDescription": "Add description",
+        "showAll": "Show all options",
+        "configured": "Configured",
+        "modelReady": "Ready to go",
+        "autoLoadHint": "Your model will load automatically when you send a message in local mode.",
+        "noRecommendations": "Model recommendations are coming soon. You can import or link a GGUF model below.",
+        "importInstead": "Import model",
+        "linkInstead": "Link model",
+        "importExplanation": "Copy into ChatterUI.",
+        "linkExplanation": "Use directly from storage.",
+        "downloadSection": "Download a model",
+        "storageSection": "Use a model you already have"
+    },
+    "downloads": {
+        "fits": "Estimated to fit your device",
+        "large": "May use too much memory",
+        "failed": "Download failed",
+        "restartHint": "Could not resume this download. Restart to download it again.",
+        "badge": "Downloads ({{count}})",
+        "status": {
+            "paused": "Paused",
+            "downloading": "Downloading",
+            "pausing": "Pausing…",
+            "completed": "Complete",
+            "failed": "Failed"
+        }
+    },
+    "guides": {
+        "skip": "Skip Guide",
+        "progress": "Step {{current}} of {{total}}",
+        "main": {
+            "welcome": "Welcome to ChatterUI!\n\nLet me give you a quick tour.",
+            "characters": "Your characters live here. Choose one to start a conversation.\n\nAI Bot has already been prepared for you.",
+            "import": "Use this button to add or import characters.",
+            "menu": "Open the main menu here to change app mode and manage your setup."
+        },
+        "chat": {
+            "history": "Use these buttons to view chat history or start a new chat with this character. You can also swipe left to open the chat drawer.",
+            "options": "Your chat options are here, including context usage, author notes, and summaries."
+        },
+        "drawer": {
+            "persona": "Tap your persona here to change your name, description, or image.",
+            "options": "These are the app’s tools and settings. Feel free to explore once this guide is finished!"
+        }
+    },
+    "background": {
+        "title": "ChatterUI is working",
+        "description": "Generations and downloads continue in the background",
+        "downloading": "Downloading ({{count}})",
+        "downloadHint": "Tap to view downloads. Other active tasks continue."
     }
 }

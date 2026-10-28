@@ -6,6 +6,10 @@ import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
 
+import Drawer from '@components/views/Drawer'
+import { onboardingGuideIds } from '@lib/guides/definitions'
+import { useGuideState } from '@lib/guides/state'
+import { useOnboardingStore } from '@lib/onboarding/store'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useAppMode } from '@lib/state/AppMode'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -13,6 +17,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 type ButtonData = {
     name: string
     path: Href | ButtonData[]
+    onPress?: () => void
     icon?: AntDesignIconName
 }
 
@@ -36,7 +41,8 @@ const DrawerButton = ({ item, index }: DrawerButtonProps) => {
             <TouchableOpacity
                 style={styles.largeButton}
                 onPress={() => {
-                    if (typeof item.path === 'string') router.push(item.path)
+                    if (item.onPress) item.onPress()
+                    else if (typeof item.path === 'string') router.push(item.path)
                     else {
                         setExpanded(!expanded)
                     }
@@ -69,13 +75,35 @@ const RouteList = () => {
     const { t } = useTranslation()
     const [devMode] = useMMKVBoolean(AppSettings.DevMode)
     const { appMode } = useAppMode()
+    const router = useRouter()
+    const replayGuides = useGuideState((state) => state.replay)
+    const restartOnboarding = useOnboardingStore((state) => state.restart)
+    const setShow = Drawer.useDrawerStore((state) => state.setShow)
+    const forceOnboarding = () => {
+        setShow(Drawer.ID.SETTINGS, false)
+        setShow(Drawer.ID.CHATLIST, false)
+        restartOnboarding()
+        if (router.canDismiss()) router.dismissAll()
+        router.replace('/')
+    }
+    const forceGuides = () => {
+        setShow(Drawer.ID.SETTINGS, false)
+        setShow(Drawer.ID.CHATLIST, false)
+        replayGuides(onboardingGuideIds)
+        if (router.canDismiss()) router.dismissAll()
+        router.replace('/')
+    }
     const paths = getPaths(appMode === 'remote', t)
     return (
         <FlatList
             showsVerticalScrollIndicator={false}
-            data={__DEV__ || devMode ? [...paths, ...paths_dev(t)] : paths}
+            data={
+                __DEV__ || devMode
+                    ? [...paths, ...paths_dev(t, forceOnboarding, forceGuides)]
+                    : paths
+            }
             renderItem={({ item, index }) => <DrawerButton item={item} index={index} />}
-            keyExtractor={(item) => item.path.toString()}
+            keyExtractor={(item) => `${item.path}:${item.name}`}
         />
     )
 }
@@ -161,7 +189,13 @@ const getPaths = (remote: boolean, t: (input: string) => string): ButtonData[] =
     },
 ]
 
-const paths_dev = (t: any): ButtonData[] => [
+const paths_dev = (
+    t: (key: string) => string,
+    forceOnboarding: () => void,
+    forceGuides: () => void
+): ButtonData[] => [
+    { name: t('navigation.dev_guides'), path: '/', icon: 'bulb', onPress: forceGuides },
+    { name: t('navigation.dev_onboarding'), path: '/', icon: 'rocket', onPress: forceOnboarding },
     /*{
         name: '[DEV] HF',
         path: '/HFTest',

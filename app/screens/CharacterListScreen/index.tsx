@@ -1,5 +1,7 @@
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import { View } from 'react-native'
+
 import Drawer from '@components/views/Drawer'
 
 import CharacterList from './CharacterList'
@@ -17,7 +19,9 @@ const CharacterListScreen = () => {
                     flex: 1,
                     flexDirection: 'row',
                 }}>
-                <CharacterList />
+                <View style={{ flex: 1 }}>
+                    <CharacterList />
+                </View>
                 <SettingsDrawer />
             </SafeAreaView>
         </Drawer.Gesture>

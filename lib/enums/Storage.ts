@@ -1,4 +1,7 @@
 export enum Storage {
+    Downloads = 'downloads',
+    Onboarding = 'onboarding',
+    Guides = 'guides',
     API = 'api-storage',
     EngineData = 'enginedata-storage',
     KV = 'kvdata-storage',

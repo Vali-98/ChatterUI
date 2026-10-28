@@ -5,6 +5,7 @@ import Animated, { Easing, SlideInLeft, SlideOutLeft } from 'react-native-reanim
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
+import DownloadList from '@components/downloads/DownloadList'
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import SectionTitle from '@components/text/SectionTitle'
 import HeaderButton from '@components/views/HeaderButton'
@@ -116,6 +117,7 @@ const ModelManagerScreen = () => {
                         keyExtractor={(item) => item.id.toString()}
                         removeClippedSubviews={false}
                         showsVerticalScrollIndicator={false}
+                        ListHeaderComponent={<DownloadList />}
                         ListEmptyComponent={() => <ModelEmpty />}
                     />
                 </Animated.View>

@@ -1,18 +1,19 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
-import { SplashScreen } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { SplashScreen, Stack } from 'expo-router'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { db } from '@db/db'
+import { prepareOnboarding, useOnboardingStore } from '@lib/onboarding/store'
 import useLocalAuth from '@lib/hooks/LocalAuth'
 import { Theme } from '@lib/theme/ThemeManager'
 import { loadChatOnInit, startupApp, useTextIntentFocus } from '@lib/utils/Startup'
 import CharacterList from '@screens/CharacterListScreen'
-// import OnboardingScreen from '@screens/OnboardingScreen'
+import OnboardingScreen from '@screens/OnboardingScreen'
 
 import migrations from '../db/migrations/migrations'
 
@@ -21,14 +22,24 @@ const useStartupRoutine = () => {
     const [ready, setReady] = useState(false)
     const [startupError, setStartupError] = useState<Error>()
     const { authorized, retry } = useLocalAuth()
+    const onboardingStatus = useOnboardingStore((state) => state.status)
+    const onboardingStep = useOnboardingStore((state) => state.step)
+    const initialChatHandled = useRef(false)
 
     useTextIntentFocus()
 
     useEffect(() => {
-        if (authorized && ready) {
-            loadChatOnInit()
-        }
-    }, [authorized, ready])
+        if (!authorized || !ready || initialChatHandled.current) return
+        initialChatHandled.current = true
+        if (onboardingStatus === 'complete') void loadChatOnInit()
+    }, [authorized, ready, onboardingStatus])
+
+    useEffect(() => {
+        if (!ready) return
+        // Welcome hides the native splash only after its matching black overlay is painted.
+        if (authorized && onboardingStatus === 'inProgress' && onboardingStep === 0) return
+        void SplashScreen.hideAsync()
+    }, [ready, authorized, onboardingStatus, onboardingStep])
 
     useEffect(() => {
         /**
@@ -38,15 +49,16 @@ const useStartupRoutine = () => {
          */
         if (success) {
             let active = true
-            void startupApp()
+            void prepareOnboarding()
+                .then(() => startupApp())
                 .then(() => {
                     if (active) setReady(true)
                 })
                 .catch((error) => {
+                    void SplashScreen.hideAsync()
                     if (active)
                         setStartupError(error instanceof Error ? error : new Error(String(error)))
                 })
-                .finally(() => SplashScreen.hideAsync())
             return () => {
                 active = false
             }
@@ -67,6 +79,7 @@ const Home = () => {
     const styles = useStyles()
     const { authorized, retry, error, success } = useStartupRoutine()
     const { t } = useTranslation()
+    const onboardingStatus = useOnboardingStore((state) => state.status)
     if (error)
         return (
             <View style={styles.centeredContainer}>
@@ -104,8 +117,14 @@ const Home = () => {
             </View>
         )
 
-    //return <OnboardingScreen />
-    if (success) return <CharacterList />
+    if (success && onboardingStatus === 'inProgress') return <OnboardingScreen />
+    if (success)
+        return (
+            <>
+                <Stack.Screen options={{ headerShown: true }} />
+                <CharacterList />
+            </>
+        )
     return <HeaderTitle />
 }
 

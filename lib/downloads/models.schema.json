@@ -1,0 +1,42 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "$schema": { "type": "string" },
+        "models": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "downloadUrl",
+                    "filename",
+                    "sizeBytes",
+                    "estimatedRuntimeBytes",
+                    "contextLength",
+                    "tags"
+                ],
+                "properties": {
+                    "id": { "type": "string", "description": "Stable catalog identifier." },
+                    "name": { "type": "string" },
+                    "description": { "type": "string" },
+                    "downloadUrl": { "type": "string", "format": "uri" },
+                    "filename": { "type": "string", "pattern": "^[^/\\\\]+\\.gguf$" },
+                    "sizeBytes": { "type": "integer", "minimum": 0 },
+                    "estimatedRuntimeBytes": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "description": "Estimated total RAM for the model plus context at contextLength. Zero means unknown. Compared with 60% of device RAM as advice, not a download restriction."
+                    },
+                    "contextLength": { "type": "integer", "minimum": 1 },
+                    "tags": { "type": "array", "items": { "type": "string" } }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "required": ["models"],
+    "additionalProperties": false
+}

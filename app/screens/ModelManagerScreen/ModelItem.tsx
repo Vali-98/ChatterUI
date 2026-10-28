@@ -139,7 +139,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
             <ListButtonSection style={{ flex: 1 }}>
                 <TouchableOpacity
                     onPress={() => setShowInfo(!showInfo)}
-                    style={{ paddingVertical: 12 }}>
+                    style={{ paddingVertical: 18 }}>
                     <Text style={styles.title}>{item.name}</Text>
 
                     {showInfo && !isInvalid && (

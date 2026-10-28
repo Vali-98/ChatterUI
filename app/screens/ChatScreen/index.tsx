@@ -6,6 +6,8 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
+import GuideHost from '@components/guides/GuideHost'
+import GuideTarget from '@components/guides/GuideTarget'
 import ThemedButton from '@components/buttons/ThemedButton'
 import AvatarViewer from '@components/views/AvatarViewer'
 import Drawer from '@components/views/Drawer'
@@ -85,7 +87,9 @@ const ChatScreen = () => {
     const renderHeaderButtonRight = () => {
         return (
             !showSettings && (
-                <>
+                <GuideTarget
+                    id="chat.history"
+                    style={{ flexDirection: 'row', alignItems: 'center' }}>
                     {!showChats ? (
                         <ThemedButton
                             buttonStyle={{
@@ -108,7 +112,7 @@ const ChatScreen = () => {
                         />
                     )}
                     <Drawer.Button drawerID={Drawer.ID.CHATLIST} openIcon="message" />
-                </>
+                </GuideTarget>
             )
         )
     }
@@ -134,6 +138,10 @@ const ChatScreen = () => {
             <View style={{ flex: 1, paddingBottom: insets.bottom + 4 }}>
                 <Animated.View style={animatedStyle}>
                     <HeaderTitle />
+                    <GuideHost
+                        id="chat-ui"
+                        enabled={!showSettings && !showChats && typeof chatId === 'number'}
+                    />
                     <HeaderButton
                         headerLeft={renderHeaderButtonLeft}
                         headerRight={renderHeaderButtonRight}

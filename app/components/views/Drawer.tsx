@@ -19,6 +19,7 @@ import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton, { ThemedButtonProps } from '@components/buttons/ThemedButton'
+import { useGuideState } from '@lib/guides/state'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import FadeBackrop from './FadeBackdrop'
@@ -150,6 +151,7 @@ namespace Drawer {
     }
 
     export const Gesture: React.FC<DrawerGestureProps> = ({ config, ...rest }) => {
+        const guideActive = useGuideState((state) => !!state.active)
         const { setShowDrawer, values } = Drawer.useDrawerStore(
             useShallow((state) => ({
                 setShowDrawer: state.setShow,
@@ -168,7 +170,7 @@ namespace Drawer {
                         setShowDrawer(item.drawerID, false)
                     })
                     .runOnJS(true)
-                    .enabled(values?.[item.drawerID])
+                    .enabled(!guideActive && !!values?.[item.drawerID])
             )
 
             gestures.push(
@@ -178,7 +180,7 @@ namespace Drawer {
                         setShowDrawer(item.drawerID, true)
                     })
                     .runOnJS(true)
-                    .enabled(!drawerShown)
+                    .enabled(!guideActive && !drawerShown)
             )
         })
         const gesture = GS.Simultaneous(...gestures)

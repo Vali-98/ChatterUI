@@ -4,6 +4,8 @@ import { View } from 'react-native'
 import Animated, { LinearTransition } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
+import GuideHost from '@components/guides/GuideHost'
+import GuideTarget from '@components/guides/GuideTarget'
 import Drawer from '@components/views/Drawer'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
@@ -78,21 +80,29 @@ const CharacterList: React.FC = () => {
     }, [data])
 
     // do not render when not shown, optimizes some rerenders
+    const settingsOpen = Drawer.useDrawerStore((state) => !!state.values[Drawer.ID.SETTINGS])
     const path = usePathname()
     if (path !== '/') return
 
     return (
         <View style={{ flex: 1, paddingTop: 8 }}>
+            <GuideHost id="main-ui" enabled={!settingsOpen} />
             <HeaderTitle />
             <HeaderButton
-                headerLeft={() => <Drawer.Button drawerID={Drawer.ID.SETTINGS} />}
+                headerLeft={() => (
+                    <GuideTarget id="main.menu">
+                        <Drawer.Button drawerID={Drawer.ID.SETTINGS} />
+                    </GuideTarget>
+                )}
                 headerRight={() => (
-                    <CharacterNewMenu isLoading={isLoading} setIsLoading={setIsLoading} />
+                    <GuideTarget id="main.import">
+                        <CharacterNewMenu isLoading={isLoading} setIsLoading={setIsLoading} />
+                    </GuideTarget>
                 )}
             />
 
             <CharacterListHeader resultLength={characterList.length} />
-            <View style={{ flex: 1 }}>
+            <GuideTarget id="main.characters" style={{ flex: 1 }}>
                 <Animated.FlatList
                     layout={LinearTransition}
                     itemLayoutAnimation={LinearTransition}
@@ -122,7 +132,7 @@ const CharacterList: React.FC = () => {
                     }}
                     ListEmptyComponent={() => data.length === 0 && updatedAt && <CharactersEmpty />}
                 />
-            </View>
+            </GuideTarget>
 
             {characterList.length === 0 && data.length !== 0 && updatedAt && (
                 <CharactersSearchEmpty />

@@ -3,6 +3,8 @@ import { Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 import appConfig from '@appconfig'
+import GuideHost from '@components/guides/GuideHost'
+import GuideTarget from '@components/guides/GuideTarget'
 import SupportButton from '@components/buttons/SupportButton'
 import Drawer from '@components/views/Drawer'
 import { AppSettings } from '@lib/constants/GlobalValues'
@@ -24,9 +26,14 @@ const SettingsDrawer = () => {
                 width: '60%',
                 paddingBottom: spacing.xl,
             }}>
-            <UserInfo />
+            <GuideHost id="main-drawer" />
+            <GuideTarget id="drawer.persona">
+                <UserInfo />
+            </GuideTarget>
             <AppModeToggle />
-            <RouteList />
+            <GuideTarget id="drawer.options" style={{ flex: 1 }}>
+                <RouteList />
+            </GuideTarget>
             <Text
                 style={{
                     alignSelf: 'center',

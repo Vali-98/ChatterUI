@@ -1,8 +1,7 @@
-import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useTranslation } from 'react-i18next'
-import { Linking, Pressable, ScrollView, Text, View } from 'react-native'
+import { Linking, View } from 'react-native'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import ThemePalettePicker from './ThemePalettePicker'
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import TText from '@components/text/TText'
@@ -128,102 +127,12 @@ const ThemePicker = ({
                     style={{ flex: 0 }}
                 />
             )}
-            <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ columnGap: 10 }}>
-                {[...DefaultColorSchemes.schemes, ...state.customColors].map((theme, index) => {
-                    const active = selected.name === theme.name
-                    const custom = index >= DefaultColorSchemes.schemes.length
-                    return (
-                        <View
-                            key={theme.name}
-                            style={{
-                                width: 148,
-                                borderRadius: 12,
-                                overflow: 'hidden',
-                                borderWidth: 2,
-                                borderColor: active ? theme.primary._500 : theme.neutral._300,
-                                backgroundColor: theme.neutral._100,
-                            }}>
-                            <Pressable
-                                onPress={() => select(theme)}
-                                accessibilityRole="button"
-                                accessibilityLabel={theme.name}
-                                accessibilityState={{ selected: active }}
-                                style={{ padding: 12, rowGap: 12 }}>
-                                <View
-                                    style={{
-                                        flexDirection: 'row',
-                                        height: 30,
-                                        borderRadius: 6,
-                                        overflow: 'hidden',
-                                    }}>
-                                    {[theme.primary._500, theme.neutral._300].map(
-                                        (backgroundColor, i) => (
-                                            <View
-                                                key={i}
-                                                style={{
-                                                    flex: 1,
-                                                    backgroundColor: backgroundColor,
-                                                }}
-                                            />
-                                        )
-                                    )}
-                                </View>
-                                <View
-                                    style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        columnGap: 6,
-                                    }}>
-                                    <Text
-                                        numberOfLines={2}
-                                        style={{ flex: 1, color: theme.text._100 }}>
-                                        {theme.name}
-                                    </Text>
-                                    {active && (
-                                        <AntDesign
-                                            name="check-circle"
-                                            size={16}
-                                            color={theme.primary._500}
-                                        />
-                                    )}
-                                </View>
-                            </Pressable>
-                            <View
-                                style={{
-                                    paddingHorizontal: 12,
-                                    paddingBottom: 8,
-                                    minHeight: 30,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                }}>
-                                <Text style={{ color: theme.text._500, fontSize: 11 }}>
-                                    {t(
-                                        custom
-                                            ? 'settings.colors.custom'
-                                            : 'settings.colors.builtIn'
-                                    )}
-                                </Text>
-                                {custom && (
-                                    <ThemedButton
-                                        iconName="delete"
-                                        variant="tertiary"
-                                        iconSize={16}
-                                        iconStyle={{ color: theme.error._400 }}
-                                        accessibilityLabel={t(
-                                            'settings.colors.alert.deleteTheme.confirm'
-                                        )}
-                                        onPress={() => remove(theme)}
-                                    />
-                                )}
-                            </View>
-                        </View>
-                    )
-                })}
-            </ScrollView>
+            <ThemePalettePicker
+                themes={[...DefaultColorSchemes.schemes, ...state.customColors]}
+                selected={selected}
+                onSelect={select}
+                onRemove={remove}
+            />
             <InputSheet
                 ref={inputRef}
                 title={t('settings.colors.pasteThemeTitle')}

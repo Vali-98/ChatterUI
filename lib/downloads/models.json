@@ -1,0 +1,20 @@
+{
+    "$schema": "./models.schema.json",
+    "models": [
+        {
+            "id": "qwen3-0.6b-q4-k-m",
+            "name": "Qwen3 0.6B",
+            "description": "A small general-purpose model for lightweight chats.",
+            "downloadUrl": "https://huggingface.co/unsloth/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf",
+            "filename": "Qwen3-0.6B-Q4_K_M.gguf",
+            "sizeBytes": 397000000,
+            "estimatedRuntimeBytes": 0,
+            "contextLength": 4096,
+            "tags": [
+                "0.6B",
+                "Q4_K_M",
+                "Small"
+            ]
+        }
+    ]
+}

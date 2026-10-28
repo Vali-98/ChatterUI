@@ -38,6 +38,8 @@ export interface APIFeatures {
     usePrefill: boolean
     useFirstMessage: boolean
     useKey: boolean
+    // A key is optional unless explicitly required.
+    keyRequired?: boolean
     useModel: boolean
     multipleModels: boolean
 }

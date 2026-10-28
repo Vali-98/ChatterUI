@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 
+import GuideTarget from '@components/guides/GuideTarget'
 import ContextMenu from '@components/views/ContextMenu'
 import Drawer from '@components/views/Drawer'
 import { Chats } from '@lib/state/chat'
@@ -34,13 +35,15 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
 
     return (
         <ContextMenu disabled={disabled} placement="top">
-            <ContextMenu.Trigger>
-                <AntDesign
-                    name="caret-up"
-                    style={[styles.optionsButton, { opacity: disabled ? 0.5 : 1 }]}
-                    size={24}
-                />
-            </ContextMenu.Trigger>
+            <GuideTarget id="chat.options">
+                <ContextMenu.Trigger>
+                    <AntDesign
+                        name="caret-up"
+                        style={[styles.optionsButton, { opacity: disabled ? 0.5 : 1 }]}
+                        size={24}
+                    />
+                </ContextMenu.Trigger>
+            </GuideTarget>
             <ContextMenu.Body>
                 <View style={{ width: optionsWidth, alignSelf: 'flex-start' }}>
                     <ChatTokenCount />

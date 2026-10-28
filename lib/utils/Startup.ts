@@ -8,8 +8,10 @@ import { setBackgroundColorAsync as setUIBackgroundColor } from 'expo-system-ui'
 import { z } from 'zod'
 
 import { migrateData } from '@db/dataMigrations'
+import { observeModelDownloads } from '@lib/downloads/models'
 import { Model } from '@lib/engine/Local/Model'
 import { Tokenizer } from '@lib/engine/Tokenizer'
+import { useOnboardingStore } from '@lib/onboarding/store'
 import { setupNotifications } from '@lib/notifications/Notifications'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { useChatInputTextStore } from '@lib/state/components/ChatInput'
@@ -43,7 +45,7 @@ export const loadChatOnInit = async () => {
 
 export const useTextIntentFocus = () => {
     return useTextIntentOnForeground(async (text) => {
-        if (!text) return
+        if (!text || useOnboardingStore.getState().status !== 'complete') return
         useChatInputTextStore.getState().setText(text)
         if (router.canDismiss()) router.dismissAll()
         router.push('/screens/ChatScreen')
@@ -247,7 +249,7 @@ export const startupApp = async () => {
     await generateDefaultDirectories()
     // The default card now imports directly from its bundled Expo asset.
     deleteFile(`${AppDirectory.Assets}aibot.png`)
-    setDefaultUser().catch(Logger.error)
+    await setDefaultUser()
     setDefaultInstruct()
 
     // setup notifications
@@ -271,6 +273,7 @@ export const startupApp = async () => {
 
     // Local Model Data in case external models are deleted
     Model.verifyModelList()
+    observeModelDownloads()
     Tokenizer.useTokenizerState.getState().loadModel()
 
     // Fix any missing samplers

@@ -376,7 +376,16 @@
             "share": "分享",
             "select": "选择",
             "test": "测试",
-            "tryAgain": "再试一次"
+            "tryAgain": "再试一次",
+            "next": "下一步",
+            "skip": "跳过",
+            "gotIt": "知道了",
+            "done": "完成",
+            "download": "下载",
+            "pause": "暂停",
+            "resume": "继续",
+            "clear": "清除",
+            "restart": "重新开始"
         },
         "alert": {
             "unsaved": {
@@ -796,7 +805,9 @@
         "models": "模型",
         "sampler": "采样器",
         "settings": "设置",
-        "tts": "TTS"
+        "tts": "TTS",
+        "dev_onboarding": "[DEV] 重新开始初始设置",
+        "dev_guides": "[DEV] 重播界面引导"
     },
     "sampler": {
         "alert": {
@@ -1199,5 +1210,93 @@
             "examples": "Character examples"
         },
         "summarySavings": "Estimated tokens saved by summaries: {{count}}"
+    },
+    "onboarding": {
+        "welcome": "欢迎使用 ChatterUI",
+        "tagline": "你的聊天，你的设备。",
+        "capabilities": "设备端模型 · 自托管服务器 · API 服务商",
+        "start": "开始使用",
+        "finish": "开始聊天",
+        "later": "稍后设置",
+        "persona": "打造你的身份",
+        "personaDescription": "选择你在对话中的身份。你的描述能帮助角色了解你。",
+        "description": "描述（可选）",
+        "chooseAvatar": "选择头像",
+        "personaLater": "你可以稍后在「用户身份」中修改。",
+        "mode": "设置应用模式",
+        "localDescription": "在设备上运行下载的模型。模型大小和运行速度取决于设备硬件。",
+        "remoteDescription": "使用 API 服务商，或在你自己的电脑上运行的模型。",
+        "modeLater": "你可以通过侧边菜单切换本地模式和远程模式。",
+        "localSetup": "获取模型",
+        "remoteSetup": "添加连接",
+        "connectionReady": "已准备好连接",
+        "connectionReadyHint": "你可以稍后在「连接」中选择模型和管理连接。",
+        "providers": "模型服务商",
+        "selfHosted": "自托管",
+        "selfHostedDescription": "连接到你自己电脑上兼容 OpenAI 的服务器。",
+        "otherApis": "其他 API",
+        "models": {
+            "idle": "输入连接信息以加载可用模型。",
+            "loading": "正在加载模型…",
+            "ready": "模型列表已加载。",
+            "failed": "无法加载模型。请检查地址和凭据后重试。你也可以稍后选择模型。"
+        },
+        "connectionLater": "你可以随时在「连接」菜单中更换服务商。",
+        "appearance": "选择主题",
+        "appearanceLater": "你可以稍后在「设置 → 外观」中修改主题和聊天样式。",
+        "ready": "准备就绪",
+        "readyDescription": "系统将为你创建一个默认角色，供你开始聊天。\n\n设置错了？别担心。\n所有设置都可以随时修改。",
+        "namePlaceholder": "用户",
+        "descriptionPlaceholder": "简单介绍一下你自己…",
+        "addDescription": "添加描述",
+        "showAll": "显示所有选项",
+        "configured": "已配置",
+        "modelReady": "准备就绪",
+        "autoLoadHint": "在本地模式下发送消息时，模型会自动加载。",
+        "noRecommendations": "模型推荐即将推出。你可以在下方导入或链接 GGUF 模型。",
+        "importInstead": "导入模型",
+        "linkInstead": "链接模型",
+        "importExplanation": "复制到 ChatterUI。",
+        "linkExplanation": "直接使用存储中的文件。",
+        "downloadSection": "下载模型",
+        "storageSection": "使用已有模型"
+    },
+    "downloads": {
+        "fits": "预计适合你的设备",
+        "large": "可能占用过多内存",
+        "failed": "下载失败",
+        "restartHint": "无法继续此下载。请重新开始下载。",
+        "badge": "下载（{{count}}）",
+        "status": {
+            "paused": "已暂停",
+            "downloading": "正在下载",
+            "pausing": "正在暂停…",
+            "completed": "已完成",
+            "failed": "失败"
+        }
+    },
+    "guides": {
+        "skip": "跳过引导",
+        "progress": "第 {{current}} 步，共 {{total}} 步",
+        "main": {
+            "welcome": "欢迎使用 ChatterUI！\n\n让我带你快速了解一下。",
+            "characters": "你的角色都在这里。选择一个即可开始对话。\n\nAI Bot 已为你准备好。",
+            "import": "使用此按钮添加或导入角色。",
+            "menu": "在这里打开主菜单，即可切换应用模式和管理设置。"
+        },
+        "chat": {
+            "history": "使用这些按钮查看聊天记录，或与此角色开始新的聊天。你也可以向左滑动以打开聊天侧栏。",
+            "options": "聊天选项都在这里，包括上下文用量、作者注释和摘要。"
+        },
+        "drawer": {
+            "persona": "点击这里的用户身份，即可修改姓名、描述或图片。",
+            "options": "这里是应用的工具和设置。引导结束后，欢迎自由探索！"
+        }
+    },
+    "background": {
+        "title": "ChatterUI 正在运行",
+        "description": "生成和下载将在后台继续",
+        "downloading": "正在下载（{{count}}）",
+        "downloadHint": "点击查看下载。其他正在进行的任务会继续运行。"
     }
 }

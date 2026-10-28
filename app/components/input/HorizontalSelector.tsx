@@ -2,7 +2,7 @@ import MaterialIcons, {
     MaterialIconsIconName,
 } from '@react-native-vector-icons/material-icons/static'
 import { useEffect, useRef } from 'react'
-import { Pressable, Text, View, ViewStyle } from 'react-native'
+import { Pressable, Text, TextStyle, View, ViewStyle } from 'react-native'
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -23,6 +23,8 @@ type HorizontalSelectorProps<T> = {
     onPress: (selected: T) => void
     label?: string
     description?: string
+    itemStyle?: ViewStyle
+    labelStyle?: TextStyle
     style?: ViewStyle
     capitalizeValues?: string
 }
@@ -34,6 +36,8 @@ const HorizontalSelector = <T,>({
     label,
     description,
     style,
+    itemStyle,
+    labelStyle,
 }: HorizontalSelectorProps<T>) => {
     const { color, spacing, fontSize } = Theme.useTheme()
     const viewRef = useRef<View>(null)
@@ -112,6 +116,7 @@ const HorizontalSelector = <T,>({
                                 flexDirection: 'row',
                                 justifyContent: 'center',
                                 columnGap: 8,
+                                ...itemStyle,
                             }}>
                             {item.icon && (
                                 <MaterialIcons
@@ -121,10 +126,13 @@ const HorizontalSelector = <T,>({
                                 />
                             )}
                             <Text
-                                style={{
-                                    color: color.text[isSelected ? '_200' : '_500'],
-                                    fontSize: fontSize.s,
-                                }}>
+                                style={[
+                                    {
+                                        color: color.text[isSelected ? '_200' : '_500'],
+                                        fontSize: fontSize.s,
+                                    },
+                                    labelStyle,
+                                ]}>
                                 {item.label}
                             </Text>
                         </Pressable>
