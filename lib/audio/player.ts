@@ -9,7 +9,7 @@ import { useAudioSettingsStore } from './settingsStore'
 import { isAudioActive, useAudioState, type AudioSource, type AudioSession } from './state'
 
 type Player = ReturnType<typeof createAudioPlayer>
-let playback: { id: number; player: Player; unsubscribe: () => void } | undefined
+let playback: { id: number; player: Player; unsubscribe: () => void; seeking: number } | undefined
 let wantsToPlay = false
 let dismissTimer: ReturnType<typeof setTimeout> | undefined
 const cancelDismiss = () => {
@@ -86,16 +86,26 @@ const onStatus = (id: number, status: AudioStatus) => {
         return
     }
     if (session.status === 'finished' || session.status === 'failed') return
+    const keepPlaying =
+        session.status === 'playing' &&
+        wantsToPlay &&
+        ((playback?.seeking ?? 0) > 0 || status.isBuffering)
     update(id, {
-        currentTime: status.currentTime ?? session.currentTime,
+        // Native progress can still describe the old position while a seek is pending.
+        currentTime:
+            (playback?.seeking ?? 0) > 0
+                ? session.currentTime
+                : (status.currentTime ?? session.currentTime),
         duration: status.duration ?? session.duration,
-        status: status.isLoaded
-            ? status.playing
-                ? 'playing'
-                : 'paused'
-            : session.status === 'paused'
-              ? 'paused'
-              : 'loading',
+        status: keepPlaying
+            ? 'playing'
+            : status.isLoaded
+              ? status.playing
+                  ? 'playing'
+                  : 'paused'
+              : session.status === 'paused'
+                ? 'paused'
+                : 'loading',
     })
 }
 export const playAudio = async (source: AudioSource) => {
@@ -121,7 +131,7 @@ export const playAudio = async (source: AudioSource) => {
         })
         if (!current(id)) return
         const player = createAudioPlayer({ uri: source.uri }, { updateInterval: 250 })
-        playback = { id: id, player: player, unsubscribe: () => {} }
+        playback = { id: id, player: player, unsubscribe: () => {}, seeking: 0 }
         const listener = player.addListener('playbackStatusUpdate', (status) =>
             onStatus(id, status)
         )
@@ -172,6 +182,7 @@ export const seekAudio = async (seconds: number) => {
     const session = useAudioState.getState().session
     const active = playback
     if (!session || !active || !Number.isFinite(seconds)) return
+    active.seeking++
     try {
         const position = Math.max(0, Math.min(session.duration, seconds))
         if (session.status === 'finished') {
@@ -179,10 +190,12 @@ export const seekAudio = async (seconds: number) => {
             wantsToPlay = false
             update(session.id, { status: 'paused' })
         }
-        await active.player.seekTo(position)
         update(session.id, { currentTime: position })
+        await active.player.seekTo(position)
     } catch (error) {
         fail(session.id, error)
+    } finally {
+        active.seeking--
     }
 }
 const enforceScope = () => {

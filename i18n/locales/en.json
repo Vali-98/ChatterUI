@@ -385,7 +385,8 @@
             "pause": "Pause",
             "resume": "Resume",
             "clear": "Clear",
-            "restart": "Restart"
+            "restart": "Restart",
+            "collapse": "Collapse"
         },
         "alert": {
             "unsaved": {

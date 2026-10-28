@@ -205,3 +205,29 @@ test('replaying or replacing a finished clip cancels its pending dismissal', asy
     jest.advanceTimersByTime(1500)
     expect(useAudioState.getState().session?.uri).toBe('file:///replacement.mp3')
 })
+
+test('seeking preserves the pause control through transient native pause and buffering updates', async () => {
+    await playAudio(source)
+    const player = players[0]
+    emit(player, {})
+    let completeSeek!: () => void
+    player.seekTo.mockImplementationOnce(
+        () =>
+            new Promise<void>((resolve) => {
+                completeSeek = resolve
+            })
+    )
+    const seek = seekAudio(12)
+    expect(useAudioState.getState().session?.currentTime).toBe(12)
+    emit(player, { playing: false, currentTime: 5 })
+    expect(useAudioState.getState().session?.currentTime).toBe(12)
+    expect(useAudioState.getState().session?.status).toBe('playing')
+    completeSeek()
+    await seek
+    expect(useAudioState.getState().session?.currentTime).toBe(12)
+    emit(player, { playing: false, isBuffering: true, currentTime: 12 })
+    expect(useAudioState.getState().session?.status).toBe('playing')
+    pauseAudio()
+    emit(player, { playing: false, isBuffering: true })
+    expect(useAudioState.getState().session?.status).toBe('paused')
+})

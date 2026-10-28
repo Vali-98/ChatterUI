@@ -385,7 +385,8 @@
             "pause": "Jeda",
             "resume": "Lanjutkan",
             "clear": "Bersihkan",
-            "restart": "Mulai ulang"
+            "restart": "Mulai ulang",
+            "collapse": "Ciutkan"
         },
         "alert": {
             "unsaved": {

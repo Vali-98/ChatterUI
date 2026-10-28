@@ -1,12 +1,19 @@
 import { localDownload } from '@vali98/react-native-fs'
 import { shareAsync } from 'expo-sharing'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Platform, View } from 'react-native'
+import Animated, {
+    cancelAnimation,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withTiming,
+} from 'react-native-reanimated'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
-import { pauseAudio, playAudio } from '@lib/audio/player'
+import { playAudio } from '@lib/audio/player'
 import { useAudioState, type AudioSource } from '@lib/audio/state'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -19,6 +26,13 @@ const AudioAttachment = ({ source }: { source: AudioSource }) => {
         state.session?.uri === source.uri ? state.session.status : undefined
     )
     const playing = status === 'playing' || status === 'loading'
+    const active = playing || status === 'paused'
+    const opacity = useSharedValue(1)
+    useEffect(() => {
+        opacity.set(playing ? withRepeat(withTiming(0.45, { duration: 650 }), -1, true) : 1)
+        return () => cancelAnimation(opacity)
+    }, [playing, opacity])
+    const pulse = useAnimatedStyle(() => ({ opacity: opacity.value }))
     return (
         <View
             style={{
@@ -59,17 +73,21 @@ const AudioAttachment = ({ source }: { source: AudioSource }) => {
                     }
                 }}
             />
-            <ThemedButton
-                variant="tertiary"
-                iconName={playing ? 'pause-circle' : 'play-circle'}
-                iconSize={24}
-                accessibilityLabel={t(playing ? 'audio.pause' : 'audio.play')}
-                onPress={(event) => {
-                    event.stopPropagation()
-                    if (playing) pauseAudio()
-                    else void playAudio(source)
-                }}
-            />
+            <Animated.View style={pulse}>
+                <ThemedButton
+                    variant="tertiary"
+                    iconName="play-circle"
+                    iconSize={24}
+                    iconStyle={{ color: active ? color.text._600 : color.primary._400 }}
+                    disabled={active}
+                    accessibilityLabel={t('audio.play')}
+                    accessibilityState={{ disabled: active, busy: playing }}
+                    onPress={(event) => {
+                        event.stopPropagation()
+                        void playAudio(source)
+                    }}
+                />
+            </Animated.View>
         </View>
     )
 }

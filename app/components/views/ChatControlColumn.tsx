@@ -1,46 +1,11 @@
 import type { ReactNode } from 'react'
 import { View, type ViewProps } from 'react-native'
 
-import {
-    CHAT_CONTROL_GAP,
-    CHAT_CONTROL_PADDING_VERTICAL,
-    CHAT_CONTROL_ELEVATION,
-} from '@lib/constants/ChatControls'
-import { Theme } from '@lib/theme/ThemeManager'
+import { CHAT_CONTROL_GAP } from '@lib/constants/ChatControls'
 
-// Shared appearance/spacing only. Playback and message actions retain independent ownership.
-export const ChatControlPanel = ({ style, ...props }: ViewProps) => {
-    const { color } = Theme.useTheme()
-    return (
-        <View
-            {...props}
-            style={[
-                {
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    columnGap: 14,
-                    paddingVertical: CHAT_CONTROL_PADDING_VERTICAL,
-                    paddingHorizontal: 12,
-                    borderRadius: 8,
-                    elevation: CHAT_CONTROL_ELEVATION,
-                    borderWidth: 1,
-                    borderColor: color.primary._500,
-                    backgroundColor: color.neutral._100 + 'ee',
-                    boxShadow: [
-                        {
-                            offsetX: 1,
-                            offsetY: 1,
-                            color: color.shadow,
-                            spreadDistance: 1,
-                            blurRadius: 4,
-                        },
-                    ],
-                },
-                style,
-            ]}
-        />
-    )
-}
+// Message and playback controls share panel styling with notices.
+export { default as ChatControlPanel } from './FloatingPanel'
+
 export const ChatControlColumn = ({
     children,
     style,

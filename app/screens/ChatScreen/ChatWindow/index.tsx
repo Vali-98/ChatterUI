@@ -23,7 +23,9 @@ import ChatHeaderGradient from './ChatHeaderGradient'
 import ChatItem from './ChatItem'
 import ChatJumpButton from './ChatJumpButton'
 import ChatModelName from './ChatModelName'
-import ChatNoticeStack from '../ChatNoticeStack'
+import ChatNotices from '../ChatNotices'
+import { NoticeStack } from '@components/views/Notice'
+import DownloadNotice from '@components/downloads/DownloadNotice'
 
 type ChatListItem = { index: number; entryId: number; isLastMessage: boolean; isGreeting: boolean }
 const ChatCellRenderer: NonNullable<FlatListProps<ChatListItem>['CellRendererComponent']> = ({
@@ -181,7 +183,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                 />
 
                 <ChatActionOverlay chatId={chatId} />
-                <ChatNoticeStack chatId={chatId} />
+                <NoticeStack>
+                    <ChatNotices chatId={chatId} />
+                    <DownloadNotice />
+                </NoticeStack>
                 <ChatHeaderGradient />
             </ImageBackground>
         </ChatActionAnchorProvider>

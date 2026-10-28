@@ -385,7 +385,8 @@
             "pause": "暂停",
             "resume": "继续",
             "clear": "清除",
-            "restart": "重新开始"
+            "restart": "重新开始",
+            "collapse": "收起"
         },
         "alert": {
             "unsaved": {
