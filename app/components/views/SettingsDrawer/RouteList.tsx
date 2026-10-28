@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
-import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
+import Animated, { Easing, FadeInDown, FadeInUp, SlideInLeft } from 'react-native-reanimated'
 
 import Drawer from '@components/views/Drawer'
 import { EdgeFadeFlatList } from '@components/views/EdgeFade'
@@ -62,9 +62,25 @@ const DrawerButton = ({ item, index }: DrawerButtonProps) => {
                 )}
             </TouchableOpacity>
             {Array.isArray(item.path) && expanded && (
-                <View style={{ paddingLeft: 20, backgroundColor: color.neutral._200 }}>
-                    {item.path.map((item, index) => (
-                        <DrawerButton item={item} index={index} key={index} />
+                <View>
+                    {item.path.map((subitem, index) => (
+                        <View key={index} style={{ flexDirection: 'row' }}>
+                            <Animated.View
+                                entering={FadeInUp.delay(300)
+                                    .duration(300)
+                                    .easing(Easing.out(Easing.exp))}
+                                style={{
+                                    width: 30,
+                                    borderRightWidth: 2,
+                                    borderColor: color.text._700,
+                                    maxHeight:
+                                        Array.isArray(item.path) && item.path.length - 1 === index
+                                            ? '50%'
+                                            : 'auto',
+                                }}
+                            />
+                            <DrawerButton item={subitem} index={index} />
+                        </View>
                     ))}
                 </View>
             )}
