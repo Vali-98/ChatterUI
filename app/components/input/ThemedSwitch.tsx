@@ -30,7 +30,7 @@ const ThemedSwitch: React.FC<ThemedSwitchProps> = ({
                         true: color.neutral._500,
                     }}
                     thumbColor={value ? color.primary._500 : color.neutral._400}
-                    ios_backgroundColor="#3e3e3e"
+                    ios_backgroundColor={color.neutral._300}
                     onValueChange={onChangeValue}
                     value={value}
                 />

@@ -217,7 +217,7 @@ const useStyles = () => {
 
         drawer: {
             backgroundColor: color.neutral._100,
-            shadowColor: '#000',
+            shadowColor: color.shadow,
             width: '80%',
             height: '100%',
             borderTopWidth: 1,

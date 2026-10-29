@@ -151,13 +151,13 @@ const useStyles = () => {
         },
 
         errorLog: {
-            color: color.text._400,
+            color: color.text._100,
             fontSize: fontSize.s,
             paddingHorizontal: spacing.xl,
             paddingVertical: spacing.l,
             borderRadius: 12,
             margin: spacing.xl2,
-            backgroundColor: 'black',
+            backgroundColor: color.neutral._200,
         },
 
         buttonText: {

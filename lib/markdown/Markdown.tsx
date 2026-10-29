@@ -175,7 +175,7 @@ export namespace MarkdownStyle {
                     latex={content ?? ''}
                     key={node.key}
                     style={styles.latex_block}
-                    color={styles.latex_block.color ?? 'white'}
+                    color={styles.latex_block.color}
                 />
             )
         },
@@ -185,8 +185,8 @@ export namespace MarkdownStyle {
                 <RaTeXView
                     latex={content ?? ''}
                     key={node.key}
-                    style={styles.latex_block}
-                    color={styles.latex_block.color ?? 'white'}
+                    style={styles.latex_inline}
+                    color={styles.latex_inline.color}
                 />
             )
         },
@@ -537,11 +537,12 @@ export namespace MarkdownStyle {
 
                     // Links
                     link: {
+                        color: color.primary._700,
                         textDecorationLine: 'underline',
                     },
                     blocklink: {
                         flex: 1,
-                        borderColor: '#000000',
+                        borderColor: color.primary._700,
                         borderBottomWidth: 1,
                     },
 
