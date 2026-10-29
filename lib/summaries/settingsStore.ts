@@ -11,6 +11,9 @@ export type SummarySettings = {
     enabled: boolean
     autoContinueDrafts: boolean
     autoGenerate: boolean
+    autoMinHistory: number
+    autoMaxCoverage: number
+    consolidateSummaries: boolean
     autoThreshold: number
     maxOutputTokens: number
     warnOnSourceChanges: boolean
@@ -28,6 +31,9 @@ export const useSummarySettingsStore = create<
             autoContinueDrafts: false,
             autoGenerate: false,
             autoThreshold: 80,
+            autoMinHistory: 10,
+            autoMaxCoverage: 50,
+            consolidateSummaries: false,
             maxOutputTokens: 1024,
             warnOnSourceChanges: true,
             prompt: defaultSummarizerPrompt,

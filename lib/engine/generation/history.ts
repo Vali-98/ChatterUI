@@ -69,7 +69,7 @@ export const createHistoryReader = ({
     let beforeId: number | undefined
     let exhausted = false
     const summaryTokens: Record<number, { summarizedMessages: number; rawHistory: number }> = {}
-    const read = (remainingTokens = Infinity): ChatMessage[] => {
+    const readWindow = (remainingTokens = Infinity) => {
         if (exhausted) return []
         const hints = Chats.db.query.historyHints(chatId, {
             throughId: history.throughId,
@@ -127,6 +127,12 @@ export const createHistoryReader = ({
             // Include the boundary item so actual tokenization can decide whether it fits.
             if (estimatedTokens >= remainingTokens || window.length >= METADATA_BATCH_SIZE) break
         }
+        beforeId = window.at(-1)?.position
+        exhausted = window.length === candidates.length && hints.length < METADATA_BATCH_SIZE
+        return window
+    }
+    const read = (remainingTokens = Infinity): ChatMessage[] => {
+        const window = readWindow(remainingTokens)
         const entryIds = window.filter((item) => !item.summary).map((item) => item.hint.id)
         const rows = entryIds.length
             ? (Chats.db.live
@@ -164,9 +170,20 @@ export const createHistoryReader = ({
                 if (message) result.push(message)
             }
         }
-        beforeId = window.at(-1)?.position
-        exhausted = window.length === candidates.length && hints.length < METADATA_BATCH_SIZE
         return result.reverse()
     }
-    return { read, summaryTokens }
+    const readHints = (remainingTokens: number) =>
+        readWindow(remainingTokens)
+            .map((item) => ({
+                id: item.summary?.id ?? item.hint.id,
+                kind: item.summary ? ('summary' as const) : ('message' as const),
+                position: item.position,
+                isUser: item.hint.is_user,
+                tokens: Math.max(
+                    0,
+                    item.hint.tokens + item.hint.imageTokens + estimateOverhead(item.hint)
+                ),
+            }))
+            .reverse()
+    return { read, readHints, summaryTokens }
 }

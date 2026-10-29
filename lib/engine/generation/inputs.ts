@@ -296,6 +296,7 @@ export const estimateGenerationContext = async (inputs: GenerationInputs) => {
     const sources = await inputs.dataSources
     const capacity = Math.max(0, generationContextLimit(inputs) - inputs.samplers.genamt)
     let total = 0
+    let system = 0
     const originalMessages = new Map(inputs.messages.map((message) => [message.id, message]))
     await collectContext({
         ...context,
@@ -321,6 +322,7 @@ export const estimateGenerationContext = async (inputs: GenerationInputs) => {
                   : 'chat',
         onContextStats: (stats) => {
             total = stats.total
+            system = stats.system
         },
     })
     const imageTokens = context.messages.reduce(
@@ -368,5 +370,11 @@ export const estimateGenerationContext = async (inputs: GenerationInputs) => {
             imageTokens +
             sources.reduce((sum, source) => sum + Math.max(0, source.tokenBudget), 0),
         capacity,
+        historyBudget: Math.max(
+            0,
+            capacity -
+                system -
+                sources.reduce((sum, source) => sum + Math.max(0, source.tokenBudget), 0)
+        ),
     }
 }

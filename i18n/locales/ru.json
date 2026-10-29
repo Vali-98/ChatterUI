@@ -1144,15 +1144,18 @@
         "tasks": {
             "running": {
                 "summary": "Generating summary",
-                "title": "Generating title"
+                "title": "Generating title",
+                "consolidation": "Объединение сводок…"
             },
             "cancelling": {
                 "summary": "Cancelling summary",
-                "title": "Cancelling title"
+                "title": "Cancelling title",
+                "consolidation": "Отмена объединения…"
             },
             "pending": {
                 "summary": "Summary queued",
-                "title": "Title queued"
+                "title": "Title queued",
+                "consolidation": "Объединение ожидает…"
             }
         },
         "statsTitle": "Last prompt (approx.)",
@@ -1174,7 +1177,22 @@
         "empty": "Сводки ещё не созданы",
         "deleteTitle": "Delete summary?",
         "deleteConfirm": "Delete this summary? The original chat history is retained.",
-        "replaceWithNewer": "Replace with newer history"
+        "replaceWithNewer": "Replace with newer history",
+        "minimumHistory": "Минимальный объём исходной истории (%)",
+        "minimumHistoryDescription": "Минимум токенов исходной истории в процентах от ёмкости промпта после резервирования ответа. Если допустимый диапазон меньше, автоматическая сводка откладывается.",
+        "maximumCoverage": "Максимальный охват истории (%)",
+        "maximumCoverageDescription": "Сжимать не более этой доли ещё не обобщённой истории, помещающейся в контекст, сохраняя новые диалоги целиком.",
+        "consolidate": "Сохранять долгосрочный контекст",
+        "consolidateDescription": "Объединять старые сводки, когда они занимают большую часть контекста, а подходящей исходной истории мало. Повторное сжатие может терять детали.",
+        "kind": {
+            "history": "Сводка истории",
+            "consolidation": "Объединённая сводка"
+        },
+        "viewSources": "Исходные сводки ({{count}})",
+        "inputCoverage": "Исходных сводок: {{count}}",
+        "previous": "Предыдущие сводки",
+        "current": "Текущие сводки",
+        "compressionFallback": "Пока черновик не обработан, ответы используют принятые сводки и историю, помещающуюся в контекст."
     },
     "contextAllocation": {
         "title": "Context allocation",

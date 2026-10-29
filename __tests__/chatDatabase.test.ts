@@ -5,7 +5,7 @@ import {
 } from '../lib/engine/generation/history'
 import { db as database } from '../db/db'
 import { migrateSwipeReasoning } from '../db/reasoningMigration'
-import { authorNotes, lorebookEntries, lorebooks } from '../db/schema'
+import { authorNotes, lorebookEntries, lorebooks, summarySources } from '../db/schema'
 import {
     contextAuthorNotes,
     contextHistory,
@@ -15,6 +15,8 @@ import { acquireChatLease, releaseChatLease, useChatAccessState } from '../lib/s
 import { db } from '../lib/state/chat/db'
 import {
     acceptSummary,
+    createConsolidationDraft,
+    summaryInputList,
     createSummaryDraft,
     deleteSummary as deleteSummaryRow,
     getSummary,
@@ -898,5 +900,90 @@ describeSQLite('paged inference history', () => {
             .historyPage(chatId, { limit: 32, includeReasoning: true })
             .sync()
         expect(withReasoning[0].swipes[0].reasoning?.content).toBe('private thought')
+    })
+})
+
+describeSQLite('summary consolidation provenance', () => {
+    beforeEach(() => {
+        useChatAccessState.setState({ leases: {} })
+        reset()
+    })
+    const setup = () => {
+        const chatId = db.create.chat({
+            character_id: 1,
+            messages: Array.from({ length: 12 }, (_, i) => message(`entry ${i}`)),
+        })
+        const messages = db.query.chat(chatId)!.messages
+        const sources = [messages.slice(0, 3), messages.slice(3, 6), messages.slice(6, 9)].map(
+            (range, index) => {
+                const draft = createSummaryDraft(chatId, range)
+                acceptSummary(draft.id, { content: `Memory ${index}` })
+                return getSummary(draft.id)!
+            }
+        )
+        return { chatId, messages, sources }
+    }
+    test('drafts leave sources active; acceptance replaces them atomically and keeps flattened coverage', () => {
+        const { chatId, sources } = setup()
+        const draft = createConsolidationDraft(
+            chatId,
+            sources.slice(0, 2).map((source) => source.id)
+        )
+        expect(sources.slice(0, 2).map((source) => getSummary(source.id)!.status)).toEqual([
+            'accepted',
+            'accepted',
+        ])
+        expect(
+            summaryInputList(draft.id)
+                .all()
+                .map((source) => source.id)
+        ).toEqual(sources.slice(0, 2).map((source) => source.id))
+        acceptSummary(draft.id, { content: 'Combined memory' })
+        expect(sources.slice(0, 2).map((source) => getSummary(source.id)!.status)).toEqual([
+            'replaced',
+            'replaced',
+        ])
+        expect(getSummary(sources[2].id)!.status).toBe('accepted')
+        const next = createConsolidationDraft(chatId, [draft.id, sources[2].id])
+        acceptSummary(next.id, { content: 'All older memories' })
+        const entries = database
+            .select()
+            .from(summarySources)
+            .all()
+            .filter((row) => row.summary_id === next.id)
+        expect(entries).toHaveLength(9)
+    })
+    test('original-message edits and source-summary edits mark consolidated descendants stale', () => {
+        const { chatId, messages, sources } = setup()
+        const draft = createConsolidationDraft(
+            chatId,
+            sources.slice(0, 2).map((source) => source.id)
+        )
+        acceptSummary(draft.id, { content: 'Combined memory' })
+        const next = createConsolidationDraft(chatId, [draft.id, sources[2].id])
+        acceptSummary(next.id, { content: 'All older memories' })
+        db.update.swipe(messages[0].swipes[0].id, { swipe: 'changed history' })
+        expect(getSummary(next.id)!.source_changed).toBe(true)
+        updateSummary(next.id, { source_changed: false })
+        updateSummary(draft.id, { content: 'Edited memory' })
+        expect(getSummary(next.id)!.source_changed).toBe(true)
+        deleteSummaryRow(draft.id)
+        expect(getSummary(draft.id)!.status).toBe('discarded')
+        expect(summaryInputList(next.id).all()).toHaveLength(2)
+    })
+    test('invalid input groups roll back without creating a blocking draft', () => {
+        const { chatId, sources } = setup()
+        expect(() => createConsolidationDraft(chatId, [sources[0].id])).toThrow(
+            'Invalid consolidation'
+        )
+        expect(() => createConsolidationDraft(chatId, [sources[0].id, sources[2].id])).toThrow(
+            'adjacent'
+        )
+        expect(
+            createConsolidationDraft(
+                chatId,
+                sources.slice(0, 2).map((source) => source.id)
+            ).kind
+        ).toBe('consolidation')
     })
 })

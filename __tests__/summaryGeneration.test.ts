@@ -71,6 +71,11 @@ jest.mock('../lib/summaries/db', () => ({
     summaryIdentity: (id: number) => ({ id, all: () => (mockRows.has(id) ? [{ id }] : []) }),
     summaryList: () => ({ all: () => [...mockRows.values()] }),
     getSummary: (id: number) => mockRows.get(id),
+    dependentSummaryIds: () => [],
+    summaryInputList: (id: number) => ({
+        all: () => (mockRows.get(id)?.inputIds ?? []).map((id: number) => mockRows.get(id)),
+    }),
+    restrictConsolidationSources: jest.fn(),
     updateSummary: (id: number, changes: object) =>
         mockRows.has(id) ? Object.assign(mockRows.get(id)!, changes) : undefined,
     createSummaryDraft: (_chatId: number, messages: typeof mockMessages) => {
@@ -113,11 +118,18 @@ beforeEach(() => {
         autoGenerate: true,
         autoContinueDrafts: false,
         autoThreshold: 80,
+        autoMinHistory: 0,
+        autoMaxCoverage: 100,
+        consolidateSummaries: false,
         maxOutputTokens: 128,
         prompt: 'Summarize facts.',
     }
     jest.mocked(useSummarySettingsStore.getState).mockImplementation(() => settings)
-    jest.mocked(estimateGenerationContext).mockResolvedValue({ total: 90, capacity: 100 })
+    jest.mocked(estimateGenerationContext).mockResolvedValue({
+        total: 900,
+        capacity: 1000,
+        historyBudget: 1000,
+    })
     inputs = {
         chatId: 1,
         mode: 'remote',
@@ -469,9 +481,78 @@ test('an ignored draft keeps its original text and coverage as the chat grows', 
 
 test('automatic preflight checks metadata without loading the full chat below its threshold', async () => {
     inputs.history = { throughId: 100, cutoff: 90, snapshots: new Map() }
-    jest.mocked(estimateGenerationContext).mockResolvedValue({ total: 20, capacity: 100 })
+    jest.mocked(estimateGenerationContext).mockResolvedValue({
+        total: 20,
+        capacity: 100,
+        historyBudget: 100,
+    })
     expect(await prepareAutomaticSummary(inputs)).toBeUndefined()
     expect(Chats.db.query.hasSummarySources).toHaveBeenCalledWith(1, 90, [])
     expect(Chats.db.query.chat).not.toHaveBeenCalled()
     expect(mockRuns).toHaveLength(0)
+})
+
+test('consolidation continuation uses its source summaries, not raw conversation text', async () => {
+    for (const id of [1, 2])
+        mockRows.set(id, {
+            id,
+            chat_id: 1,
+            kind: 'history',
+            status: 'accepted',
+            content: `Earlier memory ${id}. `.repeat(30),
+            start_entry_id: id * 2 - 1,
+            end_entry_id: id * 2,
+            source_changed: false,
+        })
+    mockRows.set(3, {
+        id: 3,
+        chat_id: 1,
+        kind: 'consolidation',
+        status: 'draft',
+        content: '',
+        start_entry_id: 1,
+        end_entry_id: 4,
+        source_changed: false,
+        inputIds: [1, 2],
+    })
+    generateSummary(1, { inputs, summaryId: 3, continueDraft: true })
+    await mockRuns[0](new AbortController().signal)
+    const request = jest.mocked(prepareGenerationContext).mock.calls.at(-1)![0]
+    expect(request.history).toBeUndefined()
+    expect(request.messages[0].swipes[0].swipe).toContain('Earlier memory 1.')
+    expect(request.messages[0].swipes[0].swipe).toContain('Earlier memory 2.')
+    expect(request.messages[0].swipes[0].swipe).not.toContain('a long source message')
+    expect(getSummary(3)?.status).toBe('accepted')
+})
+
+test('cancelling consolidation retains an unfinished draft and its working source summaries', async () => {
+    for (const id of [1, 2])
+        mockRows.set(id, {
+            id,
+            chat_id: 1,
+            kind: 'history',
+            status: 'accepted',
+            content: 'Earlier memory. '.repeat(30),
+            start_entry_id: id * 2 - 1,
+            end_entry_id: id * 2,
+            source_changed: false,
+        })
+    mockRows.set(3, {
+        id: 3,
+        chat_id: 1,
+        kind: 'consolidation',
+        status: 'draft',
+        content: '',
+        start_entry_id: 1,
+        end_entry_id: 4,
+        source_changed: false,
+        inputIds: [1, 2],
+    })
+    generateSummary(1, { inputs, summaryId: 3, continueDraft: true })
+    const controller = new AbortController()
+    controller.abort()
+    await expect(mockRuns[0](controller.signal)).rejects.toThrow('Cancelled')
+    expect(getSummary(3)?.status).toBe('draft')
+    expect(getSummary(3)?.error?.reason).toBe('cancelled')
+    expect([getSummary(1)?.status, getSummary(2)?.status]).toEqual(['accepted', 'accepted'])
 })

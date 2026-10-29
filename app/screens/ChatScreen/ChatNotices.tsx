@@ -46,7 +46,9 @@ const ChatNotices = ({ chatId }: { chatId: number }) => {
                 <Notice key={`task-${task.id}`} variant="neutral" style={{ columnGap: 8 }}>
                     <ThemedSpinner />
                     <TText numberOfLines={1}>
-                        {t(`summary.tasks.${task.status}.${task.kind}`)}
+                        {t(
+                            `summary.tasks.${task.status}.${task.kind === 'summary' && summaries.find((summary) => summary.id === task.resourceId)?.kind === 'consolidation' ? 'consolidation' : task.kind}`
+                        )}
                     </TText>
                     <ThemedButton
                         iconName="close"

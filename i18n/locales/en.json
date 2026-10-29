@@ -1144,15 +1144,18 @@
         "tasks": {
             "running": {
                 "summary": "Generating summary",
-                "title": "Generating title"
+                "title": "Generating title",
+                "consolidation": "Consolidating summaries…"
             },
             "cancelling": {
                 "summary": "Cancelling summary",
-                "title": "Cancelling title"
+                "title": "Cancelling title",
+                "consolidation": "Cancelling consolidation…"
             },
             "pending": {
                 "summary": "Summary queued",
-                "title": "Title queued"
+                "title": "Title queued",
+                "consolidation": "Consolidation pending…"
             }
         },
         "statsTitle": "Last prompt (approx.)",
@@ -1174,7 +1177,22 @@
         "empty": "No summaries generated",
         "deleteTitle": "Delete summary?",
         "deleteConfirm": "Delete this summary? The original chat history is retained.",
-        "replaceWithNewer": "Replace with newer history"
+        "replaceWithNewer": "Replace with newer history",
+        "minimumHistory": "Minimum source history (%)",
+        "minimumHistoryDescription": "Minimum source tokens as a percentage of prompt capacity, after reserving reply tokens. Automatic summaries wait if the capped range is smaller.",
+        "maximumCoverage": "Maximum history coverage (%)",
+        "maximumCoverageDescription": "Summarize up to this percentage of the unsummarized history currently fitting in context, keeping newer dialogue in full.",
+        "consolidate": "Preserve long-term context",
+        "consolidateDescription": "Consolidate older summaries when they dominate context and too little raw history is eligible. Repeated compression can lose details.",
+        "kind": {
+            "history": "History summary",
+            "consolidation": "Consolidated summary"
+        },
+        "viewSources": "View source summaries ({{count}})",
+        "inputCoverage": "{{count}} source summaries",
+        "previous": "Previous summaries",
+        "current": "Current summaries",
+        "compressionFallback": "Until this draft is resolved, replies use accepted summaries and the history that fits."
     },
     "contextAllocation": {
         "title": "Context allocation",

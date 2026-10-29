@@ -20,6 +20,7 @@ const summary = (
 ): ChatSummary => ({
     id,
     chat_id: 1,
+    kind: 'history',
     content: `memory ${id}`,
     status: 'accepted',
     enabled: true,

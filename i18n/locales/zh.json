@@ -1144,15 +1144,18 @@
         "tasks": {
             "running": {
                 "summary": "Generating summary",
-                "title": "Generating title"
+                "title": "Generating title",
+                "consolidation": "正在合并摘要…"
             },
             "cancelling": {
                 "summary": "Cancelling summary",
-                "title": "Cancelling title"
+                "title": "Cancelling title",
+                "consolidation": "正在取消合并…"
             },
             "pending": {
                 "summary": "Summary queued",
-                "title": "Title queued"
+                "title": "Title queued",
+                "consolidation": "摘要合并等待中…"
             }
         },
         "statsTitle": "Last prompt (approx.)",
@@ -1174,7 +1177,22 @@
         "empty": "尚未生成摘要",
         "deleteTitle": "Delete summary?",
         "deleteConfirm": "Delete this summary? The original chat history is retained.",
-        "replaceWithNewer": "Replace with newer history"
+        "replaceWithNewer": "Replace with newer history",
+        "minimumHistory": "最少源历史比例（%）",
+        "minimumHistoryDescription": "最少源历史 token 数，占预留回复 token 后提示词容量的百分比。如果允许的历史范围不足，自动摘要将等待。",
+        "maximumCoverage": "最大历史覆盖比例（%）",
+        "maximumCoverageDescription": "最多概括当前上下文中未摘要历史的这一比例，保留较新的完整对话。",
+        "consolidate": "保留长期上下文",
+        "consolidateDescription": "当旧摘要占据大部分上下文且符合条件的原始历史不足时，合并旧摘要。重复压缩可能丢失细节。",
+        "kind": {
+            "history": "历史摘要",
+            "consolidation": "合并摘要"
+        },
+        "viewSources": "查看源摘要（{{count}}）",
+        "inputCoverage": "{{count}} 条源摘要",
+        "previous": "以前的摘要",
+        "current": "当前摘要",
+        "compressionFallback": "此草稿处理完毕前，回复会使用已接受的摘要和仍能放入上下文的历史。"
     },
     "contextAllocation": {
         "title": "Context allocation",

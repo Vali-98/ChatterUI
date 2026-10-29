@@ -97,7 +97,8 @@ export const selectSummarySources = (
     messages: ChatMessage[],
     summaries: ChatSummary[],
     replacesId?: number,
-    extendRange = false
+    extendRange = false,
+    range?: { startEntryId: number; endEntryId: number }
 ) => {
     const cutoff = summaryCutoff(messages)
     if (cutoff === undefined) return []
@@ -109,6 +110,7 @@ export const selectSummarySources = (
     const eligible = messages.filter(
         (message) =>
             message.id <= cutoff &&
+            (!range || (message.id >= range.startEntryId && message.id <= range.endEntryId)) &&
             (!replacement ||
                 (message.id >= replacement.start_entry_id &&
                     (extendRange || message.id <= replacement.end_entry_id)))

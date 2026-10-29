@@ -1144,15 +1144,18 @@
         "tasks": {
             "running": {
                 "summary": "Generating summary",
-                "title": "Generating title"
+                "title": "Generating title",
+                "consolidation": "Menggabungkan ringkasan…"
             },
             "cancelling": {
                 "summary": "Cancelling summary",
-                "title": "Cancelling title"
+                "title": "Cancelling title",
+                "consolidation": "Membatalkan penggabungan…"
             },
             "pending": {
                 "summary": "Summary queued",
-                "title": "Title queued"
+                "title": "Title queued",
+                "consolidation": "Penggabungan menunggu…"
             }
         },
         "statsTitle": "Last prompt (approx.)",
@@ -1174,7 +1177,22 @@
         "empty": "Belum ada ringkasan yang dibuat",
         "deleteTitle": "Delete summary?",
         "deleteConfirm": "Delete this summary? The original chat history is retained.",
-        "replaceWithNewer": "Replace with newer history"
+        "replaceWithNewer": "Replace with newer history",
+        "minimumHistory": "Riwayat sumber minimum (%)",
+        "minimumHistoryDescription": "Jumlah token sumber minimum sebagai persentase kapasitas prompt setelah token balasan dicadangkan. Ringkasan otomatis menunggu jika rentang yang dibatasi lebih kecil.",
+        "maximumCoverage": "Cakupan riwayat maksimum (%)",
+        "maximumCoverageDescription": "Ringkas hingga persentase ini dari riwayat yang belum diringkas dan masih muat dalam konteks, agar dialog terbaru tetap utuh.",
+        "consolidate": "Pertahankan konteks jangka panjang",
+        "consolidateDescription": "Gabungkan ringkasan lama saat mendominasi konteks dan riwayat mentah yang memenuhi syarat terlalu sedikit. Pemadatan berulang dapat menghilangkan detail.",
+        "kind": {
+            "history": "Ringkasan riwayat",
+            "consolidation": "Ringkasan gabungan"
+        },
+        "viewSources": "Lihat ringkasan sumber ({{count}})",
+        "inputCoverage": "{{count}} ringkasan sumber",
+        "previous": "Ringkasan sebelumnya",
+        "current": "Ringkasan saat ini",
+        "compressionFallback": "Sampai draf ini diselesaikan, balasan menggunakan ringkasan yang diterima dan riwayat yang masih muat."
     },
     "contextAllocation": {
         "title": "Context allocation",

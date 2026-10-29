@@ -22,6 +22,7 @@ const SummarySettingsScreen = () => {
             {settings.enabled && (
                 <>
                     <ThemedSwitchRow
+                        divider={!settings.autoGenerate}
                         label={t('summary.autoGenerate')}
                         value={settings.autoGenerate}
                         onChangeValue={(autoGenerate) => settings.update({ autoGenerate })}
@@ -36,6 +37,40 @@ const SummarySettingsScreen = () => {
                                 value={settings.autoThreshold}
                                 onValueChange={(autoThreshold) =>
                                     settings.update({ autoThreshold })
+                                }
+                            />
+                            <ThemedSlider
+                                label={t('summary.minimumHistory')}
+                                min={0}
+                                max={50}
+                                step={5}
+                                value={settings.autoMinHistory}
+                                onValueChange={(autoMinHistory) =>
+                                    settings.update({ autoMinHistory })
+                                }
+                            />
+                            <TText color="400" size={12}>
+                                {t('summary.minimumHistoryDescription')}
+                            </TText>
+                            <ThemedSlider
+                                label={t('summary.maximumCoverage')}
+                                min={10}
+                                max={100}
+                                step={5}
+                                value={settings.autoMaxCoverage}
+                                onValueChange={(autoMaxCoverage) =>
+                                    settings.update({ autoMaxCoverage })
+                                }
+                            />
+                            <TText color="400" size={12}>
+                                {t('summary.maximumCoverageDescription')}
+                            </TText>
+                            <ThemedSwitchRow
+                                label={t('summary.consolidate')}
+                                description={t('summary.consolidateDescription')}
+                                value={settings.consolidateSummaries}
+                                onChangeValue={(consolidateSummaries) =>
+                                    settings.update({ consolidateSummaries })
                                 }
                             />
                             <ThemedSwitchRow

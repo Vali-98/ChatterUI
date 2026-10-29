@@ -18,7 +18,7 @@ import { deleteSummary, generateSummary, saveSummary } from '@lib/engine/summari
 import { useLiveQuerySync } from '@lib/hooks/liveQuery'
 import { contextHistory } from '@lib/queries/contextAllocation'
 import { Logger } from '@lib/state/Logger'
-import { summaryManagerList } from '@lib/summaries/db'
+import { summaryManagerList, summaryInputList } from '@lib/summaries/db'
 import { useSummaryPanelState } from '@lib/summaries/panelState'
 import { useSummarySettingsStore } from '@lib/summaries/settingsStore'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -29,12 +29,18 @@ const SummaryEditor = ({
     enabled,
     select,
 }: {
-    summary: ChatSummary & { sourceCount: number }
+    summary: ChatSummary & { sourceCount: number; inputCount?: number }
     task?: DeferredTask
     enabled: boolean
     select: (id?: number) => void
 }) => {
     const { t } = useTranslation()
+    const [showSources, setShowSources] = useState(false)
+    const archived = summary.status !== 'draft' && summary.status !== 'accepted'
+    const { data: inputs } = useLiveQuerySync(summaryInputList(summary.id), {
+        key: ['summary-inputs', summary.id],
+        watch: [{ table: 'summary_inputs' }, { table: 'chat_summaries' }],
+    })
     const [content, setContent] = useState(summary.content)
     const { data: history } = useLiveQuerySync(contextHistory(summary.chat_id), {
         key: ['summary-eligible-history', summary.chat_id],
@@ -45,6 +51,7 @@ const SummaryEditor = ({
         .at(-2)?.id
     const canReplace =
         summary.status === 'draft' &&
+        summary.kind !== 'consolidation' &&
         eligibleEnd !== undefined &&
         eligibleEnd > summary.end_entry_id
     const { color } = Theme.useTheme()
@@ -78,7 +85,10 @@ const SummaryEditor = ({
                 keyboardShouldPersistTaps="handled"
                 contentContainerStyle={{ flexGrow: 1, rowGap: 12 }}>
                 <TText color="400">
-                    {t(`summary.status.${summary.status}`)} ·{' '}
+                    {t(`summary.kind.${summary.kind}`)} · {t(`summary.status.${summary.status}`)} ·{' '}
+                    {summary.kind === 'consolidation'
+                        ? `${t('summary.inputCoverage', { count: summary.inputCount })} · `
+                        : ''}
                     {t('summary.coverage', { count: summary.sourceCount })}
                 </TText>
                 {!!summary.error && (
@@ -90,7 +100,11 @@ const SummaryEditor = ({
                 {!!task && (
                     <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}>
                         <ThemedSpinner />
-                        <TText>{t(`summary.tasks.${task.status}.summary`)}</TText>
+                        <TText>
+                            {t(
+                                `summary.tasks.${task.status}.${summary.kind === 'consolidation' ? 'consolidation' : 'summary'}`
+                            )}
+                        </TText>
                         <ThemedButton
                             iconName="close"
                             variant="tertiary"
@@ -104,7 +118,7 @@ const SummaryEditor = ({
                     multiline
                     value={content}
                     onChangeText={setContent}
-                    editable={!task}
+                    editable={!task && !archived}
                     containerStyle={{ flex: 1 }}
                     style={{
                         flex: 1,
@@ -113,86 +127,112 @@ const SummaryEditor = ({
                         borderColor: summary.source_changed ? color.warning : color.neutral._400,
                     }}
                 />
-            </ScrollView>
-            <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 4 }}>
-                <View style={{ flex: 1, alignItems: 'flex-start' }}>
-                    <ThemedButton
-                        label={t('common.actions.delete')}
-                        variant="critical"
-                        buttonStyle={{ paddingHorizontal: 8 }}
-                        disabled={!!task}
-                        onPress={handleDelete}
-                    />
-                </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'center', columnGap: 4 }}>
-                    <ThemedButton
-                        iconName="reload"
-                        iconSize={24}
-                        variant="tertiary"
-                        buttonStyle={{ padding: 4 }}
-                        accessibilityLabel={t('summary.regenerate')}
-                        disabled={!!task || !enabled}
-                        onPress={() =>
-                            run(() => {
-                                const next = generateSummary(summary.chat_id, {
-                                    summaryId: summary.id,
-                                })
-                                if (next) select(next.summaryId)
-                            })
-                        }
-                    />
-                    {canReplace && (
+                {summary.kind === 'consolidation' && (
+                    <>
                         <ThemedButton
-                            iconName="double-right"
+                            variant="tertiary"
+                            label={t('summary.viewSources', { count: inputs.length })}
+                            onPress={() => setShowSources(!showSources)}
+                        />
+                        {showSources &&
+                            inputs.map((input) => (
+                                <ListButton
+                                    key={input.id}
+                                    active={false}
+                                    onPress={() => select(input.id)}
+                                    style={{ padding: 12 }}>
+                                    <TText numberOfLines={3}>{input.content}</TText>
+                                </ListButton>
+                            ))}
+                    </>
+                )}
+            </ScrollView>
+            {!!summary.error && (
+                <TText color="400" size={12}>
+                    {t('summary.compressionFallback')}
+                </TText>
+            )}
+            {!archived && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 4 }}>
+                    <View style={{ flex: 1, alignItems: 'flex-start' }}>
+                        <ThemedButton
+                            label={t('common.actions.delete')}
+                            variant="critical"
+                            buttonStyle={{ paddingHorizontal: 8 }}
+                            disabled={!!task}
+                            onPress={handleDelete}
+                        />
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', columnGap: 4 }}>
+                        <ThemedButton
+                            iconName="reload"
                             iconSize={24}
                             variant="tertiary"
                             buttonStyle={{ padding: 4 }}
-                            accessibilityLabel={t('summary.replaceWithNewer')}
+                            accessibilityLabel={t('summary.regenerate')}
                             disabled={!!task || !enabled}
                             onPress={() =>
-                                run(() =>
-                                    generateSummary(summary.chat_id, {
+                                run(() => {
+                                    const next = generateSummary(summary.chat_id, {
                                         summaryId: summary.id,
-                                        supersedeDraft: true,
                                     })
-                                )
+                                    if (next) select(next.summaryId)
+                                })
                             }
                         />
-                    )}
-                    {summary.status === 'draft' && (
+                        {canReplace && (
+                            <ThemedButton
+                                iconName="double-right"
+                                iconSize={24}
+                                variant="tertiary"
+                                buttonStyle={{ padding: 4 }}
+                                accessibilityLabel={t('summary.replaceWithNewer')}
+                                disabled={!!task || !enabled}
+                                onPress={() =>
+                                    run(() =>
+                                        generateSummary(summary.chat_id, {
+                                            summaryId: summary.id,
+                                            supersedeDraft: true,
+                                        })
+                                    )
+                                }
+                            />
+                        )}
+                        {summary.status === 'draft' && (
+                            <ThemedButton
+                                iconName="forward"
+                                iconSize={24}
+                                variant="tertiary"
+                                buttonStyle={{ padding: 4 }}
+                                accessibilityLabel={t('summary.continue')}
+                                disabled={!!task || !enabled || summary.source_changed}
+                                onPress={() =>
+                                    run(() =>
+                                        generateSummary(summary.chat_id, {
+                                            summaryId: summary.id,
+                                            continueDraft: true,
+                                            draftContent: content,
+                                        })
+                                    )
+                                }
+                            />
+                        )}
+                    </View>
+                    <View style={{ flex: 1, alignItems: 'flex-end' }}>
                         <ThemedButton
-                            iconName="forward"
-                            iconSize={24}
-                            variant="tertiary"
-                            buttonStyle={{ padding: 4 }}
-                            accessibilityLabel={t('summary.continue')}
-                            disabled={!!task || !enabled || summary.source_changed}
+                            label={t('common.actions.save')}
+                            buttonStyle={{ paddingHorizontal: 8 }}
+                            disabled={!!task || !content.trim()}
                             onPress={() =>
-                                run(() =>
-                                    generateSummary(summary.chat_id, {
-                                        summaryId: summary.id,
-                                        continueDraft: true,
-                                        draftContent: content,
-                                    })
-                                )
+                                run(() => {
+                                    saveSummary(summary.id, content)
+                                    select()
+                                })
                             }
                         />
-                    )}
+                    </View>
                 </View>
-                <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                    <ThemedButton
-                        label={t('common.actions.save')}
-                        buttonStyle={{ paddingHorizontal: 8 }}
-                        disabled={!!task || !content.trim()}
-                        onPress={() =>
-                            run(() => {
-                                saveSummary(summary.id, content)
-                                select()
-                            })
-                        }
-                    />
-                </View>
-            </View>
+            )}
         </View>
     )
 }
@@ -200,6 +240,7 @@ const SummaryEditor = ({
 const SummarySheet = () => {
     const { t } = useTranslation()
     const { color } = Theme.useTheme()
+    const [showPrevious, setShowPrevious] = useState(false)
     const router = useRouter()
     const ref = useBottomSheetRef()
     const { chatId, summaryId, select, close } = useSummaryPanelState()
@@ -207,7 +248,11 @@ const SummarySheet = () => {
     const enabled = useSummarySettingsStore((state) => state.enabled)
     const { data: summaries } = useLiveQuerySync(summaryManagerList(chatId ?? -1), {
         key: ['summary-manager', chatId],
-        watch: [{ table: 'chat_summaries' }, { table: 'summary_sources' }],
+        watch: [
+            { table: 'chat_summaries' },
+            { table: 'summary_sources' },
+            { table: 'summary_inputs' },
+        ],
         enabled: chatId !== undefined,
     })
     const tasks = useDeferredTasks(chatId).filter(isDeferredTaskActive)
@@ -217,13 +262,18 @@ const SummarySheet = () => {
             (item) =>
                 item.kind === 'summary' &&
                 (item.resourceId === id ||
+                    summaries
+                        .find((summary) => summary.id === id)
+                        ?.dependentIds.includes(item.resourceId ?? -1) ||
                     summaries.some(
                         (draft) => draft.id === item.resourceId && draft.replaces_id === id
                     ))
         )
     const task = taskFor(summaryId)
-    const visible = summaries.filter(
-        (item) => item.status === 'draft' || item.status === 'accepted'
+    const visible = summaries.filter((item) =>
+        showPrevious
+            ? item.status === 'replaced'
+            : item.status === 'draft' || item.status === 'accepted'
     )
     useEffect(() => {
         if (chatId !== undefined) ref.current?.open()
@@ -274,6 +324,13 @@ const SummarySheet = () => {
                     {summaries.some((item) => item.status === 'draft' && !taskFor(item.id)) && (
                         <TText style={{ color: color.warning }}>{t('summary.paused')}</TText>
                     )}
+                    {summaries.some((item) => item.status === 'replaced') && (
+                        <ThemedButton
+                            variant="tertiary"
+                            label={t(showPrevious ? 'summary.current' : 'summary.previous')}
+                            onPress={() => setShowPrevious(!showPrevious)}
+                        />
+                    )}
                     {visible.length ? (
                         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ rowGap: 8 }}>
                             {visible.map((item) => {
@@ -291,6 +348,7 @@ const SummarySheet = () => {
                                         <ListButtonSection style={{ flex: 1, paddingVertical: 12 }}>
                                             <View style={{ flex: 1, rowGap: 4 }}>
                                                 <TText color={active ? '100' : '400'}>
+                                                    {t(`summary.kind.${item.kind}`)} ·{' '}
                                                     {t(`summary.status.${item.status}`)}
                                                     {item.source_changed
                                                         ? ` · ${t('summary.changed')}`

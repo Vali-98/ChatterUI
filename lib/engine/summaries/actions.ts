@@ -13,6 +13,11 @@ import {
     summaryList,
     summaryIdentity,
     updateSummary,
+    summaryInputList,
+    dependentSummaryIds,
+    createConsolidationDraft,
+    resetConsolidationDraft,
+    restrictConsolidationSources,
 } from '@lib/summaries/db'
 import {
     selectSummarySources,
@@ -23,7 +28,8 @@ import {
 } from '@lib/summaries/history'
 import { useSummarySettingsStore, type SummarySettings } from '@lib/summaries/settingsStore'
 
-import { generationHistoryCutoff } from '../generation/history'
+import { selectCompressionPlan, type CompressionItem } from '@lib/summaries/compression'
+import { createHistoryReader, generationHistoryCutoff } from '../generation/history'
 import { buildAndSendRequest, type CompletionReason } from '../API/APIBuilder'
 import { buildContext } from '../API/ContextBuilder'
 import { isDeferredTaskActive, useDeferredTaskState } from '../generation/deferredState'
@@ -53,6 +59,7 @@ export const assertSummaryEditable = (id: number) => {
     if (
         !summary ||
         summaryTask(id) ||
+        dependentSummaryIds(id).some((id) => !!summaryTask(id)) ||
         summaryList(summary.chat_id)
             .all()
             .some((item) => item.replaces_id === id && !!summaryTask(item.id))
@@ -98,6 +105,9 @@ export const generateSummary = (
         continueDraft?: boolean
         inputs?: GenerationInputs
         parentGenerationId?: number
+        sourceRange?: { startEntryId: number; endEntryId: number }
+        automaticMinimumTokens?: number
+        consolidationIds?: number[]
     } = {}
 ) => {
     const settings = { ...useSummarySettingsStore.getState() }
@@ -122,22 +132,57 @@ export const generateSummary = (
     )
         throw new Error('This draft must be regenerated')
     // Read current persisted history. Captured connection/model/user configuration remains immutable.
-    const messages = options.inputs
-        ? (Chats.db.query.chat(chatId)?.messages ?? [])
-        : inputs.messages
-    if (options.continueDraft && existing!.end_entry_id > (summaryCutoff(messages) ?? -1))
+    const wantsConsolidation =
+        options.consolidationIds !== undefined || existing?.kind === 'consolidation'
+    const messages =
+        options.inputs && !wantsConsolidation
+            ? (Chats.db.query.chat(chatId)?.messages ?? [])
+            : inputs.messages
+    const cutoff = inputs.history
+        ? generationHistoryCutoff(chatId, inputs.history, inputs.messages)
+        : summaryCutoff(messages)
+    if (options.continueDraft && existing!.end_entry_id > (cutoff ?? -1))
         throw new Error('Draft now covers protected recent history; regenerate it instead')
     if (
         options.supersedeDraft &&
         (!existing || existing.status !== 'draft' || options.continueDraft)
     )
         throw new Error('Only unfinished summaries can be replaced with newer history')
-    const sources = selectSummarySources(messages, summaries, existing?.id, options.supersedeDraft)
+    const sourceSummaries = options.consolidationIds
+        ? options.consolidationIds.map((id) => getSummary(id)!).filter(Boolean)
+        : existing?.kind === 'consolidation'
+          ? summaryInputList(existing.id).all()
+          : undefined
+    const consolidating = sourceSummaries !== undefined
+    if (consolidating && options.supersedeDraft)
+        throw new Error('Consolidation keeps its original sources')
+    const sources = sourceSummaries
+        ? sourceSummaries.map((source) => summaryMessage(-source.id, source.content))
+        : selectSummarySources(
+              messages,
+              summaries,
+              existing?.id,
+              options.supersedeDraft,
+              options.sourceRange
+          )
     if (!sources.length) throw new Error('Not enough eligible history to summarize')
     let draft =
-        existing?.status === 'draft' ? existing : createSummaryDraft(chatId, sources, existing?.id)
+        existing?.status === 'draft'
+            ? existing
+            : sourceSummaries
+              ? createConsolidationDraft(
+                    chatId,
+                    sourceSummaries.map((source) => source.id),
+                    existing?.id
+                )
+              : createSummaryDraft(chatId, sources, existing?.id)
     if (existing?.status === 'draft' && !options.continueDraft) {
-        draft = resetSummaryDraft(existing.id, sources)
+        draft = sourceSummaries
+            ? resetConsolidationDraft(
+                  existing.id,
+                  sourceSummaries.map((source) => source.id)
+              )
+            : resetSummaryDraft(existing.id, sources)
     }
     const prefix = options.continueDraft ? (options.draftContent ?? draft.content) : ''
     updateSummary(draft.id, {
@@ -159,7 +204,16 @@ export const generateSummary = (
             const unsubscribe = observer.subscribe(checkOwner)
             try {
                 checkOwner()
-                await runSummary(draft.id, sources, inputs, settings, prefix, signal)
+                await runSummary(
+                    draft.id,
+                    sources,
+                    inputs,
+                    settings,
+                    prefix,
+                    signal,
+                    consolidating,
+                    options.automaticMinimumTokens
+                )
             } finally {
                 unsubscribe()
             }
@@ -180,9 +234,15 @@ const runSummary = async (
     inputs: GenerationInputs,
     settings: SummarySettings,
     prefix: string,
-    signal: AbortSignal
+    signal: AbortSignal,
+    consolidating = false,
+    minimumSourceTokens?: number
 ) => {
     if (!getSummary(id)) return
+    const transcript = (messages: typeof sources) =>
+        consolidating
+            ? messages.map((message) => `Earlier summary:\n${message.swipes[0].swipe}`).join('\n\n')
+            : summaryTranscript(messages)
     let content = prefix
     const parser = createReasoningParser()
     const parseInline =
@@ -214,12 +274,22 @@ const runSummary = async (
         const sourceTokenCounts: number[] = []
         for (const source of sources) {
             if (signal.aborted) throw new Error('Cancelled')
-            const count = await inputs.tokenizer(summaryTranscript([source]) + '\n\n')
+            const count = await inputs.tokenizer(transcript([source]) + '\n\n')
             if (tokens + count > available) break
             tokens += count
             selected.push(source)
             sourceTokenCounts.push(count)
         }
+        const enforceAutomaticRange = () => {
+            if (minimumSourceTokens === undefined || consolidating) return
+            while (selected.at(-1)?.is_user) {
+                selected.pop()
+                tokens -= sourceTokenCounts.pop()!
+            }
+            if (!selected.length || tokens < minimumSourceTokens)
+                throw new Error('Eligible history no longer meets the automatic summary minimum')
+        }
+        enforceAutomaticRange()
         if (!selected.length)
             throw new Error('Eligible history does not fit the summarizer context')
         // Continuation must cover exactly the original range, never silently shrink its coverage.
@@ -233,7 +303,7 @@ const runSummary = async (
                 : undefined,
             summaries: [],
             messages: [
-                summaryMessage(-1, summaryTranscript(selected)),
+                summaryMessage(-1, transcript(selected)),
                 ...(prefix ? [summaryMessage(-2, prefix, false)] : []),
             ],
             instruct: {
@@ -289,12 +359,20 @@ const runSummary = async (
             if (prefix) throw new Error('Draft no longer fits; regenerate it instead')
             selected.pop()
             tokens -= sourceTokenCounts.pop()!
+            enforceAutomaticRange()
             if (!selected.length)
                 throw new Error('Eligible history does not fit the summarizer context')
-            requestInputs.messages[0] = summaryMessage(-1, summaryTranscript(selected))
+            requestInputs.messages[0] = summaryMessage(-1, transcript(selected))
         }
         if (signal.aborted) throw new Error('Cancelled')
-        restrictSummarySources(id, selected)
+        if (consolidating) {
+            if (selected.length < 2)
+                throw new Error('At least two summaries must fit the consolidation context')
+            restrictConsolidationSources(
+                id,
+                selected.map((source) => -source.id)
+            )
+        } else restrictSummarySources(id, selected)
         if (inputs.mode === 'local') {
             if (!payload) throw new Error('Could not build summary prompt')
             const thinking = payload as typeof payload & {
@@ -420,7 +498,7 @@ export const prepareAutomaticSummary = async (
                   usableSummariesBefore(cutoff, summaries)
               )
             : selectSummarySources(inputs.messages, summaries).length > 0
-        if (!eligible) return
+        if (!eligible && !settings.consolidateSummaries) return
     }
     const stats = await estimateGenerationContext({ ...inputs, summaries })
     if (
@@ -429,10 +507,99 @@ export const prepareAutomaticSummary = async (
         stats.total / stats.capacity < settings.autoThreshold / 100
     )
         return
+    if (draft)
+        return generateSummary(inputs.chatId, {
+            inputs,
+            summaryId: draft.id,
+            continueDraft: true,
+            parentGenerationId: options.parentGenerationId,
+        })
+    const cutoff = inputs.history
+        ? generationHistoryCutoff(inputs.chatId, inputs.history, inputs.messages)
+        : summaryCutoff(inputs.messages)
+    const used = usableSummariesBefore(cutoff, summaries)
+    const items: CompressionItem[] = []
+    const budget = stats.historyBudget
+    if (inputs.history) {
+        const reader = createHistoryReader({
+            chatId: inputs.chatId,
+            history: inputs.history,
+            messages: inputs.messages,
+            includeReasoning: false,
+            summaries,
+        })
+        let remaining = budget
+        let stop = false
+        while (remaining > 0 && !stop) {
+            const batch = reader.readHints(remaining)
+            if (!batch.length) break
+            const accepted: CompressionItem[] = []
+            for (const item of [...batch].reverse()) {
+                if (item.tokens > remaining) {
+                    stop = true
+                    break
+                }
+                accepted.unshift(item)
+                remaining -= item.tokens
+            }
+            items.unshift(...accepted)
+        }
+    } else {
+        // Full-history inputs are used by manual/test callers; use the same source policy.
+        const logical = inputs.messages
+            .filter(
+                (message) =>
+                    !used.some(
+                        (summary) =>
+                            message.id >= summary.start_entry_id &&
+                            message.id <= summary.end_entry_id
+                    )
+            )
+            .map((message) => ({
+                id: message.id,
+                position: message.id,
+                kind: 'message' as const,
+                isUser: message.is_user,
+                tokens:
+                    message.swipes.find((swipe) => swipe.active)?.token_length ??
+                    Math.ceil(
+                        (message.swipes.find((swipe) => swipe.active)?.swipe.length ?? 0) / 4
+                    ),
+            }))
+        const combined: CompressionItem[] = [
+            ...logical,
+            ...used.map((summary) => ({
+                id: summary.id,
+                position: summary.end_entry_id,
+                kind: 'summary' as const,
+                isUser: true,
+                tokens: Math.ceil(summary.content.length / 4),
+            })),
+        ].sort((a, b) => b.position - a.position)
+        let remaining = budget
+        for (const item of combined) {
+            if (item.tokens > remaining) break
+            items.unshift(item)
+            remaining -= item.tokens
+        }
+    }
+    const plan = selectCompressionPlan(items, summaries, {
+        capacity: stats.capacity,
+        used: stats.capacity - budget + items.reduce((sum, item) => sum + item.tokens, 0),
+        cutoff,
+        minimumPercent: settings.autoMinHistory,
+        maximumCoveragePercent: settings.autoMaxCoverage,
+        consolidate: settings.consolidateSummaries,
+    })
+    if (!plan || options.signal?.aborted) return
     return generateSummary(inputs.chatId, {
         inputs,
-        summaryId: draft?.id,
-        continueDraft: !!draft,
+        ...(plan.kind === 'history'
+            ? {
+                  sourceRange: plan,
+                  automaticMinimumTokens: (stats.capacity * settings.autoMinHistory) / 100,
+              }
+            : { consolidationIds: plan.summaryIds }),
         parentGenerationId: options.parentGenerationId,
     })
 }

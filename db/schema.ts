@@ -201,6 +201,9 @@ export const chatSummaries = sqliteTable(
             .notNull()
             .references(() => chats.id, { onDelete: 'cascade' }),
         content: text('content').notNull().default(''),
+        kind: text('kind', { enum: ['history', 'consolidation'] })
+            .notNull()
+            .default('history'),
         status: text('status', { enum: ['draft', 'accepted', 'replaced', 'discarded'] })
             .notNull()
             .default('draft'),
@@ -246,6 +249,22 @@ export const summarySources = sqliteTable(
         primaryKey({ columns: [table.summary_id, table.entry_id] }),
         index('summary_sources_entry_idx').on(table.entry_id),
         index('summary_sources_swipe_idx').on(table.swipe_id),
+    ]
+)
+
+export const summaryInputs = sqliteTable(
+    'summary_inputs',
+    {
+        summary_id: integer('summary_id')
+            .notNull()
+            .references(() => chatSummaries.id, { onDelete: 'cascade' }),
+        source_summary_id: integer('source_summary_id')
+            .notNull()
+            .references(() => chatSummaries.id, { onDelete: 'cascade' }),
+    },
+    (table) => [
+        primaryKey({ columns: [table.summary_id, table.source_summary_id] }),
+        index('summary_inputs_source_idx').on(table.source_summary_id),
     ]
 )
 
