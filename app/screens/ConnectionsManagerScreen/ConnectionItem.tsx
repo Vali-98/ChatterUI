@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
-import ListButton, { ListButtonSection } from '@components/buttons/ListButton'
+import ListCard, { ListCardSection } from '@components/views/ListCard'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
@@ -34,9 +34,9 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, pendingOpen }) =>
     const active = item.id === activeConnectionId
 
     return (
-        <ListButton style={{ paddingLeft: spacing.l }} active={active}>
+        <ListCard style={{ paddingLeft: spacing.l }} active={active}>
             <ConnectionEditor originalValues={item} ref={editorRef} />
-            <ListButtonSection style={{ columnGap: spacing.xl, paddingVertical: spacing.xl }}>
+            <ListCardSection style={{ columnGap: spacing.xl, paddingVertical: spacing.xl }}>
                 <ThemedSwitch
                     value={active}
                     onChangeValue={(value) => {
@@ -51,8 +51,8 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, pendingOpen }) =>
                         {item.configName}
                     </Text>
                 </View>
-            </ListButtonSection>
-            <ListButtonSection>
+            </ListCardSection>
+            <ListCardSection>
                 <ThemedButton
                     onPress={() => editorRef.current?.open()}
                     variant="tertiary"
@@ -60,8 +60,8 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, pendingOpen }) =>
                     iconSize={24}
                     buttonStyle={{ paddingHorizontal: spacing.l }}
                 />
-            </ListButtonSection>
-        </ListButton>
+            </ListCardSection>
+        </ListCard>
     )
 }
 

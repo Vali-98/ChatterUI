@@ -3,7 +3,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, View } from 'react-native'
 
-import ListButton, { ListButtonSection } from '@components/buttons/ListButton'
+import ListButton from '@components/buttons/ListButton'
+import { ListCardSection } from '@components/views/ListCard'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import TText from '@components/text/TText'
@@ -349,7 +350,7 @@ const SummarySheet = () => {
                                         warning={needsReview}
                                         style={{ paddingHorizontal: 12, columnGap: 20 }}
                                         onPress={() => select(item.id)}>
-                                        <ListButtonSection style={{ flex: 1, paddingVertical: 12 }}>
+                                        <ListCardSection style={{ flex: 1, paddingVertical: 12 }}>
                                             <View style={{ flex: 1, rowGap: 4 }}>
                                                 <TText color={active ? '100' : '400'}>
                                                     {t(`summary.kind.${item.kind}`)} ·{' '}
@@ -362,11 +363,11 @@ const SummarySheet = () => {
                                                     {item.content || t('summary.unfinished')}
                                                 </TText>
                                             </View>
-                                        </ListButtonSection>
+                                        </ListCardSection>
                                         {busy && (
-                                            <ListButtonSection>
+                                            <ListCardSection>
                                                 <ThemedSpinner />
-                                            </ListButtonSection>
+                                            </ListCardSection>
                                         )}
                                     </ListButton>
                                 )

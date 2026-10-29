@@ -2,7 +2,8 @@ import AntDesign, { type AntDesignIconName } from '@react-native-vector-icons/an
 import { type Href, useRouter } from 'expo-router'
 import { View } from 'react-native'
 
-import ListButton, { ListButtonSection } from '@components/buttons/ListButton'
+import ListButton from '@components/buttons/ListButton'
+import { ListCardSection } from '@components/views/ListCard'
 import TText from '@components/text/TText'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -31,7 +32,7 @@ const SettingsLink = ({
                 })
             }
             style={{ padding: 14, columnGap: 14 }}>
-            <ListButtonSection style={{ columnGap: 14, flex: 1 }}>
+            <ListCardSection style={{ columnGap: 14, flex: 1 }}>
                 <View style={{ padding: 10 }}>
                     <AntDesign name={icon} size={21} color={color.text._100} />
                 </View>
@@ -43,10 +44,10 @@ const SettingsLink = ({
                         </TText>
                     )}
                 </View>
-            </ListButtonSection>
-            <ListButtonSection>
+            </ListCardSection>
+            <ListCardSection>
                 <AntDesign name="right" size={14} color={color.text._400} />
-            </ListButtonSection>
+            </ListCardSection>
         </ListButton>
     )
 }

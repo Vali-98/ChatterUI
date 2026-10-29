@@ -12,6 +12,7 @@ import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import useAnimatedActiveColorStyle from '@lib/hooks/AnimatedActiveColorStyle'
 import { Theme } from '@lib/theme/ThemeManager'
+import Octicons from '@react-native-vector-icons/octicons/static'
 
 type TemplatePickerProps = {
     ref: BottomSheetRef
@@ -72,7 +73,7 @@ const TemplateItem: React.FC<{
                 </View>
                 {link && (
                     <Pressable onPress={() => Linking.openURL(link)}>
-                        <AntDesign name={'info-circle'} color={color.text._400} size={20} />
+                        <Octicons name={'globe'} color={color.text._400} size={20} />
                     </Pressable>
                 )}
             </Pressable>

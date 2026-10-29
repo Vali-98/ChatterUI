@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, View } from 'react-native'
 import Animated, { FadeIn } from 'react-native-reanimated'
 import ListButton from '@components/buttons/ListButton'
+import ListCard from '@components/views/ListCard'
 import Aicons, { AiconsGlyphName } from '@components/icons/Aicons'
 import BottomSheet, { useBottomSheetRef } from '@components/views/BottomSheet'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -108,7 +109,7 @@ const ConnectionSetup = ({
                 <TText size={28} style={{ fontWeight: '600' }}>
                     {t('onboarding.connectionReady')}
                 </TText>
-                <ListButton active={false} style={{ padding: 16, alignItems: 'center', gap: 14 }}>
+                <ListCard active={false} style={{ padding: 16, alignItems: 'center', gap: 14 }}>
                     <Aicons
                         name={(confirmedTemplate?.ui.display?.icon ?? 'link') as AiconsGlyphName}
                         size={20}
@@ -118,7 +119,7 @@ const ConnectionSetup = ({
                         {confirmedValue.friendlyName}
                     </TText>
                     <TText color="400">{t('onboarding.configured')}</TText>
-                </ListButton>
+                </ListCard>
                 <TText color="400">{t('onboarding.connectionReadyHint')}</TText>
                 <ThemedButton
                     variant="tertiary"

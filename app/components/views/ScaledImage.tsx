@@ -2,11 +2,11 @@ import { Image, ImageProps } from 'expo-image'
 import { useEffect, useState } from 'react'
 import { Image as RNImage } from 'react-native'
 
-interface ScaledImageProps extends ImageProps {
+interface ScaledImageProps extends Omit<ImageProps, 'source'> {
     uri: string
 }
 
-const ScaledImage: React.FC<ScaledImageProps> = ({ uri, style }) => {
+const ScaledImage: React.FC<ScaledImageProps> = ({ uri, style, ...props }) => {
     const [aspectRatio, setAspectRatio] = useState(1)
     useEffect(() => {
         RNImage.getSize(
@@ -19,7 +19,7 @@ const ScaledImage: React.FC<ScaledImageProps> = ({ uri, style }) => {
             }
         )
     }, [uri])
-    return <Image source={{ uri: uri }} style={[style, { aspectRatio: aspectRatio }]} />
+    return <Image {...props} source={{ uri }} style={[{ aspectRatio }, style]} />
 }
 
 export default ScaledImage

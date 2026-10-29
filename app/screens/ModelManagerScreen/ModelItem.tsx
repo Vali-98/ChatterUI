@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
-import ListButton, { ListButtonSection } from '@components/buttons/ListButton'
+import ListCard, { ListCardSection } from '@components/views/ListCard'
 import DropdownSheet from '@components/input/DropdownSheet'
 import Alert from '@components/views/Alert'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
@@ -126,7 +126,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
         mmprojList.filter((e) => e.id === item.mmprojLink?.mmproj_id)?.[0]?.name ?? undefined
 
     return (
-        <ListButton style={{ paddingHorizontal: 24 }} active={isLoaded}>
+        <ListCard style={{ paddingHorizontal: 24 }} active={isLoaded}>
             <InputSheet
                 ref={editInputRef}
                 onConfirm={async (name) => {
@@ -136,7 +136,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 defaultValue={item.name}
             />
 
-            <ListButtonSection style={{ flex: 1 }}>
+            <ListCardSection style={{ flex: 1 }}>
                 <TouchableOpacity
                     onPress={() => setShowInfo(!showInfo)}
                     style={{ paddingVertical: 18 }}>
@@ -179,9 +179,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         </Text>
                     )}
                 </TouchableOpacity>
-            </ListButtonSection>
+            </ListCardSection>
 
-            <ListButtonSection style={styles.buttonContainer}>
+            <ListCardSection style={styles.buttonContainer}>
                 <ContextMenu disabled={disableEdit}>
                     <ContextMenu.Trigger
                         icon="edit"
@@ -261,8 +261,8 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         />
                     </TouchableOpacity>
                 )}
-            </ListButtonSection>
-        </ListButton>
+            </ListCardSection>
+        </ListCard>
     )
 }
 

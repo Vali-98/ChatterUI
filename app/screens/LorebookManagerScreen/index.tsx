@@ -5,7 +5,8 @@ import { Text, View } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import ListButton, { ListButtonSection } from '@components/buttons/ListButton'
+import ListButton from '@components/buttons/ListButton'
+import { ListCardSection } from '@components/views/ListCard'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
 import TText from '@components/text/TText'
@@ -94,7 +95,7 @@ const LorebookListItem: React.FC<{ lorebook: LorebookType }> = ({ lorebook }) =>
                 setId(lorebook.id)
                 router.push('/screens/LorebookManagerScreen/LorebookInfo')
             }}>
-            <ListButtonSection style={{ columnGap: 12 }}>
+            <ListCardSection style={{ columnGap: 12 }}>
                 <ThemedSwitch
                     value={lorebook?.active || false}
                     onChangeValue={(active) =>
@@ -109,8 +110,8 @@ const LorebookListItem: React.FC<{ lorebook: LorebookType }> = ({ lorebook }) =>
                     style={{ flexShrink: 1, paddingVertical: 12 }}>
                     {lorebook.name}
                 </TText>
-            </ListButtonSection>
-            <ListButtonSection>
+            </ListCardSection>
+            <ListCardSection>
                 <ContextMenu>
                     <ContextMenu.Trigger iconStyle={{ paddingVertical: 12 }} icon="edit" />
                     <ContextMenu.Body>
@@ -131,7 +132,7 @@ const LorebookListItem: React.FC<{ lorebook: LorebookType }> = ({ lorebook }) =>
                         />
                     </ContextMenu.Body>
                 </ContextMenu>
-            </ListButtonSection>
+            </ListCardSection>
         </ListButton>
     )
 }

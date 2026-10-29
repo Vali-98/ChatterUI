@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, View } from 'react-native'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
-import ListButton, { ListButtonSection } from '@components/buttons/ListButton'
+import ListButton from '@components/buttons/ListButton'
+import ListCard, { ListCardSection } from '@components/views/ListCard'
 import ThemedButton from '@components/buttons/ThemedButton'
 import DownloadList from '@components/downloads/DownloadList'
 import TText from '@components/text/TText'
@@ -55,8 +56,8 @@ const LocalSetup = ({ models }: { models: ModelListQueryType[] }) => {
                 <TText size={28} style={{ fontWeight: '600' }}>
                     {t('onboarding.modelReady')}
                 </TText>
-                <ListButton active={false} style={{ paddingHorizontal: 24, width: '100%' }}>
-                    <ListButtonSection
+                <ListCard active={false} style={{ paddingHorizontal: 24, width: '100%' }}>
+                    <ListCardSection
                         style={{
                             flex: 1,
                             flexDirection: 'column',
@@ -92,8 +93,8 @@ const LocalSetup = ({ models }: { models: ModelListQueryType[] }) => {
                         <TText color="400" size={12} numberOfLines={2}>
                             {t('model.item.file')}: {readyModel.file}
                         </TText>
-                    </ListButtonSection>
-                </ListButton>
+                    </ListCardSection>
+                </ListCard>
                 <TText color="400">{t('onboarding.autoLoadHint')}</TText>
             </Animated.View>
         )
@@ -124,7 +125,7 @@ const LocalSetup = ({ models }: { models: ModelListQueryType[] }) => {
             {recommendedModels.map((model) => {
                 const fits = fitsDeviceMemory(model, memory)
                 return (
-                    <ListButton
+                    <ListCard
                         key={model.id}
                         active={false}
                         style={{ padding: 16, gap: 24, alignItems: 'center' }}>
@@ -152,7 +153,7 @@ const LocalSetup = ({ models }: { models: ModelListQueryType[] }) => {
                                 }
                             }}
                         />
-                    </ListButton>
+                    </ListCard>
                 )
             })}
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 28 }}>

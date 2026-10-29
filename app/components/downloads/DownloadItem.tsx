@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
-import ListButton from '@components/buttons/ListButton'
+import ListCard from '@components/views/ListCard'
 import ThemedButton from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
 import { pauseDownload, removeDownload, resumeDownload } from '@lib/downloads/manager'
@@ -55,7 +55,7 @@ const DownloadItem = ({ item }: { item: Download }) => {
         }
     }
     return (
-        <ListButton
+        <ListCard
             active={false}
             style={{ padding: 16, flexDirection: 'column', alignItems: 'stretch', gap: 12 }}>
             <TText numberOfLines={1}>{item.name}</TText>
@@ -85,7 +85,9 @@ const DownloadItem = ({ item }: { item: Download }) => {
                 <ThemedButton
                     variant="tertiary"
                     label={t(
-                        item.status === 'completed' ? 'common.actions.clear' : 'common.actions.cancel'
+                        item.status === 'completed'
+                            ? 'common.actions.clear'
+                            : 'common.actions.cancel'
                     )}
                     disabled={waiting}
                     onPress={() => {
@@ -110,7 +112,7 @@ const DownloadItem = ({ item }: { item: Download }) => {
                     />
                 )}
             </View>
-        </ListButton>
+        </ListCard>
     )
 }
 export default DownloadItem
