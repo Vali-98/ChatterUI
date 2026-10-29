@@ -889,6 +889,7 @@
             "wideChatDescription": "Gunakan tata letak yang lebih lebar untuk jendela chat."
         },
         "colors": {
+            "lowContrast": "Tema diimpor. Beberapa teks mungkin sulit dibaca: {{pairs}}.",
             "active": "Aktif",
             "alert": {
                 "deleteTheme": {

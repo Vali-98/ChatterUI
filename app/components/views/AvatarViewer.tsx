@@ -10,6 +10,7 @@ import Avatar from '@components/views/Avatar'
 import FadeBackrop from '@components/views/FadeBackdrop'
 import { Characters } from '@lib/state/characters'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
+import { getShadowColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type AvatarViewerProps = {
@@ -129,7 +130,7 @@ const useStyles = () => {
         },
 
         bodyContainer: {
-            shadowColor: color.shadow,
+            shadowColor: getShadowColor(color.shadow),
             elevation: 10,
             paddingTop: spacing.xl2,
             paddingBottom: spacing.xl,

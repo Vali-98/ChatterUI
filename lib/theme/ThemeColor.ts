@@ -1,39 +1,19 @@
-import { z } from 'zod'
+import type { ThemeColor } from './schema'
 
-const hexColorSchema = z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/, {
-    message: 'Invalid color format. Use #RGB or #RRGGBB.',
-})
-
-const colorGradientSchema = z.object({
-    _100: hexColorSchema,
-    _200: hexColorSchema,
-    _300: hexColorSchema,
-    _400: hexColorSchema,
-    _500: hexColorSchema,
-    _600: hexColorSchema,
-    _700: hexColorSchema,
-    _800: hexColorSchema,
-    _900: hexColorSchema,
-})
-
-export const themeColorSchemaV1 = z.object({
-    version: z.number().int(),
-    name: z.string(),
-    quote: hexColorSchema,
-    shadow: hexColorSchema,
-    primary: colorGradientSchema,
-    neutral: colorGradientSchema,
-    error: colorGradientSchema,
-    warning: hexColorSchema.optional(),
-    text: colorGradientSchema,
-})
-
-export type ThemeColor = z.infer<typeof themeColorSchemaV1>
+export {
+    parseTheme,
+    themeColorSchemaV1,
+    themeColorSchemaV2,
+    themeImportSchema,
+    getThemeContrastWarnings,
+} from './schema'
+export type { ThemeColor } from './schema'
 
 export namespace DefaultColorSchemes {
     export const lavenderDark: ThemeColor = {
-        version: 1,
+        version: 2,
         name: 'Lavender Dark',
+        mode: 'dark',
         primary: {
             _100: '#2a254d',
             _200: '#3d3563',
@@ -56,17 +36,6 @@ export namespace DefaultColorSchemes {
             _800: '#AAA6CA',
             _900: '#C4C0E8',
         },
-        error: {
-            _100: '#ff8080',
-            _200: '#ee6666',
-            _300: '#d34d4d',
-            _400: '#b83333',
-            _500: '#9c1a1a',
-            _600: '#800000',
-            _700: '#640000',
-            _800: '#480000',
-            _900: '#2c0000',
-        },
         text: {
             _100: '#f4f4f4',
             _200: '#e6e6e6',
@@ -78,13 +47,87 @@ export namespace DefaultColorSchemes {
             _800: '#323232',
             _900: '#000000',
         },
-        quote: '#e69d17',
-        shadow: '#111111',
+        error: {
+            _100: '#ff8080',
+            _200: '#ee6666',
+            _300: '#d34d4d',
+            _400: '#b83333',
+            _500: '#9c1a1a',
+            _600: '#800000',
+            _700: '#640000',
+            _800: '#480000',
+            _900: '#2c0000',
+        },
+        warning: {
+            _100: '#d4a017',
+            _200: '#d4a017',
+            _300: '#d4a017',
+            _400: '#d4a017',
+            _500: '#d4a017',
+            _600: '#d4a017',
+            _700: '#d4a017',
+            _800: '#d4a017',
+            _900: '#d4a017',
+        },
+        shadow: {
+            color: '#111111',
+            opacity: 1,
+        },
+        chat: {
+            text: '#f4f4f4',
+            metadata: '#aaaaaa',
+            user: {
+                background: '#26222E',
+                border: '#26222E',
+            },
+            character: {
+                background: '#26222E',
+                border: '#26222E',
+            },
+            markdown: {
+                quote: '#e69d17',
+                emphasis: '#aaaaaa',
+                link: '#a794cc',
+                inlineCode: {
+                    background: '#26222E',
+                    text: '#f4f4f4',
+                },
+                codeBlock: {
+                    background: '#121018',
+                    text: '#c8c8c8',
+                    headerBackground: '#26222E',
+                    headerText: '#c8c8c8',
+                },
+                blockquote: {
+                    background: '#26222E',
+                    text: '#aaaaaa',
+                    border: '#7d6fa6',
+                },
+                table: {
+                    headerBackground: '#343040',
+                    background: '#26222E',
+                    border: '#343040',
+                },
+            },
+            section: {
+                background: '#121018',
+                headerBackground: '#343040',
+                headerText: '#aaaaaa',
+                border: '#343040',
+            },
+        },
+        context: {
+            system: '#5b9bd5',
+            history: '#7d6fa6',
+            reserved: '#d4a34b',
+            free: '#343040',
+        },
     }
 
     export const lavenderLight: ThemeColor = {
-        version: 1,
+        version: 2,
         name: 'Lavender Light',
+        mode: 'light',
         primary: {
             _100: '#f1eafa',
             _200: '#e4d7f5',
@@ -107,17 +150,6 @@ export namespace DefaultColorSchemes {
             _800: '#4b3d5b',
             _900: '#33263f',
         },
-        error: {
-            _100: '#fff0f0',
-            _200: '#efb4b4',
-            _300: '#bd3f43',
-            _400: '#b52f38',
-            _500: '#a82530',
-            _600: '#92202b',
-            _700: '#7a1c26',
-            _800: '#631721',
-            _900: '#4b111a',
-        },
         text: {
             _100: '#252132',
             _200: '#393344',
@@ -129,14 +161,87 @@ export namespace DefaultColorSchemes {
             _800: '#736a7f',
             _900: '#ffffff',
         },
-        quote: '#82541b',
-        shadow: '#ded6e8',
-        warning: '#8a5b00',
+        error: {
+            _100: '#fff0f0',
+            _200: '#efb4b4',
+            _300: '#bd3f43',
+            _400: '#b52f38',
+            _500: '#a82530',
+            _600: '#92202b',
+            _700: '#7a1c26',
+            _800: '#631721',
+            _900: '#4b111a',
+        },
+        warning: {
+            _100: '#8a5b00',
+            _200: '#8a5b00',
+            _300: '#8a5b00',
+            _400: '#8a5b00',
+            _500: '#8a5b00',
+            _600: '#8a5b00',
+            _700: '#8a5b00',
+            _800: '#8a5b00',
+            _900: '#8a5b00',
+        },
+        shadow: {
+            color: '#ded6e8',
+            opacity: 1,
+        },
+        chat: {
+            text: '#252132',
+            metadata: '#5e566b',
+            user: {
+                background: '#ffffff',
+                border: '#ffffff',
+            },
+            character: {
+                background: '#ffffff',
+                border: '#ffffff',
+            },
+            markdown: {
+                quote: '#82541b',
+                emphasis: '#5e566b',
+                link: '#59318d',
+                inlineCode: {
+                    background: '#ffffff',
+                    text: '#252132',
+                },
+                codeBlock: {
+                    background: '#f2eef8',
+                    text: '#4c4559',
+                    headerBackground: '#ffffff',
+                    headerText: '#4c4559',
+                },
+                blockquote: {
+                    background: '#ffffff',
+                    text: '#5e566b',
+                    border: '#6f46a6',
+                },
+                table: {
+                    headerBackground: '#e6dfef',
+                    background: '#ffffff',
+                    border: '#e6dfef',
+                },
+            },
+            section: {
+                background: '#f2eef8',
+                headerBackground: '#e6dfef',
+                headerText: '#5e566b',
+                border: '#e6dfef',
+            },
+        },
+        context: {
+            system: '#5b9bd5',
+            history: '#6f46a6',
+            reserved: '#d4a34b',
+            free: '#e6dfef',
+        },
     }
 
     export const amoled: ThemeColor = {
-        version: 1,
+        version: 2,
         name: 'AMOLED Black & White',
+        mode: 'dark',
         primary: {
             _100: '#333333',
             _200: '#4d4d4d',
@@ -159,17 +264,6 @@ export namespace DefaultColorSchemes {
             _800: '#464646',
             _900: '#505050',
         },
-        error: {
-            _100: '#ffffff',
-            _200: '#e6e6e6',
-            _300: '#cccccc',
-            _400: '#b3b3b3',
-            _500: '#999999',
-            _600: '#808080',
-            _700: '#666666',
-            _800: '#4d4d4d',
-            _900: '#333333',
-        },
         text: {
             _100: '#ffffff',
             _200: '#e6e6e6',
@@ -181,13 +275,87 @@ export namespace DefaultColorSchemes {
             _800: '#4d4d4d',
             _900: '#333333',
         },
-        quote: '#e6a317',
-        shadow: '#ffffff',
+        error: {
+            _100: '#ffffff',
+            _200: '#e6e6e6',
+            _300: '#cccccc',
+            _400: '#b3b3b3',
+            _500: '#999999',
+            _600: '#808080',
+            _700: '#666666',
+            _800: '#4d4d4d',
+            _900: '#333333',
+        },
+        warning: {
+            _100: '#d4a017',
+            _200: '#d4a017',
+            _300: '#d4a017',
+            _400: '#d4a017',
+            _500: '#d4a017',
+            _600: '#d4a017',
+            _700: '#d4a017',
+            _800: '#d4a017',
+            _900: '#d4a017',
+        },
+        shadow: {
+            color: '#ffffff',
+            opacity: 1,
+        },
+        chat: {
+            text: '#ffffff',
+            metadata: '#b3b3b3',
+            user: {
+                background: '#0a0a0a',
+                border: '#0a0a0a',
+            },
+            character: {
+                background: '#0a0a0a',
+                border: '#0a0a0a',
+            },
+            markdown: {
+                quote: '#e6a317',
+                emphasis: '#b3b3b3',
+                link: '#cccccc',
+                inlineCode: {
+                    background: '#0a0a0a',
+                    text: '#ffffff',
+                },
+                codeBlock: {
+                    background: '#000000',
+                    text: '#cccccc',
+                    headerBackground: '#0a0a0a',
+                    headerText: '#cccccc',
+                },
+                blockquote: {
+                    background: '#0a0a0a',
+                    text: '#b3b3b3',
+                    border: '#999999',
+                },
+                table: {
+                    headerBackground: '#141414',
+                    background: '#0a0a0a',
+                    border: '#141414',
+                },
+            },
+            section: {
+                background: '#000000',
+                headerBackground: '#141414',
+                headerText: '#b3b3b3',
+                border: '#141414',
+            },
+        },
+        context: {
+            system: '#5b9bd5',
+            history: '#999999',
+            reserved: '#d4a34b',
+            free: '#141414',
+        },
     }
 
     export const navyDark: ThemeColor = {
-        version: 1,
+        version: 2,
         name: 'Navy Dark',
+        mode: 'dark',
         primary: {
             _100: '#101a2d',
             _200: '#162444',
@@ -210,17 +378,6 @@ export namespace DefaultColorSchemes {
             _800: '#a4aecf',
             _900: '#c0cbea',
         },
-        error: {
-            _100: '#ff8080',
-            _200: '#ee6666',
-            _300: '#d34d4d',
-            _400: '#b83333',
-            _500: '#9c1a1a',
-            _600: '#800000',
-            _700: '#640000',
-            _800: '#480000',
-            _900: '#2c0000',
-        },
         text: {
             _100: '#e4e8f4',
             _200: '#c8d1e6',
@@ -232,13 +389,87 @@ export namespace DefaultColorSchemes {
             _800: '#1a3c63',
             _900: '#001f46',
         },
-        quote: '#e6a317',
-        shadow: '#000000',
+        error: {
+            _100: '#ff8080',
+            _200: '#ee6666',
+            _300: '#d34d4d',
+            _400: '#b83333',
+            _500: '#9c1a1a',
+            _600: '#800000',
+            _700: '#640000',
+            _800: '#480000',
+            _900: '#2c0000',
+        },
+        warning: {
+            _100: '#d4a017',
+            _200: '#d4a017',
+            _300: '#d4a017',
+            _400: '#d4a017',
+            _500: '#d4a017',
+            _600: '#d4a017',
+            _700: '#d4a017',
+            _800: '#d4a017',
+            _900: '#d4a017',
+        },
+        shadow: {
+            color: '#000000',
+            opacity: 1,
+        },
+        chat: {
+            text: '#e4e8f4',
+            metadata: '#8ca1ca',
+            user: {
+                background: '#1b1f2e',
+                border: '#1b1f2e',
+            },
+            character: {
+                background: '#1b1f2e',
+                border: '#1b1f2e',
+            },
+            markdown: {
+                quote: '#e6a317',
+                emphasis: '#8ca1ca',
+                link: '#3260b6',
+                inlineCode: {
+                    background: '#1b1f2e',
+                    text: '#e4e8f4',
+                },
+                codeBlock: {
+                    background: '#0e1218',
+                    text: '#aab9d8',
+                    headerBackground: '#1b1f2e',
+                    headerText: '#aab9d8',
+                },
+                blockquote: {
+                    background: '#1b1f2e',
+                    text: '#8ca1ca',
+                    border: '#274889',
+                },
+                table: {
+                    headerBackground: '#272c40',
+                    background: '#1b1f2e',
+                    border: '#272c40',
+                },
+            },
+            section: {
+                background: '#0e1218',
+                headerBackground: '#272c40',
+                headerText: '#8ca1ca',
+                border: '#272c40',
+            },
+        },
+        context: {
+            system: '#5b9bd5',
+            history: '#274889',
+            reserved: '#d4a34b',
+            free: '#272c40',
+        },
     }
 
     export const hotPink: ThemeColor = {
-        version: 1,
+        version: 2,
         name: 'Pink',
+        mode: 'light',
         primary: {
             _100: '#fdeaf1',
             _200: '#fad5e4',
@@ -261,17 +492,6 @@ export namespace DefaultColorSchemes {
             _800: '#543341',
             _900: '#3d2230',
         },
-        error: {
-            _100: '#fff0f0',
-            _200: '#efb4b4',
-            _300: '#bd3f43',
-            _400: '#b52f38',
-            _500: '#a82530',
-            _600: '#92202b',
-            _700: '#7a1c26',
-            _800: '#631721',
-            _900: '#4b111a',
-        },
         text: {
             _100: '#34232c',
             _200: '#47313d',
@@ -283,14 +503,87 @@ export namespace DefaultColorSchemes {
             _800: '#806674',
             _900: '#ffffff',
         },
-        quote: '#88511f',
-        shadow: '#ecd8e1',
-        warning: '#8a5b00',
+        error: {
+            _100: '#fff0f0',
+            _200: '#efb4b4',
+            _300: '#bd3f43',
+            _400: '#b52f38',
+            _500: '#a82530',
+            _600: '#92202b',
+            _700: '#7a1c26',
+            _800: '#631721',
+            _900: '#4b111a',
+        },
+        warning: {
+            _100: '#8a5b00',
+            _200: '#8a5b00',
+            _300: '#8a5b00',
+            _400: '#8a5b00',
+            _500: '#8a5b00',
+            _600: '#8a5b00',
+            _700: '#8a5b00',
+            _800: '#8a5b00',
+            _900: '#8a5b00',
+        },
+        shadow: {
+            color: '#ecd8e1',
+            opacity: 1,
+        },
+        chat: {
+            text: '#34232c',
+            metadata: '#654b59',
+            user: {
+                background: '#ffffff',
+                border: '#ffffff',
+            },
+            character: {
+                background: '#ffffff',
+                border: '#ffffff',
+            },
+            markdown: {
+                quote: '#88511f',
+                emphasis: '#654b59',
+                link: '#8b2450',
+                inlineCode: {
+                    background: '#ffffff',
+                    text: '#34232c',
+                },
+                codeBlock: {
+                    background: '#fbf0f4',
+                    text: '#573e4b',
+                    headerBackground: '#ffffff',
+                    headerText: '#573e4b',
+                },
+                blockquote: {
+                    background: '#ffffff',
+                    text: '#654b59',
+                    border: '#ad3567',
+                },
+                table: {
+                    headerBackground: '#f2e1e8',
+                    background: '#ffffff',
+                    border: '#f2e1e8',
+                },
+            },
+            section: {
+                background: '#fbf0f4',
+                headerBackground: '#f2e1e8',
+                headerText: '#654b59',
+                border: '#f2e1e8',
+            },
+        },
+        context: {
+            system: '#5b9bd5',
+            history: '#ad3567',
+            reserved: '#d4a34b',
+            free: '#f2e1e8',
+        },
     }
 
     export const retroGreen: ThemeColor = {
-        version: 1,
+        version: 2,
         name: 'Retro Green',
+        mode: 'dark',
         primary: {
             _100: '#38582a',
             _200: '#486839',
@@ -313,17 +606,6 @@ export namespace DefaultColorSchemes {
             _800: '#484848',
             _900: '#505050',
         },
-        error: {
-            _100: '#ff8080',
-            _200: '#ee6666',
-            _300: '#d34d4d',
-            _400: '#b83333',
-            _500: '#9c1a1a',
-            _600: '#800000',
-            _700: '#640000',
-            _800: '#480000',
-            _900: '#2c0000',
-        },
         text: {
             _100: '#c4d4b2',
             _200: '#b4c4a2',
@@ -335,8 +617,81 @@ export namespace DefaultColorSchemes {
             _800: '#546442',
             _900: '#445432',
         },
-        quote: '#e6a317',
-        shadow: '#000000',
+        error: {
+            _100: '#ff8080',
+            _200: '#ee6666',
+            _300: '#d34d4d',
+            _400: '#b83333',
+            _500: '#9c1a1a',
+            _600: '#800000',
+            _700: '#640000',
+            _800: '#480000',
+            _900: '#2c0000',
+        },
+        warning: {
+            _100: '#d4a017',
+            _200: '#d4a017',
+            _300: '#d4a017',
+            _400: '#d4a017',
+            _500: '#d4a017',
+            _600: '#d4a017',
+            _700: '#d4a017',
+            _800: '#d4a017',
+            _900: '#d4a017',
+        },
+        shadow: {
+            color: '#000000',
+            opacity: 1,
+        },
+        chat: {
+            text: '#c4d4b2',
+            metadata: '#94a482',
+            user: {
+                background: '#181818',
+                border: '#181818',
+            },
+            character: {
+                background: '#181818',
+                border: '#181818',
+            },
+            markdown: {
+                quote: '#e6a317',
+                emphasis: '#94a482',
+                link: '#98b884',
+                inlineCode: {
+                    background: '#181818',
+                    text: '#c4d4b2',
+                },
+                codeBlock: {
+                    background: '#101010',
+                    text: '#a4b492',
+                    headerBackground: '#181818',
+                    headerText: '#a4b492',
+                },
+                blockquote: {
+                    background: '#181818',
+                    text: '#94a482',
+                    border: '#789866',
+                },
+                table: {
+                    headerBackground: '#202020',
+                    background: '#181818',
+                    border: '#202020',
+                },
+            },
+            section: {
+                background: '#101010',
+                headerBackground: '#202020',
+                headerText: '#94a482',
+                border: '#202020',
+            },
+        },
+        context: {
+            system: '#5b9bd5',
+            history: '#789866',
+            reserved: '#d4a34b',
+            free: '#202020',
+        },
     }
 
     export const schemes = [lavenderDark, lavenderLight, amoled, navyDark, hotPink, retroGreen]

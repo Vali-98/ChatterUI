@@ -9,7 +9,13 @@ import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
-import { DefaultColorSchemes, ThemeColor, themeColorSchemaV1 } from './ThemeColor'
+import {
+    DefaultColorSchemes,
+    ThemeColor,
+    themeImportSchema,
+    parseTheme,
+    getThemeContrastWarnings,
+} from './ThemeColor'
 
 const PreviewColorContext = createContext<ThemeColor | undefined>(undefined)
 
@@ -20,7 +26,7 @@ interface ColorStateProps {
     useSystemDarkMode: boolean
     setUseSystemDarkMode: (b: boolean) => void
     customColors: ThemeColor[]
-    addCustomColor: (colorScheme: ThemeColor) => void
+    addCustomColor: (colorScheme: unknown) => void
     removeColorScheme: (index: number) => void
     colorName: string
     lightColorName: string
@@ -66,8 +72,8 @@ export namespace Theme {
                 },
 
                 customColors: [],
-                addCustomColor: (colorScheme: ThemeColor) => {
-                    const validation = themeColorSchemaV1.safeParse(colorScheme)
+                addCustomColor: (input: unknown) => {
+                    const validation = themeImportSchema.safeParse(input)
 
                     if (!validation.success) {
                         Logger.errorToast(t('common.errors.schemaValidationFailed'))
@@ -80,6 +86,7 @@ export namespace Theme {
                         return
                     }
 
+                    const colorScheme = parseTheme(validation.data)
                     if (
                         get().customColors.some((item) => item.name === colorScheme.name) ||
                         DefaultColorSchemes.schemes.some((item) => item.name === colorScheme.name)
@@ -89,6 +96,14 @@ export namespace Theme {
                     }
                     set({ customColors: [...get().customColors, colorScheme] })
                     Logger.info(`Successfully imported ${colorScheme.name}`)
+                    const warnings = getThemeContrastWarnings(colorScheme)
+                    if (warnings.length) {
+                        Logger.warnToast(
+                            t('settings.colors.lowContrast', {
+                                pairs: warnings.map((warning) => warning.pair).join(', '),
+                            })
+                        )
+                    }
                 },
                 removeColorScheme: (index: number) => {
                     if (index < 0 || index >= get().customColors.length) {
@@ -119,7 +134,7 @@ export namespace Theme {
             {
                 name: Storage.ColorState,
                 storage: createMMKVStorage(),
-                version: 4,
+                version: 5,
                 partialize: (state) => ({
                     colorName: state.colorName,
                     customColors: state.customColors,
@@ -146,7 +161,10 @@ export namespace Theme {
                             persistedState.darkColorName ??
                             persistedState.darkColor?.name ??
                             DefaultColorSchemes.lavenderDark.name,
-                        customColors: persistedState.customColors ?? [],
+                        customColors:
+                            version < 5
+                                ? (persistedState.customColors ?? []).map(parseTheme)
+                                : (persistedState.customColors ?? []),
                         useSystemDarkMode: persistedState.useSystemDarkMode ?? true,
                     }
                 },
@@ -215,7 +233,7 @@ export namespace Theme {
 
         return useMemo(
             () => ({
-                color: { ...color, warning: color.warning ?? '#d4a017' },
+                color,
                 spacing: spacing,
                 font: font,
                 borderWidth: borderWidth,

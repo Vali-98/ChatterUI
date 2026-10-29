@@ -19,13 +19,20 @@ const ChatReasoning = ({
         <Accordion
             label={t(generating ? 'chat.reasoning.generating' : 'chat.reasoning.label')}
             accordionStyle={{
+                backgroundColor: color.chat.section.headerBackground,
+                borderColor: color.chat.section.border,
+                borderWidth: 1,
                 borderBottomLeftRadius: 0,
                 borderBottomRightRadius: 0,
                 borderTopLeftRadius: 8,
                 borderTopRightRadius: 8,
             }}
-            bodyStyle={{ borderWidth: 0 }}
-            labelStyle={{ color: color.text._400 }}
+            bodyStyle={{
+                backgroundColor: color.chat.section.background,
+                borderColor: color.chat.section.border,
+            }}
+            labelStyle={{ color: color.chat.section.headerText }}
+            iconColor={color.chat.section.headerText}
             style={{ flex: 1 }}>
             <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
                 {content}

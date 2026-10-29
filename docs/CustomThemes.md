@@ -1,152 +1,109 @@
 # Custom Themes
 
-v0.8.5 introduces custom app themes, allowing you to customize the colors used in the app!
-
-To get started, simply add your custom colors to [exampleTheme.json](https://github.com/Vali-98/ChatterUI/blob/master/docs/exampleTheme.json), then import them in the `Settings` > `Change Theme` > `Gear Icon` > `Import`
-
-This doc will explain each property of the theme object:
+Edit [exampleTheme.json](exampleTheme.json), then import it from **Settings > Appearance > Theme options > Import Theme**. Themes can also be pasted or exported from this menu.
 
 ## Metadata
 
-- `name`: The unique name for your Theme - you cannot have themes of the same name!
-- `version`: Current schema version, currently `1`.
+- `name`: Unique theme name.
+- `version`: Current format version, `2`. Version 1 files are converted on import.
+- `mode`: `light` or `dark`. Controls system-bar appearance.
 
 ## Colors
 
-All colors range from key \_100 to \_900. The schema only accepts strings formatted in `#RRGGBB` or `#RGB`
+Colors accept `#RGB` or `#RRGGBB`.
 
 ### primary
 
-This is the primary theme color which generally determines the color of inputs and buttons.
+Accent colors for buttons, selections and controls.
 
-1. `_100`: Should be the lightest tone in light mode, and darkest tone in dark mode.
-2. `_500`: Should be the base tone for this color.
-3. `_900`: Should be the darkest tone in light mode, and lightest tone in dark mode.
-
-<details>
-<summary><i><b>More Details</b></i></summary>
-
-- `_100`: Tag background under each character
-- `_200`:
-    - Background of selected item in drop-down menu.
-    - Frame color of:
-      - Popup
-      - (Settings): "Add" tag button
-      - (User menu):
-        - "Save"
-        - "New User"
-      - (Models menu):
-        - "Show settings"
-        - "Back to models"
-      - (Chat sidebar): "Start new chat"
-- `_300`: 
-    - Frame color of:
-      - (Main sidebar): Active app mode
-      - (User profiles sidebar): User pfp.
-    - Background color of:
-      - Drop-down menu.
-      - Active character sort.
-      - Character pfp edit button.
-- `_400`: 
-    - Progress bar color.
-    - Frame color of:
-      - (Settings): Big buttons
-      - (Character Edit):
-        - Tag frame.
-        - Export frame.
-- `_500`:
-    - Active slider head.
-    - "Model loaded" arrow in chat interface.
-    - Horizontal line in chat.
-    - Frame color of:
-        - (User profiles sidebar): 
-            - User profile picture.
-            - Active profile frame.
-    - Background color of:
-        - (User profiles sidebar):
-            - "Save" button.
-            - "New user" button.
-        - (Settings): "Add" tag button.
-    - Accent color circle in theme selector
-- `_600`: (NO EFFECT)
-- `_700`: (Settings) Text of big buttons.
-- `_800`: (Chat) Foldable section arrow (Thought Process)
-- `_900`: (NO EFFECT)
-
-</details>
+- `_100`–`_200`: Subtle and selected backgrounds.
+- `_300`–`_400`: Borders and indicators.
+- `_500`: Filled buttons and active controls.
+- `_700`: Colored text and icons.
 
 ### neutral
 
-This is the color used for surfaces - though it scales up to \_900, currently the app rarely uses tones above \_500
+Background and border colors.
 
-1. `_100`: Should be your lightest tone in light mode, and darkest tone in dark mode
-> [!Note] 
-> `_100` controls the default background color for the app
-2. `_900`: Should be the darkest tone for light mode, and lightest tone for dark mode
-
-<details>
-<summary><i><b>More Details</b></i></summary>
-
-- `_100`: Background color of the whole app.
-- `_200`:
-    - Background color of:
-        - Popup.
-        - Inactive character sort.
-        - (Model menu): Model cards.
-        - (User menu): Edit pfp button.
-        - (Chat):
-            - Media attachment.
-            - "Model Loaded"
-        - (Formatting menu): Drop-down input filter.
-    - Frame color of:
-        - Inactive app mode.
-        - Character pfp
-        - (Character search):
-            - Tag filter.
-- `_300`:
-   - Inactive slider background.
-   - (Chat): Extra actions menu divider. 
-   - (Theme selector): Active theme frame.
-   - (Character edit menu): Tag box frame.
-- `_400`:
-   - Inactive slider head.
-   - Foldable section background (Thought process).
-   - Editable field frame.
-   - Sampler value frame.
-- `_500`:
-   - Settings divider.
-   - Active slider background.
-   - Checkbox frame.
-- `_600`: (NO EFFECT)
-- `_700`: (NO EFFECT) 
-- `_800`: (NO EFFECT)
-- `_900`: (NO EFFECT)
-
-</details>
-
-### error
-
-This is the color for critical functions like deletion.
-
-- `_100`: Should be the lightest tone in light mode, and darkest tone in dark mode.
-- `_500`: Should be the base tone for this color.
-- `_900`: Should be the darkest tone in light mode, and lightest tone in dark mode.
-
+- `_100`: App background.
+- `_200`: Component surfaces.
+- `_300`: Inset and selected surfaces.
+- `_400`: Subtle borders.
+- `_500`: Stronger borders.
 
 ### text
 
-This is the color for text in the app
+App text colors.
 
-- `_100`: Should be the most readable color.
-- `_900`: Should be the least readable color.
+- `_100`: Main text.
+- `_200`: Secondary text.
+- `_300`: Descriptions.
+- `_400`: Muted text and placeholders.
+- `_500`: Disabled text.
 
+### error
+
+Colors for errors and destructive actions. Uses the same shade conventions as `primary`.
+
+### warning
+
+Colors for warnings. Uses the same shade conventions as `primary`. All shades are optional and default to `#d4a017`.
+
+### Optional shades
+
+Primary and error require `_100`–`_500` and `_700`. Neutral and text require `_100`–`_500`.
+
+Omitted shades use these fallbacks, in order:
+
+| Shade  | Fallbacks              |
+| ------ | ---------------------- |
+| `_600` | `_500`                 |
+| `_700` | `_400`                 |
+| `_800` | `_700`, `_400`         |
+| `_900` | `_800`, `_700`, `_400` |
 
 ### shadow
-This controls the colors for shadows
 
+- `color`: Shadow color.
+- `opacity`: Shadow opacity, from `0` to `1`.
 
-### quote
+## Chat
 
-This controls the colors for Markdown texts wrapped in double quotes for the chat. 
+All `chat` properties are optional and default to app palette colors.
 
-E.g. `"This is some quoted text."`
+- `text`: Shared message text color, including headings, bold text and maths.
+- `metadata`: Message times, indices and generation statistics.
+- `user`: User bubble `background` and `border`.
+- `character`: Character bubble `background` and `border`.
+
+Both bubble backgrounds default to `neutral._200`. Choose backgrounds that remain readable with the shared text colors. Low-contrast imports display a warning.
+
+### chat.markdown
+
+- `quote`: Text wrapped in double quotes.
+- `emphasis`: Italic text using `*asterisks*` or `_underscores_`.
+- `link`: Link text and border color.
+- `inlineCode`: `background` and `text`.
+- `codeBlock`: `background`, `text`, `headerBackground` and `headerText`.
+- `blockquote`: `background`, `text` and `border` for `>` blocks.
+- `table`: `headerBackground`, `background` and `border`.
+
+### chat.section
+
+Colors for expandable chat sections, including reasoning.
+
+- `background`: Section body background.
+- `headerBackground`: Header background.
+- `headerText`: Header text and icon color.
+- `border`: Section border color.
+
+Section content uses the shared chat text and Markdown colors.
+
+## Context Meter
+
+All `context` properties are optional.
+
+- `system`: System allocation; defaults to `#5b9bd5`.
+- `history`: History allocation; defaults to `primary._500`.
+- `reserved`: Reserved allocation; defaults to `#d4a34b`.
+- `free`: Free space; defaults to `neutral._300`.

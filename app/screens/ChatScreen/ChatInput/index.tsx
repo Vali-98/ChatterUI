@@ -36,7 +36,7 @@ import { Chats } from '@lib/state/chat'
 import { useChatControlLayoutState } from '@lib/state/components/ChatControls'
 import { useChatInputTextStore } from '@lib/state/components/ChatInput'
 import { Logger } from '@lib/state/Logger'
-import { getContrastingColor } from '@lib/theme/contrast'
+import { getContrastingColor, getShadowColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ChatOptions from './ChatInputOptions'
@@ -156,7 +156,7 @@ const ChatInput = () => {
                     {
                         offsetX: 1,
                         offsetY: 1,
-                        color: color.shadow,
+                        color: getShadowColor(color.shadow),
                         spreadDistance: 1,
                         blurRadius: 4,
                     },

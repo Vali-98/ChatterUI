@@ -889,6 +889,7 @@
             "wideChatDescription": "Use a wider layout for the chat window."
         },
         "colors": {
+            "lowContrast": "Theme imported. Some text may be difficult to read: {{pairs}}.",
             "active": "Active",
             "alert": {
                 "deleteTheme": {

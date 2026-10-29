@@ -20,6 +20,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton, { ThemedButtonProps } from '@components/buttons/ThemedButton'
 import { useGuideState } from '@lib/guides/state'
+import { getShadowColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import FadeBackrop from './FadeBackdrop'
@@ -217,7 +218,7 @@ const useStyles = () => {
 
         drawer: {
             backgroundColor: color.neutral._100,
-            shadowColor: color.shadow,
+            shadowColor: getShadowColor(color.shadow),
             width: '80%',
             height: '100%',
             borderTopWidth: 1,

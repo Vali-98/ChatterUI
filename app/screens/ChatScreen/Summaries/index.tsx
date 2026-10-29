@@ -95,7 +95,9 @@ const SummaryEditor = ({
                     <TText style={{ color: color.error._400 }}>{summary.error.message}</TText>
                 )}
                 {summary.source_changed && (
-                    <TText style={{ color: color.warning }}>{t('summary.sourceChanged')}</TText>
+                    <TText style={{ color: color.warning._700 }}>
+                        {t('summary.sourceChanged')}
+                    </TText>
                 )}
                 {!!task && (
                     <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}>
@@ -124,7 +126,9 @@ const SummaryEditor = ({
                         flex: 1,
                         minHeight: 180,
                         textAlignVertical: 'top',
-                        borderColor: summary.source_changed ? color.warning : color.neutral._400,
+                        borderColor: summary.source_changed
+                            ? color.warning._500
+                            : color.neutral._400,
                     }}
                 />
                 {summary.kind === 'consolidation' && (
@@ -322,7 +326,7 @@ const SummarySheet = () => {
                 <>
                     {!enabled && <TText>{t('summary.disabled')}</TText>}
                     {summaries.some((item) => item.status === 'draft' && !taskFor(item.id)) && (
-                        <TText style={{ color: color.warning }}>{t('summary.paused')}</TText>
+                        <TText style={{ color: color.warning._700 }}>{t('summary.paused')}</TText>
                     )}
                     {summaries.some((item) => item.status === 'replaced') && (
                         <ThemedButton

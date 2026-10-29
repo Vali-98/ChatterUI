@@ -9,7 +9,7 @@ import { useChatBubbleStyle } from '@lib/hooks/useChatBubbleStyle'
 import { useBackgroundStore } from '@lib/state/BackgroundImage'
 import { Characters } from '@lib/state/characters'
 import type { ChatMessage } from '@lib/state/chat'
-import { getContrastingColor } from '@lib/theme/contrast'
+import { getContrastingColor, getShadowColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
 import { AppDirectory } from '@lib/utils/File'
 import ChatFrame from '@screens/ChatScreen/ChatWindow/ChatFrame'
@@ -48,6 +48,7 @@ const ChatAppearancePreview = ({
     const { t } = useTranslation()
     const { color, spacing, borderRadius } = Theme.useTheme()
     const bubbleStyle = useChatBubbleStyle()
+    const userBubbleStyle = useChatBubbleStyle(true)
     const image = useBackgroundStore((state) => state.image)
     const characterName = Characters.useCharacterState((state) => state.card?.name)
     const characterImage = Characters.useCharacterState((state) => state.card?.background_image)
@@ -100,7 +101,7 @@ const ChatAppearancePreview = ({
                                 entry={entry}
                                 index={index + 1}
                                 isGenerating={false}>
-                                <View style={bubbleStyle}>
+                                <View style={entry.is_user ? userBubbleStyle : bubbleStyle}>
                                     <ChatText swipeText={entry.swipes[0].swipe} />
                                 </View>
                             </ChatFrame>
@@ -119,7 +120,7 @@ const ChatAppearancePreview = ({
                                     {
                                         offsetX: 1,
                                         offsetY: 1,
-                                        color: color.shadow,
+                                        color: getShadowColor(color.shadow),
                                         spreadDistance: 1,
                                         blurRadius: 4,
                                     },

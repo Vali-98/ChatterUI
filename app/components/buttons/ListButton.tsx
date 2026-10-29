@@ -35,8 +35,8 @@ const ListButton: React.FC<{
     const { spacing, borderWidth, color } = Theme.useTheme()
 
     const animatedStyle = useAnimatedActiveColorStyle({
-        deactiveColor: warning ? color.warning : color.neutral._200,
-        activeColor: warning ? color.warning : color.primary._500,
+        deactiveColor: warning ? color.warning._500 : color.neutral._200,
+        activeColor: warning ? color.warning._500 : color.primary._500,
         active: active,
     })
 

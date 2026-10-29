@@ -10,6 +10,7 @@ interface AccordionProps extends ViewProps {
     labelStyle?: TextStyle
     accordionStyle?: ViewStyle
     bodyStyle?: ViewStyle
+    iconColor?: string
 }
 
 const Accordion: React.FC<AccordionProps> = ({
@@ -18,6 +19,7 @@ const Accordion: React.FC<AccordionProps> = ({
     labelStyle = {},
     accordionStyle = {},
     bodyStyle = {},
+    iconColor,
     children,
     ...rest
 }) => {
@@ -44,7 +46,7 @@ const Accordion: React.FC<AccordionProps> = ({
                 <Text style={{ color: color.text._100, ...labelStyle }}>{label}</Text>
                 <Octicons
                     name={show ? 'chevron-up' : 'chevron-down'}
-                    color={color.primary._800}
+                    color={iconColor ?? color.primary._800}
                     size={18}
                 />
             </Pressable>

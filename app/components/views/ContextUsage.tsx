@@ -8,9 +8,6 @@ import type { ContextAllocation } from '@lib/utils/contextAllocation'
 
 import BottomSheet, { useBottomSheetRef } from './BottomSheet'
 
-// Category colours, independent of warning/error status. V2 will expose overrides.
-const CONTEXT_CATEGORY_COLORS = { system: '#5b9bd5', reserved: '#d4a34b' } as const
-
 const ContextUsage = ({
     generatedLength,
     compact = false,
@@ -24,10 +21,10 @@ const ContextUsage = ({
     const allocation = useContextAllocation(generatedLength)
     const { values } = allocation
     const colors: Record<keyof ContextAllocation['values'], string> = {
-        system: CONTEXT_CATEGORY_COLORS.system,
-        history: color.primary._500,
-        reserved: CONTEXT_CATEGORY_COLORS.reserved,
-        free: color.neutral._300,
+        system: color.context.system,
+        history: color.context.history,
+        reserved: color.context.reserved,
+        free: color.context.free,
     }
     const keys = Object.keys(values) as (keyof typeof values)[]
     const bar = () => (

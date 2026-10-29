@@ -83,14 +83,14 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, isGenerating, is
                             {entry.name}
                         </Text>
                         <View style={{ columnGap: 12, flexDirection: rowDir }}>
-                            <Text style={{ fontSize: fontSize.s, color: color.text._400 }}>
+                            <Text style={{ fontSize: fontSize.s, color: color.chat.metadata }}>
                                 {swipe.gen_finished.toLocaleTimeString()}
                             </Text>
-                            <Text style={{ color: color.text._700, fontSize: fontSize.s }}>
+                            <Text style={{ color: color.chat.metadata, fontSize: fontSize.s }}>
                                 {t('chat.frame.entryNumber', { index })}
                             </Text>
                             {deltaTime !== undefined && !entry.is_user && index !== 0 && (
-                                <Text style={{ color: color.text._700, fontSize: fontSize.s }}>
+                                <Text style={{ color: color.chat.metadata, fontSize: fontSize.s }}>
                                     {t('chat.frame.seconds', { seconds: deltaTime })}
                                 </Text>
                             )}
@@ -122,11 +122,11 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, isGenerating, is
                         />
                     </TouchableOpacity>
 
-                    <Text style={{ color: color.text._400 }}>
+                    <Text style={{ color: color.chat.metadata }}>
                         {t('chat.frame.entryNumber', { index })}
                     </Text>
                     {deltaTime !== undefined && !entry.is_user && index !== 0 && (
-                        <Text style={{ color: color.text._400 }}>
+                        <Text style={{ color: color.chat.metadata }}>
                             {t('chat.frame.seconds', { seconds: deltaTime })}
                         </Text>
                     )}
@@ -143,7 +143,7 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, isGenerating, is
                             }}>
                             {entry.name}
                         </Text>
-                        <Text style={{ fontSize: fontSize.s, color: color.text._400 }}>
+                        <Text style={{ fontSize: fontSize.s, color: color.chat.metadata }}>
                             {swipe.gen_finished.toLocaleTimeString()}
                         </Text>
                     </View>

@@ -889,6 +889,7 @@
             "wideChatDescription": "在聊天窗口使用更宽的布局。"
         },
         "colors": {
+            "lowContrast": "主题已导入。部分文字可能难以阅读：{{pairs}}。",
             "active": "活动",
             "alert": {
                 "deleteTheme": {

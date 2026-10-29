@@ -35,7 +35,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
     isLastMessage,
     isGreeting,
 }) => {
-    const bubbleStyle = useChatBubbleStyle()
+    const bubbleStyle = useChatBubbleStyle(entry.is_user)
     const anchorRef = useMessageActionAnchor(entry.id)
     const { t } = useTranslation()
     const { appMode } = useAppMode()
@@ -83,7 +83,7 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                             {showTPS && appMode === 'local' && timings && (
                                 <Text
                                     style={{
-                                        color: color.text._500,
+                                        color: color.chat.metadata,
                                         fontWeight: '300',
                                         textAlign: 'right',
                                         fontSize: fontSize.s,

@@ -1,6 +1,7 @@
 {
-    "version": 1,
+    "version": 2,
     "name": "Example",
+    "mode": "dark",
     "primary": {
         "_100": "#2a254d",
         "_200": "#3d3563",
@@ -23,17 +24,6 @@
         "_800": "#AAA6CA",
         "_900": "#C4C0E8"
     },
-    "error": {
-        "_100": "#ff8080",
-        "_200": "#ee6666",
-        "_300": "#d34d4d",
-        "_400": "#b83333",
-        "_500": "#9c1a1a",
-        "_600": "#800000",
-        "_700": "#640000",
-        "_800": "#480000",
-        "_900": "#2c0000"
-    },
     "text": {
         "_100": "#f4f4f4",
         "_200": "#e6e6e6",
@@ -45,6 +35,79 @@
         "_800": "#323232",
         "_900": "#000000"
     },
-    "quote": "#e69d17",
-    "shadow": "#000000"
+    "error": {
+        "_100": "#ff8080",
+        "_200": "#ee6666",
+        "_300": "#d34d4d",
+        "_400": "#b83333",
+        "_500": "#9c1a1a",
+        "_600": "#800000",
+        "_700": "#640000",
+        "_800": "#480000",
+        "_900": "#2c0000"
+    },
+    "warning": {
+        "_100": "#d4a017",
+        "_200": "#d4a017",
+        "_300": "#d4a017",
+        "_400": "#d4a017",
+        "_500": "#d4a017",
+        "_600": "#d4a017",
+        "_700": "#d4a017",
+        "_800": "#d4a017",
+        "_900": "#d4a017"
+    },
+    "shadow": {
+        "color": "#111111",
+        "opacity": 1
+    },
+    "chat": {
+        "text": "#f4f4f4",
+        "metadata": "#aaaaaa",
+        "user": {
+            "background": "#26222E",
+            "border": "#26222E"
+        },
+        "character": {
+            "background": "#26222E",
+            "border": "#26222E"
+        },
+        "markdown": {
+            "quote": "#e69d17",
+            "emphasis": "#aaaaaa",
+            "link": "#a794cc",
+            "inlineCode": {
+                "background": "#26222E",
+                "text": "#f4f4f4"
+            },
+            "codeBlock": {
+                "background": "#121018",
+                "text": "#c8c8c8",
+                "headerBackground": "#26222E",
+                "headerText": "#c8c8c8"
+            },
+            "blockquote": {
+                "background": "#26222E",
+                "text": "#aaaaaa",
+                "border": "#7d6fa6"
+            },
+            "table": {
+                "headerBackground": "#343040",
+                "background": "#26222E",
+                "border": "#343040"
+            }
+        },
+        "section": {
+            "background": "#121018",
+            "headerBackground": "#343040",
+            "headerText": "#aaaaaa",
+            "border": "#343040"
+        }
+    },
+    "context": {
+        "system": "#5b9bd5",
+        "history": "#7d6fa6",
+        "reserved": "#d4a34b",
+        "free": "#343040"
+    }
 }

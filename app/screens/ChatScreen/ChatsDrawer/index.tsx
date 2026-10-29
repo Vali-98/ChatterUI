@@ -14,6 +14,7 @@ import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/chat'
 import { Logger } from '@lib/state/Logger'
+import { getShadowColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ChatDrawerItem from './ChatDrawerItem'
@@ -175,7 +176,7 @@ const useStyles = () => {
         drawer: {
             backgroundColor: color.neutral._100,
             width: '90%',
-            shadowColor: color.shadow,
+            shadowColor: getShadowColor(color.shadow),
             borderTopWidth: 3,
             elevation: 20,
             right: 0,
