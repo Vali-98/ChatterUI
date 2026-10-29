@@ -144,6 +144,7 @@ const SamplerManagerScreen = () => {
             <HeaderButton headerRight={headerRight} />
 
             <DropdownSheet
+                keyExtractor={(item) => item.id}
                 containerStyle={{ marginHorizontal: spacing.xl, paddingVertical: spacing.m }}
                 selected={currentConfig}
                 data={configList}

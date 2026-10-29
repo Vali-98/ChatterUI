@@ -8,7 +8,7 @@ import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { EdgeFadeFlatList } from '@components/views/EdgeFade'
+import { EdgeFadeFlashList } from '@components/views/EdgeFade'
 import InputSheet from '@components/views/InputSheet'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Logger } from '@lib/state/Logger'
@@ -111,8 +111,9 @@ const TemplateManager = () => {
                 title={t('connections.templates.pasteSheetTitle')}
             />
             {templates.length > 0 && (
-                <EdgeFadeFlatList
-                    contentContainerStyle={{ rowGap: 4 }}
+                <EdgeFadeFlashList
+                    containerStyle={{ flex: 1 }}
+                    ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
                     data={templates}
                     keyExtractor={(item) => item.name}
                     renderItem={({ item }) => <TemplateItem item={item} />}

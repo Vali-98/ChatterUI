@@ -71,6 +71,7 @@ const ConnectionsManagerScreen = () => {
             />
             {apiValues.length > 0 && (
                 <EdgeFadeFlatList
+                    containerStyle={{ flex: 1 }}
                     style={{
                         paddingHorizontal: spacing.xl,
                     }}

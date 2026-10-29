@@ -1,128 +1,163 @@
+import { useTranslation } from 'react-i18next'
 import {
     createRef,
     forwardRef,
-    ReactNode,
-    RefObject,
+    type ReactNode,
+    type RefObject,
     useCallback,
     useImperativeHandle,
     useRef,
     useState,
 } from 'react'
-import { Modal, View, ViewStyle } from 'react-native'
+import {
+    Modal,
+    Pressable,
+    StyleSheet,
+    View,
+    type StyleProp,
+    type ViewProps,
+    type ViewStyle,
+    useWindowDimensions,
+} from 'react-native'
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
-import Animated, { SlideInDown, SlideOutDown, useAnimatedStyle } from 'react-native-reanimated'
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { scheduleOnRN } from 'react-native-worklets'
 
+import TText from '@components/text/TText'
 import { Theme } from '@lib/theme/ThemeManager'
-
-import FadeBackrop from './FadeBackdrop'
 
 export interface BottomSheetRefFunctions {
     open: () => void
     close: () => void
 }
-
 export type BottomSheetRef = RefObject<BottomSheetRefFunctions | null>
-
 export interface BottomSheetProps {
     children: ReactNode
-    sheetStyle?: ViewStyle
+    sheetStyle?: StyleProp<ViewStyle>
+    bodyContainerStyle?: StyleProp<ViewStyle>
+    onOpen?: () => void
     onClose?: () => void
     onRequestClose?: (close: () => void) => void
 }
+export const useBottomSheetRef = () => useRef<BottomSheetRefFunctions>(null)
+export const createBottomSheetRef = () => createRef<BottomSheetRefFunctions>()
 
-export const useBottomSheetRef = () => {
-    const ref = useRef<BottomSheetRefFunctions>(null)
-    return ref
-}
-
-export const createBottomSheetRef = () => {
-    return createRef<BottomSheetRefFunctions>()
-}
-
+export const BottomSheetHeader = ({
+    title,
+    description,
+    children,
+    style,
+    ...props
+}: ViewProps & { title?: string; description?: string }) => (
+    <View {...props} style={[{ rowGap: 8 }, style]}>
+        {title ? <TText size={18}>{title}</TText> : null}
+        {description ? <TText color="400">{description}</TText> : null}
+        {children}
+    </View>
+)
 const BottomSheet = forwardRef<BottomSheetRefFunctions, BottomSheetProps>(
-    ({ children, onClose, sheetStyle, onRequestClose }, ref) => {
-        const { color, spacing } = Theme.useTheme()
+    ({ children, onOpen, onClose, sheetStyle, bodyContainerStyle, onRequestClose }, ref) => {
+        const { t } = useTranslation()
+        const { color, borderRadius } = Theme.useTheme()
         const insets = useSafeAreaInsets()
-        const { height } = useReanimatedKeyboardAnimation()
-        const animatedStyle = useAnimatedStyle(() => {
-            return {
-                paddingBottom: -height.value - insets.bottom,
-                flex: 1,
-                justifyContent: 'flex-end',
-            }
-        })
-        const [visible, setVisible] = useState(false)
-        const [contentVisible, setContentVisible] = useState(false)
+        const { height: keyboardHeight } = useReanimatedKeyboardAnimation()
+        const window = useWindowDimensions()
+        const progress = useSharedValue(0)
+        const sheetHeight = useSharedValue(window.height)
+        const [phase, setPhase] = useState<'closed' | 'open' | 'closing'>('closed')
+        const phaseRef = useRef(phase)
+        const transition = useCallback((next: typeof phase) => {
+            phaseRef.current = next
+            setPhase(next)
+        }, [])
 
-        const handleClose = useCallback(() => {
-            setContentVisible(false)
-            setVisible(false)
+        const finishClose = useCallback(() => {
+            if (phaseRef.current !== 'closing') return
+            transition('closed')
             onClose?.()
-        }, [onClose, setVisible, setContentVisible])
-
+        }, [onClose, transition])
+        const close = useCallback(() => {
+            if (phaseRef.current !== 'open') return
+            transition('closing')
+            progress.set(
+                withTiming(0, { duration: 200 }, (finished) => {
+                    if (finished) scheduleOnRN(finishClose)
+                })
+            )
+        }, [finishClose, progress, transition])
         const open = useCallback(() => {
-            setVisible(true)
-            setContentVisible(true)
-        }, [setVisible, setContentVisible])
-
-        useImperativeHandle(
-            ref,
-            () => ({
-                open: open,
-                close: handleClose,
-            }),
-            [handleClose, open]
-        )
-
+            if (phaseRef.current === 'open') return
+            if (phaseRef.current === 'closing') {
+                transition('open')
+                progress.set(withTiming(1, { duration: 200 }))
+                return
+            }
+            transition('open')
+            progress.set(0)
+            onOpen?.()
+        }, [onOpen, progress, transition])
+        const requestClose = () => {
+            if (phaseRef.current !== 'open') return
+            if (onRequestClose) onRequestClose(close)
+            else close()
+        }
+        useImperativeHandle(ref, () => ({ open, close }), [open, close])
+        const position = useAnimatedStyle(() => ({
+            paddingBottom: Math.max(0, -keyboardHeight.value),
+        }))
+        const backdrop = useAnimatedStyle(() => ({ opacity: progress.value * 0.5 }))
+        const surface = useAnimatedStyle(() => ({
+            transform: [{ translateY: (1 - progress.value) * sheetHeight.value }],
+            paddingBottom: Math.max(0, insets.bottom + keyboardHeight.value),
+        }))
         return (
             <Modal
                 transparent
                 statusBarTranslucent
                 navigationBarTranslucent
-                onRequestClose={() => {
-                    if (onRequestClose) {
-                        onRequestClose(handleClose)
-                        return
-                    }
-                    handleClose()
-                }}
-                style={{
-                    flex: 1,
-                }}
-                visible={visible}
-                animationType="fade">
-                {contentVisible && (
+                visible={phase !== 'closed'}
+                animationType="none"
+                onRequestClose={requestClose}
+                onShow={() => {
+                    if (phaseRef.current === 'open') progress.set(withTiming(1, { duration: 200 }))
+                }}>
+                <View style={{ flex: 1 }}>
                     <Animated.View
-                        style={[animatedStyle]}
-                        entering={SlideInDown}
-                        exiting={SlideOutDown}>
-                        <FadeBackrop handleOverlayClick={handleClose} />
-                        <View
+                        pointerEvents="none"
+                        style={[StyleSheet.absoluteFill, { backgroundColor: '#000000' }, backdrop]}
+                    />
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={t('common.actions.close')}
+                        style={StyleSheet.absoluteFill}
+                        onPress={requestClose}
+                    />
+                    <Animated.View
+                        pointerEvents="box-none"
+                        style={[{ flex: 1, justifyContent: 'flex-end' }, position]}>
+                        <Animated.View
+                            pointerEvents={phase === 'closing' ? 'none' : 'auto'}
+                            onLayout={(event) => sheetHeight.set(event.nativeEvent.layout.height)}
                             style={[
                                 {
-                                    paddingTop: spacing.xl2,
-                                    paddingBottom: insets.bottom + spacing.xl2,
-                                    paddingLeft: spacing.xl2,
-                                    paddingRight: spacing.xl,
                                     maxHeight: '70%',
                                     width: '100%',
-                                    borderTopLeftRadius: spacing.xl2,
-                                    borderTopRightRadius: spacing.xl2,
+                                    flexShrink: 1,
+                                    borderTopLeftRadius: borderRadius.xl2,
+                                    borderTopRightRadius: borderRadius.xl2,
                                     backgroundColor: color.neutral._100,
                                 },
                                 sheetStyle,
+                                surface,
                             ]}>
-                            {children}
-                        </View>
+                            <View style={[{ flexShrink: 1 }, bodyContainerStyle]}>{children}</View>
+                        </Animated.View>
                     </Animated.View>
-                )}
+                </View>
             </Modal>
         )
     }
 )
-
-// eslint-disable-next-line i18next/no-literal-string
 BottomSheet.displayName = 'BottomSheet'
-
 export default BottomSheet

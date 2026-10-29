@@ -114,7 +114,10 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ ref, originalValues
     }
 
     return (
-        <BottomSheet sheetStyle={{ flex: 2, maxHeight: '80%' }} ref={ref}>
+        <BottomSheet
+            sheetStyle={{ flex: 2, maxHeight: '80%' }}
+            ref={ref}
+            bodyContainerStyle={[{ paddingHorizontal: 16, paddingVertical: 16 }, { flex: 1 }]}>
             <View style={styles.mainContainer}>
                 <Text
                     style={{
@@ -202,6 +205,9 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ ref, originalValues
                                 }}>
                                 {!template.features.multipleModels && (
                                     <DropdownSheet
+                                        keyExtractor={(item) =>
+                                            String(getNestedValue(item, template.model.nameParser))
+                                        }
                                         containerStyle={{ flex: 1 }}
                                         selected={values.model}
                                         data={modelList}
@@ -217,6 +223,9 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ ref, originalValues
                                 )}
                                 {template.features.multipleModels && (
                                     <MultiDropdownSheet
+                                        keyExtractor={(item) =>
+                                            String(getNestedValue(item, template.model.nameParser))
+                                        }
                                         containerStyle={{ flex: 1 }}
                                         selected={values?.model ?? []}
                                         data={modelList}

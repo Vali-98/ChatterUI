@@ -302,6 +302,7 @@ const FormattingManager = () => {
                         columnGap: spacing.m,
                     }}>
                     <DropdownSheet
+                        keyExtractor={(item) => item.id}
                         containerStyle={{ flex: 1 }}
                         selected={selectedItem}
                         data={instructList}

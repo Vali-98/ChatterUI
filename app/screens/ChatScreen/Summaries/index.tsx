@@ -1,10 +1,10 @@
 import { useFocusEffect, useRouter } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
+import { type ComponentProps, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, View } from 'react-native'
 
 import ListButton from '@components/buttons/ListButton'
-import { ListCardSection } from '@components/views/ListCard'
+import ListCard, { ListCardSection } from '@components/views/ListCard'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import TText from '@components/text/TText'
@@ -43,6 +43,7 @@ const SummaryEditor = ({
         watch: [{ table: 'summary_inputs' }, { table: 'chat_summaries' }],
     })
     const [content, setContent] = useState(summary.content)
+    const [contentHeight, setContentHeight] = useState<number>()
     const { data: history } = useLiveQuerySync(contextHistory(summary.chat_id), {
         key: ['summary-eligible-history', summary.chat_id],
         watch: [{ table: 'chat_entries' }, { table: 'chat_swipes' }],
@@ -81,17 +82,27 @@ const SummaryEditor = ({
             ],
         })
     return (
-        <View style={{ flex: 1, rowGap: 12 }}>
+        <View style={{ flexShrink: 1, rowGap: 12 }}>
             <ScrollView
                 keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{ flexGrow: 1, rowGap: 12 }}>
-                <TText color="400">
-                    {t(`summary.kind.${summary.kind}`)} · {t(`summary.status.${summary.status}`)} ·{' '}
-                    {summary.kind === 'consolidation'
-                        ? `${t('summary.inputCoverage', { count: summary.inputCount })} · `
-                        : ''}
-                    {t('summary.coverage', { count: summary.sourceCount })}
-                </TText>
+                style={{ flexGrow: 0, flexShrink: 1 }}
+                contentContainerStyle={{ rowGap: 12 }}>
+                {(summary.status !== 'accepted' || summary.kind === 'consolidation') && (
+                    <TText color="400">
+                        {summary.status !== 'accepted' &&
+                            t(
+                                summary.status === 'replaced'
+                                    ? 'summary.previous'
+                                    : `summary.status.${summary.status}`
+                            )}
+                        {summary.kind === 'consolidation' && (
+                            <>
+                                {summary.status !== 'accepted' ? ' · ' : ''}
+                                {t('summary.inputCoverage', { count: summary.inputCount })}
+                            </>
+                        )}
+                    </TText>
+                )}
                 {!!summary.error && (
                     <TText style={{ color: color.error._400 }}>{summary.error.message}</TText>
                 )}
@@ -100,38 +111,58 @@ const SummaryEditor = ({
                         {t('summary.sourceChanged')}
                     </TText>
                 )}
-                {!!task && (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}>
-                        <ThemedSpinner />
-                        <TText>
-                            {t(
-                                `summary.tasks.${task.status}.${summary.kind === 'consolidation' ? 'consolidation' : 'summary'}`
-                            )}
-                        </TText>
+                {task ? (
+                    <ListCard
+                        active={false}
+                        style={{
+                            paddingHorizontal: 16,
+                            paddingVertical: 12,
+                            alignItems: 'center',
+                            columnGap: 16,
+                        }}>
+                        <View
+                            style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                columnGap: 12,
+                            }}>
+                            <ThemedSpinner />
+                            <TText color="400">
+                                {t(
+                                    `summary.tasks.${task.status}.${summary.kind === 'consolidation' ? 'consolidation' : 'summary'}`
+                                )}
+                            </TText>
+                        </View>
                         <ThemedButton
-                            iconName="close"
-                            variant="tertiary"
+                            label={t('common.actions.cancel')}
+                            variant={task.status === 'cancelling' ? 'disabled' : 'secondary'}
+                            labelStyle={{ color: color.text._400 }}
+                            buttonStyle={{ borderColor: color.neutral._400, paddingHorizontal: 12 }}
                             disabled={task.status === 'cancelling'}
-                            accessibilityLabel={t('common.actions.cancel')}
                             onPress={() => cancelDeferredTask(task.id)}
                         />
-                    </View>
+                    </ListCard>
+                ) : (
+                    <ThemedTextInput
+                        multiline
+                        value={content}
+                        onChangeText={setContent}
+                        onContentSizeChange={(event) =>
+                            setContentHeight(Math.ceil(event.nativeEvent.contentSize.height))
+                        }
+                        scrollEnabled={false}
+                        editable={!archived}
+                        containerStyle={{ flex: 0 }}
+                        style={{
+                            height: contentHeight,
+                            textAlignVertical: 'top',
+                            borderColor: summary.source_changed
+                                ? color.warning._500
+                                : color.neutral._400,
+                        }}
+                    />
                 )}
-                <ThemedTextInput
-                    multiline
-                    value={content}
-                    onChangeText={setContent}
-                    editable={!task && !archived}
-                    containerStyle={{ flex: 1 }}
-                    style={{
-                        flex: 1,
-                        minHeight: 180,
-                        textAlignVertical: 'top',
-                        borderColor: summary.source_changed
-                            ? color.warning._500
-                            : color.neutral._400,
-                    }}
-                />
                 {summary.kind === 'consolidation' && (
                     <>
                         <ThemedButton
@@ -242,6 +273,58 @@ const SummaryEditor = ({
     )
 }
 
+const SummaryEditorSheet = ({
+    summary,
+    task,
+    enabled,
+    select,
+    onSettings,
+}: Omit<ComponentProps<typeof SummaryEditor>, 'summary'> & {
+    summary?: ComponentProps<typeof SummaryEditor>['summary']
+    onSettings: () => void
+}) => {
+    const { t } = useTranslation()
+    const ref = useBottomSheetRef()
+    const summaryId = summary?.id
+    useEffect(() => {
+        if (summaryId !== undefined) ref.current?.open()
+        else ref.current?.close()
+    }, [summaryId, ref])
+    const selectSummary = (id?: number) => {
+        if (id === undefined) ref.current?.close()
+        else select(id)
+    }
+    return (
+        <BottomSheet
+            ref={ref}
+            onClose={() => select()}
+            bodyContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16, rowGap: 12 }}>
+            {summary && (
+                <>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 12 }}>
+                        <TText size={18} numberOfLines={1} style={{ flex: 1 }}>
+                            {`${t('summary.status.accepted')} · ${t('summary.coverage', { count: summary.sourceCount })}`}
+                        </TText>
+                        <ThemedButton
+                            iconName="setting"
+                            variant="tertiary"
+                            accessibilityLabel={t('summary.settings')}
+                            onPress={onSettings}
+                        />
+                    </View>
+                    <SummaryEditor
+                        key={`${summary.id}:${summary.content}`}
+                        summary={summary}
+                        task={task}
+                        enabled={enabled}
+                        select={selectSummary}
+                    />
+                </>
+            )}
+        </BottomSheet>
+    )
+}
+
 const SummarySheet = () => {
     const { t } = useTranslation()
     const { color } = Theme.useTheme()
@@ -261,7 +344,6 @@ const SummarySheet = () => {
         enabled: chatId !== undefined,
     })
     const tasks = useDeferredTasks(chatId).filter(isDeferredTaskActive)
-    const summary = summaries.find((item) => item.id === summaryId)
     const taskFor = (id?: number) =>
         tasks.find(
             (item) =>
@@ -284,6 +366,10 @@ const SummarySheet = () => {
         if (chatId !== undefined) ref.current?.open()
         else ref.current?.close()
     }, [chatId, ref])
+    const openSettings = () => {
+        close()
+        router.push('/screens/SummarySettingsScreen')
+    }
     const run = (action: () => unknown) => {
         try {
             action()
@@ -292,113 +378,111 @@ const SummarySheet = () => {
         }
     }
     return (
-        <BottomSheet ref={ref} onClose={close} sheetStyle={{ flex: 1, rowGap: 12 }}>
+        <BottomSheet
+            ref={ref}
+            onClose={close}
+            sheetStyle={{ flex: 1 }}
+            bodyContainerStyle={{
+                paddingHorizontal: 16,
+                paddingVertical: 16,
+                flex: 1,
+                rowGap: 12,
+            }}>
             <View
                 style={{
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                 }}>
-                <ThemedButton
-                    label={t('summary.title')}
-                    iconName={summary ? 'arrow-left' : 'file-text'}
-                    variant="tertiary"
-                    onPress={() => select()}
-                />
+                <TText size={18} numberOfLines={1} style={{ flex: 1 }}>
+                    {t('summary.title')}
+                </TText>
                 <ThemedButton
                     iconName="setting"
                     variant="tertiary"
                     accessibilityLabel={t('summary.settings')}
-                    onPress={() => {
-                        close()
-                        router.push('/screens/SummarySettingsScreen')
-                    }}
+                    onPress={openSettings}
                 />
             </View>
-            {summary ? (
-                <SummaryEditor
-                    key={`${summary.id}:${summary.content}`}
-                    summary={summary}
-                    task={task}
-                    enabled={enabled}
-                    select={select}
-                />
-            ) : (
-                <>
-                    {!enabled && <TText>{t('summary.disabled')}</TText>}
-                    {summaries.some((item) => item.status === 'draft' && !taskFor(item.id)) && (
-                        <TText style={{ color: color.warning._700 }}>{t('summary.paused')}</TText>
-                    )}
-                    {summaries.some((item) => item.status === 'replaced') && (
-                        <ThemedButton
-                            variant="tertiary"
-                            label={t(showPrevious ? 'summary.current' : 'summary.previous')}
-                            onPress={() => setShowPrevious(!showPrevious)}
-                        />
-                    )}
-                    {visible.length ? (
-                        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ rowGap: 8 }}>
-                            {visible.map((item) => {
-                                const busy = !!taskFor(item.id)
-                                const active = item.status === 'accepted'
-                                const needsReview =
-                                    !busy && (item.source_changed || item.status === 'draft')
-                                return (
-                                    <ListButton
-                                        key={item.id}
-                                        active={active}
-                                        warning={needsReview}
-                                        style={{ paddingHorizontal: 12, columnGap: 20 }}
-                                        onPress={() => select(item.id)}>
-                                        <ListCardSection style={{ flex: 1, paddingVertical: 12 }}>
-                                            <View style={{ flex: 1, rowGap: 4 }}>
-                                                <TText color={active ? '100' : '400'}>
-                                                    {t(`summary.kind.${item.kind}`)} ·{' '}
-                                                    {t(`summary.status.${item.status}`)}
-                                                    {item.source_changed
-                                                        ? ` · ${t('summary.changed')}`
-                                                        : ''}
-                                                </TText>
-                                                <TText numberOfLines={3} color="400">
-                                                    {item.content || t('summary.unfinished')}
-                                                </TText>
-                                            </View>
-                                        </ListCardSection>
-                                        {busy && (
-                                            <ListCardSection>
-                                                <ThemedSpinner />
-                                            </ListCardSection>
-                                        )}
-                                    </ListButton>
-                                )
-                            })}
-                        </ScrollView>
-                    ) : (
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <TText color="400" style={{ textAlign: 'center' }}>
-                                {t('summary.empty')}
-                            </TText>
-                        </View>
-                    )}
-                    <ThemedButton
-                        label={t('summary.generate')}
-                        iconName="plus"
-                        variant="secondary"
-                        disabled={
-                            !enabled ||
-                            summaries.some((item) => item.status === 'draft') ||
-                            tasks.some((item) => item.kind === 'summary')
-                        }
-                        onPress={() => {
-                            if (chatId !== undefined)
-                                run(() => {
-                                    const next = generateSummary(chatId)
-                                    if (next) select(next.summaryId)
-                                })
-                        }}
-                    />
-                </>
+            {!enabled && <TText>{t('summary.disabled')}</TText>}
+            {summaries.some((item) => item.status === 'draft' && !taskFor(item.id)) && (
+                <TText style={{ color: color.warning._700 }}>{t('summary.paused')}</TText>
             )}
+            {summaries.some((item) => item.status === 'replaced') && (
+                <ThemedButton
+                    variant="tertiary"
+                    label={t(showPrevious ? 'summary.current' : 'summary.previous')}
+                    onPress={() => setShowPrevious(!showPrevious)}
+                />
+            )}
+            {visible.length ? (
+                <ScrollView style={{ flex: 1 }} contentContainerStyle={{ rowGap: 8 }}>
+                    {visible.map((item) => {
+                        const busy = !!taskFor(item.id)
+                        const active = item.status === 'accepted'
+                        const needsReview =
+                            !busy && (item.source_changed || item.status === 'draft')
+                        return (
+                            <ListButton
+                                key={item.id}
+                                active={active}
+                                warning={needsReview}
+                                style={{ paddingHorizontal: 12, columnGap: 20 }}
+                                onPress={() => select(item.id)}>
+                                <ListCardSection style={{ flex: 1, paddingVertical: 12 }}>
+                                    <View style={{ flex: 1, rowGap: 4 }}>
+                                        <TText color={active ? '100' : '400'}>
+                                            {t(`summary.kind.${item.kind}`)} ·{' '}
+                                            {t(`summary.status.${item.status}`)}
+                                            {item.source_changed
+                                                ? ` · ${t('summary.changed')}`
+                                                : ''}
+                                        </TText>
+                                        <TText numberOfLines={3} color="400">
+                                            {item.content || t('summary.unfinished')}
+                                        </TText>
+                                    </View>
+                                </ListCardSection>
+                                {busy && (
+                                    <ListCardSection>
+                                        <ThemedSpinner />
+                                    </ListCardSection>
+                                )}
+                            </ListButton>
+                        )
+                    })}
+                </ScrollView>
+            ) : (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <TText color="400" style={{ textAlign: 'center' }}>
+                        {t('summary.empty')}
+                    </TText>
+                </View>
+            )}
+            <ThemedButton
+                label={t('summary.generate')}
+                iconName="plus"
+                variant="secondary"
+                disabled={
+                    !enabled ||
+                    summaries.some((item) => item.status === 'draft') ||
+                    tasks.some((item) => item.kind === 'summary')
+                }
+                onPress={() => {
+                    if (chatId !== undefined)
+                        run(() => {
+                            const next = generateSummary(chatId)
+                            if (next) select(next.summaryId)
+                        })
+                }}
+            />
+            <SummaryEditorSheet
+                summary={summaries.find((item) => item.id === summaryId)}
+                task={task}
+                enabled={enabled}
+                select={select}
+                onSettings={openSettings}
+            />
         </BottomSheet>
     )
 }

@@ -28,8 +28,10 @@ export const buildRequest = async ({
     prompt,
     stopSequence,
 }: RequestBuilderParams) => {
+    const limit = apiConfig.request.stopSequenceLimit
+    const requestStops = limit === undefined ? stopSequence : stopSequence.slice(0, limit)
     const samplerFields = getSamplerFields(apiConfig, apiValues, samplers)
-    const fields = await buildFields(apiConfig, apiValues, samplerFields, stopSequence, prompt)
+    const fields = await buildFields(apiConfig, apiValues, samplerFields, requestStops, prompt)
 
     switch (apiConfig.payload.type) {
         case 'openai':
@@ -43,7 +45,7 @@ export const buildRequest = async ({
         case 'claude':
             return claudeRequest(apiConfig, instruct, fields)
         case 'custom':
-            return customRequest(apiConfig, apiValues, samplers, stopSequence, prompt)
+            return customRequest(apiConfig, apiValues, samplers, requestStops, prompt)
     }
 }
 

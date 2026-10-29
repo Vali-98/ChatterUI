@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import ListSheet from '@components/input/ListSheet'
+import SelectionSheet from '@components/input/SelectionSheet'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { LinkType } from '@db/schema'
@@ -137,7 +137,6 @@ const CharacterLinkItem: React.FC<{
         ['sampler_id']: t('character.editor.links.missingSampler'),
     }
     const active = linkCollection.active
-    const initialIndex = linkCollection.options.findIndex((item) => item.value === active?.value)
 
     return (
         <Pressable
@@ -160,20 +159,20 @@ const CharacterLinkItem: React.FC<{
                 />
             </Pressable>
 
-            <ListSheet
+            <SelectionSheet
                 items={linkCollection.options}
-                initialIndex={initialIndex !== -1 ? initialIndex : undefined}
+                selectedKey={active?.value ?? null}
+                commitMode="confirm"
                 ref={ref}
-                keyExtractor={(item) => item.value.toString()}
+                keyExtractor={(item) => item.value}
                 labelExtractor={(item) => item.label}
-                selectLabel={t('common.actions.link')}
-                onSelect={async (item, ref) => {
-                    if (characterId === undefined || !item) return ref.current?.close()
-                    CharacterLinks.db.upsert.link(characterId, {
+                confirmLabel={t('common.actions.link')}
+                onSelect={async (item) => {
+                    if (characterId === undefined) return
+                    await CharacterLinks.db.upsert.link(characterId, {
                         type: linkCollection.type,
                         value: item.value,
                     })
-                    ref.current?.close()
                 }}
             />
         </Pressable>

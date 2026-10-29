@@ -364,7 +364,6 @@ function obtainFields(inputs: GenerationInputs, options: ObtainFieldsOptions) {
             if (!apiConfig || !apiValues) return
             const samplers = { ...inputs.samplers }
             const length = Math.max(0, generationContextLimit(inputs) - samplers.genamt)
-            const limit = apiConfig.request.stopSequenceLimit
             const context = await prepareGenerationContext(inputs, { recordStats })
             return {
                 ...context,
@@ -373,9 +372,7 @@ function obtainFields(inputs: GenerationInputs, options: ObtainFieldsOptions) {
                 apiConfig: apiConfig,
                 apiValues: apiValues,
                 samplers: samplers,
-                stopSequence: limit
-                    ? inputs.stopSequence.slice(0, limit)
-                    : [...inputs.stopSequence],
+                stopSequence: [...inputs.stopSequence],
                 maxLength: length,
             }
         } catch (error) {

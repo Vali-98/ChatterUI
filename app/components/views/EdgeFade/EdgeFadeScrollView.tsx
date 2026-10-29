@@ -29,7 +29,7 @@ const EdgeFadeScrollView = ({
 }: EdgeFadeScrollViewProps) => {
     const fade = useEdgeFade(!!horizontal)
     return (
-        <View style={[!horizontal && { flex: 1 }, containerStyle]}>
+        <View style={containerStyle}>
             <ScrollView
                 {...props}
                 horizontal={horizontal}

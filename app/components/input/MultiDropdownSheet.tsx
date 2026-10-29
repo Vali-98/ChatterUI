@@ -1,216 +1,81 @@
-import Octicons from '@react-native-vector-icons/octicons/static'
-import { useState } from 'react'
+import { View, type StyleProp, type ViewStyle } from 'react-native'
 import { useTranslation } from 'react-i18next'
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
 
-import BottomSheet, { useBottomSheetRef } from '@components/views/BottomSheet'
-import { Theme } from '@lib/theme/ThemeManager'
+import { useBottomSheetRef } from '@components/views/BottomSheet'
+import DropdownTrigger from './DropdownTrigger'
+import SelectionSheet, { type SelectionKey, type SelectionRow } from './SelectionSheet'
 
-type DropdownItemProps = {
-    label: string
-    active: boolean
-    onValueChange: (b: boolean) => void
-}
-
-const DropdownItem: React.FC<DropdownItemProps> = ({ label, active, onValueChange }) => {
-    const styles = useDropdownStyles()
-    return (
-        <Pressable
-            style={active ? styles.listItemSelected : styles.listItem}
-            onPress={() => {
-                onValueChange(!active)
-            }}>
-            <Text style={styles.listItemText}>{label}</Text>
-        </Pressable>
-    )
-}
-
-type DropdownSheetProps<T> = {
-    containerStyle?: ViewStyle
-    style?: ViewStyle
+export type MultiDropdownSheetProps<T> = {
+    containerStyle?: StyleProp<ViewStyle>
+    contentContainerStyle?: StyleProp<ViewStyle>
+    style?: StyleProp<ViewStyle>
     data: T[]
     selected: T[]
-    onChangeValue: (data: T[]) => void
-    labelExtractor: (data: T) => string
+    onChangeValue: (items: T[]) => void | Promise<void>
+    keyExtractor: (item: T) => SelectionKey
+    labelExtractor: (item: T) => string
+    renderItem?: (row: SelectionRow<T>) => React.ReactNode
     search?: boolean
     placeholder?: string
     modalTitle?: string
     closeOnSelect?: boolean
+    commitMode?: 'immediate' | 'confirm'
+    confirmLabel?: string
+    allowEmpty?: boolean
+    disabled?: boolean
 }
-
 const MultiDropdownSheet = <T,>({
-    containerStyle = undefined,
-    onChangeValue,
+    containerStyle,
+    contentContainerStyle,
     style,
+    data,
     selected,
-    data = [],
+    onChangeValue,
+    keyExtractor,
+    labelExtractor,
+    renderItem,
+    search,
     placeholder,
     modalTitle,
-    labelExtractor = (data) => {
-        return data as string
-    },
-    search = false,
-    closeOnSelect = true,
-}: DropdownSheetProps<T>) => {
+    closeOnSelect,
+    commitMode = 'confirm',
+    confirmLabel,
+    allowEmpty,
+    disabled,
+}: MultiDropdownSheetProps<T>) => {
     const { t } = useTranslation()
-    const styles = useDropdownStyles()
-    const { color, spacing } = Theme.useTheme()
-    const sheetRef = useBottomSheetRef()
-    const [searchFilter, setSearchFilter] = useState('')
-
-    const finalPlaceholder = placeholder ?? t('dropdown.selectItem')
-    const finalModalTitle = modalTitle ?? t('dropdown.selectItem')
-
-    const items = data.filter((item) =>
-        labelExtractor(item)
-            ?.toLowerCase()
-            .includes(searchFilter.toLowerCase() ?? true)
-    )
+    const ref = useBottomSheetRef()
     return (
         <View style={containerStyle}>
-            <BottomSheet
-                ref={sheetRef}
-                onClose={() => {
-                    setSearchFilter('')
-                }}>
-                <View
-                    style={{
-                        marginBottom: spacing.xl2,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                    }}>
-                    <Text style={styles.modalTitle}>{finalModalTitle}</Text>
-                    <Text style={styles.counterText}>
-                        {selected.length > 0
-                            ? t('multiDropdown.counter', { count: selected.length })
-                            : t('multiDropdown.noItemsSelected')}
-                    </Text>
-                </View>
-                {items.length > 0 ? (
-                    <FlatList
-                        contentContainerStyle={{ rowGap: 2 }}
-                        showsVerticalScrollIndicator={false}
-                        data={items}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={({ item, index }) => (
-                            <DropdownItem
-                                label={labelExtractor(item)}
-                                active={selected?.some(
-                                    (e) => labelExtractor(e) === labelExtractor(item)
-                                )}
-                                onValueChange={(active) => {
-                                    if (!active && selected.length > 0) {
-                                        const data = selected.filter(
-                                            (e) => labelExtractor(e) !== labelExtractor(item)
-                                        )
-                                        onChangeValue(data)
-                                    } else {
-                                        // we duplicate for a fresh reference
-                                        const data = [...selected]
-                                        if (
-                                            selected.some(
-                                                (e) => labelExtractor(e) === labelExtractor(item)
-                                            )
-                                        )
-                                            return
-                                        data.push(item)
-                                        onChangeValue(data)
-                                    }
-                                }}
-                            />
-                        )}
-                    />
-                ) : (
-                    <Text style={styles.emptyText}>{t('common.emptyStates.noItems')}</Text>
-                )}
-                {search && (
-                    <TextInput
-                        placeholder={t('dropdown.filter')}
-                        placeholderTextColor={color.text._300}
-                        style={styles.searchBar}
-                        value={searchFilter}
-                        onChangeText={setSearchFilter}
-                    />
-                )}
-            </BottomSheet>
-            <Pressable style={[style, styles.button]} onPress={() => sheetRef.current?.open()}>
-                {selected && selected.length > 0 && (
-                    <Text style={styles.buttonText}>
-                        {selected.length} {t('common.labels.selected')}
-                    </Text>
-                )}
-                {(!selected || selected.length === 0) && (
-                    <Text style={styles.placeholderText}>{finalPlaceholder}</Text>
-                )}
-                <Octicons name="chevron-down" color={color.primary._800} size={18} />
-            </Pressable>
+            <SelectionSheet
+                multiple
+                ref={ref}
+                contentContainerStyle={contentContainerStyle}
+                items={data}
+                keyExtractor={keyExtractor}
+                labelExtractor={labelExtractor}
+                renderItem={renderItem}
+                selectedKeys={selected.map(keyExtractor)}
+                onSelect={onChangeValue}
+                allowEmpty={allowEmpty}
+                search={search}
+                title={modalTitle}
+                closeOnSelect={closeOnSelect}
+                commitMode={commitMode}
+                confirmLabel={confirmLabel}
+            />
+            <DropdownTrigger
+                label={
+                    selected.length
+                        ? `${selected.length} ${t('common.labels.selected')}`
+                        : undefined
+                }
+                placeholder={placeholder ?? t('dropdown.selectItem')}
+                onPress={() => ref.current?.open()}
+                disabled={disabled}
+                style={style}
+            />
         </View>
     )
 }
-
 export default MultiDropdownSheet
-
-export const useDropdownStyles = () => {
-    const { color, spacing, borderRadius } = Theme.useTheme()
-    return StyleSheet.create({
-        button: {
-            paddingHorizontal: spacing.xl,
-            paddingVertical: spacing.m,
-            alignItems: 'center',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            borderRadius: borderRadius.m,
-            backgroundColor: color.primary._300,
-        },
-        buttonText: {
-            color: color.text._100,
-        },
-        placeholderText: {
-            color: color.text._300,
-        },
-
-        modalTitle: {
-            color: color.text._300,
-            fontSize: 20,
-            fontWeight: '500',
-            paddingBottom: spacing.xl2,
-        },
-
-        listItem: {
-            paddingVertical: spacing.xl,
-            paddingHorizontal: spacing.xl2,
-        },
-
-        listItemSelected: {
-            paddingVertical: spacing.xl,
-            paddingHorizontal: spacing.xl2,
-            backgroundColor: color.primary._200,
-            borderRadius: borderRadius.xl,
-        },
-
-        emptyText: {
-            color: color.text._400,
-            padding: spacing.xl,
-        },
-
-        listItemText: {
-            color: color.text._200,
-            fontSize: 16,
-        },
-
-        searchBar: {
-            marginTop: spacing.l,
-            borderRadius: borderRadius.m,
-            padding: spacing.l,
-            backgroundColor: color.neutral._200,
-            color: color.text._100,
-            textAlignVertical: 'center',
-        },
-
-        counterText: {
-            color: color.text._300,
-            fontSize: 14,
-            paddingBottom: spacing.xl2,
-        },
-    })
-}

@@ -23,6 +23,7 @@ type LorebookEntryEditorStateProps = {
 
     open: (entryId: number) => void
     close: () => void
+    clear: () => void
 }
 
 export const useLorebookEntryEditorState = create<LorebookEntryEditorStateProps>()((set, get) => ({
@@ -37,15 +38,15 @@ export const useLorebookEntryEditorState = create<LorebookEntryEditorStateProps>
 
     close: () => {
         get().ref?.current?.close()
-        set({ entryId: undefined })
     },
+    clear: () => set({ entryId: undefined }),
 }))
 
 const LorebookEntryEditor = () => {
     const { t } = useTranslation()
     const { spacing } = Theme.useTheme()
 
-    const { close, entryId, ref } = useLorebookEntryEditorState(useShallow((state) => state))
+    const { close, clear, entryId, ref } = useLorebookEntryEditorState(useShallow((state) => state))
 
     const [placeholderEntry, setPlaceholderEntry] = useState<LorebookEntryType | undefined>(
         undefined
@@ -133,7 +134,12 @@ const LorebookEntryEditor = () => {
     }
 
     return (
-        <BottomSheet onRequestClose={backAction} sheetStyle={{ flex: 1 }} ref={ref}>
+        <BottomSheet
+            onRequestClose={backAction}
+            onClose={clear}
+            sheetStyle={{ flex: 1 }}
+            ref={ref}
+            bodyContainerStyle={[{ paddingHorizontal: 16, paddingVertical: 16 }, { flex: 1 }]}>
             {entry && placeholderEntry && entryId && (
                 <>
                     <KeyboardAwareScrollView

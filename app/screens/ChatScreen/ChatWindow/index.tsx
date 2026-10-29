@@ -118,6 +118,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, scrollData }) => {
                 )}
 
                 <EdgeFadeFlatList
+                    containerStyle={{ flex: 1 }}
                     CellRendererComponent={ChatCellRenderer}
                     ref={flatlistRef}
                     maintainVisibleContentPosition={

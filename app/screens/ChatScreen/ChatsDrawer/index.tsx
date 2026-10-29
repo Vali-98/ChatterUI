@@ -116,6 +116,7 @@ const ChatsDrawer = () => {
                         entering={FadeIn.duration(200)}
                         style={styles.listContainer}>
                         <EdgeFadeFlashList
+                            containerStyle={{ flex: 1 }}
                             keyboardShouldPersistTaps="always"
                             data={data}
                             keyExtractor={(item) => item.id.toString()}
@@ -142,6 +143,7 @@ const ChatsDrawer = () => {
                         </Text>
                     )}
                     <EdgeFadeFlashList
+                        containerStyle={{ flex: 1 }}
                         data={searchResults}
                         keyExtractor={(item) => item.swipe_id.toString()}
                         renderItem={({ item }) => (

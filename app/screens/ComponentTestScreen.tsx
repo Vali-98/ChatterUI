@@ -21,7 +21,7 @@ import InputSheet from '@components/views/InputSheet'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const selectorData = [
-    { label: 'Item 0', value: '1' },
+    { label: 'Item 0', value: '0' },
     { label: 'Item 1', value: '1' },
     { label: 'Item 2', value: '2' },
     { label: 'Item 3', value: '3' },
@@ -226,12 +226,14 @@ const ComponentTestScreen = () => {
                     onChangeText={setTextInputData}
                 />
                 <DropdownSheet
+                    keyExtractor={(item) => item.value}
                     data={selectorData}
                     selected={selected}
                     onChangeValue={setSelected}
                     labelExtractor={(item) => item.label}
                 />
                 <MultiDropdownSheet
+                    keyExtractor={(item) => item.value}
                     data={selectorData}
                     selected={selectedM}
                     onChangeValue={setSelectedM}

@@ -24,7 +24,7 @@ const EdgeFadeFlatList = <Item,>({
 }: EdgeFadeFlatListProps<Item>) => {
     const fade = useEdgeFade(!!horizontal, !!inverted)
     return (
-        <View style={[!horizontal && { flex: 1 }, containerStyle]}>
+        <View style={containerStyle}>
             <FlatList
                 {...props}
                 horizontal={horizontal}

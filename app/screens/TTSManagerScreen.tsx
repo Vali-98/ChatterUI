@@ -105,6 +105,7 @@ const TTSManagerScreen = () => {
             </SectionTitle>
             <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}>
                 <DropdownSheet
+                    keyExtractor={(item) => item}
                     containerStyle={{ flex: 1 }}
                     selected={lang}
                     data={languages}
@@ -125,6 +126,7 @@ const TTSManagerScreen = () => {
             </SectionTitle>
 
             <DropdownSheet
+                keyExtractor={(item) => item.identifier}
                 style={{ marginBottom: 8 }}
                 search
                 modalTitle={t('tts.selectvoice')}

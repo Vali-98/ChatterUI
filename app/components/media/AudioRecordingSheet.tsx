@@ -217,7 +217,7 @@ const RecordingControls = ({
 }
 
 const AudioRecordingSheet = ({ ref, chatId, onAttach }: RecordingSheetProps) => (
-    <BottomSheet ref={ref}>
+    <BottomSheet ref={ref} bodyContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16 }}>
         <RecordingControls
             chatId={chatId}
             onAttach={onAttach}

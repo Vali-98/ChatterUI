@@ -25,7 +25,11 @@ const CameraSheet: React.FC<CameraSheetProps> = ({ ref, onTakePicture }) => {
     return (
         <BottomSheet
             ref={ref}
-            sheetStyle={{ flex: 1, maxHeight: '70%', justifyContent: 'space-between' }}>
+            sheetStyle={{ flex: 1, maxHeight: '70%', justifyContent: 'space-between' }}
+            bodyContainerStyle={[
+                { paddingHorizontal: 16, paddingVertical: 16 },
+                { flex: 1, justifyContent: 'space-between' },
+            ]}>
             <CameraView
                 ref={cameraRef}
                 autofocus="on"

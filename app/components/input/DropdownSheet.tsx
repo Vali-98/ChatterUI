@@ -1,118 +1,83 @@
-import Octicons, { OcticonsIconName } from '@react-native-vector-icons/octicons/static'
-import { useState } from 'react'
+import type { OcticonsIconName } from '@react-native-vector-icons/octicons/static'
+import { View, type StyleProp, type ViewStyle } from 'react-native'
 import { useTranslation } from 'react-i18next'
-import { FlatList, Pressable, Text, TextInput, View, ViewStyle } from 'react-native'
 
-import BottomSheet, { useBottomSheetRef } from '@components/views/BottomSheet'
-import { Theme } from '@lib/theme/ThemeManager'
+import { useBottomSheetRef } from '@components/views/BottomSheet'
+import DropdownTrigger from './DropdownTrigger'
+import SelectionSheet, { type SelectionKey, type SelectionRow } from './SelectionSheet'
 
-import { useDropdownStyles } from './MultiDropdownSheet'
-
-type DropdownSheetProps<T> = {
-    containerStyle?: ViewStyle
-    style?: ViewStyle
+export type DropdownSheetProps<T> = {
+    containerStyle?: StyleProp<ViewStyle>
+    contentContainerStyle?: StyleProp<ViewStyle>
+    style?: StyleProp<ViewStyle>
     data: T[]
-    selected?: T | undefined
-    onChangeValue: (data: T) => void
-    labelExtractor: (data: T) => string
+    selected?: T | null
+    onChangeValue: (item: T) => void | Promise<void>
+    keyExtractor: (item: T) => SelectionKey
+    labelExtractor: (item: T) => string
+    renderItem?: (row: SelectionRow<T>) => React.ReactNode
     search?: boolean
     placeholder?: string
     modalTitle?: string
     closeOnSelect?: boolean
+    commitMode?: 'immediate' | 'confirm'
+    confirmLabel?: string
+    disabled?: boolean
     icon?: OcticonsIconName | null
     iconPosition?: 'right' | 'left'
     iconSize?: number
 }
-
 const DropdownSheet = <T,>({
-    containerStyle = undefined,
-    onChangeValue,
+    containerStyle,
+    contentContainerStyle,
     style,
-    selected = undefined,
-    data = [],
-    placeholder: propPlaceholder, // Renamed to avoid conflict
-    modalTitle: propModalTitle, // Renamed to avoid conflict
-    labelExtractor = (data) => {
-        return data as string
-    },
-    search = false,
-    closeOnSelect = true,
-    icon = 'chevron-down',
-    iconPosition = 'right',
-    iconSize = 18,
+    data,
+    selected,
+    onChangeValue,
+    keyExtractor,
+    labelExtractor,
+    renderItem,
+    search,
+    placeholder,
+    modalTitle,
+    closeOnSelect,
+    commitMode,
+    confirmLabel,
+    disabled,
+    icon,
+    iconPosition,
+    iconSize,
 }: DropdownSheetProps<T>) => {
-    const styles = useDropdownStyles()
-    const sheetRef = useBottomSheetRef()
-    const [searchFilter, setSearchFilter] = useState('')
-    const theme = Theme.useTheme()
     const { t } = useTranslation()
-
-    // Translate default placeholder and modal title if not provided
-    const placeholder = propPlaceholder ?? t('dropdown.selectItem')
-    const modalTitle = propModalTitle ?? t('dropdown.selectItem')
-
-    const items = data.filter((item) =>
-        labelExtractor(item).toLowerCase().includes(searchFilter.toLowerCase())
-    )
-
+    const ref = useBottomSheetRef()
     return (
         <View style={containerStyle}>
-            <BottomSheet
-                ref={sheetRef}
-                onClose={() => {
-                    setSearchFilter('')
-                }}>
-                <Text style={styles.modalTitle}>{modalTitle}</Text>
-                {items.length > 0 ? (
-                    <FlatList
-                        contentContainerStyle={{ rowGap: 2 }}
-                        showsVerticalScrollIndicator={false}
-                        data={items}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={({ item }) => (
-                            <Pressable
-                                style={
-                                    selected && labelExtractor(item) === labelExtractor(selected)
-                                        ? styles.listItemSelected
-                                        : styles.listItem
-                                }
-                                onPress={() => {
-                                    onChangeValue(item)
-                                    if (closeOnSelect) sheetRef.current?.close()
-                                }}>
-                                <Text style={styles.listItemText}>{labelExtractor(item)}</Text>
-                            </Pressable>
-                        )}
-                    />
-                ) : (
-                    <Text style={styles.emptyText}>{t('common.emptyStates.noItems')}</Text>
-                )}
-                {search && (
-                    <TextInput
-                        placeholder={t('dropdown.filter')}
-                        placeholderTextColor={theme.color.text._300}
-                        style={styles.searchBar}
-                        value={searchFilter}
-                        onChangeText={setSearchFilter}
-                    />
-                )}
-            </BottomSheet>
-            <Pressable
-                style={[
-                    styles.button,
-                    style,
-                    {
-                        flexDirection: iconPosition === 'right' ? 'row' : 'row-reverse',
-                        columnGap: 8,
-                    },
-                ]}
-                onPress={() => sheetRef.current?.open()}>
-                {selected && <Text style={styles.buttonText}>{labelExtractor(selected)}</Text>}
-                {!selected && <Text style={styles.placeholderText}>{placeholder}</Text>}
-                {icon && <Octicons name={icon} color={theme.color.primary._800} size={iconSize} />}
-            </Pressable>
+            <SelectionSheet
+                ref={ref}
+                contentContainerStyle={contentContainerStyle}
+                items={data}
+                keyExtractor={keyExtractor}
+                labelExtractor={labelExtractor}
+                renderItem={renderItem}
+                selectedKey={selected == null ? null : keyExtractor(selected)}
+                onSelect={onChangeValue}
+                search={search}
+                title={modalTitle}
+                closeOnSelect={closeOnSelect}
+                commitMode={commitMode}
+                confirmLabel={confirmLabel}
+            />
+            <DropdownTrigger
+                label={selected == null ? undefined : labelExtractor(selected)}
+                placeholder={placeholder ?? t('dropdown.selectItem')}
+                onPress={() => ref.current?.open()}
+                disabled={disabled}
+                style={style}
+                icon={icon}
+                iconPosition={iconPosition}
+                iconSize={iconSize}
+            />
         </View>
     )
 }
-
 export default DropdownSheet

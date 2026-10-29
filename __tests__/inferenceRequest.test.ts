@@ -93,3 +93,41 @@ test('Claude receives the assembled system prompt including card content', async
         messages: [{ role: 'user', content: 'hello' }],
     })
 })
+
+test.each([
+    { limit: 5, count: 5 },
+    { limit: undefined, count: 7 },
+    { limit: 0, count: 0 },
+])(
+    'request payload applies stopSequenceLimit=$limit for every generation flow',
+    async ({ limit, count }) => {
+        const template = config()
+        template.request.stopSequenceLimit = limit
+        const stops = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+        const result = await buildRequest({
+            apiConfig: template,
+            apiValues: values,
+            samplers,
+            instruct: {} as InstructType,
+            prompt: 'summarize this history',
+            stopSequence: stops,
+        })
+        expect(result).toHaveProperty(template.request.stopKey, stops.slice(0, count))
+        expect(stops).toHaveLength(7)
+    }
+)
+
+test('custom payload stop macros also respect the provider limit', async () => {
+    const template = config()
+    template.request.stopSequenceLimit = 2
+    template.payload = { type: 'custom', customPayload: '{"stop": {{stop}}}' }
+    const result = await buildRequest({
+        apiConfig: template,
+        apiValues: values,
+        samplers,
+        instruct: {} as InstructType,
+        prompt: 'summary',
+        stopSequence: ['a', 'b', 'c'],
+    })
+    expect(JSON.parse(result as string)).toEqual({ stop: ['a', 'b'] })
+})

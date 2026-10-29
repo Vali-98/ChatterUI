@@ -25,7 +25,10 @@ const AuthorNoteSheet = () => {
     const ref = useAuthorNoteState(useShallow((state) => state.ref))
 
     return (
-        <BottomSheet sheetStyle={{ flex: 1 }} ref={ref}>
+        <BottomSheet
+            sheetStyle={{ flex: 1 }}
+            ref={ref}
+            bodyContainerStyle={[{ paddingHorizontal: 16, paddingVertical: 16 }, { flex: 1 }]}>
             <AuthorNoteBody />
         </BottomSheet>
     )

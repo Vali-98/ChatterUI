@@ -113,7 +113,11 @@ const ContextUsage = ({
             </Pressable>
             <BottomSheet
                 ref={ref}
-                sheetStyle={{ maxHeight: '85%', paddingLeft: 0, paddingRight: 0 }}>
+                sheetStyle={{ maxHeight: '85%', paddingLeft: 0, paddingRight: 0 }}
+                bodyContainerStyle={[
+                    { paddingHorizontal: 16, paddingVertical: 16 },
+                    { paddingHorizontal: 0 },
+                ]}>
                 <ScrollView contentContainerStyle={{ rowGap: 12, paddingHorizontal: spacing.xl2 }}>
                     <TText size={18}>{t('contextAllocation.title')}</TText>
                     <TText color="400">{t('contextAllocation.estimateDescription')}</TText>
@@ -127,7 +131,11 @@ const ContextUsage = ({
                                 borderTopColor: color.neutral._300,
                                 paddingTop: 12,
                             }}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                }}>
                                 <TText
                                     style={{
                                         color: key === 'free' ? color.text._400 : colors[key],

@@ -119,6 +119,11 @@ const AuthorNoteEditor = () => {
         [note, placeHolderNote, edited, t]
     )
 
+    const ready = note !== undefined && placeHolderNote !== undefined && noteId !== undefined
+    useEffect(() => {
+        if (ready) ref?.current?.open()
+    }, [ready, noteId, ref])
+
     if (note === undefined || placeHolderNote === undefined || !noteId) return
 
     const handleUpdateNoteType = async (
@@ -134,7 +139,11 @@ const AuthorNoteEditor = () => {
 
     const selectedNoteType = getNoteTypeFromIds(placeHolderNote)
     return (
-        <BottomSheet onRequestClose={backAction} sheetStyle={{ flex: 1 }} ref={ref}>
+        <BottomSheet
+            onRequestClose={backAction}
+            sheetStyle={{ flex: 1 }}
+            ref={ref}
+            bodyContainerStyle={[{ paddingHorizontal: 16, paddingVertical: 16 }, { flex: 1 }]}>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ rowGap: spacing.xl, paddingBottom: spacing.xl2 }}>

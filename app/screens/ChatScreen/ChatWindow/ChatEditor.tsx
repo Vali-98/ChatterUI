@@ -313,7 +313,10 @@ const ChatEditor = () => {
         if (entry && !editable) hide()
     }, [entry, editable, hide])
     return (
-        <BottomSheet sheetStyle={{ rowGap: 12, maxHeight: '95%' }} ref={ref}>
+        <BottomSheet
+            sheetStyle={{ rowGap: 12, maxHeight: '95%' }}
+            ref={ref}
+            bodyContainerStyle={[{ paddingHorizontal: 16, paddingVertical: 16 }, { rowGap: 12 }]}>
             {entry?.swipes[0] && (
                 <MessageEditor
                     key={`${entryId}-${session}`}

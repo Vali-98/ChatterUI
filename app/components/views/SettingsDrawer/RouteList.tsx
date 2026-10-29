@@ -111,6 +111,7 @@ const RouteList = () => {
     const paths = getPaths(appMode === 'remote', t)
     return (
         <EdgeFadeFlatList
+            containerStyle={{ flex: 1 }}
             showsVerticalScrollIndicator={false}
             data={
                 __DEV__ || devMode

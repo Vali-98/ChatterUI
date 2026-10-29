@@ -190,7 +190,10 @@ const ConnectionSetup = ({
                     onPress={() => setShowAll(!showAll)}
                 />
             )}
-            <BottomSheet ref={sheet} sheetStyle={{ maxHeight: '85%', flex: 1 }}>
+            <BottomSheet
+                ref={sheet}
+                sheetStyle={{ maxHeight: '85%', flex: 1 }}
+                bodyContainerStyle={[{ paddingHorizontal: 16, paddingVertical: 16 }, { flex: 1 }]}>
                 <ScrollView
                     keyboardShouldPersistTaps="handled"
                     contentContainerStyle={{ gap: 16, paddingBottom: 24 }}>
@@ -264,6 +267,9 @@ const ConnectionSetup = ({
                             {template.features.useModel && (
                                 <>
                                     <DropdownSheet
+                                        keyExtractor={(item) =>
+                                            String(getNestedValue(item, template.model.nameParser))
+                                        }
                                         data={models}
                                         selected={
                                             template.features.multipleModels

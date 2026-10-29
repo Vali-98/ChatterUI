@@ -24,7 +24,7 @@ const EdgeFadeFlashList = <Item,>({
 }: EdgeFadeFlashListProps<Item>) => {
     const fade = useEdgeFade(!!horizontal)
     return (
-        <View style={[!horizontal && { flex: 1 }, containerStyle]}>
+        <View style={containerStyle}>
             <FlashList
                 {...props}
                 horizontal={horizontal}

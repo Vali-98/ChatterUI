@@ -191,6 +191,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                     <ContextMenu.Body>
                         {!(isMMPROJ || !!item.mmprojLink || mmprojList.length === 0) && (
                             <DropdownSheet
+                                keyExtractor={(item) => item.id}
                                 modalTitle={t('model.selectmmproj')}
                                 style={{
                                     backgroundColor: color.neutral._200,
