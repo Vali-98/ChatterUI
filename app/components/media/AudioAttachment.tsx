@@ -11,7 +11,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import TText from '@components/text/TText'
 import { playAudio } from '@lib/audio/player'
 import { useAudioState, type AudioSource } from '@lib/audio/state'
@@ -51,7 +51,7 @@ const AudioAttachment = ({ source }: { source: AudioSource }) => {
                 {source.name}
             </TText>
 
-            <ThemedButton
+            <IconButton
                 variant="tertiary"
                 iconName="download"
                 iconSize={24}
@@ -74,11 +74,11 @@ const AudioAttachment = ({ source }: { source: AudioSource }) => {
                 }}
             />
             <Animated.View style={pulse}>
-                <ThemedButton
+                <IconButton
                     variant="tertiary"
                     iconName="play-circle"
                     iconSize={24}
-                    iconStyle={{ color: active ? color.text._600 : color.primary._400 }}
+                    level="primary"
                     disabled={active}
                     accessibilityLabel={t('audio.play')}
                     accessibilityState={{ disabled: active, busy: playing }}

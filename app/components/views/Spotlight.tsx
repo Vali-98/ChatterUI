@@ -372,7 +372,7 @@ const Spotlight = ({
                                                     labelStyle={{ color: color.primary._500 }}
                                                     label={t('common.actions.gotIt')}
                                                     onPress={onDismiss}
-                                                    buttonStyle={{ alignSelf: 'flex-end' }}
+                                                    viewStyle={{ alignSelf: 'flex-end' }}
                                                 />
                                             )}
                                         </View>

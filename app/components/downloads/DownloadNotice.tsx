@@ -2,13 +2,14 @@ import { router } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import TText from '@components/text/TText'
 import Notice, { CollapsedNotice } from '@components/views/Notice'
 import ThemedSpinner from '@components/views/ThemedSpinner'
 import { useDownloadNoticeState } from '@lib/downloads/noticeState'
 import { useDownloadStore } from '@lib/downloads/store'
 import { useOnboardingStore } from '@lib/onboarding/store'
+
 import { DownloadProgress } from './DownloadItem'
 
 const DownloadNotice = () => {
@@ -59,7 +60,7 @@ const DownloadNotice = () => {
                             : ''
                         : ` · ${t(failed ? 'downloads.status.failed' : 'downloads.status.paused')}`}
                 </TText>
-                <ThemedButton
+                <IconButton
                     variant="tertiary"
                     iconName="close"
                     iconSize={16}

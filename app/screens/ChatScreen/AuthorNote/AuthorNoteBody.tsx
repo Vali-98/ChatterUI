@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import { AuthorNotes, NoteType } from '@lib/state/AuthorNotes'
 import { Characters } from '@lib/state/characters'
@@ -57,8 +57,8 @@ const AuthorNoteBody = () => {
                     selected={currentNoteType}
                     onPress={setCurrentNoteType}
                 />
-                <ThemedButton
-                    buttonStyle={{ paddingHorizontal: 10 }}
+                <IconButton
+                    viewStyle={{ paddingHorizontal: 10 }}
                     variant="secondary"
                     iconName="plus"
                     onPress={handleAddNote}

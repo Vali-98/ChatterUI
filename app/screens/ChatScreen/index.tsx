@@ -6,9 +6,9 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
+import IconButton from '@components/buttons/IconButton'
 import GuideHost from '@components/guides/GuideHost'
 import GuideTarget from '@components/guides/GuideTarget'
-import ThemedButton from '@components/buttons/ThemedButton'
 import AvatarViewer from '@components/views/AvatarViewer'
 import Drawer from '@components/views/Drawer'
 import HeaderButton from '@components/views/HeaderButton'
@@ -91,8 +91,8 @@ const ChatScreen = () => {
                     id="chat.history"
                     style={{ flexDirection: 'row', alignItems: 'center' }}>
                     {!showChats ? (
-                        <ThemedButton
-                            buttonStyle={{
+                        <IconButton
+                            viewStyle={{
                                 marginRight: 16,
                             }}
                             iconName="plus"
@@ -101,8 +101,8 @@ const ChatScreen = () => {
                             onPress={handleCreateChat}
                         />
                     ) : (
-                        <ThemedButton
-                            buttonStyle={{
+                        <IconButton
+                            viewStyle={{
                                 marginRight: 16,
                             }}
                             iconName="upload"

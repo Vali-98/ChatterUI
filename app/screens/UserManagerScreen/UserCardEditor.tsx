@@ -175,7 +175,7 @@ const UserCardEditor = () => {
                             iconSize={20}
                             label={t('common.actions.save')}
                             onPress={handleSaveUserCard}
-                            variant={isDirty ? 'secondary' : 'disabled'}
+                            variant="secondary"
                         />
                     </View>
 

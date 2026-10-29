@@ -1,9 +1,9 @@
-import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useFocusEffect } from 'expo-router'
 import React, { useCallback } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { measure, useAnimatedRef, useFrameCallback } from 'react-native-reanimated'
 
+import IconButton from '@components/buttons/IconButton'
 import { ChatSwipe } from '@db/schema'
 import { useCanStartGeneration } from '@lib/engine/generation/hooks'
 import { continueResponse, generateResponse, regenerateResponse } from '@lib/engine/Inference'
@@ -21,7 +21,6 @@ type SwipesProps = {
 
 const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) => {
     const styles = useStyles()
-    const { color } = Theme.useTheme()
     const { chatId } = Chats.useChat()
     const canGenerate = useCanStartGeneration(chatId)
     const { data: swipeIdListData } = useLiveQueryAsync(Chats.db.live.swipeIds(swipe.entry_id), {
@@ -73,13 +72,6 @@ const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) 
         }, [frame, visible, playerHeight, entryId])
     )
 
-    const getTextColor = useCallback(
-        (b: boolean) => {
-            return b ? color.text._600 : color.text._300
-        },
-        [color]
-    )
-
     // return if no list, bad index, or if no alt greetings
     if (!swipeIdList || currentIndex === -1 || (isGreeting && swipeIdList.length === 1)) return
 
@@ -115,21 +107,23 @@ const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) 
 
     return (
         <View ref={ref} collapsable={false} style={styles.swipesItem}>
-            <TouchableOpacity
-                style={styles.swipeButton}
+            <IconButton
+                viewStyle={styles.swipeButton}
                 onPress={handleSwipeLeft}
-                disabled={disableSwipeLeft}>
-                <AntDesign name="left" size={20} color={getTextColor(disableSwipeLeft)} />
-            </TouchableOpacity>
+                disabled={disableSwipeLeft}
+                iconName="left"
+                iconSize={20}
+            />
 
             {!isGreeting && (
-                <TouchableOpacity
+                <IconButton
                     onPress={() => regenerateResponse(swipe)}
                     onLongPress={() => regenerateResponse(swipe, false)}
                     disabled={isGenerating}
-                    style={styles.swipeButton}>
-                    <AntDesign name="retweet" size={20} color={getTextColor(isGenerating)} />
-                </TouchableOpacity>
+                    viewStyle={styles.swipeButton}
+                    iconName="retweet"
+                    iconSize={20}
+                />
             )}
 
             <Text style={styles.swipeText}>
@@ -137,21 +131,23 @@ const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) 
             </Text>
 
             {!isGreeting && (
-                <TouchableOpacity
+                <IconButton
                     onPress={() => continueResponse(swipe)}
                     disabled={isGenerating}
-                    style={styles.swipeButton}>
-                    <AntDesign name="forward" size={20} color={getTextColor(isGenerating)} />
-                </TouchableOpacity>
+                    viewStyle={styles.swipeButton}
+                    iconName="forward"
+                    iconSize={20}
+                />
             )}
 
-            <TouchableOpacity
-                style={styles.swipeButton}
+            <IconButton
+                viewStyle={styles.swipeButton}
                 onPress={() => handleSwipeRight('')}
                 onLongPress={() => handleSwipeRight(swipe.swipe ?? '')}
-                disabled={disableSwipeRight}>
-                <AntDesign name="right" size={20} color={getTextColor(disableSwipeRight)} />
-            </TouchableOpacity>
+                disabled={disableSwipeRight}
+                iconName="right"
+                iconSize={20}
+            />
         </View>
     )
 }

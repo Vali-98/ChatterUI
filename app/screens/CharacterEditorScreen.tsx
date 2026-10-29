@@ -6,11 +6,12 @@ import { Redirect, useNavigation, useRouter } from 'expo-router'
 import { usePreventRemove } from 'expo-router/build/react-navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
+import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedTextInput from '@components/input/ThemedTextInput'
@@ -369,7 +370,8 @@ const CharacterEditorScreen = () => {
                                         iconSize={20}
                                         label={t('common.actions.save')}
                                         onPress={handleSaveCharacterCard}
-                                        variant={isDirty ? 'secondary' : 'disabled'}
+                                        variant="secondary"
+                                        level="primary"
                                     />
                                 </View>
                                 <ThemedTextInput
@@ -436,46 +438,36 @@ const CharacterEditorScreen = () => {
                                 </Text>
 
                                 <View style={{ flexDirection: 'row', columnGap: 32 }}>
-                                    <TouchableOpacity
-                                        onPress={handleConfirmDeleteAlternateGreeting}>
-                                        {cardDraft.alternate_greetings.length !== 0 && (
-                                            <AntDesign
-                                                color={color.error._400}
-                                                name="delete"
-                                                size={20}
-                                            />
-                                        )}
-                                    </TouchableOpacity>
                                     {cardDraft.alternate_greetings.length > 0 && (
-                                        <TouchableOpacity
+                                        <IconButton
+                                            iconName="delete"
+                                            iconSize={20}
+                                            level="error"
+                                            onPress={handleConfirmDeleteAlternateGreeting}
+                                        />
+                                    )}
+                                    {cardDraft.alternate_greetings.length > 0 && (
+                                        <IconButton
                                             onPress={() =>
                                                 setAlternateGreetingIndex(
                                                     Math.max(alternateGreetingIndex - 1, 0)
                                                 )
-                                            }>
-                                            <AntDesign
-                                                color={
-                                                    alternateGreetingIndex === 0
-                                                        ? color.text._700
-                                                        : color.text._100
-                                                }
-                                                name="left"
-                                                size={20}
-                                            />
-                                        </TouchableOpacity>
+                                            }
+                                            iconName="left"
+                                            iconSize={20}
+                                            disabled={alternateGreetingIndex === 0}
+                                        />
                                     )}
                                     {alternateGreetingIndex ===
                                         cardDraft.alternate_greetings.length - 1 ||
                                     cardDraft.alternate_greetings.length === 0 ? (
-                                        <TouchableOpacity onPress={handleAddAlternateGreeting}>
-                                            <AntDesign
-                                                color={color.text._100}
-                                                name="plus"
-                                                size={20}
-                                            />
-                                        </TouchableOpacity>
+                                        <IconButton
+                                            onPress={handleAddAlternateGreeting}
+                                            iconName="plus"
+                                            iconSize={20}
+                                        />
                                     ) : (
-                                        <TouchableOpacity
+                                        <IconButton
                                             onPress={() =>
                                                 setAlternateGreetingIndex(
                                                     Math.min(
@@ -483,13 +475,10 @@ const CharacterEditorScreen = () => {
                                                         cardDraft.alternate_greetings.length - 1
                                                     )
                                                 )
-                                            }>
-                                            <AntDesign
-                                                color={color.text._100}
-                                                name="right"
-                                                size={20}
-                                            />
-                                        </TouchableOpacity>
+                                            }
+                                            iconName="right"
+                                            iconSize={20}
+                                        />
                                     )}
                                 </View>
                             </View>

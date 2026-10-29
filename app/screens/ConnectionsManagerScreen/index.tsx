@@ -9,9 +9,10 @@ import { useShallow } from 'zustand/react/shallow'
 import ThemedButton from '@components/buttons/ThemedButton'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
+import { EdgeFadeFlatList } from '@components/views/EdgeFade'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { EdgeFadeFlatList } from '@components/views/EdgeFade'
+import { IconSizes } from '@lib/constants/IconSizes'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -88,7 +89,11 @@ const ConnectionsManagerScreen = () => {
 
             {apiValues.length === 0 && (
                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                    <MaterialIcons name="cloud-off" size={64} color={color.text._700} />
+                    <MaterialIcons
+                        name="cloud-off"
+                        size={IconSizes.empty}
+                        color={color.text._700}
+                    />
                     <Text
                         style={{
                             color: color.text._400,
@@ -101,13 +106,15 @@ const ConnectionsManagerScreen = () => {
             )}
 
             <ThemedButton
-                buttonStyle={{
+                viewStyle={{
                     marginHorizontal: spacing.xl,
                 }}
                 onPress={() => {
                     templatePickerRef.current?.open()
                 }}
                 label={t('connections.manager.add')}
+                variant="primary"
+                level="primary"
             />
             <TemplatePicker ref={templatePickerRef} setPending={setPendingOpen} />
         </SafeAreaView>

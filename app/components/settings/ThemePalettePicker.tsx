@@ -2,8 +2,8 @@ import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useTranslation } from 'react-i18next'
 import { Pressable, Text, View } from 'react-native'
 
+import IconButton from '@components/buttons/IconButton'
 import { EdgeFadeScrollView, type EdgeFadeOptions } from '@components/views/EdgeFade'
-import ThemedButton from '@components/buttons/ThemedButton'
 import { DefaultColorSchemes, type ThemeColor } from '@lib/theme/ThemeColor'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -80,7 +80,7 @@ const ThemePalettePicker = ({
                         </View>
                         {custom && onRemove && (
                             <View style={{ alignItems: 'flex-end', marginTop: 'auto' }}>
-                                <ThemedButton
+                                <IconButton
                                     iconName="delete"
                                     variant="tertiary"
                                     iconSize={16}

@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { TextInput, View, type StyleProp, type ViewStyle } from 'react-native'
 
 import ListButton from '@components/buttons/ListButton'
-import ThemedButton from '@components/buttons/ThemedButton'
+import ThemedButton, { ThemedButtonProps } from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
 import BottomSheet, { BottomSheetHeader, type BottomSheetRef } from '@components/views/BottomSheet'
-import { Theme } from '@lib/theme/ThemeManager'
 import { EdgeFadeFlatList } from '@components/views/EdgeFade'
+import { Theme } from '@lib/theme/ThemeManager'
 
 export type SelectionKey = string | number
 export type SelectionRow<T> = { item: T; selected: boolean; disabled: boolean; onPress: () => void }
@@ -46,6 +46,8 @@ export type SelectionSheetProps<T> = Presentation<T> &
         sheetStyle?: StyleProp<ViewStyle>
         contentContainerStyle?: StyleProp<ViewStyle>
         onClose?: () => void
+        buttonVariant?: ThemedButtonProps['variant']
+        buttonLevel?: ThemedButtonProps['level']
     }
 
 const SelectionSheet = <T,>(props: SelectionSheetProps<T>) => {
@@ -196,12 +198,13 @@ const SelectionSheet = <T,>(props: SelectionSheetProps<T>) => {
                         paddingVertical: 16,
                     }}>
                     <ThemedButton
-                        variant={saving || !canConfirm ? 'disabled' : 'secondary'}
+                        variant={props.buttonVariant ?? 'secondary'}
                         disabled={saving || !canConfirm}
                         label={confirmLabel ?? t('common.actions.select')}
                         onPress={() => {
                             void commit(draft)
                         }}
+                        level={props.buttonLevel}
                     />
                 </View>
             )}

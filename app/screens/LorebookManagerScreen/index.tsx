@@ -6,7 +6,6 @@ import { FlatList } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import ListButton from '@components/buttons/ListButton'
-import { ListCardSection } from '@components/views/ListCard'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
 import TText from '@components/text/TText'
@@ -16,7 +15,9 @@ import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import InputSheet from '@components/views/InputSheet'
+import { ListCardSection } from '@components/views/ListCard'
 import { LorebookType } from '@db/schema'
+import { IconSizes } from '@lib/constants/IconSizes'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Lorebooks } from '@lib/state/lorebooks'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -148,7 +149,11 @@ const LorebookEmpty = () => {
                 alignItems: 'center',
                 rowGap: 12,
             }}>
-            <AntDesign name="file-search" size={64} style={{ color: color.text._600 }} />
+            <AntDesign
+                name="file-search"
+                size={IconSizes.empty}
+                style={{ color: color.text._600 }}
+            />
             <Text style={{ color: color.text._600 }}>{t('lorebook.empty')}</Text>
         </View>
     )

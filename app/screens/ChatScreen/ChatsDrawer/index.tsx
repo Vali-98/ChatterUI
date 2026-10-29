@@ -1,13 +1,14 @@
-import { EdgeFadeFlashList } from '@components/views/EdgeFade'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
+import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Drawer from '@components/views/Drawer'
+import { EdgeFadeFlashList } from '@components/views/EdgeFade'
 import { YAxisOnlyTransition } from '@lib/animations/transitions'
 import { useDebounce } from '@lib/hooks/Debounce'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
@@ -88,9 +89,9 @@ const ChatsDrawer = () => {
                 <Text style={styles.drawerTitle}>
                     {showSearchBar ? t('chat.drawer.search.title') : t('chat.drawer.title')}
                 </Text>
-                <ThemedButton
+                <IconButton
                     variant="tertiary"
-                    iconName={showSearchBar ? 'menu' : 'search'}
+                    iconName={showSearchBar ? 'menu' : { family: 'material', name: 'search' }}
                     onPress={() => {
                         setShowSearchBar(!showSearchBar)
                         setShowSearchResults(searchQuery.length > 0 && !showSearchBar)
@@ -130,6 +131,8 @@ const ChatsDrawer = () => {
                     <Animated.View entering={FadeIn} exiting={FadeOut}>
                         <ThemedButton
                             label={t('chat.drawer.actions.startNewChat')}
+                            variant="primary"
+                            level="primary"
                             onPress={handleCreateChat}
                         />
                     </Animated.View>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -43,8 +43,8 @@ const AboutScreen = () => {
             {devMode && (
                 <ThemedButton
                     label={t('about.devMode.disableAction')}
-                    variant="critical"
-                    buttonStyle={{
+                    variant="secondary"
+                    viewStyle={{
                         marginTop: spacing.xl,
                     }}
                     onPress={() => {
@@ -69,7 +69,7 @@ const AboutScreen = () => {
             <Text style={styles.subtitleText}>{t('about.logsReminder')}</Text>
 
             <ThemedButton
-                buttonStyle={{ marginTop: spacing.m }}
+                viewStyle={{ marginTop: spacing.m }}
                 variant="secondary"
                 label="Github"
                 iconName="github"

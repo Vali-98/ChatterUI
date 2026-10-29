@@ -2,17 +2,17 @@ import { router, useFocusEffect, usePathname, Stack } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BackHandler, ScrollView, View, useColorScheme } from 'react-native'
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
 import Animated, { FadeInUp } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { defaultTemplates } from '@lib/engine/API/DefaultAPI'
-import { Model } from '@lib/engine/Local/Model'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
+import { Model } from '@lib/engine/Local/Model'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { isConnectionReady } from '@lib/onboarding/connection'
 import { useOnboardingStore } from '@lib/onboarding/store'
@@ -272,7 +272,7 @@ const OnboardingScreen = () => {
                             <ThemedButton
                                 label={t('common.actions.back', { defaultValue: 'Back' })}
                                 variant="tertiary"
-                                buttonStyle={{
+                                viewStyle={{
                                     minHeight: 44,
                                     minWidth: 92,
                                     paddingHorizontal: 20,
@@ -286,7 +286,7 @@ const OnboardingScreen = () => {
                         <ThemedButton
                             label={nextLabel}
                             variant={complete ? 'secondary' : 'tertiary'}
-                            buttonStyle={{
+                            viewStyle={{
                                 minHeight: 44,
                                 minWidth: 108,
                                 paddingHorizontal: 20,

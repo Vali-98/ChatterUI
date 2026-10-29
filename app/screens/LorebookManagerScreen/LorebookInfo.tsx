@@ -5,8 +5,8 @@ import { FlatList } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { create } from 'zustand'
 
+import IconButton from '@components/buttons/IconButton'
 import ListButton from '@components/buttons/ListButton'
-import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import ThemedTextInput from '@components/input/ThemedTextInput'
@@ -132,9 +132,9 @@ const LorebookInfoScreen = () => {
                     onChangeText={setSearch}
                 />
 
-                <ThemedButton
+                <IconButton
                     variant="secondary"
-                    buttonStyle={{ flex: 0, paddingHorizontal: 8 }}
+                    viewStyle={{ flex: 0, paddingHorizontal: 8 }}
                     iconName="plus"
                     onPress={async () => {
                         if (!id) return

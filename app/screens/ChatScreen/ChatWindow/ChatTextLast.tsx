@@ -103,17 +103,16 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ isGenerating, swipe }) => {
                         <View style={{ flexDirection: 'row' }}>
                             <ThemedButton
                                 onPress={() => setShowHidden(!showHidden)}
-                                variant="secondary"
+                                variant="tertiary"
                                 label={
                                     showHidden
                                         ? t('chat.filteredText.hide')
                                         : t('chat.filteredText.show')
                                 }
                                 labelStyle={{ flex: 0, fontSize: 12 }}
-                                buttonStyle={{
+                                viewStyle={{
                                     paddingVertical: 0,
                                     paddingHorizontal: 0,
-                                    borderWidth: 0,
                                 }}
                             />
                         </View>

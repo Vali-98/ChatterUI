@@ -3,20 +3,20 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, View } from 'react-native'
 import Animated, { FadeIn } from 'react-native-reanimated'
-import ListButton from '@components/buttons/ListButton'
-import ListCard from '@components/views/ListCard'
-import Aicons, { AiconsGlyphName } from '@components/icons/Aicons'
-import BottomSheet, { useBottomSheetRef } from '@components/views/BottomSheet'
-import { Theme } from '@lib/theme/ThemeManager'
 
+import ListButton from '@components/buttons/ListButton'
 import ThemedButton from '@components/buttons/ThemedButton'
+import Aicons, { AiconsGlyphName } from '@components/icons/Aicons'
 import DropdownSheet from '@components/input/DropdownSheet'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import TText from '@components/text/TText'
-import { isConnectionReady, requiresConnectionKey } from '@lib/onboarding/connection'
+import BottomSheet, { useBottomSheetRef } from '@components/views/BottomSheet'
+import ListCard from '@components/views/ListCard'
 import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { APIConfiguration, APIValues } from '@lib/engine/API/APIBuilder.types'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
+import { isConnectionReady, requiresConnectionKey } from '@lib/onboarding/connection'
+import { Theme } from '@lib/theme/ThemeManager'
 import { getNestedValue } from '@lib/utils/Parsing'
 
 export type ConnectionDraft = APIValues & { friendlyName: string }
@@ -125,7 +125,7 @@ const ConnectionSetup = ({
                     variant="tertiary"
                     label={t('common.actions.reset')}
                     labelStyle={{ color: color.text._400 }}
-                    buttonStyle={{ alignSelf: 'flex-start' }}
+                    viewStyle={{ alignSelf: 'flex-start' }}
                     onPress={() => {
                         confirmValue(undefined)
                         onChange(undefined)
@@ -306,7 +306,7 @@ const ConnectionSetup = ({
                     )}
                 </ScrollView>
                 <ThemedButton
-                    variant={isConnectionReady(value, template) ? 'secondary' : 'disabled'}
+                    variant="secondary"
                     label={t('common.actions.save')}
                     disabled={!isConnectionReady(value, template)}
                     onPress={() => {

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
+import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
 import Notice, { CollapsedNotice } from '@components/views/Notice'
@@ -50,13 +51,13 @@ const ChatNotices = ({ chatId }: { chatId: number }) => {
                             `summary.tasks.${task.status}.${task.kind === 'summary' && summaries.find((summary) => summary.id === task.resourceId)?.kind === 'consolidation' ? 'consolidation' : task.kind}`
                         )}
                     </TText>
-                    <ThemedButton
+                    <IconButton
                         iconName="close"
                         iconSize={16}
                         variant="tertiary"
                         disabled={task.status === 'cancelling'}
                         accessibilityLabel={t('common.actions.cancel')}
-                        iconStyle={{ color: color.error._400 }}
+                        level="error"
                         onPress={() => cancelDeferredTask(task.id)}
                     />
                 </Notice>

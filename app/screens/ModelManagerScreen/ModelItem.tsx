@@ -1,15 +1,15 @@
-import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
-import ListCard, { ListCardSection } from '@components/views/ListCard'
+import IconButton from '@components/buttons/IconButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import Alert from '@components/views/Alert'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import InputSheet from '@components/views/InputSheet'
+import ListCard, { ListCardSection } from '@components/views/ListCard'
 import { ModelDataType } from '@db/schema'
 import { GGMLNameMap } from '@lib/engine/Local'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
@@ -248,19 +248,13 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 </ContextMenu>
 
                 {!isMMPROJ && (
-                    <TouchableOpacity disabled={loadToggle} onPress={handleLoadModel}>
-                        <AntDesign
-                            name={isLoaded ? 'close-circle' : 'play-circle'}
-                            size={24}
-                            color={
-                                loadToggle
-                                    ? color.text._600
-                                    : isLoaded
-                                      ? color.error._400
-                                      : color.primary._500
-                            }
-                        />
-                    </TouchableOpacity>
+                    <IconButton
+                        disabled={loadToggle}
+                        onPress={handleLoadModel}
+                        iconName={isLoaded ? 'close-circle' : 'play-circle'}
+                        iconSize={24}
+                        level={isLoaded ? 'error' : 'primary'}
+                    />
                 )}
             </ListCardSection>
         </ListCard>

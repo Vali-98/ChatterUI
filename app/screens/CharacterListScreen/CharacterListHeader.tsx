@@ -7,7 +7,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import { db } from '@db/db'
@@ -105,7 +105,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                         flexDirection: 'row',
                         columnGap: 12,
                     }}>
-                    <ThemedButton
+                    <IconButton
                         iconName="tag"
                         variant="tertiary"
                         onPress={() => {
@@ -118,9 +118,9 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                             color: showTags ? color.text._100 : color.text._700,
                         }}
                     />
-                    <ThemedButton
+                    <IconButton
                         variant="tertiary"
-                        iconName={showSearch ? 'close' : 'search'}
+                        iconName={showSearch ? 'close' : { family: 'material', name: 'search' }}
                         onPress={() => {
                             setShowSearch(!showSearch)
                         }}
@@ -140,11 +140,14 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                 </View>
             </View>
 
-            <Animated.View layout={LinearTransition}>
+            <Animated.View
+                collapsable={false}
+                layout={LinearTransition.duration(200)}
+                style={{ overflow: 'hidden' }}>
                 {showSearch && (
                     <Animated.View
-                        entering={FadeIn.delay(100)}
-                        exiting={FadeOut}
+                        entering={FadeIn.duration(150)}
+                        exiting={FadeOut.duration(100)}
                         style={{ paddingHorizontal: 12, paddingBottom: 8, rowGap: 8 }}>
                         {showTags && data.length > 0 && (
                             <StringArrayEditor

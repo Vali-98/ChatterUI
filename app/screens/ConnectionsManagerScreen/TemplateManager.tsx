@@ -6,10 +6,11 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
+import { EdgeFadeFlashList } from '@components/views/EdgeFade'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { EdgeFadeFlashList } from '@components/views/EdgeFade'
 import InputSheet from '@components/views/InputSheet'
+import { IconSizes } from '@lib/constants/IconSizes'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -127,7 +128,7 @@ const TemplateManager = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                     }}>
-                    <AntDesign name="file-unknown" size={64} color={color.text._700} />
+                    <AntDesign name="file-unknown" size={IconSizes.empty} color={color.text._700} />
                     <Text
                         style={{
                             color: color.text._400,

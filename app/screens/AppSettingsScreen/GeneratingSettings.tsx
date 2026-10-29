@@ -3,8 +3,8 @@ import { View } from 'react-native'
 import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 
 import ThemedButton from '@components/buttons/ThemedButton'
-import ThemedTextInput from '@components/input/ThemedTextInput'
 import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
+import ThemedTextInput from '@components/input/ThemedTextInput'
 import SettingsPage from '@components/settings/SettingsPage'
 import TText from '@components/text/TText'
 import {
@@ -50,7 +50,7 @@ const GeneratingSettings = () => {
                     label={t('common.actions.reset')}
                     iconName="reload"
                     variant="tertiary"
-                    buttonStyle={{ alignSelf: 'flex-end' }}
+                    viewStyle={{ alignSelf: 'flex-end' }}
                     onPress={() => setContinuationPrompt(undefined)}
                 />
             </View>

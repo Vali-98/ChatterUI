@@ -113,7 +113,7 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
                             }}>
                             {filteredSuggestions.map((item, index) => (
                                 <ThemedButton
-                                    buttonStyle={{ paddingVertical: 4 }}
+                                    viewStyle={{ paddingVertical: 4 }}
                                     onPress={() => addData(item)}
                                     variant="secondary"
                                     label={item}

@@ -182,7 +182,7 @@ const RecordingControls = ({
             )}
             {busy && <ThemedSpinner />}
             <ThemedButton
-                variant={busy ? 'disabled' : phase === 'recording' ? 'critical' : 'secondary'}
+                variant="secondary"
                 iconName={phase === 'recording' ? 'stop' : 'audio'}
                 label={t(
                     phase === 'recording'
@@ -192,6 +192,8 @@ const RecordingControls = ({
                           : 'audio.record'
                 )}
                 onPress={phase === 'recording' ? stop : start}
+                level={phase === 'recording' ? 'error' : 'neutral'}
+                disabled={busy}
             />
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <ThemedButton
@@ -200,7 +202,7 @@ const RecordingControls = ({
                     onPress={onClose}
                 />
                 <ThemedButton
-                    variant={recording && phase === 'ready' ? 'secondary' : 'disabled'}
+                    variant="secondary"
                     label={t('audio.attach')}
                     iconName="paper-clip"
                     onPress={() => {
@@ -210,6 +212,7 @@ const RecordingControls = ({
                         attached.current = true
                         onClose()
                     }}
+                    disabled={!(recording && phase === 'ready')}
                 />
             </View>
         </View>

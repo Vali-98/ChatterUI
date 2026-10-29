@@ -74,6 +74,8 @@ const UserList = () => {
                 />
                 <ThemedButton
                     label={t('users.create')}
+                    variant="primary"
+                    level="primary"
                     onPress={() => newUserInputRef.current?.open()}
                 />
             </View>

@@ -1,13 +1,10 @@
-import AntDesign from '@react-native-vector-icons/ant-design/static'
-import Octicons from '@react-native-vector-icons/octicons/static'
 import { usePathname } from 'expo-router'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { View } from 'react-native'
 import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import AudioControls from '@components/media/AudioControls'
 import { observeAudioPlayback, setAudioChatScope, stopAudio } from '@lib/audio/player'
 import { useAudioState } from '@lib/audio/state'
@@ -78,29 +75,10 @@ const PlaybackPlayer = () => {
                         <Animated.View
                             entering={ZoomIn.duration(200)}
                             exiting={ZoomOut.duration(200)}>
-                            <ThemedButton
+                            <IconButton
                                 variant="tertiary"
-                                icon={
-                                    <View style={{ width: 26, height: 24 }}>
-                                        <AntDesign
-                                            name="message"
-                                            size={22}
-                                            color={color.text._400}
-                                        />
-                                        <AntDesign
-                                            name="arrow-right"
-                                            size={12}
-                                            color={color.text._400}
-                                            style={{
-                                                position: 'absolute',
-                                                bottom: -2,
-                                                right: -2,
-                                                backgroundColor: color.neutral._100,
-                                                borderRadius: 3,
-                                            }}
-                                        />
-                                    </View>
-                                }
+                                iconName={{ name: 'message', subIcon: 'arrow-right' }}
+                                iconSize={24}
                                 accessibilityLabel={t('tts.jumpToMessage')}
                                 onPress={() => {
                                     void jumpToTTSSource().catch(Logger.stackTrace)
@@ -112,7 +90,7 @@ const PlaybackPlayer = () => {
                         <Animated.View
                             entering={ZoomIn.duration(200)}
                             exiting={ZoomOut.duration(200)}>
-                            <ThemedButton
+                            <IconButton
                                 variant="tertiary"
                                 iconName="reload"
                                 iconSize={24}
@@ -122,14 +100,17 @@ const PlaybackPlayer = () => {
                         </Animated.View>
                     )}
                     <Animated.View entering={ZoomIn.duration(200)} exiting={ZoomOut.duration(200)}>
-                        <ThemedButton
+                        <IconButton
                             variant="tertiary"
-                            icon={
-                                session.status === 'finished' || session.status === 'failed' ? (
-                                    <AntDesign name="close" size={24} color={color.text._400} />
-                                ) : (
-                                    <Octicons name="mute" size={24} color={color.error._500} />
-                                )
+                            iconName={
+                                session.status === 'finished' || session.status === 'failed'
+                                    ? 'close'
+                                    : { family: 'octicons', name: 'mute' }
+                            }
+                            level={
+                                session.status === 'finished' || session.status === 'failed'
+                                    ? 'neutral'
+                                    : 'error'
                             }
                             accessibilityLabel={t(
                                 session.status === 'finished' || session.status === 'failed'

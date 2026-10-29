@@ -9,6 +9,7 @@ import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanima
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { scheduleOnRN } from 'react-native-worklets'
 
+import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
 import { useAppModeStore } from '@lib/state/AppMode'
@@ -170,31 +171,30 @@ const AttachmentViewer = ({
                                 justifyContent: 'space-between',
                                 alignSelf: 'stretch',
                             }}>
-                            <ThemedButton
+                            <IconButton
                                 iconName="left"
                                 variant="tertiary"
                                 disabled={index === 0}
-                                iconStyle={{
-                                    color: index === 0 ? color.text._500 : color.text._100,
+                                viewStyle={{
+                                    paddingHorizontal: 8,
+                                    paddingVertical: 8,
+                                    borderWidth: 0,
                                 }}
-                                buttonStyle={{ padding: 8, borderWidth: 0 }}
                                 accessibilityLabel={t('chat.attachments.previous')}
                                 onPress={() => setIndex((current) => Math.max(0, current - 1))}
                             />
                             <TText>
                                 {index + 1}/{images.length}
                             </TText>
-                            <ThemedButton
+                            <IconButton
                                 iconName="right"
                                 variant="tertiary"
                                 disabled={index >= images.length - 1}
-                                iconStyle={{
-                                    color:
-                                        index >= images.length - 1
-                                            ? color.text._500
-                                            : color.text._100,
+                                viewStyle={{
+                                    paddingHorizontal: 8,
+                                    paddingVertical: 8,
+                                    borderWidth: 0,
                                 }}
-                                buttonStyle={{ padding: 8, borderWidth: 0 }}
                                 accessibilityLabel={t('chat.attachments.next')}
                                 onPress={() =>
                                     setIndex((current) => Math.min(images.length - 1, current + 1))
@@ -205,16 +205,18 @@ const AttachmentViewer = ({
                             <ThemedButton
                                 iconName="download"
                                 label={t('common.actions.save')}
-                                variant={busy ? 'disabled' : 'secondary'}
+                                variant="secondary"
                                 accessibilityLabel={t('chat.attachments.save')}
                                 onPress={() => exportImage(false)}
+                                disabled={busy}
                             />
                             <ThemedButton
                                 iconName="share-alt"
                                 label={t('common.actions.share')}
-                                variant={busy ? 'disabled' : 'secondary'}
+                                variant="secondary"
                                 accessibilityLabel={t('chat.attachments.share')}
                                 onPress={() => exportImage(true)}
+                                disabled={busy}
                             />
                             <ThemedButton
                                 iconName="close"

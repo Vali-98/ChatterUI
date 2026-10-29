@@ -1,8 +1,9 @@
 import React, { act, createRef } from 'react'
 import { TextInput } from 'react-native'
+
 import SelectionSheet from '../app/components/input/SelectionSheet'
-import InputSheet from '../app/components/views/InputSheet'
 import type { BottomSheetRefFunctions } from '../app/components/views/BottomSheet'
+import InputSheet from '../app/components/views/InputSheet'
 
 jest.mock('../app/components/views/EdgeFade/EdgeFades', () => ({
     __esModule: true,
@@ -24,6 +25,9 @@ jest.mock('../app/components/views/BottomSheet', () => {
         BottomSheetHeader: Part,
     }
 })
+jest.mock('../app/components/buttons/IconButton', () =>
+    jest.requireMock('../app/components/buttons/ThemedButton')
+)
 jest.mock('../app/components/buttons/ThemedButton', () => ({
     __esModule: true,
     default: (props: any) => require('react').createElement('Button', props),

@@ -18,7 +18,7 @@ import Animated, {
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
-import ThemedButton, { ThemedButtonProps } from '@components/buttons/ThemedButton'
+import IconButton, { type IconButtonProps } from '@components/buttons/IconButton'
 import { useGuideState } from '@lib/guides/state'
 import { getShadowColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -48,7 +48,7 @@ type DrawerBodyProps = {
     children?: ReactNode
 }
 
-interface DrawerButtonProps extends ThemedButtonProps {
+interface DrawerButtonProps extends Omit<IconButtonProps, 'iconName'> {
     drawerID: Drawer.ID
     openIcon?: AntDesignIconName
     closeIcon?: AntDesignIconName
@@ -139,7 +139,7 @@ namespace Drawer {
             }))
         )
         return (
-            <ThemedButton
+            <IconButton
                 iconSize={24}
                 onPressIn={() => {
                     setShow(drawerId, !show)

@@ -1,4 +1,4 @@
-import React, { act } from 'react'
+import { act } from 'react'
 
 import ChatNotices from '../app/screens/ChatScreen/ChatNotices'
 
@@ -54,6 +54,9 @@ jest.mock('../app/components/text/TText', () => ({
     __esModule: true,
     default: require('react-native').Text,
 }))
+jest.mock('../app/components/buttons/IconButton', () =>
+    jest.requireMock('../app/components/buttons/ThemedButton')
+)
 jest.mock('../app/components/buttons/ThemedButton', () => ({
     __esModule: true,
     default: require('react-native').Pressable,

@@ -240,7 +240,7 @@ const LorebookEntryEditor = () => {
                         }}>
                         <ThemedButton
                             label={t('common.actions.delete')}
-                            variant="critical"
+                            variant="secondary"
                             iconName="delete"
                             onPress={() => {
                                 Alert.alert({
@@ -265,6 +265,8 @@ const LorebookEntryEditor = () => {
                                     ],
                                 })
                             }}
+                            level="error"
+                            viewStyle={{ paddingHorizontal: 8 }}
                         />
 
                         <ThemedButton
@@ -274,6 +276,7 @@ const LorebookEntryEditor = () => {
                             onPress={() => {
                                 handleSetPlaceholder(entry, false)
                             }}
+                            viewStyle={{ paddingHorizontal: 8 }}
                         />
 
                         <ThemedButton
@@ -281,6 +284,7 @@ const LorebookEntryEditor = () => {
                             variant="secondary"
                             iconName="save"
                             onPress={save}
+                            viewStyle={{ paddingHorizontal: 8 }}
                         />
                     </View>
                 </>

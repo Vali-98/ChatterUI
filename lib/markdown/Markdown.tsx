@@ -6,7 +6,7 @@ import React, { ReactNode, useCallback, useMemo, useState } from 'react'
 import { Platform, StyleSheet, Text, useWindowDimensions, View } from 'react-native'
 import { MarkdownIt } from 'react-native-markdown-display'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import { ChatStyle } from '@lib/state/ChatStyle'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -122,7 +122,7 @@ export namespace MarkdownStyle {
                             {sourceInfo || 'Code'}
                         </Text>
                         {content && (
-                            <ThemedButton
+                            <IconButton
                                 iconName="copy"
                                 variant="tertiary"
                                 iconStyle={{ color: styles.fenceHeader.color }}

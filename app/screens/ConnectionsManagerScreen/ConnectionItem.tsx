@@ -2,10 +2,10 @@ import { useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
-import ListCard, { ListCardSection } from '@components/views/ListCard'
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
+import ListCard, { ListCardSection } from '@components/views/ListCard'
 import { Connection, useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -53,12 +53,12 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, pendingOpen }) =>
                 </View>
             </ListCardSection>
             <ListCardSection>
-                <ThemedButton
+                <IconButton
                     onPress={() => editorRef.current?.open()}
                     variant="tertiary"
                     iconName="edit"
                     iconSize={24}
-                    buttonStyle={{ paddingHorizontal: spacing.l }}
+                    viewStyle={{ paddingHorizontal: spacing.l }}
                 />
             </ListCardSection>
         </ListCard>

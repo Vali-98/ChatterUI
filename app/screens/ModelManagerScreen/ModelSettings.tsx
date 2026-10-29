@@ -178,10 +178,12 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             />
             {saveKV && (
                 <ThemedButton
-                    buttonStyle={{ marginTop: 8 }}
+                    viewStyle={{ marginTop: 8 }}
                     label={t('model.purgekv', { size: readableFileSize(kvSize) })}
                     onPress={handleDeleteKV}
-                    variant={kvSize === 0 ? 'disabled' : 'critical'}
+                    variant="secondary"
+                    level="error"
+                    disabled={kvSize === 0}
                 />
             )}
         </Animated.ScrollView>

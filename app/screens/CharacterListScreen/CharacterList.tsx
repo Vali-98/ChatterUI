@@ -102,9 +102,11 @@ const CharacterList: React.FC = () => {
             />
 
             <CharacterListHeader resultLength={characterList.length} />
-            <GuideTarget id="main.characters" style={{ flex: 1 }}>
+            <GuideTarget
+                id="main.characters"
+                style={{ flex: 1 }}
+                layout={LinearTransition.duration(200)}>
                 <Animated.FlatList
-                    layout={LinearTransition}
                     itemLayoutAnimation={LinearTransition}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ rowGap: 16 }}

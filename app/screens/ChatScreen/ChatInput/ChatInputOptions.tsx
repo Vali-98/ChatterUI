@@ -61,7 +61,7 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
                             router.back()
                         }}
                         label={t('chat.input.actions.mainMenu')}
-                        icon="backward"
+                        icon="left"
                     />
                     <ContextMenu.Button
                         label={t('summary.title')}

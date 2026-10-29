@@ -1,11 +1,10 @@
 import Slider from '@react-native-community/slider'
-import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import TText from '@components/text/TText'
 import ThemedSpinner from '@components/views/ThemedSpinner'
 import { pauseAudio, resumeAudio, seekAudio, stopAudio } from '@lib/audio/player'
@@ -62,7 +61,7 @@ const AudioControls = () => {
                 {session.status === 'loading' ? (
                     <ThemedSpinner />
                 ) : (
-                    <ThemedButton
+                    <IconButton
                         variant="tertiary"
                         iconName={
                             playing
@@ -87,22 +86,19 @@ const AudioControls = () => {
                 )}
             </Animated.View>
             <Animated.View entering={ZoomIn.duration(200)} exiting={ZoomOut.duration(200)}>
-                <ThemedButton
+                <IconButton
                     variant="tertiary"
-                    icon={
-                        <MaterialIcons
-                            name={
-                                session.status === 'finished' || session.status === 'failed'
-                                    ? 'close'
-                                    : 'stop'
-                            }
-                            size={24}
-                            color={
-                                session.status === 'finished' || session.status === 'failed'
-                                    ? color.text._400
-                                    : color.error._500
-                            }
-                        />
+                    iconName={{
+                        family: 'material',
+                        name:
+                            session.status === 'finished' || session.status === 'failed'
+                                ? 'close'
+                                : 'stop',
+                    }}
+                    level={
+                        session.status === 'finished' || session.status === 'failed'
+                            ? 'neutral'
+                            : 'error'
                     }
                     accessibilityLabel={t('audio.stop')}
                     onPress={stopAudio}

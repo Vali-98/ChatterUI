@@ -6,7 +6,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import Alert from '@components/views/Alert'
 import { ChatControlPanel } from '@components/views/ChatControlColumn'
 import { ChatSwipe } from '@db/schema'
@@ -106,13 +106,11 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ entryId, isGenerating, sw
                             style={{ flexDirection: 'row' }}
                             entering={ZoomIn.duration(200)}
                             exiting={ZoomOut.duration(200)}>
-                            <ThemedButton
+                            <IconButton
                                 variant="tertiary"
                                 iconName="delete"
                                 iconSize={24}
-                                iconStyle={{
-                                    color: color.error._400,
-                                }}
+                                level="error"
                                 onPress={() => {
                                     setShowOptions(undefined)
                                     Chats.actions.deleteMessage(entryId)
@@ -129,36 +127,27 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ entryId, isGenerating, sw
                         </Animated.View>
                     )}
                     <Animated.View entering={ZoomIn.duration(200)} exiting={ZoomOut.duration(200)}>
-                        <ThemedButton
+                        <IconButton
                             variant="tertiary"
                             iconName="font-colors"
                             iconSize={22}
-                            iconStyle={{
-                                color: color.text._500,
-                            }}
                             onPress={handleCreateAuthorNote}
                         />
                     </Animated.View>
                     <Animated.View entering={ZoomIn.duration(200)} exiting={ZoomOut.duration(200)}>
-                        <ThemedButton
+                        <IconButton
                             variant="tertiary"
                             iconName="fork"
                             iconSize={22}
-                            iconStyle={{
-                                color: color.text._500,
-                            }}
                             onPress={handleFork}
                         />
                     </Animated.View>
 
                     <Animated.View entering={ZoomIn.duration(200)} exiting={ZoomOut.duration(200)}>
-                        <ThemedButton
+                        <IconButton
                             variant="tertiary"
                             iconName="copy"
                             iconSize={22}
-                            iconStyle={{
-                                color: color.text._500,
-                            }}
                             onPress={() => {
                                 setShowOptions(undefined)
                                 setStringAsync(swipe.swipe)
@@ -173,13 +162,10 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({ entryId, isGenerating, sw
                     </Animated.View>
 
                     <Animated.View entering={ZoomIn.duration(200)} exiting={ZoomOut.duration(200)}>
-                        <ThemedButton
+                        <IconButton
                             variant="tertiary"
                             iconName="edit"
                             iconSize={24}
-                            iconStyle={{
-                                color: color.text._500,
-                            }}
                             onPress={handleEnableEdit}
                         />
                     </Animated.View>

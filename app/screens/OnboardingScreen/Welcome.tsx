@@ -127,7 +127,7 @@ const Welcome = ({ onStart, disabled }: { onStart: () => void; disabled: boolean
                     iconName="right"
                     disabled={disabled || !introFinished}
                     onPress={onStart}
-                    buttonStyle={{
+                    viewStyle={{
                         paddingHorizontal: 24,
                         minHeight: 50,
                         justifyContent: 'center',

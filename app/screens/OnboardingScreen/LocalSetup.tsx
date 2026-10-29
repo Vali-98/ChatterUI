@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, View } from 'react-native'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
+import IconButton from '@components/buttons/IconButton'
 import ListButton from '@components/buttons/ListButton'
-import ListCard, { ListCardSection } from '@components/views/ListCard'
-import ThemedButton from '@components/buttons/ThemedButton'
 import DownloadList from '@components/downloads/DownloadList'
 import TText from '@components/text/TText'
+import ListCard, { ListCardSection } from '@components/views/ListCard'
 import {
     downloadModel,
     fitsDeviceMemory,
@@ -15,8 +15,8 @@ import {
     recommendedModels,
 } from '@lib/downloads/models'
 import { useDownloadStore } from '@lib/downloads/store'
-import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { GGMLNameMap } from '@lib/engine/Local/GGML'
+import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { Model, ModelListQueryType } from '@lib/engine/Local/Model'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -141,7 +141,7 @@ const LocalSetup = ({ models }: { models: ModelListQueryType[] }) => {
                                 </TText>
                             )}
                         </View>
-                        <ThemedButton
+                        <IconButton
                             variant="tertiary"
                             iconName="download"
                             accessibilityLabel={t('common.actions.download')}

@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
-import ListCard from '@components/views/ListCard'
+import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
+import ListCard from '@components/views/ListCard'
 import { pauseDownload, removeDownload, resumeDownload } from '@lib/downloads/manager'
 import { type Download } from '@lib/downloads/store'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -95,8 +96,8 @@ const DownloadItem = ({ item }: { item: Download }) => {
                     }}
                 />
                 {item.status !== 'completed' && (
-                    <ThemedButton
-                        variant={waiting ? 'disabled' : 'secondary'}
+                    <IconButton
+                        variant="secondary"
                         iconName={downloading ? 'pause' : resumeFailed ? 'reload' : 'caret-right'}
                         accessibilityLabel={t(
                             downloading

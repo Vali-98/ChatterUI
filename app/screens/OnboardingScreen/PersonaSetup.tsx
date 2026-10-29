@@ -87,7 +87,7 @@ const PersonaSetup = ({
                         iconName="plus"
                         label={t('onboarding.addDescription')}
                         onPress={() => setDescriptionVisible(true)}
-                        buttonStyle={{ alignSelf: 'center' }}
+                        viewStyle={{ alignSelf: 'center' }}
                     />
                 )}
             </Animated.View>

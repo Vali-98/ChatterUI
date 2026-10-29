@@ -1,5 +1,5 @@
 import { useFocusEffect } from 'expo-router'
-import { ReactNode, useCallback } from 'react'
+import { type ComponentProps, ReactNode, useCallback } from 'react'
 import type { StyleProp, View, ViewStyle } from 'react-native'
 import Animated, { useAnimatedRef } from 'react-native-reanimated'
 
@@ -10,10 +10,12 @@ const GuideTarget = ({
     id,
     children,
     style,
+    layout,
 }: {
     id: GuideTargetId
     children: ReactNode
     style?: StyleProp<ViewStyle>
+    layout?: ComponentProps<typeof Animated.View>['layout']
 }) => {
     const ref = useAnimatedRef<View>()
     const register = useGuideState((state) => state.register)
@@ -25,7 +27,7 @@ const GuideTarget = ({
         }, [id, ref, register, unregister])
     )
     return (
-        <Animated.View ref={ref} collapsable={false} style={style}>
+        <Animated.View ref={ref} collapsable={false} style={style} layout={layout}>
             {children}
         </Animated.View>
     )

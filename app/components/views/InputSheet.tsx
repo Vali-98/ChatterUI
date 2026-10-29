@@ -3,10 +3,12 @@ import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View, type StyleProp, type ViewStyle } from 'react-native'
 
+import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import TText from '@components/text/TText'
 import { Theme } from '@lib/theme/ThemeManager'
+
 import BottomSheet, { BottomSheetHeader, type BottomSheetRef } from './BottomSheet'
 
 export type InputSheetProps = {
@@ -124,14 +126,14 @@ const InputSheet = ({
                     onPress={() => ref.current?.close()}
                 />
                 <View style={{ flexDirection: 'row', columnGap: 12 }}>
-                    <ThemedButton
+                    <IconButton
                         iconStyle={{ color: color.text._400 }}
                         iconName="close"
                         variant="tertiary"
                         disabled={saving}
                         onPress={() => setText('')}
                     />
-                    <ThemedButton
+                    <IconButton
                         iconStyle={{ color: color.text._400 }}
                         iconName="copy"
                         variant="tertiary"
@@ -144,7 +146,7 @@ const InputSheet = ({
                 </View>
                 <ThemedButton
                     label={confirmLabel ?? t('common.actions.save')}
-                    variant={saving ? 'disabled' : 'primary'}
+                    variant="secondary"
                     disabled={saving}
                     onPress={() => {
                         void submit()

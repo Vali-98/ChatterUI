@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
+import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import ThemedSlider from '@components/input/ThemedSlider'
@@ -113,7 +114,7 @@ const TTSManagerScreen = () => {
                     placeholder={t('tts.selectlang')}
                     onChangeValue={(item) => setLang(item)}
                 />
-                <ThemedButton
+                <IconButton
                     iconName="reload"
                     iconSize={20}
                     onPress={() => getVoices()}
@@ -150,7 +151,7 @@ const TTSManagerScreen = () => {
                 />
                 <ThemedButton
                     label={t('common.actions.test')}
-                    variant={audioActive ? 'disabled' : 'secondary'}
+                    variant="secondary"
                     onPress={() => {
                         if (voice === undefined) {
                             Logger.warnToast(t('tts.nospeaker'))
@@ -158,6 +159,7 @@ const TTSManagerScreen = () => {
                         }
                         previewSpeech(testAudioText)
                     }}
+                    disabled={audioActive}
                 />
             </View>
         </SettingsPage>

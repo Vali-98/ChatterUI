@@ -225,7 +225,7 @@ const AuthorNoteEditor = () => {
                 }}>
                 <ThemedButton
                     label={t('common.actions.delete')}
-                    variant="critical"
+                    variant="secondary"
                     iconName="delete"
                     onPress={() => {
                         Alert.alert({
@@ -245,6 +245,8 @@ const AuthorNoteEditor = () => {
                             ],
                         })
                     }}
+                    level="error"
+                    viewStyle={{ paddingHorizontal: 8 }}
                 />
                 <ThemedButton
                     label={t('common.actions.reset')}
@@ -253,6 +255,7 @@ const AuthorNoteEditor = () => {
                     onPress={async () => {
                         handleSetPlaceholder(note, false)
                     }}
+                    viewStyle={{ paddingHorizontal: 8 }}
                 />
                 <ThemedButton
                     label={t('common.actions.save')}
@@ -269,6 +272,7 @@ const AuthorNoteEditor = () => {
                         })
                         close()
                     }}
+                    viewStyle={{ paddingHorizontal: 8 }}
                 />
             </View>
         </BottomSheet>

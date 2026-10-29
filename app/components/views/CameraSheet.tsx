@@ -1,7 +1,7 @@
 import { CameraCapturedPicture, CameraView } from 'expo-camera'
 import { useRef } from 'react'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 
 import BottomSheet, { BottomSheetRef } from './BottomSheet'
 
@@ -36,7 +36,7 @@ const CameraSheet: React.FC<CameraSheetProps> = ({ ref, onTakePicture }) => {
                 mode="picture"
                 style={{ flex: 1, borderRadius: 8, marginBottom: 24 }}
             />
-            <ThemedButton iconName="camera" onPress={handleTakePicture} />
+            <IconButton iconName="camera" onPress={handleTakePicture} />
         </BottomSheet>
     )
 }

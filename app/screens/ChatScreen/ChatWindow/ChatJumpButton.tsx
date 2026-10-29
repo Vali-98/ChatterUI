@@ -1,7 +1,7 @@
-import AntDesign from '@react-native-vector-icons/ant-design/static'
-import { Pressable } from 'react-native'
+import { View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 
+import IconButton from '@components/buttons/IconButton'
 import { useChatControlLayoutState } from '@lib/state/components/ChatControls'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -12,23 +12,23 @@ const ChatJumpButton: React.FC<{ jump: () => void; visible: boolean }> = ({ jump
     if (!visible) return
     return (
         <Animated.View entering={FadeInDown}>
-            <Pressable
-                style={{ position: 'absolute', bottom: chatInputHeight + 12, right: '50%' }}
-                onPress={jump}>
-                <AntDesign
-                    name="caret-down"
-                    size={16}
-                    style={{
+            <View style={{ position: 'absolute', bottom: chatInputHeight + 12, right: '50%' }}>
+                <IconButton
+                    iconName="caret-down"
+                    iconSize={16}
+                    onPress={jump}
+                    iconStyle={{ color: color.text._300 }}
+                    viewStyle={{
                         left: 16,
                         borderRadius: 32,
-                        color: color.text._300,
                         backgroundColor: color.neutral._100,
                         borderWidth: 2,
                         borderColor: color.primary._300,
-                        padding: 8,
+                        paddingHorizontal: 8,
+                        paddingVertical: 8,
                     }}
                 />
-            </Pressable>
+            </View>
         </Animated.View>
     )
 }

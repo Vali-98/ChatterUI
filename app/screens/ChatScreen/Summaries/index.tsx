@@ -3,13 +3,14 @@ import { type ComponentProps, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, View } from 'react-native'
 
+import IconButton from '@components/buttons/IconButton'
 import ListButton from '@components/buttons/ListButton'
-import ListCard, { ListCardSection } from '@components/views/ListCard'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import TText from '@components/text/TText'
 import Alert from '@components/views/Alert'
 import BottomSheet, { useBottomSheetRef } from '@components/views/BottomSheet'
+import ListCard, { ListCardSection } from '@components/views/ListCard'
 import ThemedSpinner from '@components/views/ThemedSpinner'
 import type { ChatSummary } from '@db/schema'
 import { isDeferredTaskActive, type DeferredTask } from '@lib/engine/generation/deferredState'
@@ -136,9 +137,8 @@ const SummaryEditor = ({
                         </View>
                         <ThemedButton
                             label={t('common.actions.cancel')}
-                            variant={task.status === 'cancelling' ? 'disabled' : 'secondary'}
-                            labelStyle={{ color: color.text._400 }}
-                            buttonStyle={{ borderColor: color.neutral._400, paddingHorizontal: 12 }}
+                            variant="secondary"
+                            viewStyle={{ paddingHorizontal: 12 }}
                             disabled={task.status === 'cancelling'}
                             onPress={() => cancelDeferredTask(task.id)}
                         />
@@ -193,18 +193,19 @@ const SummaryEditor = ({
                     <View style={{ flex: 1, alignItems: 'flex-start' }}>
                         <ThemedButton
                             label={t('common.actions.delete')}
-                            variant="critical"
-                            buttonStyle={{ paddingHorizontal: 8 }}
+                            variant="secondary"
+                            viewStyle={{ paddingHorizontal: 8 }}
                             disabled={!!task}
                             onPress={handleDelete}
+                            level="error"
                         />
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', columnGap: 4 }}>
-                        <ThemedButton
+                        <IconButton
                             iconName="reload"
                             iconSize={24}
                             variant="tertiary"
-                            buttonStyle={{ padding: 4 }}
+                            viewStyle={{ paddingHorizontal: 4, paddingVertical: 4 }}
                             accessibilityLabel={t('summary.regenerate')}
                             disabled={!!task || !enabled}
                             onPress={() =>
@@ -217,11 +218,11 @@ const SummaryEditor = ({
                             }
                         />
                         {canReplace && (
-                            <ThemedButton
+                            <IconButton
                                 iconName="double-right"
                                 iconSize={24}
                                 variant="tertiary"
-                                buttonStyle={{ padding: 4 }}
+                                viewStyle={{ paddingHorizontal: 4, paddingVertical: 4 }}
                                 accessibilityLabel={t('summary.replaceWithNewer')}
                                 disabled={!!task || !enabled}
                                 onPress={() =>
@@ -235,11 +236,11 @@ const SummaryEditor = ({
                             />
                         )}
                         {summary.status === 'draft' && (
-                            <ThemedButton
+                            <IconButton
                                 iconName="forward"
                                 iconSize={24}
                                 variant="tertiary"
-                                buttonStyle={{ padding: 4 }}
+                                viewStyle={{ paddingHorizontal: 4, paddingVertical: 4 }}
                                 accessibilityLabel={t('summary.continue')}
                                 disabled={!!task || !enabled || summary.source_changed}
                                 onPress={() =>
@@ -257,7 +258,7 @@ const SummaryEditor = ({
                     <View style={{ flex: 1, alignItems: 'flex-end' }}>
                         <ThemedButton
                             label={t('common.actions.save')}
-                            buttonStyle={{ paddingHorizontal: 8 }}
+                            viewStyle={{ paddingHorizontal: 8 }}
                             disabled={!!task || !content.trim()}
                             onPress={() =>
                                 run(() => {
@@ -305,7 +306,7 @@ const SummaryEditorSheet = ({
                         <TText size={18} numberOfLines={1} style={{ flex: 1 }}>
                             {`${t('summary.status.accepted')} · ${t('summary.coverage', { count: summary.sourceCount })}`}
                         </TText>
-                        <ThemedButton
+                        <IconButton
                             iconName="setting"
                             variant="tertiary"
                             accessibilityLabel={t('summary.settings')}
@@ -397,7 +398,7 @@ const SummarySheet = () => {
                 <TText size={18} numberOfLines={1} style={{ flex: 1 }}>
                     {t('summary.title')}
                 </TText>
-                <ThemedButton
+                <IconButton
                     iconName="setting"
                     variant="tertiary"
                     accessibilityLabel={t('summary.settings')}
@@ -462,7 +463,8 @@ const SummarySheet = () => {
             <ThemedButton
                 label={t('summary.generate')}
                 iconName="plus"
-                variant="secondary"
+                variant="primary"
+                level="primary"
                 disabled={
                     !enabled ||
                     summaries.some((item) => item.status === 'draft') ||

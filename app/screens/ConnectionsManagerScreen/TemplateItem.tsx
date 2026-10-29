@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import Alert from '@components/views/Alert'
 import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
@@ -64,14 +64,14 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ item }) => {
                 </View>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <ThemedButton
+                <IconButton
                     onPress={handleDelete}
                     iconName="delete"
                     iconSize={24}
-                    variant="critical"
-                    buttonStyle={{ borderWidth: 0 }}
+                    variant="tertiary"
+                    level="error"
                 />
-                <ThemedButton
+                <IconButton
                     onPress={handleExport}
                     iconName="download"
                     iconSize={24}

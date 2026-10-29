@@ -3,7 +3,7 @@ import { Text, View } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import { useLiveQuerySync } from '@lib/hooks/liveQuery'
 import { AuthorNotes } from '@lib/state/AuthorNotes'
@@ -67,7 +67,7 @@ const AuthorNoteItem: React.FC<AuthorNoteItemProps> = ({ id }) => {
                         {note.content.replaceAll('\n', ' ') || t('authorNotes.item.noContent')}
                     </Text>
                 </View>
-                <ThemedButton
+                <IconButton
                     iconName="edit"
                     variant="tertiary"
                     iconSize={24}

@@ -2,6 +2,7 @@ import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
+import { IconSizes } from '@lib/constants/IconSizes'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const CharactersEmpty = () => {
@@ -16,7 +17,7 @@ const CharactersEmpty = () => {
                 alignItems: 'center',
                 marginTop: spacing.xl3,
             }}>
-            <MaterialIcons name="person-search" color={color.text._700} size={60} />
+            <MaterialIcons name="person-search" color={color.text._700} size={IconSizes.empty} />
             <Text
                 style={{
                     color: color.text._700,

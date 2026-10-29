@@ -1,9 +1,10 @@
 import { launchImageLibraryAsync } from 'expo-image-picker'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { View, ScrollView } from 'react-native'
+import { View, ScrollView, Pressable } from 'react-native'
 import { create } from 'zustand'
 
+import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import ThemedTextInput from '@components/input/ThemedTextInput'
@@ -170,15 +171,12 @@ const MessageEditor = ({
                                     columnGap: 12,
                                 }}>
                                 {item.type === 'image' && (
-                                    <ThemedButton
-                                        variant="tertiary"
-                                        onPress={() => setViewerIndex(images.indexOf(item))}
-                                        buttonStyle={{ padding: 0 }}>
+                                    <Pressable onPress={() => setViewerIndex(images.indexOf(item))}>
                                         <ScaledImage
                                             uri={item.uri}
                                             style={{ height: 72, maxWidth: 120, borderRadius: 8 }}
                                         />
-                                    </ThemedButton>
+                                    </Pressable>
                                 )}
                                 {item.type === 'audio' ? (
                                     <View style={{ flex: 1 }}>
@@ -196,9 +194,9 @@ const MessageEditor = ({
                                         {item.name}
                                     </TText>
                                 )}
-                                <ThemedButton
+                                <IconButton
                                     iconName="close"
-                                    variant={saving ? 'disabled' : 'tertiary'}
+                                    variant="tertiary"
                                     accessibilityLabel={t('chat.attachments.remove')}
                                     onPress={() =>
                                         setDraft((draft) => ({
@@ -208,19 +206,22 @@ const MessageEditor = ({
                                             ),
                                         }))
                                     }
+                                    disabled={saving}
                                 />
                             </View>
                         ))}
                         <ThemedButton
                             iconName="picture"
                             label={t('chat.input.actions.addImage')}
-                            variant={saving ? 'disabled' : 'secondary'}
+                            variant="secondary"
                             onPress={addImages}
+                            disabled={saving}
+                            viewStyle={{ paddingHorizontal: 8 }}
                         />
                         <ThemedButton
                             iconName="sound"
                             label={t('audio.add')}
-                            variant={saving ? 'disabled' : 'secondary'}
+                            variant="secondary"
                             onPress={async () => {
                                 try {
                                     const selected = await pickAudioAttachments()
@@ -240,6 +241,8 @@ const MessageEditor = ({
                                     Logger.errorToast(t('audio.addFailed'), error)
                                 }
                             }}
+                            disabled={saving}
+                            viewStyle={{ paddingHorizontal: 8 }}
                         />
                     </ScrollView>
                 ) : (
@@ -256,7 +259,7 @@ const MessageEditor = ({
                 <ThemedButton
                     label={t('chat.editor.actions.delete')}
                     iconName="delete"
-                    variant={saving ? 'disabled' : 'critical'}
+                    variant="secondary"
                     onPress={() => {
                         try {
                             Chats.actions.deleteMessage(entry.id)
@@ -266,18 +269,25 @@ const MessageEditor = ({
                             Logger.errorToast(t('chat.attachments.editFailed'))
                         }
                     }}
+                    level="error"
+                    disabled={saving}
+                    viewStyle={{ paddingHorizontal: 8 }}
                 />
                 <ThemedButton
                     iconName="reload"
-                    variant={saving ? 'disabled' : 'tertiary'}
+                    variant="tertiary"
                     label={t('chat.editor.actions.reset')}
                     onPress={() => setDraft(initialDraft())}
+                    disabled={saving}
+                    viewStyle={{ paddingHorizontal: 8 }}
                 />
                 <ThemedButton
                     label={t('chat.editor.actions.confirm')}
                     iconName="check"
-                    variant={saving || !editable ? 'disabled' : 'secondary'}
+                    variant="secondary"
                     onPress={save}
+                    disabled={saving || !editable}
+                    viewStyle={{ paddingHorizontal: 8 }}
                 />
             </View>
             {viewerIndex !== undefined && (

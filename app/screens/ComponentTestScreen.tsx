@@ -1,9 +1,10 @@
 /* eslint-disable i18next/no-literal-string */
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import HorizontalSelector from '@components/input/HorizontalSelector'
@@ -14,6 +15,7 @@ import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import CollapsableTitle from '@components/text/CollapsableTitle'
+import TText from '@components/text/TText'
 import Accordion from '@components/views/Accordion'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
@@ -32,7 +34,8 @@ const selectorData = [
     { label: 'Item 8', value: '8' },
 ]
 
-const buttonVariants = ['primary', 'secondary', 'tertiary', 'critical', 'disabled']
+const buttonVariants = ['primary', 'secondary', 'tertiary'] as const
+const buttonLevels = ['neutral', 'primary', 'warning', 'error'] as const
 
 const ComponentTestScreen = () => {
     const [selected, setSelected] = useState<(typeof selectorData)[0]>(selectorData[0])
@@ -69,16 +72,49 @@ const ComponentTestScreen = () => {
                     }}
                 />
 
-                <CollapsableTitle title="Collapsable Title">
-                    <View style={{ rowGap: 8 }}>
-                        {buttonVariants.map((item) => (
-                            <ThemedButton
-                                //@ts-expect-error
-                                variant={item}
-                                key={item}
-                                label={`Button Variant: ${item}`}
-                            />
+                <CollapsableTitle title="Buttons">
+                    <View style={{ rowGap: 16 }}>
+                        {buttonLevels.map((level) => (
+                            <View key={level} style={{ rowGap: 8 }}>
+                                <TText>{level}</TText>
+                                {buttonVariants.map((variant) => (
+                                    <View
+                                        key={variant}
+                                        style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                                        <ThemedButton
+                                            label={variant}
+                                            variant={variant}
+                                            level={level}
+                                        />
+                                        <ThemedButton
+                                            label={variant}
+                                            variant={variant}
+                                            level={level}
+                                            disabled
+                                        />
+                                        <IconButton
+                                            iconName="edit"
+                                            variant={variant}
+                                            level={level}
+                                        />
+                                        <IconButton
+                                            iconName="edit"
+                                            variant={variant}
+                                            level={level}
+                                            disabled
+                                        />
+                                    </View>
+                                ))}
+                            </View>
                         ))}
+                        <View style={{ flexDirection: 'row', columnGap: 16 }}>
+                            <IconButton iconName="save" />
+                            <IconButton iconName={{ family: 'material', name: 'search' }} />
+                            <IconButton
+                                iconName={{ family: 'octicons', name: 'unmute', subIcon: 'close' }}
+                            />
+                            <IconButton iconName={{ name: 'message', subIcon: 'arrow-right' }} />
+                        </View>
                     </View>
                 </CollapsableTitle>
 

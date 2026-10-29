@@ -31,7 +31,7 @@ const StyleSettings = () => {
             {chatBackground && (
                 <ThemedButton
                     label={t('settings.style.deleteBackground')}
-                    variant="critical"
+                    variant="secondary"
                     onPress={() =>
                         Alert.alert({
                             title: t('settings.style.alert.deleteBackground.title'),
@@ -46,6 +46,7 @@ const StyleSettings = () => {
                             ],
                         })
                     }
+                    level="error"
                 />
             )}
         </View>

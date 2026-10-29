@@ -290,10 +290,12 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ ref, originalValues
                         justifyContent: 'space-between',
                     }}>
                     <ThemedButton
-                        variant="critical"
+                        variant="secondary"
                         iconName="delete"
                         label={t('common.actions.delete')}
                         onPress={handleDelete}
+                        level="error"
+                        viewStyle={{ paddingHorizontal: 8 }}
                     />
                     <ThemedButton
                         variant="tertiary"
@@ -305,6 +307,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ ref, originalValues
                             addConnection(newValue)
                             ref.current?.close()
                         }}
+                        viewStyle={{ paddingHorizontal: 8 }}
                     />
                     <ThemedButton
                         variant="secondary"
@@ -314,6 +317,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ ref, originalValues
                             updateConnection(originalValues.id, values)
                             ref.current?.close()
                         }}
+                        viewStyle={{ paddingHorizontal: 8 }}
                     />
                 </View>
             </View>

@@ -16,7 +16,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import AudioAttachment from '@components/media/AudioAttachment'
 import AudioRecordingSheet from '@components/media/AudioRecordingSheet'
 import Alert from '@components/views/Alert'
@@ -195,7 +195,7 @@ const ChatInput = () => {
                                     }}
                                 />
                             ) : (
-                                <View style={{ width: 260 }}>
+                                <View style={{ width: 292, paddingRight: 32 }}>
                                     <AudioAttachment
                                         source={{
                                             uri: item.uri,
@@ -206,17 +206,19 @@ const ChatInput = () => {
                                 </View>
                             )}
 
-                            <ThemedButton
+                            <IconButton
                                 iconName="close"
-                                iconSize={20}
-                                buttonStyle={{
-                                    borderWidth: 0,
-                                    paddingHorizontal: 2,
-                                    paddingVertical: 2,
+                                iconSize={16}
+                                viewStyle={{
                                     position: 'absolute',
-                                    alignSelf: 'flex-end',
-                                    margin: -8,
-                                    backgroundColor: color.neutral._500,
+                                    top: 6,
+                                    right: item.type === 'image' ? 6 : 0,
+                                    paddingHorizontal: 5,
+                                    paddingVertical: 5,
+                                    borderRadius: borderRadius.xl3,
+                                    borderWidth: 1,
+                                    borderColor: color.neutral._400,
+                                    backgroundColor: color.neutral._100,
                                 }}
                                 onPress={() => {
                                     setAttachments(attachments.filter((a) => a.uri !== item.uri))
@@ -324,13 +326,14 @@ const ChatInput = () => {
                     )}
                     {hideOptions && (
                         <Animated.View entering={FadeIn} exiting={FadeOut}>
-                            <ThemedButton
+                            <IconButton
                                 iconSize={18}
                                 iconStyle={{
                                     color: color.text._400,
                                 }}
-                                buttonStyle={{
-                                    padding: 5,
+                                viewStyle={{
+                                    paddingHorizontal: 5,
+                                    paddingVertical: 5,
                                     backgroundColor: color.neutral._200,
                                     borderRadius: 32,
                                 }}
@@ -402,11 +405,11 @@ const ChatInput = () => {
                         <MaterialIcons
                             name={isGenerating ? 'stop' : 'send'}
                             color={
-                                activeProvider
-                                    ? getContrastingColor(
-                                          isGenerating ? color.error._500 : color.primary._500
-                                      )
-                                    : color.text._700
+                                isGenerating
+                                    ? '#111111'
+                                    : activeProvider
+                                      ? getContrastingColor(color.primary._500)
+                                      : color.text._700
                             }
                             size={24}
                         />

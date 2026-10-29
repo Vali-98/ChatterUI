@@ -95,6 +95,8 @@ const TemplatePicker = ({ ref, setPending }: TemplatePickerProps) => {
                     setPending(connectionId)
                 }
             }}
+            buttonVariant="primary"
+            buttonLevel="primary"
         />
     )
 }

@@ -7,7 +7,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
-import ThemedButton from '@components/buttons/ThemedButton'
+import IconButton from '@components/buttons/IconButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedCheckbox from '@components/input/ThemedCheckbox'
@@ -314,7 +314,7 @@ const FormattingManager = () => {
                         modalTitle={t('formatting.selectConfig')}
                         search
                     />
-                    <ThemedButton
+                    <IconButton
                         iconName="save"
                         iconSize={28}
                         variant="tertiary"
