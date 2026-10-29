@@ -12,6 +12,7 @@ import AttachmentViewer from '@components/media/AttachmentViewer'
 import AudioAttachment from '@components/media/AudioAttachment'
 import TText from '@components/text/TText'
 import BottomSheet, { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
+import BottomSheetControls, { BottomSheetButton } from '@components/views/BottomSheetControls'
 import ScaledImage from '@components/views/ScaledImage'
 import { pickAudioAttachments } from '@lib/audio/files'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
@@ -255,8 +256,8 @@ const MessageEditor = ({
                     />
                 )}
             </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ThemedButton
+            <BottomSheetControls>
+                <BottomSheetButton
                     label={t('chat.editor.actions.delete')}
                     iconName="delete"
                     variant="secondary"
@@ -271,25 +272,22 @@ const MessageEditor = ({
                     }}
                     level="error"
                     disabled={saving}
-                    viewStyle={{ paddingHorizontal: 8 }}
                 />
-                <ThemedButton
+                <BottomSheetButton
                     iconName="reload"
                     variant="tertiary"
                     label={t('chat.editor.actions.reset')}
                     onPress={() => setDraft(initialDraft())}
                     disabled={saving}
-                    viewStyle={{ paddingHorizontal: 8 }}
                 />
-                <ThemedButton
+                <BottomSheetButton
                     label={t('chat.editor.actions.confirm')}
                     iconName="check"
                     variant="secondary"
                     onPress={save}
                     disabled={saving || !editable}
-                    viewStyle={{ paddingHorizontal: 8 }}
                 />
-            </View>
+            </BottomSheetControls>
             {viewerIndex !== undefined && (
                 <AttachmentViewer
                     images={images}

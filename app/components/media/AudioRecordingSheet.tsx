@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
 import ThemedButton from '@components/buttons/ThemedButton'
+import BottomSheetControls, { BottomSheetButton } from '@components/views/BottomSheetControls'
 import TText from '@components/text/TText'
 import BottomSheet, { type BottomSheetRef } from '@components/views/BottomSheet'
 import ThemedSpinner from '@components/views/ThemedSpinner'
@@ -195,13 +196,13 @@ const RecordingControls = ({
                 level={phase === 'recording' ? 'error' : 'neutral'}
                 disabled={busy}
             />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ThemedButton
+            <BottomSheetControls>
+                <BottomSheetButton
                     variant="tertiary"
                     label={t('common.actions.cancel')}
                     onPress={onClose}
                 />
-                <ThemedButton
+                <BottomSheetButton
                     variant="secondary"
                     label={t('audio.attach')}
                     iconName="paper-clip"
@@ -214,7 +215,7 @@ const RecordingControls = ({
                     }}
                     disabled={!(recording && phase === 'ready')}
                 />
-            </View>
+            </BottomSheetControls>
         </View>
     )
 }

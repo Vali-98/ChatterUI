@@ -63,6 +63,7 @@ const MultiDropdownSheet = <T,>({
                 closeOnSelect={closeOnSelect}
                 commitMode={commitMode}
                 confirmLabel={confirmLabel}
+                buttonLevel="primary"
             />
             <DropdownTrigger
                 label={

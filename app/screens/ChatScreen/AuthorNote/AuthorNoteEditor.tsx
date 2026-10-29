@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
-import ThemedButton from '@components/buttons/ThemedButton'
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import BottomSheet from '@components/views/BottomSheet'
+import BottomSheetControls, { BottomSheetButton } from '@components/views/BottomSheetControls'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { useDebounceTokenizer } from '@lib/hooks/Tokenizer'
@@ -216,14 +216,8 @@ const AuthorNoteEditor = () => {
                 />
             </ScrollView>
 
-            <View
-                style={{
-                    flexDirection: 'row',
-                    columnGap: spacing.l,
-                    justifyContent: 'space-between',
-                    marginTop: 8,
-                }}>
-                <ThemedButton
+            <BottomSheetControls>
+                <BottomSheetButton
                     label={t('common.actions.delete')}
                     variant="secondary"
                     iconName="delete"
@@ -246,18 +240,14 @@ const AuthorNoteEditor = () => {
                         })
                     }}
                     level="error"
-                    viewStyle={{ paddingHorizontal: 8 }}
                 />
-                <ThemedButton
+                <BottomSheetButton
                     label={t('common.actions.reset')}
                     variant="tertiary"
                     iconName="reload"
-                    onPress={async () => {
-                        handleSetPlaceholder(note, false)
-                    }}
-                    viewStyle={{ paddingHorizontal: 8 }}
+                    onPress={() => handleSetPlaceholder(note, false)}
                 />
-                <ThemedButton
+                <BottomSheetButton
                     label={t('common.actions.save')}
                     variant="secondary"
                     iconName="save"
@@ -272,9 +262,8 @@ const AuthorNoteEditor = () => {
                         })
                         close()
                     }}
-                    viewStyle={{ paddingHorizontal: 8 }}
                 />
-            </View>
+            </BottomSheetControls>
         </BottomSheet>
     )
 }

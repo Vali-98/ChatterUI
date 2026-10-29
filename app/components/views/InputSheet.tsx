@@ -3,10 +3,9 @@ import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View, type StyleProp, type ViewStyle } from 'react-native'
 
-import IconButton from '@components/buttons/IconButton'
-import ThemedButton from '@components/buttons/ThemedButton'
-import ThemedTextInput from '@components/input/ThemedTextInput'
+import ThemedTextInputNext from '@components/input/ThemedTextInputNext'
 import TText from '@components/text/TText'
+import BottomSheetControls, { BottomSheetButton } from '@components/views/BottomSheetControls'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import BottomSheet, { BottomSheetHeader, type BottomSheetRef } from './BottomSheet'
@@ -96,63 +95,62 @@ const InputSheet = ({
             }}
             onRequestClose={saving ? () => {} : undefined}>
             {(title || description) && (
-                <BottomSheetHeader title={title} description={description} />
+                <BottomSheetHeader
+                    title={title}
+                    description={description}
+                    style={{ paddingVertical: 8 }}
+                />
             )}
             <View style={{ rowGap: 8 }}>
-                <ThemedTextInput
+                <ThemedTextInputNext
                     multiline={multiline}
                     autoFocus={autoFocus}
                     placeholder={placeholder}
                     value={text}
                     onChangeText={setText}
                     editable={!saving}
-                    containerStyle={{ flex: 0 }}
                     numberOfLines={multiline ? 10 : 1}
+                    toolbar={
+                        <>
+                            <ThemedTextInputNext.Action
+                                label={t('common.actions.clear')}
+                                iconName="close"
+                                disabled={saving}
+                                onPress={() => setText('')}
+                            />
+                            <ThemedTextInputNext.Action
+                                label={t('common.actions.paste')}
+                                iconName={{ family: 'material', name: 'content-paste' }}
+                                disabled={saving}
+                                onPress={async () => {
+                                    const paste = await getStringAsync()
+                                    if (paste) setText((value) => value + paste)
+                                }}
+                            />
+                        </>
+                    }
                 />
                 {!!(error || errorMessage) && (
                     <TText style={{ color: color.error._400 }}>{error || errorMessage}</TText>
                 )}
             </View>
-            <View
-                style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                }}>
-                <ThemedButton
+            <BottomSheetControls>
+                <BottomSheetButton
                     label={t('common.actions.close')}
                     variant="secondary"
                     disabled={saving}
                     onPress={() => ref.current?.close()}
                 />
-                <View style={{ flexDirection: 'row', columnGap: 12 }}>
-                    <IconButton
-                        iconStyle={{ color: color.text._400 }}
-                        iconName="close"
-                        variant="tertiary"
-                        disabled={saving}
-                        onPress={() => setText('')}
-                    />
-                    <IconButton
-                        iconStyle={{ color: color.text._400 }}
-                        iconName="copy"
-                        variant="tertiary"
-                        disabled={saving}
-                        onPress={async () => {
-                            const paste = await getStringAsync()
-                            if (paste) setText((value) => value + paste)
-                        }}
-                    />
-                </View>
-                <ThemedButton
+                <BottomSheetButton
                     label={confirmLabel ?? t('common.actions.save')}
-                    variant="secondary"
+                    variant="primary"
+                    level="primary"
                     disabled={saving}
                     onPress={() => {
                         void submit()
                     }}
                 />
-            </View>
+            </BottomSheetControls>
         </BottomSheet>
     )
 }

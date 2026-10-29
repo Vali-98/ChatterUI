@@ -385,6 +385,7 @@
             "pause": "Pause",
             "resume": "Resume",
             "clear": "Clear",
+            "paste": "Paste",
             "restart": "Restart",
             "collapse": "Collapse",
             "openSettings": "Open settings"

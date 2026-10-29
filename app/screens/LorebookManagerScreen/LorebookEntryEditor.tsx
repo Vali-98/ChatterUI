@@ -5,13 +5,13 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
-import ThemedButton from '@components/buttons/ThemedButton'
 import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import BottomSheet, { BottomSheetRef, createBottomSheetRef } from '@components/views/BottomSheet'
+import BottomSheetControls, { BottomSheetButton } from '@components/views/BottomSheetControls'
 import { LorebookEntryType } from '@db/schema'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Lorebooks } from '@lib/state/lorebooks'
@@ -231,14 +231,8 @@ const LorebookEntryEditor = () => {
                         />
                     </KeyboardAwareScrollView>
 
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            columnGap: spacing.l,
-                            justifyContent: 'space-between',
-                            marginTop: 8,
-                        }}>
-                        <ThemedButton
+                    <BottomSheetControls>
+                        <BottomSheetButton
                             label={t('common.actions.delete')}
                             variant="secondary"
                             iconName="delete"
@@ -266,27 +260,20 @@ const LorebookEntryEditor = () => {
                                 })
                             }}
                             level="error"
-                            viewStyle={{ paddingHorizontal: 8 }}
                         />
-
-                        <ThemedButton
+                        <BottomSheetButton
                             label={t('common.actions.reset')}
                             variant="tertiary"
                             iconName="reload"
-                            onPress={() => {
-                                handleSetPlaceholder(entry, false)
-                            }}
-                            viewStyle={{ paddingHorizontal: 8 }}
+                            onPress={() => handleSetPlaceholder(entry, false)}
                         />
-
-                        <ThemedButton
+                        <BottomSheetButton
                             label={t('common.actions.save')}
                             variant="secondary"
                             iconName="save"
                             onPress={save}
-                            viewStyle={{ paddingHorizontal: 8 }}
                         />
-                    </View>
+                    </BottomSheetControls>
                 </>
             )}
         </BottomSheet>

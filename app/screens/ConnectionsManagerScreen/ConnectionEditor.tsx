@@ -4,12 +4,12 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 import HeartbeatButton from '@components/buttons/HeartbeatButton'
-import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import BottomSheet, { BottomSheetRef } from '@components/views/BottomSheet'
+import BottomSheetControls, { BottomSheetButton } from '@components/views/BottomSheetControls'
 import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { APIValues } from '@lib/engine/API/APIBuilder.types'
 import { Connection, useConnectionStore } from '@lib/engine/API/connectionStore'
@@ -283,21 +283,15 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ ref, originalValues
                         />
                     )}
                 </ScrollView>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        paddingTop: 8,
-                        justifyContent: 'space-between',
-                    }}>
-                    <ThemedButton
+                <BottomSheetControls>
+                    <BottomSheetButton
                         variant="secondary"
                         iconName="delete"
                         label={t('common.actions.delete')}
                         onPress={handleDelete}
                         level="error"
-                        viewStyle={{ paddingHorizontal: 8 }}
                     />
-                    <ThemedButton
+                    <BottomSheetButton
                         variant="tertiary"
                         iconName="copy"
                         label={t('common.actions.clone')}
@@ -307,9 +301,8 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ ref, originalValues
                             addConnection(newValue)
                             ref.current?.close()
                         }}
-                        viewStyle={{ paddingHorizontal: 8 }}
                     />
-                    <ThemedButton
+                    <BottomSheetButton
                         variant="secondary"
                         label={t('common.actions.save')}
                         iconName="save"
@@ -317,9 +310,8 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ ref, originalValues
                             updateConnection(originalValues.id, values)
                             ref.current?.close()
                         }}
-                        viewStyle={{ paddingHorizontal: 8 }}
                     />
-                </View>
+                </BottomSheetControls>
             </View>
         </BottomSheet>
     )

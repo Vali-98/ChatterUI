@@ -10,8 +10,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { scheduleOnRN } from 'react-native-worklets'
 
 import IconButton from '@components/buttons/IconButton'
-import ThemedButton from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
+import BottomSheetControls, { BottomSheetButton } from '@components/views/BottomSheetControls'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -201,30 +201,28 @@ const AttachmentViewer = ({
                                 }
                             />
                         </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 12 }}>
-                            <ThemedButton
+                        <BottomSheetControls>
+                            <BottomSheetButton
                                 iconName="download"
                                 label={t('common.actions.save')}
                                 variant="secondary"
-                                accessibilityLabel={t('chat.attachments.save')}
                                 onPress={() => exportImage(false)}
                                 disabled={busy}
                             />
-                            <ThemedButton
+                            <BottomSheetButton
                                 iconName="share-alt"
                                 label={t('common.actions.share')}
                                 variant="secondary"
-                                accessibilityLabel={t('chat.attachments.share')}
                                 onPress={() => exportImage(true)}
                                 disabled={busy}
                             />
-                            <ThemedButton
+                            <BottomSheetButton
                                 iconName="close"
                                 label={t('common.actions.close')}
                                 variant="tertiary"
                                 onPress={onClose}
                             />
-                        </View>
+                        </BottomSheetControls>
                     </View>
                 </SafeAreaView>
             </GestureHandlerRootView>
