@@ -27,11 +27,12 @@ const ThemePicker = ({
     const { t } = useTranslation()
     const state = Theme.useColorState()
     const inputRef = useBottomSheetRef()
-    const selected = state.useSystemDarkMode
+    const selectedName = state.useSystemDarkMode
         ? target === 'dark'
-            ? state.darkColor
-            : state.lightColor
-        : state.color
+            ? state.darkColorName
+            : state.lightColorName
+        : state.colorName
+    const selected = Theme.resolveColor(selectedName, state.customColors)
     const select = (theme: ThemeColor) => {
         if (!state.useSystemDarkMode) state.setColor(theme)
         else if (target === 'dark') state.setDarkColor(theme)

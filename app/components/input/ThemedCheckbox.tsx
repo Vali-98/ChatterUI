@@ -11,6 +11,7 @@ import Animated, {
     ZoomOut,
 } from 'react-native-reanimated'
 
+import { getContrastingColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type ThemedCheckboxProps = {
@@ -67,7 +68,7 @@ const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
                     <Animated.View
                         entering={BounceIn.duration(150)}
                         exiting={ZoomOut.duration(150)}>
-                        <AntDesign name="check" color={theme.color.text._100} size={20} />
+                        <AntDesign name="check" color={getContrastingColor(color2)} size={20} />
                     </Animated.View>
                 )}
                 {!value && (

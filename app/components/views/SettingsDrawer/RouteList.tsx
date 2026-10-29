@@ -66,9 +66,7 @@ const DrawerButton = ({ item, index }: DrawerButtonProps) => {
                     {item.path.map((subitem, index) => (
                         <View key={index} style={{ flexDirection: 'row' }}>
                             <Animated.View
-                                entering={FadeInUp.delay(300)
-                                    .duration(300)
-                                    .easing(Easing.out(Easing.exp))}
+                                entering={FadeInUp.duration(150).easing(Easing.out(Easing.exp))}
                                 style={{
                                     width: 30,
                                     borderRightWidth: 2,

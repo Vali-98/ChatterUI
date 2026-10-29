@@ -9,6 +9,7 @@ import { useChatBubbleStyle } from '@lib/hooks/useChatBubbleStyle'
 import { useBackgroundStore } from '@lib/state/BackgroundImage'
 import { Characters } from '@lib/state/characters'
 import type { ChatMessage } from '@lib/state/chat'
+import { getContrastingColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
 import { AppDirectory } from '@lib/utils/File'
 import ChatFrame from '@screens/ChatScreen/ChatWindow/ChatFrame'
@@ -154,7 +155,11 @@ const ChatAppearancePreview = ({
                                     backgroundColor: color.primary._500,
                                     borderRadius: borderRadius.m,
                                 }}>
-                                <MaterialIcons name="send" size={24} color={color.neutral._100} />
+                                <MaterialIcons
+                                    name="send"
+                                    size={24}
+                                    color={getContrastingColor(color.primary._500)}
+                                />
                             </View>
                         </View>
                     </View>

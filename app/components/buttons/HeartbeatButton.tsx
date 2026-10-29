@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
 import { useDebounce } from '@lib/hooks/Debounce'
+import { getContrastingColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const enum ResponseStatus {
@@ -112,7 +113,10 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
                 }}>
                 <Text
                     style={{
-                        color: color.text._100,
+                        color:
+                            status === ResponseStatus.DEFAULT
+                                ? color.text._100
+                                : getContrastingColor(buttonColor),
                     }}>
                     {StatusMessage()}
                 </Text>

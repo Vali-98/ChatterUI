@@ -6,6 +6,7 @@ import { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reani
 
 import TText from '@components/text/TText'
 import { AnimatedPressable } from '@lib/components/AnimatedComponents'
+import { getContrastingColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'critical' | 'disabled'
@@ -29,8 +30,6 @@ type ButtonTheme = {
 
 const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
     const theme = Theme.useTheme()
-    //TODO:
-    // Have a lightness checker to figure out whether or not to use light or dark text
     switch (variant) {
         default:
         case 'primary':
@@ -45,7 +44,7 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                 },
                 labelStyle: {
                     textAlign: 'center',
-                    color: theme.color.text._900,
+                    color: getContrastingColor(theme.color.primary._500),
                 },
             }
         case 'secondary':

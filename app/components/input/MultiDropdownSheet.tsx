@@ -208,7 +208,7 @@ export const useDropdownStyles = () => {
         },
 
         counterText: {
-            color: color.text._800,
+            color: color.text._300,
             fontSize: 14,
             paddingBottom: spacing.xl2,
         },

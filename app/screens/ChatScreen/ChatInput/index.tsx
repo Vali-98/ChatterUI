@@ -36,6 +36,7 @@ import { Chats } from '@lib/state/chat'
 import { useChatControlLayoutState } from '@lib/state/components/ChatControls'
 import { useChatInputTextStore } from '@lib/state/components/ChatInput'
 import { Logger } from '@lib/state/Logger'
+import { getContrastingColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ChatOptions from './ChatInputOptions'
@@ -400,7 +401,13 @@ const ChatInput = () => {
                         onPress={isGenerating ? abortResponse : handleSend}>
                         <MaterialIcons
                             name={isGenerating ? 'stop' : 'send'}
-                            color={activeProvider ? color.neutral._100 : color.text._700}
+                            color={
+                                activeProvider
+                                    ? getContrastingColor(
+                                          isGenerating ? color.error._500 : color.primary._500
+                                      )
+                                    : color.text._700
+                            }
                             size={24}
                         />
                     </TouchableOpacity>

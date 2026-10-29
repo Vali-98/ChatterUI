@@ -59,11 +59,14 @@ const OnboardingScreen = () => {
         connections.find((item) => item.id === onboarding.connectionId)
     )
     const [theme, setTheme] = useState(
-        themes.useSystemDarkMode
-            ? system === 'dark'
-                ? themes.darkColor
-                : themes.lightColor
-            : themes.color
+        Theme.resolveColor(
+            themes.useSystemDarkMode
+                ? system === 'dark'
+                    ? themes.darkColorName
+                    : themes.lightColorName
+                : themes.colorName,
+            themes.customColors
+        )
     )
     const [themeChosen, setThemeChosen] = useState(false)
     const [saving, setSaving] = useState(false)
@@ -240,9 +243,7 @@ const OnboardingScreen = () => {
                         paddingTop: step === 0 ? 24 : 36,
                         paddingBottom: 24,
                         justifyContent:
-                            step <= 2 ||
-                            step === 5 ||
-                            (step === 3 && complete)
+                            step <= 2 || step === 5 || (step === 3 && complete)
                                 ? 'center'
                                 : 'flex-start',
                     }}>

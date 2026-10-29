@@ -287,7 +287,9 @@ export const startupApp = async () => {
     migrateAppMode_0_8_5_to_0_8_6()
     migrateTextIntent_0_8_8_to_0_8_9()
     lockScreenOrientation()
-    const backgroundColor = Theme.useColorState.getState().color.neutral._100
+    const themeState = Theme.useColorState.getState()
+    const backgroundColor = Theme.resolveColor(themeState.colorName, themeState.customColors)
+        .neutral._100
     setUIBackgroundColor(backgroundColor)
 
     Logger.info('Resetting state values for startup.')

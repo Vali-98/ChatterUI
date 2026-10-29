@@ -26,11 +26,12 @@ const AppearanceSettings = () => {
     const [background, setBackground] = useState<'app' | 'character'>('app')
     const { color } = Theme.useTheme()
     const themes = Theme.useColorState()
-    const previewTheme = themes.useSystemDarkMode
+    const previewName = themes.useSystemDarkMode
         ? target === 'dark'
-            ? themes.darkColor
-            : themes.lightColor
-        : themes.color
+            ? themes.darkColorName
+            : themes.lightColorName
+        : themes.colorName
+    const previewTheme = Theme.resolveColor(previewName, themes.customColors)
     const hasCharacterBackground = Characters.useCharacterState(
         (state) => !!state.card?.background_image
     )
