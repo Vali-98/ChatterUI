@@ -49,6 +49,7 @@ jest.mock('../components/views/Notice', () => ({
             ...props,
             testID: 'collapsed',
         }),
+    NoticeAction: require('react-native').Pressable,
 }))
 jest.mock('../components/text/TText', () => ({
     __esModule: true,

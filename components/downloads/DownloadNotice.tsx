@@ -1,16 +1,11 @@
 import { router } from 'expo-router'
 import { useTranslation } from 'react-i18next'
-import { View } from 'react-native'
 
-import IconButton from '@components/buttons/IconButton'
-import TText from '@components/text/TText'
-import Notice, { CollapsedNotice } from '@components/views/Notice'
-import ThemedSpinner from '@components/views/ThemedSpinner'
+import { CollapsedNotice, NoticeAction } from '@components/views/Notice'
+import NoticeProgress from '@components/views/NoticeProgress'
 import { useDownloadNoticeState } from '@lib/downloads/noticeState'
 import { useDownloadStore } from '@lib/downloads/store'
 import { useOnboardingStore } from '@lib/onboarding/store'
-
-import { DownloadProgress } from './DownloadItem'
 
 const DownloadNotice = () => {
     const { t } = useTranslation()
@@ -30,7 +25,7 @@ const DownloadNotice = () => {
     const total = unfinished.reduce((sum, item) => sum + item.totalBytes, 0)
     const bytes = unfinished.reduce((sum, item) => sum + item.bytesWritten, 0)
     const knownTotal = unfinished.every((item) => item.totalBytes > 0)
-    const progress = total && knownTotal ? Math.min(100, (bytes / total) * 100) : 0
+    const progress = total && knownTotal ? Math.min(100, (bytes / total) * 100) : undefined
     const openDownloads = () => {
         router.push('/models')
     }
@@ -45,34 +40,23 @@ const DownloadNotice = () => {
             />
         )
     return (
-        <Notice
+        <NoticeProgress
             variant={failed ? 'error' : 'primary'}
+            label={`${t('downloads.badge', { count: unfinished.length })}${running ? '' : ` · ${t(failed ? 'downloads.status.failed' : 'downloads.status.paused')}`}`}
+            progress={progress}
+            isRunning={running}
+            iconName="download"
+            showPercentage={running}
             onPress={openDownloads}
             accessibilityLabel={t('downloads.badge', { count: unfinished.length })}
-            style={{ flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                {running && <ThemedSpinner />}
-                <TText numberOfLines={1} style={{ flexShrink: 1 }}>
-                    {t('downloads.badge', { count: unfinished.length })}
-                    {running
-                        ? knownTotal
-                            ? ` · ${Math.floor(progress)}%`
-                            : ''
-                        : ` · ${t(failed ? 'downloads.status.failed' : 'downloads.status.paused')}`}
-                </TText>
-                <IconButton
-                    variant="tertiary"
+            actions={
+                <NoticeAction
                     iconName="close"
-                    iconSize={16}
                     accessibilityLabel={t('common.actions.collapse')}
-                    onPress={(event) => {
-                        event.stopPropagation()
-                        collapse(signature)
-                    }}
+                    onPress={() => collapse(signature)}
                 />
-            </View>
-            <DownloadProgress progress={progress} height={8} />
-        </Notice>
+            }
+        />
     )
 }
 export default DownloadNotice

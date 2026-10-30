@@ -3,19 +3,16 @@ import { View, type ViewProps } from 'react-native'
 import { CHAT_CONTROL_ELEVATION, CHAT_CONTROL_PADDING_VERTICAL } from '@lib/constants/ChatControls'
 import { getShadowColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
+import type { ThemeColor } from '@lib/theme/ThemeColor'
 
 export type FloatingPanelVariant = 'neutral' | 'primary' | 'warning' | 'error'
 export type FloatingPanelProps = ViewProps & { variant?: FloatingPanelVariant }
+export const getFloatingPanelColor = (color: ThemeColor, variant: FloatingPanelVariant) =>
+    variant === 'error' ? color.error._400 : color[variant]._500
 
 // Appearance only: notices and controls retain their own behavior and placement.
 const FloatingPanel = ({ variant = 'primary', style, ...props }: FloatingPanelProps) => {
     const { color } = Theme.useTheme()
-    const borderColours = {
-        neutral: color.neutral._500,
-        primary: color.primary._500,
-        warning: color.warning._500,
-        error: color.error._400,
-    }
     return (
         <View
             {...props}
@@ -29,7 +26,7 @@ const FloatingPanel = ({ variant = 'primary', style, ...props }: FloatingPanelPr
                     borderRadius: 8,
                     elevation: CHAT_CONTROL_ELEVATION,
                     borderWidth: 1,
-                    borderColor: borderColours[variant],
+                    borderColor: getFloatingPanelColor(color, variant),
                     backgroundColor: color.neutral._100 + 'ee',
                     boxShadow: [
                         {

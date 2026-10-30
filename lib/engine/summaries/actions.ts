@@ -408,6 +408,7 @@ const runSummary = async (
             const completion: { reason: CompletionReason } = { reason: 'failed' }
             const result = buildAndSendRequest({
                 ...context,
+                showErrorToast: false,
                 apiConfig: inputs.apiConfig,
                 apiValues: requestInputs.apiValues!,
                 samplers: requestInputs.samplers,

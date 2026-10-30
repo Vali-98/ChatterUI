@@ -1,6 +1,7 @@
 import { act } from 'react'
 import { View } from 'react-native'
 
+import IconButton from '../components/buttons/IconButton'
 import DownloadNotice from '../components/downloads/DownloadNotice'
 import { useDownloadNoticeState } from '../lib/downloads/noticeState'
 
@@ -48,8 +49,9 @@ jest.mock('../components/buttons/ThemedButton', () => ({
     default: (props: object) =>
         require('react').createElement(require('react-native').Pressable, props),
 }))
-jest.mock('../components/downloads/DownloadItem', () => ({
-    DownloadProgress: ({ progress }: { progress: number }) =>
+jest.mock('../components/views/ProgressBar', () => ({
+    __esModule: true,
+    default: ({ progress }: { progress: number }) =>
         require('react').createElement(require('react-native').View, {
             testID: 'progress',
             progress,
@@ -72,9 +74,7 @@ test('collapsed downloads stay compact across hosts and expand before navigation
     })
     const event = { stopPropagation: jest.fn() }
     await act(async () => {
-        screen.root
-            .findAllByProps({ accessibilityLabel: 'common.actions.collapse' })[0]
-            .props.onPress(event)
+        screen.root.findByType(IconButton).props.onPress(event)
     })
     expect(event.stopPropagation).toHaveBeenCalled()
     expect(mockPush).not.toHaveBeenCalled()

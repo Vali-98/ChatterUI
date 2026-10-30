@@ -6,37 +6,10 @@ import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
 import ListCard from '@components/views/ListCard'
+import ProgressBar from '@components/views/ProgressBar'
 import { pauseDownload, removeDownload, resumeDownload } from '@lib/downloads/manager'
 import { type Download } from '@lib/downloads/store'
-import { Theme } from '@lib/theme/ThemeManager'
 import { readableFileSize } from '@lib/utils/File'
-
-export const DownloadProgress = ({
-    progress,
-    height = 8,
-}: {
-    progress: number
-    height?: number
-}) => {
-    const { color } = Theme.useTheme()
-    return (
-        <View
-            style={{
-                height,
-                borderRadius: height / 2,
-                backgroundColor: color.neutral._300,
-                overflow: 'hidden',
-            }}>
-            <View
-                style={{
-                    height: '100%',
-                    width: `${Math.max(0, Math.min(100, progress))}%`,
-                    backgroundColor: color.primary._500,
-                }}
-            />
-        </View>
-    )
-}
 
 const DownloadItem = ({ item }: { item: Download }) => {
     const { t } = useTranslation()
@@ -64,7 +37,7 @@ const DownloadItem = ({ item }: { item: Download }) => {
                 {t(`downloads.status.${item.status}`)} · {readableFileSize(item.bytesWritten)}
                 {item.totalBytes > 0 ? ` / ${readableFileSize(item.totalBytes)}` : ''}
             </TText>
-            <DownloadProgress
+            <ProgressBar
                 progress={item.totalBytes ? (item.bytesWritten / item.totalBytes) * 100 : 0}
             />
             {!!item.error && (

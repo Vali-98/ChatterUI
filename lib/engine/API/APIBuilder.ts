@@ -23,14 +23,24 @@ type DataOutput = {
 }
 
 export interface APIBuilderParams
-    extends ContextBuilderParams,
-        Omit<RequestBuilderParams, 'prompt'> {
+    extends ContextBuilderParams, Omit<RequestBuilderParams, 'prompt'> {
     onFinishReason?: (reason: string) => void
+    /** Disable when the caller already presents failures through an operation notice. */
+    showErrorToast?: boolean
     onData: (data: DataOutput) => void
     onEnd?: (data: string) => void | Promise<void>
     signal: AbortSignal
     stopSequence: string[]
     stopGenerating?: (reason: CompletionReason) => void | Promise<void>
+}
+
+const reportRequestError = (
+    params: { showErrorToast?: boolean },
+    message: string,
+    cause?: unknown
+) => {
+    if (params.showErrorToast !== false) Logger.errorToast(message, cause)
+    else Logger.error(cause === undefined ? message : `${message}: ${cause}`)
 }
 
 export const buildAndSendRequest = (params: APIBuilderParams): RequestHandle => {
@@ -71,7 +81,7 @@ export const buildAndSendRequest = (params: APIBuilderParams): RequestHandle => 
                 return
             }
             if (prompt === undefined) {
-                Logger.errorToast(t('generation.errors.promptConstructionFailed'))
+                reportRequestError(params, t('generation.errors.promptConstructionFailed'))
                 await finish('failed')
                 return
             }
@@ -81,7 +91,7 @@ export const buildAndSendRequest = (params: APIBuilderParams): RequestHandle => 
                 return
             }
             if (!payload) {
-                Logger.errorToast(t('generation.errors.payloadConstructionFailed'))
+                reportRequestError(params, t('generation.errors.payloadConstructionFailed'))
                 await finish('failed')
                 return
             }
@@ -116,11 +126,12 @@ export const buildAndSendRequest = (params: APIBuilderParams): RequestHandle => 
                 },
                 onEnd: onEnd,
                 header: header,
+                showErrorToast: params.showErrorToast,
                 stopGenerating: finish,
             })
             await request.done
         } catch (error) {
-            Logger.errorToast(t('generation.errors.completionFailed'), error)
+            reportRequestError(params, t('generation.errors.completionFailed'), error)
             if (finalized) throw error
             await finish(isAborted() ? 'cancelled' : 'failed')
         }
@@ -133,6 +144,7 @@ type KeyHeader = {
 }
 
 type SenderParams = {
+    showErrorToast?: boolean
     signal: AbortSignal
     endpoint: string
     payload: string
@@ -222,7 +234,7 @@ const hordeResponse = (params: SenderParams): RequestHandle => {
         } catch (error) {
             if (!cancelled) {
                 reason = 'failed'
-                Logger.errorToast(t('generation.errors.generationFailed'), error)
+                reportRequestError(params, t('generation.errors.generationFailed'), error)
             }
         } finally {
             params.signal.removeEventListener('abort', abort)
@@ -253,7 +265,7 @@ const readableStreamResponse = (params: SenderParams): RequestHandle => {
     })
     sse.setOnError(() => {
         failed = true
-        Logger.errorToast(t('generation.errors.generationFailed'))
+        reportRequestError(params, t('generation.errors.generationFailed'))
     })
     const done = sse
         .start({

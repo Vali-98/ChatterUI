@@ -5,6 +5,7 @@ import { APIBuilderParams, buildAndSendRequest } from '../lib/engine/API/APIBuil
 import { buildContext } from '../lib/engine/API/ContextBuilder'
 import { defaultTemplates } from '../lib/engine/API/DefaultAPI'
 import { buildRequest } from '../lib/engine/API/RequestBuilder'
+import { Logger } from '../lib/state/Logger'
 
 jest.mock('expo/fetch', () => ({ fetch: jest.fn() }))
 jest.mock('expo-application', () => ({ nativeApplicationVersion: 'test' }))
@@ -116,6 +117,22 @@ test('completion waits for persistence before invoking its successful follow-up'
     await request.done
     expect(params.onEnd).toHaveBeenCalledTimes(1)
 })
+
+test.each([true, false])(
+    'request failures respect showErrorToast=%s without hiding failure',
+    async (showErrorToast) => {
+        const params = parameters()
+        respond([], 500)
+        await buildAndSendRequest({ ...params, showErrorToast }).done
+        expect(params.stopGenerating).toHaveBeenCalledWith('failed')
+        expect(params.onEnd).not.toHaveBeenCalled()
+        if (showErrorToast) expect(Logger.errorToast).toHaveBeenCalled()
+        else {
+            expect(Logger.errorToast).not.toHaveBeenCalled()
+            expect(Logger.error).toHaveBeenCalled()
+        }
+    }
+)
 
 test('cancellation during context building prevents a network request', async () => {
     const params = parameters()
