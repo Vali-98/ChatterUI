@@ -26,6 +26,7 @@ const Action = ({
     <ThemedButton
         {...props}
         variant="tertiary"
+        level="primary"
         iconSize={iconSize}
         viewStyle={[{ paddingHorizontal: 8, paddingVertical: 4 }, viewStyle]}
         labelStyle={[{ fontSize: 12 }, labelStyle]}
