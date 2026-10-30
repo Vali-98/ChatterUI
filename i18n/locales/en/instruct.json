@@ -1,0 +1,14 @@
+{
+    "instruct.attachments": "Attachments",
+    "instruct.filteredtext.description": "Sends the filtered text for inference",
+    "instruct.filteredtext.label": "Send Filtered Text",
+    "instruct.formatting": "Instruct Formatting",
+    "instruct.hiddentext.description": "Hides text that matches regex patterns defined below. (case insensitive)",
+    "instruct.hiddentext.title": "Hidden Text",
+    "instruct.localtemplate.description": "When in Local Mode, ChatterUI automatically uses the instruct template provided by the loaded model. Disable this if you want messages to be formatted using Instruct instead. System Prompt however is always used.",
+    "instruct.localtemplate.label": "Use Built-In Local Model Template",
+    "instruct.localtemplate.title": "Local Template",
+    "instruct.macros": "Macros & Character Card",
+    "instruct.textformatter.description": "Automatically formats first message to the style below",
+    "instruct.textformatter.title": "Text Formatter"
+}

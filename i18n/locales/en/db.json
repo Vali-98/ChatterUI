@@ -1,0 +1,4 @@
+{
+    "db.migrationerror.description": "If you are seeing this, something has gone terribly wrong. Report this error below, include a screenshot of the log above.",
+    "db.migrationerror.title": "Database Migration Failed!"
+}

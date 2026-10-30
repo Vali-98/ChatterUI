@@ -1,0 +1,6 @@
+{
+    "background.title": "ChatterUI is working",
+    "background.description": "Generations and downloads continue in the background",
+    "background.downloading": "Downloading ({{count}})",
+    "background.downloadHint": "Tap to view downloads. Other active tasks continue."
+}

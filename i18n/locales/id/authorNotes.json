@@ -1,0 +1,19 @@
+{
+    "authorNotes.alert.delete.button": "Hapus Catatan",
+    "authorNotes.alert.delete.description": "Apakah Anda yakin ingin menghapus {{name}}? \nHal ini tidak dapat dibatalkan.",
+    "authorNotes.alert.delete.title": "Hapus Catatan",
+    "authorNotes.empty": "Tidak Ada Catatan",
+    "authorNotes.errors.create": "Gagal membuat catatan",
+    "authorNotes.item.comments": "Komentar",
+    "authorNotes.item.content": "Catatan Isi",
+    "authorNotes.item.depth": "Kedalaman",
+    "authorNotes.item.noContent": "Tidak Ada Konten",
+    "authorNotes.item.priority": "Prioritas",
+    "authorNotes.selector.character": "Karakter",
+    "authorNotes.selector.chat": "Mengobrol",
+    "authorNotes.selector.global": "Global",
+    "authorNotes.type": "Jenis Catatan",
+    "authorNotes.unsavedChanges.description": "Anda memiliki perubahan yang belum disimpan, keluar akan membatalkan semua perubahan.",
+    "authorNotes.unsavedChanges.discard": "Buang Perubahan",
+    "authorNotes.unsavedChanges.title": "Perubahan yang Belum Disimpan"
+}

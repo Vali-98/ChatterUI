@@ -1,0 +1,9 @@
+{
+    "logs.alert.delete.description": "确定要删除所有日志吗？此操作不可撤销。",
+    "logs.alert.delete.title": "删除日志",
+    "logs.export": "导出日志",
+    "logs.flush": "清除日志",
+    "logs.title": "日志",
+    "logs.toast.downloaderror": "无法导出日志",
+    "logs.toast.downloadok": "日志已下载！"
+}

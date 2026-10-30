@@ -1,0 +1,19 @@
+{
+    "authorNotes.alert.delete.button": "Удалить заметку",
+    "authorNotes.alert.delete.description": "Вы уверены, что хотите удалить {{name}}? \nЭто невозможно отменить.",
+    "authorNotes.alert.delete.title": "Удалить заметку",
+    "authorNotes.empty": "Нет примечаний",
+    "authorNotes.errors.create": "Не удалось создать заметку",
+    "authorNotes.item.comments": "Комментарии",
+    "authorNotes.item.content": "Примечание Содержание",
+    "authorNotes.item.depth": "Глубина",
+    "authorNotes.item.noContent": "Нет контента",
+    "authorNotes.item.priority": "Приоритет",
+    "authorNotes.selector.character": "Характер",
+    "authorNotes.selector.chat": "Чат",
+    "authorNotes.selector.global": "Глобальный",
+    "authorNotes.type": "Тип заметки",
+    "authorNotes.unsavedChanges.description": "У вас есть несохраненные изменения. Выход приведет к отмене всех изменений.",
+    "authorNotes.unsavedChanges.discard": "Отменить изменения",
+    "authorNotes.unsavedChanges.title": "Несохраненные изменения"
+}

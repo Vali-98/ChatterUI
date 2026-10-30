@@ -1,0 +1,12 @@
+{
+    "downloads.fits": "Diperkirakan sesuai untuk perangkat Anda",
+    "downloads.large": "Mungkin menggunakan terlalu banyak memori",
+    "downloads.failed": "Unduhan gagal",
+    "downloads.restartHint": "Tidak dapat melanjutkan unduhan ini. Mulai ulang untuk mengunduhnya kembali.",
+    "downloads.badge": "Unduhan ({{count}})",
+    "downloads.status.paused": "Dijeda",
+    "downloads.status.downloading": "Mengunduh",
+    "downloads.status.pausing": "Menjeda…",
+    "downloads.status.completed": "Selesai",
+    "downloads.status.failed": "Gagal"
+}

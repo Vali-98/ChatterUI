@@ -1,0 +1,6 @@
+{
+    "contextlimit.allocation": "Alokasi Konteks",
+    "contextlimit.chat": "Konteks Chat",
+    "contextlimit.generated": "Dihasilkan",
+    "contextlimit.warning": "Konteks Chat Rendah akan membuat pesan lebih cepat terlupakan"
+}

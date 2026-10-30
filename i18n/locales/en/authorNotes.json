@@ -1,0 +1,19 @@
+{
+    "authorNotes.alert.delete.button": "Delete Note",
+    "authorNotes.alert.delete.description": "Are you sure you want to delete {{name}}? This cannot be undone.",
+    "authorNotes.alert.delete.title": "Delete Note",
+    "authorNotes.empty": "No Notes",
+    "authorNotes.errors.create": "Failed to create note",
+    "authorNotes.item.comments": "Comments",
+    "authorNotes.item.content": "Note Content",
+    "authorNotes.item.depth": "Depth",
+    "authorNotes.item.noContent": "No Content",
+    "authorNotes.item.priority": "Priority",
+    "authorNotes.selector.character": "Character",
+    "authorNotes.selector.chat": "Chat",
+    "authorNotes.selector.global": "Global",
+    "authorNotes.type": "Note Type",
+    "authorNotes.unsavedChanges.description": "You have unsaved changes, exiting will undo all changes.",
+    "authorNotes.unsavedChanges.discard": "Discard Changes",
+    "authorNotes.unsavedChanges.title": "Unsaved Changes"
+}

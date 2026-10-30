@@ -1,0 +1,6 @@
+{
+    "background.title": "ChatterUI работает",
+    "background.description": "Генерация и загрузки продолжаются в фоновом режиме",
+    "background.downloading": "Загрузка ({{count}})",
+    "background.downloadHint": "Нажмите, чтобы посмотреть загрузки. Остальные задачи продолжаются."
+}

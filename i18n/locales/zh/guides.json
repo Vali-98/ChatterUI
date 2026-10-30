@@ -1,0 +1,12 @@
+{
+    "guides.skip": "跳过引导",
+    "guides.progress": "第 {{current}} 步，共 {{total}} 步",
+    "guides.main.welcome": "欢迎使用 ChatterUI！\n\n让我带你快速了解一下。",
+    "guides.main.characters": "你的角色都在这里。选择一个即可开始对话。\n\nAI Bot 已为你准备好。",
+    "guides.main.import": "使用此按钮添加或导入角色。",
+    "guides.main.menu": "在这里打开主菜单，即可切换应用模式和管理设置。",
+    "guides.chat.history": "使用这些按钮查看聊天记录，或与此角色开始新的聊天。你也可以向左滑动以打开聊天侧栏。",
+    "guides.chat.options": "聊天选项都在这里，包括上下文用量、作者注释和摘要。",
+    "guides.drawer.persona": "点击这里的用户身份，即可修改姓名、描述或图片。",
+    "guides.drawer.options": "这里是应用的工具和设置。引导结束后，欢迎自由探索！"
+}

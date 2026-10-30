@@ -1,0 +1,18 @@
+{
+    "navigation.about": "Tentang",
+    "navigation.api": "API",
+    "navigation.dataSources": "Sumber Data",
+    "navigation.dev_colortest": "[DEV] TesWarna",
+    "navigation.dev_components": "[DEV] Komponen",
+    "navigation.dev_markdown": "[DEV] Markdown",
+    "navigation.dev_tests": "[DEV] Layar Pengujian",
+    "navigation.formatting": "Pemformatan",
+    "navigation.logs": "Log",
+    "navigation.lorebooks": "Lorebooks",
+    "navigation.models": "Model",
+    "navigation.sampler": "Sampler",
+    "navigation.settings": "Pengaturan",
+    "navigation.tts": "TTS",
+    "navigation.dev_onboarding": "[DEV] Mulai ulang orientasi",
+    "navigation.dev_guides": "[DEV] Ulangi panduan antarmuka"
+}

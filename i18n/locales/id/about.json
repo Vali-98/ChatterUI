@@ -1,0 +1,12 @@
+{
+    "about.description.primary": "ChatterUI adalah aplikasi gratis dan sumber terbuka yang dikembangkan oleh Vali-98",
+    "about.description.support": "Aplikasi ini adalah proyek hobi yang saya kembangkan di waktu luang. Jika Anda menikmati aplikasi ini, pertimbangkan untuk mendukung pengembangannya!",
+    "about.devMode.disableAction": "Nonaktifkan Mode Dev",
+    "about.devMode.disabledMessage": "Mode dev dinonaktifkan.",
+    "about.devMode.enabledMessage": "Anda telah mengaktifkan mode dev.",
+    "about.logsReminder": "Jangan lupa sertakan log",
+    "about.reportIssue": "Punya masalah? Laporkan di sini:",
+    "about.support.button": "Dukung ChatterUI",
+    "about.support.label": "Donasi untuk ChatterUI di sini:",
+    "about.versionPrefix": "v"
+}

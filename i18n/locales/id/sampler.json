@@ -1,0 +1,18 @@
+{
+    "sampler.alert.delete.description": "Apakah Anda yakin ingin menghapus '{{name}}'?",
+    "sampler.alert.delete.title": "Hapus Sampler",
+    "sampler.create": "Buat Sampler",
+    "sampler.delete": "Hapus Sampler",
+    "sampler.empty": "Tidak Ada Sampler yang Dikonfigurasi",
+    "sampler.export": "Ekspor Sampler",
+    "sampler.invalid": "Bidang Sampler Tidak Valid!",
+    "sampler.new": "Prasetel Sampler Baru",
+    "sampler.noSamplers": "Anda mungkin belum menambahkan koneksi API",
+    "sampler.notSupported": "ID Sampler [{{id}}] Tidak Didukung",
+    "sampler.title": "Sampler",
+    "sampler.toast.emptyname": "Nama sampler tidak boleh kosong",
+    "sampler.toast.exists": "Konfig Sampler \"{{name}}\" sudah ada!",
+    "sampler.toast.exportok": "Konfigurasi Sampler Berhasil Diekspor!",
+    "sampler.toast.failedToImport": "Gagal mengimpor",
+    "sampler.toast.lastconfig": "Tidak Dapat Menghapus Konfigurasi Terakhir"
+}

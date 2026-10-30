@@ -1,0 +1,23 @@
+{
+    "audio.saved": "Audio disimpan",
+    "audio.saveFailed": "Gagal menyimpan audio",
+    "audio.record": "Rekam audio",
+    "audio.stopRecording": "Hentikan rekaman",
+    "audio.recordAgain": "Rekam lagi",
+    "audio.attach": "Lampirkan",
+    "audio.microphonePermission": "Izin mikrofon diperlukan untuk merekam audio.",
+    "audio.recordFailed": "Gagal merekam audio",
+    "audio.settings": "Pemutaran audio",
+    "audio.globalPlayer": "Pemutar audio global",
+    "audio.globalPlayerDescription": "Lanjutkan audio saat keluar dari obrolannya.",
+    "audio.keepPlayerOpen": "Biarkan pemutar terbuka setelah pemutaran",
+    "audio.keepPlayerOpenDescription": "Tampilkan Putar ulang dan Tutup setelah audio selesai.",
+    "audio.play": "Putar",
+    "audio.pause": "Jeda",
+    "audio.stop": "Hentikan",
+    "audio.replay": "Putar ulang",
+    "audio.seek": "Geser posisi audio",
+    "audio.playbackFailed": "Gagal memutar audio",
+    "audio.add": "Tambah audio",
+    "audio.addFailed": "Gagal menambahkan audio"
+}

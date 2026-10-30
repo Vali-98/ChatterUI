@@ -1,0 +1,14 @@
+{
+    "instruct.attachments": "Lampiran",
+    "instruct.filteredtext.description": "Mengirim teks yang difilter untuk inferensi",
+    "instruct.filteredtext.label": "Kirim Teks yang Difilter",
+    "instruct.formatting": "Pemformatan Instruct",
+    "instruct.hiddentext.description": "Menyembunyikan teks yang cocok dengan pola regex yang ditentukan di bawah. (tidak peka huruf besar/kecil)",
+    "instruct.hiddentext.title": "Teks Tersembunyi",
+    "instruct.localtemplate.description": "Saat dalam Mode Lokal, ChatterUI secara otomatis menggunakan template instruct yang disediakan oleh model yang dimuat. Nonaktifkan ini jika Anda ingin pesan diformat menggunakan Instruct. Namun Prompt Sistem selalu digunakan.",
+    "instruct.localtemplate.label": "Gunakan Template Model Lokal Bawaan",
+    "instruct.localtemplate.title": "Template Lokal",
+    "instruct.macros": "Makro & Kartu Karakter",
+    "instruct.textformatter.description": "Secara otomatis memformat pesan pertama ke gaya di bawah",
+    "instruct.textformatter.title": "Pemformat Teks"
+}

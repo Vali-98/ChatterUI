@@ -1,0 +1,6 @@
+{
+    "background.title": "ChatterUI sedang bekerja",
+    "background.description": "Pembuatan respons dan unduhan berlanjut di latar belakang",
+    "background.downloading": "Mengunduh ({{count}})",
+    "background.downloadHint": "Ketuk untuk melihat unduhan. Tugas aktif lainnya tetap berjalan."
+}

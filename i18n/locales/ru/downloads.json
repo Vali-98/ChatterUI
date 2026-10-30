@@ -1,0 +1,12 @@
+{
+    "downloads.fits": "Предположительно подходит для вашего устройства",
+    "downloads.large": "Может требовать слишком много памяти",
+    "downloads.failed": "Не удалось скачать файл",
+    "downloads.restartHint": "Не удалось продолжить загрузку. Начните заново, чтобы скачать файл повторно.",
+    "downloads.badge": "Загрузки ({{count}})",
+    "downloads.status.paused": "Приостановлено",
+    "downloads.status.downloading": "Загрузка",
+    "downloads.status.pausing": "Приостановка…",
+    "downloads.status.completed": "Завершено",
+    "downloads.status.failed": "Ошибка"
+}

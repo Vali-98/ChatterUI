@@ -1,0 +1,19 @@
+{
+    "authorNotes.alert.delete.button": "删除注释",
+    "authorNotes.alert.delete.description": "您确定要删除 {{name}} 吗？\n此操作无法撤消。",
+    "authorNotes.alert.delete.title": "删除注释",
+    "authorNotes.empty": "无注释",
+    "authorNotes.errors.create": "创建笔记失败",
+    "authorNotes.item.comments": "评论",
+    "authorNotes.item.content": "备注内容",
+    "authorNotes.item.depth": "深度",
+    "authorNotes.item.noContent": "没有内容",
+    "authorNotes.item.priority": "优先事项",
+    "authorNotes.selector.character": "特点",
+    "authorNotes.selector.chat": "聊天",
+    "authorNotes.selector.global": "全球的",
+    "authorNotes.type": "注释类型",
+    "authorNotes.unsavedChanges.description": "您有未保存的更改，退出将撤消所有更改。",
+    "authorNotes.unsavedChanges.discard": "放弃更改",
+    "authorNotes.unsavedChanges.title": "未保存的更改"
+}

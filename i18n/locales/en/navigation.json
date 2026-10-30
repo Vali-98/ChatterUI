@@ -1,0 +1,18 @@
+{
+    "navigation.about": "About",
+    "navigation.api": "API",
+    "navigation.dataSources": "Data Sources",
+    "navigation.dev_colortest": "[DEV] ColorTest",
+    "navigation.dev_components": "[DEV] Components",
+    "navigation.dev_markdown": "[DEV] Markdown",
+    "navigation.dev_tests": "[DEV] Test Screens",
+    "navigation.formatting": "Formatting",
+    "navigation.logs": "Logs",
+    "navigation.lorebooks": "Lorebooks",
+    "navigation.models": "Models",
+    "navigation.sampler": "Sampler",
+    "navigation.settings": "Settings",
+    "navigation.tts": "TTS",
+    "navigation.dev_onboarding": "[DEV] Restart onboarding",
+    "navigation.dev_guides": "[DEV] Replay interface guides"
+}

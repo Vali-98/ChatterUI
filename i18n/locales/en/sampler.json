@@ -1,0 +1,18 @@
+{
+    "sampler.alert.delete.description": "Are you sure you want to delete '{{name}}'?",
+    "sampler.alert.delete.title": "Delete Sampler",
+    "sampler.create": "Create Sampler",
+    "sampler.delete": "Delete Sampler",
+    "sampler.empty": "No Samplers to Configure",
+    "sampler.export": "Export Sampler",
+    "sampler.invalid": "Invalid Sampler Field!",
+    "sampler.new": "New Sampler Preset",
+    "sampler.noSamplers": "You probably haven't added an API connection yet",
+    "sampler.notSupported": "Sampler ID [{{id}}] Not Supported",
+    "sampler.title": "Samplers",
+    "sampler.toast.emptyname": "Sampler name cannot be empty",
+    "sampler.toast.exists": "Sampler Config \"{{name}}\" already exists!",
+    "sampler.toast.exportok": "Exported Sampler Configuration!",
+    "sampler.toast.failedToImport": "Failed to import",
+    "sampler.toast.lastconfig": "Cannot Delete Last Configuration"
+}

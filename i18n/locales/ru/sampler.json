@@ -1,0 +1,18 @@
+{
+    "sampler.alert.delete.description": "Вы уверены, что хотите удалить '{{name}}'?",
+    "sampler.alert.delete.title": "Удалить семплер",
+    "sampler.create": "Создать семплер",
+    "sampler.delete": "Удалить семплер",
+    "sampler.empty": "Нет семплеров для конфигурации",
+    "sampler.export": "Экспортировать семплер",
+    "sampler.invalid": "Неправильное поле семплера!",
+    "sampler.new": "Новая предустановка семплера",
+    "sampler.noSamplers": "Вероятно, вы еще не добавили подключение API",
+    "sampler.notSupported": "Семплер ID [{{id}}] не поддерживается",
+    "sampler.title": "Семплеры",
+    "sampler.toast.emptyname": "Имя семплера не может быть пустым",
+    "sampler.toast.exists": "Конфигурация семплера \"{{name}}\" уже существует!",
+    "sampler.toast.exportok": "Конфигурация семплера экспортирована!",
+    "sampler.toast.failedToImport": "Ошибка импорта",
+    "sampler.toast.lastconfig": "Невозможно удалить последнюю конфигурацию"
+}

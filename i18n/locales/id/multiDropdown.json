@@ -1,0 +1,5 @@
+{
+    "multiDropdown.counter_one": "{{count}} item dipilih",
+    "multiDropdown.counter_other": "{{count}} item dipilih",
+    "multiDropdown.noItemsSelected": "Tidak ada item yang dipilih"
+}

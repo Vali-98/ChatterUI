@@ -1,0 +1,23 @@
+{
+    "audio.saved": "Audio saved",
+    "audio.saveFailed": "Could not save audio",
+    "audio.record": "Record audio",
+    "audio.stopRecording": "Stop recording",
+    "audio.recordAgain": "Record again",
+    "audio.attach": "Attach",
+    "audio.microphonePermission": "Microphone permission is required to record audio.",
+    "audio.recordFailed": "Could not record audio",
+    "audio.settings": "Audio playback",
+    "audio.globalPlayer": "Global audio player",
+    "audio.globalPlayerDescription": "Continue audio when leaving its chat.",
+    "audio.keepPlayerOpen": "Keep player open after playback",
+    "audio.keepPlayerOpenDescription": "Show Replay and Close after audio finishes.",
+    "audio.play": "Play",
+    "audio.pause": "Pause",
+    "audio.stop": "Stop",
+    "audio.replay": "Replay",
+    "audio.seek": "Seek audio",
+    "audio.playbackFailed": "Could not play audio",
+    "audio.add": "Add audio",
+    "audio.addFailed": "Could not add audio"
+}

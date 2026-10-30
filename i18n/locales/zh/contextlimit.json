@@ -1,0 +1,6 @@
+{
+    "contextlimit.allocation": "上下文分配",
+    "contextlimit.chat": "聊天上下文",
+    "contextlimit.generated": "已生成",
+    "contextlimit.warning": "聊天上下文不足将更快忘记消息"
+}

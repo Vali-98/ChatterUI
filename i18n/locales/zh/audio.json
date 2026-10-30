@@ -1,0 +1,23 @@
+{
+    "audio.saved": "音频已保存",
+    "audio.saveFailed": "无法保存音频",
+    "audio.record": "录制音频",
+    "audio.stopRecording": "停止录制",
+    "audio.recordAgain": "重新录制",
+    "audio.attach": "添加附件",
+    "audio.microphonePermission": "录制音频需要麦克风权限。",
+    "audio.recordFailed": "无法录制音频",
+    "audio.settings": "音频播放",
+    "audio.globalPlayer": "全局音频播放器",
+    "audio.globalPlayerDescription": "离开当前聊天后继续播放音频。",
+    "audio.keepPlayerOpen": "播放结束后保留播放器",
+    "audio.keepPlayerOpenDescription": "音频结束后显示重播和关闭按钮。",
+    "audio.play": "播放",
+    "audio.pause": "暂停",
+    "audio.stop": "停止",
+    "audio.replay": "重播",
+    "audio.seek": "调整播放进度",
+    "audio.playbackFailed": "无法播放音频",
+    "audio.add": "添加音频",
+    "audio.addFailed": "无法添加音频"
+}

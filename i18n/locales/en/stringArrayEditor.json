@@ -1,0 +1,6 @@
+{
+    "stringArrayEditor.add": "Add",
+    "stringArrayEditor.duplicateValueError": "Value already exists",
+    "stringArrayEditor.emptyValueError": "Value cannot be empty",
+    "stringArrayEditor.placeholder": "Enter value..."
+}

@@ -1,0 +1,16 @@
+{
+    "users.create": "Buat Pengguna Baru",
+    "users.edit.card.clone": "Kloning Pengguna",
+    "users.edit.card.clonedesc": "Apakah Anda yakin ingin mengkloning '{{name}}'?",
+    "users.edit.card.delete": "Hapus Pengguna",
+    "users.edit.card.deletedesc": "Apakah Anda yakin ingin menghapus '{{name}}'?\nTindakan ini tidak dapat dibatalkan.",
+    "users.edit.image.change": "Ubah Gambar",
+    "users.edit.image.delete": "Hapus Gambar",
+    "users.edit.image.deletedesc": "Apakah Anda yakin ingin menghapus gambar ini?\nTindakan ini tidak dapat dibatalkan.",
+    "users.edit.image.view": "Lihat Gambar",
+    "users.edit.title": "Edit Pengguna",
+    "users.hint": "Petunjuk: Gesek ke Kiri atau tekan <icon/> untuk membuka laci Pengguna",
+    "users.messages.loadingUser": "Memuat Pengguna: {{name}}",
+    "users.nameplaceholder": "Nama kosong tidak disarankan",
+    "users.profilecount": "Profil Pengguna"
+}

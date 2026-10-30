@@ -1,0 +1,6 @@
+{
+    "stringArrayEditor.add": "Добавить",
+    "stringArrayEditor.duplicateValueError": "Значение уже существует",
+    "stringArrayEditor.emptyValueError": "Значение не может быть пустым",
+    "stringArrayEditor.placeholder": "Введите значение..."
+}

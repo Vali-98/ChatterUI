@@ -1,0 +1,18 @@
+{
+    "navigation.about": "О приложении",
+    "navigation.api": "API",
+    "navigation.dataSources": "Источники данных",
+    "navigation.dev_colortest": "[DEV] Тест цвета",
+    "navigation.dev_components": "[DEV] Компоненты",
+    "navigation.dev_markdown": "[DEV] Markdown",
+    "navigation.dev_tests": "[DEV] Тестовые экраны",
+    "navigation.formatting": "Форматирование",
+    "navigation.logs": "Логи",
+    "navigation.lorebooks": "учебники",
+    "navigation.models": "Модели",
+    "navigation.sampler": "Семплер",
+    "navigation.settings": "Настройки",
+    "navigation.tts": "TTS",
+    "navigation.dev_onboarding": "[DEV] Повторить начальную настройку",
+    "navigation.dev_guides": "[DEV] Повторить обучение интерфейсу"
+}

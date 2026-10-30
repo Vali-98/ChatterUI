@@ -1,0 +1,18 @@
+{
+    "navigation.about": "关于",
+    "navigation.api": "API",
+    "navigation.dataSources": "数据来源",
+    "navigation.dev_colortest": "[DEV] 颜色测试",
+    "navigation.dev_components": "[DEV] 组件",
+    "navigation.dev_markdown": "[DEV] Markdown",
+    "navigation.dev_tests": "[DEV] 测试页面",
+    "navigation.formatting": "格式",
+    "navigation.logs": "日志",
+    "navigation.lorebooks": "书店",
+    "navigation.models": "模型",
+    "navigation.sampler": "采样器",
+    "navigation.settings": "设置",
+    "navigation.tts": "TTS",
+    "navigation.dev_onboarding": "[DEV] 重新开始初始设置",
+    "navigation.dev_guides": "[DEV] 重播界面引导"
+}

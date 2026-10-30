@@ -1,0 +1,12 @@
+{
+    "guides.skip": "Skip Guide",
+    "guides.progress": "Step {{current}} of {{total}}",
+    "guides.main.welcome": "Welcome to ChatterUI!\n\nLet me give you a quick tour.",
+    "guides.main.characters": "Your characters live here. Choose one to start a conversation.\n\nAI Bot has already been prepared for you.",
+    "guides.main.import": "Use this button to add or import characters.",
+    "guides.main.menu": "Open the main menu here to change app mode and manage your setup.",
+    "guides.chat.history": "Use these buttons to view chat history or start a new chat with this character. You can also swipe left to open the chat drawer.",
+    "guides.chat.options": "Your chat options are here, including context usage, author notes, and summaries.",
+    "guides.drawer.persona": "Tap your persona here to change your name, description, or image.",
+    "guides.drawer.options": "These are the app’s tools and settings. Feel free to explore once this guide is finished!"
+}

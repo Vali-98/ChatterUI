@@ -1,0 +1,23 @@
+{
+    "audio.saved": "Аудио сохранено",
+    "audio.saveFailed": "Не удалось сохранить аудио",
+    "audio.record": "Записать аудио",
+    "audio.stopRecording": "Остановить запись",
+    "audio.recordAgain": "Записать заново",
+    "audio.attach": "Прикрепить",
+    "audio.microphonePermission": "Для записи аудио требуется доступ к микрофону.",
+    "audio.recordFailed": "Не удалось записать аудио",
+    "audio.settings": "Воспроизведение аудио",
+    "audio.globalPlayer": "Глобальный аудиоплеер",
+    "audio.globalPlayerDescription": "Продолжать воспроизведение при выходе из чата.",
+    "audio.keepPlayerOpen": "Оставлять плеер открытым",
+    "audio.keepPlayerOpenDescription": "Показывать повтор и закрытие после завершения аудио.",
+    "audio.play": "Воспроизвести",
+    "audio.pause": "Пауза",
+    "audio.stop": "Остановить",
+    "audio.replay": "Повторить",
+    "audio.seek": "Перемотать аудио",
+    "audio.playbackFailed": "Не удалось воспроизвести аудио",
+    "audio.add": "Добавить аудио",
+    "audio.addFailed": "Не удалось добавить аудио"
+}

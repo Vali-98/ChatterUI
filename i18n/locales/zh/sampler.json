@@ -1,0 +1,18 @@
+{
+    "sampler.alert.delete.description": "确定要删除 '{{name}}' 吗？",
+    "sampler.alert.delete.title": "删除采样器",
+    "sampler.create": "创建采样器",
+    "sampler.delete": "删除采样器",
+    "sampler.empty": "没有可配置的采样器",
+    "sampler.export": "导出采样器",
+    "sampler.invalid": "采样器字段无效！",
+    "sampler.new": "新采样预设",
+    "sampler.noSamplers": "你可能还没有添加 API 连接",
+    "sampler.notSupported": "采样器 ID [{{id}}] 不受支持",
+    "sampler.title": "采样器",
+    "sampler.toast.emptyname": "采样器名称不能为空",
+    "sampler.toast.exists": "采样器配置 '{{name}}' 已存在！",
+    "sampler.toast.exportok": "导出采样器配置成功！",
+    "sampler.toast.failedToImport": "导入失败",
+    "sampler.toast.lastconfig": "无法删除最后一个配置"
+}

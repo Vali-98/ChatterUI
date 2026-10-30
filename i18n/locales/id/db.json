@@ -1,0 +1,4 @@
+{
+    "db.migrationerror.description": "Jika Anda melihat ini, sesuatu telah berjalan sangat salah. Laporkan kesalahan ini di bawah, sertakan tangkapan layar dari log di atas.",
+    "db.migrationerror.title": "Migrasi Database Gagal!"
+}

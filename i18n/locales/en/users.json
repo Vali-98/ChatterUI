@@ -1,0 +1,16 @@
+{
+    "users.create": "Create New User",
+    "users.edit.card.clone": "Clone User",
+    "users.edit.card.clonedesc": "Are you sure you want to clone '{{name}}'?",
+    "users.edit.card.delete": "Delete User",
+    "users.edit.card.deletedesc": "Are you sure you want to delete '{{name}}'?\nThis cannot be undone.",
+    "users.edit.image.change": "Change Image",
+    "users.edit.image.delete": "Delete Image",
+    "users.edit.image.deletedesc": "Are you sure you want to delete this image?\nThis cannot be undone.",
+    "users.edit.image.view": "View Image",
+    "users.edit.title": "Edit User",
+    "users.hint": "Hint: Swipe Left or press <icon/> to open the Users drawer",
+    "users.messages.loadingUser": "Loading User: {{name}}",
+    "users.nameplaceholder": "Empty names are discouraged",
+    "users.profilecount": "User Profiles"
+}

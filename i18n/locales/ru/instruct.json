@@ -1,0 +1,14 @@
+{
+    "instruct.attachments": "Вложения",
+    "instruct.filteredtext.description": "Отправляет отфильтрованный текст для вывода",
+    "instruct.filteredtext.label": "Отправить отфильтрованный текст",
+    "instruct.formatting": "Форматирование инструкций",
+    "instruct.hiddentext.description": "Скрывает текст, соответствующий определенным ниже шаблонам регулярных выражений. (без учета регистра)",
+    "instruct.hiddentext.title": "Скрытый текст",
+    "instruct.localtemplate.description": "В локальном режиме ChatterUI автоматически использует шаблон инструкций, предоставленный загруженной моделью. Отключите это, если хотите, чтобы сообщения форматировались с использованием инструкций вместо этого. Системная подсказка всегда используется.",
+    "instruct.localtemplate.label": "Использовать встроенный шаблон локальной модели",
+    "instruct.localtemplate.title": "Локальный шаблон",
+    "instruct.macros": "Макросы и карточка персонажа",
+    "instruct.textformatter.description": "Автоматически форматирует первое сообщение в стиле ниже",
+    "instruct.textformatter.title": "Форматер текста"
+}

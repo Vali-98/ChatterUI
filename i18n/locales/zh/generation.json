@@ -1,0 +1,20 @@
+{
+    "generation.errors.completionFailed": "完成失败。",
+    "generation.errors.configurationNotFound": "未找到配置 '{{name}}'",
+    "generation.errors.failedToBuildPayload": "构建载荷失败",
+    "generation.errors.failedToBuildPrompt": "构建提示失败",
+    "generation.errors.failedToOrchestrateRequestBuild": "组织请求构建失败",
+    "generation.errors.generationAlreadyInProgress": "生成已在进行中",
+    "generation.errors.generationFailed": "生成失败",
+    "generation.errors.noActiveAPI": "没有可用 API",
+    "generation.errors.noActiveChat": "没有激活聊天",
+    "generation.errors.noCharacter": "未加载角色",
+    "generation.errors.noChatFound": "未找到聊天",
+    "generation.errors.noUser": "未加载用户",
+    "generation.errors.payloadConstructionFailed": "载荷构建失败",
+    "generation.errors.promptConstructionFailed": "提示构建失败",
+    "generation.errors.sseFailed": "SSE 事件期间出错",
+    "generation.warn.entryWithoutValidSwipeFound": "发现没有有效滑动的条目",
+    "generation.warn.noMessagesAddedCheckLogs": "未添加消息。请检查日志。",
+    "generation.warn.systemPromptExceedsContext": "系统提示词超出可用的上下文长度。"
+}

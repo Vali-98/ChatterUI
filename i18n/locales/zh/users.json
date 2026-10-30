@@ -1,0 +1,16 @@
+{
+    "users.create": "创建新用户",
+    "users.edit.card.clone": "克隆用户",
+    "users.edit.card.clonedesc": "确定要克隆 '{{name}}' 吗？",
+    "users.edit.card.delete": "删除用户",
+    "users.edit.card.deletedesc": "确定要删除 '{{name}}' 吗？\n此操作不可撤销。",
+    "users.edit.image.change": "更改图片",
+    "users.edit.image.delete": "删除图片",
+    "users.edit.image.deletedesc": "确定要删除此图片吗？\n此操作不可撤销。",
+    "users.edit.image.view": "查看图片",
+    "users.edit.title": "编辑用户",
+    "users.hint": "提示：向左滑动或按 <icon/> 打开用户抽屉",
+    "users.messages.loadingUser": "正在加载用户：{{name}}",
+    "users.nameplaceholder": "不建议留空名称",
+    "users.profilecount": "用户配置"
+}

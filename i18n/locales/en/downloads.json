@@ -1,0 +1,12 @@
+{
+    "downloads.fits": "Estimated to fit your device",
+    "downloads.large": "May use too much memory",
+    "downloads.failed": "Download failed",
+    "downloads.restartHint": "Could not resume this download. Restart to download it again.",
+    "downloads.badge": "Downloads ({{count}})",
+    "downloads.status.paused": "Paused",
+    "downloads.status.downloading": "Downloading",
+    "downloads.status.pausing": "Pausing…",
+    "downloads.status.completed": "Complete",
+    "downloads.status.failed": "Failed"
+}

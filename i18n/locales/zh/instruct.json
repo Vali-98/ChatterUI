@@ -1,0 +1,14 @@
+{
+    "instruct.attachments": "附件",
+    "instruct.filteredtext.description": "将过滤后的文本发送给推理",
+    "instruct.filteredtext.label": "发送过滤文本",
+    "instruct.formatting": "Instruct 格式",
+    "instruct.hiddentext.description": "隐藏与下面定义的正则模式匹配的文本。（不区分大小写）",
+    "instruct.hiddentext.title": "隐藏文本",
+    "instruct.localtemplate.description": "在本地模式下，ChatterUI 会自动使用加载模型提供的 instruct 模板。禁用后，如果你希望消息改为使用 Instruct 格式，请关闭此选项。但系统提示仍然始终使用。",
+    "instruct.localtemplate.label": "使用内置本地模型模板",
+    "instruct.localtemplate.title": "本地模板",
+    "instruct.macros": "宏与角色卡片",
+    "instruct.textformatter.description": "自动将首条消息格式化为以下样式",
+    "instruct.textformatter.title": "文本格式化器"
+}

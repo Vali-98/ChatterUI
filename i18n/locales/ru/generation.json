@@ -1,0 +1,20 @@
+{
+    "generation.errors.completionFailed": "Завершение не удалось.",
+    "generation.errors.configurationNotFound": "Конфигурация \"{{name}}\" не найдена",
+    "generation.errors.failedToBuildPayload": "Не удалось построить полезную нагрузку",
+    "generation.errors.failedToBuildPrompt": "Не удалось построить подсказку",
+    "generation.errors.failedToOrchestrateRequestBuild": "Не удалось организовать построение запроса",
+    "generation.errors.generationAlreadyInProgress": "Генерация уже выполняется",
+    "generation.errors.generationFailed": "Генерация не удалась",
+    "generation.errors.noActiveAPI": "Нет активного API",
+    "generation.errors.noActiveChat": "Нет активного чата",
+    "generation.errors.noCharacter": "Персонаж не загружен",
+    "generation.errors.noChatFound": "Чат не найден",
+    "generation.errors.noUser": "Пользователь не загружен",
+    "generation.errors.payloadConstructionFailed": "Ошибка построения полезной нагрузки",
+    "generation.errors.promptConstructionFailed": "Ошибка построения подсказки",
+    "generation.errors.sseFailed": "Ошибка во время события SSE",
+    "generation.warn.entryWithoutValidSwipeFound": "Найдена запись без действительного смахивания",
+    "generation.warn.noMessagesAddedCheckLogs": "Сообщения не добавлены. Проверьте логи.",
+    "generation.warn.systemPromptExceedsContext": "Системный промпт превышает доступную длину контекста."
+}

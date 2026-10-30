@@ -1,0 +1,9 @@
+{
+    "logs.alert.delete.description": "Are you sure you want to delete all logs? This cannot be undone.",
+    "logs.alert.delete.title": "Delete Logs",
+    "logs.export": "Export Logs",
+    "logs.flush": "Flush Logs",
+    "logs.title": "Logs",
+    "logs.toast.downloaderror": "Could Not Export Logs",
+    "logs.toast.downloadok": "Logs Downloaded!"
+}

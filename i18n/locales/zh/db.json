@@ -1,0 +1,4 @@
+{
+    "db.migrationerror.description": "如果你看到此消息，那么发生了非常严重的问题。请在下面报告此错误，并附上日志截图。",
+    "db.migrationerror.title": "数据库迁移失败！"
+}

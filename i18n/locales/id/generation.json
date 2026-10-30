@@ -1,0 +1,20 @@
+{
+    "generation.errors.completionFailed": "Penyelesaian gagal.",
+    "generation.errors.configurationNotFound": "Konfigurasi \"{{name}}\" tidak ditemukan",
+    "generation.errors.failedToBuildPayload": "Gagal membangun payload",
+    "generation.errors.failedToBuildPrompt": "Gagal membangun prompt",
+    "generation.errors.failedToOrchestrateRequestBuild": "Gagal mengorkestrasi pembangunan permintaan",
+    "generation.errors.generationAlreadyInProgress": "Pembuatan sudah berlangsung",
+    "generation.errors.generationFailed": "Pembuatan Gagal",
+    "generation.errors.noActiveAPI": "Tidak Ada API Aktif",
+    "generation.errors.noActiveChat": "Tidak ada chat aktif",
+    "generation.errors.noCharacter": "Tidak ada karakter yang dimuat",
+    "generation.errors.noChatFound": "Tidak ada chat ditemukan",
+    "generation.errors.noUser": "Tidak ada pengguna yang dimuat",
+    "generation.errors.payloadConstructionFailed": "Pembangunan payload gagal",
+    "generation.errors.promptConstructionFailed": "Pembangunan prompt gagal",
+    "generation.errors.sseFailed": "Kesalahan Selama event SSE",
+    "generation.warn.entryWithoutValidSwipeFound": "Entri tanpa gesekan valid ditemukan",
+    "generation.warn.noMessagesAddedCheckLogs": "Tidak ada pesan yang ditambahkan. Periksa Log.",
+    "generation.warn.systemPromptExceedsContext": "Prompt sistem melebihi panjang konteks yang tersedia."
+}

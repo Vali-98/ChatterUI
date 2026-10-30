@@ -1,0 +1,20 @@
+{
+    "generation.errors.completionFailed": "Completion failed.",
+    "generation.errors.configurationNotFound": "Configuration \"{{name}}\" not found",
+    "generation.errors.failedToBuildPayload": "Failed to build payload",
+    "generation.errors.failedToBuildPrompt": "Failed to build prompt",
+    "generation.errors.failedToOrchestrateRequestBuild": "Failed to orchestrate request build",
+    "generation.errors.generationAlreadyInProgress": "Generation already in progress",
+    "generation.errors.generationFailed": "Generation Failed",
+    "generation.errors.noActiveAPI": "No Active API",
+    "generation.errors.noActiveChat": "No active chat",
+    "generation.errors.noCharacter": "No loaded character",
+    "generation.errors.noChatFound": "No chat found",
+    "generation.errors.noUser": "No loaded user",
+    "generation.errors.payloadConstructionFailed": "Payload construction failed",
+    "generation.errors.promptConstructionFailed": "Prompt construction failed",
+    "generation.errors.sseFailed": "Error During SSE event",
+    "generation.warn.entryWithoutValidSwipeFound": "Entry without valid swipe found",
+    "generation.warn.noMessagesAddedCheckLogs": "No messages added. Check Logs.",
+    "generation.warn.systemPromptExceedsContext": "System prompt exceeds the available context length."
+}

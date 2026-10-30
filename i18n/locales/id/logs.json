@@ -1,0 +1,9 @@
+{
+    "logs.alert.delete.description": "Apakah Anda yakin ingin menghapus semua log? Tindakan ini tidak dapat dibatalkan.",
+    "logs.alert.delete.title": "Hapus Log",
+    "logs.export": "Ekspor Log",
+    "logs.flush": "Bersihkan Log",
+    "logs.title": "Log",
+    "logs.toast.downloaderror": "Tidak Dapat Mengekspor Log",
+    "logs.toast.downloadok": "Log Berhasil Diunduh!"
+}

@@ -1,0 +1,12 @@
+{
+    "about.description.primary": "ChatterUI - свободное приложение с открытым исходным кодом, разработанное Vali-98",
+    "about.description.support": "Это приложение - мой личный проект, развиваемый в свободное время. Если вам нравится приложение, рассмотрите возможность поддержать его разработку!",
+    "about.devMode.disableAction": "Отключить режим разработки",
+    "about.devMode.disabledMessage": "Режим разработки отключен.",
+    "about.devMode.enabledMessage": "Режим разработки включен.",
+    "about.logsReminder": "Не забудьте включить логи",
+    "about.reportIssue": "Нашли проблему? Сообщите о ней здесь:",
+    "about.support.button": "Поддержать ChatterUI",
+    "about.support.label": "Пожертвовать ChatterUI:",
+    "about.versionPrefix": "v"
+}

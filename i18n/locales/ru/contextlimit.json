@@ -1,0 +1,6 @@
+{
+    "contextlimit.allocation": "Распределение контекста",
+    "contextlimit.chat": "Контекст чата",
+    "contextlimit.generated": "Сгенерировано",
+    "contextlimit.warning": "Низкий контекст чата будет забывать сообщения быстрее"
+}

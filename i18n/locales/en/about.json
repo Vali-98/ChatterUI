@@ -1,0 +1,12 @@
+{
+    "about.description.primary": "ChatterUI is a free and open-source application developed by Vali-98",
+    "about.description.support": "This app is a passion project I develop in my free time. If you're enjoying the app, consider supporting its development!",
+    "about.devMode.disableAction": "Disable Dev Mode",
+    "about.devMode.disabledMessage": "Dev mode disabled.",
+    "about.devMode.enabledMessage": "You have enabled dev mode.",
+    "about.logsReminder": "Remember to include logs",
+    "about.reportIssue": "Got an issue? Report it here:",
+    "about.support.button": "Support ChatterUI",
+    "about.support.label": "Donate to ChatterUI here:",
+    "about.versionPrefix": "v"
+}

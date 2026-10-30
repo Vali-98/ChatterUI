@@ -1,0 +1,12 @@
+{
+    "about.description.primary": "ChatterUI 是由 Vali-98 开发的免费开源应用",
+    "about.description.support": "这个应用是我业余时间的一个热情项目。如果你喜欢这个应用，请考虑支持它的开发！",
+    "about.devMode.disableAction": "禁用开发模式",
+    "about.devMode.disabledMessage": "开发模式已禁用。",
+    "about.devMode.enabledMessage": "你已启用开发模式。",
+    "about.logsReminder": "记得附上日志",
+    "about.reportIssue": "遇到问题？在这里报告：",
+    "about.support.button": "支持 ChatterUI",
+    "about.support.label": "在这里捐助 ChatterUI：",
+    "about.versionPrefix": "v"
+}

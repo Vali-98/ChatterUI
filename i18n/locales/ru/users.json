@@ -1,0 +1,16 @@
+{
+    "users.create": "Создать нового пользователя",
+    "users.edit.card.clone": "Клонировать пользователя",
+    "users.edit.card.clonedesc": "Вы уверены, что хотите клонировать '{{name}}'?",
+    "users.edit.card.delete": "Удалить пользователя",
+    "users.edit.card.deletedesc": "Вы уверены, что хотите удалить '{{name}}'?\nЭто действие не может быть отменено.",
+    "users.edit.image.change": "Изменить изображение",
+    "users.edit.image.delete": "Удалить изображение",
+    "users.edit.image.deletedesc": "Вы уверены, что хотите удалить это изображение?\nЭто действие не может быть отменено.",
+    "users.edit.image.view": "Просмотреть изображение",
+    "users.edit.title": "Редактировать пользователя",
+    "users.hint": "Подсказка: проведите пальцем влево или нажмите <icon/> для открытия ящика пользователей",
+    "users.messages.loadingUser": "Загрузка пользователя: {{name}}",
+    "users.nameplaceholder": "Пустые имена не рекомендуются",
+    "users.profilecount": "Профили пользователей"
+}

@@ -1,0 +1,6 @@
+{
+    "background.title": "ChatterUI 正在运行",
+    "background.description": "生成和下载将在后台继续",
+    "background.downloading": "正在下载（{{count}}）",
+    "background.downloadHint": "点击查看下载。其他正在进行的任务会继续运行。"
+}

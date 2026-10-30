@@ -1,0 +1,12 @@
+{
+    "guides.skip": "Lewati panduan",
+    "guides.progress": "Langkah {{current}} dari {{total}}",
+    "guides.main.welcome": "Selamat datang di ChatterUI!\n\nMari kenali aplikasi ini sebentar.",
+    "guides.main.characters": "Karakter Anda ada di sini. Pilih satu untuk memulai percakapan.\n\nAI Bot sudah disiapkan untuk Anda.",
+    "guides.main.import": "Gunakan tombol ini untuk menambahkan atau mengimpor karakter.",
+    "guides.main.menu": "Buka menu utama di sini untuk mengubah mode aplikasi dan mengelola pengaturan Anda.",
+    "guides.chat.history": "Gunakan tombol-tombol ini untuk melihat riwayat obrolan atau memulai obrolan baru dengan karakter ini. Anda juga dapat mengusap ke kiri untuk membuka panel obrolan.",
+    "guides.chat.options": "Opsi obrolan Anda ada di sini, termasuk penggunaan konteks, catatan penulis, dan ringkasan.",
+    "guides.drawer.persona": "Ketuk persona Anda di sini untuk mengubah nama, deskripsi, atau gambar.",
+    "guides.drawer.options": "Inilah alat dan pengaturan aplikasi. Silakan jelajahi setelah panduan ini selesai!"
+}

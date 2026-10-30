@@ -1,0 +1,12 @@
+{
+    "downloads.fits": "预计适合你的设备",
+    "downloads.large": "可能占用过多内存",
+    "downloads.failed": "下载失败",
+    "downloads.restartHint": "无法继续此下载。请重新开始下载。",
+    "downloads.badge": "下载（{{count}}）",
+    "downloads.status.paused": "已暂停",
+    "downloads.status.downloading": "正在下载",
+    "downloads.status.pausing": "正在暂停…",
+    "downloads.status.completed": "已完成",
+    "downloads.status.failed": "失败"
+}

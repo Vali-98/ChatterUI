@@ -1,0 +1,6 @@
+{
+    "contextlimit.allocation": "Context Allocation",
+    "contextlimit.chat": "Chat Context",
+    "contextlimit.generated": "Generated",
+    "contextlimit.warning": "Low Chat Context will forget messages faster"
+}

@@ -1,0 +1,5 @@
+{
+    "multiDropdown.counter_one": "已选择 {{count}} 项",
+    "multiDropdown.counter_other": "已选择 {{count}} 项",
+    "multiDropdown.noItemsSelected": "未选择任何项目"
+}

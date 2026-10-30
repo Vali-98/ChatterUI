@@ -1,0 +1,9 @@
+{
+    "logs.alert.delete.description": "Вы уверены, что хотите удалить все логи? Это действие не может быть отменено.",
+    "logs.alert.delete.title": "Удалить логи",
+    "logs.export": "Экспортировать логи",
+    "logs.flush": "Очистить логи",
+    "logs.title": "Логи",
+    "logs.toast.downloaderror": "Не удалось экспортировать логи",
+    "logs.toast.downloadok": "Логи загружены!"
+}

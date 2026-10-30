@@ -7,10 +7,10 @@ import { persist } from 'zustand/middleware'
 import { Storage } from '@lib/enums/Storage'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
-import en from './locales/en.json'
-import id from './locales/id.json'
-import ru from './locales/ru.json'
-import zh from './locales/zh.json'
+import en from './locales/en'
+import id from './locales/id'
+import ru from './locales/ru'
+import zh from './locales/zh'
 
 // import { I18nManager } from 'react-native' may be needed by rtl
 
@@ -70,10 +70,10 @@ const supportedLanguageAsObject = Object.fromEntries(
 
 // eslint-disable-next-line import/no-named-as-default-member
 i18n.use(initReactI18next).init({
-    // or even better, manage them via a UI: https://react.i18next.com/guides/multiple-translation-files#manage-your-translations-with-a-management-gui)
     resources: supportedLanguageAsObject,
     lng: useLanguageStore.getState().language ?? lang,
     fallbackLng: 'en',
+    keySeparator: false,
 
     interpolation: {
         escapeValue: false, // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape

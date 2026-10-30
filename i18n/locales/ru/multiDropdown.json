@@ -1,0 +1,5 @@
+{
+    "multiDropdown.counter_one": "Выбран {{count}} элемент",
+    "multiDropdown.counter_other": "Выбрано {{count}} элементов",
+    "multiDropdown.noItemsSelected": "Элементы не выбраны"
+}
