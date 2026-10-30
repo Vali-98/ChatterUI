@@ -148,6 +148,7 @@ const TTSManagerScreen = () => {
                     value={testAudioText}
                     onChangeText={setTestAudioText}
                     style={{ color: color.text._400, fontStyle: 'italic' }}
+                    viewStyle={{ flex: 1 }}
                 />
                 <ThemedButton
                     label={t('common.actions.test')}

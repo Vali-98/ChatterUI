@@ -392,7 +392,7 @@ const CharacterEditorScreen = () => {
                                 count: descriptionTokens,
                             })}
                             multiline
-                            containerStyle={styles.input}
+                            viewStyle={styles.input}
                             numberOfLines={16}
                             onChangeText={(mes) => {
                                 updateCardDraft({
@@ -406,7 +406,7 @@ const CharacterEditorScreen = () => {
                         <ThemedTextInput
                             label={t('character.editor.fields.firstMessage')}
                             multiline
-                            containerStyle={styles.input}
+                            viewStyle={styles.input}
                             onChangeText={(mes) => {
                                 updateCardDraft({
                                     ...cardDraft,
@@ -518,7 +518,7 @@ const CharacterEditorScreen = () => {
                         <ThemedTextInput
                             label={t('character.editor.fields.personality')}
                             multiline
-                            containerStyle={styles.input}
+                            viewStyle={styles.input}
                             numberOfLines={4}
                             onChangeText={(mes) => {
                                 updateCardDraft({
@@ -532,7 +532,7 @@ const CharacterEditorScreen = () => {
                         <ThemedTextInput
                             label={t('character.editor.fields.scenario')}
                             multiline
-                            containerStyle={styles.input}
+                            viewStyle={styles.input}
                             onChangeText={(mes) => {
                                 updateCardDraft({
                                     ...cardDraft,
@@ -546,7 +546,7 @@ const CharacterEditorScreen = () => {
                         <ThemedTextInput
                             label={t('character.editor.fields.exampleMessages')}
                             multiline
-                            containerStyle={styles.input}
+                            viewStyle={styles.input}
                             onChangeText={(mes) => {
                                 updateCardDraft({
                                     ...cardDraft,

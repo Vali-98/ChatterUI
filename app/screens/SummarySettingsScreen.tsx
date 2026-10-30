@@ -104,7 +104,6 @@ const SummarySettingsScreen = () => {
                         multiline
                         value={settings.prompt}
                         onChangeText={(prompt) => settings.update({ prompt })}
-                        containerStyle={{ flex: 0 }}
                     />
                     <TText color="400">{t('summary.historyDescription')}</TText>
                 </>

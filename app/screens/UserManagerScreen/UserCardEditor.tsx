@@ -180,7 +180,8 @@ const UserCardEditor = () => {
                     </View>
 
                     <ThemedTextInput
-                        style={{ height: 36 }}
+                        fieldStyle={{ height: 36 }}
+                        style={{ flex: 1 }}
                         value={cardDraft?.name ?? ''}
                         onChangeText={(text) => {
                             if (cardDraft)
@@ -194,15 +195,9 @@ const UserCardEditor = () => {
             </View>
             <ThemedTextInput
                 multiline
-                containerStyle={{
-                    marginHorizontal: 16,
-                }}
-                style={{
-                    backgroundColor: color.neutral._100,
-                    paddingVertical: 12,
-                    paddingHorizontal: 12,
-                    borderRadius: 8,
-                }}
+                viewStyle={{ marginHorizontal: 16 }}
+                fieldStyle={{ backgroundColor: color.neutral._100, borderRadius: 8 }}
+                style={{ paddingVertical: 12, paddingHorizontal: 12 }}
                 numberOfLines={10}
                 label={t('common.labels.description')}
                 value={cardDraft?.description ?? ''}

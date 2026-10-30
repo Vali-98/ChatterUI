@@ -38,7 +38,10 @@ jest.mock('../app/components/buttons/ListButton', () => ({
 }))
 jest.mock('../app/components/input/ThemedTextInput', () => ({
     __esModule: true,
-    default: (props: any) => require('react').createElement('Input', props),
+    default: Object.assign(
+        (props: any) => require('react').createElement('Input', props, props.toolbar),
+        { Action: (props: any) => require('react').createElement('Button', props) }
+    ),
 }))
 jest.mock('../lib/theme/ThemeManager', () => ({
     Theme: {
@@ -200,5 +203,53 @@ test('InputSheet resets by default, scopes remembered drafts, and retains failed
     )
     act(() => ref.current!.open())
     expect(renderer.root.findByType('Input').props.value).toBe('other item')
+    act(() => renderer.unmount())
+})
+
+test.each([true, false])('the input exposes its native ref with autoUnfocus=%s', (autoUnfocus) => {
+    const Input = jest.requireActual('../app/components/input/ThemedTextInput').default
+    const ref = createRef<TextInput>()
+    let renderer: any
+    act(() => {
+        renderer = create(<Input ref={ref} value="text" autoUnfocus={autoUnfocus} />)
+    })
+    const native = renderer.root.findByType(TextInput).instance
+    expect(ref.current).toBe(native)
+    const focus = jest.spyOn(native, 'focus').mockClear()
+    act(() => ref.current!.focus())
+    expect(focus).toHaveBeenCalledTimes(1)
+    act(() => renderer.unmount())
+    expect(ref.current).toBeNull()
+})
+
+test('InputSheet configures each footer button while retaining its save/dismiss handlers', async () => {
+    const ref = createRef<BottomSheetRefFunctions>()
+    const onConfirm = jest.fn()
+    const onClose = jest.fn()
+    let renderer: any
+    act(() => {
+        renderer = create(
+            <InputSheet
+                ref={ref}
+                defaultValue="New item"
+                onConfirm={onConfirm}
+                onClose={onClose}
+                confirmLabel="Create"
+                confirmButtonProps={{ variant: 'primary', level: 'primary' }}
+                cancelLabel="Not now"
+                cancelButtonProps={{ variant: 'tertiary' }}
+            />
+        )
+    })
+    act(() => ref.current!.open())
+    expect(button(renderer, 'Create').props.variant).toBe('primary')
+    expect(button(renderer, 'Create').props.level).toBe('primary')
+    expect(button(renderer, 'Not now').props.variant).toBe('tertiary')
+    act(() => button(renderer, 'Not now').props.onPress())
+    expect(onConfirm).not.toHaveBeenCalled()
+    act(() => ref.current!.open())
+    await act(async () => button(renderer, 'Create').props.onPress())
+    expect(onConfirm).toHaveBeenCalledWith('New item')
+    expect(onClose).toHaveBeenCalledTimes(2)
     act(() => renderer.unmount())
 })

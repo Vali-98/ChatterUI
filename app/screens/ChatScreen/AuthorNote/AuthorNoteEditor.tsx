@@ -149,7 +149,6 @@ const AuthorNoteEditor = () => {
                 contentContainerStyle={{ rowGap: spacing.xl, paddingBottom: spacing.xl2 }}>
                 <ThemedTextInput
                     label={t('common.labels.name')}
-                    containerStyle={{ flex: 0 }}
                     value={placeHolderNote.name}
                     onChangeText={(t) => {
                         handleSetPlaceholder({ ...placeHolderNote, name: t })
@@ -157,7 +156,6 @@ const AuthorNoteEditor = () => {
                 />
                 <ThemedTextInput
                     label={t('authorNotes.item.content', { tokenLength: contentTokens })}
-                    containerStyle={{ flex: 0 }}
                     numberOfLines={10}
                     value={placeHolderNote.content}
                     onChangeText={(t) => {
@@ -170,7 +168,6 @@ const AuthorNoteEditor = () => {
 
                 <ThemedTextInput
                     label={t('authorNotes.item.comments')}
-                    containerStyle={{ flex: 0 }}
                     numberOfLines={2}
                     value={placeHolderNote.note}
                     onChangeText={(t) => {

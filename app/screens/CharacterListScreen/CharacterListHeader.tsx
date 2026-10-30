@@ -165,7 +165,6 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                         )}
                         <ThemedTextInput
                             label={t('character.list.search.byName')}
-                            containerStyle={{ flex: 0 }}
                             value={textFilter}
                             onChangeText={setTextFilter}
                             style={{

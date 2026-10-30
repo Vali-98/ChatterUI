@@ -385,6 +385,7 @@
             "pause": "暂停",
             "resume": "继续",
             "clear": "清除",
+            "paste": "粘贴",
             "restart": "重新开始",
             "collapse": "收起",
             "openSettings": "打开设置"

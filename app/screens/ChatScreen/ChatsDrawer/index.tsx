@@ -102,7 +102,7 @@ const ChatsDrawer = () => {
                 {showSearchBar && (
                     <ThemedTextInput
                         placeholder={t('chat.drawer.search.placeholder')}
-                        containerStyle={{ flex: 0, marginTop: 12, marginBottom: 12 }}
+                        viewStyle={{ marginTop: 12, marginBottom: 12 }}
                         value={searchQuery}
                         autoCorrect={false}
                         onChangeText={setSearch}

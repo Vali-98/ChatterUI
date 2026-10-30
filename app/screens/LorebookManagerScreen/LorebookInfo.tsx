@@ -80,7 +80,6 @@ const LorebookInfoScreen = () => {
                     label={t('lorebook.labels.generationSettings')}
                     bodyStyle={{ rowGap: 8, paddingBottom: 24 }}>
                     <ThemedTextInput
-                        containerStyle={{ flex: 0 }}
                         label={t('common.labels.name')}
                         value={placeholderInfo?.name ?? ''}
                         onChangeText={(name) => handleUpdate({ name })}
@@ -88,7 +87,6 @@ const LorebookInfoScreen = () => {
                     <ThemedTextInput
                         multiline
                         numberOfLines={4}
-                        containerStyle={{ flex: 0 }}
                         label={t('common.labels.description')}
                         value={placeholderInfo?.description ?? ''}
                         onChangeText={(description) => handleUpdate({ description })}
@@ -126,7 +124,7 @@ const LorebookInfoScreen = () => {
                     columnGap: 8,
                 }}>
                 <ThemedTextInput
-                    containerStyle={{}}
+                    viewStyle={{ flex: 1 }}
                     placeholder={t('common.actions.search')}
                     value={search}
                     onChangeText={setSearch}

@@ -151,7 +151,6 @@ const LorebookEntryEditor = () => {
                         }}>
                         <ThemedTextInput
                             label={t('common.labels.name')}
-                            containerStyle={{ flex: 0 }}
                             value={placeholderEntry.name}
                             onChangeText={(value) => updateEntry('name', value)}
                         />
@@ -165,7 +164,6 @@ const LorebookEntryEditor = () => {
                         <ThemedTextInput
                             label={t('common.labels.content')}
                             multiline
-                            containerStyle={{ flex: 0 }}
                             numberOfLines={10}
                             value={placeholderEntry.content}
                             onChangeText={(value) => updateEntry('content', value)}
@@ -174,7 +172,6 @@ const LorebookEntryEditor = () => {
                         <ThemedTextInput
                             label={t('common.labels.comment')}
                             multiline
-                            containerStyle={{ flex: 0 }}
                             numberOfLines={3}
                             value={placeholderEntry.comment}
                             onChangeText={(value) => updateEntry('comment', value)}

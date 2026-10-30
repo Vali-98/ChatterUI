@@ -204,14 +204,12 @@ const ConnectionSetup = ({
                     {value && template && (
                         <View style={{ gap: 12 }}>
                             <ThemedTextInput
-                                containerStyle={{ flex: 0 }}
                                 label={t('connections.editor.friendlyName')}
                                 value={value.friendlyName}
                                 onChangeText={(friendlyName) => patch({ friendlyName })}
                             />
                             {template.ui.editableCompletionPath && (
                                 <ThemedTextInput
-                                    containerStyle={{ flex: 0 }}
                                     label={t('connections.editor.completionUrl')}
                                     value={value.endpoint}
                                     placeholder={
@@ -245,7 +243,6 @@ const ConnectionSetup = ({
                             )}
                             {template.features.useKey && (
                                 <ThemedTextInput
-                                    containerStyle={{ flex: 0 }}
                                     label={t('connections.editor.apiKey')}
                                     value={value.key}
                                     onChangeText={(key) => patch({ key })}
@@ -256,7 +253,6 @@ const ConnectionSetup = ({
                             )}
                             {template.ui.editableModelPath && (
                                 <ThemedTextInput
-                                    containerStyle={{ flex: 0 }}
                                     label={t('connections.editor.modelUrl')}
                                     value={value.modelEndpoint}
                                     onChangeText={(modelEndpoint) => patch({ modelEndpoint })}

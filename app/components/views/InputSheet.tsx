@@ -3,7 +3,8 @@ import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View, type StyleProp, type ViewStyle } from 'react-native'
 
-import ThemedTextInputNext from '@components/input/ThemedTextInputNext'
+import type { ThemedButtonProps } from '@components/buttons/ThemedButton'
+import ThemedTextInput from '@components/input/ThemedTextInput'
 import TText from '@components/text/TText'
 import BottomSheetControls, { BottomSheetButton } from '@components/views/BottomSheetControls'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -23,6 +24,9 @@ export type InputSheetProps = {
     defaultValue?: string
     multiline?: boolean
     confirmLabel?: string
+    cancelLabel?: string
+    confirmButtonProps?: Omit<ThemedButtonProps, 'label' | 'onPress'>
+    cancelButtonProps?: Omit<ThemedButtonProps, 'label' | 'onPress'>
     rememberInput?: boolean
     inputKey?: string | number
     bodyContainerStyle?: StyleProp<ViewStyle>
@@ -41,6 +45,9 @@ const InputSheet = ({
     defaultValue = '',
     multiline = false,
     confirmLabel,
+    cancelLabel,
+    confirmButtonProps,
+    cancelButtonProps,
     rememberInput = false,
     inputKey,
     bodyContainerStyle,
@@ -102,7 +109,7 @@ const InputSheet = ({
                 />
             )}
             <View style={{ rowGap: 8 }}>
-                <ThemedTextInputNext
+                <ThemedTextInput
                     multiline={multiline}
                     autoFocus={autoFocus}
                     placeholder={placeholder}
@@ -112,13 +119,13 @@ const InputSheet = ({
                     numberOfLines={multiline ? 10 : 1}
                     toolbar={
                         <>
-                            <ThemedTextInputNext.Action
+                            <ThemedTextInput.Action
                                 label={t('common.actions.clear')}
                                 iconName="close"
                                 disabled={saving}
                                 onPress={() => setText('')}
                             />
-                            <ThemedTextInputNext.Action
+                            <ThemedTextInput.Action
                                 label={t('common.actions.paste')}
                                 iconName={{ family: 'material', name: 'content-paste' }}
                                 disabled={saving}
@@ -136,16 +143,17 @@ const InputSheet = ({
             </View>
             <BottomSheetControls>
                 <BottomSheetButton
-                    label={t('common.actions.close')}
                     variant="secondary"
-                    disabled={saving}
+                    {...cancelButtonProps}
+                    label={cancelLabel ?? t('common.actions.close')}
+                    disabled={saving || cancelButtonProps?.disabled}
                     onPress={() => ref.current?.close()}
                 />
                 <BottomSheetButton
+                    variant="secondary"
+                    {...confirmButtonProps}
                     label={confirmLabel ?? t('common.actions.save')}
-                    variant="primary"
-                    level="primary"
-                    disabled={saving}
+                    disabled={saving || confirmButtonProps?.disabled}
                     onPress={() => {
                         void submit()
                     }}

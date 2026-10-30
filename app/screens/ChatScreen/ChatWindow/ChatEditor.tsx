@@ -248,7 +248,9 @@ const MessageEditor = ({
                     </ScrollView>
                 ) : (
                     <ThemedTextInput
-                        containerStyle={{ flex: 0, flexShrink: 1 }}
+                        viewStyle={{ flexShrink: 1 }}
+                        fieldStyle={{ flexShrink: 1 }}
+                        style={{ flexShrink: 1 }}
                         value={draft[field]}
                         editable={!saving}
                         onChangeText={(text) => setDraft((draft) => ({ ...draft, [field]: text }))}

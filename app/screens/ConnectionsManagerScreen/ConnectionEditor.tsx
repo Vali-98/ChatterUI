@@ -171,6 +171,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({ ref, originalValues
                         <View style={{ flexDirection: 'row' }}>
                             <ThemedTextInput
                                 label={t('connections.editor.modelUrl')}
+                                viewStyle={{ flex: 1 }}
                                 value={values.modelEndpoint}
                                 onChangeText={(value) => {
                                     setValues({ ...values, modelEndpoint: value })

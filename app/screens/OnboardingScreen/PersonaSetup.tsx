@@ -62,7 +62,7 @@ const PersonaSetup = ({
                 />
             </Pressable>
             <ThemedTextInput
-                containerStyle={{ flex: 0, width: '70%', maxWidth: 280, alignSelf: 'center' }}
+                viewStyle={{ width: '70%', maxWidth: 280, alignSelf: 'center' }}
                 label={t('common.labels.name')}
                 placeholder={t('onboarding.namePlaceholder')}
                 value={name}
@@ -72,7 +72,6 @@ const PersonaSetup = ({
                 {descriptionVisible ? (
                     <Animated.View entering={FadeIn}>
                         <ThemedTextInput
-                            containerStyle={{ flex: 0 }}
                             label={t('onboarding.description')}
                             placeholder={t('onboarding.descriptionPlaceholder')}
                             value={description}
