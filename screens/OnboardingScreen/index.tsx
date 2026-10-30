@@ -272,13 +272,14 @@ const OnboardingScreen = () => {
                             <ThemedButton
                                 label={t('common.actions.back', { defaultValue: 'Back' })}
                                 variant="tertiary"
+                                level="muted"
                                 viewStyle={{
                                     minHeight: 44,
                                     minWidth: 92,
                                     paddingHorizontal: 20,
                                     justifyContent: 'center',
                                 }}
-                                labelStyle={{ fontSize: 17, color: color.text._500 }}
+                                labelStyle={{ fontSize: 17 }}
                                 disabled={saving}
                                 onPress={() => onboarding.setStep(step - 1)}
                             />
@@ -286,6 +287,7 @@ const OnboardingScreen = () => {
                         <ThemedButton
                             label={nextLabel}
                             variant={complete ? 'secondary' : 'tertiary'}
+                            level={complete ? 'neutral' : 'muted'}
                             viewStyle={{
                                 minHeight: 44,
                                 minWidth: 108,

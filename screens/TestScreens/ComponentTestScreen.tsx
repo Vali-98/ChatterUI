@@ -35,7 +35,7 @@ const selectorData = [
 ]
 
 const buttonVariants = ['primary', 'secondary', 'tertiary'] as const
-const buttonLevels = ['neutral', 'primary', 'warning', 'error'] as const
+const buttonLevels = ['neutral', 'muted', 'primary', 'warning', 'error'] as const
 
 const ComponentTestScreen = () => {
     const [selected, setSelected] = useState<(typeof selectorData)[0]>(selectorData[0])

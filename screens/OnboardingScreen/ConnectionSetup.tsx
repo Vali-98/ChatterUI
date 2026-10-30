@@ -124,7 +124,7 @@ const ConnectionSetup = ({
                 <ThemedButton
                     variant="tertiary"
                     label={t('common.actions.reset')}
-                    labelStyle={{ color: color.text._400 }}
+                    level="muted"
                     viewStyle={{ alignSelf: 'flex-start' }}
                     onPress={() => {
                         confirmValue(undefined)

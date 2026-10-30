@@ -14,7 +14,7 @@ import { getContrastingColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'tertiary'
-export type ButtonLevel = 'neutral' | 'primary' | 'warning' | 'error'
+export type ButtonLevel = 'neutral' | 'muted' | 'primary' | 'warning' | 'error'
 
 export interface ButtonAppearanceProps extends Omit<PressableProps, 'style' | 'children'> {
     variant?: ButtonVariant
@@ -46,16 +46,19 @@ const ButtonBase = ({
     labelStyle?: StyleProp<TextStyle>
 }) => {
     const { color, borderWidth, borderRadius, spacing } = Theme.useTheme()
-    const palette = level === 'neutral' ? color.neutral : color[level]
-    const fill = level === 'neutral' ? palette._300 : palette._500
+    const palette = level === 'neutral' || level === 'muted' ? color.neutral : color[level]
+    const fill =
+        level === 'muted' ? palette._200 : level === 'neutral' ? palette._300 : palette._500
     const foreground =
-        variant === 'primary'
-            ? getContrastingColor(fill)
-            : level === 'neutral'
-              ? color.text._200
-              : level === 'error'
-                ? palette._400
-                : palette._700
+        level === 'muted'
+            ? color.text._400
+            : variant === 'primary'
+              ? getContrastingColor(fill)
+              : level === 'neutral'
+                ? color.text._200
+                : level === 'error'
+                  ? palette._400
+                  : palette._700
     const disabledColor = color.text._500
     const animOpacity = useSharedValue(1)
     const animatedStyle = useAnimatedStyle(() => ({ opacity: disabled ? 1 : animOpacity.value }))
@@ -90,7 +93,12 @@ const ButtonBase = ({
                     alignItems: 'center',
                     borderRadius: borderRadius.m,
                     borderWidth: variant === 'tertiary' ? 0 : borderWidth.m,
-                    borderColor: variant === 'tertiary' ? 'transparent' : palette._400,
+                    borderColor:
+                        variant === 'tertiary'
+                            ? 'transparent'
+                            : level === 'muted'
+                              ? palette._300
+                              : palette._400,
                     backgroundColor: variant === 'primary' ? fill : 'transparent',
                     paddingHorizontal: label === undefined ? 4 : spacing.xl,
                     paddingVertical: label === undefined ? 4 : spacing.m,
