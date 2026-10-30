@@ -25,13 +25,17 @@ export const convertAudioAttachment = async (
     }
 }
 
-export const pickAudioAttachments = async (): Promise<AudioAttachmentFile[]> => {
+export const pickAudioAttachments = async ({ onPrepare }: { onPrepare?: () => void } = {}): Promise<
+    AudioAttachmentFile[]
+> => {
     const result = await getDocumentAsync({
         type: 'audio/*',
         multiple: true,
         copyToCacheDirectory: true,
     })
     if (result.canceled) return []
+    if (result.assets.length === 0) return []
+    onPrepare?.()
     const converted: AudioAttachmentFile[] = []
     try {
         for (const asset of result.assets)

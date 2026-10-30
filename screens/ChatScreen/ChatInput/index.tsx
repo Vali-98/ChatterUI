@@ -23,8 +23,9 @@ import Alert from '@components/views/Alert'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import CameraSheet from '@components/views/CameraSheet'
 import ContextMenu from '@components/views/ContextMenu'
+import ThemedSpinner from '@components/views/ThemedSpinner'
 import { XAxisOnlyTransition } from '@lib/animations/transitions'
-import { pickAudioAttachments } from '@lib/audio/files'
+import { useAudioAttachmentPicker } from '@lib/audio/useAudioAttachmentPicker'
 import { AnimatedTextInput } from '@lib/components/AnimatedComponents'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useChatGenerating, useCanStartGeneration } from '@lib/engine/generation/hooks'
@@ -60,6 +61,9 @@ const ChatInput = () => {
     const setHeight = useChatControlLayoutState((state) => state.setInputHeight)
 
     const { chatId } = Chats.useChat()
+    const { pickAudio, isPreparingAudio } = useAudioAttachmentPicker(chatId, (selected) => {
+        setAttachments((current) => [...current, ...selected])
+    })
     const isGenerating = useChatGenerating(chatId)
     const canGenerate = useCanStartGeneration(chatId)
 
@@ -77,8 +81,8 @@ const ChatInput = () => {
     }
 
     const handleSend = async () => {
+        if (!chatId || !canGenerate || isPreparingAudio) return
         Keyboard.dismiss()
-        if (!chatId || !canGenerate) return
         try {
             const accepted = await submitMessage(chatId, {
                 text: newMessage,
@@ -168,12 +172,12 @@ const ChatInput = () => {
                 itemLayoutAnimation={LinearTransition}
                 style={{
                     display: attachments.length > 0 ? 'flex' : 'none',
-                    padding: spacing.l,
+
                     backgroundColor: color.neutral._200,
                     borderRadius: borderRadius.m,
                 }}
                 horizontal
-                contentContainerStyle={{ columnGap: spacing.xl }}
+                contentContainerStyle={{ columnGap: spacing.xl, padding: spacing.l }}
                 data={attachments}
                 keyExtractor={(item) => item.uri}
                 renderItem={({ item }) => {
@@ -295,17 +299,7 @@ const ChatInput = () => {
                                         onPress={async (close) => {
                                             close()
                                             try {
-                                                const selected = await pickAudioAttachments()
-                                                setAttachments((current) => [
-                                                    ...current,
-                                                    ...selected.filter(
-                                                        (item) =>
-                                                            !current.some(
-                                                                (existing) =>
-                                                                    existing.uri === item.uri
-                                                            )
-                                                    ),
-                                                ])
+                                                await pickAudio()
                                             } catch (error) {
                                                 Logger.errorToast(t('audio.addFailed'), error)
                                             }
@@ -376,12 +370,15 @@ const ChatInput = () => {
                         setNewMessage(text)
                     }}
                     multiline
-                    submitBehavior={sendOnEnter ? 'blurAndSubmit' : 'newline'}
+                    submitBehavior={
+                        sendOnEnter ? (isPreparingAudio ? 'submit' : 'blurAndSubmit') : 'newline'
+                    }
                     onSubmitEditing={sendOnEnter ? handleSend : undefined}
                 />
                 <Animated.View layout={XAxisOnlyTransition}>
                     <TouchableOpacity
                         disabled={
+                            (isPreparingAudio && !isGenerating) ||
                             (!canGenerate && !isGenerating) ||
                             !chatId ||
                             (!activeProvider && !isGenerating)
@@ -402,17 +399,24 @@ const ChatInput = () => {
                                   : color.primary._500,
                         }}
                         onPress={isGenerating ? abortResponse : handleSend}>
-                        <MaterialIcons
-                            name={isGenerating ? 'stop' : 'send'}
-                            color={
-                                isGenerating
-                                    ? '#111111'
-                                    : activeProvider
-                                      ? getContrastingColor(color.primary._500)
-                                      : color.text._700
-                            }
-                            size={24}
-                        />
+                        {isPreparingAudio && !isGenerating ? (
+                            <ThemedSpinner
+                                size={24}
+                                color={getContrastingColor(color.primary._500)}
+                            />
+                        ) : (
+                            <MaterialIcons
+                                name={isGenerating ? 'stop' : 'send'}
+                                color={
+                                    isGenerating
+                                        ? '#111111'
+                                        : activeProvider
+                                          ? getContrastingColor(color.primary._500)
+                                          : color.text._700
+                                }
+                                size={24}
+                            />
+                        )}
                     </TouchableOpacity>
                 </Animated.View>
             </View>

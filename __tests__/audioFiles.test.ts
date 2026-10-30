@@ -11,13 +11,11 @@ jest.mock('expo-crypto', () => ({ randomUUID: jest.fn() }))
 jest.mock('expo-document-picker', () => ({ getDocumentAsync: jest.fn() }))
 jest.mock('expo-file-system', () => ({
     Paths: { cache: { uri: 'file:///cache/' } },
-    Directory: jest
-        .fn()
-        .mockImplementation((parent, name) => ({
-            uri: `${parent.uri}${name}/`,
-            create: jest.fn(),
-            delete: jest.fn(),
-        })),
+    Directory: jest.fn().mockImplementation((parent, name) => ({
+        uri: `${parent.uri}${name}/`,
+        create: jest.fn(),
+        delete: jest.fn(),
+    })),
 }))
 jest.mock('../lib/utils/File', () => ({ deleteFile: jest.fn() }))
 
@@ -81,7 +79,9 @@ test('a failed multi-file selection cleans successful conversions instead of ret
 })
 
 test('canceling the file picker creates no conversion files', async () => {
+    const onPrepare = jest.fn()
     jest.mocked(getDocumentAsync).mockResolvedValue({ canceled: true, assets: null })
-    expect(await pickAudioAttachments()).toEqual([])
+    expect(await pickAudioAttachments({ onPrepare })).toEqual([])
+    expect(onPrepare).not.toHaveBeenCalled()
     expect(convertToWav).not.toHaveBeenCalled()
 })

@@ -1,17 +1,20 @@
 import { extractPngTextChunk } from '@vali98/react-native-png-utils'
 import { Asset } from 'expo-asset'
-import { readBase64Async } from '../lib/utils/File'
+import { getDocumentAsync } from 'expo-document-picker'
+import { readBase64Async, readStringAsync } from '../lib/utils/File'
 import {
     createCard,
     createDefaultCard,
     deleteCardImage,
     duplicateCard,
     updateCardImage,
+    importCards,
 } from '../lib/state/characters/actions'
 import { db } from '../lib/state/characters/db'
 import { copyImageFile, deleteImageFile } from '../lib/state/characters/images'
 import { buildBlankCharacterCard } from '../lib/state/characters/schema'
 import type { CharacterCard } from '../lib/state/characters/types'
+import { useCharacterImportState } from '../lib/state/characters/importState'
 
 jest.mock('@vali98/react-native-png-utils', () => ({
     extractPngTextChunk: jest.fn(),
@@ -27,6 +30,7 @@ jest.mock('../lib/state/Logger', () => ({
 jest.mock('../lib/utils/File', () => ({
     fileExists: jest.fn(() => true),
     readBase64Async: jest.fn(),
+    readStringAsync: jest.fn(),
 }))
 jest.mock('../lib/state/characters/images', () => {
     let nextImageId = 100
@@ -172,4 +176,71 @@ test('a failed card import reports no created ID so startup can retry', async ()
     jest.mocked(extractPngTextChunk).mockReturnValueOnce([])
     expect(await createDefaultCard()).toBeUndefined()
     expect(db.create.card).not.toHaveBeenCalled()
+})
+
+test('bulk imports count successful and failed files and release their blocker', async () => {
+    jest.mocked(getDocumentAsync).mockResolvedValueOnce({
+        canceled: false,
+        assets: [
+            { name: 'good.json', uri: '/good.json', mimeType: 'application/json' },
+            { name: 'bad.json', uri: '/bad.json', mimeType: 'application/json' },
+        ],
+    } as never)
+    jest.mocked(readStringAsync).mockImplementation(async (uri) =>
+        uri === '/good.json' ? JSON.stringify(buildBlankCharacterCard('Imported')) : 'invalid JSON'
+    )
+    await importCards()
+    expect(useCharacterImportState.getState()).toEqual({
+        isImporting: false,
+        total: 2,
+        completed: 2,
+        succeeded: 1,
+        failed: 1,
+    })
+})
+
+test('a pending bulk import prevents a second picker and cancellation releases it', async () => {
+    let cancel!: (result: Awaited<ReturnType<typeof getDocumentAsync>>) => void
+    jest.mocked(getDocumentAsync).mockImplementationOnce(
+        () =>
+            new Promise((resolve) => {
+                cancel = resolve
+            })
+    )
+    const first = importCards()
+    expect(useCharacterImportState.getState().isImporting).toBe(true)
+    await importCards()
+    expect(getDocumentAsync).toHaveBeenCalledTimes(1)
+    cancel({ canceled: true, assets: null })
+    await first
+    expect(useCharacterImportState.getState()).toEqual({
+        isImporting: false,
+        total: 0,
+        completed: 0,
+        succeeded: 0,
+        failed: 0,
+    })
+})
+
+test('a rejected picker releases the import blocker', async () => {
+    jest.mocked(getDocumentAsync).mockRejectedValueOnce(new Error('picker failed'))
+    await expect(importCards()).rejects.toThrow('picker failed')
+    expect(useCharacterImportState.getState().isImporting).toBe(false)
+})
+
+test('image imports that report no created card count as failures', async () => {
+    jest.mocked(getDocumentAsync).mockResolvedValueOnce({
+        canceled: false,
+        assets: [{ name: 'missing.png', uri: '/missing.png', mimeType: 'image/png' }],
+    } as never)
+    jest.mocked(readBase64Async).mockResolvedValueOnce('png-without-card')
+    jest.mocked(extractPngTextChunk).mockReturnValueOnce([])
+    await importCards()
+    expect(useCharacterImportState.getState()).toEqual({
+        isImporting: false,
+        total: 1,
+        completed: 1,
+        succeeded: 0,
+        failed: 1,
+    })
 })

@@ -8,6 +8,7 @@ import { fileExists, readBase64Async, readStringAsync, saveStringToDownload } fr
 
 import { db } from './db'
 import { copyImageFile, createImageId, deleteImageFile, getCardImageUri } from './images'
+import { useCharacterImportState } from './importState'
 import type { CharacterCardV2 } from './schema'
 import {
     characterCardV1Schema,
@@ -189,28 +190,48 @@ const importCardV2 = async (data: unknown, imageUri?: string) => {
 }
 
 export const importCards = async () => {
-    const result = await DocumentPicker.getDocumentAsync({
-        copyToCacheDirectory: true,
-        type: ['image/*', 'application/json'],
-        multiple: true,
+    if (useCharacterImportState.getState().isImporting) return
+    useCharacterImportState.setState({
+        isImporting: true,
+        total: 0,
+        completed: 0,
+        succeeded: 0,
+        failed: 0,
     })
-    if (result.canceled) return
-    await Promise.all(
-        result.assets.map(async (item) => {
-            const isImage = item.mimeType?.includes('image/')
-            const isJson = item.mimeType?.includes('application/json')
-            try {
-                if (isJson) {
-                    const data = await readStringAsync(item.uri)
-                    await importCardV2(JSON.parse(data))
-                }
-
-                if (isImage) await importCardImage(item.uri)
-            } catch (e) {
-                Logger.error(`Failed to create card from '${item.name}': ${e}`)
-            }
+    try {
+        const result = await DocumentPicker.getDocumentAsync({
+            copyToCacheDirectory: true,
+            type: ['image/*', 'application/json'],
+            multiple: true,
         })
-    )
+        if (result.canceled) return
+        useCharacterImportState.setState({ total: result.assets.length })
+        await Promise.all(
+            result.assets.map(async (item) => {
+                let succeeded = false
+                try {
+                    let id: number | undefined
+                    if (item.mimeType?.includes('application/json')) {
+                        const data = await readStringAsync(item.uri)
+                        id = await importCardV2(JSON.parse(data))
+                    } else if (item.mimeType?.includes('image/')) {
+                        id = await importCardImage(item.uri)
+                    }
+                    succeeded = id !== undefined
+                } catch (error) {
+                    Logger.error(`Failed to create card from '${item.name}': ${error}`)
+                } finally {
+                    useCharacterImportState.setState((state) => ({
+                        completed: state.completed + 1,
+                        succeeded: state.succeeded + (succeeded ? 1 : 0),
+                        failed: state.failed + (succeeded ? 0 : 1),
+                    }))
+                }
+            })
+        )
+    } finally {
+        useCharacterImportState.setState({ isImporting: false })
+    }
 }
 
 export const exportCard = async (characterId: number) => {

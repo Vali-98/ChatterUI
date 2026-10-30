@@ -7,6 +7,7 @@ import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import InputSheet from '@components/views/InputSheet'
 import { Characters } from '@lib/state/characters'
+import { useCharacterImportState } from '@lib/state/characters/importState'
 import { Logger } from '@lib/state/Logger'
 
 type CharacterNewMenuProps = {
@@ -15,6 +16,7 @@ type CharacterNewMenuProps = {
 
 const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ navigationPending }) => {
     const { t } = useTranslation()
+    const isImporting = useCharacterImportState((state) => state.isImporting)
     const { selectCharacterCard } = Characters.useCharacterState(
         useShallow((state) => ({
             selectCharacterCard: state.setCard,
@@ -60,8 +62,13 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ navigationPending }
                 <ContextMenu.Body>
                     <ContextMenu.Button
                         label={t('character.list.actions.importFromFile')}
-                        onPress={() => {
-                            Characters.actions.importCards()
+                        disabled={isImporting}
+                        onPress={async () => {
+                            try {
+                                await Characters.actions.importCards()
+                            } catch (error) {
+                                Logger.errorToast(t('character.editor.errors.createFailed'), error)
+                            }
                         }}
                         icon="upload"
                     />
