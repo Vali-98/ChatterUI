@@ -7,12 +7,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
 import IconButton from '@components/buttons/IconButton'
+import DownloadNotice from '@components/downloads/DownloadNotice'
 import GuideHost from '@components/guides/GuideHost'
 import GuideTarget from '@components/guides/GuideTarget'
 import AvatarViewer from '@components/views/AvatarViewer'
 import Drawer from '@components/views/Drawer'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
+import { NoticeStack } from '@components/views/Notice'
+import OperationNotices from '@components/views/OperationNotices'
 import SettingsDrawer from '@components/views/SettingsDrawer'
 import { Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/chat'
@@ -25,6 +28,7 @@ import ChatWindow from '@screens/ChatScreen/ChatWindow'
 import AuthorNoteSheet from './AuthorNote'
 import AuthorNoteEditor from './AuthorNote/AuthorNoteEditor'
 import ChatEditor from './ChatWindow/ChatEditor'
+import ChatNotices from './ChatNotices'
 import SummarySheet from './Summaries'
 
 const ChatScreen = () => {
@@ -156,6 +160,11 @@ const ChatScreen = () => {
                         <SummarySheet />
                         <AuthorNoteSheet />
                         <AuthorNoteEditor />
+                        <NoticeStack>
+                            <OperationNotices />
+                            {typeof chatId === 'number' && <ChatNotices chatId={chatId} />}
+                            <DownloadNotice />
+                        </NoticeStack>
                     </View>
                 </Animated.View>
 

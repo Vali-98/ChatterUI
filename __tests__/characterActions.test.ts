@@ -9,12 +9,14 @@ import {
     duplicateCard,
     updateCardImage,
     importCards,
+    importCardImage,
 } from '../lib/state/characters/actions'
 import { db } from '../lib/state/characters/db'
 import { copyImageFile, deleteImageFile } from '../lib/state/characters/images'
 import { buildBlankCharacterCard } from '../lib/state/characters/schema'
 import type { CharacterCard } from '../lib/state/characters/types'
 import { useCharacterImportState } from '../lib/state/characters/importState'
+import { Logger } from '../lib/state/Logger'
 
 jest.mock('@vali98/react-native-png-utils', () => ({
     extractPngTextChunk: jest.fn(),
@@ -148,7 +150,7 @@ test('deleting a card image clears the database reference and deletes its physic
     expect(cards.get(1)!.background_image).toBe(30)
 })
 
-test('the default card imports the bundled asset directly and returns its new ID', async () => {
+test('the default card imports the bundled asset directly and returns its new ID in a result', async () => {
     jest.mocked(Asset.loadAsync).mockResolvedValueOnce([
         { localUri: 'file:///bundle/aibot.raw' },
     ] as never)
@@ -156,15 +158,15 @@ test('the default card imports the bundled asset directly and returns its new ID
     jest.mocked(extractPngTextChunk).mockReturnValueOnce([
         { keyword: 'Description', data: JSON.stringify(buildBlankCharacterCard('AI Bot')) },
     ])
-    expect(await createDefaultCard()).toBe(2)
+    expect(await createDefaultCard()).toEqual({ success: true, data: 2 })
     expect(readBase64Async).toHaveBeenCalledWith('file:///bundle/aibot.raw')
     expect(copyImageFile).toHaveBeenCalledWith(expect.any(Number), 'file:///bundle/aibot.raw')
     expect(cards.get(2)?.name).toBe('AI Bot')
 })
 
-test('a missing local asset URI reports no created ID', async () => {
+test('a missing local asset URI returns a failure', async () => {
     jest.mocked(Asset.loadAsync).mockResolvedValueOnce([{ localUri: null }] as never)
-    expect(await createDefaultCard()).toBeUndefined()
+    expect(await createDefaultCard()).toEqual({ success: false, error: expect.any(Error) })
     expect(db.create.card).not.toHaveBeenCalled()
 })
 
@@ -174,7 +176,7 @@ test('a failed card import reports no created ID so startup can retry', async ()
     ] as never)
     jest.mocked(readBase64Async).mockResolvedValueOnce('png-data')
     jest.mocked(extractPngTextChunk).mockReturnValueOnce([])
-    expect(await createDefaultCard()).toBeUndefined()
+    expect(await createDefaultCard()).toEqual({ success: false, error: expect.any(Error) })
     expect(db.create.card).not.toHaveBeenCalled()
 })
 
@@ -190,7 +192,7 @@ test('bulk imports count successful and failed files and release their blocker',
         uri === '/good.json' ? JSON.stringify(buildBlankCharacterCard('Imported')) : 'invalid JSON'
     )
     await importCards()
-    expect(useCharacterImportState.getState()).toEqual({
+    expect(useCharacterImportState.getState()).toMatchObject({
         isImporting: false,
         total: 2,
         completed: 2,
@@ -213,7 +215,7 @@ test('a pending bulk import prevents a second picker and cancellation releases i
     expect(getDocumentAsync).toHaveBeenCalledTimes(1)
     cancel({ canceled: true, assets: null })
     await first
-    expect(useCharacterImportState.getState()).toEqual({
+    expect(useCharacterImportState.getState()).toMatchObject({
         isImporting: false,
         total: 0,
         completed: 0,
@@ -236,11 +238,41 @@ test('image imports that report no created card count as failures', async () => 
     jest.mocked(readBase64Async).mockResolvedValueOnce('png-without-card')
     jest.mocked(extractPngTextChunk).mockReturnValueOnce([])
     await importCards()
-    expect(useCharacterImportState.getState()).toEqual({
+    expect(useCharacterImportState.getState()).toMatchObject({
         isImporting: false,
         total: 1,
         completed: 1,
         succeeded: 0,
         failed: 1,
     })
+    expect(Logger.errorToast).not.toHaveBeenCalled()
+})
+
+test.each([
+    ['v1', { name: 'Imported', description: 'Legacy card' }],
+    ['v2', buildBlankCharacterCard('Imported')],
+])(
+    'a %s image import returns the created ID without presenting feedback',
+    async (_version, card) => {
+        jest.mocked(readBase64Async).mockResolvedValueOnce('png-data')
+        jest.mocked(extractPngTextChunk).mockReturnValueOnce([
+            { keyword: 'chara', data: JSON.stringify(card) },
+        ])
+        expect(await importCardImage('/card.png')).toEqual({ success: true, data: 2 })
+        expect(cards.get(2)?.name).toBe('Imported')
+        expect(Logger.errorToast).not.toHaveBeenCalled()
+    }
+)
+
+test('an image-copy failure returns its error after rolling back the imported card', async () => {
+    const error = new Error('copy failed')
+    jest.mocked(readBase64Async).mockResolvedValueOnce('png-data')
+    jest.mocked(extractPngTextChunk).mockReturnValueOnce([
+        { keyword: 'chara', data: JSON.stringify(buildBlankCharacterCard('Imported')) },
+    ])
+    jest.mocked(copyImageFile).mockRejectedValueOnce(error)
+    expect(await importCardImage('/card.png')).toEqual({ success: false, error })
+    expect(cards.has(2)).toBe(false)
+    expect(deleteImageFile).toHaveBeenCalled()
+    expect(Logger.errorToast).not.toHaveBeenCalled()
 })

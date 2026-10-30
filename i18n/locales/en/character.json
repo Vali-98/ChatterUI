@@ -70,5 +70,8 @@
     "character.list.search.byTags": "Search By Tags",
     "character.list.sort.label": "Sort By",
     "character.list.sort.recent": "Recent",
-    "character.editor.fields.tagsPlaceholder": "Add a tag…"
+    "character.editor.fields.tagsPlaceholder": "Add a tag…",
+    "character.import.progress": "Importing characters · {{completed}}/{{total}}",
+    "character.import.result": "Characters imported: {{succeeded}}",
+    "character.import.resultWithFailures": "Imported {{succeeded}} · Failed {{failed}}"
 }

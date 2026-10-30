@@ -7,6 +7,7 @@ import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated'
 import { AlertProvider } from '@components/views/Alert'
 import { PortalHost } from '@components/views/Portal'
 import PlaybackPlayer from '@components/views/PlaybackPlayer'
+import ScreenNoticeLayout from '@components/views/ScreenNoticeLayout'
 import { useAppStateNotificationObserver } from '@lib/notifications/Notifications'
 import { Theme } from '@lib/theme/ThemeManager'
 import '../i18n/i18n'
@@ -32,6 +33,9 @@ const Layout = () => {
             <KeyboardProvider>
                 <AlertProvider />
                 <Stack
+                    screenLayout={({ children, route }) => (
+                        <ScreenNoticeLayout routeName={route.name}>{children}</ScreenNoticeLayout>
+                    )}
                     screenOptions={{
                         headerBackButtonDisplayMode: 'minimal',
                         headerStyle: { backgroundColor: color.neutral._100 },

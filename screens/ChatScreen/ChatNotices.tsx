@@ -47,10 +47,9 @@ const ChatNotices = ({ chatId }: { chatId: number }) => {
                     )}
                     actions={
                         <NoticeAction
-                            iconName="close"
+                            label={t('common.actions.cancel')}
                             disabled={task.status === 'cancelling'}
                             accessibilityLabel={t('common.actions.cancel')}
-                            level="error"
                             onPress={() => cancelDeferredTask(task.id)}
                         />
                     }

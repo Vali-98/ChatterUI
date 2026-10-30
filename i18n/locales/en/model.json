@@ -37,14 +37,11 @@
     "model.title": "Models",
     "model.toast.autoLoadingMMPROJ": "Auto-loading MMPROJ: {{name}}",
     "model.toast.autoLoadingModel": "Auto-loading Model: {{name}}",
-    "model.toast.couldNotLoadModel": "Could Not Load Model",
     "model.toast.deletekv": "KV Cache deleted!",
     "model.toast.failedToGenerateLocally": "Failed to generate locally",
-    "model.toast.failedToLoadMMPROJ": "Failed to load MMPROJ",
     "model.toast.failedToRunLocalInference": "Failed to run local inference",
     "model.toast.failedToUnloadMMPROJ": "Failed to unload MMPROJ",
     "model.toast.failedtolink": "Failed to link model",
-    "model.toast.failedtoload": "Failed to load model",
     "model.toast.mediaAddedWithoutMMPROJModel": "Media was added without MMPROJ model",
     "model.toast.mediaAddedWithoutMultimodalSupport": "Media was added without multimodal support.",
     "model.toast.modelAlreadyLoaded": "Model Already Loaded!",
@@ -54,5 +51,9 @@
     "model.toast.noAutoLoadModelSet": "No Auto-Load Model Set",
     "model.toast.noModelLoaded": "No Model Loaded",
     "model.toast.quantizationNoLongerSupported": "Quantization No Longer Supported!",
-    "model.unlinkmmproj": "Unlink MMPROJ"
+    "model.unlinkmmproj": "Unlink MMPROJ",
+    "model.notice.loading": "Loading model · {{name}}",
+    "model.notice.unloading": "Unloading model · {{name}}",
+    "model.notice.projector": "Loading projector · {{name}}",
+    "model.notice.failed": "Model operation failed: {{error}}"
 }

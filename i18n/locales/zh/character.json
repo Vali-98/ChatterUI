@@ -70,5 +70,8 @@
     "character.list.search.byTags": "按标签搜索",
     "character.list.sort.label": "排序方式",
     "character.list.sort.recent": "最近",
-    "character.editor.fields.tagsPlaceholder": "添加标签…"
+    "character.editor.fields.tagsPlaceholder": "添加标签…",
+    "character.import.progress": "正在导入角色 · {{completed}}/{{total}}",
+    "character.import.result": "已导入 {{succeeded}} 个角色",
+    "character.import.resultWithFailures": "已导入 {{succeeded}} · 失败 {{failed}}"
 }

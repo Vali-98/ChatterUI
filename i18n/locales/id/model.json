@@ -37,14 +37,11 @@
     "model.title": "Model",
     "model.toast.autoLoadingMMPROJ": "Memuat MMPROJ Otomatis: {{name}}",
     "model.toast.autoLoadingModel": "Memuat Model Otomatis: {{name}}",
-    "model.toast.couldNotLoadModel": "Tidak Dapat Memuat Model",
     "model.toast.deletekv": "KV Cache dihapus!",
     "model.toast.failedToGenerateLocally": "Gagal menghasilkan secara lokal",
-    "model.toast.failedToLoadMMPROJ": "Gagal memuat MMPROJ",
     "model.toast.failedToRunLocalInference": "Gagal menjalankan inferensi lokal",
     "model.toast.failedToUnloadMMPROJ": "Gagal membongkar MMPROJ",
     "model.toast.failedtolink": "Gagal menautkan model",
-    "model.toast.failedtoload": "Gagal memuat model",
     "model.toast.mediaAddedWithoutMMPROJModel": "Media ditambahkan tanpa model MMPROJ",
     "model.toast.mediaAddedWithoutMultimodalSupport": "Media ditambahkan tanpa dukungan multimodal.",
     "model.toast.modelAlreadyLoaded": "Model Sudah Dimuat!",
@@ -54,5 +51,9 @@
     "model.toast.noAutoLoadModelSet": "Tidak Ada Model Muat Otomatis yang Diatur",
     "model.toast.noModelLoaded": "Tidak Ada Model yang Dimuat",
     "model.toast.quantizationNoLongerSupported": "Kuantisasi Tidak Lagi Didukung!",
-    "model.unlinkmmproj": "Putuskan tautan MMPROJ"
+    "model.unlinkmmproj": "Putuskan tautan MMPROJ",
+    "model.notice.loading": "Memuat model · {{name}}",
+    "model.notice.unloading": "Melepas model · {{name}}",
+    "model.notice.projector": "Memuat proyektor · {{name}}",
+    "model.notice.failed": "Operasi model gagal: {{error}}"
 }

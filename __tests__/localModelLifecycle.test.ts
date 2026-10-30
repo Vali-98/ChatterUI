@@ -15,7 +15,7 @@ jest.mock('../lib/engine/Local/Model', () => ({
     KV: { useKVStore: { getState: () => ({ setKvCacheLoaded: jest.fn() }) } },
 }))
 jest.mock('../lib/state/Logger', () => ({
-    Logger: { info: jest.fn(), warnToast: jest.fn(), errorToast: jest.fn() },
+    Logger: { info: jest.fn(), error: jest.fn(), warnToast: jest.fn(), errorToast: jest.fn() },
 }))
 jest.mock('../lib/storage/MMKV', () => ({
     mmkv: { getBoolean: jest.fn() },
@@ -113,4 +113,55 @@ test('model unloading is blocked until a deferred local summary has settled', as
     useDeferredTaskState.setState({ tasks: {} })
     await Llama.useLlamaModelStore.getState().unload()
     expect(previous.release).toHaveBeenCalledTimes(1)
+})
+
+test('native load progress is exposed until the model is ready', async () => {
+    let ready!: () => void
+    jest.mocked(initLlama).mockImplementationOnce((_params, onProgress) => {
+        onProgress?.(35)
+        return new Promise((resolve) => {
+            ready = () => resolve(context([]) as any)
+        })
+    })
+    const loading = Llama.useLlamaModelStore.getState().load(model(2))
+    await tick()
+    expect(useLocalModelResourceState.getState().activity).toEqual({
+        kind: 'loading',
+        name: 'Model 2',
+        progress: 35,
+    })
+    expect(useLocalModelResourceState.getState().operations).toBe(1)
+    ready()
+    await loading
+    expect(useLocalModelResourceState.getState().activity).toBeUndefined()
+    expect(Llama.useLlamaModelStore.getState().model?.id).toBe(2)
+})
+
+test('failed native loading leaves a dismissible error and releases local capacity', async () => {
+    jest.mocked(initLlama).mockRejectedValueOnce(new Error('out of memory'))
+    await Llama.useLlamaModelStore.getState().load(model(2))
+    expect(useLocalModelResourceState.getState()).toMatchObject({
+        operations: 0,
+        activity: { kind: 'loading', error: 'out of memory' },
+    })
+    expect(Llama.useLlamaModelStore.getState().model).toBeUndefined()
+    useLocalModelResourceState.getState().dismissNotice()
+    expect(useLocalModelResourceState.getState().activity).toBeUndefined()
+    jest.mocked(initLlama).mockResolvedValueOnce(context([]) as any)
+    await Llama.useLlamaModelStore.getState().load(model(2))
+    expect(Llama.useLlamaModelStore.getState().model?.id).toBe(2)
+})
+
+test('a failed projector load is reported without marking the projector loaded', async () => {
+    const nativeContext = context([])
+    nativeContext.initMultimodal.mockRejectedValueOnce(new Error('unsupported projector'))
+    jest.mocked(initLlama).mockResolvedValueOnce(nativeContext as any)
+    jest.mocked(Model.getModel).mockResolvedValueOnce(model(3))
+    await Llama.useLlamaModelStore.getState().load({ ...model(2), mmprojLink: { mmproj_id: 3 } })
+    expect(Llama.useLlamaModelStore.getState().model?.id).toBe(2)
+    expect(Llama.useLlamaModelStore.getState().mmproj).toBeUndefined()
+    expect(useLocalModelResourceState.getState()).toMatchObject({
+        operations: 0,
+        activity: { kind: 'projector', error: 'unsupported projector' },
+    })
 })

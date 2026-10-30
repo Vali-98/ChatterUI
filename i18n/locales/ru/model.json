@@ -37,14 +37,11 @@
     "model.title": "Модели",
     "model.toast.autoLoadingMMPROJ": "Автозагрузка MMPROJ: {{name}}",
     "model.toast.autoLoadingModel": "Автозагрузка модели: {{name}}",
-    "model.toast.couldNotLoadModel": "Не удалось загрузить модель",
     "model.toast.deletekv": "Кэш KV удален!",
     "model.toast.failedToGenerateLocally": "Не удалось сгенерировать локально",
-    "model.toast.failedToLoadMMPROJ": "Не удалось загрузить MMPROJ",
     "model.toast.failedToRunLocalInference": "Не удалось запустить локальный вывод",
     "model.toast.failedToUnloadMMPROJ": "Не удалось выгрузить MMPROJ",
     "model.toast.failedtolink": "Не удалось привязать модель",
-    "model.toast.failedtoload": "Не удалось загрузить модель",
     "model.toast.mediaAddedWithoutMMPROJModel": "Медиа было добавлено без модели MMPROJ",
     "model.toast.mediaAddedWithoutMultimodalSupport": "Медиа было добавлено без поддержки мультимодальности.",
     "model.toast.modelAlreadyLoaded": "Модель уже загружена!",
@@ -54,5 +51,9 @@
     "model.toast.noAutoLoadModelSet": "Автозагрузка модели не установлена",
     "model.toast.noModelLoaded": "Модель не загружена",
     "model.toast.quantizationNoLongerSupported": "Квантизация больше не поддерживается!",
-    "model.unlinkmmproj": "Отсоединить MMPROJ"
+    "model.unlinkmmproj": "Отсоединить MMPROJ",
+    "model.notice.loading": "Загрузка модели · {{name}}",
+    "model.notice.unloading": "Выгрузка модели · {{name}}",
+    "model.notice.projector": "Загрузка проектора · {{name}}",
+    "model.notice.failed": "Ошибка операции с моделью: {{error}}"
 }

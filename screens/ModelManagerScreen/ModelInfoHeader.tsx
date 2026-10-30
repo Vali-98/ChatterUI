@@ -3,21 +3,18 @@ import React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { View, Text, StyleSheet } from 'react-native'
 import * as Progress from 'react-native-progress'
-import { useShallow } from 'zustand/react/shallow'
 
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type ModelInfoHeaderProps = {
     modelImporting: boolean
-    modelLoading: boolean
     modelListLength: number
     modelUpdatedAt: Date | undefined
 }
 
 const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
     modelImporting,
-    modelLoading,
     modelListLength,
     modelUpdatedAt,
 }) => {
@@ -25,16 +22,11 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
     const styles = useStyles()
     const { color } = Theme.useTheme()
 
-    const { modelName, loadProgress } = Llama.useLlamaModelStore(
-        useShallow((state) => ({
-            modelName: state.model?.name,
-            loadProgress: state.loadProgress,
-        }))
-    )
+    const modelName = Llama.useLlamaModelStore((state) => state.model?.name)
 
     return (
         <View style={styles.modelContainer}>
-            {!modelImporting && !modelLoading && modelListLength !== 0 && (
+            {!modelImporting && modelListLength !== 0 && (
                 <Text style={styles.subtitle}>
                     {t('model.info.loaded')}:{' '}
                     <Text style={styles.modelTitle} ellipsizeMode="tail" numberOfLines={1}>
@@ -42,7 +34,7 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
                     </Text>
                 </Text>
             )}
-            {!modelImporting && !modelLoading && modelListLength === 0 && modelUpdatedAt && (
+            {!modelImporting && modelListLength === 0 && modelUpdatedAt && (
                 <View>
                     <Text style={styles.hint}>
                         <Trans
@@ -57,7 +49,7 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
                 </View>
             )}
 
-            {!modelLoading && modelImporting && (
+            {modelImporting && (
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Progress.Bar
                         style={{ flex: 5 }}
@@ -76,29 +68,7 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
                             color: color.text._100,
                             textAlign: 'center',
                         }}>
-                        Importing...
-                    </Text>
-                </View>
-            )}
-
-            {modelLoading && !modelImporting && (
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Progress.Bar
-                        style={{ flex: 5 }}
-                        progress={loadProgress / 100}
-                        color={color.primary._500}
-                        borderColor={color.neutral._300}
-                        height={12}
-                        borderRadius={12}
-                        width={null}
-                    />
-                    <Text
-                        style={{
-                            flex: 1,
-                            color: color.text._100,
-                            textAlign: 'center',
-                        }}>
-                        {loadProgress}%
+                        {t('common.messages.importingFile')}
                     </Text>
                 </View>
             )}

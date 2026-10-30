@@ -21,7 +21,6 @@ import { readableFileSize } from '@lib/utils/File'
 type ModelItemProps = {
     item: ModelListQueryType
     modelLoading: boolean
-    setModelLoading: (b: boolean) => void
     mmprojList: ModelDataType[]
     modelImporting: boolean
 }
@@ -30,7 +29,6 @@ const ModelItem: React.FC<ModelItemProps> = ({
     item,
     modelImporting,
     modelLoading,
-    setModelLoading,
     mmprojList,
 }) => {
     const { t } = useTranslation()
@@ -90,24 +88,22 @@ const ModelItem: React.FC<ModelItemProps> = ({
     }
 
     const handleLoadModel = async () => {
-        if (isLoaded) {
-            await unloadModel()
-            return
+        try {
+            if (isLoaded) await unloadModel()
+            else await loadModel(item)
+        } catch (error) {
+            Logger.error(error)
         }
-        setModelLoading(true)
-        await loadModel(item).catch((e) => {
-            Logger.errorToast(t('model.toast.failedtoload'), `${e}`)
-        })
-        setModelLoading(false)
     }
 
     const isMMPROJ = Model.isMMPROJ(item.architecture)
     const isLoaded = isMMPROJ ? mmprojId === item.id : modelId === item.id
 
     const disable =
-        modelLoading || isInvalid || modelImporting || isMMPROJ
-            ? !modelId || isLoaded
-            : modelId !== undefined
+        modelLoading ||
+        isInvalid ||
+        modelImporting ||
+        (isMMPROJ ? !modelId || isLoaded : modelId !== undefined)
     const disableEdit = isLoaded || modelLoading || isInvalid
     const disableDelete = isLoaded || modelLoading
 

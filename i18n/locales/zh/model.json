@@ -37,14 +37,11 @@
     "model.title": "模型",
     "model.toast.autoLoadingMMPROJ": "自动加载 MMPROJ：{{name}}",
     "model.toast.autoLoadingModel": "自动加载模型：{{name}}",
-    "model.toast.couldNotLoadModel": "无法加载模型",
     "model.toast.deletekv": "KV 缓存已删除！",
     "model.toast.failedToGenerateLocally": "本地生成失败",
-    "model.toast.failedToLoadMMPROJ": "加载 MMPROJ 失败",
     "model.toast.failedToRunLocalInference": "本地推理运行失败",
     "model.toast.failedToUnloadMMPROJ": "卸载 MMPROJ 失败",
     "model.toast.failedtolink": "链接模型失败",
-    "model.toast.failedtoload": "加载模型失败",
     "model.toast.mediaAddedWithoutMMPROJModel": "已添加媒体，但没有 MMPROJ 模型",
     "model.toast.mediaAddedWithoutMultimodalSupport": "已添加媒体，但不支持多模态。",
     "model.toast.modelAlreadyLoaded": "模型已加载！",
@@ -54,5 +51,9 @@
     "model.toast.noAutoLoadModelSet": "未设置自动加载模型",
     "model.toast.noModelLoaded": "未加载模型",
     "model.toast.quantizationNoLongerSupported": "量化不再受支持！",
-    "model.unlinkmmproj": "取消链接 MMPROJ"
+    "model.unlinkmmproj": "取消链接 MMPROJ",
+    "model.notice.loading": "正在加载模型 · {{name}}",
+    "model.notice.unloading": "正在卸载模型 · {{name}}",
+    "model.notice.projector": "正在加载投影器 · {{name}}",
+    "model.notice.failed": "模型操作失败：{{error}}"
 }

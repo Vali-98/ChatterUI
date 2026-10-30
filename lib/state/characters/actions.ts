@@ -136,57 +136,43 @@ export const duplicateCard = async (characterId: number) => {
     return createdId
 }
 
-export const importCardImage = async (imageUri: string) => {
+export type CardImportResult = { success: true; data: number } | { success: false; error: Error }
+
+const importFailure = (error: unknown): CardImportResult => ({
+    success: false,
+    error: error instanceof Error ? error : new Error(String(error)),
+})
+
+const importCardData = async (data: unknown, imageUri?: string): Promise<CardImportResult> => {
+    try {
+        const v2 = characterCardV2Schema.safeParse(data)
+        let card: CharacterCardV2
+        if (v2.success) card = v2.data
+        else {
+            const v1 = characterCardV1Schema.safeParse(data)
+            if (!v1.success) return importFailure(t('character.editor.errors.invalidCharacterCard'))
+            card = buildBlankCharacterCard(v1.data.name, v1.data)
+        }
+        const id = await createCard(card, { imageUri })
+        if (id === undefined) return importFailure(t('character.editor.errors.createFailed'))
+        return { success: true, data: id }
+    } catch (error) {
+        return importFailure(error)
+    }
+}
+
+export const importCardImage = async (imageUri: string): Promise<CardImportResult> => {
     try {
         const file = await readBase64Async(imageUri)
-        if (!file) {
-            Logger.errorToast(t('character.editor.errors.createFromImage'))
-            return
-        }
+        if (!file) return importFailure(t('character.editor.errors.createFromImage'))
         const [result] = extractPngTextChunk(file, {
             keywords: CHARACTER_CARD_TEXT_CHUNK_KEYWORDS,
         })
-
-        if (!result) {
-            Logger.errorToast(t('character.editor.errors.createFromImage'))
-            return
-        }
-
-        const card = JSON.parse(result.data)
-        if (card === undefined) {
-            Logger.errorToast(t('character.editor.errors.cardNoCharacter'))
-            return
-        }
-
-        return await importCardV2(card, imageUri)
-    } catch (e) {
-        Logger.errorToast(t('character.editor.errors.createFailed'))
-        Logger.error(`${e}`)
+        if (!result) return importFailure(t('character.editor.errors.createFromImage'))
+        return await importCardData(JSON.parse(result.data), imageUri)
+    } catch (error) {
+        return importFailure(error)
     }
-}
-
-const importCardV1 = async (data: unknown, imageUri?: string) => {
-    const result = characterCardV1Schema.safeParse(data)
-    if (result.error) {
-        Logger.errorToast(t('character.editor.errors.invalidCharacterCard'))
-        return
-    }
-    const converted = buildBlankCharacterCard(result.data.name, result.data)
-
-    Logger.info(`Creating new character: ${result.data.name}`)
-    return createCard(converted, { imageUri: imageUri })
-}
-
-const importCardV2 = async (data: unknown, imageUri?: string) => {
-    // check JSON def
-    const result = characterCardV2Schema.safeParse(data)
-    if (result.error) {
-        Logger.warnToast(t('character.editor.errors.v2ParsingFailedFallingBack'))
-        return await importCardV1(data, imageUri)
-    }
-
-    Logger.info(`Creating new character: ${result.data.data.name}`)
-    return await createCard(result.data, { imageUri: imageUri })
 }
 
 export const importCards = async () => {
@@ -197,6 +183,7 @@ export const importCards = async () => {
         completed: 0,
         succeeded: 0,
         failed: 0,
+        noticeDismissed: false,
     })
     try {
         const result = await DocumentPicker.getDocumentAsync({
@@ -210,14 +197,16 @@ export const importCards = async () => {
             result.assets.map(async (item) => {
                 let succeeded = false
                 try {
-                    let id: number | undefined
+                    let imported: CardImportResult
                     if (item.mimeType?.includes('application/json')) {
                         const data = await readStringAsync(item.uri)
-                        id = await importCardV2(JSON.parse(data))
+                        imported = await importCardData(JSON.parse(data))
                     } else if (item.mimeType?.includes('image/')) {
-                        id = await importCardImage(item.uri)
-                    }
-                    succeeded = id !== undefined
+                        imported = await importCardImage(item.uri)
+                    } else throw new Error(t('character.editor.errors.invalidCharacterCard'))
+                    succeeded = imported.success
+                    if (!imported.success)
+                        Logger.error(`Failed to create card from '${item.name}': ${imported.error}`)
                 } catch (error) {
                     Logger.error(`Failed to create card from '${item.name}': ${error}`)
                 } finally {
@@ -259,13 +248,12 @@ export const exportCard = async (characterId: number) => {
     }
 }
 
-export const createDefaultCard = async () => {
+export const createDefaultCard = async (): Promise<CardImportResult> => {
     try {
         const [asset] = await Asset.loadAsync(require('../../../assets/models/aibot.raw'))
         if (!asset.localUri) throw new Error('Default character asset has no local URI')
         return await importCardImage(asset.localUri)
-    } catch (e) {
-        Logger.errorToast(t('settings.character.errors.failedToCreateDefaultCharacter'))
-        Logger.error('Error: ' + e)
+    } catch (error) {
+        return importFailure(error)
     }
 }

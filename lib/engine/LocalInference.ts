@@ -35,7 +35,7 @@ const maybeLoadLinkedModel = async (
     if (!modelLink) return false
     const model = await Model.getModelWithMMProj(modelLink.value)
     if (!model) return false
-    Logger.infoToast(t('model.toast.autoLoadingModel', { name: model.name }))
+    Logger.info(t('model.toast.autoLoadingModel', { name: model.name }))
     await Llama.useLlamaModelStore
         .getState()
         .load(model, { generationId: generationId, config: inputs.localConfig })
@@ -51,8 +51,9 @@ export const verifyModelLoaded = async (
         throw new Error('Local model changed before generation execution')
 
     // Model Loading Routine, also check for character linked model
-    if (model || (await maybeLoadLinkedModel(inputs.character.id, generationId, inputs)))
-        return true
+    if (model) return true
+    if (await maybeLoadLinkedModel(inputs.character.id, generationId, inputs))
+        return !!Llama.useLlamaModelStore.getState().context
 
     const lastModel = inputs.lastLocalModel
     const autoLoad = inputs.autoLoadLocal
@@ -66,12 +67,12 @@ export const verifyModelLoaded = async (
     }
 
     // attempt to load model
-    Logger.infoToast(t('model.toast.autoLoadingModel', { name: lastModel.name }))
+    Logger.info(t('model.toast.autoLoadingModel', { name: lastModel.name }))
     await Llama.useLlamaModelStore
         .getState()
         .load(lastModel, { generationId: generationId, config: inputs.localConfig })
 
-    return true
+    return !!Llama.useLlamaModelStore.getState().context
 }
 
 export const localInference = async (generationId: number, inputs: GenerationInputs) => {

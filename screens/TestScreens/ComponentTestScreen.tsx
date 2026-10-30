@@ -146,7 +146,7 @@ const ComponentTestScreen = () => {
                         )}
                         <NoticeProgress
                             label="Generating summary"
-                            actions={<NoticeAction iconName="close" level="error" />}
+                            actions={<NoticeAction label="Cancel" />}
                         />
                         <Notice
                             label="Unfinished summary"

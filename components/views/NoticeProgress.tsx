@@ -21,6 +21,7 @@ const NoticeProgress = ({
     iconName,
     showPercentage = true,
     variant = 'neutral',
+    style,
     ...props
 }: NoticeProgressProps) => {
     const { color } = Theme.useTheme()
@@ -35,6 +36,7 @@ const NoticeProgress = ({
     return (
         <Notice
             {...props}
+            style={[percentage !== undefined && { paddingBottom: 8 }, style]}
             variant={variant}
             leading={leading}
             label={

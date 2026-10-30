@@ -20,7 +20,12 @@ import { AppSettings } from '../../constants/GlobalValues'
 import { Logger } from '../../state/Logger'
 import { createMMKVStorage, mmkv } from '../../storage/MMKV'
 import { isDeferredTaskRunning, useDeferredTaskState } from '../generation/deferredState'
-import { runLocalModelOperation } from '../generation/localResource'
+import {
+    failLocalModelActivity,
+    runLocalModelOperation,
+    startLocalModelActivity,
+    useLocalModelResourceState,
+} from '../generation/localResource'
 import { isActiveGeneration, useGenerationState } from '../generation/state'
 
 export type CompletionTimings = {
@@ -59,12 +64,10 @@ export type LlamaState = {
     context: LlamaContext | undefined
     model?: ModelDataType
     mmproj?: ModelDataType
-    loadProgress: number
     chatCount: number
     promptCache?: string
     load: (model: ModelListQueryType, options?: ModelAccessOptions) => Promise<void>
     loadMmproj: (model: ModelDataType, options?: ModelAccessOptions) => Promise<void>
-    setLoadProgress: (progress: number) => void
     unload: (options?: ModelAccessOptions) => Promise<void>
     saveKV: (prompt: string | undefined, media_paths?: string[]) => Promise<void>
     loadKV: () => Promise<boolean>
@@ -152,6 +155,8 @@ export namespace Llama {
         // would wait behind the load operation that is awaiting them.
         const unloadModel = async (options: ModelAccessOptions) => {
             assertModelAccess(options)
+            if (!get().context) return
+            startLocalModelActivity({ kind: 'unloading', name: get().model?.name ?? '' })
             if (get().mmproj) {
                 await get().context?.releaseMultimodal()
             }
@@ -168,6 +173,7 @@ export namespace Llama {
             assertModelAccess(options)
             const context = get().context
             if (!context) return
+            startLocalModelActivity({ kind: 'projector', name: model.name })
 
             let model_path = model.file_path
             if (model.file_path.includes('content://')) {
@@ -175,13 +181,16 @@ export namespace Llama {
             }
 
             Logger.info('Loading MMPROJ')
-            await context.initMultimodal({ path: model_path, use_gpu: true }).catch((e) => {
+            try {
+                await context.initMultimodal({ path: model_path, use_gpu: true })
+            } catch (error) {
                 if (model.file_path.includes('content://')) {
                     closeFd(model_path)
                 }
-
-                Logger.errorToast(t('model.toast.failedToLoadMMPROJ'), e)
-            })
+                Logger.error(error)
+                failLocalModelActivity(error)
+                return
+            }
             if (await context.isMultimodalEnabled()) {
                 const capabilities = await context.getMultimodalSupport()
                 Logger.info(
@@ -195,7 +204,6 @@ export namespace Llama {
         }
         return {
             context: undefined,
-            loadProgress: 0,
             chatCount: 0,
             promptCache: undefined,
             load: (model, options = {}) =>
@@ -221,6 +229,7 @@ export namespace Llama {
                     if (get().context !== undefined) {
                         await unloadModel(options)
                     }
+                    startLocalModelActivity({ kind: 'loading', name: model.name, progress: 0 })
 
                     let model_path = model.file_path
                     if (model.file_path.includes('content://')) {
@@ -244,15 +253,18 @@ export namespace Llama {
                     )
 
                     const progressCallback = (progress: number) => {
-                        if (progress % 5 === 0) get().setLoadProgress(progress)
+                        if (progress % 5 === 0)
+                            useLocalModelResourceState.setState((state) =>
+                                state.activity?.kind === 'loading'
+                                    ? { activity: { ...state.activity, progress } }
+                                    : state
+                            )
                     }
 
                     const llamaContext = await initLlama(params, progressCallback).catch(
                         (error) => {
-                            Logger.errorToast(
-                                t('model.toast.couldNotLoadModel'),
-                                JSON.stringify(error)
-                            )
+                            Logger.error(error)
+                            failLocalModelActivity(error)
                             if (model.file_path.includes('content://')) {
                                 closeFd(model_path)
                             }
@@ -280,9 +292,6 @@ export namespace Llama {
                 }),
             loadMmproj: (model, options = {}) =>
                 runLocalModelOperation(() => loadProjector(model, options)),
-            setLoadProgress: (progress: number) => {
-                set({ loadProgress: progress })
-            },
             unload: (options = {}) => runLocalModelOperation(() => unloadModel(options)),
             completion: async (
                 params: CompletionParams,

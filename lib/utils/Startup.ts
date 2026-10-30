@@ -67,8 +67,9 @@ const setAppDefaultSettings = () => {
 
 const createDefaultCard = async () => {
     if (!mmkv.getBoolean(AppSettings.CreateDefaultCard)) return
-    const id = await Characters.actions.createDefaultCard()
-    if (id !== undefined) mmkv.set(AppSettings.CreateDefaultCard, false)
+    const result = await Characters.actions.createDefaultCard()
+    if (result.success) mmkv.set(AppSettings.CreateDefaultCard, false)
+    else Logger.error(result.error)
 }
 
 const setCPUFeatures = async () => {

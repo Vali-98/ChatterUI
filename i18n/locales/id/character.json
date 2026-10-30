@@ -70,5 +70,8 @@
     "character.list.search.byTags": "Cari Berdasarkan Tag",
     "character.list.sort.label": "Urutkan Berdasarkan",
     "character.list.sort.recent": "Terbaru",
-    "character.editor.fields.tagsPlaceholder": "Tambah tag…"
+    "character.editor.fields.tagsPlaceholder": "Tambah tag…",
+    "character.import.progress": "Mengimpor karakter · {{completed}}/{{total}}",
+    "character.import.result": "{{succeeded}} karakter diimpor",
+    "character.import.resultWithFailures": "Diimpor {{succeeded}} · Gagal {{failed}}"
 }

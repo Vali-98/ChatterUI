@@ -3,14 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { SectionList } from 'react-native'
 import Animated, { Easing, SlideInLeft, SlideOutLeft } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useShallow } from 'zustand/react/shallow'
 
 import DownloadList from '@components/downloads/DownloadList'
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import SectionTitle from '@components/text/SectionTitle'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { Llama } from '@lib/engine/Local/LlamaLocal'
+import { useLocalModelResourceState } from '@lib/engine/generation/localResource'
 import { Model } from '@lib/engine/Local/Model'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -35,14 +34,8 @@ const ModelManagerScreen = () => {
     })
 
     const [showSettings, setShowSettings] = useState(false)
-    const [modelLoading, setModelLoading] = useState(false)
+    const modelLoading = useLocalModelResourceState((state) => state.operations > 0)
     const [modelImporting, setModelImporting] = useState(false)
-
-    const { setloadProgress } = Llama.useLlamaModelStore(
-        useShallow((state) => ({
-            setloadProgress: state.setLoadProgress,
-        }))
-    )
 
     const data = [
         {
@@ -83,7 +76,6 @@ const ModelManagerScreen = () => {
                     exiting={SlideOutLeft.easing(Easing.inOut(Easing.cubic))}>
                     <ModelInfoHeader
                         modelImporting={modelImporting}
-                        modelLoading={modelLoading}
                         modelListLength={modelList.length}
                         modelUpdatedAt={modelUpdatedAt}
                     />
@@ -96,10 +88,6 @@ const ModelManagerScreen = () => {
                                 item={item}
                                 mmprojList={mmprojList}
                                 modelLoading={modelLoading}
-                                setModelLoading={(b: boolean) => {
-                                    if (b) setloadProgress(0)
-                                    setModelLoading(b)
-                                }}
                                 modelImporting={modelImporting}
                             />
                         )}

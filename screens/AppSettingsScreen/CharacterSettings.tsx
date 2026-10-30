@@ -5,6 +5,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
 import { Characters } from '@lib/state/characters'
+import { Logger } from '@lib/state/Logger'
 
 const CharacterSettings = () => {
     const { t } = useTranslation()
@@ -26,7 +27,14 @@ const CharacterSettings = () => {
                             {
                                 label: t('settings.character.alert.regenerateDefaultCard.confirm'),
                                 onPress: async () => {
-                                    await Characters.actions.createDefaultCard()
+                                    const result = await Characters.actions.createDefaultCard()
+                                    if (!result.success)
+                                        Logger.errorToast(
+                                            t(
+                                                'settings.character.errors.failedToCreateDefaultCharacter'
+                                            ),
+                                            result.error
+                                        )
                                 },
                             },
                         ],

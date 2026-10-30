@@ -70,5 +70,8 @@
     "character.list.search.byTags": "Поиск по тегам",
     "character.list.sort.label": "Сортировать по",
     "character.list.sort.recent": "Последние",
-    "character.editor.fields.tagsPlaceholder": "Добавить тег…"
+    "character.editor.fields.tagsPlaceholder": "Добавить тег…",
+    "character.import.progress": "Импорт персонажей · {{completed}}/{{total}}",
+    "character.import.result": "Импортировано персонажей: {{succeeded}}",
+    "character.import.resultWithFailures": "Импортировано: {{succeeded}} · Ошибок: {{failed}}"
 }
