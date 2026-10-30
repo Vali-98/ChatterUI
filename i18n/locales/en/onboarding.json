@@ -34,7 +34,7 @@
     "onboarding.namePlaceholder": "User",
     "onboarding.descriptionPlaceholder": "A little about you…",
     "onboarding.addDescription": "Add description",
-    "onboarding.showAll": "Show all options",
+    "onboarding.showAll": "More connection options",
     "onboarding.configured": "Configured",
     "onboarding.modelReady": "Ready to go",
     "onboarding.autoLoadHint": "Your model will load automatically when you send a message in local mode.",

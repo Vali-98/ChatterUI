@@ -185,6 +185,8 @@ const ConnectionSetup = ({
             ))}
             {!showAll && (
                 <ThemedButton
+                    iconName="down"
+                    iconSize={16}
                     variant="secondary"
                     label={t('onboarding.showAll')}
                     onPress={() => setShowAll(!showAll)}

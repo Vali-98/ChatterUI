@@ -124,6 +124,7 @@ const Welcome = ({ onStart, disabled }: { onStart: () => void; disabled: boolean
                 <ThemedButton
                     label={t('onboarding.start')}
                     variant="secondary"
+                    level="primary"
                     iconName="right"
                     disabled={disabled || !introFinished}
                     onPress={onStart}
