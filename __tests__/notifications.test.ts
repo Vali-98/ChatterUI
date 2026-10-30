@@ -1,7 +1,7 @@
 import * as Notifications from 'expo-notifications'
 import { AppState, Platform } from 'react-native'
 
-import Alert from '../app/components/views/Alert'
+import Alert from '../components/views/Alert'
 import {
     registerForPushNotificationsAsync,
     setupNotifications,
@@ -24,7 +24,7 @@ jest.mock('../lib/storage/MMKV', () => ({ mmkv: { getBoolean: () => false } }))
 jest.mock('../lib/state/characters', () => ({ Characters: {} }))
 jest.mock('../lib/state/chat', () => ({ Chats: {} }))
 jest.mock('../lib/state/Logger', () => ({ Logger: {} }))
-jest.mock('../app/components/views/Alert', () => ({
+jest.mock('../components/views/Alert', () => ({
     __esModule: true,
     default: { alert: jest.fn() },
 }))

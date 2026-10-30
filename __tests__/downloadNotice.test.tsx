@@ -1,7 +1,7 @@
 import { act } from 'react'
 import { View } from 'react-native'
 
-import DownloadNotice from '../app/components/downloads/DownloadNotice'
+import DownloadNotice from '../components/downloads/DownloadNotice'
 import { useDownloadNoticeState } from '../lib/downloads/noticeState'
 
 const mockPush = jest.fn()
@@ -36,19 +36,19 @@ jest.mock('@react-native-vector-icons/ant-design/static', () => ({
     default: () =>
         require('react').createElement(require('react-native').View, { testID: 'download-icon' }),
 }))
-jest.mock('../app/components/text/TText', () => ({
+jest.mock('../components/text/TText', () => ({
     __esModule: true,
     default: require('react-native').Text,
 }))
-jest.mock('../app/components/buttons/IconButton', () =>
-    jest.requireMock('../app/components/buttons/ThemedButton')
+jest.mock('../components/buttons/IconButton', () =>
+    jest.requireMock('../components/buttons/ThemedButton')
 )
-jest.mock('../app/components/buttons/ThemedButton', () => ({
+jest.mock('../components/buttons/ThemedButton', () => ({
     __esModule: true,
     default: (props: object) =>
         require('react').createElement(require('react-native').Pressable, props),
 }))
-jest.mock('../app/components/downloads/DownloadItem', () => ({
+jest.mock('../components/downloads/DownloadItem', () => ({
     DownloadProgress: ({ progress }: { progress: number }) =>
         require('react').createElement(require('react-native').View, {
             testID: 'progress',

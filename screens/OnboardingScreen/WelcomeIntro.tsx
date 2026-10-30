@@ -183,7 +183,7 @@ const WelcomeIntro = ({
                         iconStyle,
                     ]}>
                     <Animated.Image
-                        source={require('../../../assets/images/adaptive-icon.png')}
+                        source={require('../../assets/images/adaptive-icon.png')}
                         onLoad={() => setImageLoaded(true)}
                         style={[{ position: 'absolute' }, artworkStyle]}
                     />

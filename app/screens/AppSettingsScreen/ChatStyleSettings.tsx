@@ -1,5 +1,5 @@
-import { Redirect } from 'expo-router'
+import ChatStyleSettings from '@screens/AppSettingsScreen/ChatStyleSettings'
 
-export default function AppearanceRedirect() {
-    return <Redirect href="/screens/AppSettingsScreen/AppearanceSettings" />
+export default function ChatStyleSettingsRoute() {
+    return <ChatStyleSettings />
 }

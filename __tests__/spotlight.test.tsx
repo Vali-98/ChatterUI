@@ -1,7 +1,7 @@
 import React, { act } from 'react'
 import { View } from 'react-native'
 
-import Spotlight from '../app/components/views/Spotlight'
+import Spotlight from '../components/views/Spotlight'
 
 let mockFrame: (frame: { timestamp: number }) => void
 let mockActive = false
@@ -21,11 +21,11 @@ jest.mock('../lib/theme/ThemeManager', () => ({
         useTheme: () => ({ color: { primary: { _500: '#aaa' }, neutral: { _200: '#222' } } }),
     },
 }))
-jest.mock('../app/components/text/TText', () => ({
+jest.mock('../components/text/TText', () => ({
     __esModule: true,
     default: require('react-native').Text,
 }))
-jest.mock('../app/components/buttons/ThemedButton', () => ({
+jest.mock('../components/buttons/ThemedButton', () => ({
     __esModule: true,
     default: ({ label, onPress }: { label: string; onPress: () => void }) =>
         require('react').createElement(require('react-native').Pressable, {
@@ -33,7 +33,7 @@ jest.mock('../app/components/buttons/ThemedButton', () => ({
             onPress,
         }),
 }))
-jest.mock('../app/components/views/Portal', () => ({
+jest.mock('../components/views/Portal', () => ({
     __esModule: true,
     default: ({ children }: { children: React.ReactNode }) =>
         require('react').createElement(

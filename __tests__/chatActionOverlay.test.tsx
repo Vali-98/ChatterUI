@@ -1,8 +1,8 @@
 import React, { act } from 'react'
 import { BackHandler } from 'react-native'
 
-import { ChatActionAnchorProvider } from '../app/screens/ChatScreen/ChatWindow/ChatActionAnchor'
-import ChatActionOverlay from '../app/screens/ChatScreen/ChatWindow/ChatActionOverlay'
+import { ChatActionAnchorProvider } from '../screens/ChatScreen/ChatWindow/ChatActionAnchor'
+import ChatActionOverlay from '../screens/ChatScreen/ChatWindow/ChatActionOverlay'
 import type { ChatMessage } from '../lib/state/chat/types'
 import { useChatActionsState } from '../lib/state/components/ChatControls'
 
@@ -21,7 +21,7 @@ jest.mock('../lib/state/chat', () => ({
 jest.mock('../lib/state/components/chatControlBounds', () => ({
     chatControlLift: { value: 0 },
 }))
-jest.mock('../app/screens/ChatScreen/ChatWindow/ChatQuickActions', () => ({
+jest.mock('../screens/ChatScreen/ChatWindow/ChatQuickActions', () => ({
     __esModule: true,
     default: () =>
         require('react').createElement(require('react-native').View, { testID: 'actions' }),

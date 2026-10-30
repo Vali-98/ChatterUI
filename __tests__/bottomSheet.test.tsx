@@ -1,6 +1,6 @@
 import React, { act, createRef } from 'react'
 import { Modal, View } from 'react-native'
-import BottomSheet, { type BottomSheetRefFunctions } from '../app/components/views/BottomSheet'
+import BottomSheet, { type BottomSheetRefFunctions } from '../components/views/BottomSheet'
 
 const mockFinishes: ((finished: boolean) => void)[] = []
 jest.mock('react-native/Libraries/Modal/Modal', () => ({

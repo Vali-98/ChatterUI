@@ -1,16 +1,16 @@
 import React, { act, createRef } from 'react'
 import { TextInput } from 'react-native'
 
-import SelectionSheet from '../app/components/input/SelectionSheet'
-import type { BottomSheetRefFunctions } from '../app/components/views/BottomSheet'
-import InputSheet from '../app/components/views/InputSheet'
+import SelectionSheet from '../components/input/SelectionSheet'
+import type { BottomSheetRefFunctions } from '../components/views/BottomSheet'
+import InputSheet from '../components/views/InputSheet'
 
-jest.mock('../app/components/views/EdgeFade/EdgeFades', () => ({
+jest.mock('../components/views/EdgeFade/EdgeFades', () => ({
     __esModule: true,
     default: () => null,
 }))
 
-jest.mock('../app/components/views/BottomSheet', () => {
+jest.mock('../components/views/BottomSheet', () => {
     const React = require('react')
     const Part = ({ children }: any) => React.createElement('Part', null, children)
     return {
@@ -25,18 +25,18 @@ jest.mock('../app/components/views/BottomSheet', () => {
         BottomSheetHeader: Part,
     }
 })
-jest.mock('../app/components/buttons/IconButton', () =>
-    jest.requireMock('../app/components/buttons/ThemedButton')
+jest.mock('../components/buttons/IconButton', () =>
+    jest.requireMock('../components/buttons/ThemedButton')
 )
-jest.mock('../app/components/buttons/ThemedButton', () => ({
+jest.mock('../components/buttons/ThemedButton', () => ({
     __esModule: true,
     default: (props: any) => require('react').createElement('Button', props),
 }))
-jest.mock('../app/components/buttons/ListButton', () => ({
+jest.mock('../components/buttons/ListButton', () => ({
     __esModule: true,
     default: (props: any) => require('react').createElement('Row', props),
 }))
-jest.mock('../app/components/input/ThemedTextInput', () => ({
+jest.mock('../components/input/ThemedTextInput', () => ({
     __esModule: true,
     default: Object.assign(
         (props: any) => require('react').createElement('Input', props, props.toolbar),
@@ -207,7 +207,7 @@ test('InputSheet resets by default, scopes remembered drafts, and retains failed
 })
 
 test.each([true, false])('the input exposes its native ref with autoUnfocus=%s', (autoUnfocus) => {
-    const Input = jest.requireActual('../app/components/input/ThemedTextInput').default
+    const Input = jest.requireActual('../components/input/ThemedTextInput').default
     const ref = createRef<TextInput>()
     let renderer: any
     act(() => {

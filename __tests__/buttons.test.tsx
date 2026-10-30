@@ -1,13 +1,13 @@
 import { act } from 'react'
 import { StyleSheet } from 'react-native'
 
-import IconButton from '../app/components/buttons/IconButton'
-import ThemedButton, { type ButtonVariant } from '../app/components/buttons/ThemedButton'
+import IconButton from '../components/buttons/IconButton'
+import ThemedButton, { type ButtonVariant } from '../components/buttons/ThemedButton'
 
 jest.mock('../lib/components/AnimatedComponents', () => ({
     AnimatedPressable: (props: object) => require('react').createElement('Button', props),
 }))
-jest.mock('../app/components/text/TText', () => ({
+jest.mock('../components/text/TText', () => ({
     __esModule: true,
     default: (props: object) => require('react').createElement('Label', props),
 }))

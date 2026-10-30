@@ -1,5 +1,5 @@
-import { Redirect } from 'expo-router'
+import ColorSelector from '@screens/AppSettingsScreen/ColorSelector'
 
-export default function AppearanceRedirect() {
-    return <Redirect href="/screens/AppSettingsScreen/AppearanceSettings" />
+export default function ColorSelectorRoute() {
+    return <ColorSelector />
 }

@@ -31,7 +31,7 @@ jest.mock('react-native-background-actions', () => ({
     default: { start: jest.fn(), stop: jest.fn(async () => {}) },
 }))
 jest.mock('i18next', () => ({ t: (key: string) => key }))
-jest.mock('../app/components/views/Alert', () => ({
+jest.mock('../components/views/Alert', () => ({
     __esModule: true,
     default: { alert: jest.fn() },
 }))
@@ -323,7 +323,7 @@ test('local context receives additional sources', async () => {
 })
 
 test('KV mismatch waits for a decision', async () => {
-    const Alert = require('../app/components/views/Alert').default
+    const Alert = require('../components/views/Alert').default
     const { pending } = startLocal({ saveLocalKV: true })
     await tickUntil(() => Alert.alert.mock.calls.length === 1)
     expect(model.completion).not.toHaveBeenCalled()
@@ -334,7 +334,7 @@ test('KV mismatch waits for a decision', async () => {
 })
 
 test('abort dismisses pending KV choice without starting completion', async () => {
-    const Alert = require('../app/components/views/Alert').default
+    const Alert = require('../components/views/Alert').default
     const { pending } = startLocal({ saveLocalKV: true })
     await tickUntil(() => Alert.alert.mock.calls.length === 1)
     await abortGeneration(10)

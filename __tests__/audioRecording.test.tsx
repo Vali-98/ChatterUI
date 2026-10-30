@@ -1,7 +1,7 @@
 import { act, create, type ReactTestRenderer } from 'react-test-renderer'
 import { requestRecordingPermissionsAsync, useAudioRecorder } from 'expo-audio'
 
-import AudioRecordingSheet from '../app/components/media/AudioRecordingSheet'
+import AudioRecordingSheet from '../components/media/AudioRecordingSheet'
 import { convertAudioAttachment } from '../lib/audio/files'
 import { stopAudioSource } from '../lib/audio/player'
 import { useAudioState } from '../lib/audio/state'
@@ -22,23 +22,23 @@ jest.mock('../lib/state/Logger', () => ({
     Logger: { stackTrace: jest.fn(), warnToast: jest.fn(), errorToast: jest.fn() },
 }))
 jest.mock('../lib/utils/File', () => ({ deleteFile: jest.fn() }))
-jest.mock('../app/components/media/AudioAttachment', () => ({
+jest.mock('../components/media/AudioAttachment', () => ({
     __esModule: true,
     default: () => null,
 }))
-jest.mock('../app/components/views/ThemedSpinner', () => ({
+jest.mock('../components/views/ThemedSpinner', () => ({
     __esModule: true,
     default: () => null,
 }))
-jest.mock('../app/components/views/BottomSheet', () => ({
+jest.mock('../components/views/BottomSheet', () => ({
     __esModule: true,
     default: ({ children }: { children: React.ReactNode }) => children,
 }))
-jest.mock('../app/components/text/TText', () => ({
+jest.mock('../components/text/TText', () => ({
     __esModule: true,
     default: require('react-native').Text,
 }))
-jest.mock('../app/components/buttons/ThemedButton', () => ({
+jest.mock('../components/buttons/ThemedButton', () => ({
     __esModule: true,
     default: ({ label, onPress }: { label: string; onPress: () => void }) =>
         require('react').createElement(require('react-native').Pressable, {

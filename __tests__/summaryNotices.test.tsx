@@ -1,6 +1,6 @@
 import { act } from 'react'
 
-import ChatNotices from '../app/screens/ChatScreen/ChatNotices'
+import ChatNotices from '../screens/ChatScreen/ChatNotices'
 
 const mockOpen = jest.fn()
 const mockRestore = jest.fn((id: number) => {
@@ -37,7 +37,7 @@ jest.mock('../lib/summaries/settingsStore', () => ({
     useSummarySettingsStore: (selector: (state: unknown) => unknown) =>
         selector({ warnOnSourceChanges: true }),
 }))
-jest.mock('../app/components/views/Notice', () => ({
+jest.mock('../components/views/Notice', () => ({
     __esModule: true,
     default: (props: object) =>
         require('react').createElement(require('react-native').View, {
@@ -50,18 +50,18 @@ jest.mock('../app/components/views/Notice', () => ({
             testID: 'collapsed',
         }),
 }))
-jest.mock('../app/components/text/TText', () => ({
+jest.mock('../components/text/TText', () => ({
     __esModule: true,
     default: require('react-native').Text,
 }))
-jest.mock('../app/components/buttons/IconButton', () =>
-    jest.requireMock('../app/components/buttons/ThemedButton')
+jest.mock('../components/buttons/IconButton', () =>
+    jest.requireMock('../components/buttons/ThemedButton')
 )
-jest.mock('../app/components/buttons/ThemedButton', () => ({
+jest.mock('../components/buttons/ThemedButton', () => ({
     __esModule: true,
     default: require('react-native').Pressable,
 }))
-jest.mock('../app/components/views/ThemedSpinner', () => ({
+jest.mock('../components/views/ThemedSpinner', () => ({
     __esModule: true,
     default: require('react-native').View,
 }))

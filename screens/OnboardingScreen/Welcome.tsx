@@ -66,7 +66,7 @@ const Welcome = ({ onStart, disabled }: { onStart: () => void; disabled: boolean
                     collapsable={false}
                     style={{ width: 80, height: 80, opacity: introFinished ? 1 : 0 }}>
                     <Image
-                        source={require('../../../assets/images/icon.png')}
+                        source={require('../../assets/images/icon.png')}
                         style={{ width: 80, height: 80, borderRadius: 20 }}
                     />
                 </Animated.View>

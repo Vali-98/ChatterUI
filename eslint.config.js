@@ -47,7 +47,7 @@ module.exports = defineConfig([
         },
     },
     {
-        files: ['app/**/*.{tsx,ts}'],
+        files: ['app/**/*.{tsx,ts}', 'components/**/*.{tsx,ts}', 'screens/**/*.{tsx,ts}'],
         rules: {
             'i18next/no-literal-string': ['warn', i18nRules],
         },
