@@ -75,7 +75,7 @@ export function useAppStateNotificationObserver() {
                 try {
                     await setId(chatId)
                     await setCard(characterId)
-                    router.navigate('/screens/ChatScreen')
+                    router.navigate('/chat')
                     Notifications.clearLastNotificationResponse()
                 } catch (e) {
                     Logger.error('Failed to load chat: ' + e)

@@ -36,7 +36,7 @@ const PlaybackPlayer = () => {
     )
     const audioId = useAudioState((state) => state.session?.id)
     const chatId = Chats.useChatState((state) => state.id)
-    const isChat = usePathname().endsWith('/screens/ChatScreen')
+    const isChat = usePathname() === '/chat'
     useEffect(() => {
         setTTSChatVisible(isChat)
         setAudioChatScope(isChat ? chatId : undefined)

@@ -18,7 +18,7 @@ const UserInfo = () => {
     return (
         <TouchableOpacity
             onPress={() => {
-                router.push('/screens/UserManagerScreen')
+                router.push('/users')
             }}
             style={{
                 alignItems: 'center',

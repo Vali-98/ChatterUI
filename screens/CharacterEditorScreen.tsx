@@ -258,7 +258,7 @@ const CharacterEditorScreen = () => {
                     label={t('character.editor.actions.manageLinks')}
                     icon="link"
                     onPress={() => {
-                        router.push('/screens/CharacterLinksScreen')
+                        router.push('/characterLinks')
                     }}
                 />
                 <ContextMenu.Button

@@ -135,8 +135,8 @@ const ChatInput = () => {
             onPress={() => {
                 if (activeProvider) return
                 if (mode === 'local') {
-                    router.push('/screens/ModelManagerScreen')
-                } else router.push('/screens/ConnectionsManagerScreen')
+                    router.push('/models')
+                } else router.push('/connections')
             }}
             onLayout={(e) => {
                 setHeight(e.nativeEvent.layout.height)

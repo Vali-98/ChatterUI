@@ -40,7 +40,7 @@ const loadNewestChat = async () => {
 export const loadChatOnInit = async () => {
     if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return
     await loadNewestChat()
-    router.push('/screens/ChatScreen')
+    router.push('/chat')
 }
 
 export const useTextIntentFocus = () => {
@@ -48,7 +48,7 @@ export const useTextIntentFocus = () => {
         if (!text || useOnboardingStore.getState().status !== 'complete') return
         useChatInputTextStore.getState().setText(text)
         if (router.canDismiss()) router.dismissAll()
-        router.push('/screens/ChatScreen')
+        router.push('/chat')
         await loadNewestChat()
     }, [])
 }

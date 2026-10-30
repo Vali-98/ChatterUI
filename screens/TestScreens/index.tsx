@@ -32,19 +32,19 @@ const TestScreens = () => {
             id: 'components',
             label: t('navigation.dev_components'),
             iconName: 'appstore',
-            onPress: () => router.push('/screens/TestScreens/Components'),
+            onPress: () => router.push('/testScreens/components'),
         },
         {
             id: 'colours',
             label: t('navigation.dev_colortest'),
             iconName: 'bg-colors',
-            onPress: () => router.push('/screens/TestScreens/Colours'),
+            onPress: () => router.push('/testScreens/colours'),
         },
         {
             id: 'markdown',
             label: t('navigation.dev_markdown'),
             iconName: 'file-markdown',
-            onPress: () => router.push('/screens/TestScreens/Markdown'),
+            onPress: () => router.push('/testScreens/markdown'),
         },
         {
             id: 'onboarding',

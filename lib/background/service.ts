@@ -69,7 +69,7 @@ export const updateDownloadNotification = (completed: number, total: number, cou
     void BackgroundService.updateNotification({
         taskTitle: count ? t('background.downloading', { count }) : options.taskTitle,
         taskDesc: count ? t('background.downloadHint') : options.taskDesc,
-        linkingURI: count ? 'chatterui://screens/ModelManagerScreen' : options.linkingURI,
+        linkingURI: count ? 'chatterui://models' : options.linkingURI,
         progressBar:
             count && total > 0
                 ? {

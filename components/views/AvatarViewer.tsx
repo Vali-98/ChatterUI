@@ -90,8 +90,8 @@ const AvatarViewer: React.FC<AvatarViewerProps> = ({ editorButton = true }) => {
                                 onPress={() => {
                                     router.push(
                                         isUser
-                                            ? '/screens/UserManagerScreen'
-                                            : '/screens/CharacterEditorScreen'
+                                            ? '/users'
+                                            : '/characterEditor'
                                     )
                                     setShow(false)
                                 }}

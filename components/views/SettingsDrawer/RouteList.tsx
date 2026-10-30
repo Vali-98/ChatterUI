@@ -85,7 +85,7 @@ const RouteList = () => {
     const paths = getPaths(appMode === 'remote', t)
     const testScreensLink: ButtonData = {
         name: t('navigation.dev_tests'),
-        path: '/screens/TestScreens',
+        path: '/testScreens',
         icon: 'experiment',
     }
     return (
@@ -124,22 +124,22 @@ const getPaths = (remote: boolean, t: (input: string) => string): ButtonData[] =
     remote
         ? {
               name: t('navigation.api'),
-              path: '/screens/ConnectionsManagerScreen',
+              path: '/connections',
               icon: 'link',
           }
         : {
               name: t('navigation.models'),
-              path: '/screens/ModelManagerScreen',
+              path: '/models',
               icon: 'branches',
           },
     {
         name: t('navigation.sampler'),
-        path: '/screens/SamplerManagerScreen',
+        path: '/samplers',
         icon: 'control',
     },
     {
         name: t('navigation.formatting'),
-        path: '/screens/FormattingManagerScreen',
+        path: '/formatting',
         icon: 'profile',
     },
     {
@@ -147,12 +147,12 @@ const getPaths = (remote: boolean, t: (input: string) => string): ButtonData[] =
         path: [
             {
                 name: t('summary.settings'),
-                path: '/screens/SummarySettingsScreen',
+                path: '/summarySettings',
                 icon: 'file-text',
             },
             {
                 name: t('navigation.lorebooks'),
-                path: '/screens/LorebookManagerScreen',
+                path: '/lorebooks',
                 icon: 'book',
             },
         ],
@@ -160,22 +160,22 @@ const getPaths = (remote: boolean, t: (input: string) => string): ButtonData[] =
     },
     {
         name: t('navigation.tts'),
-        path: '/screens/TTSManagerScreen',
+        path: '/tts',
         icon: 'sound',
     },
     {
         name: t('navigation.logs'),
-        path: '/screens/LogsScreen',
+        path: '/logs',
         icon: 'code',
     },
     {
         name: t('navigation.about'),
-        path: '/screens/AboutScreen',
+        path: '/about',
         icon: 'info-circle',
     },
     {
         name: t('navigation.settings'),
-        path: '/screens/AppSettingsScreen',
+        path: '/settings',
         icon: 'setting',
     },
 ]

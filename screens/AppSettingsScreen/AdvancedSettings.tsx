@@ -9,7 +9,7 @@ export default function AdvancedSettings() {
     return (
         <SettingsPage title={t('settings.categories.advanced.title')}>
             <GenerationDebugSettings />
-            <SettingsLink href="/screens/LogsScreen" icon="code" title={t('navigation.logs')} />
+            <SettingsLink href="/logs" icon="code" title={t('navigation.logs')} />
         </SettingsPage>
     )
 }

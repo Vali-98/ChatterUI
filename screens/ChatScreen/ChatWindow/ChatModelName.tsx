@@ -35,7 +35,7 @@ const ChatModelName = () => {
                 {model ? model.name : t('chat.model.noModelLoaded')}
             </Text>
             <TouchableOpacity
-                onPress={() => router.push('/screens/ModelManagerScreen')}
+                onPress={() => router.push('/models')}
                 style={{ paddingLeft: spacing.xl2, paddingVertical: spacing.m }}>
                 <AntDesign name="caret-right" color={color.primary._500} size={18} />
             </TouchableOpacity>

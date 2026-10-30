@@ -82,7 +82,7 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
                         closeOnPress={false}
                         onPress={(close) => {
                             close()
-                            router.push('/screens/CharacterEditorScreen')
+                            router.push('/characterEditor')
                         }}
                         label={t('chat.input.actions.editCharacter')}
                         icon="edit"

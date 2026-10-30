@@ -93,7 +93,7 @@ test('collapsed downloads stay compact across hosts and expand before navigation
     await act(async () =>
         screen.root.findAllByProps({ accessibilityRole: 'button' })[0].props.onPress()
     )
-    expect(mockPush).toHaveBeenCalledWith('/screens/ModelManagerScreen')
+    expect(mockPush).toHaveBeenCalledWith('/models')
     expect(useDownloadNoticeState.getState().collapsedFor).toBeUndefined()
     expect(
         screen.root.findAllByProps({ accessibilityLabel: 'common.actions.collapse' }).length

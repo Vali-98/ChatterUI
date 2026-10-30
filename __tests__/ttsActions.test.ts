@@ -84,7 +84,7 @@ test('jumping to a source supports the newest message and repeated jumps in the 
     const first = Chats.useChatState.getState().scrollData
     await jumpToTTSSource()
     expect(Chats.useChatState.getState().scrollData).not.toBe(first)
-    expect(router.navigate).toHaveBeenCalledWith('/screens/ChatScreen')
+    expect(router.navigate).toHaveBeenCalledWith('/chat')
     expect(useTTSState.getState().session?.swipeId).toBe(5)
 })
 
@@ -112,7 +112,7 @@ test('an explicit jump still completes when playback finishes during chat loadin
     })
     await jumpToTTSSource()
     expect(useTTSState.getState().session).toBeUndefined()
-    expect(router.navigate).toHaveBeenCalledWith('/screens/ChatScreen')
+    expect(router.navigate).toHaveBeenCalledWith('/chat')
     expect(Chats.useChatState.getState().scrollData).toMatchObject({ cause: 'search', index: 0 })
 })
 

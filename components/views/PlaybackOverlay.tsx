@@ -24,7 +24,7 @@ const PlaybackOverlay = ({ id, children }: { id?: number | string; children: Rea
     const inputHeight = useChatControlLayoutState((state) => state.inputHeight)
     const setPlayerHeight = useChatControlLayoutState((state) => state.setPlayerHeight)
     const releasePlayerHeight = useChatControlLayoutState((state) => state.releasePlayerHeight)
-    const isChat = usePathname().endsWith('/screens/ChatScreen')
+    const isChat = usePathname() === '/chat'
     const insets = useSafeAreaInsets()
     const { height } = useReanimatedKeyboardAnimation()
     useAnimatedReaction(

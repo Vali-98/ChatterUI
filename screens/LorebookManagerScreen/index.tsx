@@ -94,7 +94,7 @@ const LorebookListItem: React.FC<{ lorebook: LorebookType }> = ({ lorebook }) =>
             active={lorebook.active ?? false}
             onPress={() => {
                 setId(lorebook.id)
-                router.push('/screens/LorebookManagerScreen/LorebookInfo')
+                router.push('/lorebooks/info')
             }}>
             <ListCardSection style={{ columnGap: 12 }}>
                 <ThemedSwitch

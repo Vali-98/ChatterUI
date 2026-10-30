@@ -36,7 +36,7 @@ const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
     const setSampler = useSamplerStore((state) => state.setCurrentConfig)
 
     const handleOpenChat = async () => {
-        if (isLoading || path === '/screens/ChatScreen' || !character.id) return
+        if (isLoading || path === '/chat' || !character.id) return
         try {
             setIsLoading(true)
             await selectCharacterCard(character.id)
@@ -72,7 +72,7 @@ const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
             }
             await setId(chatId)
             setIsLoading(false)
-            router.push('/screens/ChatScreen')
+            router.push('/chat')
         } catch (error) {
             Logger.errorToast(t('character.list.errors.load', { error }))
             setIsLoading(false)
@@ -131,7 +131,7 @@ const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
         await selectCharacterCard(character.id)
         setIsLoading(false)
         close()
-        router.push('/screens/CharacterEditorScreen')
+        router.push('/characterEditor')
     }
 
     return (

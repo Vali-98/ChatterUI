@@ -35,7 +35,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ isLoading, setIsLoa
             setIsLoading(true)
             await selectCharacterCard(id)
             setIsLoading(false)
-            router.push('/screens/CharacterEditorScreen')
+            router.push('/characterEditor')
         })
     }
 

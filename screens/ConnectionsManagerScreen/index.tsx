@@ -51,7 +51,7 @@ const ConnectionsManagerScreen = () => {
                                 icon="file"
                                 label={t('connections.options.manageTemplates')}
                                 onPress={() => {
-                                    router.push('/screens/ConnectionsManagerScreen/TemplateManager')
+                                    router.push('/connections/templates')
                                 }}
                             />
                             <ContextMenu.Button

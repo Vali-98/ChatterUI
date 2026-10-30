@@ -32,7 +32,7 @@ const DownloadNotice = () => {
     const knownTotal = unfinished.every((item) => item.totalBytes > 0)
     const progress = total && knownTotal ? Math.min(100, (bytes / total) * 100) : 0
     const openDownloads = () => {
-        router.push('/screens/ModelManagerScreen')
+        router.push('/models')
     }
     if (collapsed)
         return (

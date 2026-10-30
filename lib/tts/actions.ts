@@ -46,5 +46,5 @@ export const jumpToTTSSource = async () => {
     // The clicked destination remains valid even if playback finishes while loading it.
     if (!(await Chats.actions.loadChat(session.chatId))) return
     Chats.useChatState.getState().setChat(session.chatId, { cause: 'search', index: index })
-    router.navigate('/screens/ChatScreen')
+    router.navigate('/chat')
 }

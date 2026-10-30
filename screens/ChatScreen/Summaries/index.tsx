@@ -357,7 +357,7 @@ const SummarySheet = () => {
     }, [chatId, ref])
     const openSettings = () => {
         close()
-        router.push('/screens/SummarySettingsScreen')
+        router.push('/summarySettings')
     }
     const run = (action: () => unknown) => {
         try {
