@@ -74,9 +74,6 @@ jest.mock('../lib/state/characters', () => ({
 jest.mock('../lib/state/characters/links', () => ({
     CharacterLinks: { db: { query: { links: async () => [] } } },
 }))
-jest.mock('../lib/state/characters/tokenState', () => ({
-    useCharacterTokenState: { getState: () => ({ countTokens: async () => ({}) }) },
-}))
 jest.mock('../lib/state/Instructs', () => ({
     Instructs: {
         useInstruct: {

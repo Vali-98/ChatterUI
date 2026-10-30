@@ -266,10 +266,6 @@ export const startupApp = async () => {
     // set cpu thread count
     setCPUThreads()
 
-    // patch Android text for bold Accessibility, still an issue here:
-    // https://github.com/Vali-98/ChatterUI/issues/511
-    // patchAndroidText()
-
     // set keep awake settings
     setKeepAwake()
 
@@ -295,4 +291,7 @@ export const startupApp = async () => {
     setUIBackgroundColor(backgroundColor)
 
     Logger.info('Resetting state values for startup.')
+    // note, there is an ancient RN bug where bold text accessibilty breaks
+    // text rendering, keep this in mind:
+    // https://github.com/react/react-native/issues/53666#issuecomment-3357502528
 }
