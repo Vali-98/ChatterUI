@@ -1,6 +1,6 @@
 import { useMMKVBoolean } from 'react-native-mmkv'
 
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { useAppMode } from '@lib/state/AppMode'
 
 import { useActiveConnection } from './ActiveConnection'

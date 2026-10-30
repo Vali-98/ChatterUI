@@ -2,9 +2,9 @@ import Toast from 'react-native-simple-toast'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import { Storage } from '@lib/enums/Storage'
+import { Storage } from '@lib/constants/storageKeys'
 
-import { AppSettings } from '../constants/GlobalValues'
+import { AppSettings } from '../constants/appSettings'
 import { createMMKVStorage, mmkv } from '../storage/MMKV'
 
 const toastTime = Toast.SHORT

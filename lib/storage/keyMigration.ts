@@ -1,7 +1,8 @@
 import type { MMKV } from 'react-native-mmkv'
 
-import { AppSettings, Global } from '@lib/constants/GlobalValues'
-import { Storage } from '@lib/enums/Storage'
+import { AppSettings } from '@lib/constants/appSettings'
+import { Global } from '@lib/constants/globalValues'
+import { Storage } from '@lib/constants/storageKeys'
 
 type KeyStorage = Pick<
     MMKV,

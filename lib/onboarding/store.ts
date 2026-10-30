@@ -3,9 +3,9 @@ import { persist } from 'zustand/middleware'
 
 import { onboardingGuideIds } from '@lib/guides/definitions'
 import { useGuideState } from '@lib/guides/state'
-import { Global } from '@lib/constants/GlobalValues'
+import { Global } from '@lib/constants/globalValues'
 import { Characters } from '@lib/state/characters'
-import { Storage } from '@lib/enums/Storage'
+import { Storage } from '@lib/constants/storageKeys'
 import { createMMKVStorage, mmkv } from '@lib/storage/MMKV'
 
 type OnboardingStore = {

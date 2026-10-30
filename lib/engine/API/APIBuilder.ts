@@ -1,7 +1,8 @@
 import { nativeApplicationVersion } from 'expo-application'
 import { t } from 'i18next'
 
-import { AppSettings, CLAUDE_VERSION } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
+import { CLAUDE_VERSION } from '@lib/constants/generation'
 import { SSEFetch } from '@lib/engine/SSEFetch'
 import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'

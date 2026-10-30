@@ -7,7 +7,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { Easing, FadeInUp, SlideInLeft } from 'react-native-reanimated'
 
 import { EdgeFadeFlatList } from '@components/views/EdgeFade'
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { useAppMode } from '@lib/state/AppMode'
 import { Theme } from '@lib/theme/ThemeManager'
 

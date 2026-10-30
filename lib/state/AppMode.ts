@@ -5,7 +5,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import Alert from '@components/views/Alert'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
-import { Storage } from '@lib/enums/Storage'
+import { Storage } from '@lib/constants/storageKeys'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
 type AppMode = 'local' | 'remote'

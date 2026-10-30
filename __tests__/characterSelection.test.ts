@@ -1,6 +1,6 @@
 import { addDatabaseChangeListener, type DatabaseChangeEvent } from 'expo-sqlite'
 
-import { Storage } from '../lib/enums/Storage'
+import { Storage } from '../lib/constants/storageKeys'
 import { useCharacterState } from '../lib/state/characters/state'
 import { useUserStore } from '../lib/state/characters/store'
 import type { CharacterCard } from '../lib/state/characters/types'

@@ -2,7 +2,7 @@ import React from 'react'
 import { View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type ChatFrameSkeletonProps = {

@@ -1,6 +1,6 @@
 import BackgroundService from 'react-native-background-actions'
 
-import { AppSettings } from '../lib/constants/GlobalValues'
+import { AppSettings } from '../lib/constants/appSettings'
 import { buildAndSendRequest } from '../lib/engine/API/APIBuilder'
 import {
     buildChatCompletionContext,

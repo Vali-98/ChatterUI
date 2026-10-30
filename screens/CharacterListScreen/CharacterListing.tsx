@@ -5,7 +5,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
 import Avatar from '@components/views/Avatar'
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { Characters, CharacterCardSummary } from '@lib/state/characters'
 import { useCharacterSortStore } from '@lib/state/characters/sortStore'
 import { Theme } from '@lib/theme/ThemeManager'

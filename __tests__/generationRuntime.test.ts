@@ -1,6 +1,6 @@
 import BackgroundService from 'react-native-background-actions'
 
-import { AppSettings } from '../lib/constants/GlobalValues'
+import { AppSettings } from '../lib/constants/appSettings'
 import { isDeferredTaskRunning, useDeferredTaskState } from '../lib/engine/generation/deferredState'
 import { runLocalModelOperation } from '../lib/engine/generation/localResource'
 import { beginGeneration } from '../lib/engine/generation/runtime'

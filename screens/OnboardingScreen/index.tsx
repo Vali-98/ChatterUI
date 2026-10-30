@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { defaultTemplates } from '@lib/engine/API/DefaultAPI'
 import { Llama } from '@lib/engine/Local/LlamaLocal'

@@ -7,7 +7,7 @@ import GuideHost from '@components/guides/GuideHost'
 import GuideTarget from '@components/guides/GuideTarget'
 import SupportButton from '@components/buttons/SupportButton'
 import Drawer from '@components/views/Drawer'
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import AppModeToggle from './AppModeToggle'

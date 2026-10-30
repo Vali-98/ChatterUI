@@ -2,7 +2,7 @@ import type { DownloadPauseState } from 'expo-file-system'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import { Storage } from '@lib/enums/Storage'
+import { Storage } from '@lib/constants/storageKeys'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
 export type Download = {

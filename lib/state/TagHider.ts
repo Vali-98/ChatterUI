@@ -3,8 +3,8 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
 
-import { AppSettings } from '@lib/constants/GlobalValues'
-import { Storage } from '@lib/enums/Storage'
+import { AppSettings } from '@lib/constants/appSettings'
+import { Storage } from '@lib/constants/storageKeys'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
 interface TagHiderStoreProps {

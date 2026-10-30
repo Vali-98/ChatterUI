@@ -1,10 +1,7 @@
 import { t } from 'i18next'
 
-import {
-    AppSettings,
-    CONTINUATION_PROMPT_KEY,
-    DEFAULT_CONTINUATION_PROMPT,
-} from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
+import { CONTINUATION_PROMPT_KEY, DEFAULT_CONTINUATION_PROMPT } from '@lib/constants/generation'
 import { useTextFilterStore } from '@lib/hooks/TextFilter'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { CharacterCard, CharacterTokenCounts } from '@lib/state/characters'

@@ -5,11 +5,8 @@ import { useMMKVBoolean, useMMKVString } from 'react-native-mmkv'
 import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import SettingsPage from '@components/settings/SettingsPage'
-import {
-    AppSettings,
-    CONTINUATION_PROMPT_KEY,
-    DEFAULT_CONTINUATION_PROMPT,
-} from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
+import { CONTINUATION_PROMPT_KEY, DEFAULT_CONTINUATION_PROMPT } from '@lib/constants/generation'
 import { mmkv } from '@lib/storage/MMKV'
 
 const GeneratingSettings = () => {

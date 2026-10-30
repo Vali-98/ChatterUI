@@ -1,6 +1,6 @@
 import { t } from 'i18next'
 
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Characters } from '@lib/state/characters'
 import { Logger } from '@lib/state/Logger'

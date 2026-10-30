@@ -11,7 +11,7 @@ import type { ChatMessage } from '../lib/state/chat/types'
 import type { InstructType } from '../lib/state/Instructs'
 import { Logger } from '../lib/state/Logger'
 import { mmkv } from '../lib/storage/MMKV'
-import { DEFAULT_CONTINUATION_PROMPT } from '../lib/constants/GlobalValues'
+import { DEFAULT_CONTINUATION_PROMPT } from '../lib/constants/generation'
 import { readBase64Async } from '../lib/utils/File'
 
 jest.mock('i18next', () => ({ t: (key: string) => key }))

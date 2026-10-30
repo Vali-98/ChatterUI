@@ -7,7 +7,7 @@ import {
     ensureCompletionNotificationChannel,
 } from '@lib/notifications/channels'
 
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { mmkv } from '@lib/storage/MMKV'
 
 export const notifyGenerationComplete = async (notification: {

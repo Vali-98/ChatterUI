@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import { Storage } from '@lib/enums/Storage'
+import { Storage } from '@lib/constants/storageKeys'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
 type GuideStore = {

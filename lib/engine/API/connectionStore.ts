@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
 
-import { Storage } from '@lib/enums/Storage'
+import { Storage } from '@lib/constants/storageKeys'
 import { CharacterLinks } from '@lib/state/characters/links'
 import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'

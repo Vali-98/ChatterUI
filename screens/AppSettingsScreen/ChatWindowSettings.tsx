@@ -5,7 +5,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 
 import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import SectionTitle from '@components/text/SectionTitle'
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 
 const ChatWindowSettings = () => {
     const { t } = useTranslation()

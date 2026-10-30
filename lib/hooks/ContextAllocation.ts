@@ -1,6 +1,6 @@
 import { useMMKVBoolean } from 'react-native-mmkv'
 
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { SamplerID } from '@lib/constants/SamplerData'
 import { useActiveConnectionTemplate } from '@lib/engine/API/connectionStore'
 import { getSystemPrompt } from '@lib/engine/API/ContextBuilder'

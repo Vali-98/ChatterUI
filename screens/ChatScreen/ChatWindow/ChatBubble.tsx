@@ -4,7 +4,7 @@ import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { useChatBubbleStyle } from '@lib/hooks/useChatBubbleStyle'
 import { useAppMode } from '@lib/state/AppMode'
 import { ChatMessage } from '@lib/state/chat'

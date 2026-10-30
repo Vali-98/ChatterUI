@@ -6,7 +6,7 @@ import { AppState, Linking } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 import Alert from '@components/views/Alert'
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { Characters } from '@lib/state/characters'
 import { Chats } from '@lib/state/chat'
 import { Logger } from '@lib/state/Logger'

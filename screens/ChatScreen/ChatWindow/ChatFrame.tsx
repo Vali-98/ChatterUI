@@ -4,7 +4,7 @@ import { Text, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 import Avatar from '@components/views/Avatar'
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { Characters } from '@lib/state/characters'
 import { ChatMessage } from '@lib/state/chat'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'

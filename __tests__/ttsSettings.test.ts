@@ -1,4 +1,4 @@
-import { Storage } from '../lib/enums/Storage'
+import { Storage } from '../lib/constants/storageKeys'
 import { useTTSSettingsStore } from '../lib/tts/settingsStore'
 
 jest.mock('../lib/storage/MMKV', () => ({

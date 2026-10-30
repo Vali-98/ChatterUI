@@ -2,7 +2,7 @@ import { t } from 'i18next'
 
 import Alert from '@components/views/Alert'
 import { CompletionTimings } from '@db/schema'
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'
 

@@ -1,4 +1,4 @@
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { Logger } from '@lib/state/Logger'
 import { mmkv } from '@lib/storage/MMKV'
 

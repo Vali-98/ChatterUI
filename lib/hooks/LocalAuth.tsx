@@ -2,7 +2,7 @@ import { authenticateAsync, getEnrolledLevelAsync, SecurityLevel } from 'expo-lo
 import { useCallback, useEffect, useState } from 'react'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 
 const useLocalAuth = () => {
     const [success, setSuccess] = useState(false)

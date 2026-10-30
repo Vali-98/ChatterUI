@@ -1,7 +1,7 @@
 import { DeviceType, getDeviceTypeAsync } from 'expo-device'
 import { lockAsync, OrientationLock } from 'expo-screen-orientation'
 
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { mmkv } from '@lib/storage/MMKV'
 
 export const lockScreenOrientation = async () => {

@@ -4,7 +4,7 @@ import { initReactI18next } from 'react-i18next'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import { Storage } from '@lib/enums/Storage'
+import { Storage } from '@lib/constants/storageKeys'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
 import en from './locales/en'

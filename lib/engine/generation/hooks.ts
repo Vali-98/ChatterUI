@@ -1,7 +1,7 @@
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { useAppModeStore } from '@lib/state/AppMode'
 
 import { useDeferredTaskState, isDeferredTaskRunning, dismissDeferredTask } from './deferredState'

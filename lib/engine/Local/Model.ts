@@ -9,7 +9,7 @@ import { persist } from 'zustand/middleware'
 
 import { db } from '@db/db'
 import { model_data, model_mmproj_links, ModelDataType } from '@db/schema'
-import { Storage } from '@lib/enums/Storage'
+import { Storage } from '@lib/constants/storageKeys'
 import { CharacterLinks } from '@lib/state/characters/links'
 import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'

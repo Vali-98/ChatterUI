@@ -1,5 +1,7 @@
-import { AppSettings, CONTINUATION_PROMPT_KEY, Global } from '../lib/constants/GlobalValues'
-import { Storage } from '../lib/enums/Storage'
+import { AppSettings } from '../lib/constants/appSettings'
+import { CONTINUATION_PROMPT_KEY } from '../lib/constants/generation'
+import { Global } from '../lib/constants/globalValues'
+import { Storage } from '../lib/constants/storageKeys'
 import { migrateMMKVKeys } from '../lib/storage/keyMigration'
 
 const mockValues = new Map<string, string | number | boolean>()

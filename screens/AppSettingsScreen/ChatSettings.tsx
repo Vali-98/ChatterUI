@@ -8,7 +8,7 @@ import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import SettingsPage from '@components/settings/SettingsPage'
 import SectionTitle from '@components/text/SectionTitle'
 import { useAudioSettingsStore } from '@lib/audio/settingsStore'
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 
 import ChatWindowSettings from './ChatWindowSettings'
 import TagHiderSettings from './TagHiderSettings'

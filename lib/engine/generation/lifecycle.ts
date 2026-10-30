@@ -1,4 +1,4 @@
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { publishDatabaseChanges } from '@lib/queries/databaseQuery'
 import { updateSwipe } from '@lib/state/chat/actions'
 import { db } from '@lib/state/chat/db'

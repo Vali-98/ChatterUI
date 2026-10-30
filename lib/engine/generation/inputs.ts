@@ -1,6 +1,6 @@
 import { RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER } from 'cui-llama.rn'
 
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { useTextFilterStore } from '@lib/hooks/TextFilter'
 import { Characters } from '@lib/state/characters'
 import { countCharacterTokens, prepareCharacterTokenText } from '@lib/state/characters/tokenCache'

@@ -7,7 +7,7 @@ import appConfig from '@appconfig'
 import SupportButton from '@components/buttons/SupportButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { AppSettings } from '@lib/constants/GlobalValues'
+import { AppSettings } from '@lib/constants/appSettings'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 
