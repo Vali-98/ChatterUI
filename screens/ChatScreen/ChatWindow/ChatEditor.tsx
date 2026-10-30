@@ -66,11 +66,13 @@ const MessageEditor = ({
     const [draft, setDraft] = useState(initialDraft)
     const [field, setField] = useState<EditorField>('content')
     const [saving, setSaving] = useState(false)
+    const committing = useRef(false)
     const [viewerIndex, setViewerIndex] = useState<number>()
     const images = draft.attachments.filter((item) => item.type === 'image')
     const save = async () => {
-        if (!editable || saving) return
-        setSaving(true)
+        if (!editable || committing.current) return
+        committing.current = true
+        setSaving(draft.attachments.some((item) => item.id === undefined))
         try {
             await Chats.actions.editMessage(entry.id, {
                 swipeId: swipe.id,
@@ -88,6 +90,7 @@ const MessageEditor = ({
             Logger.error(error)
             Logger.errorToast(t('chat.attachments.editFailed'))
         } finally {
+            committing.current = false
             setSaving(false)
         }
     }

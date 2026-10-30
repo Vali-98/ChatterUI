@@ -65,7 +65,6 @@ const SelectionSheet = <T,>(props: SelectionSheetProps<T>) => {
     } = props
     const [draft, setDraft] = useState<SelectionKey[]>([])
     const [filter, setFilter] = useState('')
-    const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
     const committing = useRef(false)
     const getSearchText = props.searchTextExtractor ?? labelExtractor
@@ -86,7 +85,6 @@ const SelectionSheet = <T,>(props: SelectionSheetProps<T>) => {
     const commit = async (keys: SelectionKey[]) => {
         if (committing.current) return
         committing.current = true
-        setSaving(true)
         setError('')
         try {
             const selection = getSelection(keys)
@@ -99,7 +97,6 @@ const SelectionSheet = <T,>(props: SelectionSheetProps<T>) => {
             setError(cause instanceof Error ? cause.message : String(cause))
         } finally {
             committing.current = false
-            setSaving(false)
         }
     }
     const select = (item: T) => {
@@ -130,8 +127,7 @@ const SelectionSheet = <T,>(props: SelectionSheetProps<T>) => {
                 setFilter('')
                 setError('')
             }}
-            onClose={props.onClose}
-            onRequestClose={saving ? () => {} : undefined}>
+            onClose={props.onClose}>
             <BottomSheetHeader
                 title={title ?? t('common.actions.select')}
                 style={{ paddingHorizontal: 16, paddingVertical: 16 }}>
@@ -139,7 +135,6 @@ const SelectionSheet = <T,>(props: SelectionSheetProps<T>) => {
                     <TextInput
                         value={filter}
                         onChangeText={setFilter}
-                        editable={!saving}
                         placeholder={t('dropdown.filter')}
                         placeholderTextColor={color.text._400}
                         style={{
@@ -162,7 +157,7 @@ const SelectionSheet = <T,>(props: SelectionSheetProps<T>) => {
                     { paddingHorizontal: 16, paddingVertical: 4, rowGap: 8 },
                     props.contentContainerStyle,
                 ]}
-                extraData={{ draft, saving }}
+                extraData={draft}
                 ListEmptyComponent={
                     <TText color="400" style={{ paddingVertical: 16 }}>
                         {t('common.emptyStates.noItems')}
@@ -172,11 +167,10 @@ const SelectionSheet = <T,>(props: SelectionSheetProps<T>) => {
                     const selected = draft.includes(keyExtractor(item))
                     const onPress = () => select(item)
                     return renderItem ? (
-                        <>{renderItem({ item, selected, disabled: saving, onPress })}</>
+                        <>{renderItem({ item, selected, disabled: false, onPress })}</>
                     ) : (
                         <ListButton
                             active={selected}
-                            disabled={saving}
                             onPress={onPress}
                             accessibilityState={{ selected }}
                             style={{ paddingHorizontal: 16, paddingVertical: 14, minHeight: 48 }}>
@@ -199,7 +193,7 @@ const SelectionSheet = <T,>(props: SelectionSheetProps<T>) => {
                     }}>
                     <ThemedButton
                         variant={props.buttonVariant ?? 'secondary'}
-                        disabled={saving || !canConfirm}
+                        disabled={!canConfirm}
                         label={confirmLabel ?? t('common.actions.select')}
                         onPress={() => {
                             void commit(draft)

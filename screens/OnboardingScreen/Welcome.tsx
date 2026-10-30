@@ -31,7 +31,7 @@ const useBubbleEntrance = (visible: boolean, delay: number) => {
     }))
 }
 
-const Welcome = ({ onStart, disabled }: { onStart: () => void; disabled: boolean }) => {
+const Welcome = ({ onStart, disabled = false }: { onStart: () => void; disabled?: boolean }) => {
     const { t } = useTranslation()
     const { color } = Theme.useTheme()
     const iconTarget = useAnimatedRef<View>()

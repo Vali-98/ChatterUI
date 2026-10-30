@@ -1,5 +1,5 @@
 import { usePathname, useRouter } from 'expo-router'
-import { ReactNode } from 'react'
+import { type ReactNode, type RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
@@ -14,15 +14,13 @@ import { useSamplerStore } from '@lib/state/samplerStore'
 
 type CharacterActionsMenuProps = {
     character: CharacterCardSummary
-    isLoading: boolean
-    setIsLoading: (b: boolean) => void
+    navigationPending: RefObject<boolean>
     children: ReactNode
 }
 
 const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
     character,
-    setIsLoading,
-    isLoading,
+    navigationPending,
     children,
 }) => {
     const { t } = useTranslation()
@@ -36,10 +34,10 @@ const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
     const setSampler = useSamplerStore((state) => state.setCurrentConfig)
 
     const handleOpenChat = async () => {
-        if (isLoading || path === '/chat' || !character.id) return
+        if (navigationPending.current || path === '/chat' || !character.id) return
+        navigationPending.current = true
         try {
-            setIsLoading(true)
-            await selectCharacterCard(character.id)
+            selectCharacterCard(character.id)
             character?.links.forEach((item) => {
                 switch (item.type) {
                     case 'user_id':
@@ -71,11 +69,11 @@ const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
                 return
             }
             await setId(chatId)
-            setIsLoading(false)
             router.push('/chat')
         } catch (error) {
             Logger.errorToast(t('character.list.errors.load', { error }))
-            setIsLoading(false)
+        } finally {
+            navigationPending.current = false
         }
     }
 
@@ -115,27 +113,22 @@ const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
                 {
                     label: t('character.editor.dialogs.clone.confirm'),
                     onPress: async () => {
-                        setIsLoading(true)
                         await Characters.actions.duplicateCard(character.id)
-
-                        setIsLoading(false)
                     },
                 },
             ],
         })
     }
 
-    const handleEditCard = async (close: () => void) => {
-        if (isLoading) return
-        setIsLoading(true)
-        await selectCharacterCard(character.id)
-        setIsLoading(false)
+    const handleEditCard = (close: () => void) => {
+        if (navigationPending.current) return
+        selectCharacterCard(character.id)
         close()
         router.push('/characterEditor')
     }
 
     return (
-        <ContextMenu disabled={isLoading || path !== '/'} placement="center">
+        <ContextMenu disabled={path !== '/'} placement="center">
             <ContextMenu.Trigger onPress={handleOpenChat} longPress delayLongPress={300}>
                 <View pointerEvents="none">{children}</View>
             </ContextMenu.Trigger>

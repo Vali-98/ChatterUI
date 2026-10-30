@@ -14,7 +14,7 @@ export const createCardSelection = () => {
         id: undefined,
         card: undefined,
         error: undefined,
-        setCard: async (characterId) => {
+        setCard: (characterId) => {
             if (get().id === characterId) liveQuery?.refresh()
             else set({ id: characterId, card: undefined, error: undefined })
             const { card, error } = get()

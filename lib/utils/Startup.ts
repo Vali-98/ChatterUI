@@ -33,7 +33,7 @@ const loadNewestChat = async () => {
     Logger.info('Loading latest chat')
     const newestChat = await Chats.db.query.latestChat()
     if (!newestChat) return
-    await Characters.useCharacterState.getState().setCard(newestChat.character_id)
+    Characters.useCharacterState.getState().setCard(newestChat.character_id)
     await Chats.actions.loadChat(newestChat.id)
 }
 
@@ -188,7 +188,7 @@ const migrateTextIntent_0_8_8_to_0_8_9 = () => {
 
 const createDefaultUserData = async () => {
     const id = await Characters.db.create.blankCard('User', { type: 'user' })
-    await Characters.useUserStore.getState().setCard(id)
+    Characters.useUserStore.getState().setCard(id)
 }
 
 const setDefaultUser = async () => {
@@ -203,7 +203,7 @@ const setDefaultUser = async () => {
         Logger.warn('No Users exist, creating default Users')
         await createDefaultUserData()
     } else if (userList.length > 0 && !Characters.useUserStore.getState().card) {
-        await Characters.useUserStore.getState().setCard(userList[0].id)
+        Characters.useUserStore.getState().setCard(userList[0].id)
     }
 }
 

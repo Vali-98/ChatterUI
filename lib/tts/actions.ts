@@ -42,7 +42,7 @@ export const jumpToTTSSource = async () => {
         Logger.warnToast(t('tts.sourceUnavailable'))
         return
     }
-    await Characters.useCharacterState.getState().setCard(chat.character_id)
+    Characters.useCharacterState.getState().setCard(chat.character_id)
     // The clicked destination remains valid even if playback finishes while loading it.
     if (!(await Chats.actions.loadChat(session.chatId))) return
     Chats.useChatState.getState().setChat(session.chatId, { cause: 'search', index: index })

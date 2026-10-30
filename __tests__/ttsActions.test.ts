@@ -23,7 +23,7 @@ jest.mock('../lib/storage/MMKV', () => ({
     createMMKVStorage: () => ({ getItem: () => null, setItem: jest.fn(), removeItem: jest.fn() }),
 }))
 jest.mock('../lib/state/characters', () => ({
-    Characters: { useCharacterState: { getState: () => ({ setCard: jest.fn(async () => {}) }) } },
+    Characters: { useCharacterState: { getState: () => ({ setCard: jest.fn() }) } },
 }))
 jest.mock('../lib/state/chat', () => ({
     Chats: {

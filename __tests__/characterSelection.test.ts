@@ -104,8 +104,8 @@ afterEach(async () => {
 })
 
 test('character and user expose the same load API with a single live observer each', async () => {
-    expect(await useCharacterState.getState().setCard(1)).toBe('Character')
-    expect(await useUserStore.getState().setCard(2)).toBe('User')
+    expect(useCharacterState.getState().setCard(1)).toBe('Character')
+    expect(useUserStore.getState().setCard(2)).toBe('User')
     expect(listeners.size).toBe(2)
     expect(useCharacterState.getState().getImageUri()).toBe('/cards/11.png')
     expect(useUserStore.getState().getImageUri()).toBe('/cards/12.png')
@@ -118,8 +118,8 @@ test('character and user expose the same load API with a single live observer ea
 })
 
 test('all included relations refresh both snapshots and deletion clears their selection', async () => {
-    await useCharacterState.getState().setCard(1)
-    await useUserStore.getState().setCard(2)
+    useCharacterState.getState().setCard(1)
+    useUserStore.getState().setCard(2)
     for (const table of ['character_greetings', 'character_tags', 'tags', 'characterLinks']) {
         records.set(1, card(1, table))
         records.set(2, card(2, table))
@@ -175,21 +175,21 @@ test('missing stored users and v1 snapshots clear selection rather than trusting
 })
 
 test('reselecting the same ID explicitly refreshes without replacing the database listener', async () => {
-    await useCharacterState.getState().setCard(1)
+    useCharacterState.getState().setCard(1)
     records.set(1, card(1, 'Fresh'))
     const count = jest.mocked(addDatabaseChangeListener).mock.calls.length
-    expect(await useCharacterState.getState().setCard(1)).toBe('Fresh')
+    expect(useCharacterState.getState().setCard(1)).toBe('Fresh')
     expect(jest.mocked(addDatabaseChangeListener)).toHaveBeenCalledTimes(count)
-    expect(await useUserStore.getState().setCard(999)).toBeUndefined()
+    expect(useUserStore.getState().setCard(999)).toBeUndefined()
     expect(useUserStore.getState().id).toBeUndefined()
 })
 
-test('selection refresh failures reject without discarding the last good record', async () => {
-    await useCharacterState.getState().setCard(1)
+test('selection refresh failures throw without discarding the last good record', async () => {
+    useCharacterState.getState().setCard(1)
     read.mockImplementationOnce(() => {
         throw new Error('read failed')
     })
-    await expect(useCharacterState.getState().setCard(1)).rejects.toThrow('read failed')
+    expect(() => useCharacterState.getState().setCard(1)).toThrow('read failed')
     expect(useCharacterState.getState().card?.name).toBe('Character')
     expect(useCharacterState.getState().id).toBe(1)
     emit('characters', 1)

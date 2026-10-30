@@ -51,7 +51,7 @@ const UserListing: React.FC<UserListingProps> = ({ user }) => {
                                 const id = await Characters.db.create.blankCard(defaultName, {
                                     type: 'user',
                                 })
-                                await setCard(id)
+                                setCard(id)
                                 return
                             }
                             if (userId && list.some((item) => item.id === userId)) return
@@ -89,8 +89,8 @@ const UserListing: React.FC<UserListingProps> = ({ user }) => {
         <ContextMenu placement="center">
             <ContextMenu.Trigger
                 longPress
-                onPress={async () => {
-                    await setCard(user.id)
+                onPress={() => {
+                    setCard(user.id)
                     setShowDrawer(false)
                 }}>
                 <View

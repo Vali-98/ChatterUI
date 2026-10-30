@@ -57,7 +57,7 @@ export type CharacterCardSelectionState = {
     card?: CharacterCard
     id: number | undefined
     error?: Error
-    setCard: (characterId: number) => Promise<string | undefined>
+    setCard: (characterId: number) => string | undefined
     unloadCard: () => void
     getImageUri: () => string
 }

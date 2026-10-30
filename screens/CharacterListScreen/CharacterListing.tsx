@@ -1,3 +1,4 @@
+import type { RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -15,15 +16,10 @@ import CharacterListingTags from './CharacterListingTags'
 
 type CharacterListingProps = {
     character: CharacterCardSummary
-    isLoading: boolean
-    setIsLoading: (b: boolean) => void
+    navigationPending: RefObject<boolean>
 }
 
-const CharacterListing: React.FC<CharacterListingProps> = ({
-    character,
-    isLoading,
-    setIsLoading,
-}) => {
+const CharacterListing: React.FC<CharacterListingProps> = ({ character, navigationPending }) => {
     const { t } = useTranslation()
     const [showTags] = useMMKVBoolean(AppSettings.ShowTags)
     const { setShowSearch, setTagFilter, tagFilter } = useCharacterSortStore(
@@ -43,10 +39,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
 
     return (
         <View>
-            <CharacterActionsMenu
-                character={character}
-                setIsLoading={setIsLoading}
-                isLoading={isLoading}>
+            <CharacterActionsMenu character={character} navigationPending={navigationPending}>
                 <View style={styles.longButtonContainer}>
                     <Avatar
                         targetImage={Characters.getCardImageUri(character.image_id)}

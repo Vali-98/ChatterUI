@@ -52,7 +52,7 @@ export const loadChat = async (chatId: number) => {
     if (chat.user_id !== null && mmkv.getBoolean(AppSettings.AutoLoadUser)) {
         const user = Characters.useUserStore.getState()
         if (user.id !== chat.user_id) {
-            const name = await user.setCard(chat.user_id)
+            const name = user.setCard(chat.user_id)
             if (name) Logger.infoToast(t('users.messages.loadingUser', { name }))
             else Logger.warn(`Failed to load user card ${chat.user_id}; it may have been deleted.`)
         }

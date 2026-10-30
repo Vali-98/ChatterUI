@@ -253,3 +253,38 @@ test('InputSheet configures each footer button while retaining its save/dismiss 
     expect(onClose).toHaveBeenCalledTimes(2)
     act(() => renderer.unmount())
 })
+
+test('local async selections stay interactive without disabled styling', async () => {
+    const ref = createRef<BottomSheetRefFunctions>()
+    let finish!: () => void
+    const onSelect = jest.fn(
+        () =>
+            new Promise<void>((resolve) => {
+                finish = resolve
+            })
+    )
+    let renderer: any
+    act(() => {
+        renderer = create(
+            <SelectionSheet
+                ref={ref}
+                items={items}
+                keyExtractor={keyExtractor}
+                labelExtractor={labelExtractor}
+                selectedKey={0}
+                onSelect={onSelect}
+                closeOnSelect={false}
+                search
+            />
+        )
+    })
+    act(() => ref.current!.open())
+    act(() => renderer.root.findAllByType('Row')[1].props.onPress())
+    expect(renderer.root.findAllByType('Row').some((row: any) => row.props.disabled)).toBe(false)
+    expect(renderer.root.findByType(TextInput).props.editable).not.toBe(false)
+    expect(renderer.root.findByType('Sheet').props.onRequestClose).toBeUndefined()
+    act(() => renderer.root.findAllByType('Row')[0].props.onPress())
+    expect(onSelect).toHaveBeenCalledTimes(1)
+    await act(async () => finish())
+    act(() => renderer.unmount())
+})

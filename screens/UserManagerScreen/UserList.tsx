@@ -46,7 +46,7 @@ const UserList = () => {
                 autoFocus
                 onConfirm={async (text) => {
                     const id = await Characters.db.create.blankCard(text, { type: 'user' })
-                    await setCard(id)
+                    setCard(id)
                 }}
             />
             <View

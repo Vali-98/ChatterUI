@@ -91,7 +91,6 @@ const ListEditorSheet = <T,>({
         }
     })
     const [expanded, setExpanded] = useState(false)
-    const [busy, setBusy] = useState(false)
     const [error, setError] = useState('')
     const pending = useRef(false)
     useKeyboardHandler(
@@ -144,14 +143,12 @@ const ListEditorSheet = <T,>({
             const result = action()
             if (result) {
                 pending.current = true
-                setBusy(true)
                 void result
                     .catch((cause) => {
                         setError(cause instanceof Error ? cause.message : String(cause))
                     })
                     .finally(() => {
                         pending.current = false
-                        setBusy(false)
                     })
             }
         } catch (cause) {
@@ -259,8 +256,7 @@ const ListEditorSheet = <T,>({
                     setFilter('')
                     setEntryFocused(false)
                     setError('')
-                }}
-                onRequestClose={busy ? () => {} : undefined}>
+                }}>
                 <Animated.View style={{ flexShrink: 1 }}>
                     <BottomSheetHeader
                         title={title ?? t('common.actions.edit')}
@@ -303,7 +299,6 @@ const ListEditorSheet = <T,>({
                                             iconName="close"
                                             level="muted"
                                             iconSize={10}
-                                            disabled={busy}
                                             accessibilityLabel={t('common.actions.delete')}
                                             onPress={() => {
                                                 void perform(() =>
@@ -358,7 +353,6 @@ const ListEditorSheet = <T,>({
                                                 iconName="plus"
                                                 iconSize={12}
                                                 variant="tertiary"
-                                                disabled={busy}
                                                 viewStyle={[itemStyle, { maxWidth: '100%' }]}
                                                 onPress={() => {
                                                     void perform(() => append(item))
@@ -370,7 +364,6 @@ const ListEditorSheet = <T,>({
                                         <ThemedTextInput
                                             value={filter}
                                             onChangeText={setFilter}
-                                            editable={!busy}
                                             placeholder={t('dropdown.filter')}
                                         />
                                     )}
@@ -393,7 +386,6 @@ const ListEditorSheet = <T,>({
                                     placeholder={placeholder ?? t('common.placeholders.addItem')}
                                     viewStyle={{ flex: 1 }}
                                     onFocus={() => setEntryFocused(true)}
-                                    editable={!busy}
                                     multiline={multiline}
                                     onSubmitEditing={!multiline ? addText : undefined}
                                     returnKeyType={!multiline ? 'done' : undefined}
@@ -401,7 +393,7 @@ const ListEditorSheet = <T,>({
                                 />
                                 <ThemedButton
                                     label={t('common.actions.add')}
-                                    disabled={busy || text.length === 0}
+                                    disabled={text.length === 0}
                                     onPress={addText}
                                 />
                             </View>
@@ -413,13 +405,11 @@ const ListEditorSheet = <T,>({
                                         ? 'common.actions.close'
                                         : 'common.actions.save'
                                 )}
-                                disabled={busy}
                                 onPress={() => sheet.current?.close()}
                             />
                             {commitMode === 'confirm' && (
                                 <BottomSheetButton
                                     label={confirmLabel ?? t('common.actions.save')}
-                                    disabled={busy}
                                     onPress={() => {
                                         void perform(async () => {
                                             await onChangeValue([...draft])

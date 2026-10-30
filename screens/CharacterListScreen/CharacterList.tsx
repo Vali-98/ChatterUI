@@ -1,5 +1,5 @@
 import { usePathname } from 'expo-router'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
 import Animated, { LinearTransition } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
@@ -23,7 +23,7 @@ import CharactersSearchEmpty from './CharactersSearchEmpty'
 const PAGE_SIZE = 30
 
 const CharacterList: React.FC = () => {
-    const [isLoading, setIsLoading] = useState(false)
+    const navigationPending = useRef(false)
     const { sortBy, sortDirection, tagFilter, textFilter } = useCharacterSortStore(
         useShallow((state) => ({
             sortBy: state.searchType,
@@ -96,7 +96,7 @@ const CharacterList: React.FC = () => {
                 )}
                 headerRight={() => (
                     <GuideTarget id="main.import">
-                        <CharacterNewMenu isLoading={isLoading} setIsLoading={setIsLoading} />
+                        <CharacterNewMenu navigationPending={navigationPending} />
                     </GuideTarget>
                 )}
             />
@@ -113,11 +113,7 @@ const CharacterList: React.FC = () => {
                     data={characterList}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
-                        <CharacterListing
-                            character={item}
-                            isLoading={isLoading}
-                            setIsLoading={setIsLoading}
-                        />
+                        <CharacterListing character={item} navigationPending={navigationPending} />
                     )}
                     onEndReachedThreshold={1}
                     onEndReached={() => {

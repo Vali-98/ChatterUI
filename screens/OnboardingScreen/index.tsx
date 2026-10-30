@@ -1,5 +1,5 @@
 import { router, useFocusEffect, usePathname, Stack } from 'expo-router'
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BackHandler, ScrollView, View, useColorScheme } from 'react-native'
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
@@ -69,7 +69,7 @@ const OnboardingScreen = () => {
         )
     )
     const [themeChosen, setThemeChosen] = useState(false)
-    const [saving, setSaving] = useState(false)
+    const advancing = useRef(false)
     const [error, setError] = useState('')
     const { data: models } = useLiveQueryAsync(Model.getModelListQuery(), {
         key: ['onboarding-models'],
@@ -103,21 +103,21 @@ const OnboardingScreen = () => {
         useCallback(() => {
             const listener = BackHandler.addEventListener('hardwareBackPress', () => {
                 if (step === 0) return false
-                if (!saving) onboarding.setStep(step - 1)
+                if (!advancing.current) onboarding.setStep(step - 1)
                 return true
             })
             return () => listener.remove()
-        }, [step, saving, onboarding.setStep])
+        }, [step, onboarding.setStep])
     )
     const next = async () => {
-        if (saving) return
-        setSaving(true)
+        if (advancing.current) return
+        advancing.current = true
         setError('')
         try {
             if (step === 1 && personaComplete && user) {
                 await Characters.db.update.cardFields(user.id, { name: name.trim(), description })
                 if (avatar) await Characters.actions.updateCardImage(user.id, avatar)
-                await setCard(user.id)
+                setCard(user.id)
             }
             if (step === 2) {
                 setAppMode(mode)
@@ -147,7 +147,7 @@ const OnboardingScreen = () => {
         } catch (error) {
             setError(error instanceof Error ? error.message : String(error))
         } finally {
-            setSaving(false)
+            advancing.current = false
         }
     }
     const renderStep = () => {
@@ -158,7 +158,6 @@ const OnboardingScreen = () => {
                         onStart={() => {
                             void next()
                         }}
-                        disabled={saving}
                     />
                 )
             case 1:
@@ -280,8 +279,9 @@ const OnboardingScreen = () => {
                                     justifyContent: 'center',
                                 }}
                                 labelStyle={{ fontSize: 17 }}
-                                disabled={saving}
-                                onPress={() => onboarding.setStep(step - 1)}
+                                onPress={() => {
+                                    if (!advancing.current) onboarding.setStep(step - 1)
+                                }}
                             />
                         )}
                         <ThemedButton
@@ -296,7 +296,6 @@ const OnboardingScreen = () => {
                                 borderRadius: 14,
                             }}
                             labelStyle={{ fontSize: 17 }}
-                            disabled={saving}
                             onPress={() => {
                                 void next()
                             }}

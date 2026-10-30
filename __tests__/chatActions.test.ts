@@ -147,7 +147,7 @@ const userSelection = {
     id: 2,
     card: undefined,
     error: undefined,
-    setCard: jest.fn<Promise<string | undefined>, [number]>(),
+    setCard: jest.fn<string | undefined, [number]>(),
     unloadCard: jest.fn(),
     getImageUri: jest.fn(),
 }
@@ -179,7 +179,7 @@ beforeEach(() => {
     jest.mocked(db.create.chat).mockReturnValue(99)
     jest.mocked(db.create.message).mockReturnValue(source.messages[0])
     userSelection.id = 2
-    userSelection.setCard.mockResolvedValue('User')
+    userSelection.setCard.mockReturnValue('User')
     jest.mocked(Characters.useUserStore.getState).mockReturnValue(userSelection)
     useChatState.getState().reset()
     useGenerationState.setState({ generations: {} })

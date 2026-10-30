@@ -56,7 +56,6 @@ const InputSheet = ({
     const { color } = Theme.useTheme()
     const [text, setText] = useState(defaultValue)
     const [error, setError] = useState('')
-    const [saving, setSaving] = useState(false)
     const identity = useRef<string | number | undefined>(undefined)
     const saved = useRef(false)
     const committing = useRef(false)
@@ -68,7 +67,6 @@ const InputSheet = ({
             return
         }
         committing.current = true
-        setSaving(true)
         setError('')
         try {
             await onConfirm(text)
@@ -78,7 +76,6 @@ const InputSheet = ({
             setError(cause instanceof Error ? cause.message : String(cause))
         } finally {
             committing.current = false
-            setSaving(false)
         }
     }
     return (
@@ -99,8 +96,7 @@ const InputSheet = ({
             onClose={() => {
                 setError('')
                 onClose?.()
-            }}
-            onRequestClose={saving ? () => {} : undefined}>
+            }}>
             {(title || description) && (
                 <BottomSheetHeader
                     title={title}
@@ -115,20 +111,17 @@ const InputSheet = ({
                     placeholder={placeholder}
                     value={text}
                     onChangeText={setText}
-                    editable={!saving}
                     numberOfLines={multiline ? 10 : 1}
                     toolbar={
                         <>
                             <ThemedTextInput.Action
                                 label={t('common.actions.clear')}
                                 iconName="close"
-                                disabled={saving}
                                 onPress={() => setText('')}
                             />
                             <ThemedTextInput.Action
                                 label={t('common.actions.paste')}
                                 iconName={{ family: 'material', name: 'content-paste' }}
-                                disabled={saving}
                                 onPress={async () => {
                                     const paste = await getStringAsync()
                                     if (paste) setText((value) => value + paste)
@@ -146,14 +139,14 @@ const InputSheet = ({
                     variant="secondary"
                     {...cancelButtonProps}
                     label={cancelLabel ?? t('common.actions.close')}
-                    disabled={saving || cancelButtonProps?.disabled}
+                    disabled={cancelButtonProps?.disabled}
                     onPress={() => ref.current?.close()}
                 />
                 <BottomSheetButton
                     variant="secondary"
                     {...confirmButtonProps}
                     label={confirmLabel ?? t('common.actions.save')}
-                    disabled={saving || confirmButtonProps?.disabled}
+                    disabled={confirmButtonProps?.disabled}
                     onPress={() => {
                         void submit()
                     }}

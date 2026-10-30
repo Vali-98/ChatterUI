@@ -1,3 +1,4 @@
+import type { RefObject } from 'react'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { useShallow } from 'zustand/react/shallow'
@@ -9,11 +10,10 @@ import { Characters } from '@lib/state/characters'
 import { Logger } from '@lib/state/Logger'
 
 type CharacterNewMenuProps = {
-    isLoading: boolean
-    setIsLoading: (b: boolean) => void
+    navigationPending: RefObject<boolean>
 }
 
-const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ isLoading, setIsLoading }) => {
+const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ navigationPending }) => {
     const { t } = useTranslation()
     const { selectCharacterCard } = Characters.useCharacterState(
         useShallow((state) => ({
@@ -30,13 +30,15 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ isLoading, setIsLoa
             Logger.errorToast(t('character.list.errors.nameEmpty'))
             return
         }
-        Characters.db.create.blankCard(text).then(async (id) => {
-            if (isLoading) return
-            setIsLoading(true)
-            await selectCharacterCard(id)
-            setIsLoading(false)
+        if (navigationPending.current) return
+        navigationPending.current = true
+        try {
+            const id = await Characters.db.create.blankCard(text)
+            selectCharacterCard(id)
             router.push('/characterEditor')
-        })
+        } finally {
+            navigationPending.current = false
+        }
     }
 
     return (

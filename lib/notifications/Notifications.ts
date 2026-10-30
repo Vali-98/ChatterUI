@@ -74,7 +74,7 @@ export function useAppStateNotificationObserver() {
                 Logger.info('Loading chat from notification')
                 try {
                     await setId(chatId)
-                    await setCard(characterId)
+                    setCard(characterId)
                     router.navigate('/chat')
                     Notifications.clearLastNotificationResponse()
                 } catch (e) {
