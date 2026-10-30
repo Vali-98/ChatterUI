@@ -30,7 +30,7 @@ const ButtonBase = ({
     disabled = false,
     viewStyle,
     iconName,
-    iconSize,
+    iconSize: customIconSize,
     iconStyle,
     label,
     labelStyle,
@@ -41,11 +41,12 @@ const ButtonBase = ({
 }: ButtonAppearanceProps & {
     variant: ButtonVariant
     iconName?: IconName
-    iconSize: number
     label?: string
     labelStyle?: StyleProp<TextStyle>
 }) => {
-    const { color, borderWidth, borderRadius, spacing } = Theme.useTheme()
+    const { color, borderWidth, borderRadius, spacing, iconSize } = Theme.useTheme()
+    const resolvedIconSize =
+        customIconSize ?? (label === undefined ? iconSize.button : iconSize.buttonLabel)
     const palette = level === 'neutral' || level === 'muted' ? color.neutral : color[level]
     const fill =
         level === 'muted' ? palette._200 : level === 'neutral' ? palette._300 : palette._500
@@ -110,7 +111,7 @@ const ButtonBase = ({
             {iconName && (
                 <ThemedIcon
                     iconName={iconName}
-                    size={iconSize}
+                    size={resolvedIconSize}
                     color={disabled ? disabledColor : foreground}
                     backgroundColor={
                         disabledStyle?.backgroundColor === 'transparent'

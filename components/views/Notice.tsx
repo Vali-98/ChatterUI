@@ -11,7 +11,6 @@ import IconButton from '@components/buttons/IconButton'
 import ThemedButton, { type ThemedButtonProps } from '@components/buttons/ThemedButton'
 import ThemedIcon, { type IconName } from '@components/icons/ThemedIcon'
 import TText from '@components/text/TText'
-import { CHAT_CONTROL_EDGE, CHAT_CONTROL_GAP } from '@lib/constants/ChatControls'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import FloatingPanel, { type FloatingPanelProps } from './FloatingPanel'
@@ -24,12 +23,12 @@ export const NoticeStack = ({ style, ...props }: ViewProps) => (
         style={[
             {
                 position: 'absolute',
-                top: CHAT_CONTROL_EDGE,
-                right: CHAT_CONTROL_EDGE,
+                top: 12,
+                right: 12,
                 maxWidth: '95%',
                 zIndex: 150,
                 alignItems: 'flex-end',
-                rowGap: CHAT_CONTROL_GAP,
+                rowGap: 8,
             },
             style,
         ]}

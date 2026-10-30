@@ -10,7 +10,6 @@ import { EdgeFadeFlashList } from '@components/views/EdgeFade'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import InputSheet from '@components/views/InputSheet'
-import { IconSizes } from '@lib/constants/IconSizes'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -27,7 +26,7 @@ const TemplateManager = () => {
     )
     const pasteInputRef = useBottomSheetRef()
     const { t } = useTranslation()
-    const { color, spacing } = Theme.useTheme()
+    const { color, spacing, iconSize } = Theme.useTheme()
 
     return (
         <SafeAreaView
@@ -128,7 +127,7 @@ const TemplateManager = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                     }}>
-                    <AntDesign name="file-unknown" size={IconSizes.empty} color={color.text._700} />
+                    <AntDesign name="file-unknown" size={iconSize.empty} color={color.text._700} />
                     <Text
                         style={{
                             color: color.text._400,

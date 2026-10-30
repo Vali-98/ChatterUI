@@ -1,7 +1,6 @@
 import { type StyleProp, type TextStyle } from 'react-native'
 
 import { type IconName } from '@components/icons/ThemedIcon'
-import { IconSizes } from '@lib/constants/IconSizes'
 
 import ButtonBase, { type ButtonAppearanceProps } from './ButtonBase'
 
@@ -13,10 +12,8 @@ export interface ThemedButtonProps extends ButtonAppearanceProps {
     iconName?: IconName
 }
 
-const ThemedButton = ({
-    variant = 'secondary',
-    iconSize = IconSizes.buttonLabel,
-    ...props
-}: ThemedButtonProps) => <ButtonBase {...props} variant={variant} iconSize={iconSize} />
+const ThemedButton = ({ variant = 'secondary', ...props }: ThemedButtonProps) => (
+    <ButtonBase {...props} variant={variant} />
+)
 
 export default ThemedButton

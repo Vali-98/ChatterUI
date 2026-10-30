@@ -17,7 +17,6 @@ import HeaderTitle from '@components/views/HeaderTitle'
 import InputSheet from '@components/views/InputSheet'
 import { ListCardSection } from '@components/views/ListCard'
 import { LorebookType } from '@db/schema'
-import { IconSizes } from '@lib/constants/IconSizes'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Lorebooks } from '@lib/state/lorebooks'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -140,7 +139,7 @@ const LorebookListItem: React.FC<{ lorebook: LorebookType }> = ({ lorebook }) =>
 
 const LorebookEmpty = () => {
     const { t } = useTranslation()
-    const { color } = Theme.useTheme()
+    const { color, iconSize } = Theme.useTheme()
     return (
         <View
             style={{
@@ -151,7 +150,7 @@ const LorebookEmpty = () => {
             }}>
             <AntDesign
                 name="file-search"
-                size={IconSizes.empty}
+                size={iconSize.empty}
                 style={{ color: color.text._600 }}
             />
             <Text style={{ color: color.text._600 }}>{t('lorebook.empty')}</Text>

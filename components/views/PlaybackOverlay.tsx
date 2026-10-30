@@ -11,7 +11,6 @@ import Animated, {
 } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { CHAT_CONTROL_EDGE, CHAT_CONTROL_GAP } from '@lib/constants/ChatControls'
 import { chatSwipeControlBounds, chatControlLift } from '@lib/state/components/chatControlBounds'
 import { useChatControlLayoutState } from '@lib/state/components/ChatControls'
 import { getChatControlLift } from '@lib/utils/controlPlacement'
@@ -30,13 +29,12 @@ const PlaybackOverlay = ({ id, children }: { id?: number | string; children: Rea
     useAnimatedReaction(
         () => {
             if (!isChat || playerHeight <= 0) return 0
-            const bottomInset =
-                Math.max(insets.bottom, -height.value) + inputHeight + CHAT_CONTROL_EDGE
+            const bottomInset = Math.max(insets.bottom, -height.value) + inputHeight + 12
             const bottom = windowHeight - bottomInset
             return getChatControlLift(
                 { top: bottom - playerHeight, bottom: bottom },
                 chatSwipeControlBounds.value,
-                CHAT_CONTROL_GAP
+                8
             )
         },
         (lift) => {
@@ -46,7 +44,7 @@ const PlaybackOverlay = ({ id, children }: { id?: number | string; children: Rea
     const position = useAnimatedStyle(() => ({
         bottom:
             Math.max(insets.bottom, -height.value) +
-            (isChat ? inputHeight + CHAT_CONTROL_EDGE + chatControlLift.value : CHAT_CONTROL_EDGE),
+            (isChat ? inputHeight + 12 + chatControlLift.value : 12),
     }))
     if (id === undefined) return null
     return (
@@ -57,7 +55,7 @@ const PlaybackOverlay = ({ id, children }: { id?: number | string; children: Rea
                 runOnJS(releasePlayerHeight)(id)
             })}
             entering={FadeIn.duration(120)}
-            style={[{ position: 'absolute', right: CHAT_CONTROL_EDGE, maxWidth: '92%' }, position]}>
+            style={[{ position: 'absolute', right: 12, maxWidth: '92%' }, position]}>
             <ChatControlColumn>
                 <ChatControlPanel
                     onLayout={(event) => setPlayerHeight(event.nativeEvent.layout.height, id)}>

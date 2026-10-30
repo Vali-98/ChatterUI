@@ -1,5 +1,3 @@
-import { CHAT_CONTROL_EDGE } from '@lib/constants/ChatControls'
-
 export type ControlBounds = { top: number; bottom: number; left: number; right: number }
 
 export const placeChatControl = (
@@ -24,7 +22,7 @@ export const placeChatControl = (
                 height - reservedBottom - size.height
             )
         ),
-        right: CHAT_CONTROL_EDGE,
+        right: 12,
     }
 }
 

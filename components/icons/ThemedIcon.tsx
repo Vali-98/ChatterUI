@@ -5,7 +5,6 @@ import MaterialIcons, {
 import Octicons, { type OcticonsIconName } from '@react-native-vector-icons/octicons/static'
 import { StyleSheet, View, type ColorValue, type StyleProp, type TextStyle } from 'react-native'
 
-import { IconSizes } from '@lib/constants/IconSizes'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type FamilyIcon =
@@ -41,7 +40,7 @@ const Glyph = ({
 
 const ThemedIcon = ({
     iconName,
-    size = IconSizes.buttonLabel,
+    size: customSize,
     color,
     backgroundColor,
     style,
@@ -52,7 +51,8 @@ const ThemedIcon = ({
     backgroundColor?: ColorValue
     style?: StyleProp<TextStyle>
 }) => {
-    const { color: themeColor } = Theme.useTheme()
+    const { color: themeColor, iconSize } = Theme.useTheme()
+    const size = customSize ?? iconSize.buttonLabel
     const foreground = color ?? themeColor.text._200
     const subIcon = typeof iconName === 'object' ? iconName.subIcon : undefined
     if (!subIcon) return <Glyph icon={iconName} size={size} color={foreground} style={style} />

@@ -2,12 +2,11 @@ import Octicons from '@react-native-vector-icons/octicons/static'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
-import { IconSizes } from '@lib/constants/IconSizes'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const CharSearchEmpty = () => {
     const { t } = useTranslation()
-    const { color, spacing, fontSize } = Theme.useTheme()
+    const { color, spacing, fontSize, iconSize } = Theme.useTheme()
     return (
         <View
             style={{
@@ -17,7 +16,7 @@ const CharSearchEmpty = () => {
                 alignItems: 'center',
                 marginTop: spacing.xl3,
             }}>
-            <Octicons name="search" color={color.text._400} size={IconSizes.empty} />
+            <Octicons name="search" color={color.text._400} size={iconSize.empty} />
             <Text
                 style={{
                     color: color.text._400,

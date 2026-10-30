@@ -13,7 +13,6 @@ import Animated, {
     FadeOut,
 } from 'react-native-reanimated'
 
-import { CHAT_CONTROL_EDGE, CHAT_CONTROL_GAP } from '@lib/constants/ChatControls'
 import { useChatGenerating } from '@lib/engine/generation/hooks'
 import { useBackAction } from '@lib/hooks/BackAction'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
@@ -70,7 +69,7 @@ const ChatActionOverlay = ({ chatId }: { chatId: number }) => {
         const next = {
             top: Math.round(bounds.pageY),
             left: Math.round(bounds.pageX),
-            bottom: Math.round(bounds.pageY + bounds.height - inputHeight - CHAT_CONTROL_GAP),
+            bottom: Math.round(bounds.pageY + bounds.height - inputHeight - 8),
             right: Math.round(bounds.pageX + bounds.width),
             entryId: -1,
         }
@@ -143,7 +142,7 @@ const PositionedChatActions = ({
     const size = useSharedValue({ width: 0, height: 38 })
     const placement = useSharedValue({
         top: 0,
-        right: CHAT_CONTROL_EDGE,
+        right: 12,
         maxWidth: 0,
         visible: false,
     })
@@ -161,9 +160,9 @@ const PositionedChatActions = ({
                     anchor,
                     bounds,
                     size,
-                    playerHeight > 0 ? playerHeight + CHAT_CONTROL_GAP + lift : 0
+                    playerHeight > 0 ? playerHeight + 8 + lift : 0
                 ),
-                maxWidth: Math.max(0, bounds.right - bounds.left - CHAT_CONTROL_EDGE * 2),
+                maxWidth: Math.max(0, bounds.right - bounds.left - 12 * 2),
             })
         }
     )

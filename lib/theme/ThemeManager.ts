@@ -200,6 +200,7 @@ export namespace Theme {
     }
 
     const fontSize = { s: 12, m: 14, l: 16, xl: 18, xl2: 20, xl3: 24 }
+    const iconSize = { button: 24, buttonLabel: 20, empty: 60 }
 
     const font = ''
 
@@ -238,6 +239,7 @@ export namespace Theme {
                 font: font,
                 borderWidth: borderWidth,
                 fontSize: fontSize,
+                iconSize: iconSize,
                 borderRadius: borderRadius,
             }),
             [color]

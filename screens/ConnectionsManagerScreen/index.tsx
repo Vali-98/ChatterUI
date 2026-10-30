@@ -12,7 +12,6 @@ import ContextMenu from '@components/views/ContextMenu'
 import { EdgeFadeFlatList } from '@components/views/EdgeFade'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { IconSizes } from '@lib/constants/IconSizes'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -28,7 +27,7 @@ const ConnectionsManagerScreen = () => {
             updatePreferences: state.updatePreferences,
         }))
     )
-    const { color, spacing } = Theme.useTheme()
+    const { color, spacing, iconSize } = Theme.useTheme()
     const [pendingOpen, setPendingOpen] = useState<undefined | number>()
     const templatePickerRef = useBottomSheetRef()
 
@@ -89,11 +88,7 @@ const ConnectionsManagerScreen = () => {
 
             {apiValues.length === 0 && (
                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                    <MaterialIcons
-                        name="cloud-off"
-                        size={IconSizes.empty}
-                        color={color.text._700}
-                    />
+                    <MaterialIcons name="cloud-off" size={iconSize.empty} color={color.text._700} />
                     <Text
                         style={{
                             color: color.text._400,

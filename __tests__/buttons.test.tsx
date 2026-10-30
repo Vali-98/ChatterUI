@@ -41,6 +41,7 @@ jest.mock('../lib/theme/ThemeManager', () => ({
             borderWidth: { m: 1 },
             borderRadius: { m: 8 },
             spacing: { m: 8, xl: 20 },
+            iconSize: { button: 24, buttonLabel: 20, empty: 60 },
         }),
     },
 }))

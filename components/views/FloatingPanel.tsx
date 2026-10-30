@@ -1,6 +1,5 @@
 import { View, type ViewProps } from 'react-native'
 
-import { CHAT_CONTROL_ELEVATION, CHAT_CONTROL_PADDING_VERTICAL } from '@lib/constants/ChatControls'
 import { getShadowColor } from '@lib/theme/contrast'
 import { Theme } from '@lib/theme/ThemeManager'
 import type { ThemeColor } from '@lib/theme/ThemeColor'
@@ -21,10 +20,10 @@ const FloatingPanel = ({ variant = 'primary', style, ...props }: FloatingPanelPr
                     flexDirection: 'row',
                     alignItems: 'center',
                     columnGap: 14,
-                    paddingVertical: CHAT_CONTROL_PADDING_VERTICAL,
+                    paddingVertical: 4,
                     paddingHorizontal: 12,
                     borderRadius: 8,
-                    elevation: CHAT_CONTROL_ELEVATION,
+                    elevation: 6,
                     borderWidth: 1,
                     borderColor: getFloatingPanelColor(color, variant),
                     backgroundColor: color.neutral._100 + 'ee',
