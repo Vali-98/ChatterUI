@@ -7,10 +7,12 @@ import {
     setupNotifications,
 } from '../lib/notifications/Notifications'
 import { notifyGenerationComplete } from '../lib/state/chat/notifications'
+import { ensureCompletionNotificationChannel } from '../lib/notifications/channels'
 
 jest.mock('expo-notifications', () => ({
     setNotificationHandler: jest.fn(),
     setNotificationChannelAsync: jest.fn(async () => null),
+    getNotificationChannelAsync: jest.fn(async () => null),
     getPermissionsAsync: jest.fn(),
     requestPermissionsAsync: jest.fn(),
     scheduleNotificationAsync: jest.fn(async () => 'one'),
@@ -40,11 +42,11 @@ beforeEach(() => {
 test('background completions use the configured channel, foreground completions stay silent', async () => {
     await notifyGenerationComplete(notification)
     expect(Notifications.setNotificationChannelAsync).toHaveBeenCalledWith(
-        'chatterUI',
-        expect.any(Object)
+        'chatterUI-completions',
+        expect.objectContaining({ vibrationPattern: [0, 250, 125, 250] })
     )
     expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(
-        expect.objectContaining({ trigger: { channelId: 'chatterUI' } })
+        expect.objectContaining({ trigger: { channelId: 'chatterUI-completions' } })
     )
     jest.mocked(Notifications.scheduleNotificationAsync).mockClear()
     setAppState('active')
@@ -65,6 +67,42 @@ test('the handler allows background delivery but suppresses delivery after retur
         shouldShowList: false,
         shouldPlaySound: false,
     })
+})
+
+test('the corrected vibration channel preserves previous channel preferences', async () => {
+    jest.mocked(Notifications.getNotificationChannelAsync)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({
+            id: 'chatterUI',
+            name: 'chatterUI',
+            importance: Notifications.AndroidImportance.DEFAULT,
+            bypassDnd: false,
+            description: null,
+            lightColor: '#7d6294',
+            lockscreenVisibility: 0,
+            showBadge: false,
+            audioAttributes: {
+                usage: 5,
+                contentType: 4,
+                flags: {
+                    enforceAudibility: false,
+                    requestHardwareAudioVideoSynchronization: false,
+                },
+            },
+            vibrationPattern: [250, 0, 250, 250],
+            enableLights: false,
+            enableVibrate: false,
+            sound: 'custom',
+        })
+    await ensureCompletionNotificationChannel()
+    expect(Notifications.setNotificationChannelAsync).toHaveBeenCalledWith(
+        'chatterUI-completions',
+        expect.objectContaining({
+            enableVibrate: false,
+            sound: 'custom',
+            vibrationPattern: [0, 250, 125, 250],
+        })
+    )
 })
 
 test('enabling notifications requests OS permission instead of assuming it was granted', async () => {

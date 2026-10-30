@@ -3,6 +3,7 @@ import { AppState, Platform } from 'react-native'
 import { t } from 'i18next'
 import {
     COMPLETION_CHANNEL_ID,
+    COMPLETION_VIBRATION_PATTERN,
     ensureCompletionNotificationChannel,
 } from '@lib/notifications/channels'
 
@@ -27,7 +28,9 @@ export const notifyGenerationComplete = async (notification: {
                 ? notification.text.trim()
                 : t('settings.notification.responseCompleteDescription'),
             sound: mmkv.getBoolean(AppSettings.PlayNotificationSound),
-            vibrate: mmkv.getBoolean(AppSettings.VibrateNotification) ? [250, 125, 250] : undefined,
+            vibrate: mmkv.getBoolean(AppSettings.VibrateNotification)
+                ? COMPLETION_VIBRATION_PATTERN
+                : undefined,
             badge: 0,
             data: { chatId: notification.chatId, characterId: notification.characterId },
         },
