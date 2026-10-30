@@ -152,7 +152,6 @@ const MessageEditor = ({
                                   ]
                                 : []),
                         ]}
-                        style={{ flex: 0, marginBottom: 0 }}
                         onPress={setField}
                     />
                 )}

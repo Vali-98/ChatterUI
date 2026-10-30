@@ -144,7 +144,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
 
                     {devices.length > 1 && (
                         <HorizontalSelector
-                            style={{ paddingBottom: 12 }}
+                            viewStyle={{ paddingBottom: 12 }}
                             label={t('model.backenddev')}
                             values={devices.map((item) => ({
                                 label: deviceLabels[item as keyof typeof deviceLabels] ?? item,

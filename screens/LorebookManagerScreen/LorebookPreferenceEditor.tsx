@@ -22,7 +22,6 @@ const LorebookPreferenceEditor = () => {
         <View style={{ rowGap: 24, paddingHorizontal: 8, marginBottom: 8 }}>
             <SectionTitle>{t('common.labels.preferences')}</SectionTitle>
             <HorizontalSelector
-                style={{ flex: 0 }}
                 label={t('lorebook.preferences.insertionType')}
                 values={selectorValues}
                 selected={insertionLocation}

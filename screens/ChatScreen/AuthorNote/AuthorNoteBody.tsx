@@ -45,7 +45,7 @@ const AuthorNoteBody = () => {
 
             <View style={{ columnGap: 8, flexDirection: 'row' }}>
                 <HorizontalSelector
-                    style={{ flex: 1 }}
+                    viewStyle={{ flex: 1 }}
                     values={[
                         { label: t('authorNotes.selector.chat'), value: NoteType.CHAT },
                         {

@@ -74,7 +74,6 @@ const AppearanceSettings = () => {
                             }))}
                             selected={textStyle.fontSize}
                             onPress={textStyle.setFontSize}
-                            style={{ flex: 0 }}
                         />
                         <HorizontalSelector
                             label={t('settings.chatstyle.fontWeight')}
@@ -84,7 +83,6 @@ const AppearanceSettings = () => {
                             }))}
                             selected={textStyle.textWeight}
                             onPress={textStyle.setTextWeight}
-                            style={{ flex: 0 }}
                         />
                         <ThemedSwitchRow
                             label={t('settings.chatwindow.wideChat')}
@@ -122,7 +120,6 @@ const AppearanceSettings = () => {
                                         },
                                     ]}
                                     label={t('settings.appearance.previewBackground')}
-                                    style={{ flex: 0 }}
                                 />
                                 <TText color="400" size={12}>
                                     {t('settings.appearance.backgroundOverride')}

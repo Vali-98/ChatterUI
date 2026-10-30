@@ -25,7 +25,6 @@ const AppModeSetup = ({ mode, onChange }: { mode: AppMode; onChange: (mode: AppM
                     </TText>
                 </View>
                 <HorizontalSelector
-                    style={{ flex: 0 }}
                     itemStyle={{ flexDirection: 'column', paddingVertical: 28, rowGap: 16 }}
                     labelStyle={{ fontSize: 18 }}
                     values={[

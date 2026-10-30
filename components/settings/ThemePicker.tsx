@@ -127,7 +127,6 @@ const ThemePicker = ({
                         },
                         { value: 'dark', label: t('settings.appearance.dark'), icon: 'dark-mode' },
                     ]}
-                    style={{ flex: 0 }}
                 />
             )}
             <ThemePalettePicker

@@ -10,7 +10,7 @@ const AppModeToggle = () => {
 
     return (
         <HorizontalSelector
-            style={{ flex: 0, paddingBottom: 12, paddingHorizontal: 8, marginHorizontal: 4 }}
+            viewStyle={{ paddingBottom: 12, paddingHorizontal: 8, marginHorizontal: 4 }}
             values={[
                 {
                     value: 'local',

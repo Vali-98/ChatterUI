@@ -1,8 +1,8 @@
 import MaterialIcons, {
     MaterialIconsIconName,
 } from '@react-native-vector-icons/material-icons/static'
-import { useEffect, useRef } from 'react'
-import { Pressable, Text, TextStyle, View, ViewStyle } from 'react-native'
+import { useCallback, useEffect, useRef } from 'react'
+import { Pressable, Text, type StyleProp, type TextStyle, View, type ViewStyle } from 'react-native'
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -23,10 +23,10 @@ type HorizontalSelectorProps<T> = {
     onPress: (selected: T) => void
     label?: string
     description?: string
-    itemStyle?: ViewStyle
-    labelStyle?: TextStyle
-    style?: ViewStyle
-    capitalizeValues?: string
+    itemStyle?: StyleProp<ViewStyle>
+    labelStyle?: StyleProp<TextStyle>
+    viewStyle?: StyleProp<ViewStyle>
+    selectorStyle?: StyleProp<ViewStyle>
 }
 
 const HorizontalSelector = <T,>({
@@ -35,7 +35,8 @@ const HorizontalSelector = <T,>({
     onPress,
     label,
     description,
-    style,
+    viewStyle,
+    selectorStyle,
     itemStyle,
     labelStyle,
 }: HorizontalSelectorProps<T>) => {
@@ -52,9 +53,9 @@ const HorizontalSelector = <T,>({
         return animatedValues.value
     })
 
-    useEffect(() => {
+    const updateSelection = useCallback(() => {
         if (!viewRef.current) return
-        viewRef.current.measure((x, y, width, height, pageX, pageY) => {
+        viewRef.current.measure((x, y, width, height) => {
             animatedValues.value = withTiming(
                 {
                     top: y,
@@ -64,34 +65,38 @@ const HorizontalSelector = <T,>({
                 },
                 { duration: initialRender.current ? 0 : 300, easing: Easing.out(Easing.ease) }
             )
+            initialRender.current = false
         })
-        initialRender.current = false
-    }, [animatedValues, selected])
+    }, [animatedValues])
+
+    useEffect(updateSelection, [updateSelection, selected])
 
     return (
-        <View style={[{ flex: 1 }, style]}>
+        <View style={[{ rowGap: spacing.s }, viewStyle]}>
             {label && (
                 <Text
                     style={{
-                        flex: style?.flex ?? 1,
                         color: color.text._100,
-                        paddingBottom: spacing.s,
                     }}>
                     {label}
                 </Text>
             )}
 
             <View
-                style={{
-                    flex: style?.flex ?? 1,
-                    flexDirection: 'row',
-                    justifyContent: 'space-evenly',
-                    borderColor: color.primary._200,
-                    backgroundColor: color.neutral._100,
-                    borderWidth: 2,
-                    borderRadius: 8,
-                }}>
+                onLayout={updateSelection}
+                style={[
+                    {
+                        flexDirection: 'row',
+                        justifyContent: 'space-evenly',
+                        borderColor: color.primary._200,
+                        backgroundColor: color.neutral._100,
+                        borderWidth: 2,
+                        borderRadius: 8,
+                    },
+                    selectorStyle,
+                ]}>
                 <Animated.View
+                    pointerEvents="none"
                     style={[
                         {
                             position: 'absolute',
@@ -107,17 +112,20 @@ const HorizontalSelector = <T,>({
                     return (
                         <Pressable
                             ref={isSelected ? viewRef : null}
+                            onLayout={isSelected ? updateSelection : undefined}
                             key={index}
                             onPress={() => onPress(item.value)}
-                            style={{
-                                flex: 1,
-                                paddingVertical: spacing.m,
-                                alignItems: 'center',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                columnGap: 8,
-                                ...itemStyle,
-                            }}>
+                            style={[
+                                {
+                                    flex: 1,
+                                    paddingVertical: spacing.m,
+                                    alignItems: 'center',
+                                    flexDirection: 'row',
+                                    justifyContent: 'center',
+                                    columnGap: 8,
+                                },
+                                itemStyle,
+                            ]}>
                             {item.icon && (
                                 <MaterialIcons
                                     name={item.icon}
@@ -144,9 +152,6 @@ const HorizontalSelector = <T,>({
                 <Text
                     style={{
                         color: color.text._400,
-                        marginTop: 4,
-                        paddingBottom: spacing.xs,
-                        marginBottom: spacing.m,
                     }}>
                     {description}
                 </Text>

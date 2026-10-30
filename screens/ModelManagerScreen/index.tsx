@@ -131,7 +131,6 @@ const ModelManagerScreen = () => {
                 />
             )}
             <HorizontalSelector
-                style={{ flex: 0 }}
                 values={[
                     { label: t('model.title'), value: false },
                     { label: t('common.navigation.settings'), value: true },

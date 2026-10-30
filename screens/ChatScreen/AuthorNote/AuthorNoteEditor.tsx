@@ -196,7 +196,6 @@ const AuthorNoteEditor = () => {
                 />
                 <HorizontalSelector
                     label={t('authorNotes.type')}
-                    style={{ flex: 1 }}
                     values={[
                         { label: t('authorNotes.selector.chat'), value: NoteType.CHAT },
                         {
