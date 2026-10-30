@@ -1,41 +1,27 @@
-// __tests__/i18n-locales.test.ts
-
 import fs from 'fs'
 import path from 'path'
 
 const localesDir = path.join(__dirname, '../i18n/locales')
 
-function getJsonFiles(dir: string): string[] {
-    return fs.readdirSync(dir).filter((file) => file.endsWith('.json'))
-}
-
-function flattenKeys(obj: Record<string, any>, prefix = ''): string[] {
-    return Object.entries(obj).flatMap(([key, value]) => {
-        const fullKey = prefix ? `${prefix}.${key}` : key
-
-        if (value && typeof value === 'object' && !Array.isArray(value)) {
-            return flattenKeys(value, fullKey)
-        }
-
-        return [fullKey]
-    })
+function getLocaleKeys(locale: string): string[] {
+    const directory = path.join(localesDir, locale)
+    return fs
+        .readdirSync(directory)
+        .filter((file) => file.endsWith('.json'))
+        .flatMap((file) =>
+            Object.keys(JSON.parse(fs.readFileSync(path.join(directory, file), 'utf8')))
+        )
+        .sort()
 }
 
 describe('i18n locale consistency', () => {
-    const baseLocalePath = path.join(localesDir, 'en.json')
-    const baseLocale = JSON.parse(fs.readFileSync(baseLocalePath, 'utf8'))
+    const baseKeys = getLocaleKeys('en')
+    const locales = fs
+        .readdirSync(localesDir, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory() && entry.name !== 'en')
+        .map((entry) => entry.name)
 
-    const baseKeys = flattenKeys(baseLocale).sort()
-
-    const localeFiles = getJsonFiles(localesDir).filter((file) => file !== 'en.json')
-
-    test.each(localeFiles)('%s should contain the same keys as en.json', (file) => {
-        const localePath = path.join(localesDir, file)
-
-        const locale = JSON.parse(fs.readFileSync(localePath, 'utf8'))
-
-        const localeKeys = flattenKeys(locale).sort()
-
-        expect(localeKeys).toEqual(baseKeys)
+    test.each(locales)('%s should contain the same keys as English', (locale) => {
+        expect(getLocaleKeys(locale)).toEqual(baseKeys)
     })
 })

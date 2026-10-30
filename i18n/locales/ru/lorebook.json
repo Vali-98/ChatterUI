@@ -27,5 +27,6 @@
     "lorebook.preferences.index": "Индекс",
     "lorebook.preferences.insertionDepth": "Глубина включения",
     "lorebook.preferences.insertionType": "Стратегия включения",
-    "lorebook.title": "учебники"
+    "lorebook.title": "учебники",
+    "lorebook.fields.keysPlaceholder": "Добавить ключевое слово…"
 }

@@ -5,7 +5,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
-import StringArrayEditor from '@components/input/StringArrayEditor'
+import ListEditorSheet from '@components/input/ListEditorSheet'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import ThemedTextInput from '@components/input/ThemedTextInput'
@@ -155,10 +155,15 @@ const LorebookEntryEditor = () => {
                             onChangeText={(value) => updateEntry('name', value)}
                         />
 
-                        <StringArrayEditor
-                            label={t('lorebook.fields.keys')}
+                        <ListEditorSheet
+                            title={t('lorebook.fields.keys')}
+                            placeholder={t('lorebook.fields.keysPlaceholder')}
+                            keyExtractor={(item) => item}
+                            labelExtractor={(item) => item}
+                            createItem={(text) => text}
+                            commitMode="confirm"
                             value={placeholderEntry.keys}
-                            setValue={(value) => updateEntry('keys', value)}
+                            onChangeValue={(value) => updateEntry('keys', value)}
                         />
 
                         <ThemedTextInput
@@ -196,10 +201,15 @@ const LorebookEntryEditor = () => {
                         />
 
                         {placeholderEntry.selective && (
-                            <StringArrayEditor
-                                label={t('lorebook.fields.secondaryKeys')}
+                            <ListEditorSheet
+                                title={t('lorebook.fields.secondaryKeys')}
+                                placeholder={t('lorebook.fields.keysPlaceholder')}
+                                keyExtractor={(item) => item}
+                                labelExtractor={(item) => item}
+                                createItem={(text) => text}
+                                commitMode="confirm"
                                 value={placeholderEntry.secondary_keys}
-                                setValue={(value) => updateEntry('secondary_keys', value)}
+                                onChangeValue={(value) => updateEntry('secondary_keys', value)}
                             />
                         )}
 

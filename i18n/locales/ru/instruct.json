@@ -10,5 +10,6 @@
     "instruct.localtemplate.title": "Локальный шаблон",
     "instruct.macros": "Макросы и карточка персонажа",
     "instruct.textformatter.description": "Автоматически форматирует первое сообщение в стиле ниже",
-    "instruct.textformatter.title": "Форматер текста"
+    "instruct.textformatter.title": "Форматер текста",
+    "instruct.hiddentext.placeholder": "Добавить регулярное выражение…"
 }

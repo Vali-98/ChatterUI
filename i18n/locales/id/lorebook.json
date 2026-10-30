@@ -27,5 +27,6 @@
     "lorebook.preferences.index": "Indeks",
     "lorebook.preferences.insertionDepth": "Kedalaman Penyisipan",
     "lorebook.preferences.insertionType": "Strategi Penyisipan",
-    "lorebook.title": "Buku pengetahuan"
+    "lorebook.title": "Buku pengetahuan",
+    "lorebook.fields.keysPlaceholder": "Tambah kata kunci…"
 }

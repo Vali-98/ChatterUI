@@ -68,5 +68,7 @@
     "common.messages.importingFile": "正在导入文件...",
     "common.messages.successfullyImported": "导入成功！",
     "common.navigation.about": "关于",
-    "common.navigation.settings": "设置"
+    "common.navigation.settings": "设置",
+    "common.placeholders.addItem": "添加项目…",
+    "common.emptyStates.noSuggestions": "暂无建议"
 }

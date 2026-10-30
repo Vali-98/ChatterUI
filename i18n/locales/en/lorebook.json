@@ -27,5 +27,6 @@
     "lorebook.preferences.index": "Index",
     "lorebook.preferences.insertionDepth": "Insertion Depth",
     "lorebook.preferences.insertionType": "Insertion Strategy",
-    "lorebook.title": "Lorebooks"
+    "lorebook.title": "Lorebooks",
+    "lorebook.fields.keysPlaceholder": "Add a keyword…"
 }

@@ -27,5 +27,6 @@
     "lorebook.preferences.index": "指数",
     "lorebook.preferences.insertionDepth": "插入深度",
     "lorebook.preferences.insertionType": "插入战略",
-    "lorebook.title": "书店"
+    "lorebook.title": "书店",
+    "lorebook.fields.keysPlaceholder": "添加关键词…"
 }

@@ -68,5 +68,7 @@
     "common.messages.importingFile": "Импорт файла...",
     "common.messages.successfullyImported": "Успешно импортировано!",
     "common.navigation.about": "О приложении",
-    "common.navigation.settings": "Настройки"
+    "common.navigation.settings": "Настройки",
+    "common.placeholders.addItem": "Добавить элемент…",
+    "common.emptyStates.noSuggestions": "Нет предложений"
 }

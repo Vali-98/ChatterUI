@@ -3,8 +3,11 @@ import { View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
-import StringArrayEditor from '@components/input/StringArrayEditor'
+import ListEditorSheet from '@components/input/ListEditorSheet'
 import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
+import { db } from '@db/db'
+import { tags as tagTable } from '@db/schema'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { TagHider } from '@lib/state/TagHider'
 
@@ -18,6 +21,11 @@ const TagHiderSettings = () => {
         }))
     )
 
+    const { data: availableTags } = useLiveQueryAsync(db.select().from(tagTable), {
+        key: ['hidden-tag-suggestions'],
+        watch: [{ table: 'tags' }],
+    })
+
     return (
         <View>
             <ThemedSwitchRow
@@ -26,7 +34,24 @@ const TagHiderSettings = () => {
                 value={tagHider}
                 onChangeValue={(b) => setUseTagHider(b)}
             />
-            <StringArrayEditor value={tags} setValue={(data) => setTags(data)} />
+            {tagHider && (
+                <ListEditorSheet
+                    title={t('settings.tagHider.label')}
+                    showLabel={false}
+                    placeholder={t('character.editor.fields.tagsPlaceholder')}
+                    value={tags}
+                    onChangeValue={setTags}
+                    suggestions={availableTags.map((item) => item.tag)}
+                    keyExtractor={(item) => item}
+                    labelExtractor={(item) => item}
+                    createItem={(text) => {
+                        const tag = text.trim()
+                        if (!tag) throw new Error(t('listEditor.emptyValueError'))
+                        return tag
+                    }}
+                    commitMode="confirm"
+                />
+            )}
         </View>
     )
 }

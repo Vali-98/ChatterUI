@@ -9,7 +9,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
-import StringArrayEditor from '@components/input/StringArrayEditor'
+import ListEditorSheet from '@components/input/ListEditorSheet'
 import ThemedCheckbox from '@components/input/ThemedCheckbox'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
@@ -241,7 +241,16 @@ const ComponentTestScreen = () => {
                 <Accordion label="Test Accordion">
                     <Text style={{ color: 'yellow' }}>TEST TEXT</Text>
                 </Accordion>
-                <StringArrayEditor label="Test Input Label" value={data} setValue={setData} />
+                <ListEditorSheet
+                    title="Editable text list"
+                    value={data}
+                    onChangeValue={setData}
+                    suggestions={['Fantasy', 'Adventure', 'Mystery', 'Science fiction']}
+                    keyExtractor={(item) => item}
+                    labelExtractor={(item) => item}
+                    createItem={(text) => text}
+                    commitMode="confirm"
+                />
                 <ThemedCheckbox
                     label="Test Checkbox"
                     value={checkbox}

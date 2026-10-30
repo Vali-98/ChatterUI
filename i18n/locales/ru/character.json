@@ -69,5 +69,6 @@
     "character.list.search.byName": "Поиск по имени",
     "character.list.search.byTags": "Поиск по тегам",
     "character.list.sort.label": "Сортировать по",
-    "character.list.sort.recent": "Последние"
+    "character.list.sort.recent": "Последние",
+    "character.editor.fields.tagsPlaceholder": "Добавить тег…"
 }

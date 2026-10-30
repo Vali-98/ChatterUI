@@ -68,5 +68,7 @@
     "common.messages.importingFile": "Mengimpor file...",
     "common.messages.successfullyImported": "Berhasil Diimpor!",
     "common.navigation.about": "Tentang",
-    "common.navigation.settings": "Pengaturan"
+    "common.navigation.settings": "Pengaturan",
+    "common.placeholders.addItem": "Tambah item…",
+    "common.emptyStates.noSuggestions": "Tidak ada saran"
 }

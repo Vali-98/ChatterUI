@@ -22,16 +22,14 @@ type CharacterSortStore = {
 
 export const useCharacterSortStore = create<CharacterSortStore>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             showSearch: false,
             searchType: 'modified',
             searchOrder: 'desc',
             textFilter: '',
             tagFilter: [],
             setShowSearch: (showSearch) => {
-                set({ showSearch })
-                if (get().tagFilter.length > 0) set({ tagFilter: [] })
-                if (get().textFilter) set({ textFilter: '' })
+                set(showSearch ? { showSearch } : { showSearch, tagFilter: [], textFilter: '' })
             },
 
             setTextFilter: (textFilter: string) => {

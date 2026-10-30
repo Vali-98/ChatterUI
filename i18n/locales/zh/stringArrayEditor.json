@@ -1,6 +1,0 @@
-{
-    "stringArrayEditor.add": "添加",
-    "stringArrayEditor.duplicateValueError": "值已存在",
-    "stringArrayEditor.emptyValueError": "值不能为空",
-    "stringArrayEditor.placeholder": "输入值..."
-}

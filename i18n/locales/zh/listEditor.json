@@ -1,0 +1,4 @@
+{
+    "listEditor.duplicateValueError": "值已存在",
+    "listEditor.emptyValueError": "值不能为空"
+}

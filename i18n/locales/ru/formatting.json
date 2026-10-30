@@ -56,5 +56,6 @@
     "formatting.toast.configCreated": "Конфигурация создана.",
     "formatting.toast.configNameExists": "Имя конфигурации уже существует.",
     "formatting.toast.savedToDownloads": "\"{{name}}\" сохранен в загрузки",
-    "formatting.unused": "Не используется текущим режимом"
+    "formatting.unused": "Не используется текущим режимом",
+    "formatting.sections.stopSequencePlaceholder": "Добавить стоп-последовательность…"
 }

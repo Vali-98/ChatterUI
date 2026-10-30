@@ -56,5 +56,6 @@
     "formatting.toast.configCreated": "Config created.",
     "formatting.toast.configNameExists": "Config name already exists.",
     "formatting.toast.savedToDownloads": "Saved \"{{name}}\" to Downloads",
-    "formatting.unused": "Unused by current {{mode}}"
+    "formatting.unused": "Unused by current {{mode}}",
+    "formatting.sections.stopSequencePlaceholder": "Add a stop sequence…"
 }

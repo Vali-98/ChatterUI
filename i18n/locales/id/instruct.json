@@ -10,5 +10,6 @@
     "instruct.localtemplate.title": "Template Lokal",
     "instruct.macros": "Makro & Kartu Karakter",
     "instruct.textformatter.description": "Secara otomatis memformat pesan pertama ke gaya di bawah",
-    "instruct.textformatter.title": "Pemformat Teks"
+    "instruct.textformatter.title": "Pemformat Teks",
+    "instruct.hiddentext.placeholder": "Tambah pola regex…"
 }

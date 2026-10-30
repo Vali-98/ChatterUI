@@ -8,7 +8,7 @@ import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanim
 import { useShallow } from 'zustand/react/shallow'
 
 import IconButton from '@components/buttons/IconButton'
-import StringArrayEditor from '@components/input/StringArrayEditor'
+import ListEditorSheet from '@components/input/ListEditorSheet'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import { db } from '@db/db'
 import { characterTags, tags } from '@db/schema'
@@ -150,17 +150,17 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                         exiting={FadeOut.duration(100)}
                         style={{ paddingHorizontal: 12, paddingBottom: 8, rowGap: 8 }}>
                         {showTags && data.length > 0 && (
-                            <StringArrayEditor
-                                containerStyle={{ flex: 0 }}
-                                suggestions={data
+                            <ListEditorSheet
+                                suggestions={[...data]
                                     .sort((a, b) => b.tagCount - a.tagCount)
                                     .map((item) => item.tag)}
-                                label={t('character.list.search.byTags')}
+                                title={t('character.list.search.byTags')}
                                 value={tagFilter}
-                                setValue={setTagFilter}
-                                placeholder="Filter Tags..."
-                                filterOnly
-                                showSuggestionsOnEmpty
+                                onChangeValue={setTagFilter}
+                                keyExtractor={(item) => item}
+                                labelExtractor={(item) => item}
+                                commitMode="immediate"
+                                previewNumber={3}
                             />
                         )}
                         <ThemedTextInput

@@ -1,0 +1,4 @@
+{
+    "listEditor.duplicateValueError": "Value already exists",
+    "listEditor.emptyValueError": "Value cannot be empty"
+}

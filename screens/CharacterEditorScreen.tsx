@@ -13,7 +13,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
-import StringArrayEditor from '@components/input/StringArrayEditor'
+import ListEditorSheet from '@components/input/ListEditorSheet'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
@@ -557,15 +557,21 @@ const CharacterEditorScreen = () => {
                             numberOfLines={16}
                         />
 
-                        <StringArrayEditor
-                            label={t('character.editor.fields.tags')}
-                            containerStyle={styles.input}
-                            suggestions={data
-                                .map((item) => item.tag)
-                                .filter((a) => !cardDraft?.tags.some((item) => item.tag.tag === a))}
-                            showSuggestionsOnEmpty
+                        <ListEditorSheet
+                            title={t('character.editor.fields.tags')}
+                            placeholder={t('character.editor.fields.tagsPlaceholder')}
+                            viewStyle={styles.input}
+                            commitMode="confirm"
+                            keyExtractor={(tag) => tag}
+                            labelExtractor={(tag) => tag}
+                            createItem={(text) => {
+                                const tag = text.trim()
+                                if (!tag) throw new Error(t('listEditor.emptyValueError'))
+                                return tag
+                            }}
+                            suggestions={data.map((item) => item.tag)}
                             value={cardDraft?.tags.map((item) => item.tag.tag) ?? []}
-                            setValue={(value) => {
+                            onChangeValue={(value) => {
                                 const newTags = value
                                     .filter((v) => !cardDraft.tags.some((a) => a.tag.tag === v))
                                     .map((a) => {

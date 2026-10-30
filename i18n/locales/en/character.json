@@ -69,5 +69,6 @@
     "character.list.search.byName": "Search By Name",
     "character.list.search.byTags": "Search By Tags",
     "character.list.sort.label": "Sort By",
-    "character.list.sort.recent": "Recent"
+    "character.list.sort.recent": "Recent",
+    "character.editor.fields.tagsPlaceholder": "Add a tag…"
 }

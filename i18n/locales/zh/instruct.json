@@ -10,5 +10,6 @@
     "instruct.localtemplate.title": "本地模板",
     "instruct.macros": "宏与角色卡片",
     "instruct.textformatter.description": "自动将首条消息格式化为以下样式",
-    "instruct.textformatter.title": "文本格式化器"
+    "instruct.textformatter.title": "文本格式化器",
+    "instruct.hiddentext.placeholder": "添加正则表达式…"
 }

@@ -10,5 +10,6 @@
     "instruct.localtemplate.title": "Local Template",
     "instruct.macros": "Macros & Character Card",
     "instruct.textformatter.description": "Automatically formats first message to the style below",
-    "instruct.textformatter.title": "Text Formatter"
+    "instruct.textformatter.title": "Text Formatter",
+    "instruct.hiddentext.placeholder": "Add a regex pattern…"
 }

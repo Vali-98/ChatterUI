@@ -1,6 +1,0 @@
-{
-    "stringArrayEditor.add": "Tambah",
-    "stringArrayEditor.duplicateValueError": "Nilai sudah ada",
-    "stringArrayEditor.emptyValueError": "Nilai tidak boleh kosong",
-    "stringArrayEditor.placeholder": "Masukkan nilai..."
-}

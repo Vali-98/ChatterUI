@@ -56,5 +56,6 @@
     "formatting.toast.configCreated": "Konfig dibuat.",
     "formatting.toast.configNameExists": "Nama konfig sudah ada.",
     "formatting.toast.savedToDownloads": "Disimpan \"{{name}}\" ke Unduhan",
-    "formatting.unused": "Tidak digunakan oleh {{mode}} sekarang"
+    "formatting.unused": "Tidak digunakan oleh {{mode}} sekarang",
+    "formatting.sections.stopSequencePlaceholder": "Tambah urutan penghenti…"
 }

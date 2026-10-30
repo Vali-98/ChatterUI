@@ -56,5 +56,6 @@
     "formatting.toast.configCreated": "配置已创建。",
     "formatting.toast.configNameExists": "配置名称已存在。",
     "formatting.toast.savedToDownloads": "已将 \"{{name}}\" 保存到下载",
-    "formatting.unused": "未被当前 QQmode 使用"
+    "formatting.unused": "未被当前 QQmode 使用",
+    "formatting.sections.stopSequencePlaceholder": "添加停止序列…"
 }

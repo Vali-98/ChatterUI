@@ -69,5 +69,6 @@
     "character.list.search.byName": "Cari Berdasarkan Nama",
     "character.list.search.byTags": "Cari Berdasarkan Tag",
     "character.list.sort.label": "Urutkan Berdasarkan",
-    "character.list.sort.recent": "Terbaru"
+    "character.list.sort.recent": "Terbaru",
+    "character.editor.fields.tagsPlaceholder": "Tambah tag…"
 }

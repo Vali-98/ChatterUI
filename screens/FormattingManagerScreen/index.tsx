@@ -9,7 +9,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import IconButton from '@components/buttons/IconButton'
 import DropdownSheet from '@components/input/DropdownSheet'
-import StringArrayEditor from '@components/input/StringArrayEditor'
+import ListEditorSheet from '@components/input/ListEditorSheet'
 import ThemedCheckbox from '@components/input/ThemedCheckbox'
 import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import ThemedTextInput from '@components/input/ThemedTextInput'
@@ -356,20 +356,25 @@ const FormattingManager = () => {
                     AffixGrid()
                 )}
 
-                <StringArrayEditor
-                    label={t('formatting.sections.stopSequence')}
+                <ListEditorSheet
+                    title={t('formatting.sections.stopSequence')}
+                    placeholder={t('formatting.sections.stopSequencePlaceholder')}
+                    keyExtractor={(item) => item}
+                    labelExtractor={(item) => item}
+                    createItem={(text) => text}
+                    multiline
+                    commitMode="confirm"
                     value={
                         currentInstruct.stop_sequence
                             ? currentInstruct.stop_sequence.split(',')
                             : []
                     }
-                    setValue={(data) => {
+                    onChangeValue={(data) => {
                         setCurrentInstruct({
                             ...currentInstruct,
                             stop_sequence: data.join(','),
                         })
                     }}
-                    replaceNewLine={String.fromCharCode(10)}
                 />
 
                 <ThemedCheckbox
@@ -461,15 +466,18 @@ const FormattingManager = () => {
                     </View>
                 </View>
 
-                <SectionTitle>{t('instruct.hiddentext.title')}</SectionTitle>
-                <Text
-                    style={{
-                        color: color.text._400,
-                    }}>
-                    {t('instruct.hiddentext.description')}
-                </Text>
-
-                <StringArrayEditor value={textFilter} setValue={setTextFilter} />
+                <ListEditorSheet
+                    title={t('instruct.hiddentext.title')}
+                    description={t('instruct.hiddentext.description')}
+                    placeholder={t('instruct.hiddentext.placeholder')}
+                    value={textFilter}
+                    onChangeValue={setTextFilter}
+                    keyExtractor={(item) => item}
+                    labelExtractor={(item) => item}
+                    createItem={(text) => text}
+                    multiline
+                    commitMode="confirm"
+                />
 
                 <ThemedSwitchRow
                     label={t('instruct.filteredtext.label')}

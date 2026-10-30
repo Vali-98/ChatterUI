@@ -68,5 +68,7 @@
     "common.messages.importingFile": "Importing file...",
     "common.messages.successfullyImported": "Successfully Imported!",
     "common.navigation.about": "About",
-    "common.navigation.settings": "Settings"
+    "common.navigation.settings": "Settings",
+    "common.placeholders.addItem": "Add an item…",
+    "common.emptyStates.noSuggestions": "No suggestions"
 }
