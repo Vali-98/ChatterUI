@@ -48,7 +48,7 @@ type PersistedConnectionStore = Pick<
     'connections' | 'activeConnectionId' | 'nextConnectionId' | 'preferences' | 'customTemplates'
 >
 
-// Keep the original MMKV key so existing installations hydrate and migrate in place.
+// Storage-key migration preserves the original envelope and its version.
 export const migrateConnectionStore = (persistedState: unknown, version: number) => {
     let state = persistedState
 

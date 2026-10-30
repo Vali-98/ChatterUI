@@ -1,7 +1,10 @@
 import { createMMKV } from 'react-native-mmkv'
 import { createJSONStorage, StateStorage } from 'zustand/middleware'
 
+import { migrateMMKVKeys } from './keyMigration'
+
 export const mmkv = createMMKV()
+migrateMMKVKeys(mmkv)
 
 export const mmkvStorage: StateStorage = {
     setItem: (name, value) => {
