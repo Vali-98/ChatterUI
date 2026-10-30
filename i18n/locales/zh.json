@@ -802,6 +802,7 @@
         "dev_colortest": "[DEV] 颜色测试",
         "dev_components": "[DEV] 组件",
         "dev_markdown": "[DEV] Markdown",
+        "dev_tests": "[DEV] 测试页面",
         "formatting": "格式",
         "logs": "日志",
         "lorebooks": "书店",

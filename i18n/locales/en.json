@@ -802,6 +802,7 @@
         "dev_colortest": "[DEV] ColorTest",
         "dev_components": "[DEV] Components",
         "dev_markdown": "[DEV] Markdown",
+        "dev_tests": "[DEV] Test Screens",
         "formatting": "Formatting",
         "logs": "Logs",
         "lorebooks": "Lorebooks",

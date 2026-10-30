@@ -6,13 +6,13 @@ import { StyleSheet, View } from 'react-native'
 
 import GuideTarget from '@components/guides/GuideTarget'
 import ContextMenu from '@components/views/ContextMenu'
+import ContextUsage from '@components/views/ContextUsage'
 import Drawer from '@components/views/Drawer'
 import { Chats } from '@lib/state/chat'
 import { useSummaryPanelState } from '@lib/summaries/panelState'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import { useAuthorNoteState } from '../AuthorNote'
-import ChatTokenCount from './ChatTokenCount'
 
 type ChatOptionsProps = {
     disabled: boolean
@@ -46,7 +46,7 @@ const ChatOptions: React.FC<ChatOptionsProps> = ({ disabled }) => {
             </GuideTarget>
             <ContextMenu.Body>
                 <View style={{ width: optionsWidth, alignSelf: 'flex-start' }}>
-                    <ChatTokenCount />
+                    <ContextUsage compact />
                 </View>
                 <ContextMenu.Divider />
                 <View

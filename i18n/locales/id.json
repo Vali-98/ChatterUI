@@ -802,6 +802,7 @@
         "dev_colortest": "[DEV] TesWarna",
         "dev_components": "[DEV] Komponen",
         "dev_markdown": "[DEV] Markdown",
+        "dev_tests": "[DEV] Layar Pengujian",
         "formatting": "Pemformatan",
         "logs": "Log",
         "lorebooks": "Lorebooks",

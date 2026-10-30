@@ -11,6 +11,7 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
+import ContextUsage from '@components/views/ContextUsage'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import InputSheet from '@components/views/InputSheet'
@@ -23,8 +24,6 @@ import { Logger } from '@lib/state/Logger'
 import { useSamplers } from '@lib/state/samplerStore'
 import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
-
-import ContextLimitPreview from './ContextLimitPreview'
 
 const SamplerManagerScreen = () => {
     const { t } = useTranslation()
@@ -158,7 +157,7 @@ const SamplerManagerScreen = () => {
             {samplerList.length !== 0 && currentConfig && (
                 <KeyboardAwareScrollView contentContainerStyle={styles.scrollContainer}>
                     {samplerList.some((item) => item.samplerID === SamplerID.GENERATED_LENGTH) && (
-                        <ContextLimitPreview
+                        <ContextUsage
                             generatedLength={currentConfig.data[SamplerID.GENERATED_LENGTH]}
                         />
                     )}
