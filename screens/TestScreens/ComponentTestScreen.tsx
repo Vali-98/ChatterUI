@@ -20,7 +20,7 @@ import Accordion from '@components/views/Accordion'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import InputSheet from '@components/views/InputSheet'
-import Notice, { CollapsedNotice, NoticeAction } from '@components/views/Notice'
+import Notice, { NoticeAction, NoticeStack } from '@components/views/Notice'
 import NoticeProgress from '@components/views/NoticeProgress'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -52,7 +52,6 @@ const ComponentTestScreen = () => {
     const [keepMenuOpen, setKeepMenuOpen] = useState(true)
     const [showHiddenItem, setShowHiddenItem] = useState(false)
     const [showDisabledItem, setShowDisabledItem] = useState(false)
-    const [noticeCollapsed, setNoticeCollapsed] = useState(false)
     const { color } = Theme.useTheme()
     const inputRef = useBottomSheetRef()
 
@@ -122,43 +121,21 @@ const ComponentTestScreen = () => {
                 </CollapsableTitle>
 
                 <CollapsableTitle title="Notices">
-                    <View style={{ alignItems: 'flex-end', rowGap: 8 }}>
-                        {noticeCollapsed ? (
-                            <CollapsedNotice
-                                iconName="download"
-                                count={2}
-                                variant="primary"
-                                onPress={() => setNoticeCollapsed(false)}
-                            />
-                        ) : (
-                            <NoticeProgress
-                                label="Downloading models"
-                                iconName="download"
-                                variant="primary"
-                                progress={45}
-                                actions={
-                                    <NoticeAction
-                                        iconName="close"
-                                        onPress={() => setNoticeCollapsed(true)}
-                                    />
-                                }
-                            />
-                        )}
+                    <NoticeStack
+                        style={{ position: 'relative', top: 0, right: 0, maxWidth: '100%' }}>
+                        <NoticeProgress
+                            label="Downloading models"
+                            iconName="download"
+                            variant="primary"
+                            progress={45}
+                        />
                         <NoticeProgress
                             label="Generating summary"
                             actions={<NoticeAction label="Cancel" />}
                         />
-                        <Notice
-                            label="Unfinished summary"
-                            variant="warning"
-                            actions={<NoticeAction label="Later" />}
-                        />
-                        <Notice
-                            label="Summary generation failed"
-                            variant="error"
-                            actions={<NoticeAction label="Later" />}
-                        />
-                    </View>
+                        <Notice label="Unfinished summary" variant="warning" />
+                        <Notice label="Summary generation failed" variant="error" />
+                    </NoticeStack>
                 </CollapsableTitle>
 
                 <ThemedButton onPress={() => inputRef.current?.open()} label="Show Sheet" />

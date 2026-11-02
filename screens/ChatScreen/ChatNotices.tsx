@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
-import Notice, { CollapsedNotice, NoticeAction } from '@components/views/Notice'
+import Notice, { NoticeAction } from '@components/views/Notice'
 import NoticeProgress from '@components/views/NoticeProgress'
 import { isDeferredTaskActive } from '@lib/engine/generation/deferredState'
 import { useDeferredTasks } from '@lib/engine/generation/hooks'
 import { cancelDeferredTask } from '@lib/engine/generation/scheduler'
-import { dismissSummaryNotice, restoreSummaryNotice } from '@lib/engine/summaries/actions'
 import { useLiveQuerySync } from '@lib/hooks/liveQuery'
 import { summaryList } from '@lib/summaries/db'
 import { useSummaryPanelState } from '@lib/summaries/panelState'
@@ -34,8 +33,6 @@ const ChatNotices = ({ chatId }: { chatId: number }) => {
                         ))
             )
     )
-    const notices = unresolved.filter((summary) => !summary.notice_dismissed)
-    const hidden = unresolved.filter((summary) => summary.notice_dismissed)
     return (
         <>
             {tasks.map((task) => (
@@ -55,33 +52,14 @@ const ChatNotices = ({ chatId }: { chatId: number }) => {
                     }
                 />
             ))}
-            {notices.map((summary) => (
+            {unresolved.map((summary) => (
                 <Notice
                     key={summary.id}
                     label={t(summary.status === 'draft' ? 'summary.unfinished' : 'summary.changed')}
                     onPress={() => open(chatId, summary.id)}
                     variant={summary.error?.reason === 'failed' ? 'error' : 'warning'}
-                    actions={
-                        <NoticeAction
-                            label={t('summary.later')}
-                            onPress={() => dismissSummaryNotice(summary.id)}
-                        />
-                    }
                 />
             ))}
-            {hidden.length > 0 && (
-                <CollapsedNotice
-                    iconName="file-text"
-                    count={hidden.length}
-                    variant={
-                        hidden.some((summary) => summary.error?.reason === 'failed')
-                            ? 'error'
-                            : 'warning'
-                    }
-                    accessibilityLabel={t('summary.title')}
-                    onPress={() => hidden.forEach((summary) => restoreSummaryNotice(summary.id))}
-                />
-            )}
         </>
     )
 }

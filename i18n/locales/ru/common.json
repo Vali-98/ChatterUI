@@ -33,6 +33,7 @@
     "common.actions.paste": "Вставить",
     "common.actions.restart": "Начать заново",
     "common.actions.collapse": "Свернуть",
+    "common.actions.expand": "Развернуть",
     "common.actions.openSettings": "Открыть настройки",
     "common.alert.unsaved.description": "У вас есть несохраненные изменения, выход будет отбрасывать все изменения.",
     "common.alert.unsaved.title": "Неспасенные перемены",

@@ -33,6 +33,7 @@
     "common.actions.paste": "Tempel",
     "common.actions.restart": "Mulai ulang",
     "common.actions.collapse": "Ciutkan",
+    "common.actions.expand": "Perluas",
     "common.actions.openSettings": "Buka pengaturan",
     "common.alert.unsaved.description": "Anda memiliki perubahan yang belum disimpan, keluar akan mengabaikan semua perubahan.",
     "common.alert.unsaved.title": "Perubahan Yang Belum Disimpan",

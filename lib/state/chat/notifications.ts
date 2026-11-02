@@ -19,6 +19,8 @@ export const notifyGenerationComplete = async (notification: {
     if (AppState.currentState === 'active') return
     await ensureCompletionNotificationChannel()
     const showText = mmkv.getBoolean(AppSettings.ShowNotificationText)
+    // Set the badge on this notification. Expo's Android setBadgeCountAsync(0) cancels all
+    // notifications, including the foreground service that keeps generations running.
     await Notifications.scheduleNotificationAsync({
         content: {
             title: showText
@@ -36,5 +38,4 @@ export const notifyGenerationComplete = async (notification: {
         },
         trigger: Platform.OS === 'android' ? { channelId: COMPLETION_CHANNEL_ID } : null,
     })
-    await Notifications.setBadgeCountAsync(0)
 }

@@ -6,7 +6,7 @@ import { useAppModeStore } from '@lib/state/AppMode'
 
 import { useDeferredTaskState, isDeferredTaskRunning, dismissDeferredTask } from './deferredState'
 import { useLocalModelResourceState } from './localResource'
-import { canStartGeneration, cancelDeferredTask } from './scheduler'
+import { cancelDeferredTask } from './scheduler'
 import { isActiveGeneration, useGenerationState } from './state'
 
 export const useChatGenerating = (chatId?: number) =>
@@ -24,22 +24,31 @@ export const useSwipeGeneration = (swipeId: number) =>
 export const useCanStartGeneration = (chatId?: number) => {
     const mode = useAppModeStore((state) => state.appMode)
     const [concurrent] = useMMKVBoolean(AppSettings.ConcurrentGenerations)
-    // Subscribe to lifecycle state, not just the selected chat; another task may release capacity.
-    useGenerationState((state) =>
-        Object.values(state.generations)
-            .filter((item) => isActiveGeneration(item) || (!!item.error && !item.persisted))
-            .map((item) => item.id)
-            .join(',')
+    // Derive availability from subscribed values. Discarded subscriptions followed by an
+    // imperative read can leave React Compiler caching the old result for this chat/mode.
+    const generationBlocked = useGenerationState((state) =>
+        Object.values(state.generations).some(
+            (item) =>
+                (item.chatId === chatId &&
+                    (isActiveGeneration(item) || (!!item.error && !item.persisted))) ||
+                (isActiveGeneration(item) &&
+                    (concurrent === false || (mode === 'local' && item.mode === 'local')))
+        )
     )
-    useDeferredTaskState((state) =>
-        Object.values(state.tasks)
-            .filter(isDeferredTaskRunning)
-            .map((task) => task.id)
-            .join(',')
+    const deferredBlocked = useDeferredTaskState((state) =>
+        Object.values(state.tasks).some(
+            (task) =>
+                isDeferredTaskRunning(task) &&
+                (concurrent === false || (mode === 'local' && task.mode === 'local'))
+        )
     )
-    useLocalModelResourceState((state) => state.operations)
-    void concurrent
-    return chatId !== undefined && canStartGeneration(chatId, mode)
+    const modelBusy = useLocalModelResourceState((state) => state.operations > 0)
+    return (
+        chatId !== undefined &&
+        !generationBlocked &&
+        !deferredBlocked &&
+        !(mode === 'local' && modelBusy)
+    )
 }
 
 export const useDeferredTasks = (chatId?: number) =>

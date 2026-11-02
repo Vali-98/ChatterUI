@@ -33,6 +33,7 @@
     "common.actions.paste": "粘贴",
     "common.actions.restart": "重新开始",
     "common.actions.collapse": "收起",
+    "common.actions.expand": "展开",
     "common.actions.openSettings": "打开设置",
     "common.alert.unsaved.description": "您有未保存的更改, 退出会丢弃所有更改 。",
     "common.alert.unsaved.title": "未保存的更改",

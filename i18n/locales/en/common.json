@@ -33,6 +33,7 @@
     "common.actions.paste": "Paste",
     "common.actions.restart": "Restart",
     "common.actions.collapse": "Collapse",
+    "common.actions.expand": "Expand",
     "common.actions.openSettings": "Open settings",
     "common.alert.unsaved.description": "You have unsaved changes, exiting will discard all changes.",
     "common.alert.unsaved.title": "Unsaved Changes",

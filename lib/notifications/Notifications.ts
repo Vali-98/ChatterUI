@@ -91,9 +91,18 @@ export function useAppStateNotificationObserver() {
 
             const response = Notifications.getLastNotificationResponse()
             if (!response?.notification) {
-                if ((await Notifications.getPresentedNotificationsAsync()).length > 0) {
-                    await Notifications.dismissAllNotificationsAsync()
-                }
+                const presented = await Notifications.getPresentedNotificationsAsync()
+                await Promise.all(
+                    presented
+                        .filter(
+                            (notification) =>
+                                typeof notification.request.content.data?.chatId === 'number' &&
+                                typeof notification.request.content.data?.characterId === 'number'
+                        )
+                        .map((notification) =>
+                            Notifications.dismissNotificationAsync(notification.request.identifier)
+                        )
+                )
                 return
             }
 

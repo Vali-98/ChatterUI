@@ -1,10 +1,12 @@
 import * as Notifications from 'expo-notifications'
+import { act, createElement } from 'react'
 import { AppState, Platform } from 'react-native'
 
 import Alert from '../components/views/Alert'
 import {
     registerForPushNotificationsAsync,
     setupNotifications,
+    useAppStateNotificationObserver,
 } from '../lib/notifications/Notifications'
 import { notifyGenerationComplete } from '../lib/state/chat/notifications'
 import { ensureCompletionNotificationChannel } from '../lib/notifications/channels'
@@ -17,14 +19,22 @@ jest.mock('expo-notifications', () => ({
     requestPermissionsAsync: jest.fn(),
     scheduleNotificationAsync: jest.fn(async () => 'one'),
     setBadgeCountAsync: jest.fn(async () => true),
+    getLastNotificationResponse: jest.fn(() => null),
+    getPresentedNotificationsAsync: jest.fn(async () => []),
+    dismissNotificationAsync: jest.fn(async () => {}),
+    dismissAllNotificationsAsync: jest.fn(async () => {}),
     AndroidImportance: { DEFAULT: 3 },
 }))
 jest.mock('expo-router', () => ({ router: {} }))
 jest.mock('i18next', () => ({ t: (key: string) => key }))
-jest.mock('react-native-mmkv', () => ({ useMMKVBoolean: jest.fn() }))
+jest.mock('react-native-mmkv', () => ({ useMMKVBoolean: () => [false, jest.fn()] }))
 jest.mock('../lib/storage/MMKV', () => ({ mmkv: { getBoolean: () => false } }))
-jest.mock('../lib/state/characters', () => ({ Characters: {} }))
-jest.mock('../lib/state/chat', () => ({ Chats: {} }))
+jest.mock('../lib/state/characters', () => ({
+    Characters: { useCharacterState: () => ({ setCard: jest.fn() }) },
+}))
+jest.mock('../lib/state/chat', () => ({
+    Chats: { useChat: () => ({ chatId: 1, setId: jest.fn() }) },
+}))
 jest.mock('../lib/state/Logger', () => ({ Logger: {} }))
 jest.mock('../components/views/Alert', () => ({
     __esModule: true,
@@ -37,6 +47,48 @@ beforeEach(() => {
     jest.clearAllMocks()
     setAppState('background')
     Object.defineProperty(Platform, 'OS', { configurable: true, value: 'android' })
+})
+
+test('successive background completions are delivered without clearing notifications', async () => {
+    await notifyGenerationComplete(notification)
+    await notifyGenerationComplete({ ...notification, text: 'Another response' })
+    expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledTimes(2)
+    expect(Notifications.setBadgeCountAsync).not.toHaveBeenCalled()
+    expect(Notifications.dismissAllNotificationsAsync).not.toHaveBeenCalled()
+})
+
+test('returning to the app clears completion notifications without removing the background service', async () => {
+    const { create } = require('react-test-renderer')
+    Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
+    const listen = jest.spyOn(AppState, 'addEventListener').mockReturnValue({ remove: jest.fn() })
+    const Observer = () => {
+        useAppStateNotificationObserver()
+        return null
+    }
+    const presented = (identifier: string, data: Record<string, unknown>) =>
+        ({ request: { identifier, content: { data } } }) as Notifications.Notification
+    jest.mocked(Notifications.getPresentedNotificationsAsync).mockResolvedValueOnce([
+        presented('background-service', {}),
+        presented('first', { chatId: 1, characterId: 2 }),
+        presented('second', { chatId: 3, characterId: 4 }),
+    ])
+    let screen: ReturnType<typeof create>
+    try {
+        await act(async () => {
+            screen = create(createElement(Observer))
+        })
+        await act(async () => {
+            await listen.mock.calls.at(-1)![1]('active')
+        })
+        expect(jest.mocked(Notifications.dismissNotificationAsync).mock.calls).toEqual([
+            ['first'],
+            ['second'],
+        ])
+        expect(Notifications.dismissAllNotificationsAsync).not.toHaveBeenCalled()
+    } finally {
+        await act(async () => screen?.unmount())
+        listen.mockRestore()
+    }
 })
 
 test('background completions use the configured channel, foreground completions stay silent', async () => {

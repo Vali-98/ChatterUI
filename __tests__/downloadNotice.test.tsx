@@ -3,13 +3,25 @@ import { View } from 'react-native'
 
 import IconButton from '../components/buttons/IconButton'
 import DownloadNotice from '../components/downloads/DownloadNotice'
-import { useDownloadNoticeState } from '../lib/downloads/noticeState'
+import CharacterImportNotice from '../components/views/CharacterImportNotice'
+import Notice, { NoticeStack } from '../components/views/Notice'
+import { useCharacterImportState } from '../lib/state/characters/importState'
 
 const mockPush = jest.fn()
 let mockOnboarding = 'complete'
 let mockDownloads = [{ id: 'one', status: 'downloading', bytesWritten: 50, totalBytes: 100 }]
 jest.mock('expo-router', () => ({ router: { push: (...args: unknown[]) => mockPush(...args) } }))
 jest.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string) => key }) }))
+jest.mock('react-native-reanimated', () => {
+    const transition = { duration: () => transition }
+    return {
+        __esModule: true,
+        default: { View: require('react-native').View },
+        FadeIn: transition,
+        FadeOut: transition,
+        LinearTransition: transition,
+    }
+})
 jest.mock('../lib/downloads/store', () => ({
     useDownloadStore: (selector: (state: unknown) => unknown) =>
         selector({ downloads: mockDownloads }),
@@ -61,44 +73,101 @@ jest.mock('../components/views/ProgressBar', () => ({
 const { create } = require('react-test-renderer')
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
 beforeEach(() => {
-    useDownloadNoticeState.getState().expand()
     mockOnboarding = 'complete'
     mockDownloads = [{ id: 'one', status: 'downloading', bytesWritten: 50, totalBytes: 100 }]
     mockPush.mockClear()
 })
 
-test('collapsed downloads stay compact across hosts and expand before navigation', async () => {
+test('one control collapses all notices and expanding does not navigate', async () => {
     let screen: ReturnType<typeof create>
     await act(async () => {
-        screen = create(<DownloadNotice />)
+        screen = create(
+            <NoticeStack>
+                <DownloadNotice />
+                <Notice label="Unfinished summary" variant="warning" />
+            </NoticeStack>
+        )
     })
-    const event = { stopPropagation: jest.fn() }
+    expect(screen.root.findAllByType(IconButton)).toHaveLength(1)
     await act(async () => {
-        screen.root.findByType(IconButton).props.onPress(event)
+        screen.root.findByType(IconButton).props.onPress()
     })
-    expect(event.stopPropagation).toHaveBeenCalled()
     expect(mockPush).not.toHaveBeenCalled()
-    expect(screen.root.findAllByProps({ testID: 'download-icon' }).length).toBeGreaterThan(0)
     expect(screen.root.findAllByProps({ testID: 'progress' })).toHaveLength(0)
-    await act(async () => screen.unmount())
+    expect(screen.root.findByType(IconButton).props.iconName).toBe('down')
     await act(async () => {
-        screen = create(<DownloadNotice />)
+        screen.update(
+            <NoticeStack>
+                <DownloadNotice />
+                <Notice label="Unfinished summary" variant="warning" />
+                <Notice label="Another task" />
+            </NoticeStack>
+        )
     })
-    expect(screen.root.findAllByProps({ testID: 'download-icon' }).length).toBeGreaterThan(0)
-    await act(async () =>
-        screen.root.findAllByProps({ accessibilityRole: 'button' })[0].props.onPress()
-    )
+    expect(screen.root.findAllByProps({ testID: 'progress' })).toHaveLength(0)
+    await act(async () => screen.root.findByType(IconButton).props.onPress())
     expect(mockPush).not.toHaveBeenCalled()
     expect(screen.root.findAllByProps({ testID: 'progress' })[0].props.progress).toBe(50)
     await act(async () =>
         screen.root.findAllByProps({ accessibilityRole: 'button' })[0].props.onPress()
     )
     expect(mockPush).toHaveBeenCalledWith('/models')
-    expect(useDownloadNoticeState.getState().collapsedFor).toBeUndefined()
     expect(
         screen.root.findAllByProps({ accessibilityLabel: 'common.actions.collapse' }).length
     ).toBeGreaterThan(0)
+    await act(async () =>
+        screen.update(
+            <NoticeStack>
+                <DownloadNotice />
+            </NoticeStack>
+        )
+    )
+    mockDownloads = []
+    await act(async () =>
+        screen.update(
+            <NoticeStack>
+                <DownloadNotice />
+            </NoticeStack>
+        )
+    )
+    expect(screen.root.findAllByType(IconButton)).toHaveLength(0)
     await act(async () => screen.unmount())
+})
+
+test('character import results dismiss automatically, including while the stack is collapsed', async () => {
+    jest.useFakeTimers()
+    let screen: ReturnType<typeof create>
+    try {
+        useCharacterImportState.setState({
+            isImporting: true,
+            total: 2,
+            completed: 0,
+            succeeded: 0,
+            failed: 0,
+            noticeDismissed: false,
+        })
+        await act(async () => {
+            screen = create(
+                <NoticeStack>
+                    <CharacterImportNotice />
+                </NoticeStack>
+            )
+        })
+        await act(async () => jest.advanceTimersByTime(10_000))
+        expect(useCharacterImportState.getState().noticeDismissed).toBe(false)
+        await act(async () => {
+            screen.root.findByType(IconButton).props.onPress()
+            useCharacterImportState.setState({ isImporting: false, completed: 2, succeeded: 2 })
+        })
+        await act(async () => jest.advanceTimersByTime(4999))
+        expect(useCharacterImportState.getState().noticeDismissed).toBe(false)
+        await act(async () => jest.advanceTimersByTime(1))
+        expect(useCharacterImportState.getState().noticeDismissed).toBe(true)
+        expect(screen.root.findAllByType(IconButton)).toHaveLength(0)
+    } finally {
+        await act(async () => screen?.unmount())
+        jest.useRealTimers()
+    }
 })
 
 test('onboarding and completed transfers do not show a notice', async () => {

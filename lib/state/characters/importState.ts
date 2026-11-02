@@ -10,7 +10,7 @@ export type CharacterImportState = {
     dismissNotice: () => void
 }
 
-// Keep the final counts until the result is dismissed or another import starts.
+// Keep the final counts until the result notice expires or another import starts.
 export const useCharacterImportState = create<CharacterImportState>()((set) => ({
     isImporting: false,
     total: 0,

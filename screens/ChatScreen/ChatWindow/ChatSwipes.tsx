@@ -102,8 +102,8 @@ const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) 
     const isLastAltGreeting = isGreeting && currentIndex === swipeIdList.length - 1
     const isFirstSwipe = currentIndex === 0
 
-    const disableSwipeLeft = isGenerating || isFirstSwipe
-    const disableSwipeRight = isGenerating || isLastAltGreeting
+    const disableSwipeLeft = isGenerating || !canGenerate || isFirstSwipe
+    const disableSwipeRight = isGenerating || !canGenerate || isLastAltGreeting
 
     return (
         <View ref={ref} collapsable={false} style={styles.swipesItem}>
@@ -119,7 +119,7 @@ const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) 
                 <IconButton
                     onPress={() => regenerateResponse(swipe)}
                     onLongPress={() => regenerateResponse(swipe, false)}
-                    disabled={isGenerating}
+                    disabled={isGenerating || !canGenerate}
                     viewStyle={styles.swipeButton}
                     iconName="retweet"
                     iconSize={20}
@@ -133,7 +133,7 @@ const ChatSwipes: React.FC<SwipesProps> = ({ isGenerating, isGreeting, swipe }) 
             {!isGreeting && (
                 <IconButton
                     onPress={() => continueResponse(swipe)}
-                    disabled={isGenerating}
+                    disabled={isGenerating || !canGenerate}
                     viewStyle={styles.swipeButton}
                     iconName="forward"
                     iconSize={20}

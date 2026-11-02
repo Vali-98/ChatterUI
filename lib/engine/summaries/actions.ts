@@ -71,12 +71,6 @@ export const saveSummary = (id: number, content: string) => {
     assertSummaryEditable(id)
     acceptSummary(id, { content: content })
 }
-export const dismissSummaryNotice = (id: number) => {
-    updateSummary(id, { notice_dismissed: true })
-}
-export const restoreSummaryNotice = (id: number) => {
-    updateSummary(id, { notice_dismissed: false })
-}
 export const deleteSummary = (id: number) => {
     const summary = assertSummaryEditable(id)
     deleteSummaryRow(id)

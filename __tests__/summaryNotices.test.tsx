@@ -3,12 +3,7 @@ import { act } from 'react'
 import ChatNotices from '../screens/ChatScreen/ChatNotices'
 
 const mockOpen = jest.fn()
-const mockRestore = jest.fn((id: number) => {
-    mockSummaries = mockSummaries.map((summary) =>
-        summary.id === id ? { ...summary, notice_dismissed: false } : summary
-    )
-})
-let mockSummaries = [
+const mockSummaries = [
     {
         id: 1,
         status: 'draft',
@@ -24,10 +19,6 @@ jest.mock('../lib/theme/ThemeManager', () => ({
 }))
 jest.mock('../lib/engine/generation/hooks', () => ({ useDeferredTasks: () => [] }))
 jest.mock('../lib/engine/generation/scheduler', () => ({ cancelDeferredTask: jest.fn() }))
-jest.mock('../lib/engine/summaries/actions', () => ({
-    dismissSummaryNotice: jest.fn(),
-    restoreSummaryNotice: (id: number) => mockRestore(id),
-}))
 jest.mock('../lib/hooks/liveQuery', () => ({ useLiveQuerySync: () => ({ data: mockSummaries }) }))
 jest.mock('../lib/summaries/db', () => ({ summaryList: () => null }))
 jest.mock('../lib/summaries/panelState', () => ({
@@ -43,11 +34,6 @@ jest.mock('../components/views/Notice', () => ({
         require('react').createElement(require('react-native').View, {
             ...props,
             testID: 'notice',
-        }),
-    CollapsedNotice: (props: object) =>
-        require('react').createElement(require('react-native').View, {
-            ...props,
-            testID: 'collapsed',
         }),
     NoticeAction: require('react-native').Pressable,
 }))
@@ -69,20 +55,12 @@ jest.mock('../components/views/ThemedSpinner', () => ({
 const { create } = require('react-test-renderer')
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
 
-test('a collapsed summary group retains error severity and expands without opening the editor', async () => {
+test('summary issues retain their severity and open on press without individual dismissal controls', async () => {
     let screen: ReturnType<typeof create>
     await act(async () => {
         screen = create(<ChatNotices chatId={7} />)
     })
-    const collapsed = screen.root.findAllByProps({ testID: 'collapsed' })[0]
-    expect(collapsed.props.variant).toBe('error')
-    expect(collapsed.props.count).toBe(2)
-    await act(async () => collapsed.props.onPress())
-    expect(mockRestore).toHaveBeenCalledWith(1)
-    expect(mockRestore).toHaveBeenCalledWith(2)
     expect(mockOpen).not.toHaveBeenCalled()
-    await act(async () => screen.update(<ChatNotices chatId={7} />))
-    expect(screen.root.findAllByProps({ testID: 'collapsed' })).toHaveLength(0)
     const notices = screen.root
         .findAllByProps({ testID: 'notice' })
         .filter((node: { type: unknown }) => typeof node.type === 'string')
@@ -90,6 +68,9 @@ test('a collapsed summary group retains error severity and expands without openi
         'error',
         'warning',
     ])
+    expect(notices.every((notice: { props: { actions?: unknown } }) => !notice.props.actions)).toBe(
+        true
+    )
     await act(async () => notices[0].props.onPress())
     expect(mockOpen).toHaveBeenCalledWith(7, 1)
     await act(async () => screen.unmount())
