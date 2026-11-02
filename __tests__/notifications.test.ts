@@ -9,7 +9,6 @@ import {
     useAppStateNotificationObserver,
 } from '../lib/notifications/Notifications'
 import { notifyGenerationComplete } from '../lib/state/chat/notifications'
-import { ensureCompletionNotificationChannel } from '../lib/notifications/channels'
 
 jest.mock('expo-notifications', () => ({
     setNotificationHandler: jest.fn(),
@@ -121,7 +120,7 @@ test('the handler allows background delivery but suppresses delivery after retur
     })
 })
 
-test('the corrected vibration channel preserves previous channel preferences', async () => {
+test('the corrected vibration channel converts native readback into valid creation options', async () => {
     jest.mocked(Notifications.getNotificationChannelAsync)
         .mockResolvedValueOnce(null)
         .mockResolvedValueOnce({
@@ -130,6 +129,7 @@ test('the corrected vibration channel preserves previous channel preferences', a
             importance: Notifications.AndroidImportance.DEFAULT,
             bypassDnd: false,
             description: null,
+            groupId: null,
             lightColor: '#7d6294',
             lockscreenVisibility: 0,
             showBadge: false,
@@ -146,15 +146,26 @@ test('the corrected vibration channel preserves previous channel preferences', a
             enableVibrate: false,
             sound: 'custom',
         })
-    await ensureCompletionNotificationChannel()
+    jest.mocked(Notifications.setNotificationChannelAsync).mockImplementationOnce(
+        async (_, options) => {
+            // Expo's Android bridge tries to create a group whenever this key is present.
+            if ('groupId' in options && !options.groupId)
+                throw new Error('Invalid notification group')
+            return null
+        }
+    )
+    await notifyGenerationComplete(notification)
     expect(Notifications.setNotificationChannelAsync).toHaveBeenCalledWith(
         'chatterUI-completions',
         expect.objectContaining({
             enableVibrate: false,
-            sound: 'custom',
             vibrationPattern: [0, 250, 125, 250],
         })
     )
+    const options = jest.mocked(Notifications.setNotificationChannelAsync).mock.calls[0][1]
+    expect(options).not.toHaveProperty('groupId')
+    expect(options.sound).not.toBe('custom')
+    expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledTimes(1)
 })
 
 test('enabling notifications requests OS permission instead of assuming it was granted', async () => {
