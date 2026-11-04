@@ -157,6 +157,21 @@ const defaultInstructs: InstructType[] = [
         name: 'DeepSeek-R1',
         ...defaultGenerics,
     },
+    {
+        system_prompt: "Write {{char}}'s next reply in a chat between {{char}} and {{user}}.",
+        system_prefix: '{{[SYSTEM]}}',
+        system_suffix: '{{[SYSTEM_END]}}',
+        input_prefix: '{{[INPUT]}}',
+        input_suffix: '{{[INPUT_END]}}',
+        output_prefix: '{{[OUTPUT]}}',
+        last_output_prefix: '{{[OUTPUT]}}',
+        output_suffix: '{{[OUTPUT_END]}}',
+        stop_sequence: '{{[OUTPUT_END]}}',
+        user_alignment_message: '',
+        activation_regex: '',
+        name: 'KoboldAI',
+        ...defaultGenerics,
+    },
 ]
 
 export const outputPrefixes = defaultInstructs
