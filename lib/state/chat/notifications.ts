@@ -10,6 +10,8 @@ import {
 import { AppSettings } from '@lib/constants/appSettings'
 import { mmkv } from '@lib/storage/MMKV'
 
+const COMPLETION_NOTIFICATION_ID = 'chatterui-generation-complete'
+
 export const notifyGenerationComplete = async (notification: {
     chatId: number
     characterId: number
@@ -19,9 +21,13 @@ export const notifyGenerationComplete = async (notification: {
     if (AppState.currentState === 'active') return
     await ensureCompletionNotificationChannel()
     const showText = mmkv.getBoolean(AppSettings.ShowNotificationText)
+    // dismiss previous notification based on id
+    await Notifications.dismissNotificationAsync(COMPLETION_NOTIFICATION_ID)
+
     // Set the badge on this notification. Expo's Android setBadgeCountAsync(0) cancels all
     // notifications, including the foreground service that keeps generations running.
     await Notifications.scheduleNotificationAsync({
+        identifier: COMPLETION_NOTIFICATION_ID,
         content: {
             title: showText
                 ? notification.characterName

@@ -3,7 +3,7 @@ import { Platform } from 'react-native'
 
 export const COMPLETION_CHANNEL_ID = 'chatterUI-completions'
 // Android alternates delay, vibration, pause, vibration.
-export const COMPLETION_VIBRATION_PATTERN = [0, 250, 125, 250]
+export const COMPLETION_VIBRATION_PATTERN = [0, 500, 200, 500]
 
 export const ensureCompletionNotificationChannel = async () => {
     if (Platform.OS !== 'android') return
