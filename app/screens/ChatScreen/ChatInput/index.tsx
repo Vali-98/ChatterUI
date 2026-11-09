@@ -1,5 +1,8 @@
 import MaterialIcons from '@react-native-vector-icons/material-icons/static'
 import { randomUUID } from 'expo-crypto'
+// 👇 НОВОЕ: импорты для выбора и чтения файлов
+import * as DocumentPicker from 'expo-document-picker'
+import * as FileSystem from 'expo-file-system'
 import { Image } from 'expo-image'
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from 'expo-image-picker'
 import { router } from 'expo-router'
@@ -157,6 +160,35 @@ const ChatInput = () => {
         return setAttachments([...attachments, ...newAttachments])
     }
 
+    // 👇 НОВОЕ: функция выбора и чтения текстового файла
+    const handlePickDocument = async () => {
+        try {
+            const result = await DocumentPicker.getDocumentAsync({
+                type: ['text/plain', 'text/markdown', 'application/json', 'text/csv'],
+                copyToCacheDirectory: true,
+                multiple: false,
+            })
+
+            if (result.canceled || !result.assets?.[0]) return
+
+            const file = result.assets[0]
+            const content = await FileSystem.readAsStringAsync(file.uri, {
+                encoding: FileSystem.EncodingType.UTF8,
+            })
+
+            // Ограничение, чтобы не залить мегабайты текста в поле ввода
+            const MAX = 50_000
+            const trimmed =
+                content.length > MAX ? content.slice(0, MAX) + '\n\n[…файл обрезан]' : content
+
+            const formatted = `\n\n--- ${file.name ?? 'file.txt'} ---\n${trimmed}\n--- конец файла ---\n`
+            setNewMessage(newMessage + formatted)
+        } catch (e) {
+            Logger.error(e)
+            Logger.errorToast('Не удалось прочитать файл')
+        }
+    }
+
     return (
         <Pressable
             onPress={() => {
@@ -290,6 +322,15 @@ const ChatInput = () => {
                                         onPress: async (close) => {
                                             close()
                                             handlePickImage()
+                                        },
+                                    },
+                                    // 👇 НОВОЕ: третий пункт меню — добавить файл
+                                    {
+                                        label: 'Добавить файл',
+                                        icon: 'description',
+                                        onPress: (close) => {
+                                            close()
+                                            handlePickDocument()
                                         },
                                     },
                                 ]}
