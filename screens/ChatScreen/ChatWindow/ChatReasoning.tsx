@@ -1,8 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import Markdown from 'react-native-markdown-display'
 
+import ThemedMarkdown from '@components/text/markdown/ThemedMarkdown'
 import Accordion from '@components/views/Accordion'
-import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const ChatReasoning = ({
@@ -14,7 +13,6 @@ const ChatReasoning = ({
 }) => {
     const { color } = Theme.useTheme()
     const { t } = useTranslation()
-    const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
     return (
         <Accordion
             label={t(generating ? 'chat.reasoning.generating' : 'chat.reasoning.label')}
@@ -34,9 +32,7 @@ const ChatReasoning = ({
             labelStyle={{ color: color.chat.section.headerText }}
             iconColor={color.chat.section.headerText}
             style={{ flex: 1 }}>
-            <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
-                {content}
-            </Markdown>
+            <ThemedMarkdown>{content}</ThemedMarkdown>
         </Accordion>
     )
 }

@@ -1,5 +1,5 @@
 import { createReasoningParser, splitReasoning } from '../lib/engine/reasoning/parser'
-import { thinkTags } from '../lib/markdown/ThinkTags'
+import { thinkTags } from '../lib/constants/thinkTags'
 import {
     appendGeneration,
     enableGenerationInlineReasoning,

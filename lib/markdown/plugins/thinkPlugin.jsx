@@ -1,4 +1,4 @@
-import { thinkTags } from './ThinkTags'
+import { thinkTags } from '@lib/constants/thinkTags'
 
 export default thinkPlugin
 

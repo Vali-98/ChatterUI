@@ -1,4 +1,4 @@
-import { thinkTags } from '@lib/markdown/ThinkTags'
+import { thinkTags } from '@lib/constants/thinkTags'
 
 const tags = thinkTags.map((tag) => ({ ...tag, open: new RegExp(tag.open.source, 'i') }))
 const controls = /[<`~\n]/

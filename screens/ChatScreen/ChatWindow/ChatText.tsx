@@ -1,11 +1,10 @@
 import React, { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Animated, Easing, useAnimatedValue, View } from 'react-native'
-import Markdown from 'react-native-markdown-display'
 
+import ThemedMarkdown from '@components/text/markdown/ThemedMarkdown'
 import ThemedButton from '@components/buttons/ThemedButton'
 import { useTextFilter } from '@lib/hooks/TextFilter'
-import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ChatReasoning from './ChatReasoning'
@@ -18,7 +17,6 @@ type ChatTextProps = {
 const ChatText: React.FC<ChatTextProps> = ({ swipeText, reasoning }) => {
     const { t } = useTranslation()
     const { spacing } = Theme.useTheme()
-    const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
     const [showHidden, setShowHidden] = useState(false)
     const viewRef = useRef<View>(null)
     const animHeight = useAnimatedValue(-1)
@@ -57,9 +55,7 @@ const ChatText: React.FC<ChatTextProps> = ({ swipeText, reasoning }) => {
             <View style={{ minHeight: 10 }} ref={viewRef} onLayout={updateHeight}>
                 {renderedReasoning ? <ChatReasoning content={renderedReasoning} /> : null}
                 <View style={{ paddingHorizontal: spacing.m, paddingVertical: spacing.sm }}>
-                    <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
-                        {renderedText}
-                    </Markdown>
+                    <ThemedMarkdown>{renderedText}</ThemedMarkdown>
                     {(filteredText.found || filteredReasoning.found) && (
                         <View style={{ flexDirection: 'row' }}>
                             <ThemedButton

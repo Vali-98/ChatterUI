@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Animated, Easing, useAnimatedValue, View } from 'react-native'
-import Markdown from 'react-native-markdown-display'
 
+import ThemedMarkdown from '@components/text/markdown/ThemedMarkdown'
 import ThemedButton from '@components/buttons/ThemedButton'
 import AnimatedEllipsis from '@components/text/AnimatedEllipsis'
 import { ChatSwipe } from '@db/schema'
 import { useSwipeGeneration } from '@lib/engine/generation/hooks'
 import { finishGeneration } from '@lib/engine/generation/lifecycle'
 import { useTextFilter } from '@lib/hooks/TextFilter'
-import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -23,7 +22,6 @@ type ChatTextProps = {
 const ChatTextLast: React.FC<ChatTextProps> = ({ isGenerating, swipe }) => {
     const { t } = useTranslation()
     const { spacing } = Theme.useTheme()
-    const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
 
     const generation = useSwipeGeneration(swipe.id)
     const buffer = { data: generation?.text ?? swipe.swipe }
@@ -86,9 +84,9 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ isGenerating, swipe }) => {
                         isGenerating &&
                         buffer.data === '' &&
                         !generation?.reasoning && <AnimatedEllipsis />}
-                    <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
+                    <ThemedMarkdown>
                         {generation ? buffer.data.trim() : renderedText}
-                    </Markdown>
+                    </ThemedMarkdown>
                     {generation?.error && !generation.persisted && (
                         <ThemedButton
                             label={t('common.actions.save')}

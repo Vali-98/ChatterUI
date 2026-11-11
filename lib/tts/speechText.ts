@@ -1,4 +1,4 @@
-import { thinkTags } from '@lib/markdown/ThinkTags'
+import { thinkTags } from '@lib/constants/thinkTags'
 
 const reasoningTags = thinkTags.map((tag) => ({
     open: new RegExp(tag.open.source, 'i'),

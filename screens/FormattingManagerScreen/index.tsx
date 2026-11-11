@@ -2,11 +2,11 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
-import Markdown from 'react-native-markdown-display'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
+import ThemedMarkdown from '@components/text/markdown/ThemedMarkdown'
 import IconButton from '@components/buttons/IconButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import ListEditorSheet from '@components/input/ListEditorSheet'
@@ -27,7 +27,6 @@ import useAutosave from '@lib/hooks/AutoSave'
 import { useCompletionMode } from '@lib/hooks/CompletionMode'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { useTextFilterStore } from '@lib/hooks/TextFilter'
-import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { useAppMode } from '@lib/state/AppMode'
 import { Instructs, InstructType } from '@lib/state/Instructs'
 import { Logger } from '@lib/state/Logger'
@@ -65,7 +64,6 @@ const attachmentKeys: KeysOfType<InstructType, boolean>[] = [
 
 const FormattingManager = () => {
     const { t } = useTranslation()
-    const markdownStyle = MarkdownStyle.useMarkdownStyle()
     const autoformatterData = useMemo(
         () => [
             {
@@ -441,12 +439,9 @@ const FormattingManager = () => {
                             alignItems: 'center',
                             borderRadius: borderRadius.m,
                         }}>
-                        <Markdown
-                            markdownit={MarkdownStyle.Rules}
-                            rules={MarkdownStyle.RenderRules}
-                            style={markdownStyle}>
+                        <ThemedMarkdown mergeStyle>
                             {autoformatterData[currentInstruct.format_type].example}
-                        </Markdown>
+                        </ThemedMarkdown>
                     </View>
                     <View>
                         {autoformatterData.map((item, index) => (
