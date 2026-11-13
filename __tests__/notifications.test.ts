@@ -9,6 +9,7 @@ import {
     useAppStateNotificationObserver,
 } from '../lib/notifications/Notifications'
 import { notifyGenerationComplete } from '../lib/state/chat/notifications'
+import { COMPLETION_VIBRATION_PATTERN } from '../lib/notifications/channels'
 
 jest.mock('expo-notifications', () => ({
     setNotificationHandler: jest.fn(),
@@ -94,7 +95,7 @@ test('background completions use the configured channel, foreground completions 
     await notifyGenerationComplete(notification)
     expect(Notifications.setNotificationChannelAsync).toHaveBeenCalledWith(
         'chatterUI-completions',
-        expect.objectContaining({ vibrationPattern: [0, 250, 125, 250] })
+        expect.objectContaining({ vibrationPattern: COMPLETION_VIBRATION_PATTERN })
     )
     expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(
         expect.objectContaining({ trigger: { channelId: 'chatterUI-completions' } })
@@ -159,7 +160,7 @@ test('the corrected vibration channel converts native readback into valid creati
         'chatterUI-completions',
         expect.objectContaining({
             enableVibrate: false,
-            vibrationPattern: [0, 250, 125, 250],
+            vibrationPattern: COMPLETION_VIBRATION_PATTERN,
         })
     )
     const options = jest.mocked(Notifications.setNotificationChannelAsync).mock.calls[0][1]

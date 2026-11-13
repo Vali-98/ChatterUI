@@ -43,7 +43,7 @@ const MarkdownPreview = ({
         return () => clearInterval(timer)
     }, [isStreaming, tokensPerSecond, onFinish])
 
-    return <ThemedMarkdown>{text}</ThemedMarkdown>
+    return <ThemedMarkdown streaming={isStreaming}>{text}</ThemedMarkdown>
 }
 
 const MarkdownTestScreen = () => {

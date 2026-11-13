@@ -33,35 +33,42 @@ export const useMarkdownStyles = () => {
                 body: {
                     color: color.chat.text,
                     textAlign: 'auto',
+                    gap: 0,
                 },
 
                 // Headings
                 heading1: {
+                    color: color.chat.text,
                     flexDirection: 'row',
                     fontSize: getModifiedFontSize(32),
                     fontWeight: getModifiedFontWeight(500),
                 },
                 heading2: {
+                    color: color.chat.text,
                     flexDirection: 'row',
                     fontSize: getModifiedFontSize(24),
                     fontWeight: getModifiedFontWeight(500),
                 },
                 heading3: {
+                    color: color.chat.text,
                     flexDirection: 'row',
                     fontSize: getModifiedFontSize(18),
                     fontWeight: getModifiedFontWeight(500),
                 },
                 heading4: {
+                    color: color.chat.text,
                     flexDirection: 'row',
                     fontSize: getModifiedFontSize(16),
                     fontWeight: getModifiedFontWeight(500),
                 },
                 heading5: {
+                    color: color.chat.text,
                     flexDirection: 'row',
                     fontSize: getModifiedFontSize(13),
                     fontWeight: getModifiedFontWeight(500),
                 },
                 heading6: {
+                    color: color.chat.text,
                     flexDirection: 'row',
                     fontSize: getModifiedFontSize(11),
                     fontWeight: getModifiedFontWeight(500),
@@ -210,6 +217,9 @@ export const useMarkdownStyles = () => {
                     backgroundColor: color.chat.markdown.table.background,
                 },
                 th: {
+                    color: color.chat.text,
+                    fontSize: getModifiedFontSize(14),
+                    fontWeight: getModifiedFontWeight(700),
                     flex: 1,
                     padding: 8,
                 },
@@ -220,6 +230,9 @@ export const useMarkdownStyles = () => {
                     fontSize: getModifiedFontSize(14),
                 },
                 td: {
+                    color: color.chat.text,
+                    fontSize: getModifiedFontSize(14),
+                    fontWeight: getModifiedFontWeight(400),
                     flex: 1,
                     padding: 8,
                 },
@@ -260,6 +273,8 @@ export const useMarkdownStyles = () => {
                     marginBottom: spacing.sm,
                 },
                 paragraph: {
+                    color: color.chat.text,
+                    fontWeight: getModifiedFontWeight(400),
                     flexWrap: 'wrap',
                     textAlign: 'auto',
                     marginVertical: spacing.sm,

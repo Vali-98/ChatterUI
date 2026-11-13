@@ -32,7 +32,7 @@ const ChatReasoning = ({
             labelStyle={{ color: color.chat.section.headerText }}
             iconColor={color.chat.section.headerText}
             style={{ flex: 1 }}>
-            <ThemedMarkdown>{content}</ThemedMarkdown>
+            <ThemedMarkdown streaming={generating}>{content}</ThemedMarkdown>
         </Accordion>
     )
 }

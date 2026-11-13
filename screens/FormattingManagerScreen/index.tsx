@@ -439,7 +439,7 @@ const FormattingManager = () => {
                             alignItems: 'center',
                             borderRadius: borderRadius.m,
                         }}>
-                        <ThemedMarkdown mergeStyle>
+                        <ThemedMarkdown>
                             {autoformatterData[currentInstruct.format_type].example}
                         </ThemedMarkdown>
                     </View>

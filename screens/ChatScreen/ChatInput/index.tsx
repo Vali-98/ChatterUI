@@ -17,6 +17,7 @@ import Animated, {
 import { useShallow } from 'zustand/react/shallow'
 
 import IconButton from '@components/buttons/IconButton'
+import ThemedMarkdownInput, { type MarkdownInputRef } from '@components/input/ThemedMarkdownInput'
 import AudioAttachment from '@components/media/AudioAttachment'
 import AudioRecordingSheet from '@components/media/AudioRecordingSheet'
 import Alert from '@components/views/Alert'
@@ -26,7 +27,6 @@ import ContextMenu from '@components/views/ContextMenu'
 import ThemedSpinner from '@components/views/ThemedSpinner'
 import { XAxisOnlyTransition } from '@lib/animations/transitions'
 import { useAudioAttachmentPicker } from '@lib/audio/useAudioAttachmentPicker'
-import { AnimatedTextInput } from '@lib/components/AnimatedComponents'
 import { AppSettings } from '@lib/constants/appSettings'
 import { useChatGenerating, useCanStartGeneration } from '@lib/engine/generation/hooks'
 import { abortGeneration } from '@lib/engine/generation/runtime'
@@ -50,7 +50,7 @@ export type Attachment = {
 
 const ChatInput = () => {
     const { t } = useTranslation()
-    const inputRef = useUnfocusTextInput()
+    const inputRef = useUnfocusTextInput<MarkdownInputRef>()
     const { available: activeProvider, mode } = useActiveProvider()
     const { color, borderRadius, spacing } = Theme.useTheme()
     const [sendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
@@ -338,43 +338,47 @@ const ChatInput = () => {
                         </Animated.View>
                     )}
                 </Animated.View>
-                <AnimatedTextInput
-                    layout={XAxisOnlyTransition}
-                    ref={inputRef}
-                    style={{
-                        color: color.text._100,
-                        backgroundColor: color.neutral._100,
-                        flex: 1,
-                        borderWidth: 2,
-                        borderColor: activeProvider ? color.primary._300 : color.primary._100,
-                        borderRadius: borderRadius.l,
-                        paddingHorizontal: spacing.m,
-                        paddingVertical: spacing.m,
-                    }}
-                    onPress={() => {
-                        setHideOptions(!!newMessage)
-                    }}
-                    numberOfLines={8}
-                    placeholder={
-                        activeProvider
-                            ? t('chat.input.message')
-                            : mode === 'local'
-                              ? t('chat.input.noModelLoaded')
-                              : t('chat.input.noConnection')
-                    }
-                    editable={activeProvider}
-                    placeholderTextColor={color.text._700}
-                    value={newMessage}
-                    onChangeText={(text) => {
-                        setHideOptions(!!text)
-                        setNewMessage(text)
-                    }}
-                    multiline
-                    submitBehavior={
-                        sendOnEnter ? (isPreparingAudio ? 'submit' : 'blurAndSubmit') : 'newline'
-                    }
-                    onSubmitEditing={sendOnEnter ? handleSend : undefined}
-                />
+                <Animated.View layout={XAxisOnlyTransition} style={{ flex: 1 }}>
+                    <ThemedMarkdownInput
+                        ref={inputRef}
+                        style={{
+                            color: color.text._100,
+                            backgroundColor: color.neutral._100,
+                            borderWidth: 2,
+                            borderColor: activeProvider ? color.primary._300 : color.primary._100,
+                            borderRadius: borderRadius.l,
+                            paddingHorizontal: spacing.m,
+                            paddingVertical: spacing.m,
+                        }}
+                        onPress={() => {
+                            setHideOptions(!!newMessage)
+                        }}
+                        numberOfLines={8}
+                        placeholder={
+                            activeProvider
+                                ? t('chat.input.message')
+                                : mode === 'local'
+                                  ? t('chat.input.noModelLoaded')
+                                  : t('chat.input.noConnection')
+                        }
+                        editable={activeProvider}
+                        placeholderTextColor={color.text._700}
+                        value={newMessage}
+                        onChangeText={(text) => {
+                            setHideOptions(!!text)
+                            setNewMessage(text)
+                        }}
+                        multiline
+                        submitBehavior={
+                            sendOnEnter
+                                ? isPreparingAudio
+                                    ? 'submit'
+                                    : 'blurAndSubmit'
+                                : 'newline'
+                        }
+                        onSubmitEditing={sendOnEnter ? handleSend : undefined}
+                    />
+                </Animated.View>
                 <Animated.View layout={XAxisOnlyTransition}>
                     <TouchableOpacity
                         disabled={

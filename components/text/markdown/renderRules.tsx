@@ -1,56 +1,49 @@
-import { Text } from 'react-native'
-import type { ASTNode, RenderRules } from 'react-native-markdown-display'
+import type { RenderContext, RenderRules } from '@vali98/react-native-markdown-display'
 
 import MarkdownCodeBlock from './MarkdownCodeBlock'
 import MarkdownImage from './MarkdownImage'
 import MarkdownMath from './MarkdownMath'
-import MarkdownQuote from './MarkdownQuote'
-import MarkdownTextGroup from './MarkdownTextGroup'
+
+// The native tree stores code and maths in child nodes, including highlighted code segments.
+const nodeText = ({ node, block }: RenderContext) =>
+    node.content ||
+    (block?.nodes
+        .filter((child) => child.id.startsWith(`${node.id}/`))
+        .map((child) => child.content)
+        .join('') ??
+        '')
 
 export const markdownRules: RenderRules = {
-    fence: (
-        node: ASTNode & { sourceInfo?: string },
-        children,
-        parent,
-        styles,
-        inheritedStyles = {}
-    ) => (
+    fence: (context) => (
         <MarkdownCodeBlock
-            key={node.key}
-            content={node.content}
-            language={node.sourceInfo}
-            headerStyle={styles.fenceHeader}
-            textStyle={[inheritedStyles, styles.fence]}
+            content={nodeText(context)}
+            language={context.node.language}
+            headerStyle={context.styles.fenceHeader}
+            textStyle={[
+                {
+                    color: context.styles.body.color,
+                    fontSize: context.styles.paragraph.fontSize,
+                    fontWeight: context.styles.paragraph.fontWeight,
+                },
+                context.styles.fence,
+            ]}
         />
     ),
-    double_quote: (node, children, parent, styles) => (
-        <MarkdownQuote key={node.key} node={node} style={styles.double_quote}>
-            {children}
-        </MarkdownQuote>
+    latex_block: (context) => (
+        <MarkdownMath {...context.styles.latex_block} latex={nodeText(context)} displayMode />
     ),
-    latex_block: (node, children, parent, styles) => (
-        <MarkdownMath {...styles.latex_block} latex={node.content ?? ''} key={node.key} />
+    latex_inline: (context) => (
+        <MarkdownMath
+            {...context.styles.latex_inline}
+            latex={nodeText(context)}
+            displayMode={false}
+        />
     ),
-    latex_inline: (node, children, parent, styles) => (
-        <MarkdownMath {...styles.latex_inline} latex={node.content ?? ''} key={node.key} />
-    ),
-    textgroup: (node, children, parent, styles) => (
-        <MarkdownTextGroup key={node.key} node={node} style={styles.textgroup}>
-            {children}
-        </MarkdownTextGroup>
-    ),
-    inline: (node, children, parent, styles) => (
-        <Text key={node.key} style={[styles.inline, { flexWrap: 'wrap', width: '100%' }]}>
-            {children}
-        </Text>
-    ),
-    image: (node, children, parent, styles, allowedImageHandlers, defaultImageHandler) => (
+    image: (context) => (
         <MarkdownImage
-            key={node.key}
-            node={node}
-            style={styles._VIEW_SAFE_image}
-            allowedImageHandlers={allowedImageHandlers}
-            defaultImageHandler={defaultImageHandler}
+            source={context.node.destination}
+            alt={nodeText(context)}
+            style={context.styles.image}
         />
     ),
 }

@@ -1,57 +1,29 @@
 import { Image } from 'expo-image'
 import { useState } from 'react'
 import { useWindowDimensions, View, type StyleProp, type ImageStyle } from 'react-native'
-import type { ASTNode } from 'react-native-markdown-display'
 
 const MarkdownImage = ({
-    node,
+    source,
+    alt,
     style,
-    allowedImageHandlers,
-    defaultImageHandler,
 }: {
-    node: ASTNode
+    source: string
+    alt?: string
     style: StyleProp<ImageStyle>
-    allowedImageHandlers: string[]
-    defaultImageHandler: string | null
 }) => {
-    const [imageData, setImageData] = useState({ height: 0, aspectRatio: 1 })
-    const { src, alt } = node.attributes
-
+    const [size, setSize] = useState({ width: 0, height: 0 })
     const { width } = useWindowDimensions()
-    // we check that the source starts with at least one of the elements in allowedImageHandlers
-    const show =
-        allowedImageHandlers.filter((value: string) => {
-            return src.toLowerCase().startsWith(value.toLowerCase())
-        }).length > 0
-
-    if (show === false && defaultImageHandler === null) {
-        return null
-    }
-
-    const imageProps: any = {
-        indicator: true,
-        style,
-        source: { uri: src },
-    }
-
-    if (alt) {
-        imageProps.accessible = true
-        imageProps.accessibilityLabel = alt
-    }
-
+    const imageWidth = Math.min(Math.max(0, width - 100), size.width)
+    const imageHeight = size.width > 0 ? (imageWidth * size.height) / size.width : 0
     return (
-        <View style={{ height: imageData.height }}>
+        <View style={{ height: imageHeight }}>
             <Image
-                key={node.key}
-                {...imageProps}
-                width={imageData.height}
-                aspectRatio={imageData.aspectRatio}
-                onLoad={(data) => {
-                    setImageData({
-                        height: Math.min(width - 100, data.source.width),
-                        aspectRatio: data.source.width / data.source.height,
-                    })
-                }}
+                source={{ uri: source }}
+                style={[style, { width: imageWidth, height: imageHeight }]}
+                accessibilityLabel={alt}
+                onLoad={({ source: image }) =>
+                    setSize({ width: image.width, height: image.height })
+                }
                 contentFit="contain"
             />
         </View>

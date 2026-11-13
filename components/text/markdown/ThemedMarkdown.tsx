@@ -1,28 +1,22 @@
-import { useMemo, type PropsWithChildren } from 'react'
-import Markdown, { type MarkdownProps } from 'react-native-markdown-display'
-
-import { markdownParser } from '@lib/markdown/parser'
+import Markdown, { type MarkdownProps } from '@vali98/react-native-markdown-display'
+import { useMemo } from 'react'
 
 import { markdownRules } from './renderRules'
 import { useMarkdownStyles } from './styles'
 
-export type ThemedMarkdownProps = PropsWithChildren<
-    Omit<MarkdownProps, 'renderer' | 'markdownit' | 'rules'>
->
+export type ThemedMarkdownProps = Omit<
+    MarkdownProps,
+    'source' | 'children' | 'styles' | 'rules' | 'renderRules'
+> & { children: string }
 
-const ThemedMarkdown = ({ children, style, mergeStyle = false, ...props }: ThemedMarkdownProps) => {
+const ThemedMarkdown = ({ children, style, typographer = true, ...props }: ThemedMarkdownProps) => {
     const themeStyles = useMarkdownStyles()
     const styles = useMemo(
         () => (style ? { ...themeStyles, ...style } : themeStyles),
         [themeStyles, style]
     )
     return (
-        <Markdown
-            {...props}
-            mergeStyle={mergeStyle}
-            markdownit={markdownParser}
-            rules={markdownRules}
-            style={styles}>
+        <Markdown {...props} typographer={typographer} renderRules={markdownRules} style={styles}>
             {children}
         </Markdown>
     )

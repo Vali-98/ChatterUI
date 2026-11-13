@@ -84,8 +84,8 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ isGenerating, swipe }) => {
                         isGenerating &&
                         buffer.data === '' &&
                         !generation?.reasoning && <AnimatedEllipsis />}
-                    <ThemedMarkdown>
-                        {generation ? buffer.data.trim() : renderedText}
+                    <ThemedMarkdown streaming={isGenerating && !!generation}>
+                        {generation ? buffer.data : renderedText}
                     </ThemedMarkdown>
                     {generation?.error && !generation.persisted && (
                         <ThemedButton
