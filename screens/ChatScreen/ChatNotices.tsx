@@ -37,6 +37,7 @@ const ChatNotices = ({ chatId }: { chatId: number }) => {
         <>
             {tasks.map((task) => (
                 <NoticeProgress
+                    scope="chat"
                     key={`task-${task.id}`}
                     variant="neutral"
                     label={t(
@@ -54,6 +55,7 @@ const ChatNotices = ({ chatId }: { chatId: number }) => {
             ))}
             {unresolved.map((summary) => (
                 <Notice
+                    scope="chat"
                     key={summary.id}
                     label={t(summary.status === 'draft' ? 'summary.unfinished' : 'summary.changed')}
                     onPress={() => open(chatId, summary.id)}

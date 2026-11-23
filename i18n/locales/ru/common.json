@@ -71,5 +71,9 @@
     "common.navigation.about": "О приложении",
     "common.navigation.settings": "Настройки",
     "common.placeholders.addItem": "Добавить элемент…",
-    "common.emptyStates.noSuggestions": "Нет предложений"
+    "common.emptyStates.noSuggestions": "Нет предложений",
+    "common.activity.title": "Активность",
+    "common.activity.empty": "Нет текущих событий",
+    "common.activity.chat": "Этот чат",
+    "common.activity.app": "Активность приложения"
 }

@@ -71,5 +71,9 @@
     "common.navigation.about": "About",
     "common.navigation.settings": "Settings",
     "common.placeholders.addItem": "Add an item…",
-    "common.emptyStates.noSuggestions": "No suggestions"
+    "common.emptyStates.noSuggestions": "No suggestions",
+    "common.activity.title": "Activity",
+    "common.activity.empty": "No current activity",
+    "common.activity.chat": "This chat",
+    "common.activity.app": "App activity"
 }

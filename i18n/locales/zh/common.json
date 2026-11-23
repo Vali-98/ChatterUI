@@ -71,5 +71,9 @@
     "common.navigation.about": "关于",
     "common.navigation.settings": "设置",
     "common.placeholders.addItem": "添加项目…",
-    "common.emptyStates.noSuggestions": "暂无建议"
+    "common.emptyStates.noSuggestions": "暂无建议",
+    "common.activity.title": "活动",
+    "common.activity.empty": "暂无活动",
+    "common.activity.chat": "当前聊天",
+    "common.activity.app": "应用活动"
 }

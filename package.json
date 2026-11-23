@@ -131,10 +131,7 @@
   "vali-markdown": {
     "enableCodeHighlight": true,
     "codeHighlightLanguages": [
-      "javascript",
-      "typescript",
-      "python",
-      "json"
+  "json", "html", "css", "markdown", "yaml", "go", "java", "javascript", "python", "c", "rust", "bash", "typescript", "tsx", "cpp"
     ]
   },
   "private": true,

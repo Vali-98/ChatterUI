@@ -3,9 +3,6 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { View } from 'react-native'
 
 import Drawer from '@components/views/Drawer'
-import { NoticeStack } from '@components/views/Notice'
-import DownloadNotice from '@components/downloads/DownloadNotice'
-import OperationNotices from '@components/views/OperationNotices'
 
 import CharacterList from './CharacterList'
 import SettingsDrawer from '../../components/views/SettingsDrawer'
@@ -24,10 +21,6 @@ const CharacterListScreen = () => {
                 }}>
                 <View style={{ flex: 1 }}>
                     <CharacterList />
-                    <NoticeStack>
-                        <OperationNotices />
-                        <DownloadNotice />
-                    </NoticeStack>
                 </View>
                 <SettingsDrawer />
             </SafeAreaView>

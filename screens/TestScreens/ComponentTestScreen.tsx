@@ -1,5 +1,5 @@
 /* eslint-disable i18next/no-literal-string */
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -20,7 +20,9 @@ import Accordion from '@components/views/Accordion'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
 import InputSheet from '@components/views/InputSheet'
-import Notice, { NoticeAction, NoticeStack } from '@components/views/Notice'
+import HeaderButton from '@components/views/HeaderButton'
+import Notice, { NoticeAction } from '@components/views/Notice'
+import ActivityMenu from '@components/views/ActivityMenu'
 import NoticeProgress from '@components/views/NoticeProgress'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -38,6 +40,117 @@ const selectorData = [
 
 const buttonVariants = ['primary', 'secondary', 'tertiary'] as const
 const buttonLevels = ['neutral', 'muted', 'primary', 'warning', 'error'] as const
+
+const ActivityTest = () => {
+    const nextId = useRef(2)
+    const [downloads, setDownloads] = useState<number[]>([1, 2])
+    const [progress, setProgress] = useState(25)
+    const [warning, setWarning] = useState(true)
+    const [error, setError] = useState(false)
+    const [generating, setGenerating] = useState(true)
+    const [lastAction, setLastAction] = useState('No notice selected')
+    const loadSamples = useCallback(() => {
+        nextId.current = 2
+        setDownloads([1, 2])
+        setProgress(25)
+        setWarning(true)
+        setError(false)
+        setGenerating(true)
+        setLastAction('No notice selected')
+    }, [])
+    useEffect(loadSamples, [loadSamples])
+    return (
+        <>
+            <HeaderButton
+                headerRight={() => (
+                    <ActivityMenu>
+                        {generating && (
+                            <NoticeProgress
+                                scope="chat"
+                                label="Generating summary"
+                                actions={
+                                    <NoticeAction
+                                        label="Cancel"
+                                        onPress={() => setGenerating(false)}
+                                    />
+                                }
+                            />
+                        )}
+                        {warning && (
+                            <Notice
+                                scope="chat"
+                                label="Unfinished summary"
+                                variant="warning"
+                                onPress={() => setLastAction('Review summary')}
+                            />
+                        )}
+                        {error && (
+                            <Notice
+                                scope="chat"
+                                label="Summary generation failed"
+                                variant="error"
+                                onPress={() => setLastAction('Review error')}
+                            />
+                        )}
+                        {downloads.map((id) => (
+                            <NoticeProgress
+                                key={id}
+                                label={
+                                    id === 1
+                                        ? 'Qwen3-0.6B-Q4_K_M.gguf'
+                                        : id === 2
+                                          ? 'Llama-3.2-1B-Q4_K_M.gguf'
+                                          : `Download ${id}`
+                                }
+                                previewKey={`test-download-${id}`}
+                                variant="primary"
+                                iconName="download"
+                                progress={progress}
+                                onPress={() => setLastAction(`Open download ${id}`)}
+                            />
+                        ))}
+                    </ActivityMenu>
+                )}
+            />
+            <View style={{ gap: 12 }}>
+                <TText size={18}>Activity menu</TText>
+                <TText color="400">Use the bell in the header to view sample activity.</TText>
+                <TText color="400">{lastAction}</TText>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                    <ThemedButton label="Load samples" onPress={loadSamples} />
+                    <ThemedButton
+                        label="Start download"
+                        onPress={() => {
+                            nextId.current += 1
+                            setDownloads([...downloads, nextId.current])
+                        }}
+                    />
+                    <ThemedButton label="Generate summary" onPress={() => setGenerating(true)} />
+                    <ThemedButton label="Toggle warning" onPress={() => setWarning(!warning)} />
+                    <ThemedButton label="Toggle error" onPress={() => setError(!error)} />
+                    <ThemedButton
+                        label="Clear"
+                        level="muted"
+                        onPress={() => {
+                            setDownloads([])
+                            setWarning(false)
+                            setError(false)
+                            setGenerating(false)
+                        }}
+                    />
+                </View>
+                <ThemedSlider
+                    label="Download progress"
+                    value={progress}
+                    onValueChange={setProgress}
+                    min={0}
+                    max={100}
+                    step={1}
+                />
+            </View>
+        </>
+    )
+}
 
 const ComponentTestScreen = () => {
     const [selected, setSelected] = useState<(typeof selectorData)[0]>(selectorData[0])
@@ -73,6 +186,8 @@ const ComponentTestScreen = () => {
                         setHSelected(s)
                     }}
                 />
+
+                <ActivityTest />
 
                 <CollapsableTitle title="Buttons">
                     <View style={{ rowGap: 16 }}>
@@ -118,24 +233,6 @@ const ComponentTestScreen = () => {
                             <IconButton iconName={{ name: 'message', subIcon: 'arrow-right' }} />
                         </View>
                     </View>
-                </CollapsableTitle>
-
-                <CollapsableTitle title="Notices">
-                    <NoticeStack
-                        style={{ position: 'relative', top: 0, right: 0, maxWidth: '100%' }}>
-                        <NoticeProgress
-                            label="Downloading models"
-                            iconName="download"
-                            variant="primary"
-                            progress={45}
-                        />
-                        <NoticeProgress
-                            label="Generating summary"
-                            actions={<NoticeAction label="Cancel" />}
-                        />
-                        <Notice label="Unfinished summary" variant="warning" />
-                        <Notice label="Summary generation failed" variant="error" />
-                    </NoticeStack>
                 </CollapsableTitle>
 
                 <ThemedButton onPress={() => inputRef.current?.open()} label="Show Sheet" />

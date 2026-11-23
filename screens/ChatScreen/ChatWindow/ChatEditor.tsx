@@ -136,7 +136,7 @@ const MessageEditor = ({
                     {swipe.send_date.toLocaleTimeString()}
                 </TText>
             </View>
-            <View style={{ flexShrink: 1, rowGap: 0 }}>
+            <View style={{ flex: 1, rowGap: 0 }}>
                 {(hasAttachments || hasReasoning) && (
                     <HorizontalSelector<EditorField>
                         selected={field}
@@ -255,15 +255,18 @@ const MessageEditor = ({
                 ) : (
                     <ThemedMarkdownInput
                         key={field}
+                        previewTypes={[]}
                         ref={inputRef}
-                        numberOfLines={5}
-                        viewStyle={{
-                            flexShrink: 1,
+                        viewStyle={{ flex: 1 }}
+                        style={{
+                            color: color.text._100,
                             borderWidth: 1,
                             borderColor: color.neutral._400,
                             borderRadius: 8,
+                            paddingHorizontal: 12,
+                            paddingVertical: 8,
+                            textAlignVertical: 'top',
                         }}
-                        style={{ paddingHorizontal: 12, paddingVertical: 8 }}
                         value={draft[field]}
                         editable={!saving}
                         onChangeText={(text) => setDraft((draft) => ({ ...draft, [field]: text }))}
@@ -337,9 +340,14 @@ const ChatEditor = () => {
     }, [entry, editable, hide])
     return (
         <BottomSheet
-            sheetStyle={{ rowGap: 12, maxHeight: '95%' }}
+            sheetStyle={{ height: '95%', maxHeight: '95%' }}
             ref={ref}
-            bodyContainerStyle={[{ paddingHorizontal: 16, paddingVertical: 16 }, { rowGap: 12 }]}>
+            bodyContainerStyle={{
+                flex: 1,
+                paddingHorizontal: 16,
+                paddingVertical: 16,
+                rowGap: 12,
+            }}>
             {entry?.swipes[0] && (
                 <MessageEditor
                     key={`${entryId}-${session}`}

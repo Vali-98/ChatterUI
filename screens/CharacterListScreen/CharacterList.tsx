@@ -1,3 +1,6 @@
+import ActivityMenu from '@components/views/ActivityMenu'
+import OperationNotices from '@components/views/OperationNotices'
+import DownloadNotice from '@components/downloads/DownloadNotice'
 import { usePathname } from 'expo-router'
 import { useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
@@ -95,9 +98,15 @@ const CharacterList: React.FC = () => {
                     </GuideTarget>
                 )}
                 headerRight={() => (
-                    <GuideTarget id="main.import">
-                        <CharacterNewMenu navigationPending={navigationPending} />
-                    </GuideTarget>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <ActivityMenu>
+                            <OperationNotices />
+                            <DownloadNotice />
+                        </ActivityMenu>
+                        <GuideTarget id="main.import">
+                            <CharacterNewMenu navigationPending={navigationPending} />
+                        </GuideTarget>
+                    </View>
                 )}
             />
 

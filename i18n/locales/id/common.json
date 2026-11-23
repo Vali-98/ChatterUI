@@ -71,5 +71,9 @@
     "common.navigation.about": "Tentang",
     "common.navigation.settings": "Pengaturan",
     "common.placeholders.addItem": "Tambah item…",
-    "common.emptyStates.noSuggestions": "Tidak ada saran"
+    "common.emptyStates.noSuggestions": "Tidak ada saran",
+    "common.activity.title": "Aktivitas",
+    "common.activity.empty": "Tidak ada aktivitas saat ini",
+    "common.activity.chat": "Chat ini",
+    "common.activity.app": "Aktivitas aplikasi"
 }

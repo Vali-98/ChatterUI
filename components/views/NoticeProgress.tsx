@@ -36,6 +36,7 @@ const NoticeProgress = ({
     return (
         <Notice
             {...props}
+            progress={percentage}
             style={[percentage !== undefined && { paddingBottom: 8 }, style]}
             variant={variant}
             leading={leading}

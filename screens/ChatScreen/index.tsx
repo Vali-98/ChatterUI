@@ -14,7 +14,7 @@ import AvatarViewer from '@components/views/AvatarViewer'
 import Drawer from '@components/views/Drawer'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
-import { NoticeStack } from '@components/views/Notice'
+import ActivityMenu from '@components/views/ActivityMenu'
 import OperationNotices from '@components/views/OperationNotices'
 import SettingsDrawer from '@components/views/SettingsDrawer'
 import { Characters } from '@lib/state/characters'
@@ -94,6 +94,11 @@ const ChatScreen = () => {
                 <GuideTarget
                     id="chat.history"
                     style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <ActivityMenu>
+                        {typeof chatId === 'number' && <ChatNotices chatId={chatId} />}
+                        <OperationNotices />
+                        <DownloadNotice />
+                    </ActivityMenu>
                     {!showChats ? (
                         <IconButton
                             viewStyle={{
@@ -160,11 +165,6 @@ const ChatScreen = () => {
                         <SummarySheet />
                         <AuthorNoteSheet />
                         <AuthorNoteEditor />
-                        <NoticeStack>
-                            <OperationNotices />
-                            {typeof chatId === 'number' && <ChatNotices chatId={chatId} />}
-                            <DownloadNotice />
-                        </NoticeStack>
                     </View>
                 </Animated.View>
 

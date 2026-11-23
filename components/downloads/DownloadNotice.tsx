@@ -9,30 +9,30 @@ const DownloadNotice = () => {
     const { t } = useTranslation()
     const onboarding = useOnboardingStore((state) => state.status)
     const downloads = useDownloadStore((state) => state.downloads)
-    const unfinished = downloads.filter((item) => item.status !== 'completed')
-    if (!unfinished.length || onboarding === 'inProgress') return null
-    const running = unfinished.some(
-        (item) => item.status === 'downloading' || item.status === 'pausing'
-    )
-    const failed = unfinished.some((item) => item.status === 'failed')
-    const total = unfinished.reduce((sum, item) => sum + item.totalBytes, 0)
-    const bytes = unfinished.reduce((sum, item) => sum + item.bytesWritten, 0)
-    const knownTotal = unfinished.every((item) => item.totalBytes > 0)
-    const progress = total && knownTotal ? Math.min(100, (bytes / total) * 100) : undefined
-    const openDownloads = () => {
-        router.push('/models')
-    }
-    return (
-        <NoticeProgress
-            variant={failed ? 'error' : 'primary'}
-            label={`${t('downloads.badge', { count: unfinished.length })}${running ? '' : ` · ${t(failed ? 'downloads.status.failed' : 'downloads.status.paused')}`}`}
-            progress={progress}
-            isRunning={running}
-            iconName="download"
-            showPercentage={running}
-            onPress={openDownloads}
-            accessibilityLabel={t('downloads.badge', { count: unfinished.length })}
-        />
-    )
+    if (onboarding === 'inProgress') return null
+    return downloads
+        .filter((item) => item.status !== 'completed')
+        .map((item) => {
+            const running = item.status === 'downloading' || item.status === 'pausing'
+            const failed = item.status === 'failed'
+            return (
+                <NoticeProgress
+                    key={item.id}
+                    previewKey={running ? `download-${item.id}` : undefined}
+                    variant={failed ? 'error' : 'primary'}
+                    label={`${item.name || t('downloads.badge', { count: 1 })}${running ? '' : ` · ${t(failed ? 'downloads.status.failed' : 'downloads.status.paused')}`}`}
+                    progress={
+                        item.totalBytes > 0
+                            ? (item.bytesWritten / item.totalBytes) * 100
+                            : undefined
+                    }
+                    isRunning={running}
+                    iconName="download"
+                    showPercentage={running}
+                    onPress={() => router.push('/models')}
+                    accessibilityLabel={item.name || t('downloads.badge', { count: 1 })}
+                />
+            )
+        })
 }
 export default DownloadNotice
