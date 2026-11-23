@@ -27,7 +27,9 @@ export const markdownRules: RenderRules = {
                 },
                 context.styles.fence,
             ]}
-        />
+        >
+            {context.children}
+        </MarkdownCodeBlock>
     ),
     latex_block: (context) => (
         <MarkdownMath {...context.styles.latex_block} latex={nodeText(context)} displayMode />

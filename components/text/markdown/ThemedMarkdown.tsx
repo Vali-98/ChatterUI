@@ -9,14 +9,27 @@ export type ThemedMarkdownProps = Omit<
     'source' | 'children' | 'styles' | 'rules' | 'renderRules'
 > & { children: string }
 
-const ThemedMarkdown = ({ children, style, typographer = true, ...props }: ThemedMarkdownProps) => {
+const ThemedMarkdown = ({
+    children,
+    style,
+    typographer = true,
+    streaming = false,
+    animate = streaming,
+    ...props
+}: ThemedMarkdownProps) => {
     const themeStyles = useMarkdownStyles()
     const styles = useMemo(
         () => (style ? { ...themeStyles, ...style } : themeStyles),
         [themeStyles, style]
     )
     return (
-        <Markdown {...props} typographer={typographer} renderRules={markdownRules} style={styles}>
+        <Markdown
+            {...props}
+            streaming={streaming}
+            animate={animate}
+            typographer={typographer}
+            renderRules={markdownRules}
+            style={styles}>
             {children}
         </Markdown>
     )

@@ -35,11 +35,13 @@ const MarkdownCodeBlock = ({
     language,
     headerStyle,
     textStyle,
+    children,
 }: {
     content: string
     language?: string
     headerStyle: ViewStyle & { color?: ColorValue }
     textStyle: StyleProp<TextStyle>
+    children: React.ReactNode
 }) => {
     const code = content.endsWith('\n') ? content.slice(0, -1) : content
     return (
@@ -48,7 +50,7 @@ const MarkdownCodeBlock = ({
                 <Text style={{ color: headerStyle.color }}>{language || 'Code'}</Text>
                 {code && <CodeCopyButton content={code} color={headerStyle.color} />}
             </View>
-            <Text style={textStyle}>{code}</Text>
+            <Text style={textStyle}>{children}</Text>
         </View>
     )
 }

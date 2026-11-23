@@ -95,7 +95,7 @@ export namespace DefaultColorSchemes {
                 codeBlock: {
                     background: '#121018',
                     text: '#c8c8c8',
-                    headerBackground: '#26222E',
+                    headerBackground: '#343040',
                     headerText: '#c8c8c8',
                 },
                 blockquote: {
@@ -209,7 +209,7 @@ export namespace DefaultColorSchemes {
                 codeBlock: {
                     background: '#f2eef8',
                     text: '#4c4559',
-                    headerBackground: '#ffffff',
+                    headerBackground: '#e6dfef',
                     headerText: '#4c4559',
                 },
                 blockquote: {
@@ -437,7 +437,7 @@ export namespace DefaultColorSchemes {
                 codeBlock: {
                     background: '#0e1218',
                     text: '#aab9d8',
-                    headerBackground: '#1b1f2e',
+                    headerBackground: '#272c40',
                     headerText: '#aab9d8',
                 },
                 blockquote: {
@@ -551,7 +551,7 @@ export namespace DefaultColorSchemes {
                 codeBlock: {
                     background: '#fbf0f4',
                     text: '#573e4b',
-                    headerBackground: '#ffffff',
+                    headerBackground: '#f2e1e8',
                     headerText: '#573e4b',
                 },
                 blockquote: {
@@ -665,7 +665,7 @@ export namespace DefaultColorSchemes {
                 codeBlock: {
                     background: '#101010',
                     text: '#a4b492',
-                    headerBackground: '#181818',
+                    headerBackground: '#30362b',
                     headerText: '#a4b492',
                 },
                 blockquote: {

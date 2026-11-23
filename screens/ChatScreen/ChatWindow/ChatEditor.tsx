@@ -7,7 +7,7 @@ import { create } from 'zustand'
 import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import HorizontalSelector from '@components/input/HorizontalSelector'
-import ThemedTextInput from '@components/input/ThemedTextInput'
+import ThemedMarkdownInput, { type MarkdownInputRef } from '@components/input/ThemedMarkdownInput'
 import AttachmentViewer from '@components/media/AttachmentViewer'
 import AudioAttachment from '@components/media/AudioAttachment'
 import TText from '@components/text/TText'
@@ -16,9 +16,11 @@ import BottomSheetControls, { BottomSheetButton } from '@components/views/Bottom
 import ScaledImage from '@components/views/ScaledImage'
 import { pickAudioAttachments } from '@lib/audio/files'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
+import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
 import { Chats, type ChatMessage } from '@lib/state/chat'
 import { useChatEditable } from '@lib/state/chat/access'
 import { Logger } from '@lib/state/Logger'
+import { Theme } from '@lib/theme/ThemeManager'
 
 type EditorField = 'content' | 'reasoning' | 'attachments'
 type DraftAttachment = { id?: number; uri: string; name: string; type: string; mime_type?: string }
@@ -54,6 +56,8 @@ const MessageEditor = ({
     onClose: () => void
 }) => {
     const { t } = useTranslation()
+    const { color } = Theme.useTheme()
+    const inputRef = useUnfocusTextInput<MarkdownInputRef>()
     const [original] = useState(entry)
     const swipe = original.swipes[0]
     const hasAttachments = original.attachments.length > 0
@@ -249,10 +253,17 @@ const MessageEditor = ({
                         />
                     </ScrollView>
                 ) : (
-                    <ThemedTextInput
-                        viewStyle={{ flexShrink: 1 }}
-                        fieldStyle={{ flexShrink: 1 }}
-                        style={{ flexShrink: 1 }}
+                    <ThemedMarkdownInput
+                        key={field}
+                        ref={inputRef}
+                        numberOfLines={5}
+                        viewStyle={{
+                            flexShrink: 1,
+                            borderWidth: 1,
+                            borderColor: color.neutral._400,
+                            borderRadius: 8,
+                        }}
+                        style={{ paddingHorizontal: 12, paddingVertical: 8 }}
                         value={draft[field]}
                         editable={!saving}
                         onChangeText={(text) => setDraft((draft) => ({ ...draft, [field]: text }))}

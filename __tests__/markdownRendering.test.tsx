@@ -5,6 +5,7 @@ import type {
 } from '@vali98/react-native-markdown-display'
 import { setStringAsync } from 'expo-clipboard'
 import { act } from 'react'
+import { Text } from 'react-native'
 
 import ThemedMarkdown from '../components/text/markdown/ThemedMarkdown'
 import { markdownRules } from '../components/text/markdown/renderRules'
@@ -80,7 +81,17 @@ test('native child-node content reaches copy and maths controls without rerender
         }
         return (
             <>
-                {markdownRules.fence({ node: code, block, children: [], styles: style })}
+                {markdownRules.fence({
+                    node: code,
+                    block,
+                    children: [
+                        <Text key="keyword" testID="keyword" style={{ color: '#ff8800' }}>
+                            const
+                        </Text>,
+                        <Text key="source">{` value = ${value}\n`}</Text>,
+                    ],
+                    styles: style,
+                })}
                 {markdownRules.latex_block({ node: blockMath, block, children: [], styles: style })}
                 {markdownRules.latex_inline({
                     node: inlineMath,
@@ -98,6 +109,9 @@ test('native child-node content reaches copy and maths controls without rerender
     expect(mockMathRender).toHaveBeenCalledTimes(2)
     expect(mockMathRender.mock.calls.map(([props]) => props.displayMode)).toEqual([true, false])
     expect(mockCopyRender).toHaveBeenCalledTimes(1)
+    expect(screen.root.findByProps({ testID: 'keyword' }).props.style).toEqual({
+        color: '#ff8800',
+    })
     mockMathRender.mockClear()
     mockCopyRender.mockClear()
 
@@ -143,6 +157,7 @@ test('the themed display forwards raw streamed text and the final streaming stat
     expect(screen.root.findByType('NativeMarkdown').props).toMatchObject({
         children: '**unfinished ',
         streaming: true,
+        animate: true,
         typographer: true,
         renderRules: markdownRules,
     })
@@ -152,6 +167,7 @@ test('the themed display forwards raw streamed text and the final streaming stat
     expect(screen.root.findByType('NativeMarkdown').props).toMatchObject({
         children: '**finished**',
         streaming: false,
+        animate: false,
     })
     await act(async () => screen.unmount())
 })

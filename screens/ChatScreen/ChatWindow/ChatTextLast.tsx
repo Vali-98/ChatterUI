@@ -74,7 +74,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ isGenerating, swipe }) => {
     const renderedText = showHidden ? swipe.swipe : filteredText.result
 
     return (
-        <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
+        <Animated.View style={{ overflow: 'scroll', height: isGenerating ? animHeight : undefined }}>
             <View style={{ minHeight: 10 }} ref={viewRef} onLayout={updateHeight}>
                 {reasoning ? (
                     <ChatReasoning content={reasoning} generating={!!generation && isGenerating} />
