@@ -1,4 +1,5 @@
 const IS_DEV = process.env.APP_VARIANT === 'development'
+const DISTRIBUTION = process.env.EXPO_PUBLIC_DISTRIBUTION === 'googlePlay' ? 'googlePlay' : 'direct'
 
 module.exports = {
     expo: {
@@ -30,6 +31,8 @@ module.exports = {
             },
             package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
             userInterfaceStyle: 'dark',
+            blockedPermissions:
+                DISTRIBUTION === 'googlePlay' ? ['android.permission.SYSTEM_ALERT_WINDOW'] : [],
             permissions: [
                 'android.permission.FOREGROUND_SERVICE',
                 'android.permission.WAKE_LOCK',
@@ -88,7 +91,7 @@ module.exports = {
                     cameraPermission: 'Allow ChatterUI to access your camera',
                 },
             ],
-            ['expo-sqlite', { withSQLiteVecExtension: true }],
+            ['expo-sqlite', { withSQLiteVecExtension: false }],
             [
                 'expo-image-picker',
                 {
@@ -133,6 +136,7 @@ module.exports = {
             reactCompiler: true,
         },
         extra: {
+            distribution: DISTRIBUTION,
             router: {
                 origin: false,
             },
