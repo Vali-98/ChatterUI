@@ -28,7 +28,7 @@
                     "estimatedRuntimeBytes": {
                         "type": "integer",
                         "minimum": 0,
-                        "description": "Estimated total RAM for the model plus context at contextLength. Zero means unknown. Compared with 60% of device RAM as advice, not a download restriction."
+                        "description": "Conservative, unmeasured estimate of model weights, context and working buffers at contextLength. Onboarding only shows entries within 60% of device RAM; unknown device RAM uses a 2 GiB budget. Zero means unknown and is excluded from recommendations. Importing other models is unrestricted."
                     },
                     "contextLength": { "type": "integer", "minimum": 1 },
                     "tags": { "type": "array", "items": { "type": "string" } }

@@ -35,6 +35,14 @@ export const fitsDeviceMemory = (model: RecommendedModel, totalMemory: number) =
         ? model.estimatedRuntimeBytes <= totalMemory * 0.6
         : undefined
 
+export const getRecommendedModels = (totalMemory: number) => {
+    // If memory detection is unavailable, offer only the smallest known estimates.
+    const budget = totalMemory > 0 ? totalMemory * 0.6 : 2 * 1024 ** 3
+    return recommendedModels.filter(
+        (model) => model.estimatedRuntimeBytes > 0 && model.estimatedRuntimeBytes <= budget
+    )
+}
+
 export const downloadModel = (url: string, filename: string) => {
     const name = filename.trim()
     if (

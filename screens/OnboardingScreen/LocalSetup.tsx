@@ -12,7 +12,7 @@ import {
     downloadModel,
     fitsDeviceMemory,
     getDeviceMemory,
-    recommendedModels,
+    getRecommendedModels,
 } from '@lib/downloads/models'
 import { useDownloadStore } from '@lib/downloads/store'
 import { GGMLNameMap } from '@lib/engine/Local/GGML'
@@ -27,6 +27,7 @@ const LocalSetup = ({ models }: { models: ModelListQueryType[] }) => {
     const { color, spacing, borderRadius } = Theme.useTheme()
     const [busy, setBusy] = useState(false)
     const [memory] = useState(getDeviceMemory)
+    const recommendations = getRecommendedModels(memory)
     const [downloadId, setDownloadId] = useState<string>()
     const lastModelId = Llama.useLlamaPreferencesStore((state) => state.lastModel?.id)
     const readyModel = models.find((model) => model.id === lastModelId) ?? models[0]
@@ -119,10 +120,10 @@ const LocalSetup = ({ models }: { models: ModelListQueryType[] }) => {
                 <TText color="400">{t('onboarding.downloadSection')}</TText>
                 <View style={{ flex: 1, height: 1, backgroundColor: color.neutral._300 }} />
             </View>
-            {!recommendedModels.length && (
+            {!recommendations.length && (
                 <TText color="400">{t('onboarding.noRecommendations')}</TText>
             )}
-            {recommendedModels.map((model) => {
+            {recommendations.map((model) => {
                 const fits = fitsDeviceMemory(model, memory)
                 return (
                     <ListCard

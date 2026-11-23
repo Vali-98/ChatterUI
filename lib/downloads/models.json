@@ -2,19 +2,92 @@
     "$schema": "./models.schema.json",
     "models": [
         {
-            "id": "qwen3-0.6b-q4-k-m",
-            "name": "Qwen3 0.6B",
-            "description": "A small general-purpose model for lightweight chats.",
-            "downloadUrl": "https://huggingface.co/unsloth/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf",
-            "filename": "Qwen3-0.6B-Q4_K_M.gguf",
-            "sizeBytes": 397000000,
-            "estimatedRuntimeBytes": 0,
+            "id": "qwen3.5-0.8b-q4-k-m",
+            "name": "Qwen3.5 0.8B",
+            "description": "A compact model for lightweight chats and trying local inference.",
+            "downloadUrl": "https://huggingface.co/unsloth/Qwen3.5-0.8B-GGUF/resolve/main/Qwen3.5-0.8B-Q4_K_M.gguf",
+            "filename": "Qwen3.5-0.8B-Q4_K_M.gguf",
+            "sizeBytes": 532517120,
+            "estimatedRuntimeBytes": 1610612736,
             "contextLength": 4096,
-            "tags": [
-                "0.6B",
-                "Q4_K_M",
-                "Small"
-            ]
+            "tags": ["0.8B", "Q4_K_M", "Small"]
+        },
+        {
+            "id": "lfm2.5-1.2b-instruct-q4-k-m",
+            "name": "LFM2.5 1.2B Instruct",
+            "description": "A lightweight text model for everyday conversations.",
+            "downloadUrl": "https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-GGUF/resolve/main/LFM2.5-1.2B-Instruct-Q4_K_M.gguf",
+            "filename": "LFM2.5-1.2B-Instruct-Q4_K_M.gguf",
+            "sizeBytes": 730895168,
+            "estimatedRuntimeBytes": 1610612736,
+            "contextLength": 4096,
+            "tags": ["1.2B", "Q4_K_M", "Small"]
+        },
+        {
+            "id": "lfm3-1.7b-q4-k-m",
+            "name": "LFM3 1.7B",
+            "description": "A compact reasoning model. It may think before producing an answer.",
+            "downloadUrl": "https://huggingface.co/LiquidAI/LFM3-1.7B-GGUF/resolve/main/LFM3-1.7B-Q4_K_M.gguf",
+            "filename": "LFM3-1.7B-Q4_K_M.gguf",
+            "sizeBytes": 1099627808,
+            "estimatedRuntimeBytes": 2147483648,
+            "contextLength": 4096,
+            "tags": ["1.7B", "Q4_K_M", "Reasoning"]
+        },
+        {
+            "id": "qwen3.5-2b-q4-k-m",
+            "name": "Qwen3.5 2B",
+            "description": "A balanced option for general chats with moderate memory requirements.",
+            "downloadUrl": "https://huggingface.co/unsloth/Qwen3.5-2B-GGUF/resolve/main/Qwen3.5-2B-Q4_K_M.gguf",
+            "filename": "Qwen3.5-2B-Q4_K_M.gguf",
+            "sizeBytes": 1280835840,
+            "estimatedRuntimeBytes": 2684354560,
+            "contextLength": 4096,
+            "tags": ["2B", "Q4_K_M"]
+        },
+        {
+            "id": "qwen3.5-4b-q4-k-m",
+            "name": "Qwen3.5 4B",
+            "description": "A larger option for conversations on devices with more available memory.",
+            "downloadUrl": "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/main/Qwen3.5-4B-Q4_K_M.gguf",
+            "filename": "Qwen3.5-4B-Q4_K_M.gguf",
+            "sizeBytes": 2740937888,
+            "estimatedRuntimeBytes": 4294967296,
+            "contextLength": 4096,
+            "tags": ["4B", "Q4_K_M"]
+        },
+        {
+            "id": "gemma-4-e2b-it-q4-0",
+            "name": "Gemma 4 E2B Instruct",
+            "description": "An instruction-tuned model with 2.3B effective parameters and larger embedding tables.",
+            "downloadUrl": "https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q4_0.gguf",
+            "filename": "gemma-4-E2B-it-Q4_0.gguf",
+            "sizeBytes": 2841481184,
+            "estimatedRuntimeBytes": 4831838208,
+            "contextLength": 4096,
+            "tags": ["E2B", "Q4_0"]
+        },
+        {
+            "id": "qwen3-8b-q4-k-m",
+            "name": "Qwen3 8B",
+            "description": "A larger chat and reasoning model for high-memory devices.",
+            "downloadUrl": "https://huggingface.co/unsloth/Qwen3-8B-GGUF/resolve/main/Qwen3-8B-Q4_K_M.gguf",
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sizeBytes": 5027784512,
+            "estimatedRuntimeBytes": 6979321856,
+            "contextLength": 4096,
+            "tags": ["8B", "Q4_K_M", "High memory"]
+        },
+        {
+            "id": "qwen3.5-9b-q4-k-m",
+            "name": "Qwen3.5 9B",
+            "description": "A larger general-purpose model for high-memory devices.",
+            "downloadUrl": "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf",
+            "filename": "Qwen3.5-9B-Q4_K_M.gguf",
+            "sizeBytes": 5680522464,
+            "estimatedRuntimeBytes": 8053063680,
+            "contextLength": 4096,
+            "tags": ["9B", "Q4_K_M", "High memory"]
         }
     ]
 }

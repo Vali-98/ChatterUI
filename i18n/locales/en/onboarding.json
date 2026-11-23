@@ -12,7 +12,7 @@
     "onboarding.personaLater": "You can change this later in User Personas.",
     "onboarding.mode": "Set your app mode",
     "onboarding.localDescription": "Run downloaded models on your device. Model size and speed depend on your hardware.",
-    "onboarding.remoteDescription": "Use an API provider or a model running on your own computer.",
+    "onboarding.remoteDescription": "Bring your own key from an API provider or connect to your own self-hosted model.",
     "onboarding.modeLater": "You can switch between Local and Remote from the side menu.",
     "onboarding.localSetup": "Get a model",
     "onboarding.remoteSetup": "Add a connection",
