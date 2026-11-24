@@ -69,6 +69,7 @@ const MessageEditor = ({
     })
     const [draft, setDraft] = useState(initialDraft)
     const [field, setField] = useState<EditorField>('content')
+    const [inputHeight, setInputHeight] = useState<number>()
     const [saving, setSaving] = useState(false)
     const committing = useRef(false)
     const [viewerIndex, setViewerIndex] = useState<number>()
@@ -136,7 +137,7 @@ const MessageEditor = ({
                     {swipe.send_date.toLocaleTimeString()}
                 </TText>
             </View>
-            <View style={{ flex: 1, rowGap: 0 }}>
+            <View style={{ flexShrink: 1, rowGap: 0 }}>
                 {(hasAttachments || hasReasoning) && (
                     <HorizontalSelector<EditorField>
                         selected={field}
@@ -257,7 +258,10 @@ const MessageEditor = ({
                         key={field}
                         previewTypes={[]}
                         ref={inputRef}
-                        viewStyle={{ flex: 1 }}
+                        viewStyle={{ flexShrink: 1, height: inputHeight }}
+                        onContentSizeChange={({ nativeEvent }) =>
+                            setInputHeight(Math.ceil(nativeEvent.contentSize.height) + 2)
+                        }
                         style={{
                             color: color.text._100,
                             borderWidth: 1,
@@ -340,10 +344,10 @@ const ChatEditor = () => {
     }, [entry, editable, hide])
     return (
         <BottomSheet
-            sheetStyle={{ height: '95%', maxHeight: '95%' }}
+            sheetStyle={{ maxHeight: '95%' }}
             ref={ref}
             bodyContainerStyle={{
-                flex: 1,
+                flexShrink: 1,
                 paddingHorizontal: 16,
                 paddingVertical: 16,
                 rowGap: 12,
