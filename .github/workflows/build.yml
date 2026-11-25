@@ -2,28 +2,42 @@ name: Build Workflow
 
 on:
     push:
-        branches:
-            - master
-            - dev
+        branches: [master, dev]
         paths-ignore:
-            - 'README.md'
-            - '.github/ISSUE_TEMPLATE/*'
+            - "**/README.md"
+            - "docs/**"
+            - "**/docs/**"
+            - ".github/ISSUE_TEMPLATE/**"
+
+permissions: {}
 
 jobs:
     trigger-build:
         runs-on: ubuntu-latest
+        timeout-minutes: 5
         steps:
             - name: Connect Tailscale
-              uses: tailscale/github-action@v3
+              uses: tailscale/github-action@v4
               with:
-                  oauth-client-id: ${{secrets.TS_OAUTH_CLIENT_ID}}
-                  oauth-secret: ${{secrets.TS_OAUTH_SECRET}}
+                  oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+                  oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
                   tags: tag:chatterui-cd
 
-            - name: Trigger Build
+            - name: Queue APKB build
+              shell: bash
+              env:
+                  TS_BUILD_SERVICE_API: ${{ secrets.TS_BUILD_SERVICE_API }}
+                  BUILD_SERVICE_KEY: ${{ secrets.BUILD_SERVICE_KEY }}
               run: |
-                  if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-                    curl -N -sS --max-time 1200 -X GET ${{ secrets.TS_BUILD_API }} || true
-                  elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
-                    curl -N -sS --max-time 1200 -X GET ${{ secrets.TS_BUILD_DEV_API }} || true
-                  fi
+                  set -euo pipefail
+                  : "${TS_BUILD_SERVICE_API:?Set the TS_BUILD_SERVICE_API repository secret}"
+                  : "${BUILD_SERVICE_KEY:?Set the BUILD_SERVICE_KEY repository secret}"
+                  payload="$(jq -cn --arg branch "$GITHUB_REF_NAME" --arg sha "$GITHUB_SHA" \
+                    '{branch: $branch, sha: $sha}')"
+                  curl --fail --silent --show-error \
+                    --connect-timeout 10 --max-time 60 \
+                    --output /dev/null \
+                    -H "Authorization: Bearer $BUILD_SERVICE_KEY" \
+                    -H 'Content-Type: application/json' \
+                    --data-binary "$payload" "$TS_BUILD_SERVICE_API"
+                  echo "Build queued in APKB. Check the dashboard for its result."
