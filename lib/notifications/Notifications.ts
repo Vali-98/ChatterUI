@@ -1,7 +1,7 @@
 import * as Notifications from 'expo-notifications'
 import { router } from 'expo-router'
 import { t } from 'i18next'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { AppState, Linking } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 
@@ -57,35 +57,42 @@ export async function registerForPushNotificationsAsync() {
 }
 
 export function useAppStateNotificationObserver() {
-    const [autoLoad] = useMMKVBoolean(AppSettings.ChatOnStartup)
     const [useAuth] = useMMKVBoolean(AppSettings.LocallyAuthenticateUser)
-    const { chatId: chatActive, setId } = Chats.useChat()
+    const { setId } = Chats.useChat()
+    const opening = useRef(false)
     const { setCard } = Characters.useCharacterState()
 
     const redirect = useCallback(
         async (notification: Notifications.Notification) => {
-            if (chatActive ?? autoLoad ?? useAuth) return
+            // Keep the existing app-lock restriction; an explicit tap overrides chat selection.
+            if (useAuth || opening.current) return
 
             const data = notification.request.content.data
-            const chatId = data?.chatId as number | undefined
-            const characterId = data?.characterId as number | undefined
+            const chatId = data?.chatId
+            const characterId = data?.characterId
 
-            if (chatId && characterId) {
+            if (typeof chatId === 'number' && typeof characterId === 'number') {
+                opening.current = true
                 Logger.info('Loading chat from notification')
                 try {
-                    await setId(chatId)
+                    if (!(await setId(chatId))) return
                     setCard(characterId)
                     router.navigate('/chat')
                     Notifications.clearLastNotificationResponse()
                 } catch (e) {
                     Logger.error('Failed to load chat: ' + e)
+                } finally {
+                    opening.current = false
                 }
             }
         },
-        [chatActive, autoLoad, useAuth, setId, setCard]
+        [useAuth, setId, setCard]
     )
 
     useEffect(() => {
+        const responseListener = Notifications.addNotificationResponseReceivedListener(
+            (response) => void redirect(response.notification)
+        )
         const listener = AppState.addEventListener('change', async (nextState) => {
             if (nextState !== 'active') return
 
@@ -111,6 +118,7 @@ export function useAppStateNotificationObserver() {
 
         return () => {
             listener.remove()
+            responseListener.remove()
         }
     }, [redirect])
 }

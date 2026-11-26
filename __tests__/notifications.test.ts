@@ -1,4 +1,7 @@
 import * as Notifications from 'expo-notifications'
+import { router } from 'expo-router'
+import { Chats } from '../lib/state/chat'
+import { Characters } from '../lib/state/characters'
 import { act, createElement } from 'react'
 import { AppState, Platform } from 'react-native'
 
@@ -13,6 +16,8 @@ import { COMPLETION_VIBRATION_PATTERN } from '../lib/notifications/channels'
 
 jest.mock('expo-notifications', () => ({
     setNotificationHandler: jest.fn(),
+    clearLastNotificationResponse: jest.fn(),
+    addNotificationResponseReceivedListener: jest.fn(() => ({ remove: jest.fn() })),
     setNotificationChannelAsync: jest.fn(async () => null),
     getNotificationChannelAsync: jest.fn(async () => null),
     getPermissionsAsync: jest.fn(),
@@ -25,17 +30,17 @@ jest.mock('expo-notifications', () => ({
     dismissAllNotificationsAsync: jest.fn(async () => {}),
     AndroidImportance: { DEFAULT: 3 },
 }))
-jest.mock('expo-router', () => ({ router: {} }))
+jest.mock('expo-router', () => ({ router: { navigate: jest.fn() } }))
 jest.mock('i18next', () => ({ t: (key: string) => key }))
 jest.mock('react-native-mmkv', () => ({ useMMKVBoolean: () => [false, jest.fn()] }))
 jest.mock('../lib/storage/MMKV', () => ({ mmkv: { getBoolean: () => false } }))
 jest.mock('../lib/state/characters', () => ({
-    Characters: { useCharacterState: () => ({ setCard: jest.fn() }) },
+    Characters: { useCharacterState: jest.fn(() => ({ setCard: jest.fn() })) },
 }))
 jest.mock('../lib/state/chat', () => ({
-    Chats: { useChat: () => ({ chatId: 1, setId: jest.fn() }) },
+    Chats: { useChat: jest.fn(() => ({ chatId: 1, setId: jest.fn(async () => true) })) },
 }))
-jest.mock('../lib/state/Logger', () => ({ Logger: {} }))
+jest.mock('../lib/state/Logger', () => ({ Logger: { info: jest.fn(), error: jest.fn() } }))
 jest.mock('../components/views/Alert', () => ({
     __esModule: true,
     default: { alert: jest.fn() },
@@ -185,4 +190,53 @@ test('enabling notifications requests OS permission instead of assuming it was g
     } as Notifications.NotificationPermissionsStatus)
     expect(await registerForPushNotificationsAsync()).toBe(false)
     expect(Alert.alert).toHaveBeenCalled()
+})
+
+test('notification taps open another chat with character zero despite an existing selection', async () => {
+    const { create } = require('react-test-renderer')
+    Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
+    const listen = jest.spyOn(AppState, 'addEventListener').mockReturnValue({ remove: jest.fn() })
+    const Observer = () => {
+        useAppStateNotificationObserver()
+        return null
+    }
+    let screen: ReturnType<typeof create>
+    try {
+        await act(async () => {
+            screen = create(createElement(Observer))
+        })
+        const response = {
+            actionIdentifier: 'default',
+            notification: {
+                date: 0,
+                request: {
+                    identifier: 'completion',
+                    trigger: null,
+                    content: {
+                        title: null,
+                        subtitle: null,
+                        body: null,
+                        sound: null,
+                        categoryIdentifier: null,
+                        data: { chatId: 3, characterId: 0 },
+                    },
+                },
+            },
+        } as Notifications.NotificationResponse
+        await act(async () => {
+            const onResponse = jest
+                .mocked(Notifications.addNotificationResponseReceivedListener)
+                .mock.calls.at(-1)![0]
+            onResponse(response)
+        })
+        const chat = jest.mocked(Chats.useChat).mock.results.at(-1)!.value
+        const character = jest.mocked(Characters.useCharacterState).mock.results.at(-1)!.value
+        expect(chat.setId).toHaveBeenCalledWith(3)
+        expect(character.setCard).toHaveBeenCalledWith(0)
+        expect(router.navigate).toHaveBeenCalledWith('/chat')
+        expect(Notifications.clearLastNotificationResponse).toHaveBeenCalledTimes(1)
+    } finally {
+        await act(async () => screen?.unmount())
+        listen.mockRestore()
+    }
 })

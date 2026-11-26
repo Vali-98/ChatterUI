@@ -138,5 +138,6 @@
     "settings.appearance.appBackground": "应用背景",
     "settings.appearance.characterBackground": "角色背景",
     "settings.appearance.previewBackground": "预览背景",
-    "settings.appearance.backgroundOverride": "有专属背景的角色将使用角色背景，而不是应用背景。"
+    "settings.appearance.backgroundOverride": "有专属背景的角色将使用角色背景，而不是应用背景。",
+    "settings.privacy.policy": "隐私政策"
 }

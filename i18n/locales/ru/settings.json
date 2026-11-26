@@ -138,5 +138,6 @@
     "settings.appearance.appBackground": "Фон приложения",
     "settings.appearance.characterBackground": "Фон персонажа",
     "settings.appearance.previewBackground": "Предпросмотр фона",
-    "settings.appearance.backgroundOverride": "Собственный фон персонажа используется вместо фона приложения."
+    "settings.appearance.backgroundOverride": "Собственный фон персонажа используется вместо фона приложения.",
+    "settings.privacy.policy": "Политика конфиденциальности"
 }

@@ -138,5 +138,6 @@
     "settings.appearance.appBackground": "Latar aplikasi",
     "settings.appearance.characterBackground": "Latar karakter",
     "settings.appearance.previewBackground": "Pratinjau latar belakang",
-    "settings.appearance.backgroundOverride": "Karakter dengan latar belakang sendiri menggunakannya sebagai pengganti latar aplikasi."
+    "settings.appearance.backgroundOverride": "Karakter dengan latar belakang sendiri menggunakannya sebagai pengganti latar aplikasi.",
+    "settings.privacy.policy": "Kebijakan privasi"
 }

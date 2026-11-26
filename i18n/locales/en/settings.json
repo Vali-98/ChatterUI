@@ -138,5 +138,6 @@
     "settings.appearance.appBackground": "App background",
     "settings.appearance.characterBackground": "Character background",
     "settings.appearance.previewBackground": "Preview background",
-    "settings.appearance.backgroundOverride": "Characters with their own background use it instead of the app background."
+    "settings.appearance.backgroundOverride": "Characters with their own background use it instead of the app background.",
+    "settings.privacy.policy": "Privacy policy"
 }
