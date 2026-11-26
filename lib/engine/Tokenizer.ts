@@ -2,6 +2,7 @@ import { initLlama, LlamaContext } from 'cui-llama.rn'
 import { Asset } from 'expo-asset'
 import { create } from 'zustand'
 
+import { tokenizerFilename } from '@lib/constants/directories'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { Logger } from '@lib/state/Logger'
 import { AppDirectory, copyFile, fileExists } from '@lib/utils/File'
@@ -15,7 +16,7 @@ type TokenizerState = {
     loadModel: () => Promise<void>
 }
 
-const tokenizerModelDir = `${AppDirectory.Assets}llama3tokenizer.gguf`
+const tokenizerModelDir = `${AppDirectory.Assets}${tokenizerFilename}`
 
 export namespace Tokenizer {
     export const useTokenizerState = create<TokenizerState>()((set, get) => ({

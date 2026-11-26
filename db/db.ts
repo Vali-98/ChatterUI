@@ -1,5 +1,7 @@
 import { drizzle } from 'drizzle-orm/expo-sqlite'
 import { openDatabaseSync } from 'expo-sqlite'
+// enforce order - instance should be loaded first from recovery before db
+import '@lib/storage/MMKV'
 
 import * as schema from './schema'
 

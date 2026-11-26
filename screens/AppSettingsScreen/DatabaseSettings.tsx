@@ -1,148 +1,146 @@
-import { localDownload } from '@vali98/react-native-fs'
-import { reloadAppAsync } from 'expo'
 import { getDocumentAsync } from 'expo-document-picker'
-import { Paths } from 'expo-file-system'
-import React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Text, View } from 'react-native'
+import { Modal, View } from 'react-native'
+import { Bar } from 'react-native-progress'
 
-import appConfig from '@appconfig'
 import ThemedButton from '@components/buttons/ThemedButton'
+import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import SectionTitle from '@components/text/SectionTitle'
+import TText from '@components/text/TText'
 import Alert from '@components/views/Alert'
-import { migrateData, resetDataMigrationFlags } from '@db/dataMigrations'
-import { Logger } from '@lib/state/Logger'
+import {
+    exportBackup,
+    exportDatabase,
+    restoreBackup,
+    type BackupProgress,
+} from '@lib/backup/actions'
 import { Theme } from '@lib/theme/ThemeManager'
-import { copyFile, deleteFile } from '@lib/utils/File'
-
-const appVersion = appConfig.expo.version
-
-// eslint-disable-next-line i18next/no-literal-string
-const dbPath = Paths.document.uri + '/SQLite/db.db'
 
 const DatabaseSettings = () => {
     const { t } = useTranslation()
-    const { color, spacing } = Theme.useTheme()
-
-    const exportDB = async (notify: boolean = true) => {
-        await localDownload(dbPath.replace('file://', ''))
-            .then(() => {
-                if (notify) Logger.infoToast(t('settings.database.toast.downloadOk'))
-            })
-            .catch((e: string) =>
-                Logger.errorToast(t('settings.database.toast.downloadFailed', { error: e }))
-            )
-    }
-
-    const importDB = async (uri: string, name: string) => {
-        const copyDB = async () => {
-            await exportDB(false)
-            deleteFile(dbPath)
-            const result = await copyFile({
-                from: uri,
-                to: dbPath,
-            })
-            if (result) {
-                resetDataMigrationFlags()
-                reloadAppAsync()
-            }
-        }
-
-        const dbAppVersion = name.split('-')?.[0]
-        if (dbAppVersion !== appVersion) {
+    const { color } = Theme.useTheme()
+    const [includeApiKeys, setIncludeApiKeys] = useState(false)
+    const [activity, setActivity] = useState<{
+        stage: Parameters<BackupProgress>[0]
+        progress?: number
+    }>()
+    const run = async (operation: (report: BackupProgress) => Promise<void>) => {
+        setActivity({ stage: 'preparing' })
+        try {
+            await operation((stage, progress) => setActivity({ stage, progress }))
+        } catch (error) {
             Alert.alert({
-                title: t('settings.database.alert.versionMismatch.title'),
-                description: t('settings.database.alert.versionMismatch.description', {
-                    importedVersion: dbAppVersion,
-                    currentVersion: appVersion,
-                }),
-                buttons: [
-                    { label: t('common.actions.cancel') },
-                    {
-                        label: t('settings.database.alert.versionMismatch.confirm'),
-                        onPress: copyDB,
-                        type: 'warning',
-                    },
-                ],
+                title: t('settings.backup.failed'),
+                description: String(error instanceof Error ? error.message : error),
+                buttons: [{ label: t('common.actions.close') }],
             })
-        } else copyDB()
+        } finally {
+            setActivity(undefined)
+        }
     }
-
-    const rerunMigrations = () => {
+    const pickRestore = async () => {
+        const result = await getDocumentAsync({
+            type: ['application/zip', 'application/x-zip-compressed'],
+            copyToCacheDirectory: true,
+        })
+        if (result.canceled) return
         Alert.alert({
-            title: t('settings.database.alert.rerunMigrations.title'),
-            description: t('settings.database.alert.rerunMigrations.description'),
+            title: t('settings.backup.restore'),
+            description: t('settings.backup.replaceWarning'),
             buttons: [
                 { label: t('common.actions.cancel') },
                 {
-                    label: t('settings.database.alert.rerunMigrations.confirm'),
-                    onPress: () => migrateData({ bypass: true }).catch(Logger.stackTrace),
+                    label: t('settings.backup.restore'),
                     type: 'warning',
+                    onPress: () => run((report) => restoreBackup(result.assets[0].uri, report)),
                 },
             ],
         })
     }
-
     return (
         <View style={{ rowGap: 8 }}>
-            <SectionTitle>{t('settings.database.title')}</SectionTitle>
-
-            <Text
-                style={{
-                    color: color.text._500,
-                    paddingBottom: spacing.xs,
-                    marginBottom: spacing.m,
-                }}>
-                {t('settings.database.warningText')}
-            </Text>
+            <SectionTitle>{t('settings.backup.title')}</SectionTitle>
+            <TText color="400">{t('settings.backup.description')}</TText>
+            <ThemedSwitchRow
+                label={t('settings.backup.includeKeys')}
+                description={t('settings.backup.keyWarning')}
+                value={includeApiKeys}
+                onChangeValue={setIncludeApiKeys}
+            />
             <ThemedButton
-                label={t('settings.database.exportButton')}
-                variant="secondary"
-                onPress={() => {
+                label={t('settings.backup.export')}
+                disabled={!!activity}
+                onPress={() =>
                     Alert.alert({
-                        title: t('settings.database.alert.export.title'),
-                        description: t('settings.database.alert.export.description'),
+                        title: t('settings.backup.create'),
+                        description: t('settings.backup.createDescription'),
                         buttons: [
                             { label: t('common.actions.cancel') },
                             {
-                                label: t('settings.database.alert.export.confirm'),
-                                onPress: exportDB,
+                                label: t('common.actions.create'),
+                                onPress: () =>
+                                    run(async (report) => {
+                                        await exportBackup(includeApiKeys, report)
+                                        Alert.alert({
+                                            title: t('settings.backup.saved'),
+                                            description: t('settings.backup.savedDescription'),
+                                            buttons: [{ label: t('common.actions.close') }],
+                                        })
+                                    }),
                             },
                         ],
                     })
-                }}
+                }
             />
-
             <ThemedButton
-                label={t('settings.database.importButton')}
-                variant="secondary"
-                onPress={async () => {
-                    getDocumentAsync({ type: ['application/*'] }).then(async (result) => {
-                        if (result.canceled) return
-                        Alert.alert({
-                            title: t('settings.database.alert.import.title'),
-                            description: t('settings.database.alert.import.description'),
-                            buttons: [
-                                { label: t('common.actions.cancel') },
-                                {
-                                    label: t('settings.database.alert.import.confirm'),
-                                    onPress: () =>
-                                        importDB(result.assets[0].uri, result.assets[0].name),
-                                    type: 'warning',
-                                },
-                            ],
-                        })
-                    })
-                }}
+                label={t('settings.backup.restore')}
+                disabled={!!activity}
+                onPress={pickRestore}
             />
-
+            <SectionTitle>{t('settings.backup.databaseTitle')}</SectionTitle>
             <ThemedButton
-                label={t('settings.database.rerunMigrationsButton')}
-                variant="secondary"
-                onPress={rerunMigrations}
+                label={t('settings.backup.exportDatabase')}
+                level="muted"
+                disabled={!!activity}
+                onPress={() => run(exportDatabase)}
             />
+            <Modal visible={!!activity} transparent animationType="fade" onRequestClose={() => {}}>
+                <View
+                    style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        paddingHorizontal: 24,
+                        backgroundColor: color.neutral._100,
+                    }}>
+                    {activity && (
+                        <View style={{ rowGap: 16 }}>
+                            <TText size={24} style={{ textAlign: 'center' }}>
+                                {t(`settings.backup.stage.${activity.stage}`)}
+                            </TText>
+                            <Bar
+                                width={null}
+                                height={14}
+                                borderRadius={7}
+                                borderWidth={0}
+                                color={color.primary._500}
+                                unfilledColor={color.neutral._300}
+                                indeterminate={activity.progress === undefined}
+                                progress={Math.max(0, Math.min(100, activity.progress ?? 0)) / 100}
+                            />
+                            {activity.progress !== undefined && (
+                                <TText color="400" size={16} style={{ textAlign: 'center' }}>
+                                    {`${Math.floor(Math.max(0, Math.min(100, activity.progress)))}%`}
+                                </TText>
+                            )}
+                        </View>
+                    )}
+                    <TText color="400" style={{ marginTop: 16, textAlign: 'center' }}>
+                        {t('settings.backup.keepOpen')}
+                    </TText>
+                </View>
+            </Modal>
         </View>
     )
 }
-
 export default DatabaseSettings

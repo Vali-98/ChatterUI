@@ -1,10 +1,15 @@
 import { createMMKV } from 'react-native-mmkv'
 import { createJSONStorage, StateStorage } from 'zustand/middleware'
 
+import { applyPendingRestore } from '@lib/backup/recovery'
+
 import { migrateMMKVKeys } from './keyMigration'
 
+// Imported by db.ts before opening SQLite and by stores before hydration.
 export const mmkv = createMMKV()
 migrateMMKVKeys(mmkv)
+export const restoreResult = applyPendingRestore(mmkv)
+if (restoreResult === 'restored') migrateMMKVKeys(mmkv)
 
 export const mmkvStorage: StateStorage = {
     setItem: (name, value) => {

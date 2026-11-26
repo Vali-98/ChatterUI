@@ -10,7 +10,7 @@ import type { CharacterCard } from '../lib/state/characters/types'
 import type { ChatMessage } from '../lib/state/chat/types'
 import type { InstructType } from '../lib/state/Instructs'
 import { Logger } from '../lib/state/Logger'
-import { mmkv } from '../lib/storage/MMKV'
+import { useGenerationSettingsStore } from '../lib/engine/generation/settingsStore'
 import { DEFAULT_CONTINUATION_PROMPT } from '../lib/constants/generation'
 import { readBase64Async } from '../lib/utils/File'
 
@@ -34,7 +34,8 @@ jest.mock('../lib/state/Macros', () => ({
             .applyMacros(text, { char: 'Character', user: 'User' }),
 }))
 jest.mock('../lib/storage/MMKV', () => ({
-    mmkv: { getBoolean: () => false, getString: jest.fn() },
+    mmkv: { getBoolean: () => false },
+    createMMKVStorage: () => ({ getItem: () => null, setItem: jest.fn(), removeItem: jest.fn() }),
 }))
 jest.mock('../lib/utils/File', () => ({ readBase64Async: jest.fn() }))
 
@@ -369,7 +370,7 @@ test.each([
             (template) => template.name === 'Google AI Studio'
         )!
         params.messages = [{ ...message('Partial answer', 1), is_user: false }]
-        jest.mocked(mmkv.getString).mockReturnValueOnce(saved)
+        useGenerationSettingsStore.getState().setContinuationPrompt(saved)
         expect((await buildChatCompletionContext(params))?.at(-1)).toEqual({
             role: 'user',
             content: expected,

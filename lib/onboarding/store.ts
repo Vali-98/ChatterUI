@@ -3,10 +3,9 @@ import { persist } from 'zustand/middleware'
 
 import { onboardingGuideIds } from '@lib/guides/definitions'
 import { useGuideState } from '@lib/guides/state'
-import { Global } from '@lib/constants/globalValues'
 import { Characters } from '@lib/state/characters'
 import { Storage } from '@lib/constants/storageKeys'
-import { createMMKVStorage, mmkv } from '@lib/storage/MMKV'
+import { createMMKVStorage } from '@lib/storage/MMKV'
 
 type OnboardingStore = {
     status?: 'inProgress' | 'complete'
@@ -56,10 +55,9 @@ export const prepareOnboarding = async () => {
             })
         return
     }
-    const previousStartup = mmkv.getNumber(Global.CPUThreads) !== undefined
-    const cards = previousStartup ? [] : await Characters.db.query.cardList()
-    const users = previousStartup ? [] : await Characters.db.query.cardList({ type: 'user' })
-    const legacy = previousStartup || cards.length > 0 || users.length > 0
+    const cards = await Characters.db.query.cardList()
+    const users = await Characters.db.query.cardList({ type: 'user' })
+    const legacy = cards.length > 0 || users.length > 0
     useOnboardingStore.setState({
         status: legacy ? 'complete' : 'inProgress',
         origin: legacy ? 'legacy' : 'fresh',

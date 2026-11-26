@@ -1,11 +1,12 @@
-import { getCpuFeatures, getThreads } from '@vali98/react-native-cpu-info'
-import { setTextIntentEnabled, useTextIntentOnForeground } from '@vali98/react-native-process-text'
+import { useTextIntentOnForeground } from '@vali98/react-native-process-text'
 import { DeviceType, getDeviceTypeAsync } from 'expo-device'
 import { Paths } from 'expo-file-system'
 import * as KeepAwake from 'expo-keep-awake'
 import { router } from 'expo-router'
 import { setBackgroundColorAsync as setUIBackgroundColor } from 'expo-system-ui'
 import { z } from 'zod'
+import { t } from 'i18next'
+import Alert from '@components/views/Alert'
 
 import { migrateData } from '@db/dataMigrations'
 import { observeModelDownloads } from '@lib/downloads/models'
@@ -22,12 +23,11 @@ import { useTTSSettingsStore } from '@lib/tts/settingsStore'
 import { AppDirectory, deleteFile, listFiles, makeDirectory, readStringAsync } from './File'
 import { lockScreenOrientation } from './Screen'
 import { AppSettings, AppSettingsDefault } from '../constants/appSettings'
-import { Global } from '../constants/globalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
 import { Characters } from '../state/characters'
 import { Chats } from '../state/chat'
 import { Logger } from '../state/Logger'
-import { mmkv } from '../storage/MMKV'
+import { mmkv, restoreResult } from '../storage/MMKV'
 import { Theme } from '../theme/ThemeManager'
 
 const loadNewestChat = async () => {
@@ -71,11 +71,6 @@ const createDefaultCard = async () => {
     const result = await Characters.actions.createDefaultCard()
     if (result.success) mmkv.set(AppSettings.CreateDefaultCard, false)
     else Logger.error(result.error)
-}
-
-const setCPUFeatures = async () => {
-    const result = await getCpuFeatures()
-    mmkv.set(Global.CpuFeatures, JSON.stringify(result))
 }
 
 const migrateModelData_0_7_10_to_0_8_0 = () => {
@@ -181,13 +176,6 @@ const migrateAppMode_0_8_5_to_0_8_6 = () => {
     Logger.warn('Migrated appmode from 0.8.5 to 0.8.6')
 }
 
-const migrateTextIntent_0_8_8_to_0_8_9 = () => {
-    if (!mmkv.getBoolean(Global.InstallTextIntentDisable)) {
-        mmkv.set(Global.InstallTextIntentDisable, true)
-        setTextIntentEnabled(false)
-    }
-}
-
 const createDefaultUserData = async () => {
     const id = await Characters.db.create.blankCard('User', { type: 'user' })
     Characters.useUserStore.getState().setCard(id)
@@ -227,19 +215,6 @@ const setDefaultInstruct = () => {
     })
 }
 
-const setCPUThreads = () => {
-    const threads = mmkv.getNumber(Global.CPUThreads)
-    if (threads) return
-    let newThreads = 8
-    try {
-        newThreads = getThreads()
-    } catch (e) {
-        Logger.error('Failed to set CPU Threads: ' + e)
-    }
-    Logger.info('Setting CPU Threads to ' + newThreads)
-    mmkv.set(Global.CPUThreads, newThreads)
-}
-
 export const startupApp = async () => {
     await migrateData()
     console.log('[APP STARTED]: T1APT')
@@ -260,12 +235,6 @@ export const startupApp = async () => {
     // Initialize the default card
     await createDefaultCard()
 
-    // get fp16, i8mm and dotprod data
-    setCPUFeatures()
-
-    // set cpu thread count
-    setCPUThreads()
-
     // set keep awake settings
     setKeepAwake()
 
@@ -283,12 +252,19 @@ export const startupApp = async () => {
     migratePresets_0_8_3_to_0_8_4()
     migrateTTSData_0_8_5_to_0_8_6()
     migrateAppMode_0_8_5_to_0_8_6()
-    migrateTextIntent_0_8_8_to_0_8_9()
     lockScreenOrientation()
     const themeState = Theme.useColorState.getState()
     const backgroundColor = Theme.resolveColor(themeState.colorName, themeState.customColors)
         .neutral._100
     setUIBackgroundColor(backgroundColor)
+
+    if (restoreResult === 'rolledBack') {
+        Alert.alert({
+            title: t('settings.backup.failed'),
+            description: t('settings.backup.rolledBack'),
+            buttons: [{ label: t('common.actions.close') }],
+        })
+    }
 
     Logger.info('Resetting state values for startup.')
     // note, there is an ancient RN bug where bold text accessibilty breaks

@@ -68,7 +68,10 @@ jest.mock('../lib/state/Instructs', () => ({
 jest.mock('../lib/state/samplerStore', () => ({
     getCurrentSampler: () => require('../lib/constants/SamplerData').defaultSamplerConfig,
 }))
-jest.mock('../lib/storage/MMKV', () => ({ mmkv: { getBoolean: () => false } }))
+jest.mock('../lib/storage/MMKV', () => ({
+    mmkv: { getBoolean: () => false },
+    createMMKVStorage: () => ({ getItem: () => null, setItem: jest.fn(), removeItem: jest.fn() }),
+}))
 
 const user = {
     ...buildBlankCharacterCard('User One').data,

@@ -4,13 +4,7 @@ import { Directory, File, FileMode, Paths } from 'expo-file-system'
 
 import { Logger } from '../state/Logger'
 
-export const AppDirectory = {
-    ModelPath: `${Paths.document.uri}models/`,
-    SessionPath: `${Paths.document.uri}session/`,
-    CharacterPath: `${Paths.document.uri}characters/`,
-    Assets: `${Paths.document.uri}appAssets/`,
-    Attachments: `${Paths.document.uri}attachments/`,
-}
+export { AppDirectory } from '../constants/directories'
 
 export namespace FileUtils {
     export const getDocumentDir = (dir: string) => {

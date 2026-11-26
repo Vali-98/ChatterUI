@@ -1,7 +1,6 @@
 import { prepareOnboarding, useOnboardingStore } from '../lib/onboarding/store'
 import { Characters } from '../lib/state/characters'
 import { useGuideState } from '../lib/guides/state'
-import { mmkv } from '../lib/storage/MMKV'
 
 jest.mock('../lib/storage/MMKV', () => ({
     mmkv: { getNumber: jest.fn() },
@@ -14,27 +13,19 @@ beforeEach(() => {
     jest.clearAllMocks()
     useGuideState.setState({ active: undefined, forced: [] })
     useOnboardingStore.setState({ status: undefined, origin: undefined, step: 0 })
-    jest.mocked(mmkv.getNumber).mockReturnValue(undefined)
     jest.mocked(Characters.db.query.cardList).mockResolvedValue([])
 })
 test('fresh install is marked in progress before default cards exist', async () => {
     await prepareOnboarding()
     expect(useOnboardingStore.getState().status).toBe('inProgress')
 })
-test('legacy startup evidence skips onboarding without touching cards', async () => {
-    jest.mocked(mmkv.getNumber).mockReturnValue(8)
-    await prepareOnboarding()
-    expect(useOnboardingStore.getState().status).toBe('complete')
-    expect(Characters.db.query.cardList).not.toHaveBeenCalled()
-})
-test('existing user data skips onboarding even without the startup key', async () => {
+test('existing character data skips onboarding', async () => {
     jest.mocked(Characters.db.query.cardList).mockResolvedValue([{ id: 1 }] as never)
     await prepareOnboarding()
     expect(useOnboardingStore.getState().status).toBe('complete')
 })
 test('interrupted onboarding keeps its step even after startup has created defaults', async () => {
     useOnboardingStore.setState({ status: 'inProgress', step: 3 })
-    jest.mocked(mmkv.getNumber).mockReturnValue(8)
     await prepareOnboarding()
     expect(useOnboardingStore.getState()).toMatchObject({ status: 'inProgress', step: 3 })
     expect(Characters.db.query.cardList).not.toHaveBeenCalled()

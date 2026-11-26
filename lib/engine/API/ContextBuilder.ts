@@ -1,7 +1,8 @@
 import { t } from 'i18next'
 
 import { AppSettings } from '@lib/constants/appSettings'
-import { CONTINUATION_PROMPT_KEY, DEFAULT_CONTINUATION_PROMPT } from '@lib/constants/generation'
+import { DEFAULT_CONTINUATION_PROMPT } from '@lib/constants/generation'
+import { useGenerationSettingsStore } from '@lib/engine/generation/settingsStore'
 import { useTextFilterStore } from '@lib/hooks/TextFilter'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { CharacterCard, CharacterTokenCounts } from '@lib/state/characters'
@@ -430,7 +431,8 @@ export const buildChatCompletionContext = async (params: ContextBuilderParams) =
         payload.push({
             role: feats.userRole,
             [feats.contentName]:
-                mmkv.getString(CONTINUATION_PROMPT_KEY)?.trim() || DEFAULT_CONTINUATION_PROMPT,
+                useGenerationSettingsStore.getState().continuationPrompt.trim() ||
+                DEFAULT_CONTINUATION_PROMPT,
         })
     }
     printContext(

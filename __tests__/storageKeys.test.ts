@@ -1,6 +1,4 @@
 import { AppSettings } from '../lib/constants/appSettings'
-import { CONTINUATION_PROMPT_KEY } from '../lib/constants/generation'
-import { Global } from '../lib/constants/globalValues'
 import { Storage } from '../lib/constants/storageKeys'
 import { migrateMMKVKeys } from '../lib/storage/keyMigration'
 
@@ -34,17 +32,10 @@ beforeEach(() => {
 })
 
 test('active root keys have distinct names and the expected prefixes', () => {
-    const globals = [Global.CpuFeatures, Global.CPUThreads, Global.InstallTextIntentDisable]
-    const keys = [
-        ...Object.values(Storage),
-        ...Object.values(AppSettings),
-        ...globals,
-        CONTINUATION_PROMPT_KEY,
-    ]
+    const keys = [...Object.values(Storage), ...Object.values(AppSettings)]
     expect(new Set(keys).size).toBe(keys.length)
     expect(Object.values(Storage).every((key) => key.startsWith('storage-'))).toBe(true)
     expect(Object.values(AppSettings).every((key) => key.startsWith('settings-'))).toBe(true)
-    expect(globals.every((key) => key.startsWith('global-'))).toBe(true)
 })
 
 test('moves store envelopes without modifying their payloads or persistence versions', () => {
@@ -59,16 +50,27 @@ test('moves store envelopes without modifying their payloads or persistence vers
     expect(mockValues.has('samplerstate-storage')).toBe(false)
 })
 
-test('preserves false, zero and empty string values using their original types', () => {
+test('preserves false and empty string values using their original types', () => {
     mockValues.set('createdefaultcard', false)
-    mockValues.set('constants-cpu-threads', 0)
-    mockValues.set('cpufeatures', '')
-    mockValues.set('install-text-intent-disable', true)
+    mockValues.set('summary-settings', '')
     migrateMMKVKeys(mockStorage)
     expect(mockValues.get(AppSettings.CreateDefaultCard)).toBe(false)
-    expect(mockValues.get(Global.CPUThreads)).toBe(0)
-    expect(mockValues.get(Global.CpuFeatures)).toBe('')
-    expect(mockValues.get(Global.InstallTextIntentDisable)).toBe(true)
+    expect(mockValues.get(Storage.SummarySettings)).toBe('')
+})
+
+test('removes retired keys instead of migrating them', () => {
+    for (const key of [
+        'cpufeatures',
+        'constants-cpu-threads',
+        'install-text-intent-disable',
+        'global-cpu-features',
+        'global-cpu-threads',
+        'global-install-text-intent-disable',
+        'settings-continuation-prompt',
+    ])
+        mockValues.set(key, true)
+    migrateMMKVKeys(mockStorage)
+    expect(mockValues.size).toBe(0)
 })
 
 test('an existing destination wins and removing the old alias prevents later resurrection', () => {

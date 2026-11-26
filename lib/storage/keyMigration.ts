@@ -1,13 +1,9 @@
 import type { MMKV } from 'react-native-mmkv'
 
 import { AppSettings } from '@lib/constants/appSettings'
-import { Global } from '@lib/constants/globalValues'
 import { Storage } from '@lib/constants/storageKeys'
 
-type KeyStorage = Pick<
-    MMKV,
-    'contains' | 'getString' | 'getBoolean' | 'getNumber' | 'set' | 'remove'
->
+type KeyStorage = Pick<MMKV, 'contains' | 'getString' | 'getBoolean' | 'set' | 'remove'>
 
 // Only active keys are renamed. Historical keys such as `localmodel`, `appmode` and
 // `ttsauto` remain available to the existing data migrations in Startup.ts.
@@ -30,7 +26,6 @@ const stringKeys: Record<string, string> = {
     'colorscheme-storage': Storage.ColorState,
     'tag-hider-storage': Storage.TagHider,
     'summary-settings': Storage.SummarySettings,
-    cpufeatures: Global.CpuFeatures,
 }
 
 const booleanKeys: Record<string, string> = {
@@ -58,21 +53,27 @@ const booleanKeys: Record<string, string> = {
     useModelTemplate: AppSettings.UseModelTemplate,
     showtokenpersecond: AppSettings.ShowTokenPerSecond,
     autoloaduser: AppSettings.AutoLoadUser,
-    'install-text-intent-disable': Global.InstallTextIntentDisable,
-}
-
-const numberKeys: Record<string, string> = {
-    'constants-cpu-threads': Global.CPUThreads,
 }
 
 // Run before Zustand hydration or any startup/default initialization. Keep JSON
 // envelopes intact so each store's existing version migrations still apply.
 // Checking aliases each launch also supports restored older storage files.
 export const migrateMMKVKeys = (storage: KeyStorage) => {
+    // Remove retired keys, including the unreleased standalone continuation setting.
+    for (const key of [
+        'cpufeatures',
+        'constants-cpu-threads',
+        'install-text-intent-disable',
+        'global-cpu-features',
+        'global-cpu-threads',
+        'global-install-text-intent-disable',
+        'settings-continuation-prompt',
+    ])
+        storage.remove(key)
+
     const groups = [
         { keys: stringKeys, read: (key: string) => storage.getString(key) },
         { keys: booleanKeys, read: (key: string) => storage.getBoolean(key) },
-        { keys: numberKeys, read: (key: string) => storage.getNumber(key) },
     ]
     for (const { keys, read } of groups) {
         for (const [oldKey, newKey] of Object.entries(keys)) {
