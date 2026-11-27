@@ -1,5 +1,12 @@
 import { useCallback, type ReactNode, type Ref } from 'react'
-import { TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native'
+import {
+    TextInput,
+    View,
+    type StyleProp,
+    type TextInputProps,
+    type TextInputInstance,
+    type ViewStyle,
+} from 'react-native'
 
 import ThemedButton, { type ThemedButtonProps } from '@components/buttons/ThemedButton'
 import TText from '@components/text/TText'
@@ -7,7 +14,7 @@ import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
 import { Theme } from '@lib/theme/ThemeManager'
 
 export interface ThemedTextInputProps extends TextInputProps {
-    ref?: Ref<TextInput>
+    ref?: Ref<TextInputInstance>
     label?: string
     description?: string
     value: string
@@ -49,7 +56,7 @@ const ThemedTextInput = ({
     const { color } = Theme.useTheme()
     const ref = useUnfocusTextInput(autoUnfocus)
     const attachRef = useCallback(
-        (input: TextInput | null) => {
+        (input: TextInputInstance | null) => {
             ref.current = input
             if (typeof forwardedRef === 'function') {
                 const cleanup = forwardedRef(input)

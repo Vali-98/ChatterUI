@@ -12,5 +12,6 @@
     "users.hint": "Подсказка: проведите пальцем влево или нажмите <icon/> для открытия ящика пользователей",
     "users.messages.loadingUser": "Загрузка пользователя: {{name}}",
     "users.nameplaceholder": "Пустые имена не рекомендуются",
-    "users.profilecount": "Профили пользователей"
+    "users.profilecount": "Профили пользователей",
+    "users.editor.descriptionPlaceholder": "Опишите этого пользователя…"
 }

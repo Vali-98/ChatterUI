@@ -2,7 +2,7 @@ import { AntDesignIconName } from '@react-native-vector-icons/ant-design/static'
 import { useFocusEffect } from 'expo-router'
 import React, { ComponentProps, ReactNode, useCallback } from 'react'
 import { BackHandler, StyleSheet, View, ViewStyle } from 'react-native'
-import { FlingGesture, GestureDetector, Gesture as GS } from 'react-native-gesture-handler'
+import { GestureDetector, Gesture as GS } from 'react-native-gesture-handler'
 import Animated, {
     ComplexAnimationBuilder,
     Easing,
@@ -162,7 +162,7 @@ namespace Drawer {
 
         const drawerShown = config.map((item) => values?.[item.drawerID]).some((item) => item)
 
-        const gestures: FlingGesture[] = []
+        const gestures: ReturnType<typeof GS.Fling>[] = []
         config.forEach((item) => {
             gestures.push(
                 GS.Fling()

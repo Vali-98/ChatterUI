@@ -1,5 +1,4 @@
 import { useRouter } from 'expo-router'
-import { useTranslation } from 'react-i18next'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import ListButton from '@components/buttons/ListButton'
@@ -14,7 +13,6 @@ import { useOnboardingStore } from '@lib/onboarding/store'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const TestScreens = () => {
-    const { t } = useTranslation()
     const { color } = Theme.useTheme()
     const router = useRouter()
     const replayGuides = useGuideState((state) => state.replay)
@@ -30,38 +28,38 @@ const TestScreens = () => {
     const items: { id: string; label: string; iconName: IconName; onPress: () => void }[] = [
         {
             id: 'components',
-            label: t('navigation.dev_components'),
+            label: 'Components',
             iconName: 'appstore',
             onPress: () => router.push('/testScreens/components'),
         },
         {
             id: 'colours',
-            label: t('navigation.dev_colortest'),
+            label: 'Colors',
             iconName: 'bg-colors',
             onPress: () => router.push('/testScreens/colours'),
         },
         {
             id: 'markdown',
-            label: t('navigation.dev_markdown'),
+            label: 'Markdown',
             iconName: 'file-markdown',
             onPress: () => router.push('/testScreens/markdown'),
         },
         {
             id: 'onboarding',
-            label: t('navigation.dev_onboarding'),
+            label: 'Restart onboarding',
             iconName: 'rocket',
             onPress: () => returnHome(restartOnboarding),
         },
         {
             id: 'guides',
-            label: t('navigation.dev_guides'),
+            label: 'Replay interface guides',
             iconName: 'bulb',
             onPress: () => returnHome(() => replayGuides(onboardingGuideIds)),
         },
     ]
     return (
         <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
-            <HeaderTitle title={t('navigation.dev_tests')} />
+            <HeaderTitle title="[DEV] Test Screens" />
             <EdgeFadeFlatList
                 containerStyle={{ flex: 1 }}
                 contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16, rowGap: 8 }}

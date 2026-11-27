@@ -16,10 +16,10 @@ import CharacterListingTags from './CharacterListingTags'
 
 type CharacterListingProps = {
     character: CharacterCardSummary
-    navigationPending: RefObject<boolean>
+    navigationPendingRef: RefObject<boolean>
 }
 
-const CharacterListing: React.FC<CharacterListingProps> = ({ character, navigationPending }) => {
+const CharacterListing: React.FC<CharacterListingProps> = ({ character, navigationPendingRef }) => {
     const { t } = useTranslation()
     const [showTags] = useMMKVBoolean(AppSettings.ShowTags)
     const { setShowSearch, setTagFilter, tagFilter } = useCharacterSortStore(
@@ -39,7 +39,7 @@ const CharacterListing: React.FC<CharacterListingProps> = ({ character, navigati
 
     return (
         <View>
-            <CharacterActionsMenu character={character} navigationPending={navigationPending}>
+            <CharacterActionsMenu character={character} navigationPendingRef={navigationPendingRef}>
                 <View style={styles.longButtonContainer}>
                     <Avatar
                         targetImage={Characters.getCardImageUri(character.image_id)}

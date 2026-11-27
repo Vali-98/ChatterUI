@@ -75,5 +75,6 @@
     "common.activity.title": "Активность",
     "common.activity.empty": "Нет текущих событий",
     "common.activity.chat": "Этот чат",
-    "common.activity.app": "Активность приложения"
+    "common.activity.app": "Активность приложения",
+    "common.placeholders.name": "Имя…"
 }

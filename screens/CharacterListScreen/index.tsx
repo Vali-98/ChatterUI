@@ -1,6 +1,5 @@
-import { SafeAreaView } from 'react-native-safe-area-context'
-
 import { View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import Drawer from '@components/views/Drawer'
 

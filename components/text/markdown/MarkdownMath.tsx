@@ -26,4 +26,6 @@ const MarkdownMath = React.memo(
     )
 )
 
+MarkdownMath.displayName = 'MarkdownMath'
+
 export default MarkdownMath

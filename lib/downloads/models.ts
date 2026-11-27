@@ -5,10 +5,9 @@ import { Model } from '@lib/engine/Local/Model'
 import { Logger } from '@lib/state/Logger'
 import { AppDirectory } from '@lib/utils/File'
 
-import { useDownloadStore } from './store'
-
-import catalog from './models.json'
 import { startDownload } from './manager'
+import catalog from './models.json'
+import { useDownloadStore } from './store'
 
 export type RecommendedModel = {
     id: string

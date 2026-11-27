@@ -88,11 +88,7 @@ const AvatarViewer: React.FC<AvatarViewerProps> = ({ editorButton = true }) => {
                                 iconSize={18}
                                 variant="secondary"
                                 onPress={() => {
-                                    router.push(
-                                        isUser
-                                            ? '/users'
-                                            : '/characterEditor'
-                                    )
+                                    router.push(isUser ? '/users' : '/characterEditor')
                                     setShow(false)
                                 }}
                             />

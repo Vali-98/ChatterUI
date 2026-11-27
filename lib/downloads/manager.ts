@@ -81,7 +81,7 @@ export const resumeDownload = async (id: string, restart = false) => {
                 if (cancelled.has(id)) return
                 if (pausing.has(id)) await pausing.get(id)
                 if (!result || cancelled.has(id)) return
-                partial.move(destination)
+                await partial.move(destination)
                 store.getState().update(id, {
                     status: 'completed',
                     bytesWritten: destination.size,

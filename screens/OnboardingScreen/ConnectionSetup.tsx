@@ -1,5 +1,5 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, View } from 'react-native'
 import Animated, { FadeIn } from 'react-native-reanimated'
@@ -15,12 +15,18 @@ import ListCard from '@components/views/ListCard'
 import { CLAUDE_VERSION } from '@lib/constants/generation'
 import { APIConfiguration, APIValues } from '@lib/engine/API/APIBuilder.types'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
-import { isConnectionReady, requiresConnectionKey } from '@lib/onboarding/connection'
+import { defaultTemplates } from '@lib/engine/API/DefaultAPI'
+import {
+    getModelEndpoint,
+    isConnectionReady,
+    requiresConnectionKey,
+} from '@lib/onboarding/connection'
 import { Theme } from '@lib/theme/ThemeManager'
 import { getNestedValue } from '@lib/utils/Parsing'
 
 export type ConnectionDraft = APIValues & { friendlyName: string }
-const providers = ['OpenAI', 'Google AI Studio', 'Open Router', 'Claude']
+// Template identifiers, matching the connection configuration names.
+const PROVIDER_NAMES = ['OpenAI', 'Google AI Studio', 'Open Router', 'Claude']
 
 const ConnectionSetup = ({
     value: confirmedValue,
@@ -32,75 +38,26 @@ const ConnectionSetup = ({
     const { t } = useTranslation()
     const { color } = Theme.useTheme()
     const sheet = useBottomSheetRef()
-    const [value, onChange] = useState(confirmedValue)
+    const [editing, setEditing] = useState<{ template: APIConfiguration; value: ConnectionDraft }>()
     const [showAll, setShowAll] = useState(false)
-    const getTemplates = useConnectionStore((state) => state.getTemplates)
     const customTemplates = useConnectionStore((state) => state.customTemplates)
-    const templates = getTemplates()
-    const template = templates.find((item) => item.name === value?.configName)
-    const [models, setModels] = useState<unknown[]>([])
-    const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'failed'>('idle')
-    const [retry, setRetry] = useState(0)
+    const templates = useMemo(() => [...defaultTemplates, ...customTemplates], [customTemplates])
     const choose = (template: APIConfiguration) => {
-        onChange(
+        const value =
             confirmedValue?.configName === template.name
                 ? confirmedValue
                 : {
                       ...template.defaultValues,
                       configName: template.name,
                       friendlyName: template.name,
-                      ...(template.name === 'Chat Completions'
-                          ? {
-                                endpoint: '',
-                                modelEndpoint: '',
-                                friendlyName: t('onboarding.selfHosted'),
-                            }
-                          : {}),
+                      ...(template.name === 'Chat Completions' && {
+                          endpoint: '',
+                          modelEndpoint: '',
+                          friendlyName: t('onboarding.selfHosted'),
+                      }),
                   }
-        )
+        setEditing({ template, value })
         sheet.current?.open()
-    }
-    useEffect(() => {
-        setModels([])
-        if (
-            !template?.features.useModel ||
-            !value?.modelEndpoint ||
-            (requiresConnectionKey(template) && !value.key.trim())
-        ) {
-            setStatus('idle')
-            return
-        }
-        const controller = new AbortController()
-        const timer = setTimeout(() => {
-            setStatus('loading')
-            const headers: Record<string, string> = {}
-            if (value.key)
-                headers[template.request.authHeader] = template.request.authPrefix + value.key
-            if (template.name === 'Claude') headers['anthropic-version'] = CLAUDE_VERSION
-            void fetch(value.modelEndpoint, { headers, signal: controller.signal })
-                .then(async (response) => {
-                    if (!response.ok) throw new Error(String(response.status))
-                    const result = getNestedValue(
-                        await response.json(),
-                        template.model.modelListParser
-                    )
-                    if (!Array.isArray(result)) throw new Error('No model list')
-                    if (!controller.signal.aborted) {
-                        setModels(result)
-                        setStatus('ready')
-                    }
-                })
-                .catch(() => {
-                    if (!controller.signal.aborted) setStatus('failed')
-                })
-        }, 500)
-        return () => {
-            clearTimeout(timer)
-            controller.abort()
-        }
-    }, [template?.name, value?.modelEndpoint, value?.key, retry, customTemplates])
-    const patch = (changes: Partial<ConnectionDraft>) => {
-        if (value) onChange({ ...value, ...changes })
     }
     const confirmedTemplate = templates.find((item) => item.name === confirmedValue?.configName)
     if (isConnectionReady(confirmedValue, confirmedTemplate) && confirmedValue) {
@@ -128,7 +85,6 @@ const ConnectionSetup = ({
                     viewStyle={{ alignSelf: 'flex-start' }}
                     onPress={() => {
                         confirmValue(undefined)
-                        onChange(undefined)
                     }}
                 />
             </Animated.View>
@@ -139,7 +95,7 @@ const ConnectionSetup = ({
             {[
                 {
                     title: t('onboarding.providers'),
-                    items: templates.filter((item) => providers.includes(item.name)),
+                    items: templates.filter((item) => PROVIDER_NAMES.includes(item.name)),
                 },
                 {
                     title: t('onboarding.selfHosted'),
@@ -151,7 +107,7 @@ const ConnectionSetup = ({
                               title: t('onboarding.otherApis'),
                               items: templates.filter(
                                   (item) =>
-                                      !providers.includes(item.name) &&
+                                      !PROVIDER_NAMES.includes(item.name) &&
                                       item.name !== 'Chat Completions'
                               ),
                           },
@@ -194,127 +150,184 @@ const ConnectionSetup = ({
             )}
             <BottomSheet
                 ref={sheet}
+                onClose={() => setEditing(undefined)}
                 sheetStyle={{ maxHeight: '85%', flex: 1 }}
                 bodyContainerStyle={[{ paddingHorizontal: 16, paddingVertical: 16 }, { flex: 1 }]}>
-                <ScrollView
-                    keyboardShouldPersistTaps="handled"
-                    contentContainerStyle={{ gap: 16, paddingBottom: 24 }}>
-                    <TText size={22}>{template?.ui.display?.name ?? template?.name}</TText>
-                    {template?.name === 'Chat Completions' && (
-                        <TText color="400">{t('onboarding.selfHostedDescription')}</TText>
-                    )}
-                    {value && template && (
-                        <View style={{ gap: 12 }}>
-                            <ThemedTextInput
-                                label={t('connections.editor.friendlyName')}
-                                value={value.friendlyName}
-                                onChangeText={(friendlyName) => patch({ friendlyName })}
-                            />
-                            {template.ui.editableCompletionPath && (
-                                <ThemedTextInput
-                                    label={t('connections.editor.completionUrl')}
-                                    value={value.endpoint}
-                                    placeholder={
-                                        template.name === 'Chat Completions'
-                                            ? 'http://192.168.1.100:8080/v1/chat/completions'
-                                            : undefined
-                                    }
-                                    onChangeText={(endpoint) => {
-                                        const previousModelUrl = value.endpoint.replace(
-                                            /\/chat\/completions\/?$/,
-                                            '/models'
-                                        )
-                                        patch({
-                                            endpoint,
-                                            ...(template.name === 'Chat Completions' &&
-                                            endpoint.endsWith('/chat/completions') &&
-                                            (!value.modelEndpoint ||
-                                                value.modelEndpoint === previousModelUrl)
-                                                ? {
-                                                      modelEndpoint: endpoint.replace(
-                                                          /\/chat\/completions$/,
-                                                          '/models'
-                                                      ),
-                                                  }
-                                                : {}),
-                                        })
-                                    }}
-                                    autoCapitalize="none"
-                                    autoCorrect={false}
-                                />
-                            )}
-                            {template.features.useKey && (
-                                <ThemedTextInput
-                                    label={t('connections.editor.apiKey')}
-                                    value={value.key}
-                                    onChangeText={(key) => patch({ key })}
-                                    secureTextEntry
-                                    autoCapitalize="none"
-                                    autoCorrect={false}
-                                />
-                            )}
-                            {template.ui.editableModelPath && (
-                                <ThemedTextInput
-                                    label={t('connections.editor.modelUrl')}
-                                    value={value.modelEndpoint}
-                                    onChangeText={(modelEndpoint) => patch({ modelEndpoint })}
-                                    autoCapitalize="none"
-                                    autoCorrect={false}
-                                />
-                            )}
-                            {template.features.useModel && (
-                                <>
-                                    <DropdownSheet
-                                        keyExtractor={(item) =>
-                                            String(getNestedValue(item, template.model.nameParser))
-                                        }
-                                        data={models}
-                                        selected={
-                                            template.features.multipleModels
-                                                ? value.model?.[0]
-                                                : value.model
-                                        }
-                                        labelExtractor={(item) =>
-                                            String(
-                                                getNestedValue(item, template.model.nameParser) ??
-                                                    ''
-                                            )
-                                        }
-                                        onChangeValue={(model) =>
-                                            patch({
-                                                model: template.features.multipleModels
-                                                    ? [model]
-                                                    : model,
-                                            })
-                                        }
-                                        search
-                                        placeholder={t('connections.editor.selectModel')}
-                                    />
-                                    <TText color="400">{t(`onboarding.models.${status}`)}</TText>
-                                    {status === 'failed' && (
-                                        <ThemedButton
-                                            variant="tertiary"
-                                            label={t('common.actions.tryAgain')}
-                                            onPress={() => setRetry((value) => value + 1)}
-                                        />
-                                    )}
-                                </>
-                            )}
-                        </View>
-                    )}
-                </ScrollView>
-                <ThemedButton
-                    variant="secondary"
-                    label={t('common.actions.save')}
-                    disabled={!isConnectionReady(value, template)}
-                    onPress={() => {
-                        if (value) confirmValue(value)
-                        sheet.current?.close()
-                    }}
-                />
+                {editing && (
+                    <ConnectionForm
+                        key={editing.template.name}
+                        template={editing.template}
+                        initialValue={editing.value}
+                        onSave={(value) => {
+                            confirmValue(value)
+                            sheet.current?.close()
+                        }}
+                    />
+                )}
             </BottomSheet>
             <TText color="400">{t('onboarding.connectionLater')}</TText>
         </View>
     )
 }
 export default ConnectionSetup
+
+const ConnectionForm = ({
+    template,
+    initialValue,
+    onSave,
+}: {
+    template: APIConfiguration
+    initialValue: ConnectionDraft
+    onSave: (value: ConnectionDraft) => void
+}) => {
+    const { t } = useTranslation()
+    const [value, setValue] = useState(initialValue)
+    const patch = (changes: Partial<ConnectionDraft>) =>
+        setValue((previous) => ({ ...previous, ...changes }))
+    const { models, status, retry } = useConnectionModels(template, value.modelEndpoint, value.key)
+    return (
+        <>
+            <ScrollView
+                keyboardShouldPersistTaps="handled"
+                contentContainerStyle={{ gap: 16, paddingBottom: 24 }}>
+                <TText size={22}>{template.ui.display?.name ?? template.name}</TText>
+                {template.name === 'Chat Completions' && (
+                    <TText color="400">{t('onboarding.selfHostedDescription')}</TText>
+                )}
+                <View style={{ gap: 12 }}>
+                    <ThemedTextInput
+                        label={t('connections.editor.friendlyName')}
+                        value={value.friendlyName}
+                        onChangeText={(friendlyName) => patch({ friendlyName })}
+                    />
+                    {template.ui.editableCompletionPath && (
+                        <ThemedTextInput
+                            label={t('connections.editor.completionUrl')}
+                            value={value.endpoint}
+                            placeholder={
+                                template.name === 'Chat Completions'
+                                    ? 'http://192.168.1.100:8080/v1/chat/completions'
+                                    : undefined
+                            }
+                            onChangeText={(endpoint) =>
+                                patch({
+                                    endpoint,
+                                    modelEndpoint: getModelEndpoint(value, endpoint),
+                                })
+                            }
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                        />
+                    )}
+                    {template.features.useKey && (
+                        <ThemedTextInput
+                            label={t('connections.editor.apiKey')}
+                            value={value.key}
+                            onChangeText={(key) => patch({ key })}
+                            secureTextEntry
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                        />
+                    )}
+                    {template.ui.editableModelPath && (
+                        <ThemedTextInput
+                            label={t('connections.editor.modelUrl')}
+                            value={value.modelEndpoint}
+                            onChangeText={(modelEndpoint) => patch({ modelEndpoint })}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                        />
+                    )}
+                    {template.features.useModel && (
+                        <>
+                            <DropdownSheet
+                                keyExtractor={(item) =>
+                                    String(getNestedValue(item, template.model.nameParser))
+                                }
+                                data={models}
+                                selected={
+                                    template.features.multipleModels
+                                        ? value.model?.[0]
+                                        : value.model
+                                }
+                                labelExtractor={(item) =>
+                                    String(getNestedValue(item, template.model.nameParser) ?? '')
+                                }
+                                onChangeValue={(model) =>
+                                    patch({
+                                        model: template.features.multipleModels ? [model] : model,
+                                    })
+                                }
+                                search
+                                placeholder={t('connections.editor.selectModel')}
+                            />
+                            <TText color="400">{t(`onboarding.models.${status}`)}</TText>
+                            {status === 'failed' && (
+                                <ThemedButton
+                                    variant="tertiary"
+                                    label={t('common.actions.tryAgain')}
+                                    onPress={retry}
+                                />
+                            )}
+                        </>
+                    )}
+                </View>
+            </ScrollView>
+
+            <ThemedButton
+                variant="secondary"
+                label={t('common.actions.save')}
+                disabled={!isConnectionReady(value, template)}
+                onPress={() => onSave(value)}
+            />
+        </>
+    )
+}
+
+type ModelRequest = { template: APIConfiguration; endpoint: string; key: string; attempt: number }
+const useConnectionModels = (template: APIConfiguration, endpoint: string, key: string) => {
+    const [attempt, setAttempt] = useState(0)
+    const request = useMemo(
+        () => ({ template, endpoint, key, attempt }),
+        [template, endpoint, key, attempt]
+    )
+    const [result, setResult] = useState<{
+        request: ModelRequest
+        models: unknown[]
+        status: 'ready' | 'failed'
+    }>()
+    const enabled =
+        template.features.useModel &&
+        !!endpoint.trim() &&
+        (!requiresConnectionKey(template) || !!key.trim())
+    useEffect(() => {
+        if (!enabled) return
+        const controller = new AbortController()
+        const timer = setTimeout(async () => {
+            const headers: Record<string, string> = {}
+            if (template.features.useKey && key)
+                headers[template.request.authHeader] = template.request.authPrefix + key
+            if (template.name === 'Claude') headers['anthropic-version'] = CLAUDE_VERSION
+            try {
+                const response = await fetch(endpoint, { headers, signal: controller.signal })
+                if (!response.ok) throw new Error(String(response.status))
+                const models = getNestedValue(await response.json(), template.model.modelListParser)
+                if (!Array.isArray(models)) throw new Error()
+                if (!controller.signal.aborted) setResult({ request, models, status: 'ready' })
+            } catch {
+                if (!controller.signal.aborted) setResult({ request, models: [], status: 'failed' })
+            }
+        }, 500)
+        return () => {
+            clearTimeout(timer)
+            controller.abort()
+        }
+    }, [enabled, request, template, endpoint, key])
+    const current = enabled && result?.request === request
+    return {
+        models: current ? result.models : [],
+        // eslint-disable-next-line i18next/no-literal-string -- Status identifiers select translated messages.
+        status: !enabled ? 'idle' : current ? result.status : 'loading',
+        retry: () => setAttempt((previous) => previous + 1),
+    }
+}

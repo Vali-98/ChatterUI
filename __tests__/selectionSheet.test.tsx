@@ -1,5 +1,5 @@
 import React, { act, createRef } from 'react'
-import { TextInput } from 'react-native'
+import { TextInput, type TextInputInstance } from 'react-native'
 
 import SelectionSheet from '../components/input/SelectionSheet'
 import type { BottomSheetRefFunctions } from '../components/views/BottomSheet'
@@ -208,7 +208,7 @@ test('InputSheet resets by default, scopes remembered drafts, and retains failed
 
 test.each([true, false])('the input exposes its native ref with autoUnfocus=%s', (autoUnfocus) => {
     const Input = jest.requireActual('../components/input/ThemedTextInput').default
-    const ref = createRef<TextInput>()
+    const ref = createRef<TextInputInstance>()
     let renderer: any
     act(() => {
         renderer = create(<Input ref={ref} value="text" autoUnfocus={autoUnfocus} />)

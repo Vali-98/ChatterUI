@@ -13,7 +13,7 @@ export namespace Lorebooks {
             if (!file.success) return
             const lorebook = lorebookImportSchema.safeParse(file.data)
             if (lorebook.error) {
-                Logger.error(lorebook.error.errors.map((item) => item.message).join('\n'))
+                Logger.error(lorebook.error.issues.map((item) => item.message).join('\n'))
                 throw new Error('Incorrect Lorebook Schema')
             }
             await Lorebooks.db.mutate.importFromJSON(lorebook.data)

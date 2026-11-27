@@ -75,5 +75,6 @@
     "common.activity.title": "活动",
     "common.activity.empty": "暂无活动",
     "common.activity.chat": "当前聊天",
-    "common.activity.app": "应用活动"
+    "common.activity.app": "应用活动",
+    "common.placeholders.name": "名称…"
 }

@@ -13,6 +13,7 @@ let mockOnboarding = 'complete'
 let mockDownloads = [{ id: 'one', status: 'downloading', bytesWritten: 50, totalBytes: 100 }]
 jest.mock('expo-router', () => ({
     useIsFocused: () => true,
+    useFocusEffect: (effect: () => void) => require('react').useEffect(effect, [effect]),
     router: { push: (...args: unknown[]) => mockPush(...args) },
 }))
 jest.mock('../lib/animations/transitions', () => ({ ExpandHeightIn: {}, ShrinkHeightOut: {} }))

@@ -46,7 +46,19 @@ jest.mock('react-native-reanimated', () => ({
     __esModule: true,
     default: { View: require('react-native').View },
     useAnimatedRef: () => require('react').useRef(null),
-    useSharedValue: (value: unknown) => require('react').useMemo(() => ({ value }), []),
+    useSharedValue: (initial: unknown) =>
+        require('react').useMemo(
+            () => ({
+                value: initial,
+                get() {
+                    return this.value
+                },
+                set(value: unknown) {
+                    this.value = value
+                },
+            }),
+            []
+        ),
     measure: () => mockBounds,
     useAnimatedStyle: (callback: () => unknown) => callback(),
     withTiming: (value: unknown) => value,

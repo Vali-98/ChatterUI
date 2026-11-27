@@ -2,7 +2,15 @@ import MaterialIcons, {
     MaterialIconsIconName,
 } from '@react-native-vector-icons/material-icons/static'
 import { useCallback, useEffect, useRef } from 'react'
-import { Pressable, Text, type StyleProp, type TextStyle, View, type ViewStyle } from 'react-native'
+import {
+    type ViewInstance,
+    Pressable,
+    Text,
+    type StyleProp,
+    type TextStyle,
+    View,
+    type ViewStyle,
+} from 'react-native'
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -41,7 +49,7 @@ const HorizontalSelector = <T,>({
     labelStyle,
 }: HorizontalSelectorProps<T>) => {
     const { color, spacing, fontSize } = Theme.useTheme()
-    const viewRef = useRef<View>(null)
+    const viewRef = useRef<ViewInstance>(null)
     const initialRender = useRef(true)
     const animatedValues = useSharedValue({
         top: 0,

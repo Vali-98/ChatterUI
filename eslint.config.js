@@ -3,7 +3,6 @@ const expoConfig = require('eslint-config-expo/flat')
 const i18nextPlugin = require('eslint-plugin-i18next').configs['flat/recommended']
 const internalPlugin = require('eslint-plugin-internal')
 const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended')
-const reactCompilerPlugin = require('eslint-plugin-react-compiler')
 
 const i18nRules = require('./eslint/i18n-settings')
 
@@ -22,11 +21,9 @@ module.exports = defineConfig([
             },
         },
         plugins: {
-            'react-compiler': reactCompilerPlugin,
             internal: internalPlugin,
         },
         rules: {
-            'react-compiler/react-compiler': 'error',
             'prettier/prettier': [
                 'warn',
                 {
@@ -35,7 +32,7 @@ module.exports = defineConfig([
             ],
             radix: 'off',
             '@typescript-eslint/no-require-imports': 'off',
-            'object-shorthand': ['warn', 'consistent'],
+            'object-shorthand': ['off'],
             'import/order': [
                 'warn',
                 {
@@ -51,5 +48,9 @@ module.exports = defineConfig([
         rules: {
             'i18next/no-literal-string': ['warn', i18nRules],
         },
+    },
+    {
+        files: ['screens/TestScreens/**/*.{tsx,ts}', 'app/testScreens/**/*.{tsx,ts}'],
+        rules: { 'i18next/no-literal-string': 'off' },
     },
 ])

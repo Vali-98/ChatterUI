@@ -51,16 +51,17 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
 
             {modelImporting && (
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Progress.Bar
-                        style={{ flex: 5 }}
-                        indeterminate
-                        indeterminateAnimationDuration={2000}
-                        color={color.primary._500}
-                        borderColor={color.neutral._300}
-                        height={12}
-                        borderRadius={12}
-                        width={null}
-                    />
+                    <View style={{ flex: 5 }}>
+                        <Progress.Bar
+                            indeterminate
+                            indeterminateAnimationDuration={2000}
+                            color={color.primary._500}
+                            borderColor={color.neutral._300}
+                            height={12}
+                            borderRadius={12}
+                            width={null}
+                        />
+                    </View>
 
                     <Text
                         style={{

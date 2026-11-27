@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, Text, View } from 'react-native'
+import { ScrollView, Text } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 import HorizontalSelector from '@components/input/HorizontalSelector'

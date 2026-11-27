@@ -10,9 +10,9 @@ import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
 import ThemedButton from '@components/buttons/ThemedButton'
-import BottomSheetControls, { BottomSheetButton } from '@components/views/BottomSheetControls'
 import TText from '@components/text/TText'
 import BottomSheet, { type BottomSheetRef } from '@components/views/BottomSheet'
+import BottomSheetControls, { BottomSheetButton } from '@components/views/BottomSheetControls'
 import ThemedSpinner from '@components/views/ThemedSpinner'
 import { convertAudioAttachment } from '@lib/audio/files'
 import { stopAudio, stopAudioSource } from '@lib/audio/player'
@@ -63,6 +63,7 @@ const RecordingControls = ({
         try {
             const converted = await convertAudioAttachment(
                 uri,
+                // eslint-disable-next-line i18next/no-literal-string -- Fallback filename, not display copy.
                 uri.split('/').pop() ?? 'recording.m4a'
             )
             file.current = converted.uri

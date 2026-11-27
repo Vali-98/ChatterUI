@@ -1,5 +1,5 @@
-import type { RefObject } from 'react'
 import { useRouter } from 'expo-router'
+import type { RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -11,10 +11,10 @@ import { useCharacterImportState } from '@lib/state/characters/importState'
 import { Logger } from '@lib/state/Logger'
 
 type CharacterNewMenuProps = {
-    navigationPending: RefObject<boolean>
+    navigationPendingRef: RefObject<boolean>
 }
 
-const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ navigationPending }) => {
+const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ navigationPendingRef }) => {
     const { t } = useTranslation()
     const isImporting = useCharacterImportState((state) => state.isImporting)
     const { selectCharacterCard } = Characters.useCharacterState(
@@ -32,14 +32,14 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ navigationPending }
             Logger.errorToast(t('character.list.errors.nameEmpty'))
             return
         }
-        if (navigationPending.current) return
-        navigationPending.current = true
+        if (navigationPendingRef.current) return
+        navigationPendingRef.current = true
         try {
             const id = await Characters.db.create.blankCard(text)
             selectCharacterCard(id)
             router.push('/characterEditor')
         } finally {
-            navigationPending.current = false
+            navigationPendingRef.current = false
         }
     }
 
@@ -52,7 +52,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ navigationPending }
                 verifyText={(text) =>
                     text.length === 0 ? t('character.list.errors.nameCannotBeEmpty') : ''
                 }
-                placeholder="Name..."
+                placeholder={t('common.placeholders.name')}
                 autoFocus
                 confirmLabel={t('common.actions.create')}
             />

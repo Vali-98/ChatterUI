@@ -1,5 +1,6 @@
 import type { Ref } from 'react'
 import {
+    type ScrollViewInstance,
     ScrollView,
     type ScrollViewProps,
     type StyleProp,
@@ -12,7 +13,7 @@ import { useEdgeFade } from './useEdgeFade'
 
 export type EdgeFadeScrollViewProps = ScrollViewProps &
     EdgeFadeOptions & {
-        ref?: Ref<ScrollView>
+        ref?: Ref<ScrollViewInstance>
         containerStyle?: StyleProp<ViewStyle>
     }
 

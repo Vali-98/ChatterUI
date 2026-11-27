@@ -1,5 +1,5 @@
 import Octicons from '@react-native-vector-icons/octicons/static'
-import { useMemo, useRef } from 'react'
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Linking, Pressable, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
@@ -11,6 +11,7 @@ import TText from '@components/text/TText'
 import { type BottomSheetRef } from '@components/views/BottomSheet'
 import { type APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { useConnectionStore } from '@lib/engine/API/connectionStore'
+import { defaultTemplates } from '@lib/engine/API/DefaultAPI'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type TemplatePickerProps = { ref: BottomSheetRef; setPending: (connectionId: number) => void }
@@ -57,19 +58,14 @@ const TemplateItem = ({ item, selected, onPress, disabled }: SelectionRow<APICon
 const TemplatePicker = ({ ref, setPending }: TemplatePickerProps) => {
     const { t } = useTranslation()
     const pending = useRef<number | null>(null)
-    const { addConnection, getTemplates, customTemplates } = useConnectionStore(
+    const { addConnection, customTemplates } = useConnectionStore(
         useShallow((state) => ({
             addConnection: state.addConnection,
-            getTemplates: state.getTemplates,
             customTemplates: state.customTemplates,
         }))
     )
-    const templates = useMemo(
-        () =>
-            getTemplates().sort(
-                (a, b) => (b.ui.display?.priority ?? 0) - (a.ui.display?.priority ?? 0)
-            ),
-        [getTemplates, customTemplates]
+    const templates = [...defaultTemplates, ...customTemplates].sort(
+        (a, b) => (b.ui.display?.priority ?? 0) - (a.ui.display?.priority ?? 0)
     )
     return (
         <SelectionSheet

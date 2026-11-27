@@ -75,5 +75,6 @@
     "common.activity.title": "Aktivitas",
     "common.activity.empty": "Tidak ada aktivitas saat ini",
     "common.activity.chat": "Chat ini",
-    "common.activity.app": "Aktivitas aplikasi"
+    "common.activity.app": "Aktivitas aplikasi",
+    "common.placeholders.name": "Nama…"
 }

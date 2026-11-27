@@ -8,6 +8,7 @@ import { useSummarySettingsStore } from '@lib/summaries/settingsStore'
 
 import { Logger } from '../state/Logger'
 import { APIBuilderParams, buildAndSendRequest, CompletionReason } from './API/APIBuilder'
+import { captureHistory } from './generation/history'
 import {
     captureGenerationInputs,
     generationContextLimit,
@@ -27,7 +28,6 @@ import {
     useGenerationState,
 } from './generation/state'
 import { localInference, verifyModelLoaded } from './LocalInference'
-import { captureHistory } from './generation/history'
 import { prepareAutomaticSummary } from './summaries/actions'
 
 const beginGeneration = (swipeId: number, text = '', reasoning = '') => {

@@ -33,6 +33,7 @@ const OnboardingScreen = () => {
     const pathname = usePathname()
     const { color } = Theme.useTheme()
     const onboarding = useOnboardingStore()
+    const setStep = onboarding.setStep
     const user = Characters.useUserStore((state) => state.card)
     const setCard = Characters.useUserStore((state) => state.setCard)
     const userImage = Characters.useUserStore((state) => state.getImageUri)
@@ -48,7 +49,7 @@ const OnboardingScreen = () => {
     const themes = Theme.useColorState()
     const system = useColorScheme()
     const [initialPersona] = useState({
-        name: user?.name ?? 'User',
+        name: user?.name ?? t('onboarding.namePlaceholder'),
         description: user?.description ?? '',
     })
     const [name, setName] = useState(initialPersona.name)
@@ -103,11 +104,11 @@ const OnboardingScreen = () => {
         useCallback(() => {
             const listener = BackHandler.addEventListener('hardwareBackPress', () => {
                 if (step === 0) return false
-                if (!advancing.current) onboarding.setStep(step - 1)
+                if (!advancing.current) setStep(step - 1)
                 return true
             })
             return () => listener.remove()
-        }, [step, onboarding.setStep])
+        }, [step, setStep])
     )
     const next = async () => {
         if (advancing.current) return
@@ -280,7 +281,7 @@ const OnboardingScreen = () => {
                                 }}
                                 labelStyle={{ fontSize: 17 }}
                                 onPress={() => {
-                                    if (!advancing.current) onboarding.setStep(step - 1)
+                                    if (!advancing.current) setStep(step - 1)
                                 }}
                             />
                         )}

@@ -1,12 +1,11 @@
-/* eslint-disable i18next/no-literal-string */
 import { useFocusEffect } from 'expo-router'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { ScrollView, View } from 'react-native'
+import { type ScrollViewInstance, ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import ThemedMarkdown from '@components/text/markdown/ThemedMarkdown'
 import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSlider from '@components/input/ThemedSlider'
+import ThemedMarkdown from '@components/text/markdown/ThemedMarkdown'
 import TText from '@components/text/TText'
 import Accordion from '@components/views/Accordion'
 import HeaderTitle from '@components/views/HeaderTitle'
@@ -24,13 +23,10 @@ const MarkdownPreview = ({
     tokensPerSecond: number
     onFinish: () => void
 }) => {
-    const [text, setText] = useState(isStreaming ? '' : markdownTestText)
+    const [text, setText] = useState('')
     const cursor = useRef(0)
     useEffect(() => {
-        if (!isStreaming) {
-            setText(markdownTestText)
-            return
-        }
+        if (!isStreaming) return
         const timer = setInterval(() => {
             const token = streamTokens[cursor.current]
             cursor.current++
@@ -43,14 +39,18 @@ const MarkdownPreview = ({
         return () => clearInterval(timer)
     }, [isStreaming, tokensPerSecond, onFinish])
 
-    return <ThemedMarkdown streaming={isStreaming}>{text}</ThemedMarkdown>
+    return (
+        <ThemedMarkdown streaming={isStreaming}>
+            {isStreaming ? text : markdownTestText}
+        </ThemedMarkdown>
+    )
 }
 
 const MarkdownTestScreen = () => {
     const [isStreaming, setIsStreaming] = useState(false)
     const [tokensPerSecond, setTokensPerSecond] = useState(50)
     const [streamId, setStreamId] = useState(0)
-    const scrollRef = useRef<ScrollView>(null)
+    const scrollRef = useRef<ScrollViewInstance>(null)
     const stopStream = useCallback(() => setIsStreaming(false), [])
 
     useFocusEffect(useCallback(() => () => setIsStreaming(false), []))

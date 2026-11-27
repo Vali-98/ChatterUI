@@ -71,8 +71,8 @@ export const applyPendingRestore = (storage: PreferenceStorage) => {
         JSON.parse(new File(payload, 'preferences.json').textSync())
     )
     rollback.create({ intermediates: true, idempotent: true })
-    rollbackStorage.write(JSON.stringify(readPreferences(storage)))
-    existingFile.write(
+    rollbackStorage.writeSync(JSON.stringify(readPreferences(storage)))
+    existingFile.writeSync(
         JSON.stringify(
             targets()
                 .filter((item) => item.target.exists)

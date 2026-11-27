@@ -78,5 +78,6 @@
     "chat.quickActions.toast.copyFailed": "Failed to copy to clipboard",
     "chat.state.failedToLoad": "Failed to load chat {{id}}",
     "chat.tokencount.title": "Context Limit",
-    "chat.tokencount.used": "Used {{used}}, Max {{max}}"
+    "chat.tokencount.used": "Used {{used}}, Max {{max}}",
+    "chat.codeBlock.label": "Code"
 }

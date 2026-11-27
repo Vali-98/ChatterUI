@@ -12,6 +12,7 @@ import {
     useKeyboardHandler,
     useReanimatedKeyboardAnimation,
 } from 'react-native-keyboard-controller'
+import Animated, { useAnimatedStyle, useSharedValue, ZoomIn } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 
 import IconButton from '@components/buttons/IconButton'
@@ -23,7 +24,6 @@ import { EdgeFadeScrollView } from '@components/views/EdgeFade'
 import ListCard from '@components/views/ListCard'
 import { Theme } from '@lib/theme/ThemeManager'
 
-import Animated, { useAnimatedStyle, useSharedValue, ZoomIn } from 'react-native-reanimated'
 import type { SelectionKey } from './SelectionSheet'
 import ThemedTextInput from './ThemedTextInput'
 
@@ -51,6 +51,7 @@ export type ListEditorSheetProps<T> = {
 
 // Show whitespace without changing the value passed to createItem/onChangeValue.
 const previewText = (text: string) =>
+    // eslint-disable-next-line i18next/no-literal-string -- Display escape sequences literally.
     text.replaceAll('\r', '\\r').replaceAll('\n', '\\n').replaceAll('\t', '\\t')
 
 const ListEditorSheet = <T,>({

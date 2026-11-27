@@ -78,5 +78,6 @@
     "chat.quickActions.toast.copyFailed": "Gagal menyalin ke papan klip",
     "chat.state.failedToLoad": "Gagal memuat chat {{id}}",
     "chat.tokencount.title": "Batas Konteks",
-    "chat.tokencount.used": "Digunakan {{used}}, Maks {{max}}"
+    "chat.tokencount.used": "Digunakan {{used}}, Maks {{max}}",
+    "chat.codeBlock.label": "Kode"
 }

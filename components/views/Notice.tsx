@@ -1,5 +1,4 @@
-import { useContext, useId, useLayoutEffect, type ReactNode } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useContext, useId, useLayoutEffect, useMemo, type ReactNode } from 'react'
 import { Pressable, View, type GestureResponderEvent, type PressableProps } from 'react-native'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
@@ -10,7 +9,6 @@ import TText from '@components/text/TText'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import { ActivityContext } from './ActivityMenu'
-
 import FloatingPanel, { getFloatingPanelColor, type FloatingPanelProps } from './FloatingPanel'
 
 export type NoticeProps = Omit<FloatingPanelProps, 'children'> & {
@@ -47,60 +45,81 @@ const Notice = ({
     const close = activity?.close
 
     const Panel = activity ? View : FloatingPanel
-    const panel = (
-        <Panel
-            {...props}
-            {...(!activity && { variant })}
-            style={[
-                { flexDirection: 'column', alignItems: 'stretch', rowGap: 8 },
-                activity && {
-                    paddingHorizontal: 12,
-                    paddingVertical: 12,
-                    borderLeftWidth: 2,
-                    borderLeftColor:
-                        variant === 'neutral'
-                            ? 'transparent'
-                            : getFloatingPanelColor(color, variant),
-                },
-                style,
-            ]}>
-            <View
-                style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8, minHeight: 24 }}>
-                {leading}
-                <TText color="300" numberOfLines={1}>
-                    {label}
-                </TText>
-                {actions && (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 4 }}>
-                        {actions}
-                    </View>
+    const content = useMemo(() => {
+        const panel = (
+            <Panel
+                {...props}
+                {...(!activity && { variant })}
+                style={[
+                    { flexDirection: 'column', alignItems: 'stretch', rowGap: 8 },
+                    activity && {
+                        paddingHorizontal: 12,
+                        paddingVertical: 12,
+                        borderLeftWidth: 2,
+                        borderLeftColor:
+                            variant === 'neutral'
+                                ? 'transparent'
+                                : getFloatingPanelColor(color, variant),
+                    },
+                    style,
+                ]}>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        columnGap: 8,
+                        minHeight: 24,
+                    }}>
+                    {leading}
+                    <TText color="300" numberOfLines={1}>
+                        {label}
+                    </TText>
+                    {actions && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 4 }}>
+                            {actions}
+                        </View>
+                    )}
+                </View>
+                {children}
+            </Panel>
+        )
+        return (
+            <Animated.View
+                collapsable={false}
+                entering={activity ? undefined : FadeIn.duration(150)}
+                exiting={activity ? undefined : FadeOut.duration(150)}
+                layout={LinearTransition.duration(150)}
+                style={{ maxWidth: '100%' }}>
+                {onPress ? (
+                    <Pressable
+                        onPress={(event) => {
+                            close?.()
+                            onPress(event)
+                        }}
+                        accessibilityRole="button"
+                        accessibilityLabel={accessibilityLabel}>
+                        {panel}
+                    </Pressable>
+                ) : (
+                    panel
                 )}
-            </View>
-            {children}
-        </Panel>
-    )
-    const content = (
-        <Animated.View
-            collapsable={false}
-            entering={activity ? undefined : FadeIn.duration(150)}
-            exiting={activity ? undefined : FadeOut.duration(150)}
-            layout={LinearTransition.duration(150)}
-            style={{ maxWidth: '100%' }}>
-            {onPress ? (
-                <Pressable
-                    onPress={(event) => {
-                        close?.()
-                        onPress(event)
-                    }}
-                    accessibilityRole="button"
-                    accessibilityLabel={accessibilityLabel}>
-                    {panel}
-                </Pressable>
-            ) : (
-                panel
-            )}
-        </Animated.View>
-    )
+            </Animated.View>
+        )
+    }, [
+        Panel,
+        activity,
+        color,
+        variant,
+        style,
+        props,
+        leading,
+        label,
+        actions,
+        children,
+        onPress,
+        close,
+        accessibilityLabel,
+    ])
     useLayoutEffect(() => {
         update?.(id, { label, variant, scope, previewKey, progress, content })
     }, [update, id, label, variant, scope, previewKey, progress, content])
@@ -122,13 +141,13 @@ export const NoticeAction = ({
         ...props,
         level,
         iconSize,
-        variant: 'tertiary' as const,
+        variant: 'tertiary',
         viewStyle: [{ paddingHorizontal: 4, paddingVertical: 4 }, viewStyle],
         onPress: (event: GestureResponderEvent) => {
             event.stopPropagation()
             onPress?.(event)
         },
-    }
+    } satisfies Omit<ThemedButtonProps, 'label'>
     return label === undefined ? (
         <IconButton {...common} iconName={props.iconName!} />
     ) : (

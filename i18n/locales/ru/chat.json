@@ -78,5 +78,6 @@
     "chat.quickActions.toast.copyFailed": "Не удалось скопировать в буфер обмена",
     "chat.state.failedToLoad": "Не удалось загрузить чат {{id}}",
     "chat.tokencount.title": "Лимит контекста",
-    "chat.tokencount.used": "Использовано {{used}}, максимум {{max}}"
+    "chat.tokencount.used": "Использовано {{used}}, максимум {{max}}",
+    "chat.codeBlock.label": "Код"
 }

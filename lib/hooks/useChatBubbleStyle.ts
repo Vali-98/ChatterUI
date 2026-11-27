@@ -1,7 +1,7 @@
 import type { ViewStyle } from 'react-native'
 
-import { Theme } from '@lib/theme/ThemeManager'
 import { getShadowColor } from '@lib/theme/contrast'
+import { Theme } from '@lib/theme/ThemeManager'
 
 export const useChatBubbleStyle = (isUser = false): ViewStyle => {
     const { color, borderRadius } = Theme.useTheme()

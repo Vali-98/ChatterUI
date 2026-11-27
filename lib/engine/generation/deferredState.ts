@@ -1,13 +1,7 @@
 import { create } from 'zustand'
 
 export type DeferredTaskStatus =
-    | 'pending'
-    | 'running'
-    | 'cancelling'
-    | 'completed'
-    | 'cancelled'
-    | 'failed'
-    | 'timed_out'
+    'pending' | 'running' | 'cancelling' | 'completed' | 'cancelled' | 'failed' | 'timed_out'
 export type DeferredTask = {
     id: number
     parentGenerationId?: number

@@ -1,5 +1,7 @@
 import { View } from 'react-native'
+
 import { useDownloadStore } from '@lib/downloads/store'
+
 import DownloadItem from './DownloadItem'
 
 const DownloadList = ({ downloadIds }: { downloadIds?: string[] }) => {

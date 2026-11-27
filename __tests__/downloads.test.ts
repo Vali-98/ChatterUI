@@ -9,6 +9,7 @@ import {
 import { useDownloadStore } from '../lib/downloads/store'
 
 const mockFiles = new Map<string, number>()
+let mockMoveReady: Promise<void> | undefined
 jest.mock('expo-crypto', () => ({ randomUUID: () => 'test-download' }))
 jest.mock('../lib/storage/MMKV', () => ({
     createMMKVStorage: () => ({ getItem: () => null, setItem: jest.fn(), removeItem: jest.fn() }),
@@ -45,7 +46,8 @@ jest.mock('expo-file-system', () => ({
         delete() {
             mockFiles.delete(this.uri)
         }
-        move(destination: { uri: string }) {
+        async move(destination: { uri: string }) {
+            await mockMoveReady
             mockFiles.set(destination.uri, this.size)
             this.delete()
         }
@@ -69,6 +71,7 @@ let task: {
 beforeEach(() => {
     jest.clearAllMocks()
     mockFiles.clear()
+    mockMoveReady = undefined
     useDownloadStore.setState({ downloads: [] })
     task = {
         downloadAsync: jest.fn(
@@ -115,6 +118,23 @@ test('publishes only a completed successful file and clearing history preserves 
     expect(entry().status).toBe('completed')
     expect(mockFiles.get(destination)).toBe(1234)
     await removeDownload(id)
+    expect(mockFiles.get(destination)).toBe(1234)
+})
+
+test('a download is not completed until its file move finishes', async () => {
+    let finishMove!: () => void
+    mockMoveReady = new Promise<void>((resolve) => {
+        finishMove = resolve
+    })
+    start()
+    mockFiles.set(entry().partialUri, 1234)
+    complete({ uri: entry().partialUri })
+    await tick()
+    expect(entry().status).toBe('downloading')
+    expect(mockFiles.has(destination)).toBe(false)
+    finishMove()
+    await tick()
+    expect(entry()).toMatchObject({ status: 'completed', bytesWritten: 1234 })
     expect(mockFiles.get(destination)).toBe(1234)
 })
 

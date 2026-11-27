@@ -14,13 +14,13 @@ import { useSamplerStore } from '@lib/state/samplerStore'
 
 type CharacterActionsMenuProps = {
     character: CharacterCardSummary
-    navigationPending: RefObject<boolean>
+    navigationPendingRef: RefObject<boolean>
     children: ReactNode
 }
 
 const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
     character,
-    navigationPending,
+    navigationPendingRef,
     children,
 }) => {
     const { t } = useTranslation()
@@ -34,8 +34,8 @@ const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
     const setSampler = useSamplerStore((state) => state.setCurrentConfig)
 
     const handleOpenChat = async () => {
-        if (navigationPending.current || path === '/chat' || !character.id) return
-        navigationPending.current = true
+        if (navigationPendingRef.current || path === '/chat' || !character.id) return
+        navigationPendingRef.current = true
         try {
             selectCharacterCard(character.id)
             character?.links.forEach((item) => {
@@ -73,7 +73,7 @@ const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
         } catch (error) {
             Logger.errorToast(t('character.list.errors.load', { error }))
         } finally {
-            navigationPending.current = false
+            navigationPendingRef.current = false
         }
     }
 
@@ -121,7 +121,7 @@ const CharacterActionsMenu: React.FC<CharacterActionsMenuProps> = ({
     }
 
     const handleEditCard = (close: () => void) => {
-        if (navigationPending.current) return
+        if (navigationPendingRef.current) return
         selectCharacterCard(character.id)
         close()
         router.push('/characterEditor')

@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Text, TouchableOpacity, View } from 'react-native'
 
-import { Theme } from '@lib/theme/ThemeManager'
 import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
+import { Theme } from '@lib/theme/ThemeManager'
 
 type CharacterListingTagsProps = {
     tags: string[]

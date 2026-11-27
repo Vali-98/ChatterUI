@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Linking, View } from 'react-native'
 
-import ThemePalettePicker from './ThemePalettePicker'
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import TText from '@components/text/TText'
@@ -14,6 +13,8 @@ import { Logger } from '@lib/state/Logger'
 import { DefaultColorSchemes, type ThemeColor } from '@lib/theme/ThemeColor'
 import { Theme } from '@lib/theme/ThemeManager'
 import { FileUtils, saveStringToDownload } from '@lib/utils/File'
+
+import ThemePalettePicker from './ThemePalettePicker'
 
 export type ThemeTarget = 'light' | 'dark'
 

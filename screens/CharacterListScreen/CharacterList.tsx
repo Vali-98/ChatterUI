@@ -1,17 +1,17 @@
-import ActivityMenu from '@components/views/ActivityMenu'
-import OperationNotices from '@components/views/OperationNotices'
-import DownloadNotice from '@components/downloads/DownloadNotice'
 import { usePathname } from 'expo-router'
 import { useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
 import Animated, { LinearTransition } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
+import DownloadNotice from '@components/downloads/DownloadNotice'
 import GuideHost from '@components/guides/GuideHost'
 import GuideTarget from '@components/guides/GuideTarget'
+import ActivityMenu from '@components/views/ActivityMenu'
 import Drawer from '@components/views/Drawer'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
+import OperationNotices from '@components/views/OperationNotices'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Characters, CharacterCardSummary } from '@lib/state/characters'
 import { useCharacterSortStore } from '@lib/state/characters/sortStore'
@@ -26,7 +26,7 @@ import CharactersSearchEmpty from './CharactersSearchEmpty'
 const PAGE_SIZE = 30
 
 const CharacterList: React.FC = () => {
-    const navigationPending = useRef(false)
+    const navigationPendingRef = useRef(false)
     const { sortBy, sortDirection, tagFilter, textFilter } = useCharacterSortStore(
         useShallow((state) => ({
             sortBy: state.searchType,
@@ -104,7 +104,7 @@ const CharacterList: React.FC = () => {
                             <DownloadNotice />
                         </ActivityMenu>
                         <GuideTarget id="main.import">
-                            <CharacterNewMenu navigationPending={navigationPending} />
+                            <CharacterNewMenu navigationPendingRef={navigationPendingRef} />
                         </GuideTarget>
                     </View>
                 )}
@@ -122,7 +122,10 @@ const CharacterList: React.FC = () => {
                     data={characterList}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
-                        <CharacterListing character={item} navigationPending={navigationPending} />
+                        <CharacterListing
+                            character={item}
+                            navigationPendingRef={navigationPendingRef}
+                        />
                     )}
                     onEndReachedThreshold={1}
                     onEndReached={() => {

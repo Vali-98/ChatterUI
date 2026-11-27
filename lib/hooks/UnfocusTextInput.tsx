@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react'
-import { Keyboard, TextInput } from 'react-native'
+import { Keyboard, type TextInputInstance } from 'react-native'
 
-export const useUnfocusTextInput = <T extends Pick<TextInput, 'isFocused' | 'blur'> = TextInput>(
+export const useUnfocusTextInput = <
+    T extends Pick<TextInputInstance, 'isFocused' | 'blur'> = TextInputInstance,
+>(
     enabled = true
 ) => {
     const ref = useRef<T>(null)

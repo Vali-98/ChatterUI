@@ -1,8 +1,8 @@
 import { View, type ViewProps } from 'react-native'
 
 import { getShadowColor } from '@lib/theme/contrast'
-import { Theme } from '@lib/theme/ThemeManager'
 import type { ThemeColor } from '@lib/theme/ThemeColor'
+import { Theme } from '@lib/theme/ThemeManager'
 
 export type FloatingPanelVariant = 'neutral' | 'primary' | 'warning' | 'error'
 export type FloatingPanelProps = ViewProps & { variant?: FloatingPanelVariant }

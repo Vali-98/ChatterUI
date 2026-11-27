@@ -218,6 +218,7 @@ test('notification taps open another chat with character zero despite an existin
                         body: null,
                         sound: null,
                         categoryIdentifier: null,
+                        threadIdentifier: null,
                         data: { chatId: 3, characterId: 0 },
                     },
                 },

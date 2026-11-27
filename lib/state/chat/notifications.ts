@@ -1,13 +1,13 @@
 import * as Notifications from 'expo-notifications'
-import { AppState, Platform } from 'react-native'
 import { t } from 'i18next'
+import { AppState, Platform } from 'react-native'
+
+import { AppSettings } from '@lib/constants/appSettings'
 import {
     COMPLETION_CHANNEL_ID,
     COMPLETION_VIBRATION_PATTERN,
     ensureCompletionNotificationChannel,
 } from '@lib/notifications/channels'
-
-import { AppSettings } from '@lib/constants/appSettings'
 import { mmkv } from '@lib/storage/MMKV'
 
 const COMPLETION_NOTIFICATION_ID = 'chatterui-generation-complete'

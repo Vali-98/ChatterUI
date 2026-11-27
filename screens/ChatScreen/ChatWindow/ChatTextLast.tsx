@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Animated, Easing, useAnimatedValue, View } from 'react-native'
+import { type ViewInstance, Animated, Easing, useAnimatedValue, View } from 'react-native'
 
-import ThemedMarkdown from '@components/text/markdown/ThemedMarkdown'
 import ThemedButton from '@components/buttons/ThemedButton'
 import AnimatedEllipsis from '@components/text/AnimatedEllipsis'
+import ThemedMarkdown from '@components/text/markdown/ThemedMarkdown'
 import { ChatSwipe } from '@db/schema'
 import { useSwipeGeneration } from '@lib/engine/generation/hooks'
 import { finishGeneration } from '@lib/engine/generation/lifecycle'
@@ -26,7 +26,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ isGenerating, swipe }) => {
     const generation = useSwipeGeneration(swipe.id)
     const buffer = { data: generation?.text ?? swipe.swipe }
     const [showHidden, setShowHidden] = useState(false)
-    const viewRef = useRef<View>(null)
+    const viewRef = useRef<ViewInstance>(null)
     const currentSwipeId = generation?.swipeId
     const animHeight = useAnimatedValue(-1)
     const targetHeight = useRef(-1)
@@ -74,7 +74,8 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ isGenerating, swipe }) => {
     const renderedText = showHidden ? swipe.swipe : filteredText.result
 
     return (
-        <Animated.View style={{ overflow: 'scroll', height: isGenerating ? animHeight : undefined }}>
+        <Animated.View
+            style={{ overflow: 'scroll', height: isGenerating ? animHeight : undefined }}>
             <View style={{ minHeight: 10 }} ref={viewRef} onLayout={updateHeight}>
                 {reasoning ? (
                     <ChatReasoning content={reasoning} generating={!!generation && isGenerating} />

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
@@ -13,18 +13,14 @@ import { readableFileSize } from '@lib/utils/File'
 
 const DownloadItem = ({ item }: { item: Download }) => {
     const { t } = useTranslation()
-    const [resumeFailed, setResumeFailed] = useState(false)
-    const attemptedResume = useRef(false)
+    const [attemptedResume, setAttemptedResume] = useState(false)
+    const resumeFailed = item.status === 'failed' && attemptedResume
     const downloading = item.status === 'downloading'
     const waiting = item.status === 'pausing'
-    useEffect(() => {
-        if (item.status === 'failed' && attemptedResume.current) setResumeFailed(true)
-        if (item.status === 'downloading') setResumeFailed(false)
-    }, [item.status])
     const toggle = () => {
         if (downloading) void pauseDownload(item.id)
         else {
-            attemptedResume.current = !!item.resumeState && !resumeFailed
+            setAttemptedResume(!!item.resumeState && !resumeFailed)
             void resumeDownload(item.id, resumeFailed)
         }
     }

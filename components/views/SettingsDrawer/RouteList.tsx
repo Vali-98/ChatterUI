@@ -84,7 +84,8 @@ const RouteList = () => {
     const { appMode } = useAppMode()
     const paths = getPaths(appMode === 'remote', t)
     const testScreensLink: ButtonData = {
-        name: t('navigation.dev_tests'),
+        // eslint-disable-next-line i18next/no-literal-string -- Developer-only test menu.
+        name: '[DEV] Test Screens',
         path: '/testScreens',
         icon: 'experiment',
     }

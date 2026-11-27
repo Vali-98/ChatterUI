@@ -11,3 +11,12 @@ export const isConnectionReady = (
     if (requiresConnectionKey(template) && !value.key.trim()) return false
     return true
 }
+
+export const getModelEndpoint = (value: APIValues, endpoint: string) => {
+    if (value.configName !== 'Chat Completions') return value.modelEndpoint
+    const previous = value.endpoint.replace(/\/chat\/completions\/?$/, '/models')
+    if (value.modelEndpoint && value.modelEndpoint !== previous) return value.modelEndpoint
+    return /\/chat\/completions\/?$/.test(endpoint)
+        ? endpoint.replace(/\/chat\/completions\/?$/, '/models')
+        : ''
+}

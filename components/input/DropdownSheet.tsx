@@ -1,8 +1,9 @@
 import type { OcticonsIconName } from '@react-native-vector-icons/octicons/static'
-import { View, type StyleProp, type ViewStyle } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { View, type StyleProp, type ViewStyle } from 'react-native'
 
 import { useBottomSheetRef } from '@components/views/BottomSheet'
+
 import DropdownTrigger from './DropdownTrigger'
 import SelectionSheet, { type SelectionKey, type SelectionRow } from './SelectionSheet'
 

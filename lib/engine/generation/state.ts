@@ -4,13 +4,7 @@ import type { CompletionTimings } from '@db/schema'
 import { createReasoningParser } from '@lib/engine/reasoning/parser'
 
 export type GenerationStatus =
-    | 'preparing'
-    | 'summarizing'
-    | 'running'
-    | 'saving'
-    | 'completed'
-    | 'failed'
-    | 'cancelled'
+    'preparing' | 'summarizing' | 'running' | 'saving' | 'completed' | 'failed' | 'cancelled'
 export type Generation = {
     id: number
     chatId: number

@@ -12,5 +12,6 @@
     "users.hint": "提示：向左滑动或按 <icon/> 打开用户抽屉",
     "users.messages.loadingUser": "正在加载用户：{{name}}",
     "users.nameplaceholder": "不建议留空名称",
-    "users.profilecount": "用户配置"
+    "users.profilecount": "用户配置",
+    "users.editor.descriptionPlaceholder": "描述此用户…"
 }

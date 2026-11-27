@@ -172,7 +172,7 @@ const WelcomeIntro = ({
                 collapsable={false}
                 style={StyleSheet.absoluteFill}
                 onLayout={(event) => {
-                    viewport.value = event.nativeEvent.layout
+                    viewport.set(event.nativeEvent.layout)
                 }}>
                 <Animated.View
                     style={[{ position: 'absolute', backgroundColor: '#000' }, backdropStyle]}

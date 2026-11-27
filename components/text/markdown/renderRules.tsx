@@ -4,7 +4,7 @@ import MarkdownCodeBlock from './MarkdownCodeBlock'
 import MarkdownImage from './MarkdownImage'
 import MarkdownMath from './MarkdownMath'
 
-// The native tree stores code and maths in child nodes, including highlighted code segments.
+// The native tree stores code in child nodes, including highlighted segments.
 const nodeText = ({ node, block }: RenderContext) =>
     node.content ||
     (block?.nodes
@@ -26,8 +26,7 @@ export const markdownRules: RenderRules = {
                     fontWeight: context.styles.paragraph.fontWeight,
                 },
                 context.styles.fence,
-            ]}
-        >
+            ]}>
             {context.children}
         </MarkdownCodeBlock>
     ),

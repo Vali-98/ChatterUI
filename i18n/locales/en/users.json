@@ -12,5 +12,6 @@
     "users.hint": "Hint: Swipe Left or press <icon/> to open the Users drawer",
     "users.messages.loadingUser": "Loading User: {{name}}",
     "users.nameplaceholder": "Empty names are discouraged",
-    "users.profilecount": "User Profiles"
+    "users.profilecount": "User Profiles",
+    "users.editor.descriptionPlaceholder": "Describe this user…"
 }

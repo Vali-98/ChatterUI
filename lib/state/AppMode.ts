@@ -4,8 +4,8 @@ import { persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
 
 import Alert from '@components/views/Alert'
-import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { Storage } from '@lib/constants/storageKeys'
+import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
 type AppMode = 'local' | 'remote'

@@ -3,8 +3,8 @@ import { type Href, useRouter } from 'expo-router'
 import { View } from 'react-native'
 
 import ListButton from '@components/buttons/ListButton'
-import { ListCardSection } from '@components/views/ListCard'
 import TText from '@components/text/TText'
+import { ListCardSection } from '@components/views/ListCard'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const SettingsLink = ({

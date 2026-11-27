@@ -12,5 +12,6 @@
     "users.hint": "Petunjuk: Gesek ke Kiri atau tekan <icon/> untuk membuka laci Pengguna",
     "users.messages.loadingUser": "Memuat Pengguna: {{name}}",
     "users.nameplaceholder": "Nama kosong tidak disarankan",
-    "users.profilecount": "Profil Pengguna"
+    "users.profilecount": "Profil Pengguna",
+    "users.editor.descriptionPlaceholder": "Deskripsikan pengguna ini…"
 }

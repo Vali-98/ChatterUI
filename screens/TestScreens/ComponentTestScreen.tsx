@@ -1,5 +1,4 @@
-/* eslint-disable i18next/no-literal-string */
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -8,8 +7,8 @@ import IconButton from '@components/buttons/IconButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import DropdownSheet from '@components/input/DropdownSheet'
 import HorizontalSelector from '@components/input/HorizontalSelector'
-import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import ListEditorSheet from '@components/input/ListEditorSheet'
+import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import ThemedCheckbox from '@components/input/ThemedCheckbox'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
@@ -17,12 +16,12 @@ import ThemedTextInput from '@components/input/ThemedTextInput'
 import CollapsableTitle from '@components/text/CollapsableTitle'
 import TText from '@components/text/TText'
 import Accordion from '@components/views/Accordion'
+import ActivityMenu from '@components/views/ActivityMenu'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import ContextMenu from '@components/views/ContextMenu'
-import InputSheet from '@components/views/InputSheet'
 import HeaderButton from '@components/views/HeaderButton'
+import InputSheet from '@components/views/InputSheet'
 import Notice, { NoticeAction } from '@components/views/Notice'
-import ActivityMenu from '@components/views/ActivityMenu'
 import NoticeProgress from '@components/views/NoticeProgress'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -58,7 +57,6 @@ const ActivityTest = () => {
         setGenerating(true)
         setLastAction('No notice selected')
     }, [])
-    useEffect(loadSamples, [loadSamples])
     return (
         <>
             <HeaderButton

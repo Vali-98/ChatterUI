@@ -1,10 +1,10 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+import { Storage } from '@lib/constants/storageKeys'
 import { onboardingGuideIds } from '@lib/guides/definitions'
 import { useGuideState } from '@lib/guides/state'
 import { Characters } from '@lib/state/characters'
-import { Storage } from '@lib/constants/storageKeys'
 import { createMMKVStorage } from '@lib/storage/MMKV'
 
 type OnboardingStore = {

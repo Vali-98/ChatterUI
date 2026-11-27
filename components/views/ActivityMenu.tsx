@@ -1,9 +1,10 @@
-import { useIsFocused } from 'expo-router'
+import { useFocusEffect, useIsFocused } from 'expo-router'
 import {
     createContext,
     useCallback,
     useEffect,
     useId,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
@@ -11,6 +12,7 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+    type ViewInstance,
     BackHandler,
     Pressable,
     ScrollView,
@@ -22,12 +24,12 @@ import Animated, { FadeOut } from 'react-native-reanimated'
 
 import IconButton from '@components/buttons/IconButton'
 import TText from '@components/text/TText'
-import { Theme } from '@lib/theme/ThemeManager'
 import { ExpandHeightIn, ShrinkHeightOut } from '@lib/animations/transitions'
+import { Theme } from '@lib/theme/ThemeManager'
 
 import { getFloatingPanelColor, type FloatingPanelVariant } from './FloatingPanel'
-import ProgressBar from './ProgressBar'
 import Portal from './Portal'
+import ProgressBar from './ProgressBar'
 
 export type ActivityItem = {
     label: string
@@ -44,13 +46,15 @@ export const ActivityContext = createContext<{
     close: () => void
 } | null>(null)
 
+const ACTIVITY_SCOPES = ['chat', 'app'] as const
+
 const ActivityMenu = ({ children }: { children: ReactNode }) => {
     const { t } = useTranslation()
     const { color } = Theme.useTheme()
     const focused = useIsFocused()
     const { width, height } = useWindowDimensions()
     const menuId = useId()
-    const anchor = useRef<View>(null)
+    const anchor = useRef<ViewInstance>(null)
     const [anchorPosition, setAnchorPosition] = useState({ bottom: 0, center: 0 })
     const { bottom } = anchorPosition
     const [items, setItems] = useState<Record<string, ActivityItem>>({})
@@ -58,7 +62,9 @@ const ActivityMenu = ({ children }: { children: ReactNode }) => {
     const [preview, setPreview] = useState<{ id: string; key: string }>()
     const initialized = useRef(false)
     const availability = useRef({ focused, open })
-    availability.current = { focused, open }
+    useLayoutEffect(() => {
+        availability.current = { focused, open }
+    }, [focused, open])
     const seenPreviews = useRef(new Set<string>())
     const close = useCallback(() => setOpen(false), [])
     const measure = useCallback(() => {
@@ -90,12 +96,15 @@ const ActivityMenu = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         initialized.current = true
     }, [])
-    useEffect(() => {
-        if (!focused) {
-            setOpen(false)
-            setPreview(undefined)
-        }
-    }, [focused])
+    useFocusEffect(
+        useCallback(
+            () => () => {
+                setOpen(false)
+                setPreview(undefined)
+            },
+            []
+        )
+    )
     useEffect(() => {
         if (!preview) return
         const timer = setTimeout(() => setPreview(undefined), 3000)
@@ -110,11 +119,13 @@ const ActivityMenu = ({ children }: { children: ReactNode }) => {
         return () => listener.remove()
     }, [open, focused, close])
     const values = Object.values(items)
+    /* eslint-disable i18next/no-literal-string -- Theme variant identifiers. */
     const variant = values.some((item) => item.variant === 'error')
         ? 'error'
         : values.some((item) => item.variant === 'warning')
           ? 'warning'
           : 'primary'
+    /* eslint-enable i18next/no-literal-string */
     const badgeColor = getFloatingPanelColor(color, variant)
     const previewItem = preview && items[preview.id]
     const show = () => {
@@ -122,7 +133,7 @@ const ActivityMenu = ({ children }: { children: ReactNode }) => {
         setPreview(undefined)
         setOpen(true)
     }
-    const groups = (['chat', 'app'] as const).map((scope) => ({
+    const groups = ACTIVITY_SCOPES.map((scope) => ({
         scope,
         items: Object.entries(items)
             .filter(([, item]) => item.scope === scope)

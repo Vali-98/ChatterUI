@@ -148,23 +148,23 @@ const Spotlight = ({
     useFocusEffect(
         useCallback(() => {
             if (!visible || !ready) return
-            previous.value = null
-            published.value = false
+            previous.set(null)
+            published.set(false)
             setFocused(true)
             tracking.setActive(true)
             return () => {
                 tracking.setActive(false)
                 setFocused(false)
                 setMeasurement(undefined)
-                highlightPlaced.value = false
-                bubblePlaced.value = false
+                highlightPlaced.set(false)
+                bubblePlaced.set(false)
             }
         }, [visible, ready, tracking, highlightPlaced, bubblePlaced, previous, published])
     )
     // A new target restarts measurement, without removing the existing guide overlay.
     useEffect(() => {
-        previous.value = null
-        published.value = false
+        previous.set(null)
+        published.set(false)
     }, [anchor, previous, published, window.width, window.height])
 
     useEffect(() => {
@@ -174,56 +174,65 @@ const Spotlight = ({
         const right = Math.max(x, Math.min(window.width, bounds.x + bounds.width + 5))
         const bottom = Math.max(y, Math.min(window.height, bounds.y + bounds.height + 5))
         const next = centered ? centerBounds : { x, y, width: right - x, height: bottom - y }
-        highlight.value = highlightPlaced.value ? withTiming(next, motion) : next
-        highlightPlaced.value = true
+        highlight.set(highlightPlaced.get() ? withTiming(next, motion) : next)
+        highlightPlaced.set(true)
     }, [bounds, centered, centerBounds, window.width, window.height, highlight, highlightPlaced])
 
-    const position = getSpotlightPlacement({
-        target: bounds ?? emptyRect,
-        viewport: {
-            width: window.width,
-            height: window.height,
-            topInset: insets.top,
-            bottomInset: insets.bottom,
-            leftInset: insets.left,
-            rightInset: insets.right,
-        },
-        bubbleHeight: bubbleLayout.height || 180,
-        placement: centered ? 'center' : placement,
-        gap,
-        allowOverlap,
-    })
+    const position = useMemo(
+        () =>
+            getSpotlightPlacement({
+                target: bounds ?? emptyRect,
+                viewport: {
+                    width: window.width,
+                    height: window.height,
+                    topInset: insets.top,
+                    bottomInset: insets.bottom,
+                    leftInset: insets.left,
+                    rightInset: insets.right,
+                },
+                bubbleHeight: bubbleLayout.height || 180,
+                placement: centered ? 'center' : placement,
+                gap,
+                allowOverlap,
+            }),
+        [
+            bounds,
+            window.width,
+            window.height,
+            insets.top,
+            insets.bottom,
+            insets.left,
+            insets.right,
+            bubbleLayout.height,
+            centered,
+            placement,
+            gap,
+            allowOverlap,
+        ]
+    )
     const contentMeasured = bubbleLayout.width === position.width
     useEffect(() => {
         if (!bounds || !targetSettled || !contentMeasured) return
-        bubble.value = bubblePlaced.value ? withTiming(position, motion) : position
-        bubblePlaced.value = true
-    }, [
-        bounds,
-        targetSettled,
-        contentMeasured,
-        position.x,
-        position.y,
-        position.width,
-        position.height,
-        bubble,
-        bubblePlaced,
-    ])
+        bubble.set(bubblePlaced.get() ? withTiming(position, motion) : position)
+        bubblePlaced.set(true)
+    }, [bounds, targetSettled, contentMeasured, position, bubble, bubblePlaced])
 
     const entranceReady = !!bounds && targetSettled && contentMeasured && bubbleLayout.height > 0
     useEffect(() => {
         if (!visible || !ready || !focused) {
             entered.current = false
-            opacity.value = 0
+            opacity.set(0)
             return
         }
         if (closing) {
-            opacity.value = withTiming(0, { duration: 200 }, (finished) => {
-                if (finished && onCloseComplete) scheduleOnRN(onCloseComplete)
-            })
+            opacity.set(
+                withTiming(0, { duration: 200 }, (finished) => {
+                    if (finished && onCloseComplete) scheduleOnRN(onCloseComplete)
+                })
+            )
         } else if (entranceReady && !entered.current) {
             entered.current = true
-            opacity.value = withTiming(1, { duration: 200 })
+            opacity.set(withTiming(1, { duration: 200 }))
         }
     }, [visible, ready, focused, entranceReady, closing, opacity, onCloseComplete])
 

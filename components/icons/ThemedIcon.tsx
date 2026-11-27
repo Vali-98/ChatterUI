@@ -26,8 +26,7 @@ const Glyph = ({
     color: ColorValue
     style?: StyleProp<TextStyle>
 }) => {
-    const definition =
-        typeof icon === 'string' ? { family: 'antdesign' as const, name: icon } : icon
+    const definition: FamilyIcon = typeof icon === 'string' ? { name: icon } : icon
     switch (definition.family) {
         case 'material':
             return <MaterialIcons name={definition.name} size={size} color={color} style={style} />

@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import { Linking } from 'react-native'
 
 import ThemedButton from '@components/buttons/ThemedButton'
-
 import SettingsPage from '@components/settings/SettingsPage'
 
 import SecuritySettings from './SecuritySettings'

@@ -7,8 +7,8 @@ import ListEditorSheet from '@components/input/ListEditorSheet'
 import ThemedSwitchRow from '@components/input/ThemedSwitchRow'
 import { db } from '@db/db'
 import { tags as tagTable } from '@db/schema'
-import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { AppSettings } from '@lib/constants/appSettings'
+import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { TagHider } from '@lib/state/TagHider'
 
 const TagHiderSettings = () => {

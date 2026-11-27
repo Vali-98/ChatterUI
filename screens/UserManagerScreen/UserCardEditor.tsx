@@ -1,7 +1,6 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
 import * as DocumentPicker from 'expo-document-picker'
-import { useNavigation } from 'expo-router'
-import { usePreventRemove } from 'expo-router/build/react-navigation'
+import { useNavigation, usePreventRemove } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
@@ -208,7 +207,7 @@ const UserCardEditor = () => {
                             description: text,
                         })
                 }}
-                placeholder="Describe this user..."
+                placeholder={t('users.editor.descriptionPlaceholder')}
             />
         </View>
     )

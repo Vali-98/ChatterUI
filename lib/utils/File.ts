@@ -26,7 +26,7 @@ export namespace FileUtils {
         filename: string,
         encoding: 'base64' | `utf8`
     ) => {
-        new File(Paths.cache, filename).write(data, { encoding })
+        await new File(Paths.cache, filename).write(data, { encoding })
         await localDownload((Paths.cache.uri + filename).replace('file://', '')).catch((e) =>
             Logger.error('Failed to download: ' + e)
         )
@@ -77,7 +77,7 @@ export const saveStringToDownload = async (
     filename: string,
     encoding: 'base64' | `utf8`
 ) => {
-    new File(Paths.cache, filename).write(data, { encoding })
+    await new File(Paths.cache, filename).write(data, { encoding })
     await localDownload((Paths.cache.uri + filename).replace('file://', '')).catch((e) =>
         Logger.error('Failed to download: ' + e)
     )
@@ -126,7 +126,7 @@ export const directoryExists = (path: string) => {
 
 export const copyFile = async ({ from, to }: { from: string; to: string }) => {
     try {
-        new File(from).copy(new File(to))
+        await new File(from).copy(new File(to))
         return true
     } catch (e) {
         Logger.error('Failed to copy: ' + e)
@@ -166,13 +166,18 @@ export const makeDirectory = async (path: string) => {
 }
 
 export const readFileMagic = (path: string) => {
-    const magicBytes = new File(path).open(FileMode.ReadOnly).readBytes(4)
-    const magic = String.fromCharCode(...magicBytes)
-    const hex = Array.from(magic, (b) => `0x${b.toString().padStart(2, '0').toUpperCase()}`).join(
-        ' '
-    )
-
-    return { hex, magic }
+    const handle = new File(path).open(FileMode.ReadOnly)
+    try {
+        const bytes = handle.readBytesSync(4)
+        const magic = String.fromCharCode(...bytes)
+        const hex = Array.from(
+            bytes,
+            (byte) => `0x${byte.toString(16).padStart(2, '0').toUpperCase()}`
+        ).join(' ')
+        return { hex, magic }
+    } finally {
+        handle.close()
+    }
 }
 
 export const printFileMagic = (path: string) => {

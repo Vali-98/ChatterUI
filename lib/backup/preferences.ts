@@ -1,7 +1,7 @@
 import type { MMKV } from 'react-native-mmkv'
 import { z } from 'zod'
 
-export const preferencesSchema = z.record(z.union([z.string(), z.boolean()]))
+export const preferencesSchema = z.record(z.string(), z.union([z.string(), z.boolean()]))
 export type Preferences = z.infer<typeof preferencesSchema>
 export type PreferenceStorage = Pick<
     MMKV,

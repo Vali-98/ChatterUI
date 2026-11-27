@@ -13,11 +13,11 @@ import Animated, {
     FadeOut,
 } from 'react-native-reanimated'
 
+import type { ChatSwipe } from '@db/schema'
 import { useChatGenerating } from '@lib/engine/generation/hooks'
 import { useBackAction } from '@lib/hooks/BackAction'
 import { useLiveQueryAsync } from '@lib/hooks/liveQuery'
 import { Chats } from '@lib/state/chat'
-import type { ChatSwipe } from '@db/schema'
 import { chatControlLift } from '@lib/state/components/chatControlBounds'
 import { useChatActionsState, useChatControlLayoutState } from '@lib/state/components/ChatControls'
 import { placeChatControl } from '@lib/utils/controlPlacement'

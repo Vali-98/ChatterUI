@@ -49,7 +49,7 @@ jest.mock('expo-file-system', () => {
             }
             this.uri = destination.uri
         }
-        write(value: string) {
+        writeSync(value: string) {
             mockDisk.set(this.uri, value)
         }
         textSync() {
@@ -78,7 +78,7 @@ const storage = (initial: Record<string, string | boolean | number> = {}) => {
         },
     }
 }
-const write = (path: string, data: string) => new File('file:///document', path).write(data)
+const write = (path: string, data: string) => new File('file:///document', path).writeSync(data)
 const read = (path: string) => new File('file:///document', path).textSync()
 const envelope = (state: unknown) => JSON.stringify({ state, version: 3 })
 const prepareRestore = () => {

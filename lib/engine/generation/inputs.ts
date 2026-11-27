@@ -18,13 +18,13 @@ import { summarizeHistory, usableSummariesBefore } from '@lib/summaries/history'
 import { useSummarySettingsStore } from '@lib/summaries/settingsStore'
 import { applyMacros, createMacroValues } from '@lib/utils/Macros'
 
+import { recordContextStats } from './contextStatsState'
 import {
     captureHistory,
     createHistoryReader,
     generationHistoryCutoff,
     type GenerationHistory,
 } from './history'
-import { recordContextStats } from './contextStatsState'
 import { useConnectionStore } from '../API/connectionStore'
 import { collectContext } from '../API/ContextBuilder'
 import { defaultTemplates } from '../API/DefaultAPI'

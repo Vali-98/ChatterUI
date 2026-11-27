@@ -1,4 +1,5 @@
 import type { SQLiteDatabase } from 'expo-sqlite'
+
 import { AppDirectory, tokenizerFilename } from '@lib/constants/directories'
 import { Storage } from '@lib/constants/storageKeys'
 

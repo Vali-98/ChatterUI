@@ -170,7 +170,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                             style={{
                                 color: resultLength === 0 ? color.text._700 : color.text._100,
                             }}
-                            placeholder="Name..."
+                            placeholder={t('common.placeholders.name')}
                         />
                         {(textFilter || tagFilter.length > 0) && (
                             <Text

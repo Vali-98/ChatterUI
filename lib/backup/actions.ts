@@ -1,28 +1,28 @@
 import { localDownload } from '@vali98/react-native-fs'
+import { drizzle } from 'drizzle-orm/expo-sqlite'
+import { migrate } from 'drizzle-orm/expo-sqlite/migrator'
 import { reloadAppAsync } from 'expo'
 import { randomUUID } from 'expo-crypto'
 import { Directory, File, Paths } from 'expo-file-system'
 import { backupDatabaseAsync, openDatabaseAsync } from 'expo-sqlite'
 import { zip, unzip, subscribe } from 'react-native-zip-archive'
-import { drizzle } from 'drizzle-orm/expo-sqlite'
-import { migrate } from 'drizzle-orm/expo-sqlite/migrator'
-import migrations from '@db/migrations/migrations'
 
 import appConfig from '@appconfig'
 import { sqliteDB } from '@db/db'
+import migrations from '@db/migrations/migrations'
+import { stopAudio } from '@lib/audio/player'
+import { useAudioState } from '@lib/audio/state'
+import { useDownloadStore } from '@lib/downloads/store'
 import { useDeferredTaskState, isDeferredTaskActive } from '@lib/engine/generation/deferredState'
 import { useLocalModelResourceState } from '@lib/engine/generation/localResource'
 import { useGenerationState, isActiveGeneration } from '@lib/engine/generation/state'
 import { useCharacterImportState } from '@lib/state/characters/importState'
 import { mmkv } from '@lib/storage/MMKV'
-import { useDownloadStore } from '@lib/downloads/store'
-import { useAudioState } from '@lib/audio/state'
-import { stopAudio } from '@lib/audio/player'
 import { stopTTS } from '@lib/tts/player'
 
 import { manifestSchema, remapAttachmentUri } from './format'
-import { readPreferences, preferencesSchema } from './preferences'
 import { exportPreferences, excludeModelData, excludedMediaFiles } from './policy'
+import { readPreferences, preferencesSchema } from './preferences'
 import { mediaDirectories, restoreDirectory } from './recovery'
 
 export type BackupProgress = (
@@ -106,11 +106,11 @@ export const exportBackup = async (includeApiKeys: boolean, report: BackupProgre
                 schemaTimestamp: await schemaTimestamp(destination),
                 includesApiKeys: includeApiKeys,
             }
-            new File(payload, 'manifest.json').write(JSON.stringify(manifest))
+            await new File(payload, 'manifest.json').write(JSON.stringify(manifest))
         } finally {
             await destination.closeAsync()
         }
-        new File(payload, 'preferences.json').write(
+        await new File(payload, 'preferences.json').write(
             JSON.stringify(exportPreferences(readPreferences(mmkv), includeApiKeys))
         )
         for (const { name, uri } of mediaDirectories) {

@@ -3,6 +3,7 @@ import { createDatabaseQueryObserver } from '@lib/queries/databaseQuery'
 import { useAppModeStore } from '@lib/state/AppMode'
 import { Chats } from '@lib/state/chat'
 import { Logger } from '@lib/state/Logger'
+import { selectCompressionPlan, type CompressionItem } from '@lib/summaries/compression'
 import {
     acceptSummary,
     createSummaryDraft,
@@ -28,11 +29,10 @@ import {
 } from '@lib/summaries/history'
 import { useSummarySettingsStore, type SummarySettings } from '@lib/summaries/settingsStore'
 
-import { selectCompressionPlan, type CompressionItem } from '@lib/summaries/compression'
-import { createHistoryReader, generationHistoryCutoff } from '../generation/history'
 import { buildAndSendRequest, type CompletionReason } from '../API/APIBuilder'
 import { buildContext } from '../API/ContextBuilder'
 import { isDeferredTaskActive, useDeferredTaskState } from '../generation/deferredState'
+import { createHistoryReader, generationHistoryCutoff } from '../generation/history'
 import {
     captureGenerationInputs,
     estimateGenerationContext,

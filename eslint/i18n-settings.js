@@ -284,6 +284,10 @@ module.exports = {
             'icon',
             'iconName',
             'variant',
+            'testID',
+            'accessibilityRole',
+            'previewKey',
+            'portalName',
         ],
     },
     words: {
@@ -311,6 +315,10 @@ module.exports = {
             'flex-start',
             /\b\d+(?:deg|rad)\b/g,
             'worklet',
+            'transparent',
+            /rgba\([^)${]*\)/,
+            'Courier',
+            'monospace',
         ],
     },
     callees: {
@@ -344,6 +352,8 @@ module.exports = {
             'textAlign',
             'borderColor',
             'key',
+            'id',
+            'displayName',
         ],
     },
     'class-properties': {

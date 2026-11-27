@@ -78,5 +78,6 @@
     "chat.quickActions.toast.copyFailed": "复制到剪贴板失败",
     "chat.state.failedToLoad": "无法加载聊天 {{id}}",
     "chat.tokencount.title": "上下文限制",
-    "chat.tokencount.used": "已使用 {{used}}，最大 {{max}}"
+    "chat.tokencount.used": "已使用 {{used}}，最大 {{max}}",
+    "chat.codeBlock.label": "代码"
 }

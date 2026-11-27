@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Animated, Easing, useAnimatedValue, View } from 'react-native'
+import { type ViewInstance, Animated, Easing, useAnimatedValue, View } from 'react-native'
 
-import ThemedMarkdown from '@components/text/markdown/ThemedMarkdown'
 import ThemedButton from '@components/buttons/ThemedButton'
+import ThemedMarkdown from '@components/text/markdown/ThemedMarkdown'
 import { useTextFilter } from '@lib/hooks/TextFilter'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -18,7 +18,7 @@ const ChatText: React.FC<ChatTextProps> = ({ swipeText, reasoning }) => {
     const { t } = useTranslation()
     const { spacing } = Theme.useTheme()
     const [showHidden, setShowHidden] = useState(false)
-    const viewRef = useRef<View>(null)
+    const viewRef = useRef<ViewInstance>(null)
     const animHeight = useAnimatedValue(-1)
     const targetHeight = useRef(-1)
     const firstRender = useRef(true)

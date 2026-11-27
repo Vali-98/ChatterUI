@@ -20,7 +20,8 @@ const EdgeFades = ({ horizontal, edges, edgeLength = 12, edgeColour }: EdgeFades
     const rgba = processColor(colour)
     const clear =
         typeof rgba === 'number'
-            ? `rgba(${(rgba >>> 16) & 255},${(rgba >>> 8) & 255},${rgba & 255},0)`
+            ? // eslint-disable-next-line i18next/no-literal-string
+              `rgba(${(rgba >>> 16) & 255},${(rgba >>> 8) & 255},${rgba & 255},0)`
             : 'transparent'
     const direction = horizontal ? { x: 1, y: 0 } : { x: 0, y: 1 }
     if (edgeLength <= 0) return null
